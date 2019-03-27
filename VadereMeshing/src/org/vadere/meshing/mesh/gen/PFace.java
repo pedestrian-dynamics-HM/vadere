@@ -13,6 +13,8 @@ import org.vadere.util.geometry.shapes.IPoint;
  */
 public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 
+	private static int MAX_FACE_PRINT_LEN = 100000;
+
 	/**
 	 * One of the half-edges bordering this face.
 	 */
@@ -105,13 +107,21 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 
 	@Override
 	public String toString() {
+		if(destroyed) {
+			return "destroyed Face";
+		}
 		PHalfEdge<P, CE, CF> current = edge;
 		PHalfEdge<P, CE, CF> next = edge.getNext();
 		StringBuilder builder = new StringBuilder();
-		while (!edge.equals(next)) {
+		int count = 0;
+		while (count <= MAX_FACE_PRINT_LEN && !edge.equals(next)) {
 			builder.append(current + " ");
 			current = next;
 			next = current.getNext();
+			count++;
+		}
+		if(count > MAX_FACE_PRINT_LEN) {
+			builder.insert(0, "LARGE-FACE:");
 		}
 		builder.append(current);
 		return builder.toString();

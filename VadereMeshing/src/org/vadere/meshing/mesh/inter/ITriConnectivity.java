@@ -901,6 +901,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		assert !getMesh().isAtBoundary(vertex);
 
 		// (1) remove the vertex
+
+		// get ringEdges in ccw order!
 		List<E> ringEdges = getMesh().streamEdges(vertex).map(edge -> getMesh().getPrev(edge)).collect(Collectors.toList());
 		F face = getMesh().getFace(ringEdges.get(ringEdges.size()-1));
 
@@ -928,35 +930,27 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		}
 
 		getMesh().setEdge(face, ringEdges.get(ringEdges.size()-1));
+		getMesh().setFace(ringEdges.get(ringEdges.size()-1), face);
 		getMesh().destroyVertex(vertex);
 
 		NodeLinkedList<GenEar<P, CE, CF, V, E, F>> list = new NodeLinkedList<>();
 		GenEar.EarNodeComparator<P, CE, CF, V, E, F> comparator = new GenEar.EarNodeComparator<>();
 		PriorityQueue<Node<GenEar<P, CE, CF, V, E, F>>> heap = new PriorityQueue<>(comparator);
 
+		assert getMesh().isValid();
 		// (2) re-triangulate
 		for(int i = 0; i < ringEdges.size(); i++) {
 			E e1 = ringEdges.get(i % ringEdges.size());
 			E e2 = ringEdges.get((i+1) % ringEdges.size());
 			E e3 = ringEdges.get((i+2) % ringEdges.size());
 
-			P p = getMesh().getPoint(e1);
-
-			double power;
-			// clockwise
-			if(isRightOf(p.getX(), p.getY(), e3)) {
-				power = Double.MAX_VALUE;
-			}
-			else {
-				power = -power(e1, e2, e3, vertex);
-			}
-			GenEar<P, CE, CF, V, E, F> ear = new GenEar<>(e1, e2, e3, power);
+			GenEar<P, CE, CF, V, E, F> ear = new GenEar<>(e1, e2, e3, power(e1, e2, e3, vertex));
 			Node<GenEar<P, CE, CF, V, E, F>> earNode = list.add(ear);
 			heap.add(earNode);
 
 		}
 
-		while (heap.size() > 2) {
+		while (heap.size() > 3) {
 			Node<GenEar<P, CE, CF, V, E, F>> earNode = heap.poll();
 			GenEar<P, CE, CF, V, E, F> ear = earNode.getElement();
 
@@ -976,17 +970,17 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			getMesh().setNext(e, e2);
 			getMesh().setNext(e3, e);
 
-			getMesh().setFace(e1, f);
-			getMesh().setFace(e2, f);
 			getMesh().setFace(e, f);
+			getMesh().setFace(e2, f);
+			getMesh().setFace(e3, f);
 
-			getMesh().setPrev(next, t);
+			getMesh().setNext(t, next);
 			getMesh().setNext(e1, t);
 			getMesh().setFace(t, tf);
 			getMesh().setEdge(tf, t);
 			// end
 
-			if(heap.size() > 2) {
+			if(heap.size() > 3) {
 				Node<GenEar<P, CE, CF, V, E, F>> prevEarNode = earNode.getPrev();
 				Node<GenEar<P, CE, CF, V, E, F>> nextEarNode = earNode.getNext();
 
@@ -998,33 +992,52 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 					nextEarNode = list.getHead();
 				}
 
+				Node<GenEar<P, CE, CF, V, E, F>> nnextEarNode = nextEarNode.getNext();
+				if(nnextEarNode == null) {
+					nnextEarNode = list.getHead();
+				}
+
+
 				heap.remove(earNode);
 				heap.remove(prevEarNode);
 				heap.remove(nextEarNode);
+				heap.remove(nnextEarNode);
 
-				prevEarNode.getElement().setLast(earNode.getElement().getLast());
-				nextEarNode.getElement().setFirst(earNode.getElement().getFirst());
+				prevEarNode.getElement().setLast(t);
+
+				nextEarNode.getElement().setFirst(e1);
+				nextEarNode.getElement().setMiddle(t);
+				nnextEarNode.getElement().setFirst(t);
 				earNode.remove();
 
 				GenEar<P, CE, CF, V, E, F> prevEar = prevEarNode.getElement();
 				GenEar<P, CE, CF, V, E, F> nextEar = nextEarNode.getElement();
+				GenEar<P, CE, CF, V, E, F> nnextEar = nnextEarNode.getElement();
 				prevEar.setPower(power(prevEar.getEdges().get(0), prevEar.getEdges().get(1), prevEar.getEdges().get(2), vertex));
 				nextEar.setPower(power(nextEar.getEdges().get(0), nextEar.getEdges().get(1), nextEar.getEdges().get(2), vertex));
+				nnextEar.setPower(power(nnextEar.getEdges().get(0), nnextEar.getEdges().get(1), nnextEar.getEdges().get(2), vertex));
 				heap.add(prevEarNode);
 				heap.add(nextEarNode);
+				heap.add(nnextEarNode);
 			}
 		}
 	}
 
-	default double power(@NotNull final E e1, @NotNull final E e2, @NotNull final E e3, @NotNull final IPoint p) {
+	private double power(@NotNull final E e1, @NotNull final E e2, @NotNull final E e3, @NotNull final IPoint p) {
+		P point = getMesh().getPoint(e1);
+		if(!isLeftOf(point.getX(), point.getY(), e3)) {
+			return Double.MAX_VALUE;
+		}
+
 		VPoint p1 = getMesh().toPoint(getMesh().getPoint(e1));
 		VPoint p2 = getMesh().toPoint(getMesh().getPoint(e2));
 		VPoint p3 = getMesh().toPoint(getMesh().getPoint(e3));
 		VTriangle triangle = new VTriangle(p1, p2, p3);
 		VPoint x = triangle.getCircumcenter();
 		double r = triangle.getCircumscribedRadius();
-		double xp = new VLine(x, new VPoint(p)).length();
-		return xp * xp - r*r;
+		double xpSq = x.distanceSq(p);
+		double power = (xpSq - r*r);
+		return -power;
 	}
 
 	/**

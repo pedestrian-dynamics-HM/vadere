@@ -146,13 +146,13 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 
 			if(colorFunction != null) {
 				graphics.setColor(colorFunction.apply(face));
-				graphics.fill(polygon);
+				//graphics.fill(polygon);
 				graphics.setColor(Color.GRAY);
 				graphics.draw(polygon);
 			}
 			if(alertPred.test(face)) {
 				graphics.setColor(new Color(100, 0, 0));
-				graphics.fill(polygon);
+				//graphics.fill(polygon);
 				graphics.setColor(Color.GRAY);
 				graphics.draw(polygon);
 

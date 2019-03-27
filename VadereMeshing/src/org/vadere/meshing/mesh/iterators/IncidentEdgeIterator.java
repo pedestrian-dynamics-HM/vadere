@@ -39,19 +39,19 @@ public class IncidentEdgeIterator<P extends IPoint, CE, CF, V extends IVertex<P>
 	public IncidentEdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final E edge) {
 		this.mesh = mesh;
 		this.edge = edge;
-		this.current = mesh.getNext(edge);
+		this.current = mesh.getTwin(edge);
 		this.first = true;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return (first || current != mesh.getNext(edge));
+		return (first || current != mesh.getTwin(edge));
 	}
 
 	@Override
 	public E next() {
 		E result = current;
-		current = mesh.getNext(mesh.getTwin(result));
+		current = mesh.getTwin(mesh.getPrev(result));
 		first = false;
 		count++;
 		//log.info(count);

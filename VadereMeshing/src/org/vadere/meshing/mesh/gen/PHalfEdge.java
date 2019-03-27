@@ -143,6 +143,9 @@ public class PHalfEdge<P extends IPoint, CE, CF> implements IHalfEdge<CE>, Clone
 
 	@Override
 	public String toString() {
+		if(destroyed) {
+			return "destroyed half-edge";
+		}
 		return getEnd().toString();
 	}
 

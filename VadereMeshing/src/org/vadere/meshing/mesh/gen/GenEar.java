@@ -46,6 +46,10 @@ public class GenEar<
 		this.edges.set(0, e);
 	}
 
+	public void setMiddle(@NotNull final E e) {
+		this.edges.set(1, e);
+	}
+
 	private double getPower() {
 		return power;
 	}

@@ -26,6 +26,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
@@ -118,6 +119,8 @@ public interface IMesh<
 		E extends IHalfEdge<CE>,
 		F extends IFace<CF>>
 			extends Iterable<F>, Cloneable {
+
+	Logger logger = Logger.getLogger(IMesh.class);
 
 	/**
 	 * construct a new empty mesh.
@@ -1001,6 +1004,14 @@ public interface IMesh<
 	 */
 	default List<F> getFaces() {
 		return streamFaces().filter(face -> !isBoundary(face)).filter(face -> isAlive(face)).collect(Collectors.toList());
+	}
+
+	default List<F> getFacesWithBoundary() {
+		return streamFacesWithBoundary().filter(face -> isAlive(face)).collect(Collectors.toList());
+	}
+
+	default Stream<F> streamFacesWithBoundary() {
+		return Streams.concat(streamBoundaries(), streamFaces());
 	}
 
 	default Stream<F> streamBoundaries() {
@@ -1956,6 +1967,142 @@ public interface IMesh<
 			E longestEdge = streamEdges(getFace(nonBoundaryEdge)).reduce((e1, e2) -> toLine(e1).length() > toLine(e2).length() ? e1 : e2).get();
 			return isSameLineSegment(longestEdge, edge);
 		}
+	}
+
+	/**
+	 * Tests if the mesh is a valid mesh, i.e. all relations between edges, faces and vertices are correct,
+	 * e.g. <tt>getFace(getEdge(face)) == face</tt>.
+	 *
+	 * @return true if the mesh is valid, false otherwise
+	 */
+	default boolean isValid() {
+		String message = "invalid mesh: ";
+		for(F face : getFacesWithBoundary()) {
+			int count = 0;
+			for(E edge : getEdgeIt(face)) {
+				count++;
+				if(count > getNumberOfEdges()) {
+					logger.warn(message + "endless loop in face");
+					return false;
+				}
+
+				F f = getFace(edge);
+
+				if(f == null) {
+					logger.warn(message + "null face of edge " + edge);
+					return false;
+				}
+
+				if(!f.equals(face)) {
+					logger.warn(message + "wrong edge face " + face + "!=" + getFace(edge));
+					return false;
+				}
+			}
+
+			if(count < 3) {
+				logger.warn(message + "number of edges smaller 2");
+				return false;
+			}
+
+			count = 0;
+			for(V vertex : getVertexIt(face)) {
+				if(count > getNumberOfVertices()) {
+					logger.warn(message + "endless loop in face");
+					return false;
+				}
+			}
+		}
+
+		for(V vertex : getVertices()) {
+			int count = 0;
+			E edge = getEdge(vertex);
+			if(edge == null) {
+				logger.warn(message + "null edge of vertex " + vertex);
+				return false;
+			}
+
+			if(!vertex.equals(getVertex(edge))) {
+				logger.warn(message + "wrong edge vertex " + vertex + "!=" + getVertex(edge));
+				return false;
+			}
+
+			for(E e : getEdgeIt(vertex)) {
+				if(count > getNumberOfVertices()) {
+					logger.warn(message + "endless loop around vertex " + vertex);
+					return false;
+				}
+
+				if(!vertex.equals(getVertex(e))) {
+					logger.warn(message + "wrong edge vertex " + vertex + "!=" + getVertex(e));
+					return false;
+				}
+			}
+		}
+
+		for(E edge : getEdges()) {
+			E twin = getTwin(edge);
+			E next = getNext(edge);
+			E prev = getPrev(edge);
+			V v = getVertex(edge);
+			F face = getFace(edge);
+			F twinFace = getFace(twin);
+
+			if(twin == null) {
+				logger.warn(message + "twin is null for " + edge);
+				return false;
+			}
+
+			if(next == null) {
+				logger.warn(message + "next is null for " + edge);
+				return false;
+			}
+
+			if(prev == null) {
+				logger.warn(message + "prev is null for " + edge);
+				return false;
+			}
+
+			if(v == null) {
+				logger.warn(message + "vertex is null for " + edge);
+				return false;
+			}
+
+			E twinTwin = getTwin(twin);
+
+			if(twinTwin == null) {
+				logger.warn(message + "twin of the twin is null for " + edge);
+				return false;
+			}
+
+			if(!twinTwin.equals(edge)) {
+				logger.warn(message + "twin of the twin is not equal to the edge " + edge);
+				return false;
+			}
+
+			V twinVertex = getVertex(twin);
+
+			if(twinVertex == null) {
+				logger.warn(message + "vertex of the twin is null for " + edge);
+				return false;
+			}
+
+			if(twinVertex.equals(v)) {
+				logger.warn(message + "edge ends and starts at the same vertex " + v);
+				return false;
+			}
+
+			if(twinFace.equals(face)) {
+				logger.warn(message + "the faces of the edge and its twin are equals");
+				return false;
+			}
+
+			if(isBoundary(edge) && isBoundary(twin)) {
+				logger.warn(message + "the faces of the edge and its twin are boundaries");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

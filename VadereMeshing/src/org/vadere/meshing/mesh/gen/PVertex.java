@@ -66,6 +66,9 @@ public class PVertex<P extends IPoint, CE, CF> implements IVertex<P> {
 
 	@Override
 	public String toString() {
+		if(destroyed) {
+			return "destroyed vertex";
+		}
 		return point.toString();
 	}
 

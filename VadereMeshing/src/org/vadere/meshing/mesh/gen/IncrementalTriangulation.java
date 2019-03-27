@@ -670,7 +670,16 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
 	@Override
 	public void remove(P point) {
-		throw new UnsupportedOperationException("not jet implemented.");
+		Optional<F> optFace = locateFace(point);
+		if(optFace.isPresent()) {
+			F face = optFace.get();
+			for(V vertex : getMesh().getVertexIt(face)) {
+				if(getMesh().getPoint(vertex).equals(point)) {
+					remove(vertex);
+					break;
+				}
+			}
+		}
 	}
 
 	public Collection<VTriangle> getTriangles() {
