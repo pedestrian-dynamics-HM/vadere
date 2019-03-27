@@ -1,13 +1,20 @@
 package org.vadere.simulator.projects.migration.jolttranformation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.helper.JsonFilterIterator;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.util.JacksonObjectMapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -97,6 +104,27 @@ public interface JsonNodeExplorer {
 			ret.add(n);
 		}
 		return ret;
+	}
+
+
+	default ArrayList<MeasurementArea> deserializeMeasurementArea(JsonNode node, ObjectMapper mapper) throws MigrationException, IOException {
+		ArrayNode jsonMeasurementArea = (ArrayNode) pathMustExist(node,"scenario/topography/measurementAreas");
+		ArrayList<MeasurementArea> measurementAreas = new ArrayList<>();
+		Iterator<JsonNode> iter = jsonMeasurementArea.elements();
+		while (iter.hasNext()){
+			AttributesMeasurementArea attr = mapper.readValue(iter.next().toString(), AttributesMeasurementArea.class);
+			measurementAreas.add(new MeasurementArea(attr));
+		}
+		return measurementAreas;
+	}
+
+	default void replaceMeasurementAreas(JsonNode node, ArrayList<MeasurementArea> measurementAreas, ObjectMapper mapper) throws MigrationException {
+		ArrayNode jsonMeasurementArea = (ArrayNode) pathMustExist(node,"scenario/topography/measurementAreas");
+		jsonMeasurementArea.removeAll();
+		for (MeasurementArea area : measurementAreas) {
+			JsonNode areaNode = mapper.convertValue(area.getAttributes(), JsonNode.class);
+			jsonMeasurementArea.add(areaNode);
+		}
 	}
 
 	/**

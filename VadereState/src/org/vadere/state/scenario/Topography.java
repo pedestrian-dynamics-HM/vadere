@@ -308,6 +308,10 @@ public class Topography implements DynamicElementMover{
 
 	public List<MeasurementArea> getMeasurementAreas() {return  measurementAreas; }
 
+	public MeasurementArea getMeasurementArea(int id){
+		return measurementAreas.stream().filter(area -> area.getId() == id).findFirst().orElse(null);
+	}
+
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;
 	}

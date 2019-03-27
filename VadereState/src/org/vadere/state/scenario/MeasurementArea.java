@@ -4,8 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public class MeasurementArea extends ScenarioElement {
@@ -22,6 +26,29 @@ public class MeasurementArea extends ScenarioElement {
 
 	public MeasurementArea(MeasurementArea measurementArea){
 		this(new AttributesMeasurementArea(measurementArea.getId(), measurementArea.getShape()));
+	}
+
+
+	public boolean isRectangular(){
+		VShape shape = attributes.getShape();
+		if (shape instanceof VRectangle)
+			return true;
+		if (shape instanceof VPolygon){
+			return ((VPolygon)shape).isRectangular();
+		}
+		return false;
+	}
+
+	public VRectangle asVRectangle(){
+		VShape shape = attributes.getShape();
+		if (shape instanceof VRectangle)
+			return (VRectangle) shape;
+		if (shape instanceof VPolygon){
+			VRectangle rectangle = ((VPolygon)shape).asVRectangle();
+			setShape(rectangle);
+			return rectangle;
+		}
+		return null;
 	}
 
 	@Override
