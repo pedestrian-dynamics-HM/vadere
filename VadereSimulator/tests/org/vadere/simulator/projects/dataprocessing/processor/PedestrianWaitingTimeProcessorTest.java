@@ -25,7 +25,6 @@ public class PedestrianWaitingTimeProcessorTest extends ProcessorTest{
 
 	@Test
 	public void doUpdate() throws Exception {
-		r.setValOfFile("waitingArea", new VRectangle(0, 0, 2, 5));
 		super.doUpdate();
 	}
 
@@ -35,9 +34,7 @@ public class PedestrianWaitingTimeProcessorTest extends ProcessorTest{
 
 		AttributesPedestrianWaitingTimeProcessor attr =
 				(AttributesPedestrianWaitingTimeProcessor) p.getAttributes();
-		assertEquals(attr.getWaitingArea(), r.valOfField("waitingArea"));
 
-		r.setValOfFile("waitingArea", new VRectangle(0, 0, 2, 5));
 		for (SimulationState s : processorTestEnv.getSimStates()) {
 			p.update(s);
 		}
