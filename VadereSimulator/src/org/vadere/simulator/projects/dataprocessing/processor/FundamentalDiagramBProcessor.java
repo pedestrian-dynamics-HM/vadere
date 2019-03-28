@@ -11,7 +11,6 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.VTrajectory;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
@@ -49,9 +48,9 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		super.init(manager);
 		AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
 		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(att.getPedestrianTrajectoryProcessorId());
-		measurementArea = manager.getMeasurementArea(att.getMeasurementArea());
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
 		if (measurementArea == null)
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementArea()));
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
 		if (!measurementArea.isRectangular())
 			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
 	}

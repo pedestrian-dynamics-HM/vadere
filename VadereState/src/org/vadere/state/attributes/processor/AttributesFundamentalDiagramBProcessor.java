@@ -3,19 +3,19 @@ package org.vadere.state.attributes.processor;
 
 public class AttributesFundamentalDiagramBProcessor extends AttributesProcessor {
 	private int pedestrianTrajectoryProcessorId;
-	private int measurementArea;
+	private int measurementAreaId;
 
 	public int getPedestrianTrajectoryProcessorId() {
 		return pedestrianTrajectoryProcessorId;
 	}
 
-	public int getMeasurementArea() {
-		return measurementArea;
+	public int getMeasurementAreaId() {
+		return measurementAreaId;
 	}
 
-	public void setMeasurementArea(int measurementArea) {
+	public void setMeasurementAreaId(int measurementAreaId) {
 		checkSealed();
-		this.measurementArea = measurementArea;
+		this.measurementAreaId = measurementAreaId;
 	}
 
 	public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {

@@ -51,6 +51,16 @@ public class MeasurementArea extends ScenarioElement {
 		return null;
 	}
 
+	/**
+	 * Compare {@link MeasurementArea}s based on their shape.
+	 * Important {@link VPolygon} != {@link VRectangle} even if all points are the same.
+	 * @param other
+	 * @return
+	 */
+	public boolean compareByShape(MeasurementArea other){
+		return this.getShape().equals(other.getShape());
+	}
+
 	@Override
 	public VShape getShape() {
 		return attributes.getShape();
