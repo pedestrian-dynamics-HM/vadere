@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class JoltTransformV0toV1Test extends JoltTransformationTest {
+public class JoltTransformV0toV1Test extends JsonTransformationTest {
 
 
 	@Override

@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
-public class JoltTransformV4toV5Test extends JoltTransformationTest {
+public class JoltTransformV4toV5Test extends JsonTransformationTest {
 
 
 	@Override

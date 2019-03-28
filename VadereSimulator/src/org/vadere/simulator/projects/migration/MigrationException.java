@@ -13,6 +13,10 @@ public class MigrationException extends Exception {
 		super(message);
 	}
 
+	public MigrationException(Throwable throwable) {
+		super(throwable);
+	}
+
 	public MigrationException(String message, Throwable cause) {
 		super(message, cause);
 	}

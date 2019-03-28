@@ -7,9 +7,9 @@ import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
 import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory;
 
-abstract class JoltTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
+public abstract class JsonTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
 
-	JsonTransformationFactory factory = JsonTransformationFactory.instance();
+	protected JsonTransformationFactory factory = JsonTransformationFactory.instance();
 
 
 	@Before

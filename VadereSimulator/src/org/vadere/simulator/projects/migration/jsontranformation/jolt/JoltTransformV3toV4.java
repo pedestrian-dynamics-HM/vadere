@@ -21,7 +21,7 @@ public class JoltTransformV3toV4 extends JoltTransformation {
 	@Override
 	protected void initDefaultHooks()  {
         addPostHookLast(this::presetSeedValues);
-		addPostHookLast(AbstractJsonTransformation::sort);
+		addPostHookLast(this::sort);
 	}
 
 	public JsonNode presetSeedValues(JsonNode node) throws MigrationException {

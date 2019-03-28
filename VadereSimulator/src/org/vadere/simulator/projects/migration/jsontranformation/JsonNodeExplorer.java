@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incident.helper.JsonFilterIterator;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.simulator.entrypoints.Version;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public interface JsonNodeExplorer {
 			throw new MigrationException(
 					String.format("Previous version is wrong. Expected %s but found %s",
 							version.asText(), from.label()));
-		((ObjectNode)version).put("release", to.label());
+		((ObjectNode)scenarioFile).put("release", to.label());
 		return scenarioFile;
 	}
 
@@ -104,6 +104,14 @@ public interface JsonNodeExplorer {
 		});
 	}
 
+	default  Iterator<JsonNode> iteratorMeasurementArea(JsonNode node, int id) throws MigrationException {
+		JsonNode processors = pathMustExist(node, "scenario/topography/measurementAreas");
+		return  new JsonFilterIterator(processors, n -> {
+			JsonNode areaId = path(n, "id");
+			return !areaId.isMissingNode() && areaId.asInt() == id;
+		});
+	}
+
 	default void renameField(ObjectNode node, String oldName, String newName){
 		JsonNode tmpNode = node.get(oldName);
 		node.replace(newName, tmpNode);
@@ -121,21 +129,31 @@ public interface JsonNodeExplorer {
 	}
 
 
-	default ArrayList<MeasurementArea> deserializeMeasurementArea(JsonNode node, ObjectMapper mapper) throws MigrationException, IOException {
+	default ArrayList<MeasurementArea> deserializeMeasurementArea(JsonNode node, ObjectMapper mapper) throws MigrationException {
 		ArrayNode jsonMeasurementArea = (ArrayNode) pathMustExist(node,"scenario/topography/measurementAreas");
 		ArrayList<MeasurementArea> measurementAreas = new ArrayList<>();
 		Iterator<JsonNode> iter = jsonMeasurementArea.elements();
 		while (iter.hasNext()){
-			AttributesMeasurementArea attr = mapper.readValue(iter.next().toString(), AttributesMeasurementArea.class);
+			AttributesMeasurementArea attr = null;
+			try {
+				attr = mapper.readValue(iter.next().toString(), AttributesMeasurementArea.class);
+			} catch (IOException e) {
+				throw new MigrationException(e.getCause());
+			}
 			measurementAreas.add(new MeasurementArea(attr));
 		}
 		return measurementAreas;
 	}
 
-	default int transformShapeToMeasurementArea(JsonNode scenarioFile, JsonNode shapeNode, ObjectMapper mapper) throws IOException, MigrationException {
+	default int transformShapeToMeasurementArea(JsonNode scenarioFile, JsonNode shapeNode, ObjectMapper mapper) throws MigrationException {
 		// get all existing MeasurementAreas.
 		ArrayList<MeasurementArea> measurementAreas = deserializeMeasurementArea(scenarioFile, mapper);
-		VShape shape = mapper.readValue(shapeNode.toString(), VShape.class);
+		VShape shape = null;
+		try {
+			shape = mapper.readValue(shapeNode.toString(), VShape.class);
+		} catch (IOException e) {
+			throw new MigrationException(e.getCause());
+		}
 		MeasurementArea newArea = new MeasurementArea(new AttributesMeasurementArea(-1, shape));
 		// check if an existing MeasurementArea has the same shape.
 		// If so use this area. If not add new area to list and update scenarioFile-Json.

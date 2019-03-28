@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration.jsontranformation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
@@ -116,7 +117,15 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         target.put(key, obj);
     }
 
-    public static JsonNode sort (JsonNode node) throws MigrationException{
+    public JsonNode addCommitHashWarningIfMissing(JsonNode node){
+        JsonNode commitHash = path(node, "commithash");
+        if (commitHash.isMissingNode()){
+            ((ObjectNode)node).put("commithash", "warning: no commit hash");
+        }
+        return node;
+    }
+
+    public JsonNode sort (JsonNode node) throws MigrationException{
         LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
         LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
         putObject(sortedRoot, source, "name");

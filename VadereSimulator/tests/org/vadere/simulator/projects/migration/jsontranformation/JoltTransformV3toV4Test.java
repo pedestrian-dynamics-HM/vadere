@@ -16,7 +16,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-public class JoltTransformV3toV4Test extends JoltTransformationTest {
+public class JoltTransformV3toV4Test extends JsonTransformationTest {
 
 	private ArrayList<Path> scenarios;
 	private ArrayList<Path> bakScenarios;

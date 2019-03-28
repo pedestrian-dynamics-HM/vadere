@@ -11,6 +11,7 @@ import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonNodeExplorer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.StringJoiner;
 
 import static org.hamcrest.CoreMatchers.not;
@@ -68,6 +69,42 @@ public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 			@Override
 			public void describeTo(Description description) {
 				description.appendText("The nodes should not be empty. It should be reachable with Path: <" + path + ">");
+			}
+		};
+	}
+
+	default Matcher<JsonNode> missingNode() {
+		return new BaseMatcher<JsonNode>() {
+			@Override
+			public boolean matches(Object o) {
+				final JsonNode n = (JsonNode) o;
+				return n.isMissingNode();
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("The nodes should be empty.");
+			}
+		};
+	}
+
+	default Matcher<JsonNode> measurementAreaExists(int id){
+		return new BaseMatcher<JsonNode>() {
+			@Override
+			public boolean matches(Object o) {
+				final JsonNode n = (JsonNode) o;
+				try {
+					Iterator<JsonNode> iter = iteratorMeasurementArea(n,id);
+					return iter.hasNext();
+				} catch (MigrationException e) {
+					fail(e.getMessage());
+				}
+				return false;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("No measurementAreaExists found with Id:" + id);
 			}
 		};
 	}

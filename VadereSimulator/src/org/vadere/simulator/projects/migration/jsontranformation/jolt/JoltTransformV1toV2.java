@@ -16,7 +16,7 @@ public class JoltTransformV1toV2 extends JoltTransformation {
 
 	@Override
 	protected void initDefaultHooks() {
-        addPostHookLast(AbstractJsonTransformation::sort);
+        addPostHookLast(this::sort);
 	}
 
 

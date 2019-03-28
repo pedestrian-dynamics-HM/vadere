@@ -22,7 +22,7 @@ public class JoltTransformV5toV6 extends JoltTransformation {
 	protected void initDefaultHooks() {
 		addPostHookLast(this::removePedestrianOverlapDistProcessor);
 		addPostHookLast(this::changePedestrianMaxOverlapProcessorAttributes);
-		addPostHookLast(AbstractJsonTransformation::sort);
+		addPostHookLast(this::sort);
 	}
 
 	private JsonNode removePedestrianOverlapDistProcessor(JsonNode node) throws MigrationException {

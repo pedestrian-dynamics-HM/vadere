@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.*;
 
-public class JoltTransformV1toV2Test extends JoltTransformationTest {
+public class JoltTransformV1toV2Test extends JsonTransformationTest {
 
 	@Override
 	public Path getTestDir() {

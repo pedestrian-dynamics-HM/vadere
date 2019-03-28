@@ -20,7 +20,7 @@ public class JoltTransformV4toV5 extends JoltTransformation {
 	@Override
 	protected void initDefaultHooks() {
 		addPostHookLast(this::cleanupPedestrianOverlapProcessorAttribute);
-		addPostHookLast(AbstractJsonTransformation::sort);
+		addPostHookLast(this::sort);
 	}
 
 	private JsonNode cleanupPedestrianOverlapProcessorAttribute(JsonNode node) throws MigrationException {
