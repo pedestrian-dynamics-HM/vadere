@@ -8,7 +8,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
-import org.vadere.simulator.projects.migration.jolttranformation.JsonNodeExplorer;
+import org.vadere.simulator.projects.migration.jsontranformation.JsonNodeExplorer;
 
 import java.util.ArrayList;
 import java.util.StringJoiner;

@@ -14,12 +14,14 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
 
 public class TestOutputFile {
 
 	private Scenario testScenario;
 	private MainModel mainModel;
+	private Topography topography;
 
 	@Before
 	public void setup() {
@@ -27,6 +29,7 @@ public class TestOutputFile {
 			String json = IOUtils
 					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
 			testScenario = JsonConverter.deserializeScenarioRunManager(json);
+			topography = testScenario.getTopography();
 			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore());
 			modelBuilder.createModelAndRandom();
 			mainModel = modelBuilder.getModel();
@@ -45,7 +48,7 @@ public class TestOutputFile {
 		ArrayList<String> headerAfterSecondRun = new ArrayList<>();
 
 		ProcessorManager manager = testScenario.getDataProcessingJsonManager()
-				.createProcessorManager(mainModel);
+				.createProcessorManager(mainModel, topography);
 		manager.initOutputFiles();
 		List<OutputFile<?>> outputFiles = testScenario.getDataProcessingJsonManager().getOutputFiles();
 		outputFiles.forEach(f -> headerAfterFirstRun.add(f.getHeaderLine()));
@@ -60,7 +63,7 @@ public class TestOutputFile {
 	@Test
 	public void testHandlingNameConflict(){
 		ProcessorManager manager = testScenario.getDataProcessingJsonManager()
-				.createProcessorManager(mainModel);
+				.createProcessorManager(mainModel, topography);
 		manager.initOutputFiles();
 
 		List<String> header = testScenario.getDataProcessingJsonManager().getOutputFiles().get(0).getEntireHeader();

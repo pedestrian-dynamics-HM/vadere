@@ -1,11 +1,9 @@
 package org.vadere.simulator.entrypoints;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Versions in strict order from oldest to newest.

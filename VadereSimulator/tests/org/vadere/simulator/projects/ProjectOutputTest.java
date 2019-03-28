@@ -1,9 +1,7 @@
 package org.vadere.simulator.projects;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.IOVadere;
@@ -16,7 +14,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +79,7 @@ public class ProjectOutputTest {
 	@Test
 	public void bi(){
 		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
-//		System.out.println(m.convertFile());
+//		System.out.println(m.migrateScenarioFile());
 	}
 	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 

@@ -5,11 +5,11 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
-import org.vadere.simulator.projects.migration.JoltMigrationAssistant;
+import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
-import org.vadere.simulator.projects.migration.helper.MigrationUtil;
+import org.vadere.simulator.projects.migration.incident.helper.MigrationUtil;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class MigrationSubCommand implements SubCommandRunner {
 			for (Path dir : dirs) {
 				logger.info("migrate directory to version(" + targetVersion.label() + "): " + dir.toAbsolutePath().toString());
 				if (projectOnly){
-					JoltMigrationAssistant migrationAssistant = new JoltMigrationAssistant();
+					JsonMigrationAssistant migrationAssistant = new JsonMigrationAssistant();
 					migrationAssistant.analyzeProject(dir.toString());
 				} else {
 					migrationUtil.migrateDirectoryTree(dir, targetVersion, recursive);
@@ -147,7 +147,7 @@ public class MigrationSubCommand implements SubCommandRunner {
 				outputFile = Paths.get(outputPathString).resolve(scenarioFile.getFileName());
 			}
 
-			ma.migrateFile(scenarioFile, targetVersion, outputFile);
+			ma.migrateScenarioFile(scenarioFile, targetVersion, outputFile);
 
 
 		} catch (Exception e) {
