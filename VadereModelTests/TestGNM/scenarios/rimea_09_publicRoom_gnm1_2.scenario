@@ -1,12 +1,12 @@
 {
   "name" : "rimea_09_publicRoom_gnm1_2",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
@@ -60,6 +60,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 0
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -227,7 +228,6 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    },
-    "eventInfos" : [ ]
+    }
   }
 }
