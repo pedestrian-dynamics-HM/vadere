@@ -2,11 +2,11 @@
   "name" : "basic_5_1_roadReachTarget_ovm1",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.ovm.OptimalVelocityModel",
@@ -69,6 +69,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -88,6 +89,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -109,6 +111,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "CAR"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -118,6 +121,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -133,8 +137,8 @@
           "x" : 1.0,
           "y" : 0.0
         }
-      },
-      "dynamicElements" : [ ]
-    }
+      }
+    },
+    "eventInfos" : [ ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "Reynolds_test",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -29,13 +29,7 @@
       "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 10.0,
-          "y" : 32.0,
-          "width" : 15.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
@@ -137,7 +131,17 @@
         "acceleration" : 2.0
       },
       "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 10.0,
+          "y" : 32.0,
+          "width" : 15.0,
+          "height" : 8.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ]
     }
   }
 }
