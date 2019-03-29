@@ -1,7 +1,7 @@
 {
   "name" : "rimea_11_exitSelection_gnm1",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -144,6 +144,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

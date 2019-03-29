@@ -1,7 +1,7 @@
 {
   "name" : "03_bang_event_multiple_agents",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -112,6 +112,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

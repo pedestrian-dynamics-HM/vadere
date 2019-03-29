@@ -145,6 +145,14 @@ public interface JsonNodeExplorer {
 		return measurementAreas;
 	}
 
+	default void createArrayNodeIfNotExist(JsonNode scenarioFile, String relPath, String fieldName) throws MigrationException {
+		JsonNode jsonMeasurementArea = path(scenarioFile,relPath + fieldName);
+		if (jsonMeasurementArea.isMissingNode()){
+			ObjectNode topographyJson = (ObjectNode)pathMustExist(scenarioFile, relPath);
+			topographyJson.putArray(fieldName);
+		}
+	}
+
 	/**
 	 *
 	 * @param scenarioFile			scenarioFile to migrate
@@ -154,6 +162,7 @@ public interface JsonNodeExplorer {
 	 * @throws MigrationException
 	 */
 	default int transformShapeToMeasurementArea(JsonNode scenarioFile, JsonNode shapeNode, ObjectMapper mapper) throws MigrationException {
+		createArrayNodeIfNotExist(scenarioFile, "scenario/topography/", "measurementAreas");
 		// get all existing MeasurementAreas.
 		ArrayList<MeasurementArea> measurementAreas = deserializeMeasurementArea(scenarioFile, mapper);
 		VShape shape = null;

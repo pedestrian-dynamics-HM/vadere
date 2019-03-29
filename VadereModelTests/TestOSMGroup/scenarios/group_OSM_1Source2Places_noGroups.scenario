@@ -1,8 +1,8 @@
 {
   "name" : "group_OSM_1Source2Places_noGroups",
   "description" : "",
-  "release" : "0.7",
-  "processWriters" : {
+  "release" : "0.8",
+``  "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
@@ -148,6 +148,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
