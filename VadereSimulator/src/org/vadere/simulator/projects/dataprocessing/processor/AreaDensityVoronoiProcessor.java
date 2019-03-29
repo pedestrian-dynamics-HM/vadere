@@ -6,12 +6,15 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.ProcessorFlag;
+
+import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
  *
  */
-@DataProcessorClass(label = "AreaDensityVoronoiProcessor")
+@DataProcessorClass(label = "AreaDensityVoronoiProcessor", processorFlags = {ProcessorFlag.needMeasurementArea})
 public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
 
     public AreaDensityVoronoiProcessor(){
@@ -40,5 +43,16 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
         }
 
         return super.getAttributes();
+    }
+
+    @Override
+    public boolean sanityCheck(Object o) {
+        List<MeasurementArea> data = (List<MeasurementArea>) o;
+        AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
+
+        boolean match1 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getVoronoiMeasurementAreaId());
+        boolean match2 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
+
+        return match1 && match2;
     }
 }

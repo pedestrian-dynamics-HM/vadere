@@ -6,14 +6,17 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.VTrajectory;
+import org.vadere.util.factory.processors.ProcessorFlag;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +34,7 @@ import java.util.Map;
  *
  * @author Benedikt Zoennchen
  */
-@DataProcessorClass()
+@DataProcessorClass(processorFlags = {ProcessorFlag.needMeasurementArea})
 public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
 
 	private static Logger logger = Logger.getLogger(Topography.class);
@@ -167,4 +170,13 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 	public String[] toStrings(@NotNull final PedestrianIdKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
 	}
+
+    @Override
+    public boolean sanityCheck(Object o) {
+        List<MeasurementArea> data = (List<MeasurementArea>) o;
+        AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
+
+        boolean match = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
+        return match;
+    }
 }

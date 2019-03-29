@@ -53,6 +53,13 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		this.lastStep = 0;
 	}
 
+	/**
+	 *
+	 * @param data 		Some Data used within each implementation to test if settings are correct.
+	 * @return			If not implemented allays true.
+	 */
+	public boolean sanityCheck(Object data){ return true; };
+
 	protected Map<K, V> getData() {
 		return this.data;
 	}

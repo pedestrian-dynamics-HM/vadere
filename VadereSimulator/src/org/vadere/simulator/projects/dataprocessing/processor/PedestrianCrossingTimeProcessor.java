@@ -7,18 +7,21 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesCrossingTimeProcessor;
+import org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.util.factory.processors.ProcessorFlag;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
+import java.util.List;
 
 //TODO
-@DataProcessorClass()
+@DataProcessorClass(processorFlags = {ProcessorFlag.needMeasurementArea})
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>{
 
 	private MeasurementArea measurementArea;
@@ -98,5 +101,16 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public String[] toStrings(@NotNull final  PedestrianIdKey key) {
 		Pair<Double, Double> times = getValue(key);
 		return new String[]{Double.toString(times.getLeft()), Double.toString(times.getRight())};
+	}
+
+	@Override
+	public boolean sanityCheck(Object o) {
+		List<MeasurementArea> data = (List<MeasurementArea>) o;
+		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
+
+		boolean match1 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getWaitingAreaId());
+		boolean match2 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
+
+		return match1 && match2;
 	}
 }

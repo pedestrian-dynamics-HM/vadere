@@ -7,10 +7,14 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.ProcessorFlag;
 import org.vadere.util.geometry.shapes.VRectangle;
+
+import java.util.List;
 
 /**
  * <p>This processor computes the fundamental diagram by computing at a certain time the
@@ -23,7 +27,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
  *
  * @author Benedikt Zoennchen
  */
-@DataProcessorClass()
+@DataProcessorClass(processorFlags = {ProcessorFlag.needMeasurementArea})
 public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
 	private MeasurementArea measurementArea;
@@ -90,5 +94,14 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	@Override
 	public String[] toStrings(@NotNull final TimestepKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+	@Override
+	public boolean sanityCheck(Object o) {
+		List<MeasurementArea> data = (List<MeasurementArea>) o;
+		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
+
+		boolean match = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
+		return match;
 	}
 }

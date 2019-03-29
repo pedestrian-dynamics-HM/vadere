@@ -32,10 +32,23 @@ public class DataProcessorFactoryProcessor extends BaseFactoryProcessor {
 	protected void addLastConstructor(Set<? extends Element> elements, PrintWriter writer) {
 		for (Element e : elements) {
 			writer.append("		addMember(");
-			writer.append(e.getSimpleName().toString()).append(".class, ");
 			writer.append("this::").append("get").append(name(e)).append(", ");
 			writer.append(quote(label(e))).append(", ");
-			writer.append(quote(descr(e))).println("); ");
+			writer.append(quote(descr(e))).append(", ");
+			writer.append(e.getSimpleName().toString()).append(".class");
+			//if flags are provides here...
+			String[] flags = processorFlags(e);
+			if (flags.length > 0){
+				writer.append(", ");
+				for (int i = 0; i < flags.length -1; i++) {
+					writer.append(quote(flags[i])).append(", ");
+				}
+				writer.append(quote(flags[flags.length-1]));
+				writer.println("); ");
+			} else {
+				writer.println("); ");
+			}
+
 		}
 	}
 
@@ -74,6 +87,11 @@ public class DataProcessorFactoryProcessor extends BaseFactoryProcessor {
 	private String descr(Element element) {
 		DataProcessorClass dataProcessorClass = element.getAnnotation(DataProcessorClass.class);
 		return dataProcessorClass.description();
+	}
+
+	private String[] processorFlags(Element element){
+		DataProcessorClass dataProcessorClass = element.getAnnotation(DataProcessorClass.class);
+		return dataProcessorClass.processorFlags();
 	}
 
 }
