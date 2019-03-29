@@ -26,10 +26,11 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
 
     @Override
     protected void initDefaultHooks() {
-        addPostHookLast(this::measurementAreaType1);
-        addPostHookLast(this::measurementAreaType2);
-        addPostHookLast(this::measurementAreaType3);
-        addPostHookLast(this::measurementAreaType4);
+        addPostHookLast(this::applyMeasurementAreaType1);
+        addPostHookLast(this::applyMeasurementAreaType2);
+        addPostHookLast(this::applyMeasurementAreaType3);
+        addPostHookLast(this::applyMeasurementAreaType4);
+        addPostHookLast(this::applyMeasurementAreaType5);
         addPostHookLast(this::addCommitHashWarningIfMissing);
         addPostHookLast(this::sort);
     }
@@ -77,10 +78,10 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
 
 
 
-    public JsonNode measurementAreaType1(JsonNode scenarioFile) throws MigrationException{
+    public JsonNode applyMeasurementAreaType1(JsonNode scenarioFile) throws MigrationException{
         String[] processorTypes = {
-            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",  // todo type 1 (measurementArea -> measurementAreaId)
-            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",  //todo type 1 (measurementArea -> measurementAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",  // type 1 (measurementArea -> measurementAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",  // type 1 (measurementArea -> measurementAreaId)
         };
 
         for (String type : processorTypes) {
@@ -95,10 +96,10 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         return scenarioFile;
     }
 
-    public JsonNode measurementAreaType2(JsonNode scenarioFile) throws MigrationException{
+    public JsonNode applyMeasurementAreaType2(JsonNode scenarioFile) throws MigrationException{
         String[] processorTypes = {
-            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor", //todo type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
-            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor", //todo type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor", // type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor", // type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
         };
 
         for (String type : processorTypes) {
@@ -115,9 +116,9 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         return scenarioFile;
     }
 
-    public JsonNode measurementAreaType3(JsonNode scenarioFile) throws MigrationException{
+    public JsonNode applyMeasurementAreaType3(JsonNode scenarioFile) throws MigrationException{
         String[] processorTypes = {
-            "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor", // todo type 4 (voronoiArea -> voronoiMeasurementAreaIdArea)
+            "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor", // type 4 (voronoiArea -> voronoiMeasurementAreaIdArea)
         };
 
         for (String type : processorTypes) {
@@ -132,11 +133,10 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         return scenarioFile;
     }
 
-    public JsonNode measurementAreaType4(JsonNode scenarioFile) throws MigrationException{
+    public JsonNode applyMeasurementAreaType4(JsonNode scenarioFile) throws MigrationException{
         String[] processorTypes = {
-            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianCrossingTimeProcessor", //todo type 3 (waitingArea -> waitingAreaId)
-            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingEndTimeProcessor", // todo type 3 (waitingArea -> waitingAreaId)
-            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor" //todo type 3 (waitingArea -> waitingAreaId)
+           "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingEndTimeProcessor", // type 3 (waitingArea -> waitingAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor" // type 3 (waitingArea -> waitingAreaId)
         };
 
         for (String type : processorTypes) {
@@ -146,6 +146,24 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
                 //
                 migrate_waitingArea(scenarioFile, p);
                 //
+            }
+        }
+        return scenarioFile;
+    }
+
+    public JsonNode applyMeasurementAreaType5(JsonNode scenarioFile) throws MigrationException{
+        String[] processorTypes = {
+                "org.vadere.simulator.projects.dataprocessing.processor.PedestrianCrossingTimeProcessor", // type 3 (waitingArea -> waitingAreaId, measurementArea -> measurementAreaId)
+        };
+
+        for (String type : processorTypes) {
+            ArrayList<JsonNode> processor =
+                    getProcessorsByType(scenarioFile, type);
+            for (JsonNode p : processor) {
+                //
+                migrate_waitingArea(scenarioFile, p);
+                //
+                migrate_measurementArea(scenarioFile, p);
             }
         }
         return scenarioFile;

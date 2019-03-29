@@ -4,8 +4,11 @@ import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,6 +47,11 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		DataProcessor pedPosProc = pedPosProcEnv.getTestedProcessor();
 		addRequiredProcessors(pedPosProcEnv);
 		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
+
+		attr.setMeasurementAreaId(99);
+		MeasurementArea measurementArea = new MeasurementArea(
+				new AttributesMeasurementArea(99, new VRectangle(0, 0, 4, 5)));
+		Mockito.when(manager.getMeasurementArea(99)).thenReturn(measurementArea);
 
 		try {
 			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(

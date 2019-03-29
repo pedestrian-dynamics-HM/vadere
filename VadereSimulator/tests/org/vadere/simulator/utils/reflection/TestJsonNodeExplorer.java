@@ -13,6 +13,7 @@ import org.vadere.simulator.projects.migration.jsontranformation.JsonNodeExplore
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
@@ -108,6 +109,34 @@ public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 			}
 		};
 	}
+
+
+	default Matcher<JsonNode> fieldChanged(String relPath, String oldName, String newName, Predicate<JsonNode> typeTest){
+		return new BaseMatcher<JsonNode>() {
+
+			String text;
+
+			@Override
+			public boolean matches(Object o) {
+				JsonNode node = (JsonNode)o;
+				JsonNode oldField = path(node, relPath + oldName);
+				JsonNode newField = path(node, relPath + newName);
+				if (!oldField.isMissingNode() || newField.isMissingNode()){
+					text = String.format("Expected field with name %s, no with %s", newName, oldName);
+				} else if (!typeTest.test(newField)){
+					text = String.format("New field has wrong Type %s", newField.getNodeType().name());
+				}
+				return oldField.isMissingNode() && !newField.isMissingNode() && typeTest.test(newField);
+			}
+
+			@Override
+			public void describeTo(Description description) {
+
+				description.appendText(text);
+			}
+		};
+	}
+
 
 	default void assertLatestReleaseVersion(JsonNode root) {
 		assertThat("Version must be latest:  + Version.latest().toString()",

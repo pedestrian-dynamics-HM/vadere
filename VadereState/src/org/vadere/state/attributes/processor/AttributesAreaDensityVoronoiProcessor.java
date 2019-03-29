@@ -6,14 +6,14 @@ package org.vadere.state.attributes.processor;
  */
 
 public class AttributesAreaDensityVoronoiProcessor extends AttributesAreaProcessor {
-    private int voronoiMeasurementAreaIdArea = -1;
+    private int voronoiMeasurementAreaId = -1;
 
-    public int getVoronoiMeasurementAreaIdArea() {
-        return this.voronoiMeasurementAreaIdArea;
+    public int getVoronoiMeasurementAreaId() {
+        return this.voronoiMeasurementAreaId;
     }
 
-    public void setVoronoiMeasurementAreaIdArea(int voronoiMeasurementAreaIdArea) {
+    public void setVoronoiMeasurementAreaId(int voronoiMeasurementAreaIdArea) {
         checkSealed();
-        this.voronoiMeasurementAreaIdArea = voronoiMeasurementAreaIdArea;
+        this.voronoiMeasurementAreaId = voronoiMeasurementAreaIdArea;
     }
 }

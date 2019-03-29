@@ -6,151 +6,36 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "aTimeStep.fundamentalDiagram",
-      "processors" : [ 6 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "bPedestrian.fundamentalDiagram",
-      "processors" : [ 9 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "cTimeStep.fundamentalDiagram",
-      "processors" : [ 11 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "dTimeStep.fundamentalDiagram",
-      "processors" : [ 12 ]
+      "processors" : [ 1 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 1
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
-      "id" : 2
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingEndTimeProcessor",
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor",
+      "attributes" : {
+        "waitingArea" : {
+          "x" : 18.0,
+          "y" : 1.0,
+          "width" : 4.0,
+          "height" : 2.0,
+          "type" : "RECTANGLE"
+        }
+      }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 3
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
       "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
-      "id" : 5
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramAProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
-      "attributes" : {
-        "pedestrianLineCrossProcessorId" : 8,
-        "pedestrianVelocityProcessorId" : 7,
-        "deltaTime" : 10.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 1,
-        "backSteps" : 1
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 8,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 25.0,
-          "y" : 11.9
-        },
-        "p2" : {
-          "x" : 25.0,
-          "y" : 10.1
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",
-      "id" : 9,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor",
-      "attributes" : {
-        "pedestrianTrajectoryProcessorId" : 10,
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
+        "waitingArea" : {
+          "x" : 5.0,
+          "y" : 1.0,
           "width" : 2.0,
-          "height" : 1.8,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
-      "id" : 10,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "p2" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 11,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "pedestrianVelocityProcessorId" : 7
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor",
-      "id" : 12,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
-      "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 17.0,
-          "y" : 10.1,
-          "width" : 12.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "pedestrianVelocityProcessorId" : 7
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
-      "id" : 13,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
       }
     } ],
     "isTimestamped" : true,
@@ -209,7 +94,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 50.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -264,7 +149,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 125,
+        "spawnNumber" : 10,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
