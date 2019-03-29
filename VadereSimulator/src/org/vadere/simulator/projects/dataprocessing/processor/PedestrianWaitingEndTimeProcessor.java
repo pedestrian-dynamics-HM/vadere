@@ -4,20 +4,22 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
  */
 @DataProcessorClass()
-public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
+public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> implements UsesMeasurementArea {
 	private MeasurementArea waitingArea;
 
 	public PedestrianWaitingEndTimeProcessor() {
@@ -58,5 +60,12 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 		}
 
 		return super.getAttributes();
+	}
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesPedestrianWaitingEndTimeProcessor att = (AttributesPedestrianWaitingEndTimeProcessor) this.getAttributes();
+
+		return new int[]{att.getWaitingAreaId()};
 	}
 }

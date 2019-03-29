@@ -7,10 +7,13 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.factory.processors.Flag;
+
+import java.util.List;
 
 /**
  * <p>This processor computes the fundamental diagram by computing at a certain time the
@@ -24,7 +27,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>> implements UsesMeasurementArea {
 
 	private MeasurementArea measurementArea;
 
@@ -90,5 +93,11 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	@Override
 	public String[] toStrings(@NotNull final TimestepKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
+		return new int[]{att.getMeasurementAreaId()};
 	}
 }

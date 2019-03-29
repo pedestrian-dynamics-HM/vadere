@@ -53,6 +53,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		this.lastStep = 0;
 	}
 
+
 	protected Map<K, V> getData() {
 		return this.data;
 	}

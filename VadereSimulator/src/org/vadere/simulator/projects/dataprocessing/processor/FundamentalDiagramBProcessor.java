@@ -6,14 +6,17 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.VTrajectory;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,7 +35,7 @@ import java.util.Map;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
+public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>> implements UsesMeasurementArea {
 
 	private static Logger logger = Logger.getLogger(Topography.class);
 
@@ -166,5 +169,12 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 	@Override
 	public String[] toStrings(@NotNull final PedestrianIdKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
+		return new int[]{att.getMeasurementAreaId()};
 	}
 }
