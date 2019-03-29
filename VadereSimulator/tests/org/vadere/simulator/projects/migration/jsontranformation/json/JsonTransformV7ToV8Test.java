@@ -59,8 +59,9 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
     @Test
     public void testTyp2() throws MigrationException{
         String[] processorTypes = {
-                "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor", //type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
-                "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor", //type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
+                "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor", //type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaId)
+                "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor", //type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaId)
+                "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor", // type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaId)
         };
 
         String jsonStr = getTestFileAsString("typ2.scenario");
@@ -76,40 +77,14 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
                 assertThat(p, fieldChanged("attributes/",
                         "measurementArea","measurementAreaId", JsonNode::isNumber));
                 assertThat(p, fieldChanged("attributes/",
-                        "voronoiArea","voronoiMeasurementAreaIdArea", JsonNode::isNumber));
+                        "voronoiArea","voronoiMeasurementAreaId", JsonNode::isNumber));
 
 
                 int measurementAreaId = pathMustExist(p, "attributes/measurementAreaId").asInt();
-                int voronoiMeasurementAreaIdArea = pathMustExist(p, "attributes/voronoiMeasurementAreaIdArea").asInt();
-                assertThat(measurementAreaId == voronoiMeasurementAreaIdArea, is(true));
+                int voronoiMeasurementAreaId = pathMustExist(p, "attributes/voronoiMeasurementAreaId").asInt();
+                assertThat(measurementAreaId == voronoiMeasurementAreaId, is(true));
                 assertThat(jsonNew, measurementAreaExists(measurementAreaId));
-                assertThat(jsonNew, measurementAreaExists(voronoiMeasurementAreaIdArea));
-            }
-        }
-    }
-
-
-    @Test
-    public void testTyp3() throws MigrationException{
-        String[] processorTypes = {
-                "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor", // type 4 (voronoiArea -> voronoiMeasurementAreaIdArea)
-        };
-
-        String jsonStr = getTestFileAsString("typ3.scenario");
-        JsonNode jsonOld = getJsonFromString(jsonStr);
-        JsonNode jsonNew = getJsonFromString(jsonStr);
-        JsonTransformV7ToV8 transformation = factory.getJsonTransformV7ToV8();
-        jsonNew = transformation.applyMeasurementAreaType3(jsonNew);
-
-        for (String type : processorTypes) {
-            ArrayList<JsonNode> processor =
-                    getProcessorsByType(jsonNew, type);
-            for (JsonNode p : processor) {
-                assertThat(p, fieldChanged("attributes/",
-                        "voronoiArea","voronoiMeasurementAreaIdArea", JsonNode::isNumber));
-
-                int voronoiMeasurementAreaIdArea = pathMustExist(p, "attributes/voronoiMeasurementAreaIdArea").asInt();
-                assertThat(jsonNew, measurementAreaExists(voronoiMeasurementAreaIdArea));
+                assertThat(jsonNew, measurementAreaExists(voronoiMeasurementAreaId));
             }
         }
     }

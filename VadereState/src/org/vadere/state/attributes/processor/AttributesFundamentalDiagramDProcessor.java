@@ -22,9 +22,9 @@ public class AttributesFundamentalDiagramDProcessor extends AttributesAreaProces
 		return voronoiMeasurementAreaId;
 	}
 
-	public void setVoroniMeasurementAreaIdArea(int voronoiMeasurementAreaIdArea) {
+	public void setVoroniMeasurementAreaIdArea(int voronoiMeasurementAreaId) {
 		checkSealed();
-		this.voronoiMeasurementAreaId = voronoiMeasurementAreaIdArea;
+		this.voronoiMeasurementAreaId = voronoiMeasurementAreaId;
 	}
 
 	public void setMeasurementAreaId(int measurementAreaId) {

@@ -12,8 +12,8 @@ public class AttributesAreaDensityVoronoiProcessor extends AttributesAreaProcess
         return this.voronoiMeasurementAreaId;
     }
 
-    public void setVoronoiMeasurementAreaId(int voronoiMeasurementAreaIdArea) {
+    public void setVoronoiMeasurementAreaId(int voronoiMeasurementAreaId) {
         checkSealed();
-        this.voronoiMeasurementAreaId = voronoiMeasurementAreaIdArea;
+        this.voronoiMeasurementAreaId = voronoiMeasurementAreaId;
     }
 }
