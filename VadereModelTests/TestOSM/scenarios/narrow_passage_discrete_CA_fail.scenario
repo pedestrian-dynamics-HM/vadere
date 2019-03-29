@@ -1,7 +1,8 @@
 {
   "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -40,8 +41,7 @@
         "pedestrianOverlapProcessorId" : 4
       }
     } ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -107,6 +107,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -425,7 +426,6 @@
           "y" : 0.0
         }
       }
-    },
-    "eventInfos" : [ ]
+    }
   }
 }

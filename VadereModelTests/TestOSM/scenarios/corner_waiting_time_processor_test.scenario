@@ -1,7 +1,8 @@
 {
   "name" : "corner_waiting_time_processor_test",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -25,13 +26,7 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 1.0,
-          "y" : 3.5,
-          "width" : 9.5,
-          "height" : 10.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
@@ -64,8 +59,7 @@
         "pedestrianOverlapProcessorId" : 6
       }
     } ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -131,6 +125,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -161,7 +156,16 @@
         },
         "id" : -1
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 1.0,
+          "y" : 3.5,
+          "width" : 9.5,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -249,7 +253,6 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    },
-    "eventInfos" : [ ]
+    }
   }
 }

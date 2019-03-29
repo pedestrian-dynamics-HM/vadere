@@ -1,7 +1,8 @@
 {
   "name" : "rimea_04_flow_osm1_075_h",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -88,13 +89,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor",
       "attributes" : {
         "pedestrianTrajectoryProcessorId" : 10,
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        }
+        "measurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
@@ -115,35 +110,17 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "pedestrianVelocityProcessorId" : 7
+        "pedestrianVelocityProcessorId" : 7,
+        "measurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor",
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 17.0,
-          "y" : 10.1,
-          "width" : 12.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "pedestrianVelocityProcessorId" : 7
+        "pedestrianVelocityProcessorId" : 7,
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 2
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
@@ -153,8 +130,7 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -220,6 +196,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -232,7 +209,25 @@
         "bounded" : true
       },
       "obstacles" : [ ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 22.0,
+          "y" : 10.1,
+          "width" : 2.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 17.0,
+          "y" : 10.1,
+          "width" : 12.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -286,7 +281,6 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    },
-    "eventInfos" : [ ]
+    }
   }
 }

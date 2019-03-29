@@ -1,7 +1,8 @@
 {
   "name" : "thin_wall_nelder_mead_ok",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -21,13 +22,7 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 9.0,
-          "y" : 0.0,
-          "width" : 11.0,
-          "height" : 10.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
@@ -60,8 +55,7 @@
         "pedestrianOverlapProcessorId" : 4
       }
     } ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -127,6 +121,7 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -148,7 +143,16 @@
         },
         "id" : -1
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 11.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -202,7 +206,6 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    },
-    "eventInfos" : [ ]
+    }
   }
 }
