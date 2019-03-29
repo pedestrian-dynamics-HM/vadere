@@ -2,11 +2,11 @@
   "name" : "rimea_04_flow_gnm1_100_h",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
@@ -60,7 +60,6 @@
       "fixedSeed" : 1,
       "simulationSeed" : 0
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -73,6 +72,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -126,6 +126,7 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

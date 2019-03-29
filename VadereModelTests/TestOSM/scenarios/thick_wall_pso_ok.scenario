@@ -2,7 +2,6 @@
   "name" : "thick_wall_pso_ok",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -55,7 +54,8 @@
         "pedestrianOverlapProcessorId" : 4
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -121,7 +121,6 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -206,6 +205,7 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

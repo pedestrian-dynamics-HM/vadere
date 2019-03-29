@@ -2,7 +2,6 @@
   "name" : "rimea_04_flow_osm1_050_h",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -110,17 +109,17 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "pedestrianVelocityProcessorId" : 7,
-        "measurementAreaId" : 1
+        "measurementAreaId" : 1,
+        "pedestrianVelocityProcessorId" : 7
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor",
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {
-        "pedestrianVelocityProcessorId" : 7,
         "measurementAreaId" : 1,
-        "voronoiMeasurementAreaId" : 2
+        "voronoiMeasurementAreaId" : 2,
+        "pedestrianVelocityProcessorId" : 7
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
@@ -130,7 +129,8 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -196,7 +196,6 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -281,6 +280,7 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

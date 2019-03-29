@@ -2,11 +2,11 @@
   "name" : "rimea_13_stairs_gnm1",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
@@ -60,7 +60,6 @@
       "fixedSeed" : 1,
       "simulationSeed" : 0
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -91,6 +90,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ {
         "shape" : {
           "x" : 15.0,
@@ -158,6 +158,7 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

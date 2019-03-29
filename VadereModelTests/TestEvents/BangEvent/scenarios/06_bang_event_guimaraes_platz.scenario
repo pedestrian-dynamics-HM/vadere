@@ -2,7 +2,6 @@
   "name" : "06_bang_event_guimaraes_platz",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -42,7 +41,8 @@
         "radius" : 1.5
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -108,19 +108,6 @@
       "fixedSeed" : -5666974701049342956,
       "simulationSeed" : 0
     },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
-        "startTime" : 67.0,
-        "endTime" : 67.4,
-        "repeat" : false,
-        "waitTimeBetweenRepetition" : 0.0
-      },
-      "events" : [ {
-        "type" : "BangEvent",
-        "targets" : [ ],
-        "originAsTargetId" : 0
-      } ]
-    } ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -1099,6 +1086,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -1204,6 +1192,19 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ {
+      "eventTimeframe" : {
+        "startTime" : 67.0,
+        "endTime" : 67.4,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "events" : [ {
+        "type" : "BangEvent",
+        "targets" : [ ],
+        "originAsTargetId" : 0
+      } ]
+    } ]
   }
 }

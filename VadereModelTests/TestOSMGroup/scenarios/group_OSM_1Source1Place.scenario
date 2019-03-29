@@ -2,7 +2,6 @@
   "name" : "group_OSM_1Source1Place",
   "description" : "",
   "release" : "0.8",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -29,7 +28,8 @@
         "obstacleDensity" : true
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -99,7 +99,6 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -112,6 +111,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -180,6 +180,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }
