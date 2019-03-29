@@ -1,7 +1,7 @@
 {
   "name" : "07_bang_event_osm_event_driven",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "commithash" : "3d1bcfd83a7d3848a4dd5baa50e802a2dce0c3e7",
   "processWriters" : {
     "files" : [ {
@@ -50,8 +50,7 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true,
-    "isWriteMetaData" : false
+    "isTimestamped" : true
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -117,6 +116,19 @@
       "fixedSeed" : 1,
       "simulationSeed" : 1
     },
+    "eventInfos" : [ {
+      "eventTimeframe" : {
+        "startTime" : 15.0,
+        "endTime" : 15.4,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "events" : [ {
+        "type" : "BangEvent",
+        "targets" : [ ],
+        "originAsTargetId" : 0
+      } ]
+    } ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -236,19 +248,6 @@
       },
       "teleporter" : null,
       "attributesCar" : null
-    },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
-        "startTime" : 15.0,
-        "endTime" : 15.4,
-        "repeat" : false,
-        "waitTimeBetweenRepetition" : 0.0
-      },
-      "events" : [ {
-        "type" : "BangEvent",
-        "targets" : [ ],
-        "originAsTargetId" : 0
-      } ]
-    } ]
+    }
   }
 }
