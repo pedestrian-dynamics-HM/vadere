@@ -1,21 +1,19 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
-
 /**
  * @author Mario Teixeira Parente
  *
  */
 
 public class AttributesAreaDensityVoronoiProcessor extends AttributesAreaProcessor {
-    private VRectangle voronoiArea = new VRectangle(0, 0, 1, 1);
+    private int voronoiMeasurementAreaIdArea = -1;
 
-    public VRectangle getVoronoiArea() {
-        return this.voronoiArea;
+    public int getVoronoiMeasurementAreaIdArea() {
+        return this.voronoiMeasurementAreaIdArea;
     }
 
-    public void setVoronoiArea(VRectangle voronoiArea) {
+    public void setVoronoiMeasurementAreaIdArea(int voronoiMeasurementAreaIdArea) {
         checkSealed();
-        this.voronoiArea = voronoiArea;
+        this.voronoiMeasurementAreaIdArea = voronoiMeasurementAreaIdArea;
     }
 }

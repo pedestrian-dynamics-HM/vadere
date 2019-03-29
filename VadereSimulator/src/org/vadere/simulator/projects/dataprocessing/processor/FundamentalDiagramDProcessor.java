@@ -8,6 +8,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
@@ -38,7 +39,17 @@ public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double,
 		super.init(manager);
 		AttributesFundamentalDiagramDProcessor att = (AttributesFundamentalDiagramDProcessor) this.getAttributes();
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
-		integralVoronoiAlgorithm = new IntegralVoronoiAlgorithm(key -> pedestrianVelocityProcessor.getValue(key), att.getMeasurementArea(), att.getVoronoiArea());
+		MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
+		MeasurementArea voronoiMeasurementArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId());
+		if (measurementArea == null || voronoiMeasurementArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+		if (!measurementArea.isRectangular() || !voronoiMeasurementArea.isRectangular())
+			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+
+		integralVoronoiAlgorithm = new IntegralVoronoiAlgorithm(
+				key -> pedestrianVelocityProcessor.getValue(key),
+				measurementArea,
+				voronoiMeasurementArea);
 	}
 
 	@Override

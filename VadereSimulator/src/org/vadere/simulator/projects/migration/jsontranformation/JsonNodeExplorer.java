@@ -145,6 +145,14 @@ public interface JsonNodeExplorer {
 		return measurementAreas;
 	}
 
+	/**
+	 *
+	 * @param scenarioFile			scenarioFile to migrate
+	 * @param shapeNode				Shape used in the {@link org.vadere.simulator.projects.dataprocessing.processor.DataProcessor}
+	 * @param mapper				Jackson mapper to serialize and deserialize
+	 * @return						The id of the {@link MeasurementArea} to use in the {@link org.vadere.simulator.projects.dataprocessing.processor.DataProcessor}
+	 * @throws MigrationException
+	 */
 	default int transformShapeToMeasurementArea(JsonNode scenarioFile, JsonNode shapeNode, ObjectMapper mapper) throws MigrationException {
 		// get all existing MeasurementAreas.
 		ArrayList<MeasurementArea> measurementAreas = deserializeMeasurementArea(scenarioFile, mapper);
@@ -159,6 +167,9 @@ public interface JsonNodeExplorer {
 		// If so use this area. If not add new area to list and update scenarioFile-Json.
 		MeasurementArea area = measurementAreas.stream().filter(a -> a.compareByShape(newArea)).findFirst().orElse(newArea);
 		if (area == newArea){
+			// if a new area is included ensure a unique id. Important: The id is only unique within the MeasurementAreas
+			int newId = measurementAreas.stream().map(MeasurementArea::getId).max(Integer::compareTo).orElse(0) + 1;
+			area.setId(newId);
 			measurementAreas.add(area);
 			replaceMeasurementAreas(scenarioFile, measurementAreas, mapper);
 		}

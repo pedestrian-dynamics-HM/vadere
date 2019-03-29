@@ -1,10 +1,8 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
-
 public class AttributesFundamentalDiagramDProcessor extends AttributesAreaProcessor {
-	private VRectangle measurementArea;
-	private VRectangle voronoiArea;
+	private int measurementAreaId;
+	private int voronoiMeasurementAreaId;
 	private int pedestrianVelocityProcessorId;
 
 	public int getPedestrianVelocityProcessorId() {
@@ -16,21 +14,21 @@ public class AttributesFundamentalDiagramDProcessor extends AttributesAreaProces
 		this.pedestrianVelocityProcessorId = pedestrianVelocityProcessorId;
 	}
 
-	public VRectangle getMeasurementArea() {
-		return measurementArea;
+	public int getMeasurementAreaId() {
+		return measurementAreaId;
 	}
 
-	public VRectangle getVoronoiArea() {
-		return voronoiArea;
+	public int getVoronoiMeasurementAreaId() {
+		return voronoiMeasurementAreaId;
 	}
 
-	public void setVoronoiArea(VRectangle voronoiArea) {
+	public void setVoroniMeasurementAreaIdArea(int voronoiMeasurementAreaIdArea) {
 		checkSealed();
-		this.voronoiArea = voronoiArea;
+		this.voronoiMeasurementAreaId = voronoiMeasurementAreaIdArea;
 	}
 
-	public void setMeasurementArea(VRectangle measurementArea) {
+	public void setMeasurementAreaId(int measurementAreaId) {
 		checkSealed();
-		this.measurementArea = measurementArea;
+		this.measurementAreaId = measurementAreaId;
 	}
 }

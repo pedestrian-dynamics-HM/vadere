@@ -26,7 +26,10 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
 
     @Override
     protected void initDefaultHooks() {
-        addPostHookLast(this::removeShapeFromDataProcessors);
+        addPostHookLast(this::measurementAreaType1);
+        addPostHookLast(this::measurementAreaType2);
+        addPostHookLast(this::measurementAreaType3);
+        addPostHookLast(this::measurementAreaType4);
         addPostHookLast(this::addCommitHashWarningIfMissing);
         addPostHookLast(this::sort);
     }
@@ -37,18 +40,119 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         return super.applyTransformation(node);
     }
 
-    private JsonNode removeShapeFromDataProcessors(JsonNode scenarioFile) throws MigrationException {
-        ArrayList<JsonNode> processor =
-                getProcessorsByType(scenarioFile, "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor");
-        for (JsonNode p : processor) {
-            JsonNode attr = pathMustExist(p, "attributes");
-            JsonNode measurementArea = path(attr, "measurementArea");
-            if (!measurementArea.isMissingNode()){
-                int measurementAreaId = transformShapeToMeasurementArea(scenarioFile, measurementArea, mapper);
-                remove(attr, "measurementArea");
-                addIntegerField(attr, "measurementAreaId", measurementAreaId);
+    private void migrate_measurementArea(JsonNode scenarioFile, JsonNode p) throws MigrationException {
+        JsonNode attr = pathMustExist(p, "attributes");
+        // find old field name
+        JsonNode measurementArea = path(attr, "measurementArea");
+        if (!measurementArea.isMissingNode()){
+            // search existing or create new MeasurementArea and link processor to id.
+            int measurementAreaId = transformShapeToMeasurementArea(scenarioFile, measurementArea, mapper);
+            remove(attr, "measurementArea");
+            addIntegerField(attr, "measurementAreaId", measurementAreaId);
+        }
+    }
+
+    private void migrate_voronoiArea(JsonNode scenarioFile, JsonNode p) throws MigrationException{
+        JsonNode attr = pathMustExist(p, "attributes");
+        JsonNode measurementArea = path(attr, "voronoiArea");
+        if (!measurementArea.isMissingNode()){
+            // search existing or create new MeasurementArea and link processor to id.
+            int measurementAreaId = transformShapeToMeasurementArea(scenarioFile, measurementArea, mapper);
+            remove(attr, "voronoiArea");
+            addIntegerField(attr, "voronoiMeasurementAreaIdArea", measurementAreaId);
+        }
+    }
+
+
+    private void migrate_waitingArea(JsonNode scenarioFile, JsonNode p) throws MigrationException{
+        JsonNode attr = pathMustExist(p, "attributes");
+        JsonNode measurementArea = path(attr, "waitingArea");
+        if (!measurementArea.isMissingNode()){
+            // search existing or create new MeasurementArea and link processor to id.
+            int measurementAreaId = transformShapeToMeasurementArea(scenarioFile, measurementArea, mapper);
+            remove(attr, "waitingArea");
+            addIntegerField(attr, "waitingAreaId", measurementAreaId);
+        }
+    }
+
+
+
+    public JsonNode measurementAreaType1(JsonNode scenarioFile) throws MigrationException{
+        String[] processorTypes = {
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",  // todo type 1 (measurementArea -> measurementAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",  //todo type 1 (measurementArea -> measurementAreaId)
+        };
+
+        for (String type : processorTypes) {
+            ArrayList<JsonNode> processor =
+                    getProcessorsByType(scenarioFile, type);
+            for (JsonNode p : processor) {
+                //
+                migrate_measurementArea(scenarioFile, p);
+                //
             }
         }
+        return scenarioFile;
+    }
+
+    public JsonNode measurementAreaType2(JsonNode scenarioFile) throws MigrationException{
+        String[] processorTypes = {
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramDProcessor", //todo type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
+            "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramEProcessor", //todo type 2 (measurementArea -> measurementAreaId, voronoiArea -> voronoiMeasurementAreaIdArea)
+        };
+
+        for (String type : processorTypes) {
+            ArrayList<JsonNode> processor =
+                    getProcessorsByType(scenarioFile, type);
+            for (JsonNode p : processor) {
+                //
+                migrate_measurementArea(scenarioFile, p);
+                //
+                migrate_voronoiArea(scenarioFile, p);
+                //
+            }
+        }
+        return scenarioFile;
+    }
+
+    public JsonNode measurementAreaType3(JsonNode scenarioFile) throws MigrationException{
+        String[] processorTypes = {
+            "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityVoronoiProcessor", // todo type 4 (voronoiArea -> voronoiMeasurementAreaIdArea)
+        };
+
+        for (String type : processorTypes) {
+            ArrayList<JsonNode> processor =
+                    getProcessorsByType(scenarioFile, type);
+            for (JsonNode p : processor) {
+                //
+                migrate_voronoiArea(scenarioFile, p);
+                //
+            }
+        }
+        return scenarioFile;
+    }
+
+    public JsonNode measurementAreaType4(JsonNode scenarioFile) throws MigrationException{
+        String[] processorTypes = {
+            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianCrossingTimeProcessor", //todo type 3 (waitingArea -> waitingAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingEndTimeProcessor", // todo type 3 (waitingArea -> waitingAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor" //todo type 3 (waitingArea -> waitingAreaId)
+        };
+
+        for (String type : processorTypes) {
+            ArrayList<JsonNode> processor =
+                    getProcessorsByType(scenarioFile, type);
+            for (JsonNode p : processor) {
+                //
+                migrate_waitingArea(scenarioFile, p);
+                //
+            }
+        }
+        return scenarioFile;
+    }
+
+    private JsonNode removeShapeFromDataProcessors(JsonNode scenarioFile) throws MigrationException {
+
 
         return scenarioFile;
     }

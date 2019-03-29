@@ -9,6 +9,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
@@ -25,7 +26,8 @@ import org.vadere.util.geometry.shapes.VRectangle;
 @DataProcessorClass()
 public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
 
-	private VRectangle measurementArea;
+	private MeasurementArea measurementArea;
+
 	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramCProcessor() {
@@ -36,8 +38,12 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
-		measurementArea = att.getMeasurementArea();
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+		if (measurementArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+		if (!measurementArea.isRectangular())
+			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
 	}
 
 	@Override
@@ -58,11 +64,11 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		pedestrianVelocityProcessor.update(state);
 		long N = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementArea.asVRectangle().contains(pedestrian.getPosition()))
 				.count();
 		double velocity = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementArea.asVRectangle().contains(pedestrian.getPosition()))
 				.mapToDouble(pedestrian ->
 						//pedestrian.getVelocity().getLength()
 						pedestrianVelocityProcessor.getValue(new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId()))
@@ -76,7 +82,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 			velocity /= N;
 		}
 
-		double density = N / measurementArea.getArea();
+		double density = N / measurementArea.asVRectangle().getArea();
 
 		putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));
 	}

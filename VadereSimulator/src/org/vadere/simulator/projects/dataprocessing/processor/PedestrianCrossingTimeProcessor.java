@@ -8,9 +8,11 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesCrossingTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
@@ -19,7 +21,7 @@ import java.util.Collection;
 @DataProcessorClass()
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>{
 
-	private VRectangle measurementArea;
+	private MeasurementArea measurementArea;
 	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
@@ -35,9 +37,9 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
 
 			for(FootStep footStep : ped.getFootSteps()) {
-				if(footStep.intersects(measurementArea)) {
+				if(footStep.intersects(measurementArea.asVRectangle())) {
 
-					double intersectionTime = footStep.computeIntersectionTime(measurementArea);
+					double intersectionTime = footStep.computeIntersectionTime(measurementArea.asVRectangle());
 					if(!hasCrossStartTime(key)) {
 						setStartTime(key, intersectionTime);
 					}
@@ -75,7 +77,13 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
-		this.measurementArea = att.getMeasurementArea();
+		this.measurementArea  = manager.getMeasurementArea(att.getMeasurementAreaId());
+		if (measurementArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+		if (!measurementArea.isRectangular())
+			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+
+
 	}
 
 	@Override
