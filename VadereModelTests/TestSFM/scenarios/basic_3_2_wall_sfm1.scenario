@@ -1,8 +1,7 @@
 {
   "name" : "basic_3_2_wall_sfm1",
   "description" : "",
-  "release" : "0.7",
-  "commithash" : "warning: no commit hash",
+  "release" : "0.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -14,16 +13,11 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 9.0,
-          "y" : 0.0,
-          "width" : 7.0,
-          "height" : 10.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.sfm.SocialForceModel",
@@ -98,6 +92,16 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 9.0,
+          "y" : 0.0,
+          "width" : 7.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -117,6 +121,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -138,6 +143,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -147,8 +153,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
-    }
+      "teleporter" : null,
+      "attributesCar" : null
+    },
+    "eventInfos" : [ ]
   }
 }
