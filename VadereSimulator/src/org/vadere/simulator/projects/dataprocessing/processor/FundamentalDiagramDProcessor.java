@@ -6,12 +6,11 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
-import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.util.factory.processors.ProcessorFlag;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.factory.processors.Flag;
 
 import java.util.List;
 
@@ -28,8 +27,8 @@ import java.util.List;
  *
  * @author Benedikt Zoennchen
  */
-@DataProcessorClass(processorFlags = {ProcessorFlag.needMeasurementArea})
-public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+@DataProcessorClass()
+public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  implements UsesMeasurementArea {
 
 	private IntegralVoronoiAlgorithm integralVoronoiAlgorithm;
 	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
@@ -81,14 +80,10 @@ public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double,
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
 	}
 
+
 	@Override
-	public boolean sanityCheck(Object o) {
-		List<MeasurementArea> data = (List<MeasurementArea>) o;
+	public int[] getReferencedMeasurementAreaId() {
 		AttributesFundamentalDiagramDProcessor att = (AttributesFundamentalDiagramDProcessor) this.getAttributes();
-
-		boolean match1 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getVoronoiMeasurementAreaId());
-		boolean match2 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
-
-		return match1 && match2;
+		return new int[]{att.getVoronoiMeasurementAreaId(), att.getMeasurementAreaId()};
 	}
 }

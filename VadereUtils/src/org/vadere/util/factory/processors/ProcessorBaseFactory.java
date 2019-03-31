@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProcessorBaseFactory<T> extends BaseFactory<T, ProcessorFactoryObject<T>> {
 
@@ -24,9 +25,9 @@ public class ProcessorBaseFactory<T> extends BaseFactory<T, ProcessorFactoryObje
 		return supplierMap.keySet().stream().collect(Collectors.toList());
 	}
 
-	public ArrayList<ProcessorFlag> getFlag(String key){
+	public ArrayList<Flag> getFlag(String key){
 		ProcessorFactoryObject<T> processorFactoryObject = supplierMap.get(key);
-		return processorFactoryObject.getProcessorFlags();
+		return processorFactoryObject.getFlags();
 	}
 
 	public boolean containsFlag(Class processor, String flagStr){
@@ -34,7 +35,7 @@ public class ProcessorBaseFactory<T> extends BaseFactory<T, ProcessorFactoryObje
 		if (processorFactoryObject == null)
 			return false;
 
-		ProcessorFlag flag = new ProcessorFlag(flagStr);
-		return processorFactoryObject.getProcessorFlags().stream().anyMatch(f -> f.equals(flag));
+		Flag flag = new Flag(flagStr);
+		return processorFactoryObject.getFlags().stream().anyMatch(f -> f.equals(flag));
 	}
 }

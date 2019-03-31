@@ -4,14 +4,13 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.factory.processors.ProcessorFlag;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,8 +18,8 @@ import java.util.List;
 /**
  * @author Mario Teixeira Parente
  */
-@DataProcessorClass(processorFlags = {ProcessorFlag.needMeasurementArea})
-public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
+@DataProcessorClass()
+public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKey, Double>  implements UsesMeasurementArea {
 	private double lastSimTime;
 	private MeasurementArea waitingArea;
 
@@ -72,12 +71,8 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 	}
 
 	@Override
-	public boolean sanityCheck(Object o) {
-		List<MeasurementArea> data = (List<MeasurementArea>) o;
+	public int[] getReferencedMeasurementAreaId() {
 		AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) this.getAttributes();
-
-		boolean match1 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getWaitingAreaId());
-
-		return match1;
+		return new int[]{att.getWaitingAreaId()};
 	}
 }

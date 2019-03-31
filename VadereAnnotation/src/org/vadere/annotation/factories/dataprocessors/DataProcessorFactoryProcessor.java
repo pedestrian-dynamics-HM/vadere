@@ -5,6 +5,8 @@ import com.google.auto.service.AutoService;
 import org.vadere.annotation.factories.BaseFactoryProcessor;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 import javax.annotation.processing.Processor;
@@ -12,6 +14,10 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 @SupportedAnnotationTypes("org.vadere.annotation.factories.dataprocessors.DataProcessorClass")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
@@ -91,7 +97,27 @@ public class DataProcessorFactoryProcessor extends BaseFactoryProcessor {
 
 	private String[] processorFlags(Element element){
 		DataProcessorClass dataProcessorClass = element.getAnnotation(DataProcessorClass.class);
-		return dataProcessorClass.processorFlags();
+
+		Elements elementUtil = processingEnv.getElementUtils();
+		Types typeUtil = processingEnv.getTypeUtils();
+
+		ArrayList<String> flags = new ArrayList<>();
+		TypeMirror processorFlag = elementUtil
+			.getTypeElement("org.vadere.simulator.projects.dataprocessing.flags.ProcessorFlag")
+			.asType();
+
+		// cast possible becuse element is a class
+		TypeElement e = (TypeElement)element;
+		for (TypeMirror anInterface : e.getInterfaces()) {
+			if (typeUtil.isAssignable(anInterface, processorFlag)){
+				flags.add(typeUtil.asElement(anInterface).getSimpleName().toString());
+
+			}
+		}
+
+		flags.addAll(Arrays.asList(dataProcessorClass.processorFlags()));
+
+		return flags.toArray(String[]::new);
 	}
 
 }

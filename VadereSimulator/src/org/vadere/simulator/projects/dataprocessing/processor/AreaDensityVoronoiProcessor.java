@@ -1,12 +1,13 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.util.factory.processors.ProcessorFlag;
+import org.vadere.util.factory.processors.Flag;
 
 import java.util.List;
 
@@ -14,8 +15,8 @@ import java.util.List;
  * @author Mario Teixeira Parente
  *
  */
-@DataProcessorClass(label = "AreaDensityVoronoiProcessor", processorFlags = {ProcessorFlag.needMeasurementArea})
-public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
+@DataProcessorClass(label = "AreaDensityVoronoiProcessor")
+public class AreaDensityVoronoiProcessor extends AreaDensityProcessor implements UsesMeasurementArea {
 
     public AreaDensityVoronoiProcessor(){
         super();
@@ -45,14 +46,10 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
         return super.getAttributes();
     }
 
+
     @Override
-    public boolean sanityCheck(Object o) {
-        List<MeasurementArea> data = (List<MeasurementArea>) o;
+    public int[] getReferencedMeasurementAreaId() {
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
-
-        boolean match1 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getVoronoiMeasurementAreaId());
-        boolean match2 = data.stream().map(MeasurementArea::getId).anyMatch(id -> id == att.getMeasurementAreaId());
-
-        return match1 && match2;
+        return new int[]{att.getMeasurementAreaId(), att.getMeasurementAreaId()};
     }
 }
