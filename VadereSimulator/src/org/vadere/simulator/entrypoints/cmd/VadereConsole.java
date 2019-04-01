@@ -14,6 +14,7 @@ import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
 
 
@@ -25,6 +26,7 @@ import org.vadere.util.logging.StdOutErrLog;
 public class VadereConsole {
 
 	public static void main(String[] args) {
+		Logger.setMainArguments(args);
 //		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
 //			String[] tmp = {"migrate", "--create-new-version", "0.7",  "VadereSimulator/resources/"};
 //			args = tmp;
