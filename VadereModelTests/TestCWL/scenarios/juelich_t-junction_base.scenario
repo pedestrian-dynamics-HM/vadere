@@ -310,6 +310,7 @@
         },
         "id" : 9
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 3,
