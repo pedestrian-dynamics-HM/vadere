@@ -5,7 +5,7 @@
 import os
 import time
 import density
-import heuristic
+import heuristic.t_junction as heuristic
 import utils.reader as reader
 import utils.writer as writer
 import utils.generator as generator
@@ -30,14 +30,15 @@ OUTPUT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_w
 # directory to write result files to
 RESULT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/myresults/')
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/output_01/')
-RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/results_01/')
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich-vadere/output_01/')
+RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich-vadere/results_01/')
 
 # OBSERVATION_AREA select data from observed area, [offset_x, offset_y, width, height]
 # [7,23,5,5]
 # [20, 5, 10, 10]
 # [25, 5, 10, 10]
 # OBSERVATION_AREA = [20, 10, 10, 10]
+# OBSERVATION_AREA = [13.50, 7.25, 2.4, 1]
 OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
 
 TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
@@ -51,7 +52,7 @@ SIM_TIME_STEP_LENGTH = 0.4  # unused right now
 test_size_percent = 0.2
 use_cores = 4
 # directory = '../../data/output_preprocessed/'
-NTREES = 50
+NTREES = 20
 number_of_targets = 3  # default
 tree_depth = None  # as long as possible
 

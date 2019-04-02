@@ -1,1 +1,0 @@
-from heuristic.heuristic import *

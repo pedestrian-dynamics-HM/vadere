@@ -34,40 +34,55 @@ def calc_and_print_errors(y_test_density, y_predicted_normiert, log_file):
 
 
     ### Print to console
-    print("RMSE (per direction): [%f %f %f]" % (rmse_per_tree[0], rmse_per_tree[1], rmse_per_tree[2]))
-    print("RMSE (per direction): [%.2f%% %.2f%% %.2f%%]\n" % (
-    rmse_per_tree[0] * 100, rmse_per_tree[1] * 100, rmse_per_tree[2] * 100))
+    if len(rmse_per_tree) == 3:
+        print("RMSE (per direction): [%f %f %f]" % (rmse_per_tree[0], rmse_per_tree[1], rmse_per_tree[2]))
+        print("RMSE (per direction): [%.2f%% %.2f%% %.2f%%]\n" % (rmse_per_tree[0] * 100, rmse_per_tree[1] * 100, rmse_per_tree[2] * 100))
+    elif len(rmse_per_tree) == 2:
+        print("RMSE (per direction): [%f %f]" % (rmse_per_tree[0], rmse_per_tree[1]))
+        print("RMSE (per direction): [%.2f%% %.2f%%]\n" % (rmse_per_tree[0] * 100, rmse_per_tree[1] * 100))
 
     print("Mean Euclidean Error: %f" % euklid_error_mean)
     print("Mean Euclidean Error: %.2f%%" % euklid_error_mean_percent)
     print("Std  Euclidean Error: %f " % euklid_error_std)
     print("Std  Euclidean Error: %.2f%% \n" % (euklid_error_std / np.sqrt(2) * 100))
 
-    print(
-        "Mean Absolute Error (per direction): [%f %f %f] " % (mean_abs_error[0], mean_abs_error[1], mean_abs_error[2]))
-    print("Mean Absolute Error (per direction): [%.2f%% %.2f%% %.2f%%]" % (
-    mean_abs_error_percent[0], mean_abs_error_percent[1], mean_abs_error_percent[2]))
-    print("Mean Error          (per direction): [%f %f %f]" % (mean_error[0], mean_error[1], mean_error[2]))
-
+    if len(rmse_per_tree) == 3:
+        print("Mean Absolute Error (per direction): [%f %f %f] " % (mean_abs_error[0], mean_abs_error[1], mean_abs_error[2]))
+        print("Mean Absolute Error (per direction): [%.2f%% %.2f%% %.2f%%]" % (mean_abs_error_percent[0], mean_abs_error_percent[1], mean_abs_error_percent[2]))
+        print("Mean Error          (per direction): [%f %f %f]" % (mean_error[0], mean_error[1], mean_error[2]))
+    elif len(rmse_per_tree) == 2:
+        print("Mean Absolute Error (per direction): [%f %f] " % (mean_abs_error[0], mean_abs_error[1]))
+        print("Mean Absolute Error (per direction): [%.2f%% %.2f%%]" % (mean_abs_error_percent[0], mean_abs_error_percent[1]))
+        print("Mean Error          (per direction): [%f %f]" % (mean_error[0], mean_error[1]))
 
     ###### Write results to file
 
     log_file.write(" * Errors on test data set: \n\n")
 
-    log_file.write("RMSE (per direction): [%f %f %f] \n" % (rmse_per_tree[0], rmse_per_tree[1], rmse_per_tree[2]))
-    log_file.write("RMSE (per direction): [%.2f%% %.2f%% %.2f%%] \n\n" % (
-    rmse_per_tree[0] * 100, rmse_per_tree[1] * 100, rmse_per_tree[2] * 100))
+    if len(rmse_per_tree) == 3:
+        log_file.write("RMSE (per direction): [%f %f %f] \n" % (rmse_per_tree[0], rmse_per_tree[1], rmse_per_tree[2]))
+        log_file.write("RMSE (per direction): [%.2f%% %.2f%% %.2f%%] \n\n" % (rmse_per_tree[0] * 100, rmse_per_tree[1] * 100, rmse_per_tree[2] * 100))
 
-    log_file.write("Mean Euclidean Error: %f \n" % euklid_error_mean)
-    log_file.write("Mean Euclidean Error: %.2f%% \n" % euklid_error_mean_percent)
-    log_file.write("Std  Euclidean Error: %f \n" % euklid_error_std)
-    log_file.write("Std  Euclidean Error: %.2f%% \n\n" % (euklid_error_std / np.sqrt(2) * 100))
+        log_file.write("Mean Euclidean Error: %f \n" % euklid_error_mean)
+        log_file.write("Mean Euclidean Error: %.2f%% \n" % euklid_error_mean_percent)
+        log_file.write("Std  Euclidean Error: %f \n" % euklid_error_std)
+        log_file.write("Std  Euclidean Error: %.2f%% \n\n" % (euklid_error_std / np.sqrt(2) * 100))
 
-    log_file.write(
-        "Mean Absolute Error (per forest): [%f %f %f] \n" % (mean_abs_error[0], mean_abs_error[1], mean_abs_error[2]))
-    log_file.write("Mean Absolute Error (per direction): [%.2f%% %.2f%% %.2f%%] \n" % (
-    mean_abs_error_percent[0], mean_abs_error_percent[1], mean_abs_error_percent[2]))
-    log_file.write("Mean Error          (per direction): [%f %f %f] \n" % (mean_error[0], mean_error[1], mean_error[2]))
+        log_file.write("Mean Absolute Error (per forest): [%f %f %f] \n" % (mean_abs_error[0], mean_abs_error[1], mean_abs_error[2]))
+        log_file.write("Mean Absolute Error (per direction): [%.2f%% %.2f%% %.2f%%] \n" % (mean_abs_error_percent[0], mean_abs_error_percent[1], mean_abs_error_percent[2]))
+        log_file.write("Mean Error          (per direction): [%f %f %f] \n" % (mean_error[0], mean_error[1], mean_error[2]))
+    elif len(rmse_per_tree) == 2:
+        log_file.write("RMSE (per direction): [%f %f] \n" % (rmse_per_tree[0], rmse_per_tree[1]))
+        log_file.write("RMSE (per direction): [%.2f%% %.2f%%] \n\n" % (rmse_per_tree[0] * 100, rmse_per_tree[1] * 100))
+
+        log_file.write("Mean Euclidean Error: %f \n" % euklid_error_mean)
+        log_file.write("Mean Euclidean Error: %.2f%% \n" % euklid_error_mean_percent)
+        log_file.write("Std  Euclidean Error: %f \n" % euklid_error_std)
+        log_file.write("Std  Euclidean Error: %.2f%% \n\n" % (euklid_error_std / np.sqrt(2) * 100))
+
+        log_file.write("Mean Absolute Error (per forest): [%f %f] \n" % (mean_abs_error[0], mean_abs_error[1]))
+        log_file.write("Mean Absolute Error (per direction): [%.2f%% %.2f%%] \n" % (mean_abs_error_percent[0], mean_abs_error_percent[1]))
+        log_file.write("Mean Error          (per direction): [%f %f] \n" % (mean_error[0], mean_error[1]))
 
     log_file.flush()
 

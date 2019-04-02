@@ -26,9 +26,7 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
 
     #  Some useful length measurements
     imported_files = os.listdir(directory)
-    print(imported_files)
-
-
+    
     startTime = time.time()
 
     # import data
@@ -88,6 +86,8 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
         y_predicted_tmp = rf_density_regressor.predict(x_test_density)
         y_predicted[:,iTarget] = y_predicted_tmp
 
+        #np.savetxt("y_predicted_tmp_{0}.csv".format(iTarget), y_predicted_tmp, delimiter=",")
+        
         print('Prediction is done [%.2f s]' % (time.time() - startTime))
 
         # Evaluate performance
@@ -95,12 +95,16 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
         score_test[iTarget] = rf_density_regressor.score(x_test_density, y_test_density.iloc[:, iTarget])
         score_oob[iTarget] = rf_density_regressor.oob_score_
 
-
+    # np.savetxt("y_predicted.csv", y_predicted, delimiter=",")
 
     # standardization
     row_sums = y_predicted.sum(axis=1)
     y_predicted_normiert = y_predicted / row_sums[:, np.newaxis]
 
+    combined = np.zeros((len(y_predicted_normiert), 6))
+    combined[:, :3] = y_predicted_normiert
+    combined[:, 3:] = y_test_density_np
+    np.savetxt("y_predicted_norm.csv", combined, delimiter=",")
 
     log_file.write("\n * RANDOM FOREST RESULTS * \n")
 

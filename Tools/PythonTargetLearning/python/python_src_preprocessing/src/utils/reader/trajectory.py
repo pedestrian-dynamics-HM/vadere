@@ -1,6 +1,7 @@
 import csv
 from glob import glob
 import numpy as np
+import pandas as pd
 
 ################################################################################
 # run with `python main_rf.py`                                                    #
@@ -24,6 +25,16 @@ def get_all_trajectory_files(root_dir):
     files = glob(root_dir + '/**/*.trajectories')
     return files
 
+
+def read_trajectory_file(path, fps=None):
+    frame = pd.read_csv(path, sep=' ', header=0)
+
+    if fps is not None:
+        d = 2
+
+    return frame
+
+'''
 def read_trajectory_file(path):
     #print(path)
     file = open(path, newline='\n')
@@ -32,6 +43,7 @@ def read_trajectory_file(path):
     for row in file_reader:
         scenario.append(row)
     return scenario[1:] # remove head row with labels
+'''
 
 def convert_data(data):
     def convert_row(row):

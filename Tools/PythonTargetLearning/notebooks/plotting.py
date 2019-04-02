@@ -33,16 +33,16 @@ def processRow(args):
 
   return True
 
-def processFile(file, base_directory, image_directory):
+def processFile(file, base_directory, image_directory, number_of_cores=1, _filter=lambda x: x):
   path = os.path.join(image_directory, file[:-4])
   try:
     os.mkdir(path)
   except Exception:
     print("Path", path, "already exists")
 
-  print("using 1 processor")
   for chunk in pd.read_csv(open(os.path.join(base_directory, file), 'r'), sep=';', header=None, chunksize=500):
-    with Pool(processes=1) as p:
+    chunk = _filter(chunk)
+    with Pool(processes=number_of_cores) as p:
         with tqdm(total=len(chunk), desc='process chunk', leave=False) as pbar:
             rows = list(map(lambda r: (*r, path), list(chunk.iterrows())))
             for i, result in enumerate(p.imap_unordered(processRow, rows)):
