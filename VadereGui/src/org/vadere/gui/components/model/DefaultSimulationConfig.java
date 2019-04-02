@@ -23,6 +23,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showAbsorbingAreas = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
+	private boolean showMeasurementArea = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
 	private boolean showWalkdirection = false;
@@ -151,6 +152,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowObstacles(boolean showObstacles) {
 		this.showObstacles = showObstacles;
+		setChanged();
+	}
+
+	public boolean isShowMeasurementArea(){
+		return showMeasurementArea;
+	}
+
+	public void setShowMeasurementArea(boolean showMeasurementArea){
+		this.showMeasurementArea = showMeasurementArea;
 		setChanged();
 	}
 

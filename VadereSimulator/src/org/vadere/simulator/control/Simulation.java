@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Simulation {
 
@@ -319,10 +320,17 @@ public class Simulation {
 		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
 
 		for (Model m : models) {
-			m.update(simTimeInSec);
-			if (topography.isRecomputeCells()){
-				// rebuild CellGrid if model does not manage the CellGrid state while updating
-				topographyController.update(simTimeInSec); //rebuild CellGrid
+			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
+			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
+			
+			// Only update until there are pedestrians in the scenario or pedestrian to spawn
+			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 ) {
+				m.update(simTimeInSec);
+
+				if (topography.isRecomputeCells()) {
+					// rebuild CellGrid if model does not manage the CellGrid state while updating
+					topographyController.update(simTimeInSec); //rebuild CellGrid
+				}
 			}
 		}
 

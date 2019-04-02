@@ -36,6 +36,8 @@ public class TopographyElementFactory {
 				return new org.vadere.state.scenario.AbsorbingArea(new AttributesAbsorbingArea(shape));
 			case PEDESTRIAN:
 				return new AgentWrapper(((VCircle) shape).getCenter());
+			case MEASUREMENT_AREA:
+				return new org.vadere.state.scenario.MeasurementArea(new AttributesMeasurementArea(-1, shape));
 			default:
 				throw new IllegalArgumentException("unsupported ScenarioElementType.");
 		}
@@ -50,6 +52,8 @@ public class TopographyElementFactory {
 			return new org.vadere.state.scenario.Source((AttributesSource) attributes);
 		} else if (attributes instanceof AttributesTarget) {
 			return new org.vadere.state.scenario.Target((AttributesTarget) attributes);
+		} else if (attributes instanceof AttributesMeasurementArea) {
+				return new org.vadere.state.scenario.MeasurementArea((AttributesMeasurementArea) attributes);
 		} else if (attributes instanceof AttributesAbsorbingArea) {
 			return new org.vadere.state.scenario.AbsorbingArea((AttributesAbsorbingArea) attributes);
 		} else {

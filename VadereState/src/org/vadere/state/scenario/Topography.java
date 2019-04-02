@@ -69,6 +69,11 @@ public class Topography implements DynamicElementMover{
 	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
+	 * MeasurementAreas.
+	 */
+	private final LinkedList<MeasurementArea> measurementAreas;
+
+	/**
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
 	private List<Obstacle> boundaryObstacles;
@@ -114,12 +119,14 @@ public class Topography implements DynamicElementMover{
 		targets = new LinkedList<>();
 		absorbingAreas = new LinkedList<>();
 		boundaryObstacles = new LinkedList<>();
-		
+		measurementAreas = new LinkedList<>();
+
 		allScenarioElements.add(obstacles);
 		allScenarioElements.add(stairs);
 		allScenarioElements.add(sources);
 		allScenarioElements.add(targets);
 		allScenarioElements.add(boundaryObstacles);
+		allScenarioElements.add(measurementAreas);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -299,6 +306,8 @@ public class Topography implements DynamicElementMover{
 		return teleporter;
 	}
 
+	public List<MeasurementArea> getMeasurementAreas() {return  measurementAreas; }
+
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;
 	}
@@ -321,6 +330,10 @@ public class Topography implements DynamicElementMover{
 
 	public void addObstacle(Obstacle obstacle) {
 		this.obstacles.add(obstacle);
+	}
+
+	public void addMeasurementArea(MeasurementArea measurementArea){
+		this.measurementAreas.add(measurementArea);
 	}
 
 	public void addStairs(Stairs stairs) {
@@ -434,6 +447,11 @@ public class Topography implements DynamicElementMover{
 			else
 				s.addObstacle(obstacle.clone());
 		}
+
+		for (MeasurementArea measurementArea : this.getMeasurementAreas()){
+			s.addMeasurementArea(measurementArea);
+		}
+
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
@@ -532,6 +550,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
 		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
 		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 
 		sources.stream()
@@ -549,6 +568,10 @@ public class Topography implements DynamicElementMover{
 		stairs.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		measurementAreas.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 
 		absorbingAreas.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -572,6 +595,7 @@ public class Topography implements DynamicElementMover{
 		all.addAll(targets);
 		all.addAll(sources);
 		all.addAll(boundaryObstacles);
+		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
 		return  all;
 
