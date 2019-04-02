@@ -220,6 +220,7 @@ public class AttributesSource extends AttributesEmbedShape {
 		checkSealed();
 		this.dynamicElementType = dynamicElementType;
 	}
+
 	public List<List<Integer>> getTargetDistributionIds() {
 		return targetDistributionIds;
 	}
@@ -236,5 +237,10 @@ public class AttributesSource extends AttributesEmbedShape {
 	public void setTargetDistributionProbabilities(List<Double> targetDistributionProbabilities) {
 		checkSealed();
 		this.targetDistributionProbabilities = targetDistributionProbabilities;
+	}
+	
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
 	}
 }

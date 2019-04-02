@@ -18,13 +18,13 @@ public class TargetDistribution {
         double randomNumber = random.nextDouble();
         double tmpSum = 0;
 
-        if (distribution.size() == 0) {
-            throw new RuntimeException("Distribution parameter from SourceAttributes cannot be empty.");
-        }
-        for (int i = 0; i < distribution.size(); i++) {
-            tmpSum += distribution.get(i);
-            if (randomNumber < tmpSum) {
-                return targetIds.get(i);
+        if (distribution.size() > 0) {
+            // throw new RuntimeException("Distribution parameter from SourceAttributes cannot be empty.");
+            for (int i = 0; i < distribution.size(); i++) {
+                tmpSum += distribution.get(i);
+                if (randomNumber < tmpSum) {
+                    return targetIds.get(i);
+                }
             }
         }
 

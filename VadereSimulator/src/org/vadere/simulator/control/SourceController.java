@@ -11,6 +11,7 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.TargetDistribution;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -155,8 +156,19 @@ public abstract class SourceController {
 		// TODO [priority=high] [task=refactoring] why only if he has no targets? because the createElement method
 		// might add some.
 
-		List<Integer> targets = targetDistribution.returnTargets(sourceAttributes.getTargetDistributionIds(),sourceAttributes.getTargetDistributionProbabilities());
-		newElement.setTargets(new LinkedList<>(targets));
+		List<List<Integer>> distributionIds = sourceAttributes.getTargetDistributionIds();
+		List<Double> distributionProbabilities = sourceAttributes.getTargetDistributionProbabilities();
+
+		if (distributionIds.size() == 0 || distributionProbabilities.size() == 0) {
+			if (newElement.getTargets().isEmpty()) {
+				newElement.setTargets(new LinkedList<>(sourceAttributes.getTargetIds()));
+			}
+		} else {
+			List<Integer> targets = targetDistribution.returnTargets(distributionIds, distributionProbabilities);
+			if (targets != null) {
+				newElement.setTargets(new LinkedList<>(targets));
+			}
+		}
 
 		topography.addElement(newElement);
 	}
