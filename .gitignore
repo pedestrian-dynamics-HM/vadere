@@ -12,18 +12,10 @@ vadere_analysis_tool/build
 # IDEs
 .idea/
 *.iml
-
 .settings/
 .metadata/
 .classpath
 .project
-
-#PyCharm
-__pycache__
-
-#Jupyter
-.ipynb_checkpoints
-
 
 # Package specific
 VadereGui/*.png
