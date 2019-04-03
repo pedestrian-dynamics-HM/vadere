@@ -285,7 +285,7 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 35.0,
+          "width" : 40.0,
           "height" : 12.0
         },
         "boundingBoxWidth" : 0.5,
