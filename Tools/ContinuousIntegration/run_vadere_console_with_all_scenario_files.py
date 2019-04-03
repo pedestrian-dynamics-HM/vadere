@@ -16,15 +16,15 @@ import shutil
 import subprocess
 import time
 
-long_timeout_in_seconds = 12 * 60
+long_timeout_in_seconds = 13 * 60
 short_timeout_in_seconds = 2 * 60
 
 def parse_command_line_arguments():
     parser = argparse.ArgumentParser(description="Run all scenario files.")
     parser.add_argument("--scenario", "-s", type=str, nargs="?", help="Run only the given scenario file and not all. E.g. \"VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
-    
+
     args = parser.parse_args()
-    
+
     return args
 
 def run_all():
@@ -120,7 +120,7 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
             print("Finished scenario file ({:.1f} s): {}".format(wall_time_delta, scenario_file))
             passed_scenarios.append(scenario_file)
-            
+
         except subprocess.TimeoutExpired as exception:
             print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: timeout after {} s".format(exception.timeout))
@@ -176,7 +176,7 @@ def print_summary(passed_and_failed_scenarios):
 
 if __name__ == "__main__":
     args = parse_command_line_arguments()
-    
+
     if args.scenario == None:
         passed_and_failed_scenarios = run_all()
     else:
