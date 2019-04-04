@@ -1,6 +1,6 @@
 The java_migration branch has used the following steps to compile and run vadere with JDK-11 on Windows 10:
 
-0. Ensure that JDK-11 and Git is set in the environment variables
+0. Ensure that OpenJDK11 and Git is set in the environment variables
 
 1. Adjust the IDE (IntelliJ)
    -> Make sure that you have the latest version of IntelliJ (in some older versions, Java 11 is not supported!)
@@ -47,12 +47,15 @@ The java_migration branch has used the following steps to compile and run vadere
         </plugins>
     </build>
 
-3. Compile
-3.1 Run "mvn -e clean test-compile compile" (-e for error stack trace)
-3.* possibly required updates: "mvn versions:display-dependency-updates" and "mvn versions:display-plugin-updates"
+3. Remove local Maven repository to avoid conflicts with older Java packages
+3.1 rm -R "~/.m2"
 
-4. Create local runtime
-4.1 Run "jdeps --list-deps VadereGui/target/vadere.jar"
-4.2 Run "jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.base,java.compiler,java.datatransfer,java.desktop,java.logging,java.management,java.naming,java.prefs,java.rmi,java.scripting,java.sql,java.xml --output java-runtime"
+4. Compile
+4.1 Run "mvn -e clean test-compile compile" (-e for error stack trace)
+4.* possibly required updates: "mvn versions:display-dependency-updates" and "mvn versions:display-plugin-updates"
+
+5. Optional: Create local runtime for Vadere which omits unnecessary Java packages
+5.1 Run "jdeps --list-deps VadereGui/target/vadere.jar"
+5.2 Run "jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.base,java.compiler,java.datatransfer,java.desktop,java.logging,java.management,java.naming,java.prefs,java.rmi,java.scripting,java.sql,java.xml --output java-runtime"
 // The main output of jdeps is used as the parameter for jlink --add-modules.
-4.3 Run "java-runtime/bin/java -jar VadereGui/target/vadere.jar"
+5.3 Run "java-runtime/bin/java -jar VadereGui/target/vadere.jar"
