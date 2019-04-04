@@ -1,7 +1,7 @@
 {
   "name" : "Neues_Szenario",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -75,20 +75,8 @@
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 5.0,
-          "y" : 2.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 5.0,
-          "y" : 2.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        }
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
@@ -148,26 +136,14 @@
       "id" : 15,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 5.0,
-          "y" : 2.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingEndTimeProcessor",
       "id" : 16,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 5.0,
-          "y" : 2.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOSMStrideLengthProcessor",
@@ -341,7 +317,17 @@
         "acceleration" : 2.0
       },
       "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 5.0,
+          "y" : 2.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ]
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_osm1",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
