@@ -12,6 +12,7 @@ import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProces
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.factory.processors.Flag;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
 public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>> implements UsesMeasurementArea {
 
 	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
 
 	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
@@ -47,6 +49,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
 		if (!measurementArea.isRectangular())
 			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 
 	@Override
@@ -67,11 +70,11 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		pedestrianVelocityProcessor.update(state);
 		long N = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.asVRectangle().contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
 				.count();
 		double velocity = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.asVRectangle().contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
 				.mapToDouble(pedestrian ->
 						//pedestrian.getVelocity().getLength()
 						pedestrianVelocityProcessor.getValue(new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId()))
@@ -85,7 +88,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 			velocity /= N;
 		}
 
-		double density = N / measurementArea.asVRectangle().getArea();
+		double density = N / measurementAreaVRec.getArea();
 
 		putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));
 	}

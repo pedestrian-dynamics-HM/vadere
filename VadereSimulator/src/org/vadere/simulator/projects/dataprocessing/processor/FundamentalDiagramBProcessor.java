@@ -13,6 +13,7 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.factory.processors.Flag;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 	private static Logger logger = Logger.getLogger(Topography.class);
 
 	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
 	private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
 
 	public FundamentalDiagramBProcessor() {
@@ -56,6 +58,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
 		if (!measurementArea.isRectangular())
 			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 
 	@Override
@@ -89,7 +92,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		for(Map.Entry<PedestrianIdKey, VTrajectory> trajectoryEntry : trajectoryMap.entrySet()) {
 			PedestrianIdKey key = trajectoryEntry.getKey();
 			VTrajectory trajectory = trajectoryEntry.getValue();
-			VTrajectory clone = trajectory.cut(measurementArea.asVRectangle());
+			VTrajectory clone = trajectory.cut(measurementAreaVRec);
 			cutTrajectoryMap.put(key, clone);
 		}
 
@@ -120,7 +123,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 				.sum();
 
 		densityIntegral /= duration;
-		densityIntegral /= measurementArea.asVRectangle().getArea();
+		densityIntegral /= measurementAreaVRec.getArea();
 		return densityIntegral;
 
 		/*List<Triple<Double, Double, Integer>> integralValues = new LinkedList<>();

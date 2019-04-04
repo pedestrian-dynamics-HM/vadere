@@ -13,6 +13,7 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.factory.processors.Flag;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
@@ -23,6 +24,8 @@ import java.util.List;
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>> implements UsesMeasurementArea {
 
 	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
+
 	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
@@ -38,9 +41,9 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
 
 			for(FootStep footStep : ped.getFootSteps()) {
-				if(footStep.intersects(measurementArea.asVRectangle())) {
+				if(footStep.intersects(measurementAreaVRec)) {
 
-					double intersectionTime = footStep.computeIntersectionTime(measurementArea.asVRectangle());
+					double intersectionTime = footStep.computeIntersectionTime(measurementAreaVRec);
 					if(!hasCrossStartTime(key)) {
 						setStartTime(key, intersectionTime);
 					}
@@ -83,7 +86,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
 		if (!measurementArea.isRectangular())
 			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
-
+		measurementAreaVRec = measurementArea.asVRectangle();
 
 	}
 
