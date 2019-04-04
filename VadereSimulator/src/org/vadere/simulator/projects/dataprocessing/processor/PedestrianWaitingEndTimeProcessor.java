@@ -11,6 +11,7 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @DataProcessorClass()
 public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianIdKey, Double> implements UsesMeasurementArea {
 	private MeasurementArea waitingArea;
+	private VRectangle waitingAreaVRec;
 
 	public PedestrianWaitingEndTimeProcessor() {
 		super("waitingEndTime");
@@ -34,7 +36,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 			int pedId = p.getId();
 			VPoint pos = p.getPosition();
 
-			if (this.waitingArea.asVRectangle().contains(pos)) {
+			if (this.waitingAreaVRec.contains(pos)) {
 				PedestrianIdKey key = new PedestrianIdKey(pedId);
 				this.putValue(key, state.getSimTimeInSec());
 			}
@@ -50,7 +52,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getWaitingAreaId()));
 		if (!waitingArea.isRectangular())
 			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
-
+		waitingAreaVRec = waitingArea.asVRectangle();
 	}
 
 	@Override
