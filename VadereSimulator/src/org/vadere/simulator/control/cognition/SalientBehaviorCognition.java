@@ -26,7 +26,7 @@ public class SalientBehaviorCognition {
         this.topography = topography;
     }
 
-    public void setSalientBehaviorForPedestrians(Collection<Pedestrian> pedestrians) {
+    public void setSalientBehaviorForPedestrians(Collection<Pedestrian> pedestrians, double simTimeInSec) {
         for (Pedestrian pedestrian : pedestrians) {
             // TODO: Set salient behavior for each pedestrian individually based on the most important event and/or if
             //   the pedestrian could not move for several time steps.

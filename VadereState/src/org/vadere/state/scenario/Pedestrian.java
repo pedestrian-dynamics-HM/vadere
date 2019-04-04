@@ -69,6 +69,7 @@ public class Pedestrian extends Agent {
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 		mostImportantEvent = other.mostImportantEvent;
+		salientBehavior = other.salientBehavior;
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
