@@ -1,6 +1,6 @@
 package org.vadere.simulator.control;
 
-import org.vadere.simulator.control.cognition.CognitionLayer;
+import org.vadere.simulator.control.cognition.EventCognition;
 import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -70,7 +70,7 @@ public class Simulation {
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
 	private final EventController eventController;
-	private final CognitionLayer cognitionLayer;
+	private final EventCognition eventCognition;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
@@ -101,7 +101,7 @@ public class Simulation {
 
 		// "eventController" is final. Therefore, create object here and not in helper method.
 		this.eventController = new EventController(scenarioStore);
-		this.cognitionLayer = new CognitionLayer();
+		this.eventCognition = new EventCognition();
 
 		createControllers(topography, mainModel, random);
 
@@ -317,7 +317,7 @@ public class Simulation {
 		step++;
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
-		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
+		eventCognition.prioritizeEventsForPedestrians(events, pedestrians);
 
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());

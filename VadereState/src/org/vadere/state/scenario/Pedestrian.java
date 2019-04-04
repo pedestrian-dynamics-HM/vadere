@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
@@ -20,7 +21,8 @@ public class Pedestrian extends Agent {
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
-	private Event mostImportantEvent; /** Evaluated in each time step in "CognitionLayer". */
+	private Event mostImportantEvent; /** Evaluated in each time step in "EventCognition". */
+	private SalientBehavior salientBehavior;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	/**
 	 * Footsteps is a list of foot steps a pedestrian made during the duration of one time step.
@@ -53,6 +55,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		mostImportantEvent = null;
+		salientBehavior = SalientBehavior.TARGET_ORIENTED;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -97,6 +100,7 @@ public class Pedestrian extends Agent {
 		return isLikelyInjured;
 	}
 	public Event getMostImportantEvent() { return mostImportantEvent; }
+	public SalientBehavior getSalientBehavior() { return salientBehavior; }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -116,6 +120,7 @@ public class Pedestrian extends Agent {
 		this.isLikelyInjured = likelyInjured;
 	}
 	public void setMostImportantEvent(Event mostImportantEvent) { this.mostImportantEvent = mostImportantEvent; }
+	public void setSalientBehavior(SalientBehavior salientBehavior) { this.salientBehavior = salientBehavior; }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
