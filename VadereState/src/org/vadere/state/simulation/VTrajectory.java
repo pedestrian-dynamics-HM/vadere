@@ -16,9 +16,15 @@ import java.util.stream.Stream;
 public class VTrajectory implements Iterable<FootStep> {
 
 	private LinkedList<FootStep> footSteps;
+	private transient LastFootSteps lastFootSteps;
 
 	public VTrajectory(){
+		this(10);
+	}
+
+	public VTrajectory(int lastFootStepCapacity){
 		footSteps = new LinkedList<>();
+		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
 	}
 
 	public Optional<Double> speed(@NotNull final VRectangle rectangle) {
@@ -83,7 +89,9 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	public void add(@NotNull final FootStep footStep) {
 		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
+
 		footSteps.add(footStep);
+		lastFootSteps.add(footStep);
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {

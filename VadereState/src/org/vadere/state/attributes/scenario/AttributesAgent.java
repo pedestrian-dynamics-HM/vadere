@@ -31,6 +31,9 @@ public class AttributesAgent extends AttributesDynamicElement {
 	// only used for the GNM and SFM
 	private double acceleration = 2.0;
 
+	// store n last foot steps for speed calculation
+	private int footStepsToStore = 10;
+
 	public AttributesAgent() {
 		this(-1);
 	}
@@ -51,6 +54,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.minimumSpeed = other.minimumSpeed;
 		this.maximumSpeed = other.maximumSpeed;
 		this.acceleration = other.acceleration;
+		this.footStepsToStore = other.footStepsToStore;
 	}
 
 	// Getters...
@@ -82,6 +86,10 @@ public class AttributesAgent extends AttributesDynamicElement {
 	public double getAcceleration() {
 		return acceleration;
 	}
+
+	public int getFootStepsToStore() { return footStepsToStore; }
+
+	// Setters...
 
 	public void setRadius(double radius) {
 		checkSealed();
@@ -116,5 +124,10 @@ public class AttributesAgent extends AttributesDynamicElement {
 	public void setAcceleration(double acceleration) {
 		checkSealed();
 		this.acceleration = acceleration;
+	}
+
+	public void setFootStepsToStore(int footStepsToStore) {
+		checkSealed();
+		this.footStepsToStore = footStepsToStore;
 	}
 }

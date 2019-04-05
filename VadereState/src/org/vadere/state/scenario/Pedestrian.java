@@ -59,7 +59,7 @@ public class Pedestrian extends Agent {
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
-		trajectory = new VTrajectory();
+		trajectory = new VTrajectory(attributesAgent.getFootStepsToStore());
 	}
 
 	private Pedestrian(Pedestrian other) {

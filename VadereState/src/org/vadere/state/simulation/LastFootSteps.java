@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 /**
  * Store the last foot steps of an agent to calculate the agent's average speed during simulation.
+ *
+ * TODO: Maybe, rename to "FootStepHistory".
  */
 public class LastFootSteps {
 
