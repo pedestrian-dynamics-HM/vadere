@@ -1,6 +1,5 @@
 package org.vadere.state.simulation;
 
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VRectangle;

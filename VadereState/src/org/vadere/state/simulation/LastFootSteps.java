@@ -1,6 +1,7 @@
 package org.vadere.state.simulation;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Store the last foot steps of an agent to calculate the agent's average speed during simulation.
@@ -69,4 +70,12 @@ public class LastFootSteps {
         return youngestFootStep;
     }
 
+    @Override
+    public String toString() {
+        String footStepPrefix = String.format("Last Footseps (%d): ", footSteps.size());
+
+        String footStepString = footSteps.stream().map(footStep -> footStep.toString()).collect(Collectors.joining(" -> "));
+
+        return footStepPrefix + footStepString;
+    }
 }
