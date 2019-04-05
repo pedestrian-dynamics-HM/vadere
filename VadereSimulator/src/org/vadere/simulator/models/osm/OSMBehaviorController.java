@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.events.types.BangEvent;
 import org.vadere.state.events.types.Event;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
@@ -12,6 +13,8 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
@@ -98,6 +101,27 @@ public class OSMBehaviorController {
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
         } else {
             // TODO: Maybe, log to console.
+        }
+    }
+
+    public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography) {
+        // TODO
+        //   1. Use topography to find a closest Pedestrian within step circle.
+        //   2. Check if candidate is SalientBehavior.COOPERATIVE.
+        //   3. Check if target orientation of candidate differs from own orientation.
+        //   4. Swap if checks (2) and (3) are true.
+        List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
+                .getObjects(pedestrian.getPosition(), pedestrian.getRadius() * 5);
+        closestPedestrians = closestPedestrians.stream().filter(candidate -> pedestrian.getId() != candidate.getId()).collect(Collectors.toList());
+
+        // TODO Remove debug code here.
+        if (pedestrian.getId() == 14) {
+            System.out.println(String.format("Me: %s", pedestrian.getPosition()));
+            System.out.println(String.format("Closest pedestrians: %d", closestPedestrians.size()));
+
+            if (closestPedestrians.size() > 0) {
+                System.out.println(String.format("Closest[0]: %s", closestPedestrians.get(0).getId()));
+            }
         }
     }
 
