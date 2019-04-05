@@ -23,6 +23,7 @@ public class LastFootSteps {
     // Getters
     public int getCapacity() { return capacity; }
     public ArrayList<FootStep> getFootSteps() { return footSteps; }
+    public int size() { return footSteps.size(); }
 
     // Methods
     public boolean add(FootStep footStep) {

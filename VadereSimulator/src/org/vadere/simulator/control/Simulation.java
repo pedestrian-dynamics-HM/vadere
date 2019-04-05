@@ -1,6 +1,7 @@
 package org.vadere.simulator.control;
 
 import org.vadere.simulator.control.cognition.EventCognition;
+import org.vadere.simulator.control.cognition.SalientBehaviorCognition;
 import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -71,6 +72,7 @@ public class Simulation {
 	private SimulationResult simulationResult;
 	private final EventController eventController;
 	private final EventCognition eventCognition;
+	private final SalientBehaviorCognition salientBehaviorCognition;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
@@ -102,6 +104,7 @@ public class Simulation {
 		// "eventController" is final. Therefore, create object here and not in helper method.
 		this.eventController = new EventController(scenarioStore);
 		this.eventCognition = new EventCognition();
+		this.salientBehaviorCognition = new SalientBehaviorCognition(topography);
 
 		createControllers(topography, mainModel, random);
 
@@ -317,7 +320,9 @@ public class Simulation {
 		step++;
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+
 		eventCognition.prioritizeEventsForPedestrians(events, pedestrians);
+		salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
 
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());

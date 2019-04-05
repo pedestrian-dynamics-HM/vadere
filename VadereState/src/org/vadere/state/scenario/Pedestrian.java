@@ -4,6 +4,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.LastFootSteps;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 
@@ -83,13 +84,6 @@ public class Pedestrian extends Agent {
 		trajectory = other.trajectory;
 	}
 
-	public void clearFootSteps() {
-		trajectory.clear();
-	}
-
-	public VTrajectory getFootSteps() {
-		return trajectory;
-	}
 	// Getter
 	public int getIdAsTarget() {
 		return this.idAsTarget;
@@ -110,6 +104,9 @@ public class Pedestrian extends Agent {
 	@Override
 	public ScenarioElementType getType() {
 		return ScenarioElementType.PEDESTRIAN;
+	}
+	public VTrajectory getFootSteps() {
+		return trajectory;
 	}
 
 	// Setter
@@ -141,6 +138,12 @@ public class Pedestrian extends Agent {
 		groupIds.add(groupId);
 		groupSizes.add(size);
 	}
+
+	public void clearFootSteps() {
+		trajectory.clear();
+	}
+
+	// Overridden Methods
 
 	@Override
 	public Pedestrian clone() {

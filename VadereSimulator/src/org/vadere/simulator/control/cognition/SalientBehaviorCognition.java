@@ -5,6 +5,7 @@ import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.LastFootSteps;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * The SalientBehaviorCognition class should provide logic to change the salient behavior of a pedestrian
  * (e.g., change to cooperative behavior when no movement is possible for n steps).
  *
- * Watch out: The {@link EventCognition} should be finished before using methods in this class because usually
+ * Watch out: The {@link EventCognition} should be finished before using methods in this class because, usually,
  * first an event occurs and then pedestrians decide about their behavior. E.g., first a {@link BangEvent} occurs
  * and then a pedestrian decides to follow a {@link SalientBehavior#COOPERATIVE} behavior.
  */
@@ -27,11 +28,23 @@ public class SalientBehaviorCognition {
     }
 
     public void setSalientBehaviorForPedestrians(Collection<Pedestrian> pedestrians, double simTimeInSec) {
-        for (Pedestrian pedestrian : pedestrians) {
-            // TODO: Set salient behavior for each pedestrian individually based on the most important event and/or if
-            //   the pedestrian could not move for several time steps.
+        // TODO: Set salient behavior for each pedestrian individually based on the most important event and/or if
+        //   the pedestrian could not move for several time steps.
 
-            // TODO: Use pedestrian.getFootSteps() to calculate average velocity for last
+        for (Pedestrian pedestrian : pedestrians) {
+            // TODO: Maybe, add following variables as attribute to "AttributesAgent".
+            int requiredFootSteps = 5;
+            double requiredSpeedInMetersPerSecondToBeCooperative = 0.05;
+
+            LastFootSteps lastFootSteps = pedestrian.getFootSteps().getLastFootSteps();
+
+            if (lastFootSteps.size() >= requiredFootSteps) { // Adapt behavior only if we have seen some footsteps in the past
+                if (lastFootSteps.getAverageSpeedInMeterPerSecond() <= requiredSpeedInMetersPerSecondToBeCooperative) {
+                    pedestrian.setSalientBehavior(SalientBehavior.COOPERATIVE);
+                } else {
+                    pedestrian.setSalientBehavior(SalientBehavior.TARGET_ORIENTED);
+                }
+            }
         }
     }
 }
