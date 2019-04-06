@@ -62,46 +62,54 @@ public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<
     }
 
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-        triangulation.init();
-
-        logger.info("start triangulation generation");
-        LinkedList<F> toRefineFaces = new LinkedList<>();
-        LinkedList<F> sortedFaces = new LinkedList<>();
-
-        toRefineFaces.addAll(mesh.getFaces());
-
-        while (!toRefineFaces.isEmpty()) {
-            F face = toRefineFaces.removeFirst();
-
-            E longestEdge = mesh.streamEdges(face)
-                    .reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2)
-                    .get();
-
-            if(!isCompleted(longestEdge)) {
-                IPoint midPoint = mesh.toLine(longestEdge).midPoint();
-                P p = mesh.createPoint(midPoint.getX(), midPoint.getY());
-                Pair<E, E> edges = triangulation.splitEdge(p, longestEdge, false);
-
-                F f1 = mesh.getFace(edges.getLeft());
-                F f2 = mesh.getTwinFace(edges.getLeft());
-
-                if(edges.getRight() != null) {
-
-                }
-            }
-            else {
-                sortedFaces.add(face);
-            }
-        }
-
-        removeTrianglesOutsideBBox();
-        removeTrianglesInsideObstacles();
-        triangulation.finish();
-        logger.info("end triangulation generation");
-        return triangulation;
+		return generate(true);
     }
 
-    private void generate(E edge) {
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+		triangulation.init();
+
+		logger.info("start triangulation generation");
+		LinkedList<F> toRefineFaces = new LinkedList<>();
+		LinkedList<F> sortedFaces = new LinkedList<>();
+
+		toRefineFaces.addAll(mesh.getFaces());
+
+		while (!toRefineFaces.isEmpty()) {
+			F face = toRefineFaces.removeFirst();
+
+			E longestEdge = mesh.streamEdges(face)
+					.reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2)
+					.get();
+
+			if(!isCompleted(longestEdge)) {
+				IPoint midPoint = mesh.toLine(longestEdge).midPoint();
+				P p = mesh.createPoint(midPoint.getX(), midPoint.getY());
+				Pair<E, E> edges = triangulation.splitEdge(p, longestEdge, false);
+
+				F f1 = mesh.getFace(edges.getLeft());
+				F f2 = mesh.getTwinFace(edges.getLeft());
+
+				if(edges.getRight() != null) {
+
+				}
+			}
+			else {
+				sortedFaces.add(face);
+			}
+		}
+
+		removeTrianglesOutsideBBox();
+		removeTrianglesInsideObstacles();
+		if(finalize) {
+			triangulation.finish();
+		}
+
+		logger.info("end triangulation generation");
+		return triangulation;
+	}
+
+	private void generate(E edge) {
         F face = mesh.getFace(edge);
 
         E longestEdge = mesh.streamEdges(face)
@@ -147,6 +155,11 @@ public class UniformSFCTriangulator<P extends IPoint, CE, CF, V extends IVertex<
             //sortedFaces.add(face);
         }
     }
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
+	}
 
 	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {

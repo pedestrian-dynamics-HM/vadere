@@ -46,6 +46,14 @@ public class VLine extends Line2D.Double {
 		return p1.add(p3.scalarMultiply(0.5 + eps));
 	}
 
+	public VPoint getVPoint1() {
+    	return new VPoint(getX1(), getY1());
+	}
+
+	public VPoint getVPoint2() {
+    	return new VPoint(getX2(), getY2());
+	}
+
     @Override
     public int hashCode() {
         // this has to be symmetric
@@ -80,6 +88,11 @@ public class VLine extends Line2D.Double {
 	public Vector2D asVector(){
 		return new Vector2D(x2 - x1, y2 - y1);
 	}
+
+	public VPoint asVPoint(){
+		return new VPoint(x2 - x1, y2 - y1);
+	}
+
 
 	@Override
 	public String toString() {

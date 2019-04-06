@@ -103,7 +103,7 @@ public class Distmesh {
 	}
 
 	private void reTriangulate() {
-		if(firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
+		if(true || firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			firstStep = false;
 			nTriangulations++;
 

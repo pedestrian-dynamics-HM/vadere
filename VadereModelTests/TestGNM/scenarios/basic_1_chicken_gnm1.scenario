@@ -2,11 +2,11 @@
   "name" : "basic_1_chicken_gnm1",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.gnm.GradientNavigationModel",
@@ -73,29 +73,32 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 10.0,
-          "y" : 40.0,
-          "width" : 15.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 9.0,
-          "y" : 21.0,
-          "width" : 1.0,
-          "height" : 20.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : -1
-      }, {
-        "shape" : {
-          "x" : 25.0,
-          "y" : 21.0,
-          "width" : 1.0,
-          "height" : 20.0,
-          "type" : "RECTANGLE"
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 25.0,
+            "y" : 21.0
+          }, {
+            "x" : 26.0,
+            "y" : 21.0
+          }, {
+            "x" : 26.0,
+            "y" : 41.0
+          }, {
+            "x" : 9.0,
+            "y" : 41.0
+          }, {
+            "x" : 9.0,
+            "y" : 21.0
+          }, {
+            "x" : 10.0,
+            "y" : 21.0
+          }, {
+            "x" : 10.0,
+            "y" : 40.0
+          }, {
+            "x" : 25.0,
+            "y" : 40.0
+          } ]
         },
         "id" : -1
       } ],
@@ -118,6 +121,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -139,6 +143,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
+      "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,
@@ -148,8 +153,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "attributesCar" : null,
-      "dynamicElements" : [ ]
-    }
+      "teleporter" : null,
+      "attributesCar" : null
+    },
+    "eventInfos" : [ ]
   }
 }

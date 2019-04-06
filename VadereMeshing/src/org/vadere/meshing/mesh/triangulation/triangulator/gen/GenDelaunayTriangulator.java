@@ -31,18 +31,31 @@ public class GenDelaunayTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	public GenDelaunayTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 	                               @NotNull final Collection<P> pointSet) {
 		this.pointSet = pointSet;
-		this.triangulation = new IncrementalTriangulation<>(mesh, GeometryUtils.bound(pointSet, GeometryUtils.DOUBLE_EPS), halfEdge -> true);
+		this.triangulation = new IncrementalTriangulation<>(mesh, GeometryUtils.boundRelative(pointSet), halfEdge -> true);
 		this.generated = false;
 	}
 
 	@Override
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+		return generate(true);
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			triangulation.init();
 			triangulation.insert(pointSet);
-			triangulation.finish();
+
+			if(finalize) {
+				triangulation.finish();
+			}
 			generated = true;
 		}
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
 		return triangulation;
 	}
 

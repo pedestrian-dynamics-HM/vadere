@@ -31,6 +31,11 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 
 	@Override
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+		return generate(true);
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
 		if(!finished) {
 			do {
 				refined = false;
@@ -39,6 +44,14 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 
 			finished = true;
 		}
+		if(finalize) {
+			triangulation.finish();
+		}
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
 		return triangulation;
 	}
 

@@ -12,13 +12,20 @@ import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * This class is an implementation of the algorithm of Sloan [1]
@@ -41,49 +48,87 @@ import java.util.function.Predicate;
  * @author Benedikt Zoennchen
  */
 public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
-
+	private final static Logger logger = Logger.getLogger(GenConstrainedDelaunayTriangulator.class);
 	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
 	private final Collection<VLine> constrains;
 	private final Collection<Pair<V, V>> vConstrains;
 	private final Collection<E> eConstrains;
 	private final Collection<P> points;
 	private boolean generated;
+	private boolean conforming;
+
+	public GenConstrainedDelaunayTriangulator(
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupply,
+			@NotNull final Collection<VLine> constrains,
+			final boolean confirming) {
+
+		Collection<VPoint> allPoints = new ArrayList<>(constrains.size() * 2);
+		for(VLine line : constrains) {
+			allPoints.add(line.getVPoint1());
+			allPoints.add(line.getVPoint2());
+		}
+		VRectangle bound = GeometryUtils.boundRelative(allPoints);
+
+		this.conforming = confirming;
+		this.constrains = constrains;
+		this.points = Collections.EMPTY_LIST;
+		this.vConstrains = new ArrayList<>(constrains.size());
+		this.eConstrains = new ArrayList<>(constrains.size());
+
+		/**
+		 * This prevent the flipping of constrained edges
+		 */
+		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
+		this.triangulation = new IncrementalTriangulation<>(meshSupply.get(), bound, canIllegal);
+	}
 
 
 	public GenConstrainedDelaunayTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupply,
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<VLine> constrains,
 			@NotNull final Collection<P> points) {
-		this.triangulation = new IncrementalTriangulation<>(mesh, bound, halfEdge -> true);
+		this.conforming = false;
 		this.constrains = constrains;
 		this.points = points;
 		this.vConstrains = new ArrayList<>(constrains.size());
 		this.eConstrains = new ArrayList<>(constrains.size());
+
+		/**
+		 * This prevent the flipping of constrained edges
+		 */
+		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
+		this.triangulation = new IncrementalTriangulation<>(meshSupply.get(), bound, canIllegal);
 	}
 
 	public GenConstrainedDelaunayTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupply,
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<VLine> constrains,
 			@NotNull final Set<P> points,
 			@NotNull final Predicate<E> illegalPredicate) {
-		this.triangulation = new IncrementalTriangulation<>(mesh, bound, illegalPredicate);
+
+		this.conforming = false;
 		this.constrains = constrains;
 		this.points = points;
 		this.vConstrains = new ArrayList<>(constrains.size());
 		this.eConstrains = new ArrayList<>(constrains.size());
+
+		/**
+		 * This prevent the flipping of constrained edges
+		 */
+		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
+		this.triangulation = new IncrementalTriangulation<>(meshSupply.get(), bound, illegalPredicate.and(canIllegal));
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(final boolean finalize) {
 		if(!generated) {
-			computeDelaunayTriangulation();
+			computeDelaunayTriangulation(finalize);
 			for(Pair<V, V> constrain : vConstrains) {
 				LinkedList<E> newEdges = forceConstrain(constrain);
 				reinforceDelaunayCriteria(constrain, newEdges);
 			}
-			triangulation.finish();
 			generated = true;
 		}
 
@@ -93,13 +138,60 @@ public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V exte
 			for(E e : getMesh().getEdgeIt(v1)) {
 				if(getMesh().getTwinVertex(e).equals(v2)) {
 					eConstrains.add(e);
+					eConstrains.add(getMesh().getTwin(e));
 					break;
 				}
 			}
 		}
 
+		if(conforming) {
+			reinforceConformingCriteria();
+		}
+
 		return triangulation;
 	}
+
+	// TODO: this is slow!
+	private void reinforceConformingCriteria() {
+		Optional<E> nonConformingEdge;
+		do {
+			nonConformingEdge = eConstrains.stream()
+					.filter(edge -> !getMesh().isAtBoundary(edge))
+					.filter(edge -> getTriangulation().isDelaunayIllegal(edge))
+					.findAny();
+
+			if(nonConformingEdge.isPresent()) {
+				split(nonConformingEdge.get(), eConstrains);
+			}
+		} while (nonConformingEdge.isPresent());
+	}
+
+	// remove again!
+	/*public void step(boolean finalize) {
+		if(!generated) {
+			computeDelaunayTriangulation(finalize);
+			for(Pair<V, V> constrain : vConstrains) {
+				LinkedList<E> newEdges = forceConstrain(constrain);
+				reinforceDelaunayCriteria(constrain, newEdges);
+			}
+			//triangulation.finish();
+			generated = true;
+		}
+
+		if(!vConstrains.isEmpty()) {
+			Pair<V, V> constrain = vConstrains.iterator().next();
+			vConstrains.remove(constrain);
+			V v1 = constrain.getLeft();
+			V v2 = constrain.getRight();
+			for(E e : getMesh().getEdgeIt(v1)) {
+				if(getMesh().getTwinVertex(e).equals(v2)) {
+					eConstrains.add(e);
+					eConstrains.add(getMesh().getTwin(e));
+					break;
+				}
+			}
+		}
+	}*/
 
 	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {
@@ -108,6 +200,11 @@ public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V exte
 
 	public Collection<E> getConstrains() {
 		return eConstrains;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
 	}
 
 	private void reinforceDelaunayCriteria(@NotNull final Pair<V, V> contrain, @NotNull final LinkedList<E> newEdges) {
@@ -167,23 +264,40 @@ public class GenConstrainedDelaunayTriangulator<P extends IPoint, CE, CF, V exte
 		return newEdges;
 	}
 
-	private void computeDelaunayTriangulation() {
+	private void computeDelaunayTriangulation(final boolean finalize) {
 		triangulation.init();
 		IMesh<P, CE, CF, V, E, F> mesh = triangulation.getMesh();
 
 		triangulation.insert(points);
 
 		for(VLine constrain : constrains) {
+			boolean insertPair = true;
 			P p1 = mesh.createPoint(constrain.x1, constrain.y1);
 			P p2 = mesh.createPoint(constrain.x2, constrain.y2);
 
 			E edge1 = triangulation.insert(p1);
-			E edge2 = triangulation.insert(p2);
-
 			V v1 = triangulation.getMesh().getVertex(edge1);
-			V v2 = triangulation.getMesh().getVertex(edge2);
+			// could not insert p1
+			if(!getMesh().getPoint(v1).equals(p1)) {
+				logger.warn("could not insert " + p1);
+				insertPair = false;
+			}
 
-			vConstrains.add(Pair.of(v1, v2));
+			E edge2 = triangulation.insert(p2);
+			V v2 = triangulation.getMesh().getVertex(edge2);
+			// could not insert p2
+			if(!getMesh().getPoint(v2).equals(p2)) {
+				logger.warn("could not insert " + p2);
+				insertPair = false;
+			}
+
+			if(insertPair) {
+				vConstrains.add(Pair.of(v1, v2));
+			}
+		}
+
+		if(finalize) {
+			triangulation.finish();
 		}
 	}
 }

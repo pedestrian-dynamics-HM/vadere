@@ -5,6 +5,8 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
+import org.vadere.meshing.utils.io.poly.PolyGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -21,6 +23,7 @@ import org.vadere.util.math.IDistanceFunction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Shows a very basic example how {@link GenEikMesh} can be used
@@ -28,14 +31,54 @@ import java.util.List;
  */
 public class EikMeshExamples {
 
-	public static void main(String... args) {
-		uniformMeshShapes();
+	public static void main(String... args) throws InterruptedException {
+		//delaunayTriangulation();
+		//uniformMeshShapes();
 		uniformMeshDiscFunction();
-		uniformMeshRingFunction();
-		combineDistanceFunctions();
+		//uniformMeshRingFunction();
+		/*combineDistanceFunctions();
 		edgeLengthFunction();
 		edgeLengthAndDistanceFunction();
-		userDefinedPoints();
+		userDefinedPoints();*/
+	}
+
+	public static void delaunayTriangulation() throws InterruptedException {
+		Random random = new Random(0);
+		int width = 10;
+		int height = 10;
+		int numberOfPoints = 200;
+		double linePoints = (int)Math.sqrt(numberOfPoints)+5;
+
+		List<EikMeshPoint> points = new ArrayList<>();
+
+		for(double i = 0; i < linePoints; i++) {
+			points.add(new EikMeshPoint(0.1, 0.1 + i / linePoints * (height-0.2), true));
+			points.add(new EikMeshPoint(0.1 + i / linePoints * (width-0.2), 0.1, true));
+			points.add(new EikMeshPoint(width-0.2, 0.1 + i / linePoints * (height-0.2), true));
+			points.add(new EikMeshPoint(0.1 + i / linePoints * (width-0.2), height-0.2, true));
+		}
+
+		for(int i = 0; i < numberOfPoints-15; i++) {
+			points.add(new EikMeshPoint(1.5 + random.nextDouble() * (width-3), 1.5 + random.nextDouble() * (height-3)));
+		}
+
+		var delaunayTriangulator = new PDelaunayTriangulator<>(points, (x, y) -> new EikMeshPoint(x, y, false));
+		var triangulation = delaunayTriangulator.generate();
+
+		var improver = new PEikMeshGen<>(p -> 1.0, triangulation);
+		var panel = new PMeshPanel<>(triangulation.getMesh(), 500, 500);
+		panel.display("A square mesh");
+		panel.repaint();
+
+		for(int i = 0; i < 1000; i++) {
+			Thread.sleep(5000);
+			improver.improve();
+			panel.repaint();
+		}
+
+
+
+
 	}
 
 	/**
@@ -109,36 +152,48 @@ public class EikMeshExamples {
 	 * The edgeLength is a measure for the approximate edge lengths of all edges since it is a uniform triangulation,
 	 * i.e. the desired edge length function is a constant.
 	 */
-	public static void uniformMeshDiscFunction() {
+	public static void uniformMeshDiscFunction() throws InterruptedException {
 		// define a bounding box
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
 		// distance function that defines a disc with radius 1 at (1,1).
-		IDistanceFunction d = p -> Math.sqrt((p.getX() - 1) * (p.getX() - 1) + (p.getY() - 1) * (p.getY() - 1)) - 1.0;
-				//IDistanceFunction.createDisc(1, 1, 1.0);
+		VPoint center = new VPoint(1,1);
+		IDistanceFunction d = IDistanceFunction.createDisc(center.x, center.y, 1.0);
 
 		IEdgeLengthFunction h = p -> 1.0 + 5.0 * Math.abs(d.apply(p));
+
 		// define the EikMesh-Improver
 		double h0 = 0.1;
 		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
 				d,
-				h,
+				p -> 1.0,
+				Arrays.asList(center),
 				h0,
 				bound,
 				(x, y) -> new EikMeshPoint(x, y, false));
 
-		meshImprover.generate();
+		//meshImprover.generate();
 
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		//PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 
 
 		// display the mesh
-		//meshPanel.display("Geometry defined by a distance function (disc)");
+		meshPanel.display("Geometry defined by a distance function (disc)");
+
+		while (true) {
+			synchronized (meshImprover.getMesh()) {
+				meshImprover.improve();
+			}
+			Thread.sleep(100);
+			meshPanel.repaint();
+		}
+
+		//System.out.println(PolyGenerator.to2DPoly(meshImprover.getMesh()));
 	}
 
 	/**
@@ -169,6 +224,8 @@ public class EikMeshExamples {
 
 		// generate the mesh
 		meshImprover.generate();
+
+		System.out.println(PolyGenerator.to2DPoly(meshImprover.getMesh()));
 
 		// display the mesh
 		meshPanel.display("Geometry defined by a distance function (ring)");

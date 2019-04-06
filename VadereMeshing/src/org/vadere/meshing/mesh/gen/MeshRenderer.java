@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -45,6 +46,8 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	 */
 	private Collection<F> faces;
 
+	private Collection<E> edges;
+
 	/**
 	 * A {@link Predicate} of {@link F} which marks a face to be drawn (not filled) in a special way.
 	 */
@@ -54,7 +57,9 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	/**
 	 * A function which decides by which color the face should be filled.
 	 */
-	@Nullable private Function<F, Color> colorFunction;
+	@Nullable private Function<F, Color> faceColorFunction;
+
+	@Nullable private Function<E, Color> edgeColorFunction;
 
 	private BufferedImage bufferedImage = null;
 
@@ -70,10 +75,20 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			@Nullable final Function<F, Color> colorFunction) {
+		this(mesh, alertPred, colorFunction, null);
+	}
+
+	public MeshRenderer(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			@Nullable final Function<F, Color> faceColorFunction,
+			@Nullable final Function<E, Color> edgeColorFunction) {
 		this.mesh = mesh;
 		this.alertPred = alertPred;
 		this.faces = new ArrayList<>();
-		this.colorFunction = colorFunction;
+		this.edges = new ArrayList<>();
+		this.faceColorFunction = faceColorFunction;
+		this.edgeColorFunction = edgeColorFunction;
 	}
 
 	/**
@@ -127,6 +142,7 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 			bound = mesh.getBound();
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 			faces = mesh.clone().getFaces();
+			edges = mesh.getEdges();
 		}
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
@@ -134,7 +150,7 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		graphics.fill(bound);
 
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
-		graphics.setStroke(new BasicStroke(0.003f));
+		graphics.setStroke(new BasicStroke(0.001f));
 		//graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -144,24 +160,25 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		for(F face : faces) {
 			VPolygon polygon = mesh.toPolygon(face);
 
-			if(colorFunction != null) {
-				graphics.setColor(colorFunction.apply(face));
-				//graphics.fill(polygon);
-				graphics.setColor(Color.GRAY);
-				graphics.draw(polygon);
-			}
-			if(alertPred.test(face)) {
+			if(faceColorFunction != null) {
+				graphics.setColor(faceColorFunction.apply(face));
+			} else if(alertPred.test(face)) {
 				graphics.setColor(new Color(100, 0, 0));
-				//graphics.fill(polygon);
+			} else {
 				graphics.setColor(Color.GRAY);
-				graphics.draw(polygon);
-
 			}
-			else if(colorFunction == null) {
-				graphics.setColor(Color.GRAY);
-				graphics.draw(polygon);
-			}
+			graphics.fill(polygon);
 		}
+
+		for(E edge : edges) {
+			Color ec = Color.GRAY;
+			if(edgeColorFunction != null) {
+				ec = edgeColorFunction.apply(edge);
+			}
+			graphics.setColor(ec);
+			graphics.draw(mesh.toLine(edge));
+		}
+
 		graphics.setColor(c);
 		graphics.setStroke(stroke);
 		graphics.scale(1.0 / scale, 1.0 / scale);

@@ -59,11 +59,33 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 	/**
 	 * Construct a mesh panel filling faces with the color defined by the color function.
 	 *
-	 * @param mesh          the mesh which will be rendered
-	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
-	 * @param width         width of the canvas
-	 * @param height        height of the canvas
-	 * @param colorFunction color function coloring faces
+	 * @param mesh              the mesh which will be rendered
+	 * @param alertPred         a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width             width of the canvas
+	 * @param height            height of the canvas
+	 * @param colorFunction     color function coloring faces
+	 * @param edgeColorFunction color function coloring edges
+	 */
+	public MeshPanel(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			final double width,
+			final double height,
+			@NotNull final Function<F, Color> colorFunction,
+			@NotNull final Function<E, Color> edgeColorFunction) {
+		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction, edgeColorFunction);
+		this.height = height;
+		this.width = width;
+	}
+
+	/**
+	 * Construct a mesh panel filling faces with the color defined by the color function.
+	 *
+	 * @param mesh              the mesh which will be rendered
+	 * @param alertPred         a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width             width of the canvas
+	 * @param height            height of the canvas
+	 * @param colorFunction     color function coloring faces
 	 */
 	public MeshPanel(
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
@@ -71,7 +93,7 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 			final double width,
 			final double height,
 			@NotNull final Function<F, Color> colorFunction) {
-		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction);
+		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction, e -> Color.GRAY);
 		this.height = height;
 		this.width = width;
 	}
@@ -89,7 +111,7 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 		    @NotNull final Predicate<F> alertPred,
 		    final double width,
 		    final double height) {
-    	this(mesh, alertPred, width, height, f -> Color.WHITE);
+    	this(mesh, alertPred, width, height, f -> Color.WHITE, e -> Color.GRAY);
     }
 
 	/**
@@ -103,7 +125,7 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			final double width,
 			final double height) {
-		this(mesh, f -> false, width, height, f -> Color.WHITE);
+		this(mesh, f -> false, width, height, f -> Color.WHITE, e -> Color.GRAY);
 	}
 
 	@Override

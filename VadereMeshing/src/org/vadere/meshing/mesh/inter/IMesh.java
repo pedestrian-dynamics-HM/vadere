@@ -1880,6 +1880,22 @@ public interface IMesh<
 	}
 
 	/**
+	 * Returns the half-edge which ends in v1 and starts in v2 if there is any, otherwise empty.
+	 *
+	 * @param v1 the end vertex
+	 * @param v2 the start vertex
+	 * @return the half-edge which ends in v1 and starts in v2 if there is any, empty otherwise
+	 */
+	default Optional<E> getEdge(@NotNull V v1, @NotNull V v2){
+		for(E edge : getEdgeIt(v1)) {
+			if(getTwinVertex(edge).equals(v2)) {
+				return Optional.of(edge);
+			}
+		}
+		return Optional.empty();
+	}
+
+	/**
 	 * Returns a deep clone of this mesh.
 	 *
 	 * @return a deep clone of this mesh

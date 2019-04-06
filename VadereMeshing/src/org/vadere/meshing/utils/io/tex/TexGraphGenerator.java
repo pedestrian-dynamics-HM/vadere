@@ -1,6 +1,7 @@
 package org.vadere.meshing.utils.io.tex;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -39,6 +40,21 @@ public class TexGraphGenerator {
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, boolean standalone){
 		return toTikz(mesh, 1.0f, standalone);
 	}
+
+	public static String toTikz(@NotNull final Collection<VLine> lines) {
+		return toTikz(lines, 1.0);
+	}
+
+	public static String toTikz(@NotNull final Collection<VLine> lines, final double scaling) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
+		for(VLine line : lines) {
+			builder.append("\\draw ("+toString(line.getX1()) + "," + toString(line.getY1()) + ") -- ("+ toString(line.getX2()) +"," + toString(line.getY2())+");\n");
+		}
+		builder.append("\\end{tikzpicture}");
+		return builder.toString();
+	}
+
 
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling.
@@ -129,6 +145,7 @@ public class TexGraphGenerator {
 	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
+			@Nullable final Function<E, Color> edgeColorFunction,
 			final float scaling) {
 
 		StringBuilder builder = new StringBuilder();
@@ -141,7 +158,21 @@ public class TexGraphGenerator {
 			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
-			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
+			if(edgeColorFunction != null) {
+				builder.append("\\filldraw[fill="+tikzColor+"]" + poly + ";\n");
+			}
+			else {
+				builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
+			}
+		}
+
+		if(edgeColorFunction != null) {
+			for (E edge : mesh.getEdges()) {
+				Color c = edgeColorFunction.apply(edge);
+				VLine line = mesh.toLine(edge);
+				String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+				builder.append("\\draw[color="+tikzColor+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
+			}
 		}
 
 		/*for(F face : mesh.getFaces()) {
@@ -151,6 +182,30 @@ public class TexGraphGenerator {
 
 		builder.append("\\end{tikzpicture}");
 		return builder.toString();
+	}
+
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
+	 * of the mesh is filled by the color defined by the coloring-function.
+	 *
+	 * @param mesh      the mesh
+	 * @param coloring  the coloring function
+	 * @param scaling   the scaling of the tikz graphics
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
+	 * @return a string representing a tikz graphics
+	 */
+	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Function<F, Color> coloring,
+			final float scaling) {
+		return toTikz(mesh, coloring, null, scaling);
 	}
 
 	/**

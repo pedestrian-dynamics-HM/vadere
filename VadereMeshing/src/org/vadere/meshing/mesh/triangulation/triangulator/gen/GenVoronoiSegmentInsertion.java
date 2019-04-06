@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -29,55 +30,57 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
+public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
 
-	private static Logger logger = Logger.getLogger(GenDelaunayRefinement.class);
+	private static Logger logger = Logger.getLogger(GenVoronoiVertexInsertion.class);
 	private VPolygon bound;
 	private final Collection<VPolygon> constrains;
 	private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
+
+	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
 	private Set<E> segments;
+
 	private boolean initialized;
 	private boolean generated;
+
+	// Improvements: use multiple unsorted queues to improve performance
 	private PriorityQueue<F> active;
+
 	private Set<F> activeSet;
 	private Set<F> accepted;
-	private Map<F, Double> circumcenters;
+	private Map<F, VTriangle> triangles;
 	private boolean createHoles;
-	private double minQuality;
 	private Function<IPoint, Double> circumRadiusFunc;
 	private final static int MAX_POINTS = 20000;
 	private double delta = 1.5;
 
-	public GenDirichletRefinement(@NotNull final VPolygon bound,
-	                             @NotNull final Collection<VPolygon> constrains,
-	                             @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
-	                             final boolean createHoles,
-	                             final double minQuality,
-	                             @NotNull Function<IPoint, Double> circumRadiusFunc) {
+	private VoronoiSegPlacement<P, CE, CF, V, E, F> placementStrategy;
+
+	public GenVoronoiSegmentInsertion(@NotNull final VPolygon bound,
+	                                  @NotNull final Collection<VPolygon> constrains,
+	                                  @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
+	                                  final boolean createHoles,
+	                                  @NotNull Function<IPoint, Double> circumRadiusFunc) {
 		this.bound = bound;
 		this.constrains = constrains;
 		this.segments = new HashSet<>();
 		this.initialized = false;
 		this.generated = false;
-		this.active = new PriorityQueue<>(new GenDirichletRefinement.FaceQualityComparator());
+		this.active = new PriorityQueue<>(new GenVoronoiSegmentInsertion.FaceQualityComparator());
 		this.accepted = new HashSet<>();
 		this.activeSet = new HashSet<>();
-		this.circumcenters = new HashMap<>();
+		this.triangles = new HashMap<>();
 		this.createHoles = createHoles;
-		this.minQuality = minQuality;
 		this.circumRadiusFunc = circumRadiusFunc;
-		List<VLine> lines = new ArrayList<>();
-		for(VPolygon polygon : constrains) {
-			lines.addAll(polygon.getLinePath());
-		}
+		List<VLine> lines = generateLines();
 
-		lines.addAll(bound.getLinePath());
 
 		/**
 		 * This prevent the flipping of constrained edges
 		 */
 		Predicate<E> canIllegal = e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e));
-		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier.get(), GeometryUtils.bound(bound.getPoints(), GeometryUtils.DOUBLE_EPS), lines, Collections.EMPTY_SET, canIllegal);
+		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, GeometryUtils.boundRelative(bound.getPoints()), lines, Collections.EMPTY_SET, canIllegal);
+		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), circumRadiusFunc, delta);
 	}
 
 	private boolean isAccepted(@NotNull final E edge) {
@@ -88,13 +91,11 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 	public void refine() {
 		if(!refinementFinished()) {
 			if(!initialized) {
-				cdt.generate();
+				cdt.generate(true);
 				segments = new HashSet<>(cdt.getConstrains());
-				removeTriangles();
-
 				for(F face : getTriangulation().getMesh().getFaces()) {
 					if(!isAccepted(face) && isActive(face)) {
-						circumcenters.put(face, getMesh().toTriangle(face).getCircumscribedRadius());
+						triangles.put(face, getMesh().toTriangle(face));
 						active.add(face);
 						activeSet.add(face);
 					}
@@ -107,10 +108,15 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 				activeSet.remove(face);
 				refine(face);
 			}
+		} else if(!isFinished()) {
+			finish(true);
+		}
+		else {
+			logger.info("finished");
 		}
 	}
 
-	private void refine(@NotNull F face) {
+	private void refine(@NotNull final F face) {
 		E shortestEdge = null;
 		VLine shortestLine = null;
 		for(E edge : getMesh().getEdgeIt(face)) {
@@ -121,44 +127,7 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 			}
 		}
 
-		VPoint midpoint = shortestLine.midPoint();
-		VPoint c = getMesh().toTriangle(face).getCircumcenter();
-		double pq = 0.5 * shortestLine.length();
-		double pc = new VLine(c, new VPoint(getMesh().getPoint(shortestEdge))).length();
-
-		double r = circumRadiusFunc.apply(midpoint);
-		if(getMesh().isAtBoundary(shortestEdge)) {
-			double s = ((2 * pq) / Math.sqrt(3));
-			if(s / circumRadiusFunc.apply(getMesh().toTriangle(face).midPoint()) < delta) {
-				r = s;
-			}
-		}
-
-		double mc = new VLine(c, midpoint).length();
-		double rmax = (pq * pq + pc * pc) / (2 * mc);
-		r = Math.min(Math.max(r, 0.5 * shortestLine.length()), rmax);
-		double d = Math.sqrt(r * r - pq * pq) + r;
-		VPoint e;
-		VPoint x;
-		if(!getMesh().isBoundary(getMesh().getTwinFace(shortestEdge))) {
-			VPoint cc = getMesh().toTriangle(getMesh().getTwinFace(shortestEdge)).getCircumcenter();
-			e = c.subtract(cc).norm();
-			x = midpoint.add(e.scalarMultiply(d));
-		} else {
-			if(c.distanceSq(midpoint) < GeometryUtils.DOUBLE_EPS) {
-				x = midpoint;
-			} else {
-				// would otherwise result in a very large angle at the boundary
-				if(d / Math.sqrt((3*pq * pq)) < 0.8) {
-					x = midpoint;
-				}
-				else {
-					e = c.subtract(midpoint).norm();
-					x = midpoint.add(e.scalarMultiply(d));
-				}
-			}
-		}
-
+		VPoint x = placementStrategy.computePlacement(shortestEdge, triangles.get(face));
 		Optional<F> optionalF = getTriangulation().locateFace(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
 
 		if(optionalF.isPresent() && !getMesh().isBoundary(optionalF.get())) {
@@ -175,14 +144,14 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 					}
 
 					if(!isAccepted(f) && isActive(f)) {
-						circumcenters.put(f, getMesh().toTriangle(f).getCircumscribedRadius());
+						triangles.put(f, getMesh().toTriangle(f));
 						active.add(f);
 						activeSet.add(f);
 					}
 				}
 
 			} else {
-				// update circumcenters
+				// update triangles
 				for(E ev : getMesh().getEdgeIt(v)) {
 
 					E eRing = getMesh().getPrev(ev);
@@ -194,7 +163,7 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 					}
 
 					if(!isAccepted(f1) && isActive(f1)) {
-						circumcenters.put(f1, getMesh().toTriangle(f1).getCircumscribedRadius());
+						triangles.put(f1, getMesh().toTriangle(f1));
 						active.add(f1);
 						activeSet.add(f1);
 					}
@@ -204,14 +173,12 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 					}
 
 					if(!isAccepted(f2) && isActive(f2)) {
-						circumcenters.put(f2, getMesh().toTriangle(f2).getCircumscribedRadius());
+						triangles.put(f2, getMesh().toTriangle(f2));
 						active.add(f2);
 						activeSet.add(f2);
 					}
 				}
 			}
-
-
 		}
 	}
 
@@ -225,12 +192,22 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	@Override
-	public IIncrementalTriangulation generate() {
-		while (!refinementFinished()) {
-			refine();
+	public IIncrementalTriangulation generate(final boolean finalize) {
+		if(!isFinished()) {
+			while (!refinementFinished()) {
+				refine();
+			}
+			finish(false);
 		}
-		removeTriangles();
-		return cdt.generate();
+		return getTriangulation();
+	}
+
+	private void finish(boolean finalize) {
+		generated = true;
+		if(finalize) {
+			getTriangulation().finish();
+			removeTriangles();
+		}
 	}
 
 	public void removeTriangles() {
@@ -243,15 +220,14 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 				}
 			}
 
-			if(bound != null) {
-				Predicate<F> mergeCondition = f -> !bound.contains(getMesh().toTriangle(f).midPoint());
-				getTriangulation().shrinkBorder(mergeCondition, true);
-			}
+			Predicate<F> mergeCondition = f -> !bound.contains(getMesh().toTriangle(f).midPoint());
+			getTriangulation().shrinkBorder(mergeCondition, true);
+
 		}
 	}
 
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
-		return cdt.generate();
+		return cdt.getTriangulation();
 	}
 
 	@Override
@@ -265,7 +241,7 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 		}
 		else {
 			double r = getMesh().toTriangle(face).getCircumscribedRadius();
-			boolean accepted =  r / circumRadiusFunc.apply(getMesh().toTriangle(face).midPoint()) < delta && getTriangulation().faceToQuality(face) >= minQuality;
+			boolean accepted =  r / circumRadiusFunc.apply(getMesh().toTriangle(face).midPoint()) < delta /*&& getTriangulation().faceToQuality(face) >= minQuality*/;
 			if(accepted) {
 				this.accepted.add(face);
 			}
@@ -278,6 +254,11 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 			return false;
 		}
 
+		// This might be expensive!
+		if(!bound.contains(getMesh().toTriangle(face).midPoint())) {
+			return false;
+		}
+
 		for(F neighbour : getMesh().getFaceIt(face)) {
 			if(isAccepted(neighbour)) {
 				return true;
@@ -287,11 +268,45 @@ public class GenDirichletRefinement <P extends IPoint, CE, CF, V extends IVertex
 		return false;
 	}
 
+	// TODO duplicated code
+	private List<VLine> generateLines() {
+		List<VLine> polyLines = new ArrayList<>();
+
+		polyLines.addAll(bound.getLinePath());
+
+		for(VPolygon polygon : constrains) {
+			polyLines.addAll(polygon.getLinePath());
+		}
+
+		List<VLine> lines = new ArrayList<>();
+		for(VLine line : polyLines) {
+			List<VLine> splitLines = new ArrayList<>();
+			splitLines.add(line);
+			while (!splitLines.isEmpty()) {
+				List<VLine> newSplitLines = new ArrayList<>();
+				for(VLine splitLine : splitLines) {
+					VPoint midPoint = splitLine.midPoint();
+					double desiredLen = circumRadiusFunc.apply(midPoint) * Math.sqrt(3);
+					double len = splitLine.length();
+					if(len >  desiredLen) {
+						newSplitLines.add(new VLine(splitLine.getVPoint1(), midPoint));
+						newSplitLines.add(new VLine(midPoint, splitLine.getVPoint2()));
+					} else {
+						lines.add(splitLine);
+					}
+				}
+				splitLines = newSplitLines;
+			}
+		}
+
+		return lines;
+	}
+
 	private final class FaceQualityComparator implements Comparator<F> {
 
 		@Override
 		public int compare(F o1, F o2) {
-			return Double.compare(-circumcenters.get(o1), -circumcenters.get(o2));
+			return Double.compare(-triangles.get(o1).getCircumscribedRadius(), -triangles.get(o2).getCircumscribedRadius());
 		}
 	}
 }

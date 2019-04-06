@@ -12,10 +12,11 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
-import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayRefinement;
-import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulation;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PVoronoiVertexInsertion;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDirichletRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
+import org.vadere.meshing.utils.io.poly.PolyGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
@@ -26,26 +27,32 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
-import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MeshExamples {
 
-	public static void main(String... args) throws InterruptedException {
-		dirichletRefinment();
-		delaunayRefinment();
-
+	public static void main(String... args) throws InterruptedException, IOException {
+		ruppertsTriangulationPoly();
+		//delaunayTriangulation();
+		//dirichletRefinment();
+		//delaunayRefinment();
+		//constrainedDelaunayTriangulation();
 	}
 
 	public static void faceTest() throws InterruptedException {
@@ -70,7 +77,7 @@ public class MeshExamples {
 
 		points.add(newPoint);
 
-		PDelaunayTriangulation<VPoint, Double, Double> delaunayTriangulation = new PDelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
+		PDelaunayTriangulator<VPoint, Double, Double> delaunayTriangulation = new PDelaunayTriangulator<>(points, (x, y) -> new VPoint(x, y));
 		delaunayTriangulation.generate();
 
 		System.out.println(TexGraphGenerator.toTikz(delaunayTriangulation.getMesh()));
@@ -89,7 +96,7 @@ public class MeshExamples {
 	}
 
 	public static void square() {
-		PMesh<VPoint, Integer, Integer> mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+		var mesh = new PMesh<>((x, y) -> new VPoint(x, y));
 
 		assert mesh.getNumberOfFaces() == 0;
 
@@ -101,7 +108,7 @@ public class MeshExamples {
 
 		assert mesh.getNumberOfFaces() == 1;
 
-		PMeshPanel<VPoint, Integer, Integer> panel = new PMeshPanel<>(mesh, 500, 500);
+		var panel = new PMeshPanel<>(mesh, 500, 500);
 		panel.display("A square mesh");
 		panel.repaint();
 
@@ -113,70 +120,119 @@ public class MeshExamples {
 	}
 
 	public static void delaunayTriangulation() {
+
+		// (1) generate a point set
 		Random random = new Random(0);
 		int width = 10;
 		int height = 10;
-		int numberOfPoints = 1000;
+		int numberOfPoints = 100;
+		Supplier<VPoint> supply = () -> new VPoint(random.nextDouble()*width, random.nextDouble()*height);
+		Stream<VPoint> randomPoints = Stream.generate(supply);
+		List<VPoint> points = randomPoints.limit(numberOfPoints).collect(Collectors.toList());
 
-		List<VPoint> points = new ArrayList<>();
-		for(int i = 0; i < numberOfPoints; i++) {
-			points.add(new VPoint(random.nextDouble() * width, random.nextDouble() * height));
+		// (2) compute the Delaunay triangulation
+		var delaunayTriangulator = new PDelaunayTriangulator<VPoint, Double, Double>(points, (x, y) -> new VPoint(x, y));
+		var triangulation = delaunayTriangulator.generate();
+
+		// \definecolor{mygreen}{RGB}{85,168,104}
+		Color green = new Color(85, 168, 104);
+		Color red = new Color(196,78,82);
+
+		var face = triangulation.locateFace(new VPoint(5,5)).get();
+		var mesh = triangulation.getMesh();
+		var deletePoints = mesh.getVertices(face);
+		var surroundingFaces = mesh.getFaces(deletePoints.get(0));
+		var ringEdges = mesh
+				.streamEdges(deletePoints.get(0))
+				.map(edge -> mesh.getPrev(edge)).collect(Collectors.toList());
+		/*System.out.println(TexGraphGenerator.toTikz(
+				delaunayTriangulator.getMesh(),
+				f -> surroundingFaces.contains(f) ? red : Color.WHITE,
+				1.0f));*/
+
+
+
+
+		//triangulation.remove(deletePoints.get(0));
+
+		var face2 = triangulation.locateFace(new VPoint(5,5)).get();
+		var list = ringEdges.stream().map(e -> mesh.getFace(e)).collect(Collectors.toList());
+		surroundingFaces.addAll(list);
+		System.out.println(TexGraphGenerator.toTikz(
+				delaunayTriangulator.getMesh(),
+		//		f -> surroundingFaces.contains(f) ? green : Color.WHITE,
+				1.0f));
+
+
+		LinkedList<PHalfEdge<VPoint, Double, Double>> visitedEdges = delaunayTriangulator.generate().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().getFace());
+		for(PFace<VPoint, Double, Double> f : delaunayTriangulator.getMesh().getFaces()) {
+			delaunayTriangulator.getMesh().setData(f, delaunayTriangulator.getMesh().toTriangle(f).getArea());
 		}
 
-		PDelaunayTriangulation<VPoint, Double, Double> delaunayTriangulation = new PDelaunayTriangulation<>(points, (x, y) -> new VPoint(x, y));
-		delaunayTriangulation.generate();
-
-
-		LinkedList<PHalfEdge<VPoint, Double, Double>> visitedEdges = delaunayTriangulation.generate().straightGatherWalk2D(5, 5, delaunayTriangulation.getMesh().getFace());
-
-		for(PFace<VPoint, Double, Double> face : delaunayTriangulation.getMesh().getFaces()) {
-			delaunayTriangulation.getMesh().setData(face, delaunayTriangulation.getMesh().toTriangle(face).getArea());
-		}
-
-		double areaSum = delaunayTriangulation.getMesh().streamFaces().mapToDouble(f -> delaunayTriangulation.getMesh().getData(f).get()).sum();
-		double averageArea = areaSum / delaunayTriangulation.getMesh().getNumberOfFaces();
+		double areaSum = delaunayTriangulator.getMesh().streamFaces().mapToDouble(f -> delaunayTriangulator.getMesh().getData(f).get()).sum();
+		double averageArea = areaSum / delaunayTriangulator.getMesh().getNumberOfFaces();
 		System.out.println("Triangulated area = " + areaSum);
 		System.out.println("Average triangle area = " + averageArea);
 		System.out.println("Area triangulated = " + (100 * (areaSum / (width * height))) + " %");
 
 
-		VPoint q = delaunayTriangulation.getMesh().toTriangle(delaunayTriangulation.getMesh().getFace(visitedEdges.peekFirst())).midPoint();
-		Set<PFace<VPoint, Double, Double>> faceSet = visitedEdges.stream().map(e -> delaunayTriangulation.getMesh().getFace(e)).collect(Collectors.toSet());
+		VPoint q = delaunayTriangulator.getMesh().toTriangle(delaunayTriangulator.getMesh().getFace(visitedEdges.peekFirst())).midPoint();
+		Set<PFace<VPoint, Double, Double>> faceSet = visitedEdges.stream().map(e -> delaunayTriangulator.getMesh().getFace(e)).collect(Collectors.toSet());
 
-		//System.out.println(TexGraphGenerator.toTikz(delaunayTriangulation.getMesh(), f -> faceSet.contains(f) ? Color.GREEN : Color.WHITE, 1.0f, new VLine(q, new VPoint(5,5))));
+		//\definecolor{myred}{RGB}{196,78,82}
 
-		delaunayTriangulation.getMesh().locate(5, 5);
 
-		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(delaunayTriangulation.getMesh(), 500, 500);
-		panel.display("A square mesh");
-		panel.repaint();
+		/*System.out.println(TexGraphGenerator.toTikz(
+				delaunayTriangulator.getMesh(),
+				//f -> delaunayTriangulation.getMesh().toTriangle(f).isNonAcute() ? red : Color.WHITE,
+				1.0f));*/
+
+
+		//System.out.println(TexGraphGenerator.toTikz(delaunayTriangulator.getMesh(), f -> faceSet.contains(f) ? red : Color.WHITE, 1.0f, new VLine(q, new VPoint(5,5))));
+
+		/*delaunayTriangulation.getMesh().locate(5, 5);
+
+		var panel = new PMeshPanel<>(
+				delaunayTriangulation.getMesh(),
+				500,
+				500,
+				f -> delaunayTriangulation.getMesh().toTriangle(f).isNonAcute() ? red : Color.WHITE);
+		panel.display("Delaunay triangulation");
+		panel.repaint();*/
 
 
 	}
 
-	public static void constrainedDelaunayTriangulation() {
-		Random random = new Random(0);
-		int width = 10;
-		int height = 10;
-		int numberOfPoints = 1000;
+	public static void constrainedDelaunayTriangulation() throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
+		boolean duplicatedLines = true;
+		var vgeometry = PolyGenerator.toPSLGtoVShapes(inputStream, duplicatedLines);
+		List<VLine> constrains = vgeometry.getRight();
+		var cdt = new PContrainedDelaunayTriangulator<VPoint, Double, Double>(
+						constrains,
+						(x, y) -> new VPoint(x, y),
+				true);
+		cdt.generate();
 
-		List<VPoint> points = new ArrayList<>();
-		for(int i = 0; i < numberOfPoints; i++) {
-			points.add(new VPoint(random.nextDouble() * width, random.nextDouble() * height));
+
+		Collection<VPoint> allPoints = new ArrayList<>(constrains.size() * 2);
+		for(VLine line : constrains) {
+			allPoints.add(line.getVPoint1());
+			allPoints.add(line.getVPoint2());
 		}
 
+		var dt = new PDelaunayTriangulator<VPoint, Double, Double>(
+				allPoints,
+				(x, y) -> new VPoint(x, y));
+		dt.generate();
 
-		List<VLine> constrains = new ArrayList<>();
-		constrains.add(new VLine(2, 2, 8, 8));
-		constrains.add( new VLine(3, 4, 5, 6));
+		Color green = new Color(85, 168, 104);
+		Color red = new Color(196,78,82);
+		var allConstrains = cdt.getConstrains();
+		Function<PHalfEdge<VPoint, Double, Double>, Color> colorFunction = e -> allConstrains.contains(e) ? red : Color.GRAY;
 
-		PContrainedDelaunayTriangulator<VPoint, Double, Double> cdt =
-				new PContrainedDelaunayTriangulator<>(
-						new VRectangle(0, 0, width, height),
-						constrains,
-						points,
-						(x, y) -> new VPoint(x, y));
-		cdt.generate();
+		System.out.println(TexGraphGenerator.toTikz(cdt.getMesh(), f -> Color.WHITE, colorFunction, 1.0f));
+		//System.out.println(TexGraphGenerator.toTikz(dt.getMesh(), 1.0f));
 
 
 		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(cdt.getMesh(), 1000, 1000);
@@ -184,6 +240,61 @@ public class MeshExamples {
 		panel.repaint();
 
 
+	}
+
+	public static void ruppertsTriangulationPoly() throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
+		boolean duplicatedLines = false;
+		var vgeometry = PolyGenerator.toPSLGtoVShapes(inputStream, duplicatedLines);
+		List<VLine> lines = vgeometry.getRight();
+		List<VPolygon> polygons = vgeometry.getLeft();
+		VPolygon segmentBound = polygons.get(0);
+
+		VPolygon boundingBox = vgeometry.getKey().get(0);
+		VPolygon hole = vgeometry.getKey().get(1);
+		if(!boundingBox.isCCW()) {
+			boundingBox = boundingBox.revertOrder();
+		}
+
+		if(!hole.isCCW()) {
+			hole = hole.revertOrder();
+		}
+
+		List<VPolygon> holes = Arrays.asList(hole);
+		List<VLine> constrains = boundingBox.getLinePath();
+		constrains.addAll(hole.getLinePath());
+
+		System.out.println(TexGraphGenerator.toTikz(constrains));
+
+		PRuppertsTriangulator<VPoint, Double, Double> ruppert = new PRuppertsTriangulator<>(
+				boundingBox,
+				holes,
+				(x, y) -> new VPoint(x, y));
+		//cdt.generate();
+		//ruppertsTriangulator.generate();
+
+
+		Function<PFace<VPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = ruppert.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppert.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+		final var segments = ruppert.getSegments();
+		System.out.println(TexGraphGenerator.toTikz(ruppert.getMesh(), colorFunction, 1.0f));
+		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(ruppert.getMesh(), 1000, 1000, f -> Color.WHITE, e -> segments.contains(e) ? Color.RED : Color.GRAY);
+		panel.display("Rupperts Algorithm");
+
+		while (true) {
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			synchronized (ruppert.getMesh()) {
+				ruppert.step();
+			}
+			panel.repaint();
+		}
 	}
 
 	public static void ruppertsTriangulation() {
@@ -297,28 +408,23 @@ public class MeshExamples {
 		}
 	}
 
-	public static void dirichletRefinment() throws InterruptedException {
-		// bounding polygon
-		VPolygon boundingBox = GeometryUtils.toPolygon(
-				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
-				100);
+	public static void dirichletRefinment() throws InterruptedException, IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
+		boolean duplicatedLines = false;
+		var vgeometry = PolyGenerator.toPSLGtoVShapes(inputStream, duplicatedLines);
+		List<VLine> lines = vgeometry.getRight();
+		List<VPolygon> polygons = vgeometry.getLeft();
+		VPolygon segmentBound = polygons.get(0);
 
-		// first polygon
-		VPolygon house = GeometryUtils.toPolygon(
-				new VPoint(1, 1),
-				new VPoint(1, 5),
-				new VPoint(3, 7),
-				new VPoint(5,5),
-				new VPoint(5,1));
+		VPolygon boundingBox = vgeometry.getKey().get(0);
+		VPolygon hole = vgeometry.getKey().get(1);
 
-		IDistanceFunction distanceFunction = IDistanceFunction.create(boundingBox, house);
+		//IDistanceFunction distanceFunction = IDistanceFunction.create(boundingBox, hole);
 		PDirichletRefinement<EikMeshPoint, Double, Double> delaunayRefinement = new PDirichletRefinement<>(
 				boundingBox,
-				Arrays.asList(house),
+				Arrays.asList(hole),
 				(x, y) -> new EikMeshPoint(x, y),
-				true,
-				0.5,
-				p -> 0.5 /*+ 0.5*Math.abs(distanceFunction.apply(p))*/);
+				p -> 0.01);
 
 		Function<PFace<EikMeshPoint, Double, Double>, Color> colorFunction = f ->  {
 			float quality = delaunayRefinement.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().toTriangle(f));
@@ -328,64 +434,55 @@ public class MeshExamples {
 		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(delaunayRefinement.getMesh(), 1000, 1000, colorFunction);
 		panel.display("Dirichlet Refinement");
 
-		delaunayRefinement.generate();
-		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
-			distanceFunction,
-				p -> 1.0 /*+ 0.5*Math.abs(distanceFunction.apply(p))*/,
-				1.0,
-				delaunayRefinement.getTriangulation());
-
-
 		while (true) {
-			synchronized (meshImprover.getMesh()) {
-				meshImprover.improve();
-			}
-
-			panel.repaint();
-			Thread.sleep(10);
-		}
-		//panel.repaint();
-	}
-
-	public static void delaunayRefinment() throws InterruptedException {
-		// bounding polygon
-		VPolygon boundingBox = GeometryUtils.toPolygon(
-				new VCircle(new VPoint(15.0/2.0, 15.0/2.0), 20.0),
-				100);
-
-		// first polygon
-		VPolygon house = GeometryUtils.toPolygon(
-				new VPoint(1, 1),
-				new VPoint(1, 5),
-				new VPoint(3, 7),
-				new VPoint(5,5),
-				new VPoint(5,1));
-
-		PDelaunayRefinement<VPoint, Double, Double> delaunayRefinement = new PDelaunayRefinement<>(
-				boundingBox,
-				Arrays.asList(house),
-				(x, y) -> new VPoint(x, y),
-				true,
-				0.3,
-				p -> 1.0);
-
-		Function<PFace<VPoint, Double, Double>, Color> colorFunction = f ->  {
-			float quality = delaunayRefinement.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().toTriangle(f));
-			return new Color(quality, quality, quality);
-		};
-
-		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(delaunayRefinement.getMesh(), 1000, 1000, colorFunction);
-		panel.display("Delaunay Refinement");
-
-		delaunayRefinement.generate();
-		/*while (!delaunayRefinement.isFinished()) {
 			synchronized (delaunayRefinement.getMesh()) {
 				delaunayRefinement.refine();
 			}
 
 			panel.repaint();
+			Thread.sleep(100);
+		}
+		//panel.repaint();
+	}
+
+	public static void delaunayRefinment() throws InterruptedException, IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
+		boolean duplicatedLines = false;
+		var vgeometry = PolyGenerator.toPSLGtoVShapes(inputStream, duplicatedLines);
+		List<VLine> lines = vgeometry.getRight();
+		List<VPolygon> polygons = vgeometry.getLeft();
+		VPolygon segmentBound = polygons.get(0);
+
+		VPolygon boundingBox = vgeometry.getKey().get(0);
+		VPolygon hole = vgeometry.getKey().get(1);
+
+		PVoronoiVertexInsertion<VPoint, Double, Double> frontalMethod = new PVoronoiVertexInsertion<>(
+				boundingBox,
+				Arrays.asList(hole),
+				(x, y) -> new VPoint(x, y),
+				p -> 0.01);
+
+		Function<PFace<VPoint, Double, Double>, Color> colorFunction = f ->  {
+			float quality = frontalMethod.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(frontalMethod.getMesh().toTriangle(f));
+			return new Color(quality, quality, quality);
+		};
+
+		PMeshPanel<VPoint, Double, Double> panel = new PMeshPanel<>(frontalMethod.getMesh(), 1000, 1000, colorFunction);
+		panel.display("Delaunay Refinement");
+
+		//frontalMethod.generate();
+		synchronized (frontalMethod.getMesh()) {
+			frontalMethod.refine();
+		}
+		while (!frontalMethod.isFinished()) {
+			synchronized (frontalMethod.getMesh()) {
+				frontalMethod.refine();
+			}
+
+			panel.repaint();
 			Thread.sleep(10);
-		}*/
+		}
+		System.out.println("finished");
 		panel.repaint();
 	}
 

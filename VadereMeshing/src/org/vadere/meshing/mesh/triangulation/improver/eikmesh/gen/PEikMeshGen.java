@@ -7,10 +7,10 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -18,8 +18,14 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
+
+	public PEikMeshGen(@NotNull final IEdgeLengthFunction edgeLengthFunc,
+	                   @NotNull final IIncrementalTriangulation<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> triangulation) {
+		super(edgeLengthFunc, triangulation);
+	}
 
 
 	public PEikMeshGen(@NotNull final IDistanceFunction distanceFunc,
@@ -57,6 +63,17 @@ public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, C
 
 		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
 				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
+	}
+
+	public PEikMeshGen(
+			@NotNull IDistanceFunction distanceFunc,
+			@NotNull IEdgeLengthFunction edgeLengthFunc,
+			@NotNull Collection<VPoint> fixPoints,
+			double initialEdgeLen,
+			@NotNull VRectangle bound,
+			@NotNull IPointConstructor<P> pointConstructor
+			) {
+		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, Collections.EMPTY_LIST,() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
 	}
 
 

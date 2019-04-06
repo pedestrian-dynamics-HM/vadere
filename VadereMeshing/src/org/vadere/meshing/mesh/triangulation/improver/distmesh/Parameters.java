@@ -9,12 +9,12 @@ public class Parameters {
     public final static double FSCALE = 1.2;
     public final static double DELTAT = 0.3;
     public final static double MIN_TRIANGLE_QUALITY = 0.1;
-    public final static double MIN_FORCE_RATIO = 0.3;
+    public final static double MIN_FORCE_RATIO = 0.5;
     public final static double MIN_SPLIT_TRIANGLE_QUALITY = 0.5;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
-    public final static double qualityMeasurement = 0.96;
+    public final static double qualityMeasurement = 0.99;
     public final static double MINIMUM = 0.25;
     public final static double DENSITYWEIGHT = 2;
     public final static int NPOINTS = 100000;

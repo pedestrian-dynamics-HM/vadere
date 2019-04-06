@@ -40,6 +40,15 @@ public class PMeshPanel<P extends IPoint, CE, CF> extends MeshPanel<P, CE, CF, P
 
 	public PMeshPanel(
 			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
+			double width,
+			double height,
+			@NotNull final Function<PFace<P, CE, CF>, Color> faceColorFunction,
+			@NotNull final Function<PHalfEdge<P, CE, CF>, Color> edgeColorFunction) {
+		super(mesh, f -> false, width, height, faceColorFunction, edgeColorFunction);
+	}
+
+	public PMeshPanel(
+			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
 			@NotNull Predicate<PFace<P, CE, CF>> predicate,
 			double width,
 			double height) {

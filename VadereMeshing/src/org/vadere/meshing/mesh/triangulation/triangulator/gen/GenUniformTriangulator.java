@@ -56,22 +56,35 @@ public class GenUniformTriangulator<P extends IPoint, CE, CF, V extends IVertex<
 
     @Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-        triangulation.init();
-
-        List<P> pointList = new ArrayList<>(generatePointSet());
-        //Collections.shuffle(pointList);
-
-        for(P point : pointList) {
-        	if(bound.contains(point)) {
-		        triangulation.insert(point);
-	        }
-        }
-
-        triangulation.finish();
-        return triangulation;
+        return generate(true);
     }
 
-    @Override
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+
+		triangulation.init();
+
+		List<P> pointList = new ArrayList<>(generatePointSet());
+		//Collections.shuffle(pointList);
+
+		for(P point : pointList) {
+			if(bound.contains(point)) {
+				triangulation.insert(point);
+			}
+		}
+
+		if(finalize) {
+			triangulation.finish();
+		}
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
+	}
+
+	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {
         return triangulation.getMesh();
 	}

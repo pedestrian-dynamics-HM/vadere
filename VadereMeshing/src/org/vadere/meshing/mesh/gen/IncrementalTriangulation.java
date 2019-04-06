@@ -109,7 +109,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this.mesh = mesh;
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.bound(points, epsilon);
+		this.bound = GeometryUtils.boundRelative(points);
 		this.finalized = false;
 		this.initialized = false;
 		this.mesh = mesh;
@@ -197,7 +197,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this.mesh = mesh;
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.bound(mesh.getPoints(mesh.getBorder()), epsilon);
+		this.bound = GeometryUtils.boundRelative(mesh.getPoints(mesh.getBorder()));
 		this.initialized = false;
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>();
@@ -305,13 +305,11 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 				double min = Math.min(bound.getWidth(), bound.getHeight());
 
 
-				double epsilon = BUFFER_PERCENTAGE * max; // 1% gap
+				double xMin = bound.getMinX();
+				double yMin = bound.getMinY();
 
-				double xMin = bound.getMinX() - epsilon;
-				double yMin = bound.getMinY() - epsilon;
-
-				double xMax = bound.getMinX() + bound.getWidth() * 2 + epsilon;
-				double yMax = bound.getMinY() + bound.getHeight() * 2 + epsilon;
+				double xMax = bound.getMinX() + 2*max;
+				double yMax = bound.getMinY() + 2*max;
 
 				V p0 = mesh.insertVertex(xMin, yMin);
 				V p1 = mesh.insertVertex(xMax, yMin);
@@ -372,7 +370,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
         initialized = false;
         finalized = false;
         points = mesh.getPoints();
-	    bound = GeometryUtils.bound(points, epsilon);
+	    bound = GeometryUtils.boundRelative(points);
         mesh.clear();
 	    setPointLocator(type);
         compute();
@@ -411,7 +409,10 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 		else {
 			//log.info("splitTriangle()");
-			assert contains(vertex.getX(), vertex.getY(), face);
+			/*if(!contains(vertex.getX(), vertex.getY(), face)) {
+				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), f));
+			}*/
+			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
 			E newEdge = splitTriangle(face, vertex,  true);
 			insertEvent(newEdge);
@@ -716,25 +717,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public boolean isIllegal(E edge, V p) {
 		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
-			//V p = mesh.getVertex(mesh.getNext(edge));
-			E t0 = mesh.getTwin(edge);
-			E t1 = mesh.getNext(t0);
-			E t2 = mesh.getNext(t1);
-
-			V x = mesh.getVertex(t0);
-			V y = mesh.getVertex(t1);
-			V z = mesh.getVertex(t2);
-
-			//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
-
-			//return Utils.isInCircumscribedCycle(x, y, z, p);
-			//if(Utils.ccw(z,x,y) > 0) {
-			return GeometryUtils.isInsideCircle(z, x, y, p);
-			//}
-			//else {
-			//	return Utils.isInsideCircle(x, z, y, p);
-			//}
+			return isDelaunayIllegal(edge, p);
 		}
 
 		return false;

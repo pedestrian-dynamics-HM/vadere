@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulation;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -97,7 +97,7 @@ public class TestTriangulationOperations {
 				new VPoint(0.3, 0.3),
 				new VPoint(0.3, 0.6));
 
-		var delaunayTriangulation = new PDelaunayTriangulation<VPoint, Integer, Integer>(points, (x, y) -> new VPoint(x, y));
+		var delaunayTriangulation = new PDelaunayTriangulator<VPoint, Integer, Integer>(points, (x, y) -> new VPoint(x, y));
 		var triangulation = delaunayTriangulation.generate();
 		var mesh = delaunayTriangulation.getMesh();
 

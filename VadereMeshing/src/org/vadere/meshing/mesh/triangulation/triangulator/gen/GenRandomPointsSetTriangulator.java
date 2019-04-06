@@ -108,21 +108,34 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 
     @Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-        triangulation.init();
-        int numberOfInsertedPoints = 0;
-
-        while (numberOfInsertedPoints < numberOfPoints) {
-            P point = randomPoint();
-
-            if(distFunc.apply(point) <= 0) {
-                triangulation.insert(point);
-                numberOfInsertedPoints++;
-            }
-        }
-
-        triangulation.finish();
-        return triangulation;
+		return generate(true);
     }
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+		triangulation.init();
+		int numberOfInsertedPoints = 0;
+
+		while (numberOfInsertedPoints < numberOfPoints) {
+			P point = randomPoint();
+
+			if(distFunc.apply(point) <= 0) {
+				triangulation.insert(point);
+				numberOfInsertedPoints++;
+			}
+		}
+
+		if(finalize) {
+			triangulation.finish();
+		}
+
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
+	}
 
 	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {

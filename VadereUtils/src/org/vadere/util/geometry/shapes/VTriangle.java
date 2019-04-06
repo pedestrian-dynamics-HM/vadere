@@ -35,6 +35,8 @@ public class VTriangle extends VPolygon {
 
     private VPoint orthocenter;
 
+    private double radius = -1;
+
     /**
      * Creates a triangle. Points must be given in ccw order.
      *
@@ -155,7 +157,10 @@ public class VTriangle extends VPolygon {
     }
 
     public double getCircumscribedRadius() {
-        return getCircumcenter().distance(p1);
+    	if(radius == -1) {
+    		radius = getCircumcenter().distance(p1);
+	    }
+        return radius;
     }
 
     public boolean isInCircumscribedCycle(final IPoint point) {

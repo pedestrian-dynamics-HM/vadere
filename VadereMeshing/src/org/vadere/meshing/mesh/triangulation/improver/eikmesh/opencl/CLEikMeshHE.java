@@ -137,7 +137,12 @@ public class CLEikMeshHE<P extends EikMeshPoint, CE, CF> implements IMeshImprove
 		}
     }
 
-    public boolean isFinished() {
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> generate(boolean finalize) {
+		return generate();
+	}
+
+	public boolean isFinished() {
         return nSteps >= MAX_STEPS;
     }
 

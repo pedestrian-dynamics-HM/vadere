@@ -2,6 +2,7 @@ package org.vadere.util.geometry;
 
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class GeometryUtils {
 	 * Constant for comparison of double values. Everything below this is
 	 * considered equal.
 	 */
-	public static final double DOUBLE_EPS = 1e-8;
+	public static final double DOUBLE_EPS = 1e-12;
 
 	public static final Logger log = Logger.getLogger(GeometryUtils.class);
 
@@ -1197,6 +1198,23 @@ public class GeometryUtils {
 		return new VRectangle(pMin.getX()-padding, pMin.getY()-padding, pMax.getX() - pMin.getX() + 2*padding, pMax.getY() - pMin.getY() + 2*padding);
 	}
 
+	public static <P extends IPoint> VRectangle boundRelative(final Collection<P> points, final double persentage) {
+		if(points.isEmpty()) {
+			throw new IllegalArgumentException("the point collection is empty.");
+		}
+
+		VPoint pMax = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()))).get();
+		VPoint pMin = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()))).get();
+
+		double padding = Math.max(pMax.x - pMin.x, pMax.y - pMin.y) * persentage;
+
+		return new VRectangle(pMin.getX()-padding, pMin.getY()-padding, pMax.getX() - pMin.getX() + 2*padding, pMax.getY() - pMin.getY() + 2*padding);
+	}
+
+	public static <P extends IPoint> VRectangle boundRelative(final Collection<P> points) {
+		return boundRelative(points, 0.5);
+	}
+
 	/**
 	 *  This method divides an non-acute triangle ACB into 7 acute triangles
 	 *  <ul>
@@ -1622,5 +1640,40 @@ public class GeometryUtils {
 		path2D.lineTo(points[0].getX(), points[0].getY());
 
 		return new VPolygon(path2D);
+	}
+
+	/**
+	 * <p>Returns a point which lies inside the polygon</p>
+	 *
+	 * Assumption: the polygon is a valid simple polygon!
+	 *
+	 * @param polygon
+	 * @return a point which lies inside the polygon
+	 */
+	public static VPoint getInteriorPoint(@NotNull final VPolygon polygon) {
+		// for a convex polygon the centroid is a valid point
+		if(polygon.contains(polygon.getCentroid())) {
+			return polygon.getCentroid();
+		}
+
+		int maxTrys = 31; // for 32 bit integer
+		double factor = 100;
+		double minLineLength = polygon.getLinePath().stream().map(line -> line.length()).min(Double::compareTo).get();
+		Rectangle2D rectangle2D = polygon.getBounds2D();
+
+		for(int i = 1; i < maxTrys; i++){
+			double eps = Math.min(Math.min(rectangle2D.getWidth(), rectangle2D.getHeight()), minLineLength) / (factor * ((1 << i)-1));
+			for(double x = rectangle2D.getX()+eps; x < rectangle2D.getX()+rectangle2D.getWidth(); x+=eps) {
+				for(double y = rectangle2D.getY()+eps; y < rectangle2D.getY()+rectangle2D.getHeight(); y+=eps) {
+					VPoint p = new VPoint(x, y);
+					if(polygon.contains(p)) {
+						return p;
+					}
+				}
+			}
+		}
+
+		throw new IllegalArgumentException("unable to find an interior point for the polygon " + polygon);
+
 	}
 }

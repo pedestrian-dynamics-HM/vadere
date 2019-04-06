@@ -118,29 +118,32 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
     }
 
     @Override
-    public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> generate() {
-        try {
-	        if(!initialized) {
-		        initialize();
-	        }
-
-	        // TODO: quality check!
-	        while (nSteps < MAX_STEPS) {
-		        improve();
-		        //log.info("quality: " + quality);
-	        }
-	        refresh();
-	        finish();
-	        return triangulation;
-        }
-        catch (OpenCLException e) {
-        	log.error(e.getMessage());
-        	e.printStackTrace();
-        	throw new RuntimeException(e);
-        }
+    public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> generate(boolean finalize) {
+        return generate();
     }
 
-    public void execute() {
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> generate() {
+		try {
+			initialize();
+
+			// TODO: quality check!
+			while (nSteps < MAX_STEPS) {
+				improve();
+				//log.info("quality: " + quality);
+			}
+			refresh();
+			finish();
+			return triangulation;
+		}
+		catch (OpenCLException e) {
+			log.error(e.getMessage());
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void execute() {
     	try {
 		    if(!initialized) {
 			    initialize();

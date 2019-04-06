@@ -133,6 +133,11 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 	 * @return the generated triangulation
 	 */
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+		return generate(true);
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			logger.info("start triangulation generation");
 			init();
@@ -141,10 +146,18 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 				step();
 			}
 
-			finish();
+			if(finalize) {
+				finish();
+			}
+
 			logger.info("end triangulation generation");
 			generated = true;
 		}
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
 		return triangulation;
 	}
 

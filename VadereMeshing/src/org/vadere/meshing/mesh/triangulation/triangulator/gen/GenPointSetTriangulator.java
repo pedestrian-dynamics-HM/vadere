@@ -64,14 +64,28 @@ public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	@Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-    	if(!generated) {
-		    triangulation.init();
-		    triangulation.insert(points);
-		    triangulation.finish();
-		    generated = true;
-	    }
-        return triangulation;
+		return generate(true);
     }
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+		if(!generated) {
+			triangulation.init();
+			triangulation.insert(points);
+
+			if(finalize) {
+				triangulation.finish();
+			}
+
+			generated = true;
+		}
+		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
+	}
 
 	@Override
 	public IMesh<P, CE, CF, V, E, F> getMesh() {

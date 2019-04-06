@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -25,11 +26,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * <p>Ruperts-Algorithm: not jet finished!</p>
+ * <p>Ruperts-Algorithm: not jet finished: Slow implementation!</p>
  *
  * @author Benedikt Zonnchen
  *
@@ -44,9 +48,13 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	private static Logger log = Logger.getLogger(GenRuppertsTriangulator.class);
     private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
+    private final Function<IPoint, Double> circumRadiusFunc;
     private final Set<P> points;
     private boolean generated;
+
+	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
     private Set<E> segments;
+
     private Collection<VPolygon> holes;
     @Nullable private VPolygon boundingBox;
 	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
@@ -55,101 +63,79 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	private double threashold;
 	private static double MIN_ANGLE_TO_TERMINATE = 20;
 	private boolean createHoles;
-	private Set<F> outsideFaces;
-
-
-    public GenRuppertsTriangulator(
-		    @NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-		    @NotNull final VRectangle bound,
-		    @NotNull final Collection<VLine> constrains,
-		    @NotNull final Set<P> points,
-		    final double minAngle,
-		    final boolean createHoles) {
-        this.points = points;
-        this.generated = false;
-        this.segments = new HashSet<>();
-		this.holes = Collections.EMPTY_LIST;
-		this.boundingBox = null;
-		this.initialized = false;
-		this.generated = false;
-		this.minAngle = minAngle;
-		this.threashold = 0.0;
-		this.createHoles = createHoles;
-		this.outsideFaces = new HashSet<>();
-
-	    /**
-	     * This prevent the flipping of constrained edges
-	     */
-	    Predicate<E> canIllegal = e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e));
-
-	    this.cdt = new GenConstrainedDelaunayTriangulator<>(mesh, bound, constrains, points, canIllegal);
-    }
+	private IPlacementStrategy<P, CE, CF, V, E, F> placementStrategy;
 
 	public GenRuppertsTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-			@NotNull final VRectangle bound,
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
 			@NotNull final Collection<VLine> constrains,
-			@NotNull final Set<P> points,
-			final double minAngle) {
-		this(mesh, bound, constrains, points, minAngle, true);
-	}
-
-	public GenRuppertsTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-			@NotNull final VRectangle bound,
-			@NotNull final Collection<VLine> constrains,
-			@NotNull final Set<P> points) {
-		this(mesh, bound, constrains, points, MIN_ANGLE_TO_TERMINATE);
-	}
-
-	public GenRuppertsTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final VPolygon bound,
-			@NotNull final Collection<VPolygon> constrains,
-			@NotNull final Set<P> points,
-			final double minAngle) {
-		this(mesh, bound, constrains, points, minAngle, true);
-	}
-
-	public GenRuppertsTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-			@NotNull final VPolygon bound,
-			@NotNull final Collection<VPolygon> constrains,
 			@NotNull final Set<P> points,
 			final double minAngle,
+			@NotNull Function<IPoint, Double> circumRadiusFunc,
 			final boolean createHoles) {
 		this.points = points;
 		this.generated = false;
 		this.segments = new HashSet<>();
-		this.holes = constrains;
+		this.holes = Collections.EMPTY_LIST;
 		this.boundingBox = bound;
 		this.initialized = false;
 		this.generated = false;
 		this.minAngle = minAngle;
 		this.threashold = 0.0;
 		this.createHoles = createHoles;
-
-		List<VLine> lines = new ArrayList<>();
-		for(VPolygon polygon : constrains) {
-			lines.addAll(polygon.getLinePath());
-		}
-
-		lines.addAll(bound.getLinePath());
+		this.circumRadiusFunc = circumRadiusFunc;
 
 		/**
 		 * This prevent the flipping of constrained edges
 		 */
 		Predicate<E> canIllegal = e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e));
-
-		this.cdt = new GenConstrainedDelaunayTriangulator<>(mesh, GeometryUtils.bound(bound.getPoints(), GeometryUtils.DOUBLE_EPS), lines, points, canIllegal);
+		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, GeometryUtils.boundRelative(bound.getPoints()), constrains, points, canIllegal);
+		this.placementStrategy = new DelaunayPlacement<>(cdt.getMesh());
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final Collection<VLine> constrains,
+			@NotNull final VPolygon bound) {
+		this(meshSupplier, constrains, bound, Collections.EMPTY_SET, MIN_ANGLE_TO_TERMINATE, p -> Double.POSITIVE_INFINITY, true);
+	}
+
+	public GenRuppertsTriangulator(
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final VPolygon bound,
+			@NotNull final Collection<VPolygon> constrains,
+			@NotNull final Set<P> points,
+			final double minAngle,
+			final boolean createHoles) {
+		this(meshSupplier,
+				Stream.concat(bound.getLinePath().stream(),constrains.stream().flatMap(polygon -> polygon.getLinePath().stream())).collect(Collectors.toList()),
+			 bound,
+			 points,
+			 minAngle,
+				p -> Double.POSITIVE_INFINITY,
+			 createHoles);
+		this.holes = constrains;
+	}
+
+	public GenRuppertsTriangulator(
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final VPolygon bound,
+			@NotNull final Collection<VPolygon> constrains,
+			@NotNull final Set<P> points,
+			final double minAngle) {
+		this(meshSupplier, bound, constrains, points, minAngle, true);
+	}
+
+	public GenRuppertsTriangulator(
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
 			@NotNull final VPolygon bound,
 			@NotNull final Collection<VPolygon> constrains,
 			@NotNull final Set<P> points) {
-		this(mesh, bound, constrains, points, MIN_ANGLE_TO_TERMINATE);
+		this(meshSupplier, bound, constrains, points, MIN_ANGLE_TO_TERMINATE);
+	}
+
+	public Set<E> getSegments() {
+		return segments;
 	}
 
 	@Override
@@ -159,17 +145,21 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	public void refine(final double angle, final double threshold) {
 		// (1) split segments until they are no longer encroached
-    	while (findAndSplit(threshold)) {}
+		if (findAndSplit(threshold)) {
+			return;
+		}
+		//while (findAndSplit(threshold)) {}
 
-    	// (2) split the next skinny triangle at its circumcenter
-		Optional<F> skinnyTriangle = getMesh().streamFaces().filter(f -> isSkinny(f, angle, threshold)).findAny();
+    	// (2) split the next skinny triangle at its circumcenter TODO: order by quality ie worst triangle first!
+		Optional<F> skinnyTriangle = getMesh().streamFaces().filter(f -> isIllegal(f, angle, threshold)).findAny();
 		if(skinnyTriangle.isPresent()) {
 			F skinnyFace = skinnyTriangle.get();
 
 			// (2.1) compute the circumcenter
-			VPoint circumCenter = getMesh().toTriangle(skinnyFace).getCircumcenter();
+			VTriangle triangle = getMesh().toTriangle(skinnyFace);
+			VPoint circumCenter = placementStrategy.computePlacement(getMesh().getEdge(skinnyFace), triangle);
 
-			// (2.2) find all encroached segements with respect to the circumcenter
+			// (2.2) find all encroached segements with respect to the circumcenter TODO: this is slow!
 			Collection<E> encroachedSegements = segments.stream().filter(e -> isEncroached(e, circumCenter)).collect(Collectors.toList());
 			if(encroachedSegements.size() > 0) {
 				// (2.3) make sure that all encroached segements will be split
@@ -183,7 +173,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	public void refineSub() {
-    	while (getMesh().streamFaces().anyMatch(f -> isSkinny(f, minAngle, threashold))) {
+    	while (getMesh().streamFaces().anyMatch(f -> isIllegal(f, minAngle, threashold))) {
     		refine(minAngle, threashold);
 	    }
 	}
@@ -210,15 +200,16 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
     	if(!initialized) {
 		    // (1) compute the constrained Delaunay triangulation (CDT)
 		    triangulation = cdt.generate();
+		    //removeTriangles();
 
 		    // (2) remove triangles inside holes and at concavities
 
 		    // (3) get the half-edges representing the segments
-		    segments = new HashSet<>(cdt.getConstrains());
+		    segments.addAll(cdt.getConstrains());
 
 		    // (3) the core algorithm
 		    initialized = true;
-	    } else if(getMesh().streamFaces().anyMatch(f -> isSkinny(f, minAngle, threashold))) {
+	    } else if(getMesh().streamFaces().anyMatch(f -> isIllegal(f, minAngle, threashold))) {
 		    refine(minAngle, threashold);
     	} else if(!generated){
 			removeTriangles();
@@ -239,32 +230,26 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	private void split(@NotNull final E segment) {
 		segments.remove(segment);
+		segments.remove(getMesh().getTwin(segment));
 
 		// add s1, s2
 		VLine line = getMesh().toLine(segment);
 		VPoint midPoint = line.midPoint();
 		V vertex = getMesh().createVertex(midPoint.getX(), midPoint.getY());
+		V v1 = getMesh().getVertex(segment);
+		V v2 = getMesh().getTwinVertex(segment);
 
 		// split s
-		log.info("split edge at " + vertex);
 		List<E> toLegalize = triangulation.splitEdgeAndReturn(vertex, segment, false);
 
-		// add s1, s2
-		int count = 0;
-		for(E e : getMesh().getEdgeIt(vertex)) {
-			// update data structure
+		// update data structure: add s1, s2
+		E e1 = getMesh().getEdge(vertex, v1).get();
+		E e2 = getMesh().getEdge(vertex, v2).get();
 
-			V twinPoint = getMesh().getTwinVertex(e);
-			if(getMesh().toPoint(twinPoint).equals(new VPoint(line.getX1(), line.getY1())) ||
-					getMesh().toPoint(twinPoint).equals(new VPoint(line.getX2(), line.getY2()))) {
-				count++;
-				//if(isEncroached(e)) {
-					segments.add(e);
-				//}
-			}
-		}
-
-		assert count == 2;
+		segments.add(e1);
+		segments.add(getMesh().getTwin(e1));
+		segments.add(e2);
+		segments.add(getMesh().getTwin(e2));
 
 		for(E e : toLegalize) {
 			triangulation.legalize(e, vertex);
@@ -273,22 +258,45 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
     @Override
     public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
-	    if(!initialized) {
-		    // (1) compute the constrained Delaunay triangulation (CDT)
-		    triangulation = cdt.generate();
+	   return generate(true);
+    }
 
-		    // (2) remove triangles inside holes and at concavities
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+		if(!initialized) {
+			// (1) compute the constrained Delaunay triangulation (CDT)
+			triangulation = cdt.generate(finalize);
 
-		    // (3) get the half-edges representing the segments
-		    segments = new HashSet<>(cdt.getConstrains());
+			// (2) remove triangles inside holes and at concavities
 
-		    // (3) the core algorithm
-		    initialized = true;
-	    }
-	    refineSub();
-	    removeTriangles();
+			// (3) get the half-edges representing the segments
+			segments.addAll(cdt.getConstrains());
+
+			// (3) the core algorithm
+			initialized = true;
+		}
+		refineSub();
+		removeTriangles();
 
 		return triangulation;
+	}
+
+	@Override
+	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		return triangulation;
+	}
+
+	private boolean isIllegal(@NotNull final F face, final double angle, final double threashold) {
+		return isInside(face) && isSkinny(face, angle, threashold);
+    }
+
+    private boolean isInside(@NotNull final F face) {
+		if(getMesh().isBoundary(face)) {
+			return false;
+		}
+
+		//TODO: this might be expensive!
+		return boundingBox.contains(getMesh().toTriangle(face).midPoint());
     }
 
 	private boolean isSkinny(@NotNull final F face, final double angle, final double threashold) {
@@ -316,13 +324,13 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 		    P p1 = getMesh().getPoint(getMesh().getNext(segment));
 
-		    if(diameterCircle.getCenter().distance(p1) < diameterCircle.getRadius() - 0.1) {
+		    if(diameterCircle.getCenter().distance(p1) < diameterCircle.getRadius() - GeometryUtils.DOUBLE_EPS) {
 			    return true;
 		    }
 
 		    P p2 = getMesh().getPoint(getMesh().getNext(getMesh().getTwin(segment)));
 
-		    if((diameterCircle.getCenter().distance(p2) < diameterCircle.getRadius()  - 0.1)) {
+		    if((diameterCircle.getCenter().distance(p2) < diameterCircle.getRadius()  - GeometryUtils.DOUBLE_EPS)) {
 			    return true;
 		    }
 	    }

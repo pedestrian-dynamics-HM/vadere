@@ -304,6 +304,32 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
+	default boolean isDelaunayIllegal(@NotNull final E edge) {
+		return isDelaunayIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
+	}
+
+	default boolean isDelaunayIllegal(@NotNull final E edge, @NotNull final V p) {
+		//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
+		//V p = mesh.getVertex(mesh.getNext(edge));
+		E t0 = getMesh().getTwin(edge);
+		E t1 = getMesh().getNext(t0);
+		E t2 = getMesh().getNext(t1);
+
+		V x = getMesh().getVertex(t0);
+		V y = getMesh().getVertex(t1);
+		V z = getMesh().getVertex(t2);
+
+		//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+
+		//return Utils.isInCircumscribedCycle(x, y, z, p);
+		//if(Utils.ccw(z,x,y) > 0) {
+		return GeometryUtils.isInsideCircle(z, x, y, p);
+		//}
+		//else {
+		//	return Utils.isInsideCircle(x, z, y, p);
+		//}
+	}
+
 	/**
 	 * <p>Helper method which returns an arbitrary edge of a pair of edges.
 	 * It returns the left if it is not null otherwise the right.</p>
@@ -889,6 +915,31 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		return splitTriangle(face, getMesh().createPoint(circumcenter.getX(), circumcenter.getY()), legalize);
 	}
 
+	//TODO test it
+	default void removeBoundaryVertex(@NotNull final V vertex) {
+		assert getMesh().isAtBoundary(vertex);
+		F boundary = getMesh().getFace(vertex);
+		E boundaryEdge = getMesh().getBoundaryEdge(vertex).get();
+		E next = getMesh().getNext(boundaryEdge);
+		E nnext = getMesh().getNext(next);
+
+		List<E> ringEdges = getMesh()
+				.streamEdges(vertex)
+				.map(edge -> getMesh().getPrev(edge))
+				.collect(Collectors.toList());
+
+		for(int i = 0; i < ringEdges.size()-1; i++) {
+			E edge = ringEdges.get(i);
+			V v = getMesh().getVertex(edge);
+			getMesh().setNext(edge, ringEdges.get(i+1));
+			getMesh().setFace(edge, boundary);
+			// adjust since the edge is now a boundary edge!
+			getMesh().setEdge(v, edge);
+		}
+
+		getMesh().setNext(ringEdges.get(ringEdges.size()-1), nnext);
+	}
+
 	/**
 	 * Removes a non-boundary vertex from the triangulation by removing the point and re-triangulating the hole
 	 * using the algorithm described in: On Deletion in Delaunay Triangulations.
@@ -897,13 +948,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 * @param vertex the vertex which will be removed
 	 */
-	default void remove(@NotNull final V vertex) {
+	default void removeNonBoundaryVertex(@NotNull final V vertex) {
 		assert !getMesh().isAtBoundary(vertex);
 
 		// (1) remove the vertex
-
 		// get ringEdges in ccw order!
-		List<E> ringEdges = getMesh().streamEdges(vertex).map(edge -> getMesh().getPrev(edge)).collect(Collectors.toList());
+		List<E> ringEdges = getMesh()
+				.streamEdges(vertex)
+				.map(edge -> getMesh().getPrev(edge)).collect(Collectors.toList());
+
 		F face = getMesh().getFace(ringEdges.get(ringEdges.size()-1));
 
 		for(int i = 0; i < ringEdges.size(); i++) {
@@ -924,7 +977,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			getMesh().setNext(edge, ringEdges.get((i+1) % ringEdges.size()));
 			getMesh().setFace(edge, face);
 
-			if(!getMesh().isAtBoundary(getMesh().getEdge(getMesh().getVertex(edge)))) {
+			E vEdge = getMesh().getEdge(getMesh().getVertex(edge));
+			if(getMesh().isDestroyed(vEdge)/* || !getMesh().isAtBoundary(vEdge)*/) {
 				getMesh().setEdge(getMesh().getVertex(edge), edge);
 			}
 		}
@@ -1020,6 +1074,20 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				heap.add(nextEarNode);
 				heap.add(nnextEarNode);
 			}
+		}
+	}
+
+	/**
+	 * Removes a vertex from the triangulation by removing the point and re-triangulating the hole
+	 * using the algorithm described in: On Deletion in Delaunay Triangulations.
+	 *
+	 * @param vertex the vertex which will be removed
+	 */
+	default void remove(@NotNull final V vertex) {
+		if(getMesh().isAtBoundary(vertex)) {
+			removeBoundaryVertex(vertex);
+		} else {
+			removeNonBoundaryVertex(vertex);
 		}
 	}
 
