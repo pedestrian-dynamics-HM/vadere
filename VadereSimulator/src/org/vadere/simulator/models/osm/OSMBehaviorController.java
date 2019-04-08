@@ -148,11 +148,13 @@ public class OSMBehaviorController {
         List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
                 .getObjects(positionOfPedestrian, pedestrian.getRadius() * 5);
 
+        // Filter out "me" and pedestrians which are farer away from target than "me".
         closestPedestrians = closestPedestrians.stream()
-                .filter(candidate -> pedestrian.getId() != candidate.getId()) // Filter out "me".
-                .filter(candidate -> pedestrian.getTargetPotential(candidate.getPosition()) < pedestrian.getTargetPotential(pedestrian.getPosition())) // Filter out pedestrians which are farer away from target than me.
+                .filter(candidate -> pedestrian.getId() != candidate.getId())
+                .filter(candidate -> pedestrian.getTargetPotential(candidate.getPosition()) < pedestrian.getTargetPotential(pedestrian.getPosition()))
                 .collect(Collectors.toList());
 
+        // Sort by distance away from "me".
         closestPedestrians = closestPedestrians.stream()
                 .sorted((pedestrian1, pedestrian2) ->
                 Double.compare(positionOfPedestrian.distance(pedestrian1.getPosition()), positionOfPedestrian.distance(pedestrian2.getPosition())))
@@ -183,7 +185,7 @@ public class OSMBehaviorController {
      * This is required to decide if pedestrian1 and pedestrian2 can be swapped because they have different walking
      * directions.
      *
-     * @return An angle between 0 and <i>pi</i> or -1 if at least one of the given pedestrians has no target.
+     * @return An angle between 0 and <i>pi</i> radian or -1 if at least one of the given pedestrians has no target.
      */
     public double calculateAngleBetweenTargets(Pedestrian pedestrian1, Pedestrian pedestrian2, Topography topography) {
         double angleInRadian = -1;
@@ -206,6 +208,7 @@ public class OSMBehaviorController {
     }
 
     private void swapPedestrians(Pedestrian pedestrian1, Pedestrian pedestrian2) {
+        // TODO Use "makeStep()" to swap both pedestrians.
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
