@@ -1,7 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,6 +32,13 @@ public class PedestrianWaitingEndTimeProcessorTestEnv extends ProcessorTestEnv<P
 			e.printStackTrace();
 		}
 		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+
+		AttributesPedestrianWaitingEndTimeProcessor attr =
+				(AttributesPedestrianWaitingEndTimeProcessor) testedProcessor.getAttributes();
+		attr.setWaitingAreaId(42);
+		MeasurementArea measurementArea = new MeasurementArea(
+				new AttributesMeasurementArea(42, new VRectangle(0, 0, 16, 16)));
+		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
 	}
 
 

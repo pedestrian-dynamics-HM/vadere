@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.migration;
 
-import org.vadere.simulator.projects.migration.incidents.Incident;
+import org.vadere.simulator.projects.migration.incident.incidents.Incident;
 
 public class MigrationException extends Exception {
 
@@ -11,6 +11,10 @@ public class MigrationException extends Exception {
 
 	public MigrationException(String message) {
 		super(message);
+	}
+
+	public MigrationException(Throwable throwable) {
+		super(throwable);
 	}
 
 	public MigrationException(String message, Throwable cause) {

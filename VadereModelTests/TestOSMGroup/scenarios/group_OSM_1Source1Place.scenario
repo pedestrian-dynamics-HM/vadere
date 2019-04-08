@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_1Source1Place",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -111,6 +111,7 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

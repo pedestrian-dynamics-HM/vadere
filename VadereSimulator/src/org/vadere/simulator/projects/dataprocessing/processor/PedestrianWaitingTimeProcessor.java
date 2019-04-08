@@ -4,21 +4,26 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
  */
 @DataProcessorClass()
-public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKey, Double> {
+public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKey, Double>  implements UsesMeasurementArea {
 	private double lastSimTime;
-	private VRectangle waitingArea;
+	private MeasurementArea waitingArea;
+	private VRectangle waitingAreaRec;
 
 	public PedestrianWaitingTimeProcessor() {
 		super("waitingTimeStart");
@@ -36,7 +41,7 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 			int pedId = p.getId();
 			VPoint pos = p.getPosition();
 
-			if (this.waitingArea.contains(pos)) {
+			if (this.waitingAreaRec.contains(pos)) {
 				PedestrianIdKey key = new PedestrianIdKey(pedId);
 				this.putValue(key, (this.hasValue(key) ? this.getValue(key) : 0.0) + dt);
 			}
@@ -49,7 +54,12 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) this.getAttributes();
-		this.waitingArea = att.getWaitingArea();
+		this.waitingArea  = manager.getMeasurementArea(att.getWaitingAreaId());
+		if (waitingArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getWaitingAreaId()));
+		if (!waitingArea.isRectangular())
+			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+		waitingAreaRec = waitingArea.asVRectangle();
 		this.lastSimTime = 0.0;
 	}
 
@@ -60,5 +70,11 @@ public class PedestrianWaitingTimeProcessor extends DataProcessor<PedestrianIdKe
 		}
 
 		return super.getAttributes();
+	}
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesPedestrianWaitingTimeProcessor att = (AttributesPedestrianWaitingTimeProcessor) this.getAttributes();
+		return new int[]{att.getWaitingAreaId()};
 	}
 }

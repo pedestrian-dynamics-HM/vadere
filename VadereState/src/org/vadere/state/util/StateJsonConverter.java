@@ -52,7 +52,11 @@ public abstract class StateJsonConverter {
 	public static ObjectMapper getMapper() {
 		return mapper;
 	}
-	
+
+	public static ObjectWriter getPrettyWriter() {
+		return prettyWriter;
+	}
+
 	// TODO handle exception
 	public static <T> T deserializeObjectFromJson(String json, Class<T> objectClass) {
 		

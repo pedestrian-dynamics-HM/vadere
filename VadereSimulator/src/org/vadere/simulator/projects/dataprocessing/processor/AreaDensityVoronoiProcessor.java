@@ -1,17 +1,22 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.Flag;
+
+import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
  *
  */
 @DataProcessorClass(label = "AreaDensityVoronoiProcessor")
-public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
+public class AreaDensityVoronoiProcessor extends AreaDensityProcessor implements UsesMeasurementArea {
 
     public AreaDensityVoronoiProcessor(){
         super();
@@ -23,7 +28,13 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
         super.init(manager);
 
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
-        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(this.getMeasurementArea(), att.getVoronoiArea()));
+        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
+        if (measurementArea == null)
+            throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+        if (!measurementArea.isRectangular())
+            throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+
+        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(this.getMeasurementArea(), measurementArea));
     }
 
     @Override
@@ -33,5 +44,12 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor {
         }
 
         return super.getAttributes();
+    }
+
+
+    @Override
+    public int[] getReferencedMeasurementAreaId() {
+        AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
+        return new int[]{att.getMeasurementAreaId(), att.getMeasurementAreaId()};
     }
 }

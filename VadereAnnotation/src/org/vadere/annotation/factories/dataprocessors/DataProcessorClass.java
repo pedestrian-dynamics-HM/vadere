@@ -25,4 +25,6 @@ public @interface DataProcessorClass {
 	String label() default "";
 
 	String description() default "";
+
+	String[] processorFlags() default {};
 }
