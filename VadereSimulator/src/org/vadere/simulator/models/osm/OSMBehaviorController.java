@@ -208,12 +208,15 @@ public class OSMBehaviorController {
     }
 
     private void swapPedestrians(Pedestrian pedestrian1, Pedestrian pedestrian2) {
-        // TODO Use "makeStep()" to swap both pedestrians.
+        // TODO Use "makeStep()" to swap both pedestrians to avoid
+        //   "java.lang.AssertionError: Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
+        /*
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
         pedestrian1.setPosition(newPosition);
         pedestrian2.setPosition(oldPosition);
+         */
     }
 
 }
