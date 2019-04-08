@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.BangEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Pedestrian;
@@ -104,25 +105,112 @@ public class OSMBehaviorController {
         }
     }
 
+    /**
+     * Try to swap the given pedestrian with the closest cooperative pedestrian.
+     * Carry out the following steps:
+     *
+     * <ol>
+     *     <li>Use topography to find a closest Pedestrian within step circle which is closer to target than the given pedestrian.</li>
+     *     <li>Check if candidate is SalientBehavior.COOPERATIVE.</li>
+     *     <li>Check if target orientation of candidate differs from own orientation.</li>
+     *     <li>Swap if checks (2) and (3) are true.</li>
+     * </ol>
+     *
+     * @param pedestrian The pedestrian which would like to swap the position.
+     * @param topography The topography is required to find the neighbors of the given pedestrian.
+     */
     public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography) {
-        // TODO
-        //   1. Use topography to find a closest Pedestrian within step circle.
-        //   2. Check if candidate is SalientBehavior.COOPERATIVE.
-        //   3. Check if target orientation of candidate differs from own orientation.
-        //   4. Swap if checks (2) and (3) are true.
-        List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
-                .getObjects(pedestrian.getPosition(), pedestrian.getRadius() * 5);
-        closestPedestrians = closestPedestrians.stream().filter(candidate -> pedestrian.getId() != candidate.getId()).collect(Collectors.toList());
+        if (pedestrian.hasNextTarget() == false) { // Ignore pedestrians with no targets.
+            return;
+        }
 
-        // TODO Remove debug code here.
-        if (pedestrian.getId() == 14) {
-            System.out.println(String.format("Me: %s", pedestrian.getPosition()));
-            System.out.println(String.format("Closest pedestrians: %d", closestPedestrians.size()));
+        List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
 
-            if (closestPedestrians.size() > 0) {
-                System.out.println(String.format("Closest[0]: %s", closestPedestrians.get(0).getId()));
+        if (closestPedestrians.size() > 0) {
+            for (Pedestrian closestPedestrian : closestPedestrians) {
+                boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
+                // TODO Implement helper method to analyze target orientation.
+                boolean targetOrientationDiffers = true;
+
+                if (closestPedIsCooperative && targetOrientationDiffers) {
+                    swapPedestrians(pedestrian, closestPedestrian);
+                    break;
+                }
+
             }
         }
+    }
+
+    @NotNull
+    private List<Pedestrian> getClosestPedestriansWhichAreCloserToTarget(PedestrianOSM pedestrian, Topography topography) {
+        VPoint positionOfPedestrian = pedestrian.getPosition();
+
+        List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
+                .getObjects(positionOfPedestrian, pedestrian.getRadius() * 5);
+
+        closestPedestrians = closestPedestrians.stream()
+                .filter(candidate -> pedestrian.getId() != candidate.getId()) // Filter out "me".
+                .filter(candidate -> pedestrian.getTargetPotential(candidate.getPosition()) < pedestrian.getTargetPotential(pedestrian.getPosition())) // Filter out pedestrians which are farer away from target than me.
+                .collect(Collectors.toList());
+
+        closestPedestrians = closestPedestrians.stream()
+                .sorted((pedestrian1, pedestrian2) ->
+                Double.compare(positionOfPedestrian.distance(pedestrian1.getPosition()), positionOfPedestrian.distance(pedestrian2.getPosition())))
+                .collect(Collectors.toList());
+
+        return closestPedestrians;
+    }
+
+    /**
+     * Calculate the angle between the two vectors v1 and v2 where
+     * v1 = (TargetPedestrian1 - pedestrian1) and v2 = (TargetPedestrian2 - pedestrian2):
+     *
+     * <pre>
+     *     T2 o   o T1
+     *        ^   ^
+     *         \a/
+     *          x
+     *         / \
+     *     P1 o   o P2
+     *
+     *     T1: target of pedestrian 1
+     *     T2: target of pedestrian 2
+     *     P1: pedestrian 1
+     *     P2: pedestrian 2
+     *     a : angle between the two vectors
+     * </pre>
+     *
+     * This is required to decide if pedestrian1 and pedestrian2 can be swapped because they have different walking
+     * directions.
+     *
+     * @return An angle between 0 and <i>pi</i> or -1 if at least one of the given pedestrians has no target.
+     */
+    public double calculateAngleBetweenTargets(Pedestrian pedestrian1, Pedestrian pedestrian2, Topography topography) {
+        double angleInRadian = -1;
+
+        if (pedestrian1.hasNextTarget() && pedestrian2.hasNextTarget()) {
+            Target targetPed1 = topography.getTarget(pedestrian1.getNextTargetId());
+            Target targetPed2 = topography.getTarget(pedestrian2.getNextTargetId());
+
+            // TODO Maybe, use "target.getShape().getClosestPoint()" instead of "getCentroid()".
+            VPoint targetVectorPed1 = targetPed1.getShape().getCentroid().subtract(pedestrian1.getPosition());
+            VPoint targetVectorPed2 = targetPed2.getShape().getCentroid().subtract(pedestrian2.getPosition());
+
+            double dotProduct = targetVectorPed1.dotProduct(targetVectorPed2);
+            double multipliedMagnitudes = targetVectorPed1.distanceToOrigin() * targetVectorPed2.distanceToOrigin();
+
+            angleInRadian = Math.acos(dotProduct / multipliedMagnitudes);
+        }
+
+        return angleInRadian;
+    }
+
+    private void swapPedestrians(Pedestrian pedestrian1, Pedestrian pedestrian2) {
+        VPoint newPosition = pedestrian2.getPosition().clone();
+        VPoint oldPosition = pedestrian1.getPosition().clone();
+
+        pedestrian1.setPosition(newPosition);
+        pedestrian2.setPosition(oldPosition);
     }
 
 }
