@@ -58,18 +58,18 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			if (pedestrian.getTimeOfNextStep() == 0) {
 				pedestrian.setTimeOfNextStep(currentTimeInSec);
 			}
-			
+
+			// TODO Make a code review with Bene here and check if everything works as expected.
 			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 			pedestrian.updateNextPosition();
 			double stepDuration = pedestrian.getDurationNextStep();
 
-			// TODO Revise following quick-and-dirty code.
+			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+
 			if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
 				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
 			}
-
-			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {

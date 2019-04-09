@@ -42,6 +42,7 @@ public class SalientBehaviorCognition {
                 if (lastFootSteps.getAverageSpeedInMeterPerSecond() <= requiredSpeedInMetersPerSecondToBeCooperative) {
                     pedestrian.setSalientBehavior(SalientBehavior.COOPERATIVE);
                 } else {
+                    // TODO Maybe, check if area directed to target is free for a step (only then change to "TARGET_ORIENTED").
                     pedestrian.setSalientBehavior(SalientBehavior.TARGET_ORIENTED);
                 }
             }

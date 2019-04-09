@@ -110,7 +110,7 @@ public class OSMBehaviorController {
      * Carry out the following steps:
      *
      * <ol>
-     *     <li>Use topography to find a closest Pedestrian within step circle which is closer to target than the given pedestrian.</li>
+     *     <li>Use topography to find a close pedestrian within step circle which is closer to target than the given pedestrian.</li>
      *     <li>Check if candidate is SalientBehavior.COOPERATIVE.</li>
      *     <li>Check if target orientation of candidate differs from own orientation.</li>
      *     <li>Swap if checks (2) and (3) are true.</li>
@@ -129,7 +129,7 @@ public class OSMBehaviorController {
         if (closestPedestrians.size() > 0) {
             for (Pedestrian closestPedestrian : closestPedestrians) {
                 boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
-                // TODO Implement helper method to analyze target orientation.
+                // TODO Use method "calculateAngleBetweenTargets()" to decide if target orientation of both pedestrians differs.
                 boolean targetOrientationDiffers = true;
 
                 if (closestPedIsCooperative && targetOrientationDiffers) {
