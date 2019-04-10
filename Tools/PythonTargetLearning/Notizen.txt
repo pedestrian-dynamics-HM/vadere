@@ -63,3 +63,13 @@ Verteilungen bei Schrittweite 1/16 - 3 Läufe
 
 1. sehr viele doppelte bilder
 2. Szenarien sind nochmal schneller
+
+
+
+"OBSTACLES" -> obstacleDensityWeight zwischen 0.0 und max 1.0, am besten 0.1
+zhang 2011
+dichte bilder wie im paper am Ende
+
+
+
+

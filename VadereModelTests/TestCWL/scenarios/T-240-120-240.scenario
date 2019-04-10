@@ -77,7 +77,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
         "pedestrianLineCrossProcessorId" : 8,
-        "pedestrianVelocityProcessorId" : 7,
+        "pedestrianVelocityProcessorId" : 13,
         "deltaTime" : 10.0
       }
     }, {
@@ -172,7 +172,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
         "pedestrianLineCrossProcessorId" : 18,
-        "pedestrianVelocityProcessorId" : 7,
+        "pedestrianVelocityProcessorId" : 13,
         "deltaTime" : 10.0
       }
     }, {
@@ -209,7 +209,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramAProcessor",
       "attributes" : {
         "pedestrianLineCrossProcessorId" : 19,
-        "pedestrianVelocityProcessorId" : 7,
+        "pedestrianVelocityProcessorId" : 13,
         "deltaTime" : 10.0
       }
     } ],
