@@ -73,9 +73,7 @@ public class OSMBehaviorController {
             pedestrian.setVelocity(pedVelocity);
         }
 
-        /**
-         * strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
-         */
+        // strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), timeOfNextStep));
         pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, timeOfNextStep, entTimeOfStep));
     }
@@ -121,10 +119,16 @@ public class OSMBehaviorController {
      */
     public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography) {
         if (pedestrian.hasNextTarget() == false) { // Ignore pedestrians with no targets.
+            // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+            pedestrian.updateNextPosition();
+            makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+            pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+
             return;
         }
 
         List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
+        boolean pedestriansSwapped = false;
 
         if (closestPedestrians.size() > 0) {
             for (Pedestrian closestPedestrian : closestPedestrians) {
@@ -133,11 +137,18 @@ public class OSMBehaviorController {
                 boolean targetOrientationDiffers = true;
 
                 if (closestPedIsCooperative && targetOrientationDiffers) {
-                    swapPedestrians(pedestrian, closestPedestrian);
+                    swapPedestrians(pedestrian, (PedestrianOSM)closestPedestrian, topography);
+                    pedestriansSwapped = true;
                     break;
                 }
-
             }
+        }
+
+        if (pedestriansSwapped == false) { // Try to perform a regular step
+            // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+            pedestrian.updateNextPosition();
+            makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+            pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
         }
     }
 
@@ -145,6 +156,7 @@ public class OSMBehaviorController {
     private List<Pedestrian> getClosestPedestriansWhichAreCloserToTarget(PedestrianOSM pedestrian, Topography topography) {
         VPoint positionOfPedestrian = pedestrian.getPosition();
 
+        // TODO Maybe, extract search radius as configurable attribute.
         List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
                 .getObjects(positionOfPedestrian, pedestrian.getRadius() * 5);
 
@@ -207,16 +219,17 @@ public class OSMBehaviorController {
         return angleInRadian;
     }
 
-    private void swapPedestrians(Pedestrian pedestrian1, Pedestrian pedestrian2) {
+    private void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
         // TODO Use "makeStep()" to swap both pedestrians to avoid
         //   "java.lang.AssertionError: Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
-        /*
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
-        pedestrian1.setPosition(newPosition);
-        pedestrian2.setPosition(oldPosition);
-         */
+        pedestrian1.setNextPosition(newPosition);
+        pedestrian2.setNextPosition(oldPosition);
+
+        makeStep(pedestrian1, topography, pedestrian1.getDurationNextStep());
+        makeStep(pedestrian2, topography, pedestrian2.getDurationNextStep());
     }
 
 }
