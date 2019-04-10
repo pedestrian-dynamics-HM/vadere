@@ -45,12 +45,12 @@ Please contact us and we will send you an invitation.
 
 ### Use the Issue Tracker
 
-Please, use the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) for both
+Please, use the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues?sort=label_priority) for both
 
 - to request a feature or to report a bug (see [how to write new issues](https://gitlab.lrz.de/vadere/vadere/issues/179))
 - to work on a feature (see [how to work on an issue](https://gitlab.lrz.de/vadere/vadere/issues/184))
 
-**Tip:** Sort the issues in the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues) by `Label priority`.
+**Tip:** Sort the issues in the [issue tracker](https://gitlab.lrz.de/vadere/vadere/issues?sort=label_priority) by `Label priority`.
 
 ### Steps for External Contributors
 
