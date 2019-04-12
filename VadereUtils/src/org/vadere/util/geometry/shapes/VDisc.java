@@ -16,4 +16,5 @@ public class VDisc extends VCircle {
 	public double distance(@NotNull final IPoint pos) {
 		return getCenter().distance(pos) - getRadius();
 	}
+
 }

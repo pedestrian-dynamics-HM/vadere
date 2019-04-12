@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 
 /**
@@ -42,7 +43,6 @@ public class DataTriangle extends VTriangle {
 	 * @param p1
 	 * @param p2
 	 * @param p3
-	 * @param mp
 	 */
 	public DataTriangle(DataPoint p1, DataPoint p2, DataPoint p3) {
 		super(p1, p2, p3);
