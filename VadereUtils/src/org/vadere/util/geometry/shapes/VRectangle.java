@@ -1,10 +1,11 @@
 package org.vadere.util.geometry.shapes;
 
+import org.vadere.util.geometry.GeometryUtils;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.List;
-
-import org.vadere.util.geometry.GeometryUtils;
 
 @SuppressWarnings("serial")
 /**
@@ -115,8 +116,32 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
-	public boolean intersects(VLine intersectingLine) {
+	public VRectangle resize(IPoint start, IPoint end){
+		double minX = Math.abs(start.getX() - getMinX()) < BORDER_TOLERANCE ? end.getX() : getMinX();
+		double minY = Math.abs(start.getY() - getMinY())  < BORDER_TOLERANCE ? end.getY() : getMinY();
 
+		double maxX    = Math.abs(start.getX() - getMaxX()) < BORDER_TOLERANCE ? end.getX() : getMaxX();
+		double maxY    = Math.abs(start.getY() - getMaxY()) < BORDER_TOLERANCE ? end.getY() : getMaxY();
+
+		return new VRectangle(minX, minY, maxX - minX, maxY - minY);
+	}
+
+	@Override
+	public int getDirectionalCode(IPoint startPoint, int directions){
+		double horizontalRatio = (startPoint.getX() - getCenterX()) / (getWidth() / 2);
+		double verticalRatio = (startPoint.getY() - getCenterY()) / (getHeight() / 2);
+		if (Math.abs(horizontalRatio - verticalRatio) < BORDER_TOLERANCE) {
+			return horizontalRatio > 0 ? 1 : 5;
+		} else if (Math.abs(horizontalRatio + verticalRatio) < BORDER_TOLERANCE) {
+			return horizontalRatio > 0 ? 3 : 7;
+		} else if (Math.abs(horizontalRatio) > Math.abs(verticalRatio)) {
+			return horizontalRatio > 0 ? 0 : 4;
+		}
+		return verticalRatio > 0 ? 2 : 6;
+	}
+
+	@Override
+	public boolean intersects(VLine intersectingLine) {
 		if (intersectingLine.intersects(this)) {
 			return true;
 		}
@@ -137,18 +162,18 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		return new VPolygon(this);
 	}
 
-    @Override
-    public boolean intersects(final VShape shape) {
-        if(shape instanceof VRectangle){
-            return super.intersects(((VRectangle)shape));
-        }
-        else if(shape instanceof VPolygon) {
-            return ((VPolygon)shape).intersects(this);
-        }
-        else {
-            return VShape.super.intersects(shape);
-        }
-    }
+	@Override
+	public boolean intersects(final VShape shape) {
+		if(shape instanceof VRectangle){
+			return super.intersects(((VRectangle)shape));
+		}
+		else if(shape instanceof VPolygon) {
+			return ((VPolygon)shape).intersects(this);
+		}
+		else {
+			return VShape.super.intersects(shape);
+		}
+	}
 
 	@Override
 	public List<VPoint> getPath() {
