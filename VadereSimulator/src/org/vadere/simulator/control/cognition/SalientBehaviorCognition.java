@@ -33,7 +33,7 @@ public class SalientBehaviorCognition {
 
         for (Pedestrian pedestrian : pedestrians) {
             // TODO: Maybe, add following variables as attribute to "AttributesAgent".
-            int requiredFootSteps = 5;
+            int requiredFootSteps = 2;
             double requiredSpeedInMetersPerSecondToBeCooperative = 0.05;
 
             LastFootSteps lastFootSteps = pedestrian.getFootSteps().getLastFootSteps();

@@ -1,5 +1,5 @@
 {
-  "name" : "01-ExperimentSetup",
+  "name" : "01-ExperimentSetup-OSMEventDriven",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -175,7 +175,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -210,7 +211,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -245,7 +247,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -280,7 +283,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -315,7 +319,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -350,7 +355,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -385,7 +391,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -420,7 +427,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -455,7 +463,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -490,7 +499,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -525,7 +535,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -560,7 +571,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -595,7 +607,8 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 10
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -617,7 +630,8 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 10
       },
       "teleporter" : null,
       "attributesCar" : {
@@ -629,6 +643,7 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
+        "footStepsToStore" : 10,
         "length" : 4.5,
         "width" : 1.7,
         "direction" : {
