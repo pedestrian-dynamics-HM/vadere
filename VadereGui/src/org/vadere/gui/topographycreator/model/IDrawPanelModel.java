@@ -1,14 +1,5 @@
 package org.vadere.gui.topographycreator.model;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.geom.Rectangle2D;
-import java.util.List;
-import java.util.Observer;
-import java.util.function.Predicate;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
@@ -23,6 +14,12 @@ import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.Observer;
+import java.util.function.Predicate;
 
 public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<T>, Iterable<ScenarioElement> {
 
@@ -163,6 +160,8 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	VShape translate(Point vector);
 
+	VShape resize(Point start, Point end);
+
 	boolean isPrototypeVisble();
 
 	VShape getPrototypeShape();
@@ -190,4 +189,9 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	List<MeasurementArea> getMeasurementAreas();
 
 	Rectangle2D.Double getBounds();
+
+	default VPoint translateVectorCoordinates(Point point) {
+		return new VPoint(point.x / getScaleFactor(), getTopography().getBounds().height - point.y / getScaleFactor());
+	}
+
 }

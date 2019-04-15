@@ -20,13 +20,11 @@ public class AreaSpeedProcessorTest extends ProcessorTest {
 		assertEquals("Must be zero after init.", 0, p.getData().size());
 		assertEquals("Must be zero after init.", 0, (int) r.valOfField("lastStep"));
 		AttributesAreaProcessor attr = (AttributesAreaProcessor) p.getAttributes();
-		assertEquals(attr.getMeasurementArea(), r.valOfField("measurementArea"));
 	}
 
 	@Test
 	public void doUpdate() throws Exception {
 		AttributesAreaProcessor attr = (AttributesAreaProcessor) p.getAttributes();
-		attr.setMeasurementArea(new VRectangle(0, 0, 4, 5));
 		processorTestEnv.init();
 		super.doUpdate();
 	}

@@ -1,11 +1,9 @@
 package org.vadere.simulator.entrypoints;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Versions in strict order from oldest to newest.
@@ -20,7 +18,8 @@ public enum Version {
 	V0_4("0.4"),
 	V0_5("0.5"),
 	V0_6("0.6"),
-	V0_7("0.7")
+	V0_7("0.7"),
+	V0_8("0.8"),
 	;
 
 	private String label;

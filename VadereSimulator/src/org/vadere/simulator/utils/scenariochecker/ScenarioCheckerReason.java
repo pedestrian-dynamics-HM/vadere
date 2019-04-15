@@ -40,7 +40,9 @@ public enum ScenarioCheckerReason {
 	PEDESTRIAN_SPEED_NEGATIVE("ScenarioChecker.pedestrian.speedIsNegative"),
 
 	// Simulation attribute reasons
-	SIM_TIME_STEP_WRONG("ScenarioChecker.simAttr.simTimeStepWrong");
+	SIM_TIME_STEP_WRONG("ScenarioChecker.simAttr.simTimeStepWrong"),
+
+	PROCESSOR_MEASUREMENT_AREA("ScenarioChecker.processor.measuremetarea.doesNotExist");
 
 	private String msgId;
 

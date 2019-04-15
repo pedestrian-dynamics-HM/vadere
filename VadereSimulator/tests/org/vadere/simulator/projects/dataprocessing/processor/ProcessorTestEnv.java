@@ -43,7 +43,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	/**
 	 * Factories
 	 */
-	DataProcessorFactory processorFactory;
+	org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory processorFactory;
 	OutputFileFactory outputFileFactory;
 	/**
 	 * Needed for DataProcessor doUpdate call. (mocked)
@@ -70,7 +70,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 		testedProcessor = null;
 		outputFile = null;
 		requiredProcessors = new LinkedList<>();
-		processorFactory = DataProcessorFactory.instance();
+		processorFactory = org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory.instance();
 		outputFileFactory = OutputFileFactory.instance();
 	}
 

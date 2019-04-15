@@ -127,6 +127,9 @@ public class TikzGenerator {
 		Color stairColor = model.getConfig().getStairColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
 
+		Color measurementAreaColor = model.getConfig().getMeasurementAreaColor();
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "MeasurementAreaColor", measurementAreaColor.getRed(), measurementAreaColor.getGreen(), measurementAreaColor.getBlue());
+
 		Color agentColor = model.getConfig().getPedestrianDefaultColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
@@ -142,16 +145,18 @@ public class TikzGenerator {
 		String drawSettings = "% Draw Settings\n";
 
 		double agentRadius = model.getConfig().getPedestrianTorso() / 2.0;
+		double opacityBetweenZeroAndOne = model.getConfig().getMeasurementAreaAlpha() / 255.0;
 
 		drawSettings += String.format(Locale.US,"\\newcommand{\\AgentRadius}{%f}\n", agentRadius);
 		drawSettings += String.format(Locale.US,"\\newcommand{\\LineWidth}{%d}\n", 1);
+		drawSettings += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
 
 		drawSettings += "\n";
 
 		return drawSettings;
 	}
 
-		private String convertScenarioElementsToTikz() {
+	private String convertScenarioElementsToTikz() {
 		String generatedCode = "";
 
 		DefaultSimulationConfig config = model.getConfig();
@@ -219,6 +224,15 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Stairs (not enabled in config)\n";
+		}
+
+		if (config.isShowMeasurementArea()) {
+			generatedCode += "% Measurement Areas\n";
+			for (MeasurementArea measurementArea : topography.getMeasurementAreas()) {
+				generatedCode += String.format(Locale.US, "\\fill[MeasurementAreaColor,opacity=\\MeasurementAreaOpacity] %s;\n", generatePathForScenarioElement(measurementArea));
+			}
+		} else {
+			generatedCode += "% Measurement Areas (not enabled in config)\n";
 		}
 
         if (config.isShowTrajectories()) {

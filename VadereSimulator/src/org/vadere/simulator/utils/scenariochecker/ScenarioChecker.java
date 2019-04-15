@@ -3,6 +3,7 @@ package org.vadere.simulator.utils.scenariochecker;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
+import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.DataProcessorsLinkedToMeasurementArea;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSpeedSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceMinRadiusCheck;
@@ -67,6 +68,7 @@ public class ScenarioChecker {
 		ret.addAll(checkSourceSpawnSetting());
 		ret.addAll(checkMinSourceRadius());
 		ret.addAll(runCheck(new TopographyOffsetCheck()));
+		ret.addAll(runCheck(new DataProcessorsLinkedToMeasurementArea()));
 		return ret;
 	}
 
