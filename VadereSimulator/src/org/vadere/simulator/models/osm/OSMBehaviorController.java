@@ -156,9 +156,8 @@ public class OSMBehaviorController {
     private List<Pedestrian> getClosestPedestriansWhichAreCloserToTarget(PedestrianOSM pedestrian, Topography topography) {
         VPoint positionOfPedestrian = pedestrian.getPosition();
 
-        // TODO Maybe, extract search radius as configurable attribute.
         List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
-                .getObjects(positionOfPedestrian, pedestrian.getRadius() * 5);
+                .getObjects(positionOfPedestrian, pedestrian.getAttributes().getSearchRadius());
 
         // Filter out "me" and pedestrians which are farer away from target than "me".
         closestPedestrians = closestPedestrians.stream()

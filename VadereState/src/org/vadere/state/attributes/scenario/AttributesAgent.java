@@ -34,6 +34,9 @@ public class AttributesAgent extends AttributesDynamicElement {
 	// store n last foot steps for speed calculation
 	private int footStepsToStore = 10;
 
+	// agents search for other scenario elements (e.g., other agents) within this radius
+	private double searchRadius = 1.0;
+
 	public AttributesAgent() {
 		this(-1);
 	}
@@ -55,6 +58,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.maximumSpeed = other.maximumSpeed;
 		this.acceleration = other.acceleration;
 		this.footStepsToStore = other.footStepsToStore;
+		this.searchRadius = other.searchRadius;
 	}
 
 	// Getters...
@@ -88,6 +92,8 @@ public class AttributesAgent extends AttributesDynamicElement {
 	}
 
 	public int getFootStepsToStore() { return footStepsToStore; }
+
+	public double getSearchRadius() { return searchRadius; }
 
 	// Setters...
 
@@ -129,5 +135,10 @@ public class AttributesAgent extends AttributesDynamicElement {
 	public void setFootStepsToStore(int footStepsToStore) {
 		checkSealed();
 		this.footStepsToStore = footStepsToStore;
+	}
+
+	public void setSearchRadius(double searchRadius) {
+		checkSealed();
+		this.searchRadius = searchRadius;
 	}
 }

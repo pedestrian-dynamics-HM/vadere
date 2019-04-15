@@ -39,9 +39,8 @@ public class Pedestrian extends Agent {
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
 
 	// Constructors
-	@SuppressWarnings("unused")
 	private Pedestrian() {
-		// TODO constructor may be required for Jackson?
+		// Default constructor required for JSON de-/serialization.
 		this(new AttributesAgent());
 	}
 
