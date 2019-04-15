@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.BangEvent;
 import org.vadere.state.events.types.Event;
@@ -133,8 +134,13 @@ public class OSMBehaviorController {
         if (closestPedestrians.size() > 0) {
             for (Pedestrian closestPedestrian : closestPedestrians) {
                 boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
-                // TODO Use method "calculateAngleBetweenTargets()" to decide if target orientation of both pedestrians differs.
-                boolean targetOrientationDiffers = true;
+                boolean targetOrientationDiffers = false;
+
+                double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+
+                if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
+                    targetOrientationDiffers = true;
+                }
 
                 if (closestPedIsCooperative && targetOrientationDiffers) {
                     swapPedestrians(pedestrian, (PedestrianOSM)closestPedestrian, topography);
@@ -205,9 +211,8 @@ public class OSMBehaviorController {
             Target targetPed1 = topography.getTarget(pedestrian1.getNextTargetId());
             Target targetPed2 = topography.getTarget(pedestrian2.getNextTargetId());
 
-            // TODO Maybe, use "target.getShape().getClosestPoint()" instead of "getCentroid()".
-            VPoint targetVectorPed1 = targetPed1.getShape().getCentroid().subtract(pedestrian1.getPosition());
-            VPoint targetVectorPed2 = targetPed2.getShape().getCentroid().subtract(pedestrian2.getPosition());
+            VPoint targetVectorPed1 = calculateVectorPedestrianToTarget(pedestrian1, targetPed1);
+            VPoint targetVectorPed2 = calculateVectorPedestrianToTarget(pedestrian2, targetPed2);
 
             double dotProduct = targetVectorPed1.dotProduct(targetVectorPed2);
             double multipliedMagnitudes = targetVectorPed1.distanceToOrigin() * targetVectorPed2.distanceToOrigin();
@@ -218,15 +223,30 @@ public class OSMBehaviorController {
         return angleInRadian;
     }
 
+    private VPoint calculateVectorPedestrianToTarget(Pedestrian pedestrian, Target target) {
+        VPoint vectorPedestrianToTarget = null;
+
+        if (pedestrian.getAttributes().getAngleCalculationType() == AttributesAgent.AngleCalculationType.USE_CENTER) {
+            vectorPedestrianToTarget = target.getShape().getCentroid().subtract(pedestrian.getPosition());
+        } else if (pedestrian.getAttributes().getAngleCalculationType() == AttributesAgent.AngleCalculationType.USE_CLOSEST_POINT) {
+            VPoint closestTargetPoint = target.getShape().closestPoint(pedestrian.getPosition());
+            vectorPedestrianToTarget = closestTargetPoint.subtract(pedestrian.getPosition());
+        } else {
+            throw new IllegalArgumentException(String.format("Unsupported angle calculation type: \"%s\"", pedestrian.getAttributes().getAngleCalculationType()));
+        }
+
+        return vectorPedestrianToTarget;
+    }
+
     private void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
-        // TODO Use "makeStep()" to swap both pedestrians to avoid
-        //   "java.lang.AssertionError: Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
         pedestrian1.setNextPosition(newPosition);
         pedestrian2.setNextPosition(oldPosition);
 
+        // Use "makeStep()" to swap both pedestrians to avoid "java.lang.AssertionError:
+        // Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
         makeStep(pedestrian1, topography, pedestrian1.getDurationNextStep());
         makeStep(pedestrian2, topography, pedestrian2.getDurationNextStep());
     }
