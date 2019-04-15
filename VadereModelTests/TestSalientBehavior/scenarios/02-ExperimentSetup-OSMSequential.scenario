@@ -1,5 +1,5 @@
 {
-  "name" : "01-ExperimentSetup-OSMSequential",
+  "name" : "02-ExperimentSetup-OSMSequential",
   "description" : "",
   "release" : "0.8",
   "processWriters" : {
@@ -176,7 +176,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -212,7 +215,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -248,7 +254,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -284,7 +293,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -320,7 +332,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -356,7 +371,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -392,7 +410,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -428,7 +449,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -464,7 +488,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -500,7 +527,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -536,7 +566,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -572,7 +605,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -608,7 +644,10 @@
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
           "acceleration" : 2.0,
-          "footStepsToStore" : 10
+          "footStepsToStore" : 10,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
@@ -631,7 +670,10 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : {
@@ -644,6 +686,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
         "footStepsToStore" : 10,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0,
         "length" : 4.5,
         "width" : 1.7,
         "direction" : {
