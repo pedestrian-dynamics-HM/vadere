@@ -36,7 +36,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	private double acceleration = 2.0;
 
 	// store n last foot steps for speed calculation
-	private int footStepsToStore = 10;
+	private int footStepsToStore = 4;
 
 	// agents search for other scenario elements (e.g., other agents) within this radius
 	private double searchRadius = 1.0;
