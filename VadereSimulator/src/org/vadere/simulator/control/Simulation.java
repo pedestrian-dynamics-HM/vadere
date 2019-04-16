@@ -322,7 +322,10 @@ public class Simulation {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 		eventCognition.prioritizeEventsForPedestrians(events, pedestrians);
-		salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
+
+		if (attributesSimulation.isUseSalientBehavior()) {
+			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
+		}
 
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());

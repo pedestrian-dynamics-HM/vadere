@@ -98,7 +98,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 6138355022448163583,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : true
     },
     "topography" : {
       "attributes" : {
