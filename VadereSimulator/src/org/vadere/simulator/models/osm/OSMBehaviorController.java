@@ -239,6 +239,11 @@ public class OSMBehaviorController {
     }
 
     private void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
+        // TODO Revise code to avoid AssertionError in VTrajectory.java:110
+        //   at org.vadere.state.simulation.VTrajectory.add(VTrajectory.java:110)
+        //   at org.vadere.simulator.models.osm.OSMBehaviorController.makeStep(OSMBehaviorController.java:79)
+        //   at org.vadere.simulator.models.osm.OSMBehaviorController.swapPedestrians(OSMBehaviorController.java:250)
+        //   This error arises because one agent makes two steps within one update step and step duration or something else is wrong.
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
