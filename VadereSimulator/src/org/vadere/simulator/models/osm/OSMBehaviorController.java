@@ -240,15 +240,9 @@ public class OSMBehaviorController {
     }
 
     private void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
-        // TODO Revise code to avoid AssertionError in VTrajectory.java:110
-        //   at org.vadere.state.simulation.VTrajectory.add(VTrajectory.java:110)
-        //   at org.vadere.simulator.models.osm.OSMBehaviorController.makeStep(OSMBehaviorController.java:79)
-        //   at org.vadere.simulator.models.osm.OSMBehaviorController.swapPedestrians(OSMBehaviorController.java:250)
-        //   This error arises because one agent makes two steps within one update step and step duration or something else is wrong.
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
-        // TODO Set also "timeOfNextStep" and "stepDuration" proberly.
         pedestrian1.setNextPosition(newPosition);
         pedestrian2.setNextPosition(oldPosition);
 
@@ -257,9 +251,12 @@ public class OSMBehaviorController {
         makeStep(pedestrian1, topography, pedestrian1.getDurationNextStep());
         makeStep(pedestrian2, topography, pedestrian2.getDurationNextStep());
 
-        printDebugInfos(pedestrian1, pedestrian2);
+        // TODO Clarify with Bene if "stepDuration" should also be set
+        //   and if "pedestrian2.timeOfNextStep()" should be also called.
+        pedestrian1.setTimeOfNextStep(pedestrian1.getTimeOfNextStep() + pedestrian1.getDurationNextStep());
     }
 
+    // TODO Remove debug method.
     private void printDebugInfos(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
         PedestrianOSM[] pedestrians = new PedestrianOSM[] { pedestrian1, pedestrian2 };
 
