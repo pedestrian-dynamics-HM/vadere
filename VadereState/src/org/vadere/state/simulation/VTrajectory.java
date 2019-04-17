@@ -38,6 +38,10 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	// Methods
+	public int size() {
+		return footSteps.size();
+	}
+
 	public Optional<Double> speed(@NotNull final VRectangle rectangle) {
 		VTrajectory cutting = clone();
 		cutting.cut(rectangle);

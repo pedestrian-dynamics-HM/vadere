@@ -11,6 +11,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 
@@ -247,6 +248,7 @@ public class OSMBehaviorController {
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
+        // TODO Set also "timeOfNextStep" and "stepDuration" proberly.
         pedestrian1.setNextPosition(newPosition);
         pedestrian2.setNextPosition(oldPosition);
 
@@ -254,6 +256,36 @@ public class OSMBehaviorController {
         // Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
         makeStep(pedestrian1, topography, pedestrian1.getDurationNextStep());
         makeStep(pedestrian2, topography, pedestrian2.getDurationNextStep());
+
+        printDebugInfos(pedestrian1, pedestrian2);
+    }
+
+    private void printDebugInfos(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
+        PedestrianOSM[] pedestrians = new PedestrianOSM[] { pedestrian1, pedestrian2 };
+
+        for (int i = 0; i < pedestrians.length; i++) {
+            PedestrianOSM currentPed = pedestrians[i];
+
+            System.out.println(String.format("Position %d: %s", currentPed.getId(), currentPed.getPosition()));
+            System.out.println(String.format("Trajectory %d: %s", currentPed.getId(), currentPed.getFootSteps()));
+
+            LinkedList<FootStep> currentFootsteps = currentPed.getFootSteps().getFootSteps();
+
+            if (currentFootsteps.size() >= 2) {
+                for (i = 1; i < currentFootsteps.size(); i++) {
+                    FootStep previousFootstep = currentFootsteps.get(i - 1);
+                    FootStep currentFootstep = currentFootsteps.get(i);
+
+                    if (previousFootstep.getEndTime() > currentFootstep.getStartTime()) {
+                        System.out.println(String.format("  Assertion failed (at index %d): previousEndTime > currentStartTime", i));
+                        System.out.println(String.format("  %.2f -> %.2f (positions: %s -> %s)",
+                                previousFootstep.getEndTime(), currentFootstep.getStartTime(),
+                                previousFootstep.getEnd(), currentFootstep.getStart()
+                        ));
+                    }
+                }
+            }
+        }
     }
 
 }

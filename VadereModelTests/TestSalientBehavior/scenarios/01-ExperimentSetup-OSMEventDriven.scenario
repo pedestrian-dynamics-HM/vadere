@@ -1,7 +1,7 @@
 {
   "name" : "01-ExperimentSetup-OSMEventDriven",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -671,7 +671,7 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
-        "footStepsToStore" : 10,
+        "footStepsToStore" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0
