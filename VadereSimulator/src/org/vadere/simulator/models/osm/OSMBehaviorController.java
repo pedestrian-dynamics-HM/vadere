@@ -254,6 +254,7 @@ public class OSMBehaviorController {
         // TODO Clarify with Bene if "stepDuration" should also be set
         //   and if "pedestrian2.timeOfNextStep()" should be also called.
         pedestrian1.setTimeOfNextStep(pedestrian1.getTimeOfNextStep() + pedestrian1.getDurationNextStep());
+        pedestrian2.setTimeOfNextStep(pedestrian2.getTimeOfNextStep() + pedestrian2.getDurationNextStep());
     }
 
     // TODO Remove debug method.
