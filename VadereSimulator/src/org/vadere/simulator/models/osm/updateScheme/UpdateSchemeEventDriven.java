@@ -59,7 +59,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 				pedestrian.setTimeOfNextStep(currentTimeInSec);
 			}
 
-			// TODO Make a code review with Bene here and check if everything works as expected.
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
 				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 				pedestrian.updateNextPosition();
