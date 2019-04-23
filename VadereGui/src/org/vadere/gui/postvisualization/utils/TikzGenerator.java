@@ -12,6 +12,10 @@ import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.voronoi.Face;
+import org.vadere.util.voronoi.HalfEdge;
+import org.vadere.util.voronoi.RectangleLimits;
+import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -235,6 +239,13 @@ public class TikzGenerator {
 			generatedCode += "% Measurement Areas (not enabled in config)\n";
 		}
 
+		if (model.isVoronoiDiagramVisible() && model.isVoronoiDiagramAvailable()) {
+			generatedCode += "% Voronoi Diagram\n";
+			generatedCode += drawVoronoiDiagram(model.getVoronoiDiagram());
+		} else {
+			generatedCode += "% Voronoi Diagram (not enabled in config)\n";
+		}
+
         if (config.isShowTrajectories()) {
             generatedCode += "% Trajectories\n";
 
@@ -401,6 +412,76 @@ public class TikzGenerator {
 
         return generatedPath.trim();
     }
+
+	private String drawVoronoiDiagram(final VoronoiDiagram voronoiDiagram) {
+		String voronoiDiagramAsTikz = "";
+
+		synchronized (voronoiDiagram) {
+
+			if (voronoiDiagram != null) {
+				RectangleLimits limits = voronoiDiagram.getLimits();
+
+				voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) rectangle (%f,%f);\n",
+						limits.xLow, limits.yLow,
+						limits.xHigh, limits.yLow);
+			}
+
+			if (voronoiDiagram != null && voronoiDiagram.getFaces() != null) {
+
+				for (Face face : voronoiDiagram.getFaces()) {
+
+					boolean go = true;
+					boolean closed = false;
+					HalfEdge last = face.getOuterComponent();
+					HalfEdge next = last.getNext();
+					HalfEdge outerComponent = last;
+
+					while (go) {
+						if (next == null || last.getOrigin() == null) {
+							go = false;
+							closed = true;
+						} else {
+
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+									last.getOrigin().x, last.getOrigin().y,
+									next.getOrigin().x, next.getOrigin().y);
+
+							if (next == outerComponent) {
+								go = false;
+							} else {
+								last = next;
+								next = next.getNext();
+							}
+						}
+					}
+
+					last = outerComponent;
+					next = last.getPrevious();
+
+					go = true;
+
+					while (go && !closed) {
+						if (next == null || next.getOrigin() == null) {
+							go = false;
+						} else {
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+									last.getOrigin().x, last.getOrigin().y,
+									next.getOrigin().x, next.getOrigin().y);
+
+							if (next == outerComponent) {
+								go = false;
+							} else {
+								last = next;
+								next = next.getPrevious();
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return voronoiDiagramAsTikz;
+	}
 
 	private String convertJavaToTikzPath(int type, float[] coords) {
 		if (type < SEG_MOVETO || type > SEG_CLOSE) {
