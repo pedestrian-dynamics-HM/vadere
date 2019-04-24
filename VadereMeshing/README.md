@@ -27,10 +27,10 @@ Additionally, EikMesh supports geometries defined by a [segment bounded planar s
 
 ## Documentation
 
-- [eikmesh - a Java library for 2D unstructured triangular meshes](TODO)
-- [A parallel generator for sparse unstructured meshes to solve the eikonal equation](https://doi.org/10.1016/j.jocs.2018.09.009)
+- User manuel: [eikmesh - a Java library for 2D unstructured triangular meshes](TODO)
+- Publication: [A parallel generator for sparse unstructured meshes to solve the eikonal equation](https://doi.org/10.1016/j.jocs.2018.09.009)
 - [Wiki](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview): Learn how to use the mesh data structure, execute different meshing algorithms and EikMesh by examples.
-- Some examples and videos are available at [vadere.org](TODO)
+- Demos: [vadere.org](TODO)
 
 ## Download
 
