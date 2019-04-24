@@ -2,14 +2,14 @@
 
 ## Introduction
 
-The EIKMESH Java library contains multiple algorithms and data structures to generate, change and use unstructured 2D triangular meshes.
+The eikmesh Java library contains multiple algorithms and data structures to generate, change and use unstructured 2D triangular meshes.
 The library implements a generic version of the edge based half-edge data structure also called doubly connected edge list (DCEL).
 User defined data types can be easily stored at and accessed via mesh elements (vertices, (half-)edges, faces / triangles).
 Given some mesh elements, adjacent elements can be accessed in O(1) time.
 Each generated mesh is conforming. Holes are supported.
 
 The aim was to provide a fast, light and user-friendly meshing tool with parametric input, generic data types and advanced visualization capabilities.
-EIKMESH generates
+eikmesh generates
 - exact Delaunay triangulations (DT),
 - constrained Delaunay triangulations (CDT),
 - conforming Delaunay triangulations (CCDT),
