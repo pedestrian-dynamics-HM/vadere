@@ -33,7 +33,7 @@ Additionally, EikMesh supports geometries defined by a [segment bounded planar s
 
 The source code is available at [GitLab](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereMeshing).
 A pre-compiled version can be download [here](TODO). 
-EikMesh is distributed under the LGPL license.
+eikmesh is part of [Vadere](http://www.vadere.org/) but can be used seperately. It is distributed under the LGPL license.
 
 ## Examples
 
