@@ -44,14 +44,16 @@ eikmesh is part of [Vadere](http://www.vadere.org/) but can be used seperately. 
 ```java
 VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 IDistanceFunction d_r = IDistanceFunction.createRing(1, 1, 0.2, 1.0);
-double h0 = 0.1;
-PEikMesh meshImprover = new PEikMesh(d_r,h0,bound);
+double h_min = 0.1;
+PEikMesh meshImprover = new PEikMesh(d_r,h_min,bound);
 meshImprover.generate();
 ```
 
 ```java 
+// read a planar straight line graph from an input stream
 PSLG pslg = ...
-PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), 0.02, pslg.getHoles());
+double h_min = 0.02;
+PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), h_min, pslg.getHoles());
 ```
 
 
@@ -61,11 +63,11 @@ VRectangle rect = new VRectangle(0.5, 0.5, 1, 1);
 IDistanceFunction d_c = IDistanceFunction.createDisc(0.5, 0.5, 0.5);
 IDistanceFunction d_r = IDistanceFunction.create(rect);
 IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
-double edgeLength = 0.03;
+double h_min = 0.03;
 var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
 				d,
-				p -> edgeLength + 0.5 * Math.abs(d.apply(p)),
-				edgeLength,
+				p -> h_min + 0.5 * Math.abs(d.apply(p)),
+				h_min,
 				bound,
 				Arrays.asList(rect),
 				(x, y) -> new EikMeshPoint(x, y, false));
@@ -92,11 +94,11 @@ IDistanceFunction d_union = IDistanceFunction.union(d_unionTmp, d2_c);
 IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
 
 // h_min
-double edgeLength = 0.03;
+double h_min = 0.03;
 
 var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
 				d,
-				p -> edgeLength + 0.5 * Math.abs(d.apply(p)),
+				p -> h_min + 0.5 * Math.abs(d.apply(p)),
 				edgeLength,
 				GeometryUtils.boundRelative(boundary.getPath()),
 				Arrays.asList(rect),
