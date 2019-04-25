@@ -60,9 +60,9 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 			renderers[element.getType().ordinal()].render(element, graphics, color);
 		}
 
-		if (panelModel.isPrototypeVisble()) {
+		if (panelModel.arePrototypesVisible()) {
 			graphics.setColor(Color.GRAY);
-			fill(panelModel.getPrototypeShape(), graphics);
+			panelModel.getPrototypeShapes().forEach(prototype -> fill(prototype, graphics));
 		}
 
 		if (panelModel.isElementSelected()) {

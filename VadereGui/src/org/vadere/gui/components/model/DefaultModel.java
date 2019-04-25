@@ -15,11 +15,8 @@ import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -34,7 +31,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	private IMode mouseSelectionMode;
 
-	protected ScenarioElement selectedElement;
+	protected LinkedList<ScenarioElement> selectedElements;
 
 	protected static final double MAX_SCALE_FACTOR = 1000;
 
@@ -81,6 +78,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.mouseSelectionMode = new DefaultSelectionMode(this);
 		this.viewportChangeListeners = new ArrayList<>();
 		this.scaleChangeListeners = new ArrayList<>();
+		this.selectedElements = new LinkedList<>();
 	}
 
 	@Override
@@ -376,9 +374,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public synchronized ScenarioElement setSelectedElement(final VPoint position) {
-		getElementsByPosition(position).ifPresent(this::setSelectedElement);
-		return selectedElement;
+	public synchronized ScenarioElement addSelectedElement(final VPoint position) {
+		getElementsByPosition(position).ifPresent(this::addSelectedElements);
+		return selectedElements.getFirst();
 	}
 
 	private Optional<ScenarioElement> getElementsByPosition(final VPoint position) {
@@ -386,10 +384,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	protected ScenarioElement getClickedElement(final VPoint position) {
-		Optional<ScenarioElement> optional = getElementsByPosition(position);
-		if (optional.isPresent())
-			return optional.get();
-		return null;
+		return getElementsByPosition(position).orElse(null);
 	}
 
 	protected Stream<ScenarioElement> getElements(final Predicate<ScenarioElement> predicate) {
@@ -397,24 +392,24 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public synchronized void setSelectedElement(final ScenarioElement selectedElement) {
-		this.selectedElement = selectedElement;
-		notifySelectSecenarioElementListener(selectedElement);
+	public synchronized void addSelectedElements(final ScenarioElement... selectedElements) {
+		this.selectedElements.addAll(Arrays.asList(selectedElements));
+		notifySelectSecenarioElementListener(this.selectedElements);
 	}
 
 	@Override
-	public synchronized void deselectSelectedElement() {
-		setSelectedElement((ScenarioElement) null);
+	public synchronized void deselectSelectedElements(final ScenarioElement... selectedElements) {
+		this.selectedElements.removeAll(Arrays.asList(selectedElements));
 	}
 
 	@Override
 	public boolean isElementSelected() {
-		return selectedElement != null;
+		return !selectedElements.isEmpty();
 	}
 
 	@Override
-	public ScenarioElement getSelectedElement() {
-		return selectedElement;
+	public LinkedList<ScenarioElement> getSelectedElements() {
+		return selectedElements;
 	}
 
 	@Override
@@ -438,13 +433,15 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public void setElementHasChanged(final ScenarioElement element) {
+	public void setElementHasChanged(final Collection<ScenarioElement> elements) {
 		setChanged();
 	}
 
-	protected void notifySelectSecenarioElementListener(final ScenarioElement scenarioElement) {
-		for (ISelectScenarioElementListener listener : selectScenarioElementListener) {
-			listener.selectionChange(scenarioElement);
+	protected void notifySelectSecenarioElementListener(final Collection<ScenarioElement> scenarioElements) {
+		for(ScenarioElement scenarioElement : scenarioElements) {
+			for (ISelectScenarioElementListener listener : selectScenarioElementListener) {
+				listener.selectionChange(scenarioElement);
+			}
 		}
 	}
 

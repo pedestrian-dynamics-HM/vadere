@@ -115,7 +115,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			simTimeInSec = observationAreaSnapshot.simTimeInSec;
 
 			// potentialFieldTarget might be null!
-            potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
+			potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
 			potentialField = observationAreaSnapshot.potentialField;
 			agent = observationAreaSnapshot.selectedAgent;
 			discretizations = observationAreaSnapshot.discretizations;
@@ -135,21 +135,24 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 				topography = observationAreaSnapshot.scenario;
 			}
 
-			if (getSelectedElement() instanceof Car) {
-				int carId = getSelectedElement().getId();
+			ScenarioElement first = (ScenarioElement) selectedElements.getFirst();
+			if (first instanceof Car) {
+				int carId = first.getId();
 				Car car = topography.getElement(Car.class, carId);
-				setSelectedElement(car);
-			} else if (getSelectedElement() instanceof Pedestrian) {
-				int pedId = getSelectedElement().getId();
+				selectedElements.removeFirst();
+				selectedElements.addFirst(car);
+			} else if (first instanceof Pedestrian) {
+				int pedId = first.getId();
 				Pedestrian ped = topography.getElement(Pedestrian.class, pedId);
-				setSelectedElement(ped);
+				selectedElements.removeFirst();
+				selectedElements.addFirst(ped);
 			}
 
 			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
 				getVoronoiDiagram().computeVoronoiDiagram(topography.getPedestrianDynamicElements().getElements()
-								.stream()
-								.map(ped -> ped.getPosition())
-								.collect(Collectors.toList()));
+						.stream()
+						.map(ped -> ped.getPosition())
+						.collect(Collectors.toList()));
 			}
 
 			return true;
@@ -157,17 +160,17 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	public void pushObservationAreaSnapshot(final OnlineVisualization.ObservationAreaSnapshotData observationAreaSnapshotData) {
-        if (observationAreaSnapshots.size() > 0) {
-            observationAreaSnapshots.pop();
-        }
-        observationAreaSnapshots.push(observationAreaSnapshotData);
-        setChanged();
+		if (observationAreaSnapshots.size() > 0) {
+			observationAreaSnapshots.pop();
+		}
+		observationAreaSnapshots.push(observationAreaSnapshotData);
+		setChanged();
 	}
 
 	public void reset() {
 		voronoiSnapshots.clear();
 		observationAreaSnapshots.clear();
-		selectedElement = null;
+		selectedElements.clear();
 
 		voronoiDiagram = null;
 		topography = null;
@@ -193,24 +196,24 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	@Override
 	public Function<IPoint, Double> getPotentialField() {
-	    Function<IPoint, Double> f = pos -> 0.0;
+		Function<IPoint, Double> f = pos -> 0.0;
 
-	    if(agent != null && potentialField != null && config.isShowPotentialField() && agent.equals(getSelectedElement())) {
-	    	f = pos -> potentialField.getPotential(pos, agent);
-	    }
+		if(agent != null && potentialField != null && config.isShowPotentialField() && agent.equals(selectedElements.getFirst())) {
+			f = pos -> potentialField.getPotential(pos, agent);
+		}
 		else if(potentialFieldTarget != null && config.isShowTargetPotentialField()) {
-            if(getSelectedElement() instanceof Agent) {
-                Agent selectedAgent = (Agent)getSelectedElement();
-                f = pos -> potentialFieldTarget.getPotential(pos, selectedAgent);
-            }
-        }
+			if(selectedElements.getFirst() instanceof Agent) {
+				Agent selectedAgent = (Agent)selectedElements.getFirst();
+				f = pos -> potentialFieldTarget.getPotential(pos, selectedAgent);
+			}
+		}
 
 		return f;
 	}
 
 	@Override
 	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
-		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
+		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(selectedElements.getFirst())) {
 			return discretizations.apply(agent);
 		}
 

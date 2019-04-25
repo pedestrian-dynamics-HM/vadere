@@ -15,6 +15,9 @@ import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public interface IDefaultModel<T extends DefaultConfig> extends Iterable<ScenarioElement> {
 
@@ -108,7 +111,7 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 * Tells the model that a element has been changed.
 	 *
 	 */
-	void setElementHasChanged(final ScenarioElement element);
+	void setElementHasChanged(final Collection<ScenarioElement> elements);
 
 	VoronoiDiagram getVoronoiDiagram();
 
@@ -235,27 +238,27 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 * @param position the world position
 	 * @return the selected element at the given world position or null if there is no such element
 	 */
-	ScenarioElement setSelectedElement(final VPoint position);
+	ScenarioElement addSelectedElement(final VPoint position);
 
 	/**
 	 * Set the selection element.
 	 * 
 	 * @param selectedElement the new selected element
 	 */
-	void setSelectedElement(final ScenarioElement selectedElement);
+	void addSelectedElements(final ScenarioElement... selectedElement);
 
 	/*
-	 * Deselect the currently selected element.
+	 * Deselects specific selected elements.
 	 * Can be called even if no element is currently selected.
 	 */
-	void deselectSelectedElement();
+	void deselectSelectedElements(ScenarioElement... elements);
 
 	/**
 	 * Returns the selected element, this may be null.
-	 * 
+	 *
 	 * @return the selected element or null
 	 */
-	ScenarioElement getSelectedElement();
+	LinkedList<ScenarioElement> getSelectedElements();
 
 	/**
 	 * Returns true if a element is selected.

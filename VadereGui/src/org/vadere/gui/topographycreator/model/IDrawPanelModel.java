@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observer;
 import java.util.function.Predicate;
@@ -97,10 +98,6 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	 */
 	void resetScenario();
 
-
-	@Override
-	ScenarioElement getSelectedElement();
-
 	Color getCursorColor();
 
 	void setCursorColor(Color red);
@@ -131,14 +128,6 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	ScenarioElement removeElement(VPoint position);
 
-	/**
-	 * @Null
-	 * @param position
-	 * @return
-	 */
-	@Override
-	ScenarioElement setSelectedElement(VPoint position);
-
 	boolean removeElement(ScenarioElement element);
 
 	ScenarioElement deleteLastShape(ScenarioElementType type);
@@ -158,26 +147,25 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	int getBoundId();
 
-	@Override
-	void setSelectedElement(ScenarioElement selectedElement);
+	VShape translate(ScenarioElement element, Point vector);
 
-	VShape translate(Point vector);
+	boolean arePrototypesVisible();
 
-	boolean isPrototypeVisble();
+	Collection<VShape> getPrototypeShapes();
 
-	VShape getPrototypeShape();
+	void addPrototypeShape(VShape prototypeShape);
 
-	void setPrototypeShape(VShape prototypeShape);
+	void addPrototypeShapes(Collection<VShape> prototypeShape);
+
+	void clearPrototypeShapes();
 
 	void hidePrototypeShape();
 
 	void showPrototypeShape();
 
-	ScenarioElement getCopiedElement();
+	Collection<ScenarioElement> getCopiedElements();
 
-	void setCopiedElement(ScenarioElement copiedElement);
-
-	VShape translate(VPoint vector);
+	void setCopiedElements(final Collection<ScenarioElement> copiedElements);
 
 	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
 

@@ -21,7 +21,7 @@ public class DefaultModeAdapter implements IMode {
 	@Override
 	public void mouseClicked(final MouseEvent event) {
 		panelModel.setMousePosition(event.getPoint());
-		panelModel.setSelectedElement(panelModel.getMousePosition());
+		panelModel.addSelectedElement(panelModel.getMousePosition());
 		panelModel.notifyObservers();
 	}
 

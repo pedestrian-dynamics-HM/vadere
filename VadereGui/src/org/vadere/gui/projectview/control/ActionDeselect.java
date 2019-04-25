@@ -22,7 +22,7 @@ public class ActionDeselect extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		panelModel.deselectSelectedElement();
+		panelModel.getSelectedElements().clear();
 
 		//Reset to select mode
 		if (selectSelectShape != null) {

@@ -4,10 +4,8 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Observer;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +29,7 @@ import org.vadere.util.geometry.shapes.VShape;
  * The data of the DrawPanel. Its holds the whole data of one scenario.
  * 
  */
-public class TopographyCreatorModel extends DefaultModel implements IDrawPanelModel {
+public class TopographyCreatorModel<T extends DefaultConfig> extends DefaultModel<T> implements IDrawPanelModel<T> {
 
 	/**
 	 * container of all ScenarioElements, separates the real panelModel (Topography)
@@ -46,14 +44,16 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	 */
 	private double scalingFactor = 1.0;
 
-	/** a copy of the topography element that will be moved, can be null. */
-	private VShape prototypeShape;
+	/**
+	 * Collection containing the copies of topography elements.
+	 * May be empty.
+	 */
+	private final Collection<VShape> prototypes;
+
+	private boolean arePrototypesVisible;
 
 	/** the last copied element, can be null. */
-	private ScenarioElement copiedElement;
-
-	/** indicate that the prototype is availible != null and visible. */
-	private boolean prototypeVisble;
+	private Collection<ScenarioElement> copiedElements;
 
 	/** Font to be used to display statistical informations. */
 	private final Font font;
@@ -79,9 +79,8 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	public TopographyCreatorModel(final Topography topography, final Scenario scenario) {
-		super(new DefaultConfig());
+		super((T) new DefaultConfig());
 		this.font = new Font("Arial", Font.PLAIN, 12);
-		this.prototypeVisble = false;
 		this.topographyBuilder = new TopographyBuilder(topography);
 		this.typeAccessStack = new LinkedList<>();
 		this.cursorColor = Color.GRAY;
@@ -89,6 +88,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		this.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		this.currentType = ScenarioElementType.OBSTACLE;
 		this.boundId = 0;
+		this.copiedElements = new TreeSet<>();
+		this.prototypes = new TreeSet<>();
+		this.arePrototypesVisible = false;
 		setVadereScenario(scenario);
 	}
 
@@ -211,15 +213,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		}
 
 		setChanged();
-		if (element.equals(getSelectedElement())) {
-			selectedElement = null;
+		if (this.selectedElements.contains(element)) {
+			selectedElements.remove(element);
 		}
 		return element;
 	}
 
 	@Override
-	public boolean isPrototypeVisble() {
-		return prototypeShape != null && prototypeVisble;
+	public boolean arePrototypesVisible() {
+		return !prototypes.isEmpty() && arePrototypesVisible;
 	}
 
 	@Override
@@ -259,13 +261,13 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	@Override
 	public void hidePrototypeShape() {
-		prototypeVisble = false;
+		arePrototypesVisible = false;
 		setChanged();
 	}
 
 	@Override
 	public void showPrototypeShape() {
-		prototypeVisble = true;
+		arePrototypesVisible = true;
 		setChanged();
 	}
 
@@ -318,9 +320,7 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	@Override
 	public boolean removeElement(final ScenarioElement element) {
 		boolean removed = topographyBuilder.removeElement(element);
-		if (element.equals(selectedElement)) {
-			selectedElement = null;
-		}
+		this.selectedElements.remove(element);
 		setChanged();
 		return removed;
 
@@ -333,9 +333,7 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 		if (element != null) {
 			topographyBuilder.removeElement(element);
-			if (element.equals(selectedElement)) {
-				deselectSelectedElement();
-			}
+			deselectSelectedElements(element);
 			setChanged();
 		}
 
@@ -356,14 +354,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
-	public VShape translate(final Point vector) {
+	public VShape translate(ScenarioElement element, final Point vector) {
 		VPoint worldVector = new VPoint(vector.x / getScaleFactor(), -vector.y / getScaleFactor());
-		return translate(worldVector);
-	}
-
-	@Override
-	public VShape translate(final VPoint vector) {
-		return translateElement(getSelectedElement(), vector);
+		return translateElement(element, worldVector);
 	}
 
 	@Override
@@ -389,19 +382,14 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 
 	@Override
 	public void removeObstacleIf(@NotNull final Predicate predicate) {
-		if(selectedElement instanceof Obstacle) {
-			selectedElement = null;
-		}
-
+		selectedElements.removeIf(element -> element instanceof Obstacle);
 		topographyBuilder.removeObstacleIf(predicate);
 		setChanged();
 	}
 
 	@Override
 	public void removeMeasurementAreaIf(final @NotNull Predicate predicate){
-		if (selectedElement instanceof MeasurementArea){
-			selectedElement = null;
-		}
+		selectedElements.removeIf(element -> element instanceof MeasurementArea);
 		topographyBuilder.removeMeasurementAreaIf(predicate);
 		setChanged();
 	}
@@ -422,13 +410,23 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
-	public VShape getPrototypeShape() {
-		return prototypeShape;
+	public Collection<VShape> getPrototypeShapes() {
+		return prototypes;
 	}
 
 	@Override
-	public void setPrototypeShape(final VShape prototypeShape) {
-		this.prototypeShape = prototypeShape;
+	public void addPrototypeShape(final VShape prototypeShape) {
+		prototypes.add(prototypeShape);
+	}
+
+	@Override
+	public void addPrototypeShapes(final Collection<VShape> prototypeShapes) {
+		prototypes.addAll(prototypeShapes);
+	}
+
+	@Override
+	public void clearPrototypeShapes() {
+		prototypes.clear();
 	}
 
 	@Override
@@ -455,13 +453,13 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
-	public ScenarioElement getCopiedElement() {
-		return copiedElement;
+	public Collection<ScenarioElement> getCopiedElements() {
+		return copiedElements;
 	}
 
 	@Override
-	public void setCopiedElement(final ScenarioElement copiedElement) {
-		this.copiedElement = copiedElement;
+	public void setCopiedElements(final Collection<ScenarioElement> copiedElements) {
+		this.copiedElements = copiedElements;
 	}
 
 	@Override

@@ -32,31 +32,33 @@ public class ActionInsertCopiedElement extends TopographyAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		IDrawPanelModel<?> model = getScenarioPanelModel();
-		ScenarioElement elementToCopy = model.getCopiedElement();
 
-		if (elementToCopy == null) {
+		if (model.getCopiedElements().isEmpty()) {
 			Toolkit.getDefaultToolkit().beep();
 			return;
 		}
 
+		for(Object toCopy : model.getCopiedElements()) {
 		// 1. reposition the copy
-		ScenarioElement newElement = elementToCopy.clone();
-		VPoint elementPos = getElementPosition(elementToCopy);
+			ScenarioElement elementToCopy = (ScenarioElement)toCopy;
+			ScenarioElement newElement = elementToCopy.clone();
+			VPoint elementPos = getElementPosition(elementToCopy);
 
-		VPoint diff = model.getMousePosition().subtract(elementPos);
-		VShape newShape = model.translateElement(elementToCopy, diff);
+			VPoint diff = model.getMousePosition().subtract(elementPos);
+			VShape newShape = model.translateElement(elementToCopy, diff);
 
-		if (elementToCopy instanceof AgentWrapper) {
-			VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());
-			((AgentWrapper) newElement).getAgentInitialStore().setPosition(position);
-		} else {
-			newElement.setShape(newShape);
+			if (elementToCopy instanceof AgentWrapper) {
+				VPoint position = new VPoint(newShape.getBounds2D().getCenterX(), newShape.getBounds2D().getCenterY());
+				((AgentWrapper) newElement).getAgentInitialStore().setPosition(position);
+			} else {
+				newElement.setShape(newShape);
+			}
+
+			// 2. add the copy
+			UndoableEdit edit = new EditDrawShape(model, newElement.getType());
+			undoSupport.postEdit(edit);
+			model.addShape(newElement);
 		}
-
-		// 2. add the copy
-		UndoableEdit edit = new EditDrawShape(model, newElement.getType());
-		undoSupport.postEdit(edit);
-		model.addShape(newElement);
 		// getScenarioPanelModel().setSelectedElement(element);
 		model.notifyObservers();
 	}

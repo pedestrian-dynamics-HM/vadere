@@ -128,8 +128,8 @@ public class OnlineVisualization implements PassiveCallback {
 			IPotentialField pedPotentialField = null;
 			Agent selectedAgent = null;
 
-			if(model.getSelectedElement() instanceof Agent){
-				selectedAgent = (Agent)model.getSelectedElement();
+			if(model.getSelectedElements().getFirst() instanceof Agent){
+				selectedAgent = (Agent)model.getSelectedElements().getFirst();
 			}
 
 			if(model.config.isShowPotentialField() && selectedAgent != null && potentialField != null) {

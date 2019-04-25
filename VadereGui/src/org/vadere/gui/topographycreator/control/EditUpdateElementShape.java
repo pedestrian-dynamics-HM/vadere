@@ -27,14 +27,14 @@ public class EditUpdateElementShape extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		AttributeModifier.setShapeToAttributes(element, oldShape);
-		panelModel.setSelectedElement(element);
+		panelModel.getSelectedElements().add(element);
 		panelModel.notifyObservers();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		AttributeModifier.setShapeToAttributes(element, newShape);
-		panelModel.setSelectedElement(element);
+		panelModel.getSelectedElements().add(element);
 		panelModel.notifyObservers();
 	}
 

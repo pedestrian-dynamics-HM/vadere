@@ -30,7 +30,7 @@ public class ScenarioCheckerMessageDocumentView extends JEditorPane {
 			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 				ScenarioElement element = linkMap.getOrDefault(e.getDescription(), null);
 				if (element != null && this.model != null) {
-					this.model.setSelectedElement(element);
+					this.model.addShape(element);
 				}
 			}
 		});

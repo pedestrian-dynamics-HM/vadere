@@ -264,7 +264,7 @@ public abstract class DefaultRenderer {
 	protected void renderSelectionBorder(final Graphics2D graphics) {
 		graphics.setColor(Color.MAGENTA);
 		graphics.setStroke(new BasicStroke(getSelectedShapeBorderLineWidth()));
-		draw(defaultModel.getSelectedElement().getShape(), graphics);
+		defaultModel.getSelectedElements().forEach(element -> draw(((ScenarioElement)element).getShape(), graphics));
 	}
 
 	protected void renderLogo(final Graphics2D graphics, double scale, double height) {

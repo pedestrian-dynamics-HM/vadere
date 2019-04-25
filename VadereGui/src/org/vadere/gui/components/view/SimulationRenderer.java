@@ -6,6 +6,7 @@ import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -17,6 +18,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.stream.Stream;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
@@ -132,7 +135,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         Color color = g.getColor();
         Stroke stroke = g.getStroke();
 
-        if (model.isElementSelected() && model.getSelectedElement().equals(pedestrain)) {
+        if (model.isElementSelected() && model.getSelectedElements().contains(pedestrain)) {
             g.setColor(Color.MAGENTA);
             g.setStroke(new BasicStroke(getLineWidth() / 2.0f));
         } else {

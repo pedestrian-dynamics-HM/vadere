@@ -18,7 +18,7 @@ public class DefaultSelectionMode extends RectangleSelectionMode {
 	@Override
 	public void mouseReleased(final MouseEvent event) {
 		panelModel.hideSelection();
-		panelModel.deselectSelectedElement();
+		panelModel.getSelectedElements().clear();
 
 		VRectangle rect = (VRectangle) panelModel.getSelectionShape();
 

@@ -40,6 +40,6 @@ class ActionAddElement extends TopographyAction {
 		ScenarioElement element = TopographyElementFactory.getInstance().createScenarioShape(model.getCurrentType(),
 				model.getSelectionShape());
 		model.addShape(element);
-		model.setSelectedElement(element);
+		model.addSelectedElements(element);
 	}
 }

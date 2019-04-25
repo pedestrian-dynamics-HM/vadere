@@ -326,7 +326,7 @@ public class TikzGenerator {
 			        generatedCode += String.format(Locale.US, agentTextPattern, colorString, agent.getPosition().x, agent.getPosition().y);
 		        }
 
-		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
+		        if (model.getSelectedElements().contains(agent)) {
 			        String agentTextPattern = "\\draw[magenta] (%f,%f) circle [radius=\\AgentRadius];\n";
 			        generatedCode += String.format(Locale.US, agentTextPattern, agent.getPosition().x, agent.getPosition().y);
 		        }

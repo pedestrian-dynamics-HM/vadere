@@ -4,6 +4,7 @@ import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.ScenarioElement;
 
 import java.awt.event.ActionEvent;
@@ -27,17 +28,20 @@ public class ActionDeleteElement extends TopographyAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		IDrawPanelModel model = getScenarioPanelModel();
-
 		if (model.isElementSelected()) {
-			ScenarioElement element = model.getSelectedElement();
-			if (model.removeElement(element)) {
-				UndoableEdit edit = new EditDeleteShape(model, element);
-				undoSupport.postEdit(edit);
-			}
+			model.getSelectedElements().forEach(element -> filter((ScenarioElement) element));
 		}
 
 		if (basicAction != null) {
 			basicAction.actionPerformed(e);
+		}
+	}
+
+	private void filter(ScenarioElement element){
+		IDrawPanelModel model = getScenarioPanelModel();
+		if (model.removeElement(element)) {
+			UndoableEdit edit = new EditDeleteShape(model, element);
+			undoSupport.postEdit(edit);
 		}
 	}
 }

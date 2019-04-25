@@ -116,14 +116,22 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		// set the content for the view
 		// defaultModel.setJSONContent(event.getDocument().getText(0,
 		// event.getDocument().getLength()));
-		ScenarioElement element = panelModel.getSelectedElement();
-		if (element != null) {
+		if (panelModel.isElementSelected()) {
 			String json = txtrTextfiletextarea.getText();
 			//logger.info(json);
-			if (json.length() == 0)
+			if (json.length() == 0){
 				return;
-
+			}
 			// try {
+			validateJson(json);
+			panelModel.setElementHasChanged(panelModel.getSelectedElements());
+			panelModel.notifyObservers();
+		}
+	}
+
+	public void validateJson(String json){
+		for(Object selected : panelModel.getSelectedElements()) {
+			ScenarioElement element = (ScenarioElement) selected;
 			if (element instanceof AgentWrapper) {
 				// JsonSerializerVShape shapeSerializer = new JsonSerializerVShape();
 				Pedestrian ped = null;
@@ -146,9 +154,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 					jsonValidIndicator.setInvalid();
 				}
 			}
-			panelModel.setElementHasChanged(element);
-			panelModel.notifyObservers();
-		}
+			}
 	}
 
 	public void setEditable(final boolean editable) {

@@ -20,7 +20,6 @@ public class ActionCopyElement extends TopographyAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ScenarioElement element = getScenarioPanelModel().getSelectedElement();
-		getScenarioPanelModel().setCopiedElement(element);
+		getScenarioPanelModel().setCopiedElements(getScenarioPanelModel().getSelectedElements());
 	}
 }

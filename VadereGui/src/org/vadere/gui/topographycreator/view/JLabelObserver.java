@@ -27,7 +27,7 @@ public class JLabelObserver extends JLabel implements Observer {
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (panelModel != null) {
-			ScenarioElement selectedElement = panelModel.getSelectedElement();
+			ScenarioElement selectedElement = (ScenarioElement) panelModel.getSelectedElements().getFirst();
 			String newText = DEFAULT_TEXT;
 
 			if (selectedElement != null)

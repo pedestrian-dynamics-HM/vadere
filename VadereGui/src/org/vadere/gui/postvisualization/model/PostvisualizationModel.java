@@ -147,7 +147,6 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.agentsByStep = new HashMap<>();
 		this.steps = new ArrayList<>();
 		this.trajectories = new HashMap<>();
-		this.selectedElement = null;
 		this.outputPath = projectPath;
 	}
 
@@ -280,17 +279,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 			}
 
-			if (isElementSelected() && getSelectedElement() instanceof Pedestrian) {
-				Trajectory trajectory = trajectories.get(getSelectedElement().getId());
-				if (trajectory != null) {
-					Optional<Agent> ped = trajectory.getAgent(this.step);
-					setSelectedElement(ped.orElseGet(() -> null));
+			for(Object element : getSelectedElements()) {
+				if (element instanceof Pedestrian) {
+					Trajectory trajectory = trajectories.get(((Pedestrian)element).getId());
+					if (trajectory != null) {
+						trajectory.getAgent(this.step).ifPresent(agent -> addSelectedElement(agent.getPosition()));
+					}
 				}
 			}
 
+
 			// so the new pedestrian position is displayed!
 			if (isElementSelected()) {
-				notifySelectSecenarioElementListener(getSelectedElement());
+				notifySelectSecenarioElementListener(getSelectedElements());
 			}
 
 			/*
