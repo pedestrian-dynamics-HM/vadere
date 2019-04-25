@@ -1,10 +1,6 @@
 package org.vadere.gui.components.model;
 
-import org.vadere.gui.components.control.DefaultSelectionMode;
-import org.vadere.gui.components.control.IMode;
-import org.vadere.gui.components.control.IScaleChangeListener;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.ViewportChangeEvent;
+import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
@@ -13,15 +9,14 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import javax.swing.*;
 
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
 	// private static final int BORDER_WIDTH = 20;

@@ -1,18 +1,16 @@
 package org.vadere.gui.topographycreator.control;
 
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
-
 import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * In this mode the user can select a ScenarioElement with his mouse (click) and he can move
@@ -22,11 +20,27 @@ import org.vadere.util.geometry.shapes.VShape;
 public class SelectElementMode extends DefaultSelectionMode {
 	private final UndoableEditSupport undoSupport;
 	private final IDrawPanelModel panelModel;
+	private boolean resizeElement;
+	private boolean isModifying;
+	private static final int[] DIRECTIONAL_CURSOR_CODES;
+
+	static{
+		DIRECTIONAL_CURSOR_CODES = new int[8];
+		DIRECTIONAL_CURSOR_CODES[0] = Cursor.E_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[1] = Cursor.NE_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[2] = Cursor.N_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[3] = Cursor.NW_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[4] = Cursor.W_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[5] = Cursor.SW_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[6] = Cursor.S_RESIZE_CURSOR;
+		DIRECTIONAL_CURSOR_CODES[7] = Cursor.SE_RESIZE_CURSOR;
+	}
 
 	public SelectElementMode(final IDrawPanelModel panelModel, final UndoableEditSupport undoSupport) {
 		super(panelModel);
 		this.undoSupport = undoSupport;
 		this.panelModel = panelModel;
+		this.resizeElement = false;
 	}
 
 	private Point startPoint;
@@ -53,9 +67,19 @@ public class SelectElementMode extends DefaultSelectionMode {
 			panelModel.getSelectedElements()
 					.forEach(element  -> panelModel.addPrototypeShape(((ScenarioElement)element).getShape()));
 			panelModel.showPrototypeShape();
+			resizeElement = (Boolean)panelModel.getSelectedElements().stream()
+					.map(element -> ((ScenarioElement)element).getShape().atBorder(panelModel.translateVectorCoordinates(startPoint)))
+					.reduce(false, (first, second) -> (Boolean)first || (Boolean)second);
+			isModifying = true;
 		} else {
 			super.mousePressed(e);
 		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		super.mouseMoved(e);
+		panelModel.setMouseSelectionMode(this);
 	}
 
 	@Override
@@ -81,10 +105,7 @@ public class SelectElementMode extends DefaultSelectionMode {
 				VShape oldShape = element.getShape();
 				VShape newShape =
 						panelModel.translate(element, new Point(e.getPoint().x - startPoint.x, e.getPoint().y - startPoint.y));
-
 				AttributeModifier.setShapeToAttributes(element, newShape);
-
-				// tell the panelModel that the selected element has changed!
 				panelModel.addSelectedElements(element);
 				UndoableEdit edit = new EditUpdateElementShape(panelModel, element, oldShape);
 				undoSupport.postEdit(edit);
@@ -92,6 +113,9 @@ public class SelectElementMode extends DefaultSelectionMode {
 		} else {
 			super.mouseReleased(e);
 		}
+		resizeElement = false;
+		isModifying = false;
+		startPoint = null;
 		panelModel.hidePrototypeShape();
 		panelModel.notifyObservers();
 	}
@@ -116,7 +140,6 @@ public class SelectElementMode extends DefaultSelectionMode {
 		}
 		return false;
 	}
-
 	@Override
 	public IMode clone() {
 		return new SelectElementMode(panelModel, undoSupport);

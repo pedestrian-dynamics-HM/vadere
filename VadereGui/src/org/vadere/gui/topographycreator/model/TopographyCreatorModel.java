@@ -1,28 +1,24 @@
 package org.vadere.gui.topographycreator.model;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 
 
 /**
@@ -359,6 +355,13 @@ public class TopographyCreatorModel<T extends DefaultConfig> extends DefaultMode
 		return translateElement(element, worldVector);
 	}
 
+
+	@Override
+	public VShape resize(ScenarioElement element, final Point start, final Point end) {
+		VPoint startVector = translateVectorCoordinates(start);
+		VPoint endVector = translateVectorCoordinates(end);
+		return element.getShape().resize(startVector, endVector);
+	}
 	@Override
 	public VShape translateElement(ScenarioElement element, VPoint vector) {
 		// double factor = Math.max(10,1/getGridResulution()); // ?? related to scaleTopography?

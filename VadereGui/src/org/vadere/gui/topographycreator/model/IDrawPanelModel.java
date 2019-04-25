@@ -1,29 +1,22 @@
 package org.vadere.gui.topographycreator.model;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.List;
-import java.util.Observer;
-import java.util.function.Predicate;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.List;
+import java.util.Observer;
+import java.util.function.Predicate;
 
 public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<T>, Iterable<ScenarioElement> {
 
@@ -153,6 +146,8 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	Collection<VShape> getPrototypeShapes();
 
+	VShape resize(ScenarioElement element, Point start, Point end);
+
 	void addPrototypeShape(VShape prototypeShape);
 
 	void addPrototypeShapes(Collection<VShape> prototypeShape);
@@ -178,4 +173,9 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	List<MeasurementArea> getMeasurementAreas();
 
 	Rectangle2D.Double getBounds();
+
+	default VPoint translateVectorCoordinates(Point point) {
+		return new VPoint(point.x / getScaleFactor(), getTopography().getBounds().height - point.y / getScaleFactor());
+	}
+
 }
