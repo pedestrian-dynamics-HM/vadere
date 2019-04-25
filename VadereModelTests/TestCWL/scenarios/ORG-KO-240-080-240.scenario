@@ -2,7 +2,6 @@
   "name" : "ORG-KO-240-080-240",
   "description" : "",
   "release" : "0.7",
-  "commithash" : "8cae59896cf1ed23507497043c4a365e14762081",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

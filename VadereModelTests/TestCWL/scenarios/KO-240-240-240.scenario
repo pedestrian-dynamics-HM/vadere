@@ -264,8 +264,8 @@
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "NAVIGATION",
-          "obstacleDensityWeight" : 0.0,
+          "type" : "OBSTACLES",
+          "obstacleDensityWeight" : 0.1,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,

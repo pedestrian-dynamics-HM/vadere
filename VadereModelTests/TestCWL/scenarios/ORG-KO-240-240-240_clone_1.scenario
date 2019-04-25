@@ -1,5 +1,5 @@
 {
-  "name" : "ORG-KO-240-240-240",
+  "name" : "ORG-KO-240-240-240_clone_1",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -239,9 +239,9 @@
         "minStepLength" : 0.1,
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
-        "dynamicStepLength" : false,
+        "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : true,
+        "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -264,8 +264,8 @@
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "OBSTACLES",
-          "obstacleDensityWeight" : 1.0,
+          "type" : "NAVIGATION",
+          "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
