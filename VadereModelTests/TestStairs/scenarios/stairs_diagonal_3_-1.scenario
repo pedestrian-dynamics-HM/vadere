@@ -1,7 +1,7 @@
 {
   "name" : "stairs_diagonal_3_-1",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_gnm1",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

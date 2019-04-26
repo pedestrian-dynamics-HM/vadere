@@ -48,7 +48,7 @@ public class MigrationUtil {
 
 	public void generateNewVersionTransform(Path resourceDir, String newVersionLabel) throws URISyntaxException, IOException {
 
-		Path oldTransform = JoltTransformation.getTransforamtionFileFromFileSystem(resourceDir, Version.latest());
+		Path oldTransform = JoltTransformation.getTransformationFileFromFileSystem(resourceDir, Version.latest());
 		Path oldIdentity = JoltTransformation.getIdenityFileFromFileSystem(resourceDir, Version.latest());
 
 		String newTransformString = JoltTransformation
