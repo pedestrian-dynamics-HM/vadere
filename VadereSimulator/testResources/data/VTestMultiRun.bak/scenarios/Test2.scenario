@@ -1,7 +1,7 @@
 {
   "name" : "Test2",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "commithash" : "c45f1d26328baaec22418c15e6351a059e910f5f",
   "processWriters" : {
     "files" : [ {

@@ -22,8 +22,9 @@ public abstract class JoltTransformation extends AbstractJsonTransformation impl
 	private final Chainr chainr; // Transformation from (version -1) to version
 	private final Chainr identity; // Identity of version
 	private final Diffy diffy;		// diff tool to check if jolt transformation worked.
+	private final Version targetVersion;
 
-	public static Path getTransforamtionFileFromFileSystem(Path baseDir, Version toVersion) {
+	public static Path getTransformationFileFromFileSystem(Path baseDir, Version toVersion) {
 		String transformString = getTransforamtionResourcePath(
 				toVersion.previousVersion().label('-'),
 				toVersion.label('-'));
@@ -45,20 +46,27 @@ public abstract class JoltTransformation extends AbstractJsonTransformation impl
 		return "/identity_v" + to.toUpperCase() + ".json";
 	}
 
-	public JoltTransformation(String transformation, String identity) {
+	public JoltTransformation(String transformation, String identity, Version targetVersion) {
 		super();
 		this.chainr = Chainr.fromSpec(JsonUtils.classpathToList(transformation));
 		this.identity = Chainr.fromSpec(JsonUtils.classpathToList(identity));
 		this.diffy = new Diffy();
+		this.targetVersion = targetVersion;
 	}
 
 	public JoltTransformation(Version targetVersion) {
 		this(getTransforamtionResourcePath(
 				targetVersion.previousVersion().label('-'),
 				targetVersion.label('-')),
-				getIdentiyResoucrePath(targetVersion.label('-')));
+				getIdentiyResoucrePath(targetVersion.label('-')),
+				targetVersion);
 	}
 
+
+	@Override
+	public Version getTargetVersion() {
+		return this.targetVersion;
+	}
 
 	@Override
 	public JsonNode applyTransformation(JsonNode root) throws MigrationException {

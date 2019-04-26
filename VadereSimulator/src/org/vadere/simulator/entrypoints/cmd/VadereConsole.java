@@ -17,6 +17,8 @@ import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
 
+import java.util.Arrays;
+
 
 /**
  * Provides the possibility to start Vadere in console mode.
@@ -178,7 +180,7 @@ public class VadereConsole {
 				.help("The scenario files or directories on to operate on. Directories containing" +
 						"the files DO_NOT_MIGRATE or DO_NOT_MIGRATE_TREE will be ignored.");
 
-		String[] versions = Version.stringValues(Version.NOT_A_RELEASE);
+		String[] versions = Version.stringValues(Version.NOT_A_RELEASE, true);
 		migrationAssistant.addArgument("--target-version")
 				.required(false)
 				.type(String.class)
