@@ -85,6 +85,7 @@ public class SelectElementMode extends DefaultSelectionMode {
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 		if (isMouseOnPrototypeShape()) {
+			panelModel.getPrototypeShapes().clear();
 			for(Object element : panelModel.getSelectedElements()) {
 				VShape shape =
 						panelModel.translate((ScenarioElement) element, new Point(e.getPoint().x - startPoint.x, e.getPoint().y - startPoint.y));
@@ -100,22 +101,23 @@ public class SelectElementMode extends DefaultSelectionMode {
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 		if (isMouseOnPrototypeShape()) {
-			for(Object object : panelModel.getSelectedElements()) {
-				ScenarioElement element = (ScenarioElement)object;
+			for (Object object : panelModel.getSelectedElements()) {
+				ScenarioElement element = (ScenarioElement) object;
 				VShape oldShape = element.getShape();
 				VShape newShape =
 						panelModel.translate(element, new Point(e.getPoint().x - startPoint.x, e.getPoint().y - startPoint.y));
 				AttributeModifier.setShapeToAttributes(element, newShape);
-				panelModel.addSelectedElements(element);
 				UndoableEdit edit = new EditUpdateElementShape(panelModel, element, oldShape);
 				undoSupport.postEdit(edit);
 			}
 		} else {
 			super.mouseReleased(e);
 		}
+		System.out.println("left selection: " + panelModel.getSelectedElements().size());
 		resizeElement = false;
 		isModifying = false;
 		startPoint = null;
+		panelModel.getPrototypeShapes().clear();
 		panelModel.hidePrototypeShape();
 		panelModel.notifyObservers();
 	}

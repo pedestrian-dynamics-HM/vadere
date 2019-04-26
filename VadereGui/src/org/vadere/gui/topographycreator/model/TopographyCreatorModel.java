@@ -84,8 +84,8 @@ public class TopographyCreatorModel<T extends DefaultConfig> extends DefaultMode
 		this.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 		this.currentType = ScenarioElementType.OBSTACLE;
 		this.boundId = 0;
-		this.copiedElements = new TreeSet<>();
-		this.prototypes = new TreeSet<>();
+		this.copiedElements = new HashSet<>();
+		this.prototypes = new HashSet<>();
 		this.arePrototypesVisible = false;
 		setVadereScenario(scenario);
 	}

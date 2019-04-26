@@ -1,7 +1,5 @@
 package org.vadere.gui.components.model;
 
-import javax.swing.*;
-
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.control.IScaleChangeListener;
 import org.vadere.gui.components.control.IViewportChangeListener;
@@ -13,11 +11,11 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.LinkedList;
 
 public interface IDefaultModel<T extends DefaultConfig> extends Iterable<ScenarioElement> {
 
@@ -258,7 +256,7 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 *
 	 * @return the selected element or null
 	 */
-	LinkedList<ScenarioElement> getSelectedElements();
+	Deque<ScenarioElement> getSelectedElements();
 
 	/**
 	 * Returns true if a element is selected.

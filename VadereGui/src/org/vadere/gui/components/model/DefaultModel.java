@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -26,7 +27,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	private IMode mouseSelectionMode;
 
-	protected LinkedList<ScenarioElement> selectedElements;
+	protected Deque<ScenarioElement> selectedElements;
 
 	protected static final double MAX_SCALE_FACTOR = 1000;
 
@@ -371,7 +372,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public synchronized ScenarioElement addSelectedElement(final VPoint position) {
 		getElementsByPosition(position).ifPresent(this::addSelectedElements);
-		return selectedElements.getFirst();
+		return selectedElements.isEmpty() ? null : selectedElements.getFirst();
 	}
 
 	private Optional<ScenarioElement> getElementsByPosition(final VPoint position) {
@@ -403,7 +404,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public LinkedList<ScenarioElement> getSelectedElements() {
+	public Deque<ScenarioElement> getSelectedElements() {
 		return selectedElements;
 	}
 
