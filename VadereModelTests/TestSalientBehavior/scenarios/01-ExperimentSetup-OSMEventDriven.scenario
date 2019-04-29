@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 5 ]
+      "processors" : [ 1, 2, 5, 6 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -35,6 +35,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSalientBehaviorProcessor",
       "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMostImportantEventProcessor",
+      "id" : 6
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

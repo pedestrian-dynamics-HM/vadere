@@ -6,6 +6,8 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.EventFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
@@ -246,7 +248,8 @@ public class TrajectoryReader {
 		}
 
 		if (mostImportantEventIndex != -1) {
-			// TODO: Convert string (in column) to event object (this requires a factory) and call ped.setMostImportantEvent(...).
+			Event mostImportantEvent = EventFactory.stringToEvent(rowTokens[mostImportantEventIndex]);
+			ped.setMostImportantEvent(mostImportantEvent);
 		}
 
 		if (salientBehaviorIndex != -1) {
