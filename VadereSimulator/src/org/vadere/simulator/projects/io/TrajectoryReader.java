@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
@@ -44,6 +45,7 @@ public class TrajectoryReader {
 
 	private static final String SPLITTER = " ";
 	private static Logger logger = Logger.getLogger(IOVadere.class);
+
 	private Path trajectoryFilePath;
 	private AttributesAgent attributesPedestrian;
 	private Set<String> pedestrianIdKeys;
@@ -54,7 +56,8 @@ public class TrajectoryReader {
 	private Set<String> groupIdKeys;
 	private Set<String> groupSizeKeys;
 	private Set<String> stridesKeys;
-
+	private Set<String> mostImportantEventKeys;
+	private Set<String> salientBehaviorKeys;
 
 	private int pedIdIndex;
 	private int stepIndex;
@@ -64,6 +67,8 @@ public class TrajectoryReader {
 	private int groupIdIndex;
 	private int groupSizeIndex;
 	private int stridesIndex;
+	private int mostImportantEventIndex;
+	private int salientBehaviorIndex;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
@@ -84,6 +89,8 @@ public class TrajectoryReader {
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
 		stridesKeys = new HashSet<>();
+		mostImportantEventKeys = new HashSet<>();
+		salientBehaviorKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
@@ -97,6 +104,8 @@ public class TrajectoryReader {
 		groupSizeKeys.add("groupSize");
 		stridesKeys.add("strides");
 		stridesKeys.add("footSteps");
+		mostImportantEventKeys.add("mostImportantEvent");
+		salientBehaviorKeys.add("salientBehavior");
 
 		pedIdIndex = -1;
 		stepIndex = -1;
@@ -106,7 +115,8 @@ public class TrajectoryReader {
 		groupIdIndex = -1;
 		groupSizeIndex = -1;
 		stridesIndex = -1;
-
+		mostImportantEventIndex = -1;
+		salientBehaviorIndex = -1;
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
@@ -131,12 +141,14 @@ public class TrajectoryReader {
 				targetIdIndex = index;
 			} else if (groupIdKeys.contains(columns[index])){
 				groupIdIndex = index;
-			}
-			else if (groupSizeKeys.contains(columns[index])){
+			} else if (groupSizeKeys.contains(columns[index])){
 				groupSizeIndex = index;
-			}
-			else if(stridesKeys.contains(columns[index])) {
+			} else if(stridesKeys.contains(columns[index])) {
 				stridesIndex = index;
+			} else if (mostImportantEventKeys.contains(columns[index])) {
+				mostImportantEventIndex = index;
+			} else if (salientBehaviorKeys.contains(columns[index])) {
+				salientBehaviorIndex = index;
 			}
 		}
 		try {
@@ -158,7 +170,7 @@ public class TrajectoryReader {
 		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
 			return in.lines()                                       // a stream of lines
 					.skip(1)                                        // skip the first line i.e. the header
-					.map(line -> split(line))              // split the line into string tokens
+					.map(line -> split(line))                       // split the line into string tokens
 					.map(rowTokens -> parseRowTokens(rowTokens))    // transform those tokens into a pair of java objects (step, agent)
 					.collect(Collectors.groupingBy(Pair::getKey,    // group all agent objects by the step.
 							Collectors.mapping(Pair::getValue, Collectors.toList())));
@@ -231,6 +243,15 @@ public class TrajectoryReader {
 			for(FootStep footStep : footSteps) {
 				ped.getFootSteps().add(footStep);
 			}
+		}
+
+		if (mostImportantEventIndex != -1) {
+			// TODO: Convert string (in column) to event object (this requires a factory) and call ped.setMostImportantEvent(...).
+		}
+
+		if (salientBehaviorIndex != -1) {
+			SalientBehavior salientBehavior = SalientBehavior.valueOf(rowTokens[salientBehaviorIndex]);
+			ped.setSalientBehavior(salientBehavior);
 		}
 
 		return Pair.create(new Step(step), ped);
