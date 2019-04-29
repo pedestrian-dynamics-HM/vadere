@@ -30,7 +30,7 @@ public class VadereConsole {
 	public static void main(String[] args) {
 		Logger.setMainArguments(args);
 //		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
-//			String[] tmp = {"migrate", "--create-new-version", "0.7",  "VadereSimulator/resources/"};
+//			String[] tmp = {"project-run", "-p", "/home/lphex/hm.d/vadere/VadereModelTests/TestOSM_Group_calibration"};
 //			args = tmp;
 		ArgumentParser parser = createArgumentParser();
 
@@ -101,11 +101,6 @@ public class VadereConsole {
 				.type(String.class)
 				.dest("project-dir")
 				.help("Path to project directory.");
-		projectRun.addArgument("--scenario-file", "-f")
-				.required(false)
-				.type(String.class)
-				.dest("scenario-file")
-				.help("Name of Scenario file.");
 		projectRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)

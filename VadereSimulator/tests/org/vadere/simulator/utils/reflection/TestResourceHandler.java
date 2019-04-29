@@ -13,6 +13,14 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.fail;
 
+/**
+ *  Manage resource directory used within a unit test. Implement {@link #getTestDir()} method
+ *  and use default implementation to access resources.
+ *
+ * If a test changes files during execution it is useful to call {@link #backupTestDir()} in the
+ * (at)Before method and {@link #loadFromBackup()} in the (at)After method to ensure a clean
+ * working environment for each test even if previous test failed.
+ */
 public interface TestResourceHandler {
 
 	Path getTestDir();
