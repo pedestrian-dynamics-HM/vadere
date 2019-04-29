@@ -24,10 +24,6 @@
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
-      },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
@@ -64,7 +60,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ "org.vadere.simulator.models.groups.CentroidGroupModel" ]
+        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -75,6 +71,10 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {

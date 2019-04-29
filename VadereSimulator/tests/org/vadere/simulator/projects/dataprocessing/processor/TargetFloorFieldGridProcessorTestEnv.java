@@ -7,6 +7,7 @@ import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.data.FloorFieldGridRow;
