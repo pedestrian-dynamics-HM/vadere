@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial as spatial
+import cProfile
 from tqdm import tqdm
 from multiprocessing import Pool
 from collections import defaultdict
@@ -10,8 +11,8 @@ from functools import reduce
 
 
 def extract_pedestrians_in_area(df, area):
-    is_x = (df['x'] >= area[0]) & (df['x'] <= (area[0] + area[2]))
-    is_y = (df['y'] >= area[1]) & (df['y'] <= (area[1] + area[3]))
+    is_x = (df.x.values >= area[0]) & (df.x.values <= (area[0] + area[2]))
+    is_y = (df.y.values >= area[1]) & (df.y.values <= (area[1] + area[3]))
     return df[is_x & is_y]
 
 
@@ -76,6 +77,8 @@ def process_timestep(args):
   area = context.get('area')
   pedestrians = extract_pedestrians_in_area(trajectories, area)
 
+  hasVelocity = 'velocity' in pedestrians.columns
+
   # skip timesteps with less than 4 pedestrians
   if len(pedestrians) < 4:
       return None
@@ -83,23 +86,18 @@ def process_timestep(args):
   
   boundary = context.get('boundary')
 
-  positions = pedestrians[['x', 'y']].to_numpy()
+  positions = list(zip(pedestrians.x.values, pedestrians.y.values))
   
   voronoi = spatial.Voronoi(positions)
   
-  x = np.arange(area[0], area[0] + area[2], 0.1)
-  y = np.arange(area[1], area[1] + area[3], 0.1)
-  xdim = len(x)
-  ydim = len(y)
-
-  xx, yy = np.meshgrid(x, y)
-  xr = xx.ravel()
-  yr = yy.ravel()
-  grid = np.c_[xr, yr, [0 for i in range(len(xr))], [0 for i in range(len(xr))]]
+  xdim = context.get('xdim')
+  ydim = context.get('ydim')
+  coordinates = context.get('coordinates')
+  D = np.zeros((ydim * xdim, 1))
+  V = np.zeros((ydim * xdim, 1))
 
   # generate voronoi diagramm 
-  bb = np.array(boundary.boundary.coords)
-  diameter = np.linalg.norm(bb.ptp(axis=0))
+  diameter = context.get('diameter')
 
   polygons = []
   for p, pos in voronoi_polygons(voronoi, diameter):
@@ -111,31 +109,32 @@ def process_timestep(args):
       if type(intersection) == Polygon:
           polygons.append((intersection, 1 / intersection.area, pos))
 
-  for point in grid:
-      p = Point(point[:2])
+  number_of_polygons = len(polygons)
+  interval = range(int(number_of_polygons / 2) + 2)
+  for index, point in coordinates:
+      p = Point(point)
       
       # skip points outside of scenario
       if not boundary.contains(p):
           continue
 
-      number_of_polygons = len(polygons)
-      for i in range(int(number_of_polygons / 2) + 2):
+      for i in interval:
         if polygons[i][0].contains(p):
-          point[2] = polygons[i][1]
-          point[3] = list(pedestrians[ (pedestrians['x'] == polygons[i][2][0]) & (pedestrians['y'] == polygons[i][2][1])]['velocity'])[0]
+          D[index] = polygons[i][1]
+          if hasVelocity:
+            V[index] = pedestrians[(pedestrians.x.values == polygons[i][2][0]) & (pedestrians.y.values == polygons[i][2][1])].velocity.values[0]
           break
         
-        if polygons[number_of_polygons - 1 - i][0].contains(p):
-          point[2] = polygons[number_of_polygons - 1 - i][1]
-          point[3] = list(pedestrians[ (pedestrians['x'] == polygons[number_of_polygons - 1 - i][2][0]) & (pedestrians['y'] == polygons[number_of_polygons - 1 - i][2][1])]['velocity'])[0]
+        end = number_of_polygons - 1 - i
+        if polygons[end][0].contains(p):
+          D[index] = polygons[end][1]
+          if hasVelocity:
+            V[index] = pedestrians[(pedestrians.x.values == polygons[end][2][0]) & (pedestrians.y.values == polygons[end][2][1])].velocity.values[0]
           break
   
-  # normalize
-  D = grid[:, 2].reshape((xdim*ydim, 1))
-  D = D / (np.max(D) / 4.5)
-  V = grid[:, 3].reshape((xdim*ydim, 1))
+  # normalize ?
   
-  return D, V, xdim, ydim
+  return D, V
 
 
 def sum(x1, x2):
@@ -143,9 +142,28 @@ def sum(x1, x2):
 
 
 def run(df, context, nprocesses=3):  
-  
-  skip = context.get('skip', 1)
 
+  area = context.get('area')
+  x = np.arange(area[0], area[0] + area[2], 0.1)
+  y = np.arange(area[1], area[1] + area[3], 0.1)
+  xdim = len(x)
+  ydim = len(y)
+
+  xx, yy = np.meshgrid(x, y)
+  coordinates = list(zip(xx.ravel(), yy.ravel()))
+
+  context['xdim'] = xdim
+  context['ydim'] = ydim
+
+  context['coordinates'] = enumerate(coordinates)
+
+  boundary = context.get('boundary')
+  bb = np.array(boundary.boundary.coords)
+  diameter = np.linalg.norm(bb.ptp(axis=0))
+
+  context['diameter'] = diameter
+
+  skip = context.get('skip', 1)
   grouped = list(df.groupby('timeStep'))
   timesteps = list(grouped)[::skip]
   timesteps = list(map(lambda a: (*a, context), timesteps))
@@ -153,25 +171,19 @@ def run(df, context, nprocesses=3):
 
   densities = []
   velocities = []
-  xdim = 0
-  ydim = 0
+
   with Pool(processes=nprocesses) as p:
-        with tqdm(total=total) as pbar:
+        with tqdm(total=total, desc=context.get('name')) as pbar:
             for _, result in enumerate(p.imap_unordered(process_timestep, timesteps)):
               pbar.update()
 
               if result is not None:
-                D, V, xdim, ydim = result
+                D, V = result
                 densities.append(D)
                 velocities.append(V)
-
+  
 
   density = reduce(sum, densities) / len(densities)
-  # density = density - np.min(density[density > 0])
-  # density[density < 0] = 0
-
   velocity = reduce(sum, velocities) / len(velocities)
-  # velocity = velocity - np.min(velocity[velocity > 0])
-  # velocity[velocity < 0] = 0
-
+  
   return np.flipud(density.reshape((ydim, xdim))), np.flipud(velocity.reshape((ydim, xdim)))
