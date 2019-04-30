@@ -27,7 +27,7 @@ Additionally, EikMesh supports geometries defined by a [segment bounded planar s
 
 ## Documentation
 
-- User manuel: [documentation.pdf](http://www.vadere.org/documentation/eikmesh_manual_short.pdf) (offline manual), [Wiki](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview) (online manual)
+- User manuel: [documentation.pdf](http://www.vadere.org/documentation/eikmesh_manual_short.pdf) (offline manual), [Wiki](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/EikMesh-Wiki) (online manual)
 - Publication: [A parallel generator for sparse unstructured meshes to solve the eikonal equation](https://doi.org/10.1016/j.jocs.2018.09.009)
 - Demos: [vadere.org](http://www.vadere.org/the-eikmesh-library/)
 
