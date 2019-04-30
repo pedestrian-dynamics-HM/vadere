@@ -16,7 +16,7 @@ The EikMesh library generates
 - constrained Delaunay triangulations (CDT),
 - conforming Delaunay triangulations (CCDT),
 - Voronoi diagrams, and 
-- ****high-quality unstructured and conforming triangular meshes****.
+- ****high-quality unstructured conforming triangular meshes****.
 
 ## The EikMesh algorithm
 
