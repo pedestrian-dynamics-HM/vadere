@@ -12,11 +12,11 @@ Given some mesh elements, adjacent elements can be accessed in O(1) time. Each g
 
 The aim was to provide a fast, light and user-friendly meshing tool with parametric input, generic data types and advanced visualization capabilities.
 eikmesh generates
-- exact Delaunay triangulations (DT),
+- Delaunay triangulations (DT),
 - constrained Delaunay triangulations (CDT),
 - conforming Delaunay triangulations (CCDT),
 - Voronoi diagrams, and 
-- high-quality unstructured and conforming triangular meshes.
+- ****high-quality unstructured and conforming triangular meshes****.
 
 ## EikMesh
 
