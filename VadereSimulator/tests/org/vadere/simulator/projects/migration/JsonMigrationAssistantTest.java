@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.migration;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.io.TestUtils;
@@ -26,12 +27,15 @@ public class JsonMigrationAssistantTest implements TestResourceHandler {
 		return getPathFromResources("/migration");
 	}
 
+	@Before
+	public void before(){
+		backupTestDir();
+	}
+
 	// clean up after test
 	@After
 	public void resetTestStructure() throws URISyntaxException {
-		Path dest =  getRelativeTestPath("testProject_v0.1");
-		Path backup = getRelativeTestPath("testProject_v0.1.bak");
-		TestUtils.copyDirTo(dest, backup);
+		loadFromBackup();
 	}
 
 	// Test transformation of single scenario file

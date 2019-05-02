@@ -24,7 +24,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
     }
 
     public static JsonTransformation get(Version currentVersion) throws MigrationException {
-        if (currentVersion.equalOrSamller(Version.UNDEFINED))
+        if (currentVersion.equalOrSmaller(Version.UNDEFINED))
             throw new MigrationException("There is now Transformation for Version " + Version.UNDEFINED.toString());
 
         if (currentVersion.equals(Version.latest()))
@@ -86,35 +86,35 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
 
     protected abstract void initDefaultHooks();
 
+    abstract public Version getTargetVersion();
 
     /**
      * Create a Copy of Json and put nodes in user specified order
      *
-     * @param target   new LinkedHashMap with wherer to put nodes
-     * @param source   source
-     * @param key      key to add to new HashMap
-     * @param children Specify Order on second level
+     * @param target        new LinkedHashMap with wherer to put nodes
+     * @param source        source
+     * @param key           key to add to new HashMap
+     * @param children      Specify Order on second level
      */
     public static void putObject(LinkedHashMap<Object, Object> target,
                           LinkedHashMap<Object, Object> source,
-                          String key, String... children) throws MigrationException {
+                          String key, String... children){
 
         Object obj = source.get(key);
-        if (obj == null) {
-            throw new MigrationException("Scenario must contain Key: " + key);
-        }
-        if (children.length > 0) {
-            LinkedHashMap<Object, Object> node = new LinkedHashMap<>();
-            LinkedHashMap<Object, Object> parent = (LinkedHashMap<Object, Object>) obj;
-            for (String childKey : children) {
-                Object childObj = parent.get(childKey);
-                if (childObj != null) {
-                    node.put(childKey, childObj);
+        if (obj != null) {
+            if (children.length > 0) {
+                LinkedHashMap<Object, Object> node = new LinkedHashMap<>();
+                LinkedHashMap<Object, Object> parent = (LinkedHashMap<Object, Object>) obj;
+                for (String childKey : children) {
+                    Object childObj = parent.get(childKey);
+                    if (childObj != null) {
+                        node.put(childKey, childObj);
+                    }
                 }
+                obj = node;
             }
-            obj = node;
+            target.put(key, obj);
         }
-        target.put(key, obj);
     }
 
     public JsonNode addCommitHashWarningIfMissing(JsonNode node){
@@ -125,15 +125,40 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         return node;
     }
 
-    public JsonNode sort (JsonNode node) throws MigrationException{
+    // choose  sort order based on targetVersion.
+    public JsonNode sort (JsonNode node) {
+
+        if (getTargetVersion().equalOrBigger(Version.V0_8)){
+            node = sort_since_V08(node);
+        } else {
+            node = sort_since_V01(node);
+        }
+
+        return  node;
+    }
+
+    private JsonNode sort_since_V08(JsonNode node) {
         LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
         LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
         putObject(sortedRoot, source, "name");
         putObject(sortedRoot, source, "description");
         putObject(sortedRoot, source, "release");
         putObject(sortedRoot, source, "commithash");
-        putObject(sortedRoot, source, "processWriters", "files", "processors", "isTimestamped");
-        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "eventInfos", "topography");
+        putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography", "eventInfos");
+
+        return  StateJsonConverter.deserializeToNode(sortedRoot);
+    }
+
+    private JsonNode sort_since_V01(JsonNode node) {
+        LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
+        LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
+        putObject(sortedRoot, source, "name");
+        putObject(sortedRoot, source, "description");
+        putObject(sortedRoot, source, "release");
+        putObject(sortedRoot, source, "commithash");
+        putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography");
 
         return  StateJsonConverter.deserializeToNode(sortedRoot);
     }

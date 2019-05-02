@@ -87,7 +87,7 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
 
-			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
+			if (version == null || version.equalOrSmaller(Version.UNDEFINED)) {
 				migrationLogger.error("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid release create a version transformation and a new idenity transformation");
 				logger.error(migrationLogger.last());
@@ -239,7 +239,7 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 		if (node.get("release") != null) {
 			version = Version.fromString(node.get("release").asText());
 
-			if (version == null || version.equalOrSamller(Version.UNDEFINED)) {
+			if (version == null || version.equalOrSmaller(Version.UNDEFINED)) {
 				migrationLogger.error("release version " + node.get("release").asText() + " is unknown or not " +
 						"supported. If this is a valid release create a version transformation and a new idenity transformation");
 				logger.error(migrationLogger.last());

@@ -1,7 +1,7 @@
 {
   "name" : "chicken_floorfield_ok",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
