@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.util.GroupSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
+import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
@@ -25,16 +26,19 @@ public class GroupSourceController extends SourceController {
 
 	private static final int NUMBER_OF_REPOSITION_TRIES = 20;
 
+
+    
 	private final GroupModel groupModel;
-	private LinkedList<Integer> groupsToSpawn;
-	protected final GroupSpawnArray spawnArray;
+	private final LinkedList<Integer> groupsToSpawn;
+	private final GroupSpawnArray spawnArray;
 
 	public GroupSourceController(Topography scenario, Source source,
 								 DynamicElementFactory dynamicElementFactory,
 								 AttributesDynamicElement attributesDynamicElement,
-								 Random random, GroupModel groupModel) {
+								 Random random, GroupModel groupModel, GroupSizeDeterminator gsd) {
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
 		this.groupModel = groupModel;
+		this.groupModel.registerGroupSizeDeterminator(source.getId(), gsd);
 		this.groupsToSpawn = new LinkedList<>();
 
 		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0, 0)).getBounds2D());
@@ -159,7 +163,7 @@ public class GroupSourceController extends SourceController {
 	 * placed after {@link GroupSourceController#NUMBER_OF_REPOSITION_TRIES} of tries.
 	 */
 	private List<VPoint> getRealRandomPositions(final int groupSize, @NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes) {
-		List<VPoint> randomPositions = new ArrayList<>(groupSize);
+		List<VPoint> randomPositions;
 
 		List<VPoint> defaultPoints = spawnArray.getDefaultGroup(groupSize);
 		for (int i = 0; i < NUMBER_OF_REPOSITION_TRIES; i++) {
@@ -181,8 +185,8 @@ public class GroupSourceController extends SourceController {
 	 * @param points default points of group members. First allowed position if the spawn would be
 	 *               based on the spawn grid.
 	 * @param random random object
-	 * @return transformed set of points based on a random translation and rotation within the
-	 * bound of the source
+	 * @return transformed set of points based on a random translation and rotation within the bound
+	 * of the source
 	 */
 	private List<VPoint> moveRandomInSourceBound(List<VPoint> points, @NotNull final Random random) {
 		Rectangle2D bound = source.getShape().getBounds2D();
@@ -220,7 +224,7 @@ public class GroupSourceController extends SourceController {
 
 	private void getNewGroupSizeFromModel() {
 		for (int i = 0; i < sourceAttributes.getSpawnNumber(); i++) {
-			int groupSize = groupModel.getGroupFactory(source.getId()).createNewGroup();
+			int groupSize = groupModel.nextGroupForSource(this.source.getId());
 			groupsToSpawn.add(groupSize);
 		}
 	}

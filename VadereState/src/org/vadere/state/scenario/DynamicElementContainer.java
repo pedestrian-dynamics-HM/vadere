@@ -120,6 +120,10 @@ public class DynamicElementContainer<T extends DynamicElement> {
 		this.removeListener.clear();
 	}
 
+	public boolean idExists(int id){
+		return elementMap.containsKey(id);
+	}
+
 	@Override
 	protected DynamicElementContainer<T> clone() throws CloneNotSupportedException {
 		DynamicElementContainer<T> clone = new DynamicElementContainer<>(bounds, cellSize);

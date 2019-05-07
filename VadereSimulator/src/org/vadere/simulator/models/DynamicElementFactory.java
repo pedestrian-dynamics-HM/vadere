@@ -2,6 +2,7 @@ package org.vadere.simulator.models;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -14,6 +15,12 @@ public interface DynamicElementFactory {
 	 * method, because some fields are individual.
 	 */
 	<T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type);
+
+	/**
+	 * Ensure all Ids are unique within the topography.
+	 */
+	int registerDynamicElementId(final Topography topography, int id);
+	int getNewDynamicElementId(final Topography topography);
 
 	/**
 	 * Returns the shape which represents the (free) place required by each element.

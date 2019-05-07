@@ -8,7 +8,5 @@ public abstract class GroupFactory {
 
 	public abstract void elementAdded(Pedestrian pedestrian);
 
-	public abstract void elementRemoved(Pedestrian ped);
-
 	public abstract int createNewGroup();
 }

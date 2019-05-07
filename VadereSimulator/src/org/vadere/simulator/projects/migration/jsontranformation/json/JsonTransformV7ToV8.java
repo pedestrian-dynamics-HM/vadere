@@ -81,6 +81,7 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         String[] processorTypes = {
             "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramBProcessor",  // type 1 (measurementArea -> measurementAreaId)
             "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",  // type 1 (measurementArea -> measurementAreaId)
+            "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
         };
 
         for (String type : processorTypes) {

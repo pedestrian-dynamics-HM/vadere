@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -43,9 +44,9 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 	}
 
 	private void addToExpectedOutput(Integer step, List<Pedestrian> m) {
-		m.forEach(p -> {
+		for (Pedestrian p : m) {
 			addToExpectedOutput(new TimestepPedestrianIdKey(step, p.getId()), p.getPosition());
-		});
+		}
 	}
 
 	@Override

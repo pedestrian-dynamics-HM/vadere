@@ -28,7 +28,6 @@ import java.util.Random;
 @ModelClass(isMainModel = true)
 public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
-	private int carIdCounter = 10000000; // TODO [priority=low] [task=refactoring] hack, think about another way of separating car IDs and pedestrian IDs.
 	private AttributesOVM attributesOVM;
 	private OVMEquations ovmEquations;
 	private List<Model> models;
@@ -93,9 +92,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	public <T extends DynamicElement> Agent createElement(VPoint position, int id, Class<T> type) {
 		if (!Car.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OVM cannot initialize " + type.getCanonicalName());
-
-		carIdCounter++;
-		AttributesCar carAttributes = new AttributesCar(elementAttributes, id > 0 ? id : carIdCounter);
+		AttributesCar carAttributes = new AttributesCar(elementAttributes, registerDynamicElementId(topography, id));
 		Car result = new Car(carAttributes, random);
 		result.setPosition(position);
 		// result.setVelocity(result.getCarAttrributes().getDirection());

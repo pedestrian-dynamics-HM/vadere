@@ -7,14 +7,19 @@ import org.vadere.simulator.projects.migration.MigrationException;
 
 public abstract class SimpleJsonTransformation extends AbstractJsonTransformation {
 
-    private Version previousVersion;
-    private Version targetVersion;
+    private final Version previousVersion;
+    private final Version targetVersion;
 
-    public SimpleJsonTransformation(Version targetVersion) {
+    public SimpleJsonTransformation(final Version targetVersion) {
         super();
         this.targetVersion = targetVersion;
         this.previousVersion = targetVersion.previousVersion();
         //todo do something with the version.
+    }
+
+    @Override
+    public Version getTargetVersion() {
+        return targetVersion;
     }
 
     /**

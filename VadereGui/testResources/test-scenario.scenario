@@ -1,7 +1,7 @@
 {
   "name" : "Neues_Szenario",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -83,15 +83,9 @@
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 5.0,
-          "y" : 2.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
         "pedestrianPositionProcessorId" : 1,
-        "pedestrianVelocityProcessorId" : 2
+        "pedestrianVelocityProcessorId" : 2,
+        "measurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",

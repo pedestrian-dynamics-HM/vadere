@@ -122,6 +122,14 @@ public class TrajectoryReader {
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
+		if (checkFile()){
+			return readStandardTrajectoryFile();
+		} else {
+			throw new IOException("could not read trajectory file, some colums are missing.");
+		}
+	}
+
+	public boolean checkFile () throws IOException {
 		// 1. Get the correct column
 		String header;
 		//read only first line.
@@ -156,10 +164,9 @@ public class TrajectoryReader {
 		try {
 			if (pedIdIndex != -1 && xIndex != -1 && yIndex != -1 && stepIndex != -1) {
 				// load default values with no groups
-				return readStandardTrajectoryFile();
-			}
-			else {
-				throw new IOException("could not read trajectory file, some colums are missing.");
+				return true;
+			} else {
+				return false;
 			}
 		} catch (Exception e) {
 			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
