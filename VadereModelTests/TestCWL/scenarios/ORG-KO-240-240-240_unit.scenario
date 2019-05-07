@@ -1,5 +1,5 @@
 {
-  "name" : "ORG-KO-240-240-240_clone_1",
+  "name" : "ORG-KO-240-240-240_unit",
   "description" : "",
   "release" : "0.7",
   "processWriters" : {
@@ -264,7 +264,7 @@
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "NAVIGATION",
+          "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
