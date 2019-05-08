@@ -20,6 +20,7 @@ import org.vadere.gui.topographycreator.control.ActionCopyElement;
 import org.vadere.gui.topographycreator.control.ActionDeleteElement;
 import org.vadere.gui.topographycreator.control.ActionInsertCopiedElement;
 import org.vadere.gui.topographycreator.control.ActionMaximizeSize;
+import org.vadere.gui.topographycreator.control.ActionMergeObstacles;
 import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
 import org.vadere.gui.topographycreator.control.ActionRedo;
@@ -29,8 +30,8 @@ import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionTopographyCheckerMenu;
 import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
+import org.vadere.gui.topographycreator.control.ActionTranslateElements;
 import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
@@ -157,6 +158,9 @@ public class TopographyWindow extends JPanel {
 		Action redoAction = new ActionRedo("redo", new ImageIcon(Resources.class
 				.getResource("/icons/redo_icon.png")), undoManager, basicAction);
 
+		Action mergeObstaclesAction = new ActionMergeObstacles("mergeObstacles", new ImageIcon(Resources.class
+				.getResource("/icons/merge.png")), panelModel, undoSupport);
+
 		FormLayout layout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
 				"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
 		thisPanel.setLayout(layout);
@@ -225,6 +229,10 @@ public class TopographyWindow extends JPanel {
 		TopographyAction switchToTargetAction = new ActionSwitchCategory("switch to targets", panelModel,
 				ScenarioElementType.TARGET, selectRectangleAction);
 
+		/* switch category to absorbing areas action */
+		TopographyAction switchToAbsorbingAreaAction = new ActionSwitchCategory("switch to absorbing areas", panelModel,
+				ScenarioElementType.ABSORBING_AREA, selectRectangleAction);
+
 		/* switch category to stairs action */
 		TopographyAction switchToStairsAction = new ActionSwitchCategory("switch to stairs", panelModel,
 				ScenarioElementType.STAIRS, selectRectangleAction);
@@ -251,13 +259,20 @@ public class TopographyWindow extends JPanel {
 
 		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
 		List<Action> sourceDrawModes = new ArrayList<>();
+		List<Action> absorbingAreaDrawModes = new ArrayList<>();
 
 		obstacleAndTargetDrawModes.add(rectangle);
 		obstacleAndTargetDrawModes.add(pen);
 		obstacleAndTargetDrawModes.add(pen2);
 
 		sourceDrawModes.add(rectangle);
+		sourceDrawModes.add(pen);
+		sourceDrawModes.add(pen2);
 		sourceDrawModes.add(dot);
+
+		absorbingAreaDrawModes.add(rectangle);
+		absorbingAreaDrawModes.add(pen);
+		absorbingAreaDrawModes.add(pen2);
 
 		/* open obstacle paint method dialog action */
 		JButton obsButton = new JButton();
@@ -271,6 +286,12 @@ public class TopographyWindow extends JPanel {
 		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
 				.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
 				obstacleAndTargetDrawModes);
+
+		/* open absorbing area paint method dialog action */
+		JButton absorbingAreaButton = new JButton();
+		TopographyAction openAbsorbingAreaDialog = new ActionOpenDrawOptionMenu("AbsorbingArea", new ImageIcon(Resources.class
+				.getResource("/icons/emergency_exit.png")), panelModel, switchToAbsorbingAreaAction, absorbingAreaButton,
+				absorbingAreaDrawModes);
 
 		/* open stairs paint method dialog action */
 		JButton stairsButton = new JButton();
@@ -299,12 +320,16 @@ public class TopographyWindow extends JPanel {
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
 		/* resize Topography */
-		TopographyAction resizeTopographyBound =new ActionResizeTopographyBound("SetTopograpyBound",
+		TopographyAction resizeTopographyBound = new ActionResizeTopographyBound(Messages.getString("TopographyBoundDialog.tooltip"),
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
 				panelModel, selectShape, undoSupport);
 
-		TopographyAction translateTopography =new ActionTranslateTopography("SetTopograpyBound",
+		TopographyAction translateTopography =new ActionTranslateTopography("TranslateTopography",
 				new ImageIcon(Resources.class.getResource("/icons/translation_icon.png")),
+				panelModel, selectShape, undoSupport);
+
+		TopographyAction translateElements =new ActionTranslateElements("TranslateElements",
+				new ImageIcon(Resources.class.getResource("/icons/translation_elements_icon.png")),
 				panelModel, selectShape, undoSupport);
 
 		/* Makros */
@@ -313,9 +338,9 @@ public class TopographyWindow extends JPanel {
 						new ImageIcon(Resources.class.getResource("/icons/auto_generate_ids.png")),
 						panelModel);
 
-		/* Topography checker*/
-		ActionTopographyCheckerMenu actionTopographyCheckerMenu =
-				new ActionTopographyCheckerMenu("TopographyChecker", panelModel, jsonValidIndicator);
+//		/* Topography checker*/
+//		ActionScenarioChecker actionScenarioChecker =
+//				new ActionScenarioChecker("ScenarioChecker", panelModel, jsonValidIndicator);
 
 
 		/* create toolbar*/
@@ -335,10 +360,13 @@ public class TopographyWindow extends JPanel {
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
 				obsButton);
+		addActionToToolbar(toolbar, openAbsorbingAreaDialog, "TopographyCreator.btnInsertAbsorbingArea.tooltip",
+				absorbingAreaButton);
 		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
 		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, mergeObstaclesAction, "TopographyCreator.btnMergeObstacles.tooltip");
 		// addActionToToolbar(toolbar, scrollAction, "TopographyCreator.btnScroll.tooltip");
 		addActionToToolbar(toolbar, zoomInAction, "TopographyCreator.btnZoomIn.tooltip");
 		addActionToToolbar(toolbar, zoomOutAction, "TopographyCreator.btnZoomOut.tooltip");
@@ -347,16 +375,18 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
 		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
 		addActionToToolbar(toolbar, translateTopography, "TopographyCreator.btnTranslation.tooltip");
+		addActionToToolbar(toolbar, translateElements, "TopographyCreator.btnElementTranslation.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
 		addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
+
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
-		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnMakro.tooltip");
-		addActionToToolbar(toolbar, actionTopographyCheckerMenu, "TopographyCreator.btnChecker.tooltip");
+		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnGenerateIds.tooltip");
+//		addActionToToolbar(toolbar, actionScenarioChecker, "TopographyCreator.btnChecker.tooltip");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 

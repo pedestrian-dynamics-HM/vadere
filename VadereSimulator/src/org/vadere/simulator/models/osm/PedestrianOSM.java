@@ -2,14 +2,15 @@ package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.StepSizeAdjuster;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeEventDriven;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM.CallMethod;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeParallel;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeSequential;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
@@ -20,8 +21,8 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.UpdateType;
-import org.vadere.util.geometry.Vector2D;
+;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -42,8 +43,10 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
+	// A setter is provided to be able to change strategy at runtime (e.g. by events).
+	private transient ICombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
-	private double durationNextStep;
+	private transient List<StepSizeAdjuster> stepSizeAdjusters;
 	private VPoint nextPosition;
 	private VPoint lastPosition;
 
@@ -76,9 +79,11 @@ public class PedestrianOSM extends Pedestrian {
 		this.potentialFieldTarget = potentialFieldTarget;
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
+		this.combinedPotentialStrategy = new TargetAttractionStrategy(potentialFieldTarget, potentialFieldObstacle, potentialFieldPedestrian);
 		this.stepCircleOptimizer = stepCircleOptimizer;
 
 		this.speedAdjusters = speedAdjusters;
+		this.stepSizeAdjusters = new LinkedList<>();
 		this.relevantPedestrians = new HashSet<>();
 		this.timeCredit = 0;
 
@@ -89,7 +94,7 @@ public class PedestrianOSM extends Pedestrian {
 		this.stepLength = attributesOSM.getStepLengthIntercept() + this.stepDeviation
 				+ attributesOSM.getStepLengthSlopeSpeed() * getFreeFlowSpeed();
 		if (attributesOSM.isMinimumStepLength()) {
-			this.minStepLength = attributesOSM.getStepLengthIntercept();
+			this.minStepLength = attributesOSM.getMinStepLength();
 		} else {
 			this.minStepLength = 0;
 		}
@@ -116,7 +121,7 @@ public class PedestrianOSM extends Pedestrian {
 	public void updateNextPosition() {
 
 		if (PotentialFieldTargetRingExperiment.class.equals(potentialFieldTarget.getClass())) {
-			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
+			VCircle reachableArea = new VCircle(getPosition(), getFreeFlowStepSize());
 
 			refreshRelevantPedestrians();
 			nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
@@ -124,12 +129,12 @@ public class PedestrianOSM extends Pedestrian {
 			// if (nextPosition.distance(this.getPosition()) < this.minStepLength) {
 			// nextPosition = this.getPosition();
 			// }
-		} else if (!hasNextTarget()) {
+		} else if (!hasNextTarget() || getDurationNextStep() > getAttributesOSM().getMaxStepDuration()) {
 			this.nextPosition = getPosition();
 		} else if (topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
 			this.nextPosition = getPosition();
 		} else {
-			VCircle reachableArea = new VCircle(getPosition(), getStepSize());
+			VCircle reachableArea = new VCircle(getPosition(), getDesiredStepSize());
 
 			// get stairs pedestrian is on - remains null if on area
 			Stairs stairs = null;
@@ -145,6 +150,10 @@ public class PedestrianOSM extends Pedestrian {
 				refreshRelevantPedestrians();
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
 
+				if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
+					nextPosition = getPosition();
+				}
+
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
 				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
@@ -158,21 +167,65 @@ public class PedestrianOSM extends Pedestrian {
 
 	}
 
-	public double getStepSize() {
+	/**
+	 * Returns the constant free flow step size
+	 *
+	 * @return the free flow step size
+	 */
+	private double getFreeFlowStepSize() {
+		/*if (attributesOSM.isDynamicStepLength()) {
+			double step = attributesOSM.getStepLengthIntercept()
+					+ attributesOSM.getStepLengthSlopeSpeed()
+					* getDesiredSpeed()
+					+ stepDeviation;
+			return step;
+		} else {*/
+			return stepLength;
+		//}
+	}
+
+	/**
+	 * Returns the actual step size of the last step.
+	 *
+	 * @return the actual step size of the last step
+	 */
+	private double getStepSize() {
+		if(nextPosition != null) {
+			return nextPosition.distance(getPosition());
+		}
+		return 0;
+	}
+
+	/**
+	 * Returns the step size the agent is currently trying to achieve. This step
+	 * size is dynamic i.e. it might be influenced by the situation via a dynamic
+	 * desired speed influenced by {@link SpeedAdjuster}.
+	 * If this step size is larger or smaller than {@link #getFreeFlowStepSize()} the agent
+	 * tries to accelerate or decelerate respectively.
+	 *
+	 * @return the currently desired step size which depends on the dynamic of the simulation
+	 */
+	public double getDesiredStepSize() {
+		double desiredStepSize = getFreeFlowStepSize();
 		if (attributesOSM.isDynamicStepLength()) {
 			double step = attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()
 					* getDesiredSpeed()
 					+ stepDeviation;
 			return step;
-		} else {
-			return stepLength;
 		}
+		return desiredStepSize;
 	}
 
+	/**
+	 * Returns the desired speed an agent is currently trying to achieve. This speed
+	 * is dynamic i.e. it might be influenced by the situation via a dynamic
+	 * desired speed influenced by {@link SpeedAdjuster}.
+	 *
+	 * @return the desired speed an agent is currently trying to achieve
+	 */
 	public double getDesiredSpeed() {
 		double desiredSpeed = getFreeFlowSpeed();
-
 		for (SpeedAdjuster adjuster : speedAdjusters) {
 			desiredSpeed = adjuster.getAdjustedSpeed(this, desiredSpeed);
 		}
@@ -180,23 +233,17 @@ public class PedestrianOSM extends Pedestrian {
 		return desiredSpeed;
 	}
 
-	public double getPotential(VPoint newPos) {
-
-		double targetPotential = potentialFieldTarget.getPotential(newPos, this);
-
-		double pedestrianPotential = potentialFieldPedestrian
-				.getAgentPotential(newPos, this, relevantPedestrians);
-		double obstacleRepulsionPotential = potentialFieldObstacle
-				.getObstaclePotential(newPos, this);
-		return targetPotential + pedestrianPotential
-				+ obstacleRepulsionPotential;
+	public double getPotential(IPoint newPos) {
+		return combinedPotentialStrategy.getValue(newPos, this, relevantPedestrians);
 	}
 
 	public void clearStrides() {
 		strides.clear();
 	}
 
-	// Getters...
+	// TODO: Group getters and setters correctly.
+
+	// Getters
 
 	public double getTargetPotential(VPoint pos) {
 		return potentialFieldTarget.getPotential(pos, this);
@@ -217,6 +264,10 @@ public class PedestrianOSM extends Pedestrian {
 	public Vector2D getPedestrianGradient(VPoint pos) {
 		return potentialFieldPedestrian.getAgentPotentialGradient(pos,
 				new Vector2D(0, 0), this, relevantPedestrians);
+	}
+
+	public ICombinedPotentialStrategy getCombinedPotentialStrategy() {
+		return combinedPotentialStrategy;
 	}
 
 	public double getTimeOfNextStep() {
@@ -252,8 +303,8 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public void refreshRelevantPedestrians() {
-		VCircle reachableArea = new VCircle(getPosition(), getStepSize());
-		relevantPedestrians = potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography());
+		VCircle reachableArea = new VCircle(getPosition(), getFreeFlowStepSize());
+		setRelevantPedestrians(potentialFieldPedestrian.getRelevantAgents(reachableArea, this, getTopography()));
 	}
 
 
@@ -263,16 +314,31 @@ public class PedestrianOSM extends Pedestrian {
 		this.relevantPedestrians = relevantPedestrians;
 	}
 
+	public void setCombinedPotentialStrategy(CombinedPotentialStrategy newStrategy) {
+		if (newStrategy == CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY) {
+			this.combinedPotentialStrategy = new TargetAttractionStrategy(this.potentialFieldTarget,
+						this.potentialFieldObstacle,
+						this.potentialFieldPedestrian);
+		} else if (newStrategy == CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY) {
+			this.combinedPotentialStrategy = new TargetDistractionStrategy(this.potentialFieldTarget,
+					this.potentialFieldObstacle,
+					this.potentialFieldPedestrian);
+		} else {
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	public Collection<? extends Agent> getRelevantPedestrians() {
 		return relevantPedestrians;
 	}
 
+	/**
+	 * Returns a constant step duration defined by the free flow step size and the free flow velocity.
+	 *
+	 * @return the step duration of this agent
+	 */
 	public double getDurationNextStep() {
-		return durationNextStep;
-	}
-
-	public void setDurationNextStep(double durationNextStep) {
-		this.durationNextStep = durationNextStep;
+		return Math.min(getAttributesOSM().getMaxStepDuration(), getDesiredStepSize() / getDesiredSpeed());
 	}
 
 	public AttributesOSM getAttributesOSM() {

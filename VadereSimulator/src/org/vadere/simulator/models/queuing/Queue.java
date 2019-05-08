@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.queuing;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,14 +74,11 @@ public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicE
 		}
 	}
 
-	public double getValue(int x, int y) {
-		return detector.getPotentialField().getValue(new Point(x, y)).potential;
-	}
-
-	public double getValue(double x, double y) {
-		return detector.getPotentialField().getValue(new Point((int) Math.round(x / detector.getResolution()),
+	/*public double getValue(double x, double y) {
+		return detector.get
+				getPotentialField().getValue(new Point((int) Math.round(x / detector.getResolution()),
 				(int) Math.round(y / detector.getResolution()))).potential;
-	}
+	}*/
 
 	public void update() {
 		detector.setPolytope(null);

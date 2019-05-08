@@ -1,21 +1,25 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ApplicationWriter;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 public abstract class ActionAbstractSaveProject extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionAbstractSaveProject.class);
+	private static Logger logger = Logger.getLogger(ActionAbstractSaveProject.class);
 
 	protected ProjectViewModel model;
 
@@ -98,6 +102,7 @@ public abstract class ActionAbstractSaveProject extends AbstractAction {
 				model.getProject().saveChanges();
 				model.refreshScenarioNames();
 				logger.info("save project");
+				updateRecentProjectPreferences(model);
 			} catch (IOException e) {
 				IOUtils.errorBox(
 						Messages.getString("SaveFileErrorMessage.text") + System.lineSeparator()
@@ -110,6 +115,16 @@ public abstract class ActionAbstractSaveProject extends AbstractAction {
 			IOUtils.infoBox(Messages.getString("EmptyProjectErrorMessage.text"),
 					Messages.getString("EmptyProjectErrorMessage.title"));
 		}
+	}
+
+	private static void updateRecentProjectPreferences(ProjectViewModel model) {
+		Preferences preferences = Preferences.userNodeForPackage(VadereApplication.class);
+		final String key = "recent_projects";
+		final TreeSet<String> values = new TreeSet(Arrays.asList(preferences.get(key, "").split(",")));
+		values.add(model.getCurrentProjectPath());
+		String value = values.stream().reduce("", (a, b) -> a + "," + b);
+		System.out.println(values.toString());
+		preferences.put(key, value.replaceFirst(",", ""));
 	}
 
 	static void savePreferences() throws IOException, BackingStoreException {

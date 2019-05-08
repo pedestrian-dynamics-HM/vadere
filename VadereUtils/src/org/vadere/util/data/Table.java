@@ -1,8 +1,16 @@
 package org.vadere.util.data;
 
-import org.apache.log4j.Logger;
+import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * The {@link Table} is an abstract data type with a fixed column size (fixed numbers of columns and
@@ -243,9 +251,9 @@ public class Table implements Iterable<Row> {
 	}
 
 	/**
-	 * Returns true if this table contains no elements.
+	 * Returns true if this table triangleContains no elements.
 	 * 
-	 * @return true if this table contains no elements
+	 * @return true if this table triangleContains no elements
 	 */
 	public boolean isEmpty() {
 		return columns() == 0 || size() == 0 || getEntry(getColumnNames()[0], 0) == null;

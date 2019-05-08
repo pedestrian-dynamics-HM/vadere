@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import org.apache.commons.math3.optim.OptimizationData;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -182,7 +183,7 @@ public class Trajectory {
 	 * Return a {@link java.util.stream.Stream<>} stream of
 	 * {@link org.vadere.util.geometry.shapes.VPoint} pedestrian positions
 	 * from the first step (1) to the (step.getStepNumber()) in reverse order.
-	 * 
+	 *
 	 * @param step the step of the last pedestrian position
 	 * @return a stream of pedestrian positions to from 1 to step.getStepNumber() in reverse order
 	 */
@@ -190,8 +191,21 @@ public class Trajectory {
 		return Stream.iterate(step, s -> new Step(s.getStepNumber() - 1))
 				.limit(step.getStepNumber())
 				.map(s -> getAgent(s))
-				.filter(optPed -> optPed.isPresent())
-				.map(optPed -> optPed.get().getPosition());
+				.filter(optAgent -> optAgent.isPresent())
+				.map(optAgent -> optAgent.get())
+				.flatMap(agent -> toPointStream(agent));
+	}
+
+	private Stream<VPoint> toPointStream(@NotNull final Agent agent) {
+		// use the foot step information if available
+		if(agent instanceof Pedestrian) {
+			Pedestrian pedestrian = (Pedestrian)agent;
+			if(!pedestrian.getFootSteps().isEmpty()) {
+				Iterable<FootStep> iterable = () -> pedestrian.getFootSteps().descendingIterator();
+				return StreamSupport.stream(iterable.spliterator(), false).map(footStep -> footStep.getEnd());
+			}
+		}
+		return Stream.of(agent.getPosition());
 	}
 
 	public Optional<Step> getStartStep() {

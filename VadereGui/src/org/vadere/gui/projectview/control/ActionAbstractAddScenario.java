@@ -1,22 +1,22 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
-import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ProjectWriter;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.util.io.IOUtils;
-
-import javax.swing.*;
+import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import javax.swing.*;
+
 public abstract class ActionAbstractAddScenario extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionAbstractAddScenario.class);
+	private static Logger logger = Logger.getLogger(ActionAbstractAddScenario.class);
 
 	private ProjectViewModel model;
 
@@ -47,7 +47,7 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 					return;
 				addScenario(vadere);
 			} catch (IOException e) {
-				logger.error(String.format("error during output load: '%s'", e.getLocalizedMessage()));
+				logger.error(String.format("topographyError during output load: '%s'", e.getLocalizedMessage()));
 			}
 		} else {
 			IOUtils.errorBox(Messages.getString("renameErrorDialog.text"),

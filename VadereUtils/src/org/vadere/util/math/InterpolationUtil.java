@@ -2,16 +2,67 @@ package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.CellGrid;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.data.cellgrid.IPotentialPoint;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 /**
  * Interpolation utilities not covered by java.lang.Math
  * 
  */
 public class InterpolationUtil {
+
+	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
+		assert points.size() == 3;
+
+		IPotentialPoint p1 = points.get(0);
+		IPotentialPoint p2 = points.get(1);
+		IPotentialPoint p3 = points.get(2);
+
+		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
+
+		double totalArea = vtriangle.getArea();
+
+		assert totalArea > 0;
+
+		VPoint point = new VPoint(x, y);
+
+		double value = 0.0;
+
+		if(point.equals(p1)) {
+			value = p1.getPotential();
+		}
+		else if(point.equals(p2)) {
+			value = p2.getPotential();
+		}
+		else if(point.equals(p3)) {
+			value = p3.getPotential();
+		}
+		else {
+			double area1 = new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea();
+			double area2 = new VTriangle(new VPoint(p1), new VPoint(p3), point).getArea();
+			double area3 = new VTriangle(new VPoint(p1), new VPoint(p2), point).getArea();
+
+			if(area1 > 0.0) {
+				double percentP1 = area1 / totalArea;
+				value += percentP1 * p1.getPotential();
+			}
+
+			if(area2 > 0.0) {
+				double percentP2 = area2 / totalArea;
+				value += percentP2 * p2.getPotential();
+			}
+
+
+			if(area3 > 0.0) {
+				double percentP3 = area3 / totalArea;
+				value += percentP3 * p3.getPotential();
+			}
+		}
+		return value;
+	}
 
 	/**
 	 * Computes bilinear interpolation of z = f(x,y) with z1 to z4 being the
@@ -52,6 +103,7 @@ public class InterpolationUtil {
 
 		return result;
 	}
+
 
     /**
      * Computes bilinear interpolation for (x,y) while nodes may be undefined
@@ -231,7 +283,7 @@ public class InterpolationUtil {
 	 * @param grad
 	 */
 	public static void getGradientMollified(CellGrid pot, double[] x,
-			double[] grad, double gradientMollifierRadius) {
+	                                        double[] grad, double gradientMollifierRadius) {
 		double aX = Math.max(pot.getMinX(), x[0] - gradientMollifierRadius);
 		double bX = Math.min(pot.getMaxX(), x[0] + gradientMollifierRadius);
 

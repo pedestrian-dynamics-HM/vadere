@@ -231,7 +231,7 @@ inline float getObstaclePotential(float minDistanceToObstacle){
 // end potential field helper methods
 
 __kernel void nextSteps(
-    __global float        *newPositions,        //output
+    __global float2        *newPositions,        //output
     __global const float  *orderedPedestrians,  //input
     __global const float2 *circlePositions,     //input
     __global const uint   *d_CellStart,         //input: cell boundaries
@@ -250,6 +250,7 @@ __kernel void nextSteps(
 
     float2 pedPosition = (float2)(orderedPedestrians[index*3], orderedPedestrians[index*3+1]);
     float stepSize = orderedPedestrians[index*3+2];
+    //stepSize = 2.0f;
 
     float2 evalPoint = pedPosition;
     float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
@@ -282,8 +283,7 @@ __kernel void nextSteps(
 
     //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
     //minArg = pedPosition;
-    newPositions[index*2] = minArg.x;
-    newPositions[index*2+1] = minArg.y;
+    newPositions[index] = (float2) (minArg.x, minArg.y);
 }
 
 //Calculate grid hash value for each particle

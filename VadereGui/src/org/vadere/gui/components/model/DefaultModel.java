@@ -1,27 +1,36 @@
 package org.vadere.gui.components.model;
 
-import javax.swing.*;
-
-import org.vadere.gui.components.control.*;
+import org.vadere.gui.components.control.DefaultSelectionMode;
+import org.vadere.gui.components.control.IMode;
+import org.vadere.gui.components.control.IScaleChangeListener;
+import org.vadere.gui.components.control.IViewportChangeListener;
+import org.vadere.gui.components.control.ViewportChangeEvent;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import javax.swing.*;
+
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
 	// private static final int BORDER_WIDTH = 20;
 	// private static final int BORDER_HEIGHT = 20;
+
+	private static Logger log = Logger.getLogger(DefaultModel.class);
 
 	private IMode mouseSelectionMode;
 
@@ -76,7 +85,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	@Override
 	public Color getScenarioElementColor(final ScenarioElementType elementType) {
-		Color c = null;
+		Color c;
 		switch (elementType) {
 			case OBSTACLE:
 				c = getConfig().getObstacleColor();
@@ -92,6 +101,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 				break;
 			case TARGET:
 				c = getConfig().getTargetColor();
+				break;
+			case ABSORBING_AREA:
+				c = getConfig().getAbsorbingAreaColor();
 				break;
 			default:
 				c = Color.RED;
@@ -490,4 +502,47 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	public T getConfig() {
 		return config;
 	}
+
+	/*public void startTriangulation() {
+		if(!triangulationTriggered) {
+			triangulationTriggered = true;
+			VRectangle bound = new VRectangle(getTopographyBound());
+			Collection<Obstacle> obstacles = Topography.createObstacleBoundary(getTopography());
+			obstacles.addAll(getTopography().getObstacles());
+
+			List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
+
+			IDistanceFunction distanceFunc = new DistanceFunction(bound, shapes);
+			PSDistmesh meshImprover = new PSDistmesh(
+					distanceFunc,
+					p -> Math.min(1.0 + Math.pow(Math.max(-distanceFunc.apply(p), 0), 2), 4.0),
+					0.3,
+					bound, getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
+
+
+			triangles = meshImprover.getTriangles();
+			//	meshImprover.improve();
+			Thread t = new Thread(() -> {
+				while(!meshImprover.isFinished()) {
+					meshImprover.improve();
+					setChanged();
+					notifyObservers();
+				}
+				Function<VTriangle, Color> colorFunction = f -> {
+					float grayScale = (float) meshImprover.getQuality(f);
+					return new Color(grayScale, grayScale, grayScale);
+				};
+
+				log.info(TexGraphGenerator.toTikz(meshImprover.getTriangles(), colorFunction, 1.0f, getTopography()));
+			});
+			t.start();
+		}
+	}
+
+	public Collection<VTriangle> getTriangles() {
+		if(triangles == null) {
+			return Collections.EMPTY_LIST;
+		}
+		return triangles;
+	}*/
 }

@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_pso_ok",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -56,7 +56,8 @@
         "pedestrianOverlapProcessorId" : 6
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -81,17 +82,19 @@
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
         "numberOfCircles" : 2,
+        "optimizationType" : "PSO",
         "varyStepDirection" : false,
+        "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "optimizationType" : "PSO",
-        "movementType" : "ARBITRARY",
+        "minStepLength" : 0.4625,
+        "minimumStepLength" : false,
+        "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
-        "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -556,6 +559,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "source" : null,
@@ -581,10 +585,15 @@
           "acceleration" : 2.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
         "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
         "source" : null,
@@ -610,10 +619,15 @@
           "acceleration" : 2.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
         "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
@@ -625,6 +639,7 @@
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -641,6 +656,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

@@ -17,7 +17,7 @@ public class EditResizeTopographyBound extends AbstractUndoableEdit {
 	private final VRectangle oldBound;
 	private final VRectangle newBound;
 
-	public EditResizeTopographyBound(final IDrawPanelModel panelModel, final VRectangle oldBound, final VRectangle newBound) {
+	public EditResizeTopographyBound(final IDrawPanelModel<?> panelModel, final VRectangle oldBound, final VRectangle newBound) {
 		this.panelModel = panelModel;
 		this.oldBound = oldBound;
 		this.newBound = newBound;

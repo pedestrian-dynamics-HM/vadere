@@ -13,15 +13,25 @@ import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
+import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 
 public class GroupSourceControllerTest extends TestSourceControllerUsingConstantSpawnRate {
@@ -60,7 +70,8 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	public void testUpdateEqualStartAndEndTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
-				.setSourceDim(5.0, 5.0)
+				.setUseFreeSpaceOnly(true)
+				.setSourceDim(15.0, 15.0)
 				.setGroupSizeDistribution(0.0, 0.5, 0.5)
 				.setGroupSizeDistributionMock(2, 2, 3, 3);
 
@@ -144,7 +155,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUpdateUseFreeSpaceOnly() {
 
-		double d = new AttributesAgent().getRadius() * 2  +  SourceController.SPAWN_BUFFER_SIZE;
+		double d = new AttributesAgent().getRadius() * 2;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0)
 				.setSpawnNumber(100)
@@ -231,24 +242,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		pedestrianCountEquals(3);
 	}
 
-	@Test(expected = RuntimeException.class)
-	public void testSpawnNumber() {
-		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
-		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setSpawnNumber(10)
-				.setSourceDim(12 * d, 12 * d ) // create source with 12x12 spots
-				.setGroupSizeDistribution(0.0, 0.0, 0.0, 1); // only groups of 4
-		initialize(builder);
-
-		first().sourceController.update(1);
-		pedestrianCountEquals(10 * 4);
-		first().sourceController.update(2); 	// use random positioning thus not
-															// not optimal and thus not enough
-															// space for all
-		fail("should not be reached. Exception expected");
-
-	}
-
 	@Test
 	public void testSpawnRateGreaterThanUpdateRate() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -270,7 +263,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testUseFreeSpaceOnly() {
 		// expected: not stop spawning before all pedestrians are created (even after end time)
-		double d = new AttributesAgent().getRadius() * 2 + SourceController.SPAWN_BUFFER_SIZE;
+		double d = new AttributesAgent().getRadius() * 2;
 		double startTime = 0;
 		double endTime = 1;
 		int spawnNumber = 100;
@@ -364,7 +357,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	}
 
 
-
 	@Test
 	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() {
 		int maxSpawnNumberTotal = 4; // <-- exhausted!
@@ -420,4 +412,84 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 	}
 
+	private static final String sourceJson = "{\n" +
+			"  \"id\" : 2,\n" +
+			"  \"shape\" : {\n" +
+			"    \"type\" : \"POLYGON\",\n" +
+			"    \"points\" : [ {\n" +
+			"      \"x\" : 506.39999999999964,\n" +
+			"      \"y\" : 509.40000000000146\n" +
+			"    }, {\n" +
+			"      \"x\" : 502.10000000000036,\n" +
+			"      \"y\" : 507.59999999999854\n" +
+			"    }, {\n" +
+			"      \"x\" : 501.60000000000036,\n" +
+			"      \"y\" : 503.2999999999993\n" +
+			"    }, {\n" +
+			"      \"x\" : 503.89999999999964,\n" +
+			"      \"y\" : 501.59999999999854\n" +
+			"    }, {\n" +
+			"      \"x\" : 508.7999999999993,\n" +
+			"      \"y\" : 503.2999999999993\n" +
+			"    }, {\n" +
+			"      \"x\" : 510.39999999999964,\n" +
+			"      \"y\" : 506.7000000000007\n" +
+			"    }, {\n" +
+			"      \"x\" : 506.2999999999993,\n" +
+			"      \"y\" : 508.7000000000007\n" +
+			"    } ]\n" +
+			"  },\n" +
+			"  \"interSpawnTimeDistribution\" : \"org.vadere.state.scenario.ConstantDistribution\",\n" +
+			"  \"distributionParameters\" : [ 1.0 ],\n" +
+			"  \"spawnNumber\" : 35,\n" +
+			"  \"maxSpawnNumberTotal\" : -1,\n" +
+			"  \"startTime\" : 0.0,\n" +
+			"  \"endTime\" : 0.0,\n" +
+			"  \"spawnAtRandomPositions\" : true,\n" +
+			"  \"useFreeSpaceOnly\" : true,\n" +
+			"  \"targetIds\" : [ 1 ],\n" +
+			"  \"groupSizeDistribution\" : [ 0.1, 0.1, 0.1, 0.1, 0.6 ],\n" +
+			"  \"dynamicElementType\" : \"PEDESTRIAN\"\n" +
+			"}";
+
+
+	@Test
+	public void testCentroid() {
+		AttributesSource attributesSource =
+				StateJsonConverter.deserializeObjectFromJson(sourceJson, AttributesSource.class);
+		Source source = new Source(attributesSource);
+
+		System.out.println(source.getShape().getBounds2D());
+		System.out.println(source.getShape().getCentroid());
+		System.out.println(source.getShape().getCircumCircle());
+		VRectangle bound = new VRectangle(source.getShape().getBounds2D());
+		System.out.println(bound.getCentroid());
+	}
+
+	@Test
+	public void testSource() {
+		AttributesSource attributesSource =
+				StateJsonConverter.deserializeObjectFromJson(sourceJson, AttributesSource.class);
+
+		VShape a = new VCircle(new VPoint(503.9265351385102, 506.9174145081969), 0.195);
+		Pedestrian pedA = new Pedestrian(new AttributesAgent(1), new Random(1));
+		pedA.setPosition(((VCircle) a).getCenter());
+
+		VShape b = new VCircle(new VPoint(504.19098333791044, 506.8493305279853), 0.195);
+		Pedestrian pedB = new Pedestrian(new AttributesAgent(2), new Random(1));
+		pedB.setPosition(((VCircle) b).getCenter());
+
+		assertTrue(a.intersects(b));
+
+		Source source = new Source(attributesSource);
+		Topography topography = new Topography();
+		topography.addElement(pedA);
+		topography.addElement(pedB);
+
+		LinkedCellsGrid grid = topography.getSpatialMap(DynamicElement.class);
+
+		VCircle center = source.getShape().getCircumCircle();
+		List<VPoint> inSource = grid.getObjects(center.getCenter(), center.getRadius());
+		assertEquals(2, inSource.size());
+	}
 }

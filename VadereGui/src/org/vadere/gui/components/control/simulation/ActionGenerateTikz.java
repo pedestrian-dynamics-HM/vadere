@@ -1,16 +1,15 @@
 package org.vadere.gui.components.control.simulation;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.TikzGenerator;
-
-import javax.swing.*;
+import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -18,8 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
+import javax.swing.*;
+
 public class ActionGenerateTikz extends AbstractAction implements IRendererChangeListener {
-	private static Logger logger = LogManager.getLogger(ActionGenerateTikz.class);
+	private static Logger logger = Logger.getLogger(ActionGenerateTikz.class);
 	private static Resources resources = Resources.getInstance("global");
 	private final TikzGenerator tikzGenerator;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
@@ -38,7 +39,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 		String formattedDate = formatter.format(todaysDate);
 
 		JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
-		File outputFile = new File("pv_snapshot_" + formattedDate + ".tex");
+		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".tex");
 
 		fileChooser.setSelectedFile(outputFile);
 
@@ -49,8 +50,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".tex") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".tex");
 
-			boolean completeDocument = true;
-			tikzGenerator.generateTikz(outputFile, completeDocument);
+			tikzGenerator.generateTikz(outputFile);
 		}
 	}
 

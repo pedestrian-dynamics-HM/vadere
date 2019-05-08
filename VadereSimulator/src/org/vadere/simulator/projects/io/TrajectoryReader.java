@@ -1,20 +1,20 @@
 package org.vadere.simulator.projects.io;
 
 import org.apache.commons.math3.util.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.Step;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class TrajectoryReader {
 
 	private static final String SPLITTER = " ";
-	private static Logger logger = LogManager.getLogger(IOVadere.class);
+	private static Logger logger = Logger.getLogger(IOVadere.class);
 	private Path trajectoryFilePath;
 	private AttributesAgent attributesPedestrian;
 	private Set<String> pedestrianIdKeys;
@@ -53,6 +53,7 @@ public class TrajectoryReader {
 	private Set<String> targetIdKeys;
 	private Set<String> groupIdKeys;
 	private Set<String> groupSizeKeys;
+	private Set<String> stridesKeys;
 
 
 	private int pedIdIndex;
@@ -62,6 +63,7 @@ public class TrajectoryReader {
 	private int targetIdIndex;
 	private int groupIdIndex;
 	private int groupSizeIndex;
+	private int stridesIndex;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
@@ -81,6 +83,7 @@ public class TrajectoryReader {
 		targetIdKeys = new HashSet<>();
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
+		stridesKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
@@ -92,6 +95,8 @@ public class TrajectoryReader {
 		targetIdKeys.add("targetId");
 		groupIdKeys.add("groupId");
 		groupSizeKeys.add("groupSize");
+		stridesKeys.add("strides");
+		stridesKeys.add("footSteps");
 
 		pedIdIndex = -1;
 		stepIndex = -1;
@@ -100,6 +105,7 @@ public class TrajectoryReader {
 		targetIdIndex = -1;
 		groupIdIndex = -1;
 		groupSizeIndex = -1;
+		stridesIndex = -1;
 
 	}
 
@@ -128,6 +134,9 @@ public class TrajectoryReader {
 			}
 			else if (groupSizeKeys.contains(columns[index])){
 				groupSizeIndex = index;
+			}
+			else if(stridesKeys.contains(columns[index])) {
+				stridesIndex = index;
 			}
 		}
 		try {
@@ -199,7 +208,7 @@ public class TrajectoryReader {
 
 		// pedestrian id
 		int pedestrianId = Integer.parseInt(rowTokens[pedIdIndex]);
-		Pedestrian ped = new Pedestrian(new AttributesAgent(this.attributesPedestrian, pedestrianId), new Random());
+		Pedestrian ped = new Pedestrian(new AttributesAgent(attributesPedestrian, pedestrianId), new Random());
 
 		// pedestrian position
 		VPoint pos = new VPoint(Double.parseDouble(rowTokens[xIndex]), Double.parseDouble(rowTokens[yIndex]));
@@ -212,9 +221,16 @@ public class TrajectoryReader {
 		ped.setTargets(targets);
 
 		if(groupIdIndex != -1) {
-			int groupId = groupIdIndex != -1 ? Integer.parseInt(rowTokens[groupIdIndex]) : -1;
+			int groupId = Integer.parseInt(rowTokens[groupIdIndex]);
 			int groupSize = groupSizeIndex != -1 ? Integer.parseInt(rowTokens[groupSizeIndex]) : -1;
 			ped.addGroupId(groupId, groupSize);
+		}
+
+		if(stridesIndex != -1) {
+			FootStep[] footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
+			for(FootStep footStep : footSteps) {
+				ped.getFootSteps().add(footStep);
+			}
 		}
 
 		return Pair.create(new Step(step), ped);

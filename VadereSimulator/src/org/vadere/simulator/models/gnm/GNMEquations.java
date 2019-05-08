@@ -1,24 +1,23 @@
 package org.vadere.simulator.models.gnm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.ode.AbstractModelEquations;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.parallel.AParallelWorker;
+import org.vadere.util.parallel.AParallelWorker.Work;
 import org.vadere.util.parallel.CountableParallelWorker;
 import org.vadere.util.parallel.IAsyncComputable;
-import org.vadere.util.parallel.AParallelWorker.Work;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The equations of the Gradient Navigation Model.
@@ -27,7 +26,7 @@ import org.vadere.util.parallel.AParallelWorker.Work;
 public class GNMEquations extends AbstractModelEquations<Pedestrian> implements
 		IAsyncComputable {
 
-	private static Logger logger = LogManager.getLogger(GNMEquations.class);
+	private static Logger logger = Logger.getLogger(GNMEquations.class);
 
 	/**
 	 * Three dimensions: 2 for dx/dt, 1 for dv/dt

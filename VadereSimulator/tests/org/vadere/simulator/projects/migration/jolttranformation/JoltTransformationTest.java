@@ -2,9 +2,9 @@ package org.vadere.simulator.projects.migration.jolttranformation;
 
 import org.junit.After;
 import org.junit.Before;
-import org.vadere.tests.util.reflection.TestJsonNodeExplorer;
-import org.vadere.tests.util.reflection.TestJsonNodeHelper;
-import org.vadere.tests.util.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
+import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 
 
 abstract class JoltTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {

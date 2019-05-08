@@ -1,11 +1,10 @@
 package org.vadere.simulator.models.density;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -16,7 +15,7 @@ public class PedestrianGaussianFilter<E extends Pedestrian> implements IGaussian
     private final Collection<E> pedestrians;
     private final Predicate<E> pedestrianPredicate;
     private final IPedestrianLoadingStrategy pedestrianLoadingStrategy;
-    private static Logger logger = LogManager.getLogger(PedestrianGaussianFilter.class);
+    private static Logger logger = Logger.getLogger(PedestrianGaussianFilter.class);
 
     public PedestrianGaussianFilter(final Collection<E> pedestrians, final IGaussianFilter filter,
                                     final IPedestrianLoadingStrategy pedestrianLoadingStrategy) {

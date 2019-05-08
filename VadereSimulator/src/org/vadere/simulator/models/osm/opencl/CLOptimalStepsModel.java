@@ -1,7 +1,5 @@
 package org.vadere.simulator.models.osm.opencl;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -15,27 +13,36 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
-import org.vadere.util.potential.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.List;
 import java.util.Random;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
+import static org.lwjgl.opencl.CL10.CL_KERNEL_LOCAL_MEM_SIZE;
+import static org.lwjgl.opencl.CL10.CL_KERNEL_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_WRITE;
+import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_END;
+import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_START;
 import static org.lwjgl.opencl.CL10.CL_PROGRAM_BUILD_STATUS;
+import static org.lwjgl.opencl.CL10.CL_QUEUE_PROFILING_ENABLE;
 import static org.lwjgl.opencl.CL10.CL_SUCCESS;
 import static org.lwjgl.opencl.CL10.clBuildProgram;
 import static org.lwjgl.opencl.CL10.clCreateBuffer;
@@ -48,7 +55,8 @@ import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
 import static org.lwjgl.opencl.CL10.clGetDeviceIDs;
-import static org.lwjgl.opencl.CL10.clGetDeviceInfo;
+import static org.lwjgl.opencl.CL10.clGetEventProfilingInfo;
+import static org.lwjgl.opencl.CL10.clGetKernelWorkGroupInfo;
 import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
 import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
 import static org.lwjgl.opencl.CL10.clReleaseContext;
@@ -59,6 +67,7 @@ import static org.lwjgl.opencl.CL10.clSetKernelArg;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1f;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
+import static org.lwjgl.opencl.CL10.clWaitForEvents;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
@@ -70,7 +79,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
 public class CLOptimalStepsModel {
-    private static Logger log = LogManager.getLogger(CLOptimalStepsModel.class);
+    private static Logger log = Logger.getLogger(CLOptimalStepsModel.class);
 
     // CL ids
     private long clPlatform;
@@ -138,6 +147,7 @@ public class CLOptimalStepsModel {
     private int[] iGridSize;
     private List<PedestrianOpenCL> pedestrianList;
     private List<VPoint> circlePositionList;
+	private final int deviceType;
 
 	private final AttributesFloorField attributesFloorField;
 	private final AttributesOSM attributesOSM;
@@ -148,11 +158,14 @@ public class CLOptimalStepsModel {
     private int[] resultValues;
     private int[] resultKeys;
 
-    private static final Logger logger = LogManager.getLogger(CLOptimalStepsModel.class);
+    private static final Logger logger = Logger.getLogger(CLOptimalStepsModel.class);
 
-    private int max_work_group_size;
+	private long max_work_group_size;
+	private long max_local_memory_size;
 
-    private boolean debug = true;
+	// time measurement
+	private boolean debug = false;
+	private boolean profiling = false;
 
     private int numberOfSortElements;
 
@@ -164,6 +177,15 @@ public class CLOptimalStepsModel {
     }
 
     private int counter = 0;
+
+	public CLOptimalStepsModel(
+			@NotNull final AttributesOSM attributesOSM,
+			@NotNull final AttributesFloorField attributesFloorField,
+			@NotNull final VRectangle bound,
+			@NotNull final EikonalSolver targetPotential,
+			@NotNull final EikonalSolver obstaclePotential) throws OpenCLException {
+		this(attributesOSM, attributesFloorField, bound, targetPotential, obstaclePotential, CL_DEVICE_TYPE_GPU);
+	}
 
 	/**
 	 * Default constructor.
@@ -177,10 +199,12 @@ public class CLOptimalStepsModel {
 		    @NotNull final AttributesFloorField attributesFloorField,
 		    @NotNull final VRectangle bound,
 		    @NotNull final EikonalSolver targetPotential,
-		    @NotNull final EikonalSolver obstaclePotential) throws OpenCLException {
+		    @NotNull final EikonalSolver obstaclePotential,
+			final int device) throws OpenCLException {
     	this.attributesOSM = attributesOSM;
 	    this.attributesFloorField = attributesFloorField;
 		this.bound = bound;
+		this.deviceType = device;
 
 		//TODO: this should be done in mallocHostMemory().
 	    this.targetPotentialField = generatePotentialFieldApproximation(targetPotential);
@@ -365,7 +389,7 @@ public class CLOptimalStepsModel {
 			/*clearMemory();
 			clearCL();*/
 			counter++;
-			clearIterationMemory();
+			//clearIterationMemory();
 			while (pedestrians.size() > originalSize) {
 				pedestrians.remove(pedestrians.size()-1);
 			}
@@ -374,6 +398,8 @@ public class CLOptimalStepsModel {
 			//clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfElements, 1);
 			//clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements, numberOfGridCells);
 
+		} finally {
+			clearIterationMemory();
 		}
 	}
 
@@ -567,7 +593,7 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clSetKernelArg1i(clCalcHash, 6, numberOfElements));
 		    clGlobalWorkSize.put(0, numberOfElements);
 		    //TODO: local work size?
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clCalcHash, 1, null, clGlobalWorkSize, null, null, null));
+		    CLInfo.checkCLError((int)enqueueNDRangeKernel("clCalcHash", clQueue, clCalcHash, 1, null, clGlobalWorkSize, null, null, null));
 	    }
     }
 
@@ -602,6 +628,7 @@ public class CLOptimalStepsModel {
 		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
+			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clNextPositions, 0); // local 4 byte (integer)
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 0, clPedestrianNextPositions));
 		    CLInfo.checkCLError(clSetKernelArg1p(clNextPositions, 1, clReorderedPedestrians));
@@ -618,21 +645,21 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clSetKernelArg1f(clNextPositions, 12, (float)attributesFloorField.getPotentialFieldResolution()));
 		    CLInfo.checkCLError(clSetKernelArg1i(clNextPositions, 13, circlePositionList.size()));
 
-		    int globalWorkSize;
-		    int localWorkSize;
-		    if(numberOfElements <= max_work_group_size){
+		    long globalWorkSize;
+		    long localWorkSize;
+		    if(numberOfElements <= maxWorkGroupSize){
 			    localWorkSize = numberOfElements;
 			    globalWorkSize = numberOfElements;
 		    }
 		    else {
-			    localWorkSize = max_work_group_size;
+			    localWorkSize = maxWorkGroupSize;
 			    globalWorkSize = multipleOf(numberOfElements, localWorkSize);
 		    }
 
 		    clGlobalWorkSize.put(0, globalWorkSize);
 		    clLocalWorkSize.put(0, localWorkSize);
 		    //TODO: local work size? + check 2^n constrain!
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clNextPositions, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		    CLInfo.checkCLError((int)enqueueNDRangeKernel("clNextPositions", clQueue, clNextPositions, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 	    }
     }
 
@@ -650,6 +677,7 @@ public class CLOptimalStepsModel {
 		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
+			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clNextPositions, 0); // local 4 byte (integer)
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
@@ -657,26 +685,71 @@ public class CLOptimalStepsModel {
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (max_work_group_size+1) * 4)); // local memory
+		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (Math.min(numberOfElements+1, maxWorkGroupSize)) * 4)); // local memory
 		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
 
-		    int globalWorkSize;
-		    int localWorkSize;
-		    if(numberOfElements <= max_work_group_size){
-			    localWorkSize = numberOfElements;
-			    globalWorkSize = numberOfElements;
-		    }
-		    else {
-			    localWorkSize = max_work_group_size;
-			    globalWorkSize = multipleOf(numberOfElements, localWorkSize);
-		    }
+		    long globalWorkSize;
+		    long localWorkSize;
+			if(numberOfElements+1 < maxWorkGroupSize){
+				localWorkSize = numberOfElements;
+				globalWorkSize = numberOfElements;
+			}
+			else {
+				localWorkSize = maxWorkGroupSize;
+				globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+			}
 
 		    clGlobalWorkSize.put(0, globalWorkSize);
 		    clLocalWorkSize.put(0, localWorkSize);
 		    //TODO: local work size? + check 2^n constrain!
-		    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		    CLInfo.checkCLError((int)enqueueNDRangeKernel("clFindCellBoundsAndReorder", clQueue, clFindCellBoundsAndReorder, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 	    }
     }
+
+	private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) throws OpenCLException {
+		if(profiling) {
+			try (MemoryStack stack = stackPush()) {
+				PointerBuffer clEvent = stack.mallocPointer(1);
+				LongBuffer startTime = stack.mallocLong(1);
+				LongBuffer endTime = stack.mallocLong(1);
+				long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
+				clWaitForEvents(clEvent);
+				long eventAddr = clEvent.get();
+				CLInfo.checkCLError(clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, null));
+				CLInfo.checkCLError(clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, null));
+				clEvent.clear();
+				// in nanaSec
+				log.info(name + " event time " + "0x"+eventAddr + ": " + ((double)endTime.get() - startTime.get()) / 1_000_000.0 + " [ms]");
+				endTime.clear();
+				startTime.clear();
+				return result;
+			}
+		}
+		else {
+			return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
+		}
+	}
+
+	private long getMaxWorkGroupSizeForKernel(long clDevice, long clKernel, long workItemMem) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			LongBuffer pp = stack.mallocLong(1);
+			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clKernel, clDevice, CL_KERNEL_LOCAL_MEM_SIZE , pp, null));
+
+			/*long kernelLocalMemory = pp.get(0);
+			logger.debug("CL_KERNEL_LOCAL_MEM_SIZE = (" + clKernel + ") = " + kernelLocalMemory);
+			logger.debug("memory for each  = " + (workItemMem + kernelLocalMemory));
+
+			long maxWorkGroupSizeForLocalMemory = (workItemMem + kernelLocalMemory) == 0 ? 0 : (max_local_memory_size / (workItemMem + kernelLocalMemory));*/
+			long maxWorkGroupSizeForLocalMemory = workItemMem == 0 ? max_work_group_size : (max_local_memory_size / (workItemMem));
+			PointerBuffer ppp = stack.mallocPointer(1);
+			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clKernel, clDevice, CL_KERNEL_WORK_GROUP_SIZE , ppp, null));
+
+			long maxWorkGroupSizeForPrivateMemory = ppp.get(0);
+			logger.debug("CL_KERNEL_WORK_GROUP_SIZE (" + clKernel + ") = " + maxWorkGroupSizeForPrivateMemory);
+			//return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
+			return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
+		}
+	}
 
     private int expOf(int value, int multiple) {
 	    int result = 2;
@@ -686,8 +759,8 @@ public class CLOptimalStepsModel {
 	    return result;
     }
 
-	private int multipleOf(int value, int multiple) {
-		int result = multiple;
+	private long multipleOf(long value, long multiple) {
+		long result = multiple;
 		while (result < value) {
 			result += multiple;
 		}
@@ -707,9 +780,10 @@ public class CLOptimalStepsModel {
 	    	PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
+			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clBitonicMergeLocal, 8); // local memory for key and values (integer)
 
 		    // small sorts
-		    if (numberOfElements <= max_work_group_size) {
+		    if (numberOfElements <= maxWorkGroupSize) {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 0, clKeysOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 1, clValuesOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal, 2, clKeysIn));
@@ -723,7 +797,7 @@ public class CLOptimalStepsModel {
 			    clLocalWorkSize.put(0, numberOfElements / 2);
 
 			    // run the kernel and read the result
-			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+			    CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 			    CLInfo.checkCLError(clFinish(clQueue));
 		    } else {
 			    //Launch bitonicSortLocal1
@@ -731,20 +805,20 @@ public class CLOptimalStepsModel {
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 1, clValuesOut));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 2, clKeysIn));
 			    CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 3, clValuesIn));
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, max_work_group_size * 4)); // local memory
-			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, max_work_group_size * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 4, maxWorkGroupSize * 4)); // local memory
+			    CLInfo.checkCLError(clSetKernelArg(clBitonicSortLocal1, 5, maxWorkGroupSize * 4)); // local memory
 
 			    clGlobalWorkSize = stack.callocPointer(1);
 			    clLocalWorkSize = stack.callocPointer(1);
 			    clGlobalWorkSize.put(0, numberOfElements / 2);
-			    clLocalWorkSize.put(0, max_work_group_size / 2);
+			    clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-			    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+			    CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 			    CLInfo.checkCLError(clFinish(clQueue));
 
-			    for (int size = 2 * max_work_group_size; size <= numberOfElements; size <<= 1) {
+			    for (int size = (int)(2 * maxWorkGroupSize); size <= numberOfElements; size <<= 1) {
 				    for (int stride = size / 2; stride > 0; stride >>= 1) {
-					    if (stride >= max_work_group_size) {
+					    if (stride >= maxWorkGroupSize) {
 						    //Launch bitonicMergeGlobal
 						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 0, clKeysOut));
 						    CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeGlobal, 1, clValuesOut));
@@ -759,9 +833,9 @@ public class CLOptimalStepsModel {
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, max_work_group_size / 4);
+						    clLocalWorkSize.put(0, maxWorkGroupSize / 4);
 
-						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+						    CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
 					    } else {
 						    //Launch bitonicMergeLocal
@@ -774,15 +848,15 @@ public class CLOptimalStepsModel {
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 5, stride));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 6, size));
 						    CLInfo.checkCLError(clSetKernelArg1i(clBitonicMergeLocal, 7, dir));
-						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, max_work_group_size * 4)); // local memory
-						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, max_work_group_size * 4)); // local memory
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 8, maxWorkGroupSize * 4)); // local memory
+						    CLInfo.checkCLError(clSetKernelArg(clBitonicMergeLocal, 9, maxWorkGroupSize * 4)); // local memory
 
 						    clGlobalWorkSize = stack.callocPointer(1);
 						    clLocalWorkSize = stack.callocPointer(1);
 						    clGlobalWorkSize.put(0, numberOfElements / 2);
-						    clLocalWorkSize.put(0, max_work_group_size / 2);
+						    clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-						    CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+						    CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 						    CLInfo.checkCLError(clFinish(clQueue));
 						    break;
 					    }
@@ -868,6 +942,7 @@ public class CLOptimalStepsModel {
 		    MemoryUtil.memFree(gridSize);
 		    MemoryUtil.memFree(circlePositions);
 		    MemoryUtil.memFree(potentialFieldGridSize);
+			MemoryUtil.memFree(source);
 	    }
     }
 
@@ -932,7 +1007,13 @@ public class CLOptimalStepsModel {
             clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
             CLInfo.checkCLError(errcode_ret);
 
-            clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+			if(profiling) {
+				clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
+			}
+			else {
+				clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
+			}
+
             CLInfo.checkCLError(errcode_ret);
         }
     }
@@ -973,11 +1054,11 @@ public class CLOptimalStepsModel {
 		    clFindCellBoundsAndReorder = clCreateKernel(clProgram, "findCellBoundsAndReorder", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 
-		    PointerBuffer pp = stack.mallocPointer(1);
-		    clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-		    max_work_group_size = (int)pp.get(0);
+			max_work_group_size = InfoUtils.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
+			logger.debug("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
 
-		    logger.info("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
+			max_local_memory_size = InfoUtils.getDeviceInfoLong(clDevice, CL_DEVICE_LOCAL_MEM_SIZE);
+			logger.debug("CL_DEVICE_LOCAL_MEM_SIZE = " + max_local_memory_size);
 	    }
 
     }

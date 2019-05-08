@@ -37,6 +37,7 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		renderers[ScenarioElementType.PEDESTRIAN.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.SOURCE.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.TARGET.ordinal()] = this::renderFilledShape;
+		renderers[ScenarioElementType.ABSORBING_AREA.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.STAIRS.ordinal()] = this::renderStair;
 		renderers[ScenarioElementType.TELEPORTER.ordinal()] = this::renderFilledShape;
 		renderers[ScenarioElementType.CAR.ordinal()] = this::renderFilledShape;
@@ -60,7 +61,7 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 
 		if (panelModel.isPrototypeVisble()) {
 			graphics.setColor(Color.GRAY);
-			graphics.fill(panelModel.getPrototypeShape());
+			fill(panelModel.getPrototypeShape(), graphics);
 		}
 
 		if (panelModel.isElementSelected()) {
@@ -84,10 +85,8 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		final VPoint cursorPosition = panelModel.getMousePosition();
 		double absolutCursorX = cursorPosition.x;
 		double absolutCursorY = cursorPosition.y;
-		g.draw(new Line2D.Double(absolutCursorX - resolution * 0.2, absolutCursorY, absolutCursorX + resolution * 0.2,
-				absolutCursorY));
-		g.draw(new Line2D.Double(absolutCursorX, absolutCursorY - resolution * 0.2, absolutCursorX, absolutCursorY
-				+ resolution * 0.2));
+		draw(new Line2D.Double(absolutCursorX - resolution * 0.2, absolutCursorY, absolutCursorX + resolution * 0.2, absolutCursorY), g);
+		draw(new Line2D.Double(absolutCursorX, absolutCursorY - resolution * 0.2, absolutCursorX, absolutCursorY + resolution * 0.2), g);
 	}
 
 	/*

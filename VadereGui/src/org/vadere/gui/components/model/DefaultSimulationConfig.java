@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.vadere.gui.components.utils.ColorHelper;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.util.visualization.ColorHelper;
 
 public class DefaultSimulationConfig extends DefaultConfig {
 	private static Resources resources = Resources.getInstance("global");
@@ -20,12 +20,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
+	private boolean showAbsorbingAreas = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
+	private boolean showTargetPotentielFieldMesh = false;
 	private boolean showPotentialField = false;
 	private boolean showTrajectories = false;
 	private boolean showGrid = false;
@@ -64,6 +66,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showStairs = config.showStairs;
 		this.showGroups = config.showGroups;
 		this.showPotentialField = config.showPotentialField;
+		this.showTargetPotentielFieldMesh = config.showTargetPotentielFieldMesh;
 	}
 
 	public boolean isShowGroups() {
@@ -72,6 +75,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowGroups(boolean showGroups) {
 		this.showGroups = showGroups;
+		setChanged();
 	}
 
 	public boolean isShowLogo() {
@@ -109,6 +113,19 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showTargets;
 	}
 
+	public boolean isShowAbsorbingAreas() {
+		return showAbsorbingAreas;
+	}
+
+	public void setShowTargetPotentielFieldMesh(final boolean showTargetPotentielFieldMesh) {
+		this.showTargetPotentielFieldMesh = showTargetPotentielFieldMesh;
+		setChanged();
+	}
+
+	public boolean isShowTargetPotentielFieldMesh() {
+		return showTargetPotentielFieldMesh;
+	}
+
 	public void setShowTargets(boolean showTargets) {
 		this.showTargets = showTargets;
 		setChanged();
@@ -120,6 +137,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowSources(boolean showSources) {
 		this.showSources = showSources;
+		setChanged();
+	}
+
+	public void setShowAbsorbingAreas(boolean showAbsorbingAreas) {
+		this.showAbsorbingAreas = showAbsorbingAreas;
 		setChanged();
 	}
 

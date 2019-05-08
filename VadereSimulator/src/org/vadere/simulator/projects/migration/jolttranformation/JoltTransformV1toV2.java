@@ -31,7 +31,7 @@ public class JoltTransformV1toV2 extends JoltTransformation {
 		putObject(sortedRoot, source, "release");
 		putObject(sortedRoot, source, "commithash");
 		putObject(sortedRoot, source, "processWriters", "files", "processors", "isTimestamped");
-		putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography");
+		putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "eventInfos", "topography");
 
 		return  StateJsonConverter.deserializeToNode(sortedRoot);
 	}

@@ -15,11 +15,13 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
-import org.vadere.util.io.ListUtils;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.io.CollectionUtils;
+import org.vadere.util.logging.Logger;
 
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
+	private static Logger logger = Logger.getLogger(UpdateSchemeParallel.class);
 	protected final ExecutorService executorService;
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
@@ -32,17 +34,31 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
+		clearStrides(topography);
+
 		movedPedestrians.clear();
 		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 		List<Future<?>> futures;
 
 		for (CallMethod callMethod : callMethods) {
+			long ms = 0;
+			if(callMethod == CallMethod.SEEK) {
+				ms = System.currentTimeMillis();
+			}
+
+
 			futures = new LinkedList<>();
-			for (final PedestrianOSM pedestrian : ListUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
+			for (final PedestrianOSM pedestrian : CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
 				Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
 				futures.add(executorService.submit(worker));
 			}
 			collectFutures(futures);
+
+			if(callMethod == CallMethod.SEEK) {
+				ms = System.currentTimeMillis() - ms;
+				logger.debug("runtime for next step computation = " + ms + " [ms]");
+			}
+
 		}
 	}
 
@@ -90,7 +106,6 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();

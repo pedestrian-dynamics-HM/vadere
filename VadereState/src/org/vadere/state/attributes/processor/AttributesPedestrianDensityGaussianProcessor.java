@@ -7,15 +7,15 @@ package org.vadere.state.attributes.processor;
 
 public class AttributesPedestrianDensityGaussianProcessor extends AttributesPedestrianDensityProcessor {
 	private double scale = 10;
-	private double standardDerivation = 0.7;
+	private double standardDeviation = 0.7;
 	private boolean obstacleDensity = true;
 
 	public double getScale() {
 		return scale;
 	}
 
-	public double getStandardDerivation() {
-		return standardDerivation;
+	public double getStandardDeviation() {
+		return standardDeviation;
 	}
 
 	public boolean isObstacleDensity() {
@@ -27,9 +27,9 @@ public class AttributesPedestrianDensityGaussianProcessor extends AttributesPede
 		this.scale = scale;
 	}
 
-	public void setStandardDerivation(double standardDerivation) {
+	public void setStandardDeviation(double standardDeviation) {
 		checkSealed();
-		this.standardDerivation = standardDerivation;
+		this.standardDeviation = standardDeviation;
 	}
 
 	public void setObstacleDensity(boolean obstacleDensity) {

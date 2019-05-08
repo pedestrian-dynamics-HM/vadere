@@ -1,11 +1,10 @@
 package org.vadere.gui.components.utils;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.ColorHelper;
+import org.vadere.util.visualization.ColorHelper;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 
@@ -50,22 +49,25 @@ public class CLGaussianCalculator {
         int width = Math.max(filterObstacles.getMatrixWidth(), filterPedestrians.getMatrixWidth());
         int height = Math.max(filterObstacles.getMatrixHeight(), filterPedestrians.getMatrixHeight());
         BufferedImage image = createImage(width, height);
-        int maxColorValue = 255 * 255 * 255;
+        int maxColorValue = 20;
         ColorHelper colorHelper = new ColorHelper(maxColorValue);
 
         // double bound = filter.getMaxFilteredValue();
         double max = 1.00;
         double factor = maxColorValue / max;
         //System.out.println(filterPedestrians.getMaxFilteredValue()); // 0.1259
-
+		double maxValue = Double.MIN_VALUE;
         for (int x = 0; x < filterPedestrians.getMatrixWidth(); x++) {
             for (int y = 0; y < filterPedestrians.getMatrixHeight(); y++) {
                 double pedValue = filterPedestrians.getFilteredValue(x, y);
                 double obsValue = filterObstacles.getFilteredValue(x, y);
                 double value = pedValue + obsValue;
                 // value = pedValue;
-                image.setRGB(x, y, colorHelper.numberToColor(value * factor).getRGB());
-				/*
+                image.setRGB(x, y, colorHelper.numberToColor(value ).getRGB());
+				if(maxValue < value) {
+					maxValue = value;
+				}
+                /*
 				 * if(value <= 0.0) {
 				 * image.setRGB(x, y, Color.WHITE.getRGB());
 				 * } else {
@@ -74,6 +76,7 @@ public class CLGaussianCalculator {
 				 */
             }
         }
+        System.out.println(maxValue);
         return image;
     }
 

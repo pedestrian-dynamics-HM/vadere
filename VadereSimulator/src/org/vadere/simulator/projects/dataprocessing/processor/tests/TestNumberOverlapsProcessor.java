@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.dataprocessing.processor.tests;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
@@ -9,6 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesTestNumberOverlapsProcessor;
+import org.vadere.util.logging.Logger;
 
 /**
  * @author Benedikt Zoennchen
@@ -17,7 +16,7 @@ import org.vadere.state.attributes.processor.AttributesTestNumberOverlapsProcess
 @DataProcessorClass()
 public class TestNumberOverlapsProcessor extends TestProcessor {
 
-	private static Logger logger = LogManager.getLogger(TestNumberOverlapsProcessor.class);
+	private static Logger logger = Logger.getLogger(TestNumberOverlapsProcessor.class);
 	private NumberOverlapsProcessor overlapProcessor;
 
 	public TestNumberOverlapsProcessor() {

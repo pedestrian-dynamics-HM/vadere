@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_sfm1",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -60,8 +60,8 @@
       },
       "org.vadere.state.attributes.models.AttributesSFM" : {
         "attributesODEIntegrator" : {
-          "solverType" : "DORMAND_PRINCE_45",
-          "stepSizeMin" : 1.0E-4,
+          "solverType" : "EULER",
+          "stepSizeMin" : 0.3,
           "stepSizeMax" : 1.0,
           "toleranceAbsolute" : 1.0E-5,
           "toleranceRelative" : 1.0E-4
@@ -153,7 +153,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50,
+        "spawnNumber" : 400,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -172,8 +172,8 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
-      "dynamicElements" : [ ],
-      "attributesCar" : null
+      "attributesCar" : null,
+      "dynamicElements" : [ ]
     }
   }
 }

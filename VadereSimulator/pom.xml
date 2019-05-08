@@ -9,7 +9,6 @@
 
   <artifactId>simulator</artifactId>
   <name>Vadere Simulator</name>
-
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>tests</testSourceDirectory>
@@ -49,6 +48,29 @@
                 </execution>
             </executions>
         </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
+            <executions>
+                <execution>
+                    <id>write-version-control-info-to-file</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <!-- Write a file with current version of Vadere to get reproducible simulations. -->
+            <configuration>
+                <executable>git</executable>
+                <arguments>
+                    <argument>rev-parse</argument>
+                    <argument>HEAD</argument>
+                </arguments>
+                <outputFile>resources/current_commit_hash.txt</outputFile>
+            </configuration>
+        </plugin>
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>
@@ -66,102 +88,48 @@
 		  </configuration>
 		</plugin>
         <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.7.9</version>
+            <!-- Use default groupId "org.apache.maven.plugins" -->
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
             <executions>
-                <!-- Use JaCoCo's Java agents to record coverage data by using on-the-fly class file instrumentation. -->
                 <execution>
-                    <id>pre-unit-test</id>
+                    <id>build-vadere-console</id> <!-- this is used for inheritance merges -->
+                    <phase>package</phase> <!-- bind to the packaging phase -->
                     <goals>
-                        <goal>prepare-agent</goal>
+                        <goal>single</goal>
                     </goals>
                     <configuration>
-                        <output>file</output>
-                        <destFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</destFile>
-                        <propertyName>surefireArgLine</propertyName>
-                    </configuration>
-                </execution>
-                <!-- Use JaCoCo agent output to create coverage reports in CSV, HTML and XML format. -->
-                <execution>
-                    <id>post-unit-test</id>
-                    <phase>test</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                    <configuration>
-                        <dataFile>${project.build.directory}/coverage-data/jacoco-unit-tests.coverage</dataFile>
-                        <outputDirectory>${project.reporting.outputDirectory}/coverage-reports</outputDirectory>
+                        <archive>
+                            <manifest>
+                                <mainClass>org.vadere.simulator.entrypoints.cmd.VadereConsole</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>vadere-console</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <attach>false</attach>
                     </configuration>
                 </execution>
             </executions>
         </plugin>
-        <plugin>
-            <!-- Maven Surefire is used to execute unit tests. -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.19</version>
-            <configuration>
-                <argLine>${surefireArgLine}</argLine>
-                <enableAssertions>true</enableAssertions>
-                <excludes>
-                    <exclude></exclude>
-                </excludes>
-                <failIfNoTests>false</failIfNoTests>
-                <skipTests>${skip.unit.tests}</skipTests>
-            </configuration>
-        </plugin>
     </plugins>
-    <pluginManagement>
-    	<plugins>
-    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-    		<plugin>
-    			<groupId>org.eclipse.m2e</groupId>
-    			<artifactId>lifecycle-mapping</artifactId>
-    			<version>1.0.0</version>
-    			<configuration>
-    				<lifecycleMappingMetadata>
-    					<pluginExecutions>
-    						<pluginExecution>
-    							<pluginExecutionFilter>
-    								<groupId>
-    									com.nativelibs4java
-    								</groupId>
-    								<artifactId>
-    									maven-javacl-plugin
-    								</artifactId>
-    								<versionRange>
-    									[1.0.0-RC4,)
-    								</versionRange>
-    								<goals>
-    									<goal>compile</goal>
-    								</goals>
-    							</pluginExecutionFilter>
-    							<action>
-    								<execute>
-    									<runOnIncremental>false</runOnIncremental>
-    								</execute>
-    							</action>
-    						</pluginExecution>
-    					</pluginExecutions>
-    				</lifecycleMappingMetadata>
-    			</configuration>
-    		</plugin>
-    	</plugins>
-    </pluginManagement>
   </build>
 
- <!-- local repository for all jars without an external repo -->
-  <repositories>
-    <repository>
-      <id>nativelibs4java</id>
-      <name>nativelibs4java Maven2 Repository</name>
-      <url>http://nativelibs4java.sourceforge.net/maven</url>
-    </repository>
-  </repositories>
+   <!--
+   use it again if error.
+   <repositories>
+        <repository>
+            <id>nativelibs4java</id>
+            <name>nativelibs4java Maven2 Repository</name>
+            <url>http://nativelibs4java.sourceforge.net/maven</url>
+        </repository>
+    </repositories>
     <properties>
         <platform.dependency>windows-x86_64</platform.dependency>
-    </properties>
+    </properties>-->
+
   <dependencies>
   	<dependency>
   		<groupId>commons-codec</groupId>
@@ -183,6 +151,11 @@
       <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>annotation</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>meshing</artifactId>
           <version>${project.version}</version>
       </dependency>
 

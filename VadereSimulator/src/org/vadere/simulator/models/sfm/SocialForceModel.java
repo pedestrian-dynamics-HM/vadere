@@ -9,10 +9,10 @@ import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.reynolds.PedestrianReynolds;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -20,8 +20,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.gradients.GradientProvider;
-import org.w3c.dom.Attr;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,8 +56,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.targets = new TreeMap<>();
 		this.floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
-						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
-						scenario, targets, null);
+						attributes.getFloorGradientProviderType(),
+						scenario, targets, potentialFieldTarget);
 
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
@@ -140,6 +139,8 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		rebuildFloorField(simTimeInSec);
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+
+		UnsupportedEventException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);

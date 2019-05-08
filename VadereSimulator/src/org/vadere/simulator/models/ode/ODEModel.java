@@ -1,21 +1,23 @@
 package org.vadere.simulator.models.ode;
 
-import java.util.Collection;
-import java.util.Random;
-
 import org.apache.commons.math3.exception.MathIllegalNumberException;
 import org.apache.commons.math3.ode.FirstOrderIntegrator;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public abstract class ODEModel<T extends DynamicElement, TAttributes extends AttributesDynamicElement>
 		implements MainModel {
@@ -30,7 +32,7 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 	protected Topography topography;
 	protected TAttributes elementAttributes;
 
-	private Logger logger = LogManager.getLogger(ODEModel.class);
+	private Logger logger = Logger.getLogger(ODEModel.class);
 	private Class<T> type;
 
 	@Deprecated
@@ -71,6 +73,9 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 
 		// get pedestrian and car data
 		Collection<T> dynamicElements = topography.getElements(type);
+
+		List<T> orderedDynamicElements = topography.getElements(type).stream().collect(Collectors.toList());
+		List<VPoint> positions = orderedDynamicElements.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
 
 		double[] y;
 
@@ -117,6 +122,15 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 			}
 
 			updateElementPositions(type, simTimeInSec, topography, equations, y);
+
+			for(int i = 0; i < orderedDynamicElements.size(); i++) {
+				DynamicElement element = orderedDynamicElements.get(i);
+				if (element.getType() == ScenarioElementType.PEDESTRIAN) {
+					Pedestrian pedestrian = (Pedestrian)element;
+					pedestrian.clearFootSteps();
+					pedestrian.getFootSteps().add(new FootStep(positions.get(i), pedestrian.getPosition(), lastSimTimeInSec, simTimeInSec));
+				}
+			}
 		}
 
 		// reset the time
@@ -128,8 +142,7 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 	 * double vector.
 	 * The {@link AbstractModelEquations} are used to get the correct positions from the vector.
 	 */
-	public static <T extends DynamicElement> void updateElementPositions(Class<T> type, double simTimeInSec,
-			Topography topography, AbstractModelEquations equations, double[] y) {
+	public static <T extends DynamicElement> void updateElementPositions(Class<T> type, double t, Topography topography, AbstractModelEquations equations, double[] y) {
 
 		Collection<T> dynamicElements = topography.getElements(type);
 
@@ -165,7 +178,10 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 			equations.getVelocity(counter, y, newVelocity);
 
 			// set data to ped
+			VPoint oldPosition = element.getPosition();
 			setPosition(element, newPos);
+			topography.moveElement(element, oldPosition);
+
 			setVelocity(element, new Vector2D(newVelocity[0], newVelocity[1]));
 			counter++;
 		}

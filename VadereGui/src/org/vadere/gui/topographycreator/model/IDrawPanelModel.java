@@ -4,12 +4,17 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
 import java.util.Observer;
+import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
@@ -143,6 +148,8 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 
 	ScenarioElementType getCurrentType();
 
+	Scenario getScenario();
+
 	void setTopography(Topography topography);
 
 	@Override
@@ -172,4 +179,10 @@ public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<
 	VShape translate(VPoint vector);
 
 	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
+
+	void removeObstacleIf(final @NotNull Predicate<Obstacle> predicate);
+
+	List<Obstacle> getObstacles();
+
+	Rectangle2D.Double getBounds();
 }

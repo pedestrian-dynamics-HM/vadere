@@ -1,17 +1,19 @@
-![VADERE](vadere.png "VADERE")
+![Vadere Logo](vadere.png "Vadere Logo")
 
 ---
 
-# VADERE
+# Vadere
 
-VADERE is an open source framework for the simulation of microscopic pedestrian dynamics. In addition to this core domain, other systems including cars and granular flow can be introduced into the framework. VADERE provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of simulation models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies.
+Vadere is an open source framework for the simulation of microscopic pedestrian dynamics. Vadere provides generic model classes and visualisation and data analysis tools for two-dimensional systems. A series of pedestrian locomotion models are already implemented in the framework that are also the basis for scientific publications. Namely the optimal steps model, the gradient navigation model, and the social force model are available for simulation studies. In addition to pedestrians, other systems including cars and granular flow can be introduced into the framework.
 
-This software runs on OS X, Windows, and Linux.
+This software runs on Windows, OS X and Linux.
 
-VADERE has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
+Vadere has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
 research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
-However, we welcome contributions from external sources.
+However, we welcome contributions from external sources. 
+
+The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview). 
 
 ## Pipeline Status
 
@@ -22,97 +24,94 @@ However, we welcome contributions from external sources.
 
 ## Installation
 
-### Dependencies
+### Download Releases
 
-* Java 8
+Latest build of master:
+* [Windows](http://www.vadere.org/builds/master/vadere.master.windows.zip)
+* [Linux](http://www.vadere.org/builds/master/vadere.master.linux.zip)
+
+Stable releases and selected branch-builds are located on [www.vadere.org/releases/](http://www.vadere.org/releases/)
+
+The ZIP file contains:
+* **README.md** - this README file. 
+* **vadere-gui.jar** - provides the GUI version of Vadere.
+* **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
+* **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
+
+To execute the `.jar` files it is highly recommended to use Java 11 (OpenJDK).  
+
+### Build from Source
+
+#### Dependencies
+
+* Java 11 (OpenJDK recommended)
 * Maven 3.0
 * Git
-* OpenCL
+* OpenCL (optional but recommended)
 
-### Install OpenCL
+**Note:** Please, ensure that the Git executable can be found in the `PATH` variable of your operating system.
 
-For this project, GPGPU with OpenCL is used to speed up some computations. Therefore, the following requirements have to be met:
+#### Install OpenCL (optional but recommended)
 
-* the latest drivers for your OpenCL device(s)
-* an OpenCL SDK
+Vadere uses computer's video card to speed up some computations. Therefore, following OpenCL components should be installed:
 
-#### Operating Systems
+* the OpenCL Installable Client Driver loader also called ICD loader (Opencl.dll for Windows and libOpenCL.so for Linux)
+* drivers for your device(s) 
 
-* Windows: For further information using OpenCL on Windows [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
+Both should be offered by the vendor of your device (often there are also open-source solutions). The device can be a CPU as well as a GPU (recommanded). For example, if you have a NVIDIA GPU instaling your drivers should be enough to install both components. 
+Vadere will search for the best suiable device which is supported. On a desktop workstation this should be your video card (GPU). If there is no device supporting OpenCL Vadere will use a plain and slower Java-implementation instead. 
+
+Please, use following instructions to set up the OpenCL components for your operating system:
+
+* Windows: For further information using OpenCL on Windows read the paragraph Running an OpenCL application [click here](https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/).
 * OS X: OpenCL is pre-installed for OS X.
 * Linux: Please refer to the installation manual of your Linux distribution. 
   * [Sources: OpenCL HowTo](https://wiki.tiker.net/OpenCLHowTo)
+  * Tips and official packages (Ubuntu): 
+    
+    <details>
+
+    * Use the console tool `clinfo` (`sudo apt-get install clinfo`) to see the current status in terminal
+    * Drivers commonly have the prefix `opencl-icd` (to look at most opencl related packages run `apt search opencl`). Some that may be helpful:
+         * `beignet-opencl-icd` (OpenCL library for Intel GPUs)
+         * `mesa-opencl-icd` (free and open source implementation of the OpenCL API)
+         * `nvidia-opencl-icd`
+         * `ocl-icd-opencl-dev` (installs opencl development files and can be required for compiling)
+         * `ocl-icd-libopencl1` (Generic OpenCL ICD Loader)
+    
+    </details>
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
 
-### Run the Application
+#### Run the Application
 
 1. Get the Source: Run `git clone https://gitlab.lrz.de/vadere/vadere.git`.
-2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`and `postvis.jar`. 
+2. Build the Application: Go to the project directory and run `mvn clean package` (or `mvn clean package -Dmaven.test.skip` if you want to skip the unit tests). This will build `vadere.jar`, `vadere-console.jar` and `postvis.jar`.
 3. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere.jar`.
 4. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
 
-## Usage Example
+## Run Built-In Examples
 
-With the following steps, you can start a scenario of one of the model test projects in [VadereModelTests](VadereModelTests):
+With the following steps, you can run a simulation with one of the built-in examples from [VadereModelTests](VadereModelTests):
 
 - start Vadere 
 - *Project* > *Open* 
-- choose `vadere.project` of one of the projects e.g. [TestOSM](VadereModelTests/TestOSM) and click *open*
+- choose `vadere.project` of one of the projects e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
 - select the scenario on the left and press *run selected scenario*
-
-
-## Development Setup
-
-Follow the **installation instructions** above i.e. install all required software and get the source. Go to the project directory and run `mvn clean install`. The project can now be imported *As Maven Project* in your IDE.
-
-### Eclipse
-
-- *File* > *Import* > *Maven* > *Existing Maven Projects*
-- choose `pom.xml` as *Root Directory* and click *Finish*
-- open *Vaderegui (gui)* > *src* > *org.vadere.gui.projectview* > `Vadereapplication`
-
-### IntelliJ IDEA
-
-- on the welcome-screen select *Import Project*
-- select `pom.xml` > *Next* > *Next* > *Next* > *Finish*
-- open *VadereGui (gui)* > *src* > *org.vadere.gui.projectview* > `VadereApplication`
-- click the *run*-icon next to the `main` method
-
-Alternatively, run `mvn eclipse:eclipse` using the [Maven Eclipse Plugin](http://maven.apache.org/plugins/maven-eclipse-plugin/usage.html) or `mvn idea:idea` using the [Maven IntelliJ Plugin](http://maven.apache.org/plugins/maven-idea-plugin/).
-
-### Git Hooks
-
-Since it is important to reproduce simulation results, we have the guidline that each output file has to provide its commit-hash. This commit-hash identifies
-the state the software was in when the output file was generated. Therefore, git hooks save the commit-hash in the **current_commit_hash.txt** which
-will be created in the [VadereSimulator/resource](vadere/VadereSimulator/resource) directory whenever a commit is made or the developer
-switches to another commit. If the file is missing or there is no commit-hash in it, you will be warned in the log. 
-We strongly suggest that you install these git hooks on your local machine:
-
-1. Copy files [post-checkout](Documentation/version-control/post-checkout), [post-merge](Documentation/version-control/post-merge), 
-[post-applypatch](Documentation/version-control/post-applypatch) and [post-commit](Documentation/version-control/post-commit) 
-from [version-control](Documentation/version-control) to your local **.git/hooks/** directory.
-These files start the script [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software).
-2. Make sure that [git-hook-vadere-software](Documentation/version-control/git-hook-vadere-software) is executable.
-
-To create the **current_commit_hash.txt** without changes to the current commit, you can choose *Switch/Checkout...* on the Repository folder or you 
-switch to another branch and switch back again using the command line or any other tool you prefer.
-
-## Contribution
-
-Please see [Contribution guidelines](CONTRIBUTING.md). The document defines guidelines for coding style and commit messages.
-
-## Contributors
-
-People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
-
-Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
+See [CHANGELOG.md](https://gitlab.lrz.de/vadere/vadere/blob/master/CHANGELOG.md) for a list of changes.
+
+## JavaDoc
+
+- [state](http://www.vadere.org/javadoc/state/index.html)
+
+## Contribution
+
+See [CONTRIBUTING.md](https://gitlab.lrz.de/vadere/vadere/blob/master/CONTRIBUTING.md) for how to set up the development environment and the coding guidelines.
 
 ## License
 
-This software is licensed under the GNU Lesser General Public License ([LGPL](LICENSE)).
+This software is licensed under the GNU Lesser General Public License ([LGPL](https://gitlab.lrz.de/vadere/vadere/blob/master/LICENSE)).
 
 For more information: http://www.gnu.org/licenses/lgpl.html

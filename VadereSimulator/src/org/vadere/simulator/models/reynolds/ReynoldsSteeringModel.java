@@ -19,10 +19,11 @@ import org.vadere.simulator.models.reynolds.behaviour.Wander;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -75,6 +76,9 @@ public class ReynoldsSteeringModel implements MainModel {
 	@Override
 	public void update(final double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+
+		UnsupportedEventException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+
 		Iterator<Pedestrian> it = pedestrians.iterator();
 		double maxSpeed = 3;
 

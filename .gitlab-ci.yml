@@ -1,57 +1,206 @@
-# # GitLab CI Jobs
+# # GitLab CI Job Configuration
 #
-# Each of the jobs defined here is triggered by GitLab's CI pipeline.
+# Goal: Run all jobs defined here on all available runners (GNU/Linux and
+# Windows).
+# 
+# Procedure: Use GitLab job templates prefixed with a "." and use them in the
+# actual job description with the "extends" keyword.
 #
-# ## GitLab YAML Job Description Syntax
+# ## Job Description Syntax
 #
 # <job_name>:                   # Job name which is displayed in web interface.
-#   stage: <stage_name>         # <build|test|deploy>: these stages are executed
-#                               # one after another. A stage can contain multiple
-#                               # jobs.
+#   stage: <stage_name>         # Run "script" commands in this stage. The
+#                               # stages are executed sequentially.
 #   script:
 #      - <arbitrary_commands>   # Here you can execute arbitratry terminal
 #                               # commands. If any of the commands return a
 #                               # non-zero exit code, the job fails.
 #
-# ## Maven Syntax for Skipping Unit Tests
+# ## References
 #
-# General syntax to execute unit tests:
-#
-# ```
-# mvn test
-# ```
-#
-# The comma-separated list of tests after "-Dtest=<list>" is skipped. All other
-# tests are executed normally:
-#
-# ```
-# mvn -Dtest=!TestClassA,!TestClassB,!TestClassC
-# ```
-#
-# **Note:** on some CI instances the exclamation mark must be escaped by a
-# backslash. Otherwise, it is interpreted by the executing shell as special
-# command.
-#
-# ## Unit Test Limitations
-#
-# **Watch out:** OpenCL code cannot be run on virtual machines where tests are
-# executed. Therefore, skip this tests.
+# - https://docs.gitlab.com/ee/ci/yaml/README.html
 
-unit_tests_with_coverage:
-  stage: test
-  
-  script:
-    - Documentation/version-control/git-hook-vadere-software
-    - mvn clean
-    - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel test
-    - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+# Variable Definitions
+variables:
+    VADERE_DEPLOYMENT_BASE_URL: "http://www.vadere.org/builds"
+    VADERE_PACKAGE_NAME_BRANCHES: "vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip"
+    VADERE_PACKAGE_NAME_RELEASES: "vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip"
 
-run_scenario_files:
-  stage: deploy
+# Stage Definitions
+# Watch out: integration tests and the seed tests run after deployment, because
+#   currently tests fail very often because of timeouts. It is not clear if
+#   Vadere has slowed down somehow or the test environment is not reliable
+#   (i.e.,the virtual machines). We have to track that!
+stages:
+    - unit_test
+    - deploy
+    - integration_test
+    - seed_test
 
-  script:
-      - Documentation/version-control/git-hook-vadere-software
-      - mvn clean
-      - mvn -Dmaven.test.skip=true package
-      - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+# PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
+#
+# 1. "include:" statement does not work properly and seems really buggy.
+#    Therefore, define all job templates and jobs directly here.
+#    "include: .gitlab/ci/templates/test_stage_templates.yml" does not work!
+# 2. Variables from "variables" section are not expanded correctly in "url"
+#    section of an "environment".
 
+# Job Template Definitions
+.template_unit_tests:
+    stage: unit_test
+    # Skip OpenCL tests by using "-Dtest=!Test1,!Test2,..." because GitLab
+    # runners do not support OpenCL.
+    script:
+        - mvn clean
+        - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel,!TestLWJGL test
+        - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
+    artifacts:
+        when: on_success
+        paths:
+            - "*/target/coverage-reports"
+        expire_in: 1 week
+    when: on_success
+            
+.template_scenario_files:
+    stage: integration_test
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+    artifacts:
+        when: on_failure
+        paths:
+            - "log_dir"
+        expire_in: 1 week
+    when: on_success
+
+.template_deploy_master_automatically:
+    stage: deploy
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
+    only:
+        refs:
+            - master
+    when: on_success
+
+.template_deploy_stable_automatically:
+    stage: deploy
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
+    # Run job only for "tags" (usually on the "stable" branch). Watch out: Multiple "only" tags are ORed together.
+    # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/27818
+    only:
+        - tags
+    when: on_success
+
+.template_deploy_branch_manually:
+    stage: deploy
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
+    when: manual
+
+.template_seed_test:
+    stage: seed_test
+    script:
+        - mvn clean
+        - mvn -Dmaven.test.skip=true package
+        # setup.py install should from the directoty at which the setup.py file is located (working directory). The brackets return the working direcory back to previous position. 
+        - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && python3 setup.py install --user)
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
+    artifacts:
+        when: on_failure
+        paths: 
+            - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
+        expire_in: 1 week
+    when: on_success
+
+# Job Definitions
+
+## Jobs for GNU/Linux runner (which is labelled with tag "linux")
+run_unit_tests_on_linux:
+    extends: .template_unit_tests
+    tags:
+        - linux
+
+run_scenario_files_on_linux:
+    extends: .template_scenario_files
+    tags:
+        - linux
+
+run_seed_test_on_linux:
+    extends: .template_seed_test
+    tags:
+        - linux
+
+deploy_master_on_linux:
+    extends: .template_deploy_master_automatically
+    tags:
+        - linux        
+    environment:
+        name: master/linux
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
+
+deploy_stable_on_linux:
+    extends: .template_deploy_stable_automatically
+    tags:
+        - linux
+    environment:
+        name: stable/linux
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/stable/vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip
+
+deploy_branch_on_linux:
+    extends: .template_deploy_branch_manually
+    tags:
+        - linux        
+    environment:
+        name: branches/${CI_COMMIT_REF_NAME}/linux
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
+
+## Jobs for Windows runner (which is labelled with tag "windows")
+run_unit_tests_on_windows:
+    extends: .template_unit_tests
+    tags:
+        - windows
+
+run_scenario_files_on_windows:
+    extends: .template_scenario_files
+    tags:
+        - windows
+
+run_seed_test_on_windows:
+    extends: .template_seed_test
+    tags:
+        - windows
+
+deploy_master_on_windows:
+    extends: .template_deploy_master_automatically
+    tags:
+        - windows        
+    environment:
+        name: master/windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
+
+deploy_stable_on_windows:
+    extends: .template_deploy_stable_automatically
+    tags:
+        - windows
+    environment:
+        name: stable/windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/stable/vadere.${CI_COMMIT_TAG}.${CI_RUNNER_TAGS}.zip
+
+deploy_branch_on_windows:
+    extends: .template_deploy_branch_manually
+    tags:
+        - windows        
+    environment:
+        name: branches/${CI_COMMIT_REF_NAME}/windows
+        url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip

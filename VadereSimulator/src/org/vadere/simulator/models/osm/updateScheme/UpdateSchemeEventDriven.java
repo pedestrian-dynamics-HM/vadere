@@ -1,12 +1,18 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 /**
@@ -16,18 +22,19 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	private final Topography topography;
 	protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
+	private final OSMBehaviorController osmBehaviorController;
 
 	public UpdateSchemeEventDriven(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianOSM());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianOSM.class));
+		osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-		for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
-			pedestrianOSM.clearStrides();
-		}
+
+		clearStrides(topography);
 
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
@@ -41,20 +48,29 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
-		VPoint oldPosition = pedestrian.getPosition();
+		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
-		// for the first step after creation, timeOfNextStep has to be initialized
-		if (pedestrian.getTimeOfNextStep() == 0) {
-			pedestrian.setTimeOfNextStep(currentTimeInSec);
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			VPoint oldPosition = pedestrian.getPosition();
+
+			// for the first step after creation, timeOfNextStep has to be initialized
+			if (pedestrian.getTimeOfNextStep() == 0) {
+				pedestrian.setTimeOfNextStep(currentTimeInSec);
+			}
+			
+			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+			pedestrian.updateNextPosition();
+			double stepDuration = pedestrian.getDurationNextStep();
+			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+			osmBehaviorController.wait(pedestrian);
+		} else if (mostImportantEvent instanceof BangEvent) {
+			osmBehaviorController.reactToBang(pedestrian, topography);
+
+			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
-
-		// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
-		pedestrian.updateNextPosition();
-		makeStep(topography, pedestrian, pedestrian.getDurationNextStep());
-
-		pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		topography.moveElement(pedestrian, oldPosition);
 	}
 
 	@Override

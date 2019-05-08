@@ -14,9 +14,9 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 @ModelClass
@@ -33,7 +33,7 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Collection<? extends Agent> otherPedestrians) {
 		throw new UnsupportedOperationException();
 	}
@@ -43,9 +43,9 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 	 * Navigation Model.
 	 */
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
-			Vector2D velocity, Agent pedestrian,
-			Collection<? extends Agent> closePedestrians) {
+	public Vector2D getAgentPotentialGradient(IPoint pos,
+	                                          Vector2D velocity, Agent pedestrian,
+	                                          Collection<? extends Agent> closePedestrians) {
 
 		double[] completeGrad = new double[2];
 		double[] grad = new double[2];
@@ -54,7 +54,7 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 		double pot;
 		double visiblePortion;
 		double phi;
-		double[] x = new double[] {pos.x, pos.y};
+		double[] x = new double[] {pos.getX(), pos.getY()};
 		double[] x2 = new double[2];
 		double[] v = new double[] {velocity.x, velocity.y};
 
@@ -98,7 +98,7 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 			Agent otherPedestrian) {
 		throw new UnsupportedOperationException();
 	}

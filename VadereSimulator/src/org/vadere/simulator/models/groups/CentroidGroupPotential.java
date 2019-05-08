@@ -1,8 +1,7 @@
 package org.vadere.simulator.models.groups;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
@@ -10,9 +9,11 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,24 +22,27 @@ import java.util.Random;
 @ModelClass
 public class CentroidGroupPotential implements PotentialFieldAgent {
 
-	private static Logger logger = LogManager.getLogger(CentroidGroupPotential.class);
+	private static Logger logger = Logger.getLogger(CentroidGroupPotential.class);
 
 	private final AttributesCGM attributesCGM;
 	private final CentroidGroupModel groupCollection;
 	private final PotentialFieldAgent potentialFieldPedestrian;
+	private final IPotentialFieldTarget potentialFieldTarget;
 
 	public CentroidGroupPotential(CentroidGroupModel groupCollection,
 								  PotentialFieldAgent pedestrianRepulsionPotential,
+								  IPotentialFieldTarget potentialFieldTarget,
 								  AttributesCGM attributesCGM) {
 
 		this.attributesCGM = attributesCGM;
 		this.groupCollection = groupCollection;
 		this.potentialFieldPedestrian = pedestrianRepulsionPotential;
+		this.potentialFieldTarget = potentialFieldTarget;
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
-									Collection<? extends Agent> closePedestrians) {
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Collection<? extends Agent> closePedestrians) {
 		double result = 0;
 
 		if (!(pedestrian instanceof Pedestrian))
@@ -53,7 +57,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		return result;
 	}
 
-	private double getPedestrianGroupPotential(Pedestrian ped, VPoint pos) {
+	private double getPedestrianGroupPotential(Pedestrian ped, IPoint pos) {
 		double result = 0;
 		CentroidGroup group = groupCollection.getGroup(ped);
 		Pedestrian leader = null;
@@ -64,6 +68,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 
 		if (leader != null) {
 			VPoint leaderPoint = leader.getPosition();
+			double leaderPotential = potentialFieldTarget.getPotential(leaderPoint, leader);
+			double pedPotential = potentialFieldTarget.getPotential(ped.getPosition(), ped);
 
 			final double[] distanceToCentroid = {
 					pos.getX() - leaderPoint.getX(),
@@ -71,15 +77,14 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 
 			result = attributesCGM.getLeaderAttractionFactor()
 					* Math.pow(
-					Math.pow(distanceToCentroid[0], 2)
-							+ Math.pow(distanceToCentroid[1], 2),
-					2);
+					leaderPotential - pedPotential,
+					4);
 		}
 
 		return result;
 	}
 
-	private double getPedestrianRepulsionPotential(Pedestrian ped, VPoint pos,
+	private double getPedestrianRepulsionPotential(Pedestrian ped, IPoint pos,
 												   Collection<? extends Agent> closePedestrians) {
 		double potential = 0;
 
@@ -93,7 +98,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public Vector2D getAgentPotentialGradient(VPoint pos,
+	public Vector2D getAgentPotentialGradient(IPoint pos,
 											  Vector2D velocity, Agent pedestrian,
 											  Collection<? extends Agent> closePedestrians) {
 		// TODO [priority=low] [task=refactoring] not implemented
@@ -102,7 +107,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public double getAgentPotential(VPoint pos, Agent pedestrian,
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
 									Agent otherPedestrian) {
 //		System.out.printf("Ped1: %s, Ped1: %s %n", pedestrian.getId(), otherPedestrian.getId());
 		CentroidGroup group = groupCollection.getGroup(pedestrian);
@@ -110,7 +115,7 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 		double potential = potentialFieldPedestrian.getAgentPotential(pos,
 				pedestrian, otherPedestrian);
 
-		if (group.equals(groupOther)) {
+		if (group != null && group.equals(groupOther)) {
 			potential *= attributesCGM.getGroupMemberRepulsionFactor();
 		}
 

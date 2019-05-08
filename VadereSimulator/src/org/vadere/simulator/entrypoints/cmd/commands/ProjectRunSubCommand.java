@@ -3,12 +3,12 @@ package org.vadere.simulator.entrypoints.cmd.commands;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioRun;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,7 +45,7 @@ public class ProjectRunSubCommand implements SubCommandRunner {
 					projectDirectory.toFile().toString(),scenarioFile);
 			new ScenarioRun(scenario, null).run();
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error(e);
 			System.exit(-1);
 		}

@@ -16,7 +16,7 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 			double max, int maxIterations) {
 		super(rng, mean, standardDeviation);
 		if (max <= min)
-			throw new IllegalArgumentException("Parameter min must be less than max.");
+			throw new IllegalArgumentException("Parameter min must be less than bound.");
 		this.min = min;
 		this.max = max;
 		this.maxIterations = maxIterations;
@@ -30,7 +30,7 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 				return sample;
 		}
 		throw new IllegalArgumentException(
-				"Max iteration count reached on sampling for truncated distribution. Parameters max and min are not suitable.");
+				"Max iteration count reached on sampling for truncated distribution. Parameters bound and min are not suitable.");
 	}
 
 }

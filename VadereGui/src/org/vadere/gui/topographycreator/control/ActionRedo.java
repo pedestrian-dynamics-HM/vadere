@@ -1,8 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +19,7 @@ public class ActionRedo extends AbstractAction {
 	private static final long serialVersionUID = 4975524648404524891L;
 	private final UndoManager undoManager;
 	private final TopographyAction action;
-	private static Logger logger = LogManager.getLogger(ActionRedo.class);
+	private static Logger logger = Logger.getLogger(ActionRedo.class);
 
 	public ActionRedo(final String name, final ImageIcon icon, final UndoManager undoManager,
 			final TopographyAction action) {
@@ -34,7 +33,7 @@ public class ActionRedo extends AbstractAction {
 		try {
 			undoManager.redo();
 		} catch (CannotRedoException e) {
-			logger.log(Priority.DEBUG, "Cannot redo! List of edits is empty!");
+			logger.debug("Cannot redo! List of edits is empty!");
 			Toolkit.getDefaultToolkit().beep();
 		}
 		action.actionPerformed(arg0);

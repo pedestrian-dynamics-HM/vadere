@@ -1,7 +1,7 @@
 {
   "name" : "stairs_upward_direction_up_-1",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -45,6 +45,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
+        "minStepLength" : 0.4625,
+        "maxStepDuration" : 1.7976931348623157E308,
         "optimizationType" : "DISCRETE",
         "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
@@ -68,7 +70,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 70.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -103,7 +105,7 @@
         "shape" : {
           "x" : 1.0,
           "y" : 0.0,
-          "width" : 0.9,
+          "width" : 1.0,
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
@@ -118,7 +120,7 @@
           "type" : "RECTANGLE"
         },
         "id" : -1,
-        "treadCount" : 25,
+        "treadCount" : 30,
         "upwardDirection" : {
           "x" : 0.0,
           "y" : -1.0
@@ -130,7 +132,7 @@
         "shape" : {
           "x" : 2.0,
           "y" : 18.0,
-          "width" : 6.1,
+          "width" : 6.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
@@ -145,9 +147,9 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 1.9,
+          "x" : 2.0,
           "y" : 1.0,
-          "width" : 6.3,
+          "width" : 6.0,
           "height" : 1.1,
           "type" : "RECTANGLE"
         },
@@ -173,6 +175,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
         "radius" : 0.195,
@@ -189,6 +192,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

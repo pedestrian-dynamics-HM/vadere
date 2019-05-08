@@ -1,10 +1,8 @@
 package org.vadere.gui.components.utils;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import org.vadere.util.logging.Logger;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -16,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
 /**
  * The Resource class is for loading, changing, adding and manipulating properties in the
  * property file [applicationName]_config.properties. The global_config.properties file
@@ -26,7 +27,7 @@ import java.util.Properties;
  */
 public class Resources {
 
-	private static Logger logger = LogManager.getLogger(Resources.class);
+	private static Logger logger = Logger.getLogger(Resources.class);
 
 	private Properties properties = null;
 
@@ -83,7 +84,7 @@ public class Resources {
 				properties.load(in);
 			} catch (IOException e) {
 				e.printStackTrace();
-				logger.error("error while loading properties for application: " + applicationName);
+				logger.error("topographyError while loading properties for application: " + applicationName);
 			} finally {
 				try {
 					in.close();

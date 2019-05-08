@@ -1,7 +1,7 @@
 package org.vadere.simulator.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.vadere.simulator.control.cognition.CognitionLayer;
+import org.vadere.simulator.control.events.EventController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -15,25 +15,27 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.scenario.*;
+import org.vadere.util.logging.Logger;
+
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Simulation {
 
-	private static Logger logger = LogManager.getLogger(Simulation.class);
+	private static Logger logger = Logger.getLogger(Simulation.class);
 
 	private final AttributesSimulation attributesSimulation;
 	private final AttributesAgent attributesAgent;
 
 	private final Collection<SourceController> sourceControllers;
 	private final Collection<TargetController> targetControllers;
+	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -41,8 +43,8 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private List<Model> models;
 
-	private boolean runSimulation = false;
-	private boolean paused = false;
+	private boolean isRunSimulation = false;
+	private boolean isPaused = false;
 	/**
 	 * current simulation time (seconds)
 	 */
@@ -67,9 +69,13 @@ public class Simulation {
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
+	private final EventController eventController;
+	private final CognitionLayer cognitionLayer;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager, SimulationResult simulationResult) {
+					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
+					  SimulationResult simulationResult) {
+
 		this.name = name;
 		this.mainModel = mainModel;
 		this.scenarioStore = scenarioStore;
@@ -77,6 +83,7 @@ public class Simulation {
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
+		this.absorbingAreaControllers = new LinkedList<>();
 		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
@@ -91,38 +98,56 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
-		this.topographyController = new TopographyController(topography, dynamicElementFactory);
+
+		// "eventController" is final. Therefore, create object here and not in helper method.
+		this.eventController = new EventController(scenarioStore);
+		this.cognitionLayer = new CognitionLayer();
+
+		createControllers(topography, mainModel, random);
 
 		// ::start:: this code is to visualize the potential fields. It may be refactored later.
-		IPotentialFieldTarget pft = null;
-		IPotentialField pt = null;
-		if(mainModel instanceof PotentialFieldModel) {
-			pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
-			pt = (pos, agent) -> {
-				if(agent instanceof PedestrianOSM) {
-					return ((PedestrianOSM)agent).getPotential(pos);
-				}
-				else {
-					return 0.0;
-				}
-			};
-		}
+		if(attributesSimulation.isVisualizationEnabled()) {
+			IPotentialFieldTarget pft = null;
+			IPotentialField pt = null;
+			if(mainModel instanceof PotentialFieldModel) {
+				pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+				pt = (pos, agent) -> {
+					if(agent instanceof PedestrianOSM) {
+						return ((PedestrianOSM)agent).getPotential(pos);
+					}
+					else {
+						return 0.0;
+					}
+				};
+			}
 
-		for (PassiveCallback pc : this.passiveCallbacks) {
-			pc.setTopography(topography);
-			pc.setPotentialFieldTarget(pft);
-			pc.setPotentialField(pt);
+			for (PassiveCallback pc : this.passiveCallbacks) {
+				pc.setPotentialFieldTarget(pft);
+				pc.setPotentialField(pt);
+			}
 		}
 		// ::end::
 
-		// create source and target controllers
+		for (PassiveCallback pc : this.passiveCallbacks) {
+			pc.setTopography(topography);
+		}
+	}
+
+	private void createControllers(Topography topography, MainModel mainModel, Random random) {
+		this.topographyController = new TopographyController(topography, mainModel);
+
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory
 					.create(topography, source, dynamicElementFactory, attributesAgent, random);
 			sourceControllers.add(sc);
 		}
+
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
+		}
+
+		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
+			absorbingAreaControllers.add(new AbsorbingAreaController(topography, absorbingArea));
 		}
 
 		if (topography.hasTeleporter()) {
@@ -139,7 +164,7 @@ public class Simulation {
 
 		simulationState = initialSimulationState();
 		topographyController.preLoop(simTimeInSec);
-		runSimulation = true;
+		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 
 		for (Model m : models) {
@@ -157,6 +182,7 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -169,7 +195,7 @@ public class Simulation {
 		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.postLoop(this.simulationState);
 		}
-		topographyController.postLoop(this.simTimeInSec);
+
 	}
 
 	/**
@@ -184,15 +210,15 @@ public class Simulation {
 
 			preLoop();
 
-			while (runSimulation) {
+			while (isRunSimulation) {
 				synchronized (this) {
-					while (paused) {
+					while (isPaused) {
 						try {
 							wait();
 						} catch (Exception e) {
-							paused = false;
+							isPaused = false;
 							Thread.currentThread().interrupt();
-							logger.warn("interrupt while paused.");
+							logger.warn("interrupt while isPaused.");
 						}
 					}
 				}
@@ -205,14 +231,13 @@ public class Simulation {
 					c.preUpdate(simTimeInSec);
 				}
 
-				assert assertAllPedestrianInBounds();
+				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
 				updateWriters(simTimeInSec);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
 				}
-
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
@@ -221,17 +246,16 @@ public class Simulation {
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
-					runSimulation = false;
+					isRunSimulation = false;
 				}
-
 
 				//remove comment to fasten simulation for evacuation simulations
 				//if (topography.getElements(Pedestrian.class).size() == 0){
-				//	runSimulation = false;
+				// isRunSimulation = false;
 				//}
 
 				if (Thread.interrupted()) {
-					runSimulation = false;
+					isRunSimulation = false;
 					simulationResult.setState("Simulation interrupted");
 					logger.info("Simulation interrupted.");
 				}
@@ -261,7 +285,6 @@ public class Simulation {
 	}
 
 	private void updateWriters(double simTimeInSec) {
-
 		SimulationState simulationState =
 				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
@@ -269,7 +292,10 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
+		// TODO Why are target controllers readded in each simulation loop?
+		// Maybe, Isabella's SIMA branch required this because pedestrians can act as targets there.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -283,11 +309,29 @@ public class Simulation {
 			targetController.update(simTimeInSec);
 		}
 
-		topographyController.update(simTimeInSec);
+		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {
+			absorbingAreaController.update(simTimeInSec);
+		}
+
+		topographyController.update(simTimeInSec); //rebuild CellGrid
 		step++;
 
+		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		cognitionLayer.prioritizeEventsForPedestrians(events, pedestrians);
+
 		for (Model m : models) {
-			m.update(simTimeInSec);
+			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
+			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
+			
+			// Only update until there are pedestrians in the scenario or pedestrian to spawn
+			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 ) {
+				m.update(simTimeInSec);
+
+				if (topography.isRecomputeCells()) {
+					// rebuild CellGrid if model does not manage the CellGrid state while updating
+					topographyController.update(simTimeInSec); //rebuild CellGrid
+				}
+			}
 		}
 
 		if (topographyController.getTopography().hasTeleporter()) {
@@ -296,19 +340,19 @@ public class Simulation {
 	}
 
 	public synchronized void pause() {
-		paused = true;
+		isPaused = true;
 	}
 
 	public synchronized boolean isPaused() {
-		return paused;
+		return isPaused;
 	}
 
 	public synchronized boolean isRunning() {
-		return runSimulation && !isPaused();
+		return isRunSimulation && !isPaused();
 	}
 
 	public synchronized void resume() {
-		paused = false;
+		isPaused = false;
 		notify();
 	}
 
@@ -333,7 +377,7 @@ public class Simulation {
 			try {
 				Thread.sleep(waitTime);
 			} catch (InterruptedException e) {
-				runSimulation = false;
+				isRunSimulation = false;
 				logger.info("Simulation interrupted.");
 			}
 		}

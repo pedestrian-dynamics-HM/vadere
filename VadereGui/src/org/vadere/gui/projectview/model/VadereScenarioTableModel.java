@@ -1,10 +1,10 @@
 package org.vadere.gui.projectview.model;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.util.logging.Logger;
 
 /**
  * The table panelModel used in the table that displays
@@ -38,7 +38,7 @@ public class VadereScenarioTableModel extends VadereTableModelSorted<VadereScena
 		}
 	}
 
-	private static Logger logger = LogManager.getLogger(VadereScenarioTableModel.class);
+	private static Logger logger = Logger.getLogger(VadereScenarioTableModel.class);
 	private static final long serialVersionUID = 1145206652000839654L;
 
 	VadereScenarioTableModel() {

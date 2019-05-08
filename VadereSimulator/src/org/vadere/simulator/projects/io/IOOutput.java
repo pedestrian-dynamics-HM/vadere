@@ -1,18 +1,15 @@
 package org.vadere.simulator.projects.io;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SimulationOutput;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.VadereClassNotFoundException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
  */
 public abstract class IOOutput {
 
-	private static final Logger logger = LogManager.getLogger(IOOutput.class);
+	private static final Logger logger = Logger.getLogger(IOOutput.class);
 
 	public static List<File> listSelectedOutputDirs(final VadereProject project, final Scenario scenario) {
 
@@ -131,7 +130,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete scenario-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge scenario-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -140,7 +139,7 @@ public abstract class IOOutput {
 				try {
 					Files.delete(file.toPath());
 				} catch (IOException e) {
-					logger.error("could not delete trajectory-file: " + file.getAbsolutePath() + ", "
+					logger.error("could not deleteEdge trajectory-file: " + file.getAbsolutePath() + ", "
 							+ e.getLocalizedMessage());
 				}
 			}
@@ -148,7 +147,7 @@ public abstract class IOOutput {
 			try {
 				Files.delete(directory.toPath());
 			} catch (IOException e) {
-				logger.error("could not delete output-directory: " + directory.getAbsolutePath() + ", "
+				logger.error("could not deleteEdge output-directory: " + directory.getAbsolutePath() + ", "
 						+ e.getLocalizedMessage());
 			}
 
@@ -162,7 +161,7 @@ public abstract class IOOutput {
 	private static List<File> listAllDirs(final VadereProject project) {
 		List<File> outputDirectories = new LinkedList<>();
 		if (Files.exists(project.getOutputDir())) {
-			File[] files = new File(project.getOutputDir().toString()).listFiles(File::isDirectory);
+			File[] files = new File(project.getOutputDir().toString()).listFiles(f -> f.isDirectory());
 			if (files != null) {
 				outputDirectories = Arrays.stream(files).filter(dir -> !dir.getName().equals(IOUtils.CORRUPT_DIR))
 						.collect(Collectors.toList());

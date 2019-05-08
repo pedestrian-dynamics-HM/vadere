@@ -395,10 +395,10 @@ public class MathUtil {
 			} else if (discr > 0) {
 				Collections.addAll(result, (-b + Math.sqrt(discr)) / (2.0 * a), (-b - Math.sqrt(discr)) / (2.0 * a));
 			}
-		} else if (c != 0) {
+		} else if (b != 0) {
 			result.add(-c / b);
 		} else {
-			throw new IllegalArgumentException("ax^2 + bx + c = 0 is not a valid quadratic equation for a=b=0.");
+			//throw new IllegalArgumentException("ax^2 + bx + c = 0 is not a valid quadratic equation for a=b=0.");
 		}
 
 		return result;

@@ -1,6 +1,22 @@
 package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import org.apache.commons.math3.analysis.function.Abs;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesDynamicElement;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.util.geometry.LinkedCellsGrid;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
+
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
@@ -15,27 +31,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesDynamicElement;
-import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.potential.CellGrid;
-import org.vadere.util.potential.CellState;
-import org.vadere.util.potential.PathFindingTag;
-
 @JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
-public class Topography {
+public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	private Function<VPoint, Double> obstacleDistanceFunction;
+	private Function<IPoint, Double> obstacleDistanceFunction;
 	
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
@@ -60,6 +62,11 @@ public class Topography {
 	 * iteration between frames.
 	 */
 	private final LinkedList<Target> targets;
+	/**
+	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
+	 * iteration between frames.
+	 */
+	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
 	 * List of obstacles used as a boundary for the whole topography.
@@ -72,6 +79,7 @@ public class Topography {
 
 	private transient final DynamicElementContainer<Pedestrian> pedestrians;
 	private transient final DynamicElementContainer<Car> cars;
+	private boolean recomputeCells;
 
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
@@ -104,6 +112,7 @@ public class Topography {
 		stairs = new LinkedList<>();
 		sources = new LinkedList<>();
 		targets = new LinkedList<>();
+		absorbingAreas = new LinkedList<>();
 		boundaryObstacles = new LinkedList<>();
 		
 		allScenarioElements.add(obstacles);
@@ -116,6 +125,7 @@ public class Topography {
 
 		this.pedestrians = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
+		recomputeCells = false;
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
 		
@@ -148,11 +158,21 @@ public class Topography {
 		return null;
 	}
 
-	public double distanceToObstacle(@NotNull VPoint point) {
+	public AbsorbingArea getAbsorbingArea(int targetId) {
+		for (AbsorbingArea absorbingArea : this.absorbingAreas) {
+			if (absorbingArea.getId() == targetId) {
+				return absorbingArea;
+			}
+		}
+
+		return null;
+	}
+
+	public double distanceToObstacle(@NotNull IPoint point) {
 		return this.obstacleDistanceFunction.apply(point);
 	}
 
-	public void setObstacleDistanceFunction(@NotNull Function<VPoint, Double> obstacleDistanceFunction) {
+	public void setObstacleDistanceFunction(@NotNull Function<IPoint, Double> obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
@@ -162,6 +182,14 @@ public class Topography {
 
 	public boolean containsTarget(final Predicate<Target> targetPredicate, final int targetId) {
 		return getTargets().stream().filter(t -> t.getId() == targetId).anyMatch(targetPredicate);
+	}
+
+	public boolean containsAbsorbingArea(final Predicate<AbsorbingArea> absorbingAreaPredicate) {
+		return getAbsorbingAreas().stream().anyMatch(absorbingAreaPredicate);
+	}
+
+	public boolean containsAbsorbingArea(final Predicate<AbsorbingArea> absorbingAreaPredicate, final int absorbingAreaId) {
+		return getAbsorbingAreas().stream().filter(t -> t.getId() == absorbingAreaId).anyMatch(absorbingAreaPredicate);
 	}
 
 	/**
@@ -175,6 +203,14 @@ public class Topography {
 		return getTargets().stream()
 				.collect(Collectors
 						.groupingBy(t -> t.getId(), Collectors
+								.mapping(t -> t.getShape(), Collectors
+										.toList())));
+	}
+
+	public Map<Integer, List<VShape>> getAbsorbingAreaShapes() {
+		return getAbsorbingAreas().stream()
+				.collect(Collectors
+						.groupingBy(absorbingArea -> absorbingArea.getId(), Collectors
 								.mapping(t -> t.getShape(), Collectors
 										.toList())));
 	}
@@ -216,16 +252,27 @@ public class Topography {
 		return getContainer(elementType).getElement(id);
 	}
 
+	@Override
 	public <T extends DynamicElement> void addElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).addElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void removeElement(T element) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).removeElement(element);
 	}
 
+	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
+	}
+
+	public boolean isRecomputeCells() {
+		return recomputeCells;
+	}
+
+	public void setRecomputeCells(boolean recomputeCells) {
+		this.recomputeCells = recomputeCells;
 	}
 
 	public List<Source> getSources() {
@@ -234,6 +281,10 @@ public class Topography {
 
 	public List<Target> getTargets() {
 		return targets;
+	}
+
+	public List<AbsorbingArea> getAbsorbingAreas() {
+		return absorbingAreas;
 	}
 
 	public List<Obstacle> getObstacles() {
@@ -262,6 +313,10 @@ public class Topography {
 
 	public void addTarget(Target target) {
 		this.targets.add(target);
+	}
+
+	public void addAbsorbingArea(AbsorbingArea absorbingArea) {
+		this.absorbingAreas.add(absorbingArea);
 	}
 
 	public void addObstacle(Obstacle obstacle) {
@@ -375,18 +430,21 @@ public class Topography {
 
 		for (Obstacle obstacle : this.getObstacles()) {
 			if (boundaryObstacles.contains(obstacle))
-				s.addBoundary((Obstacle) obstacle.clone());
+				s.addBoundary(obstacle.clone());
 			else
-				s.addObstacle((Obstacle) obstacle.clone());
+				s.addObstacle(obstacle.clone());
 		}
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
 		for (Target target : getTargets()) {
-			s.addTarget((Target) target.clone());
+			s.addTarget(target.clone());
+		}
+		for (AbsorbingArea absorbingArea: getAbsorbingAreas()) {
+			s.addAbsorbingArea(absorbingArea.clone());
 		}
 		for (Source source : getSources()) {
-			s.addSource((Source) source.clone());
+			s.addSource(source.clone());
 		}
 		for (Pedestrian pedestrian : getElements(Pedestrian.class)) {
 			s.addElement(pedestrian);
@@ -402,7 +460,7 @@ public class Topography {
 		}
 
 		if (hasTeleporter()) {
-			s.setTeleporter((Teleporter) teleporter.clone());
+			s.setTeleporter(teleporter.clone());
 		}
 
 		for (DynamicElementAddListener<Pedestrian> pedestrianAddListener : this.pedestrians.getElementAddedListener()) {
@@ -474,6 +532,7 @@ public class Topography {
 		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
 		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
 		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -491,7 +550,9 @@ public class Topography {
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 
-
+		absorbingAreas.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 	}
 
 	private int nextIdNotInSet(Set<Integer> usedIDs){
@@ -505,13 +566,30 @@ public class Topography {
 
 
 	public ArrayList<ScenarioElement> getAllScenarioElements(){
-		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size()));
+		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size() + stairs.size() + targets.size() + sources.size() + boundaryObstacles.size() + absorbingAreas.size()));
 		all.addAll(obstacles);
 		all.addAll(stairs);
 		all.addAll(targets);
 		all.addAll(sources);
 		all.addAll(boundaryObstacles);
+		all.addAll(absorbingAreas);
 		return  all;
 
+	}
+
+	public static Collection<Obstacle> createObstacleBoundary(@NotNull final Topography topography) {
+		List<Obstacle> obstacles = new ArrayList<>();
+		VPolygon boundary = new VPolygon(topography.getBounds());
+		double width = topography.getBoundingBoxWidth();
+		Collection<VPolygon> boundingBoxObstacleShapes = boundary.borderAsShapes(width, width / 2.0, 0.0001);
+
+		for (VPolygon obstacleShape : boundingBoxObstacleShapes) {
+			AttributesObstacle obstacleAttributes = new AttributesObstacle(
+					-1, obstacleShape);
+			Obstacle obstacle = new Obstacle(obstacleAttributes);
+			obstacles.add(obstacle);
+		}
+
+		return obstacles;
 	}
 }

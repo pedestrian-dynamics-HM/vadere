@@ -3,11 +3,11 @@ package org.vadere.state.util;
 import java.io.IOException;
 import java.util.List;
 
+import org.vadere.util.geometry.shapes.ShapeType;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.ShapeType;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;

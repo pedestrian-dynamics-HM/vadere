@@ -1,17 +1,18 @@
 package org.vadere.gui.postvisualization.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
 
 public class ActionSetTimeStep extends ActionVisualization implements ChangeListener {
-	private static Logger logger = LogManager.getLogger(ActionSetTimeStep.class);
+	private static Logger logger = Logger.getLogger(ActionSetTimeStep.class);
 	private PostvisualizationModel model;
 
 	public ActionSetTimeStep(final String name, PostvisualizationModel model) {

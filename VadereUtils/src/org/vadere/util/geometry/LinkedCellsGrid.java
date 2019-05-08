@@ -3,12 +3,9 @@ package org.vadere.util.geometry;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,7 +29,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	private int size;
 
 	/**
-	 * One cell in the grid. It contains a mapping from points to lists of
+	 * One cell in the grid. It triangleContains a mapping from points to lists of
 	 * objects. This means that one can store multiple objects in one cell.
 	 * 
 	 * 
@@ -76,6 +73,33 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 
 		private LinkedCellsGrid getOuterType() {
 			return LinkedCellsGrid.this;
+		}
+	}
+
+	private class ContainerisedElement {
+		final private int[] cell;
+		final private T object;
+
+		ContainerisedElement(int[] cell, T object){
+			this.cell = cell;
+			this.object = object;
+		}
+
+		public int[] getCell() {
+			return cell;
+		}
+
+		public T getObject() {
+			return object;
+		}
+
+		@Override
+		public String toString() {
+			return "ContainerisedElement{" +
+					"cell=" + Arrays.toString(cell) +
+					", object=" + object +
+					", pos= " + ((PointPositioned)object).getPosition() +
+					'}';
 		}
 	}
 
@@ -141,9 +165,9 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 
 		// create grid
 		/*
-		 * this.gridSize = (int) Math.max(1,
-		 * Math.ceil(Math.max(width, height) / sideLength));
-		 * this.cellSize = Math.max(width, height) / gridSize;
+		 * this.gridSize = (int) Math.bound(1,
+		 * Math.ceil(Math.bound(width, height) / sideLength));
+		 * this.cellSize = Math.bound(width, height) / gridSize;
 		 * this.grid = generateGrid(gridSize, gridSize);
 		 */
 
@@ -288,7 +312,7 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	}
 
 	/**
-	 * Tests whether the linked cells grid contains an object that equals(the
+	 * Tests whether the linked cells grid triangleContains an object that equals(the
 	 * given object). The complexity of this operation is O(N), N = number of
 	 * objects in the grid.
 	 * 
@@ -302,6 +326,19 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 			}
 		}
 		return false;
+	}
+
+	public List<ContainerisedElement> getElementContainer(final T element){
+		List<ContainerisedElement> elements  = new ArrayList<>();
+		for (int r = 0; r < grid.length; r++) {
+			// TODO [priority=medium] [task=test] changed this [20.08.2014] here 1 to r - pls check this
+			for (int c = 0; c < grid[r].length; c++) {
+				if (grid[r][c].objects.contains(element)){
+					elements.add(new ContainerisedElement(new int[]{r, c}, element));
+				}
+			}
+		}
+		return elements;
 	}
 
 	@Override

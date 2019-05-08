@@ -1,12 +1,12 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.simulator.control.OfflineSimulation;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class ActionRunOutput extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LogManager.getLogger(ActionRunOutput.class);
+	private static Logger logger = Logger.getLogger(ActionRunOutput.class);
 
 	private ProjectViewModel model;
 

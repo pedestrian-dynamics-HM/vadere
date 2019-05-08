@@ -10,7 +10,7 @@ import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
-import org.vadere.tests.util.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
 
 import java.io.File;

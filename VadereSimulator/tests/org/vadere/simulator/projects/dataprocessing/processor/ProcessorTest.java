@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.tests.util.reflection.ReflectionHelper;
+import org.vadere.simulator.utils.reflection.ReflectionHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

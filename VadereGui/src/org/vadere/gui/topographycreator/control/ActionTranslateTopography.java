@@ -3,7 +3,6 @@ package org.vadere.gui.topographycreator.control;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.gui.topographycreator.view.ActionResizeTopographyBoundDialog;
 import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;

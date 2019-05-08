@@ -1,17 +1,18 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
+
+import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 /**
  * Ask the user to select a scenario-file from an output directory to convert this file to a
@@ -21,7 +22,7 @@ import java.io.IOException;
 public class ActionGenerateScenarioFromOutputFile extends ActionAbstractAddScenario {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LogManager.getLogger(ActionGenerateScenarioFromOutputFile.class);
+	private static Logger logger = Logger.getLogger(ActionGenerateScenarioFromOutputFile.class);
 
 	private ProjectViewModel model;
 

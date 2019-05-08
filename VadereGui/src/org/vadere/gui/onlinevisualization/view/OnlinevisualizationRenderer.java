@@ -4,12 +4,15 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class OnlinevisualizationRenderer extends SimulationRenderer {
@@ -100,6 +103,20 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 					}
 				}
 			}
+		}
+	}
+
+	/*
+	 * This method should replace pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+	 * However the simulation runs in an separated thread. Therefore, foot steps might be cleared
+	 * before they can be drawn! Solution: deep clone of the topography, which is costly and difficult.
+	 */
+	private Stream<VPoint> getFootStepsPosition(@NotNull final Agent agent) {
+		if(agent instanceof Pedestrian) {
+			return ((Pedestrian) agent).getFootSteps().stream().map(footStep -> footStep.getStart());
+		}
+		else {
+			return Stream.of(agent.getPosition());
 		}
 	}
 }

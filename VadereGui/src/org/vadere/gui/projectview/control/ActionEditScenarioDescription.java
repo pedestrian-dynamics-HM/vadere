@@ -1,11 +1,11 @@
 package org.vadere.gui.projectview.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +15,7 @@ import javax.swing.*;
 
 public class ActionEditScenarioDescription extends AbstractAction {
 
-	private static Logger logger = LogManager.getLogger(ActionEditScenarioDescription.class);
+	private static Logger logger = Logger.getLogger(ActionEditScenarioDescription.class);
 
 	private ProjectViewModel model;
 	

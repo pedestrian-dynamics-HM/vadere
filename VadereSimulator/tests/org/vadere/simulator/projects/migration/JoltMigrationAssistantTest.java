@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.tests.util.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;

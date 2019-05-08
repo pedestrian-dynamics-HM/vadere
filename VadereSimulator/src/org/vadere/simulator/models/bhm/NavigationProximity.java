@@ -1,18 +1,17 @@
 package org.vadere.simulator.models.bhm;
 
+import org.vadere.state.attributes.models.AttributesBHM;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.vadere.state.attributes.models.AttributesBHM;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VPoint;
-
 public class NavigationProximity implements Navigation {
 
-	private static Logger logger = LogManager.getLogger(NavigationProximity.class);
+	private static Logger logger = Logger.getLogger(NavigationProximity.class);
 
 	private final Random random;
 	private final AttributesBHM attributesBHM;

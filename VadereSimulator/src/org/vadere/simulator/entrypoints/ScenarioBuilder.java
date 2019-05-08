@@ -1,10 +1,5 @@
 package org.vadere.simulator.entrypoints;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
@@ -16,6 +11,10 @@ import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Teleporter;
+import org.vadere.util.logging.Logger;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 
 /**
@@ -29,7 +28,7 @@ import org.vadere.state.scenario.Teleporter;
  *
  */
 public class ScenarioBuilder {
-    private static Logger logger = LogManager.getLogger(ScenarioBuilder.class);
+    private static Logger logger = Logger.getLogger(ScenarioBuilder.class);
 
     private Scenario scenario;
     private ScenarioStore store;

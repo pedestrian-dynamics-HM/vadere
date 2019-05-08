@@ -4,27 +4,26 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.util.Collections;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.ShapeType;
 
 /**
- * Note: A polygon which has the same points as a rectangle is not
- * equals to the rectangle.
+ * Note: A polygon which has the same points as a rectangle is not equals to the rectangle.
  */
 public class VPolygon extends Path2D.Double implements VShape {
 	private static final long serialVersionUID = 6534837112398242609L;
 
 	public VPolygon(Path2D.Double path) {
 		this.reset();
+		this.append(path, false);
+		this.closePath();
+		/*if (!path.getBounds().isEmpty()) {
 
-		if (!path.getBounds().isEmpty()) {
-			this.append(path, false);
-			this.closePath();
-		}
+		}*/
 	}
 
 	public VPolygon() {
@@ -35,12 +34,60 @@ public class VPolygon extends Path2D.Double implements VShape {
 		this(new Path2D.Double(shape));
 	}
 
+	public boolean isSimple() {
+		List<VPoint> points = getPath();
+		for(int i = 0; i < points.size(); i++) {
+			VPoint p1 = points.get(i);
+			VPoint p2 = points.get((i+1) % points.size());
+			for(int j = i + 1; j < points.size(); j++) {
+				VPoint q1 = points.get(j);
+				VPoint q2 = points.get((j+1) % points.size());
+
+				if(GeometryUtils.intersectLineSegment(p1, p2, q1, q2)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public boolean isCCW() {
+		List<VPoint> points = getPath();
+		assert points.size() >= 3;
+		return GeometryUtils.isCCW(points.get(0), points.get(1), points.get(2));
+	}
+
+	public VPolygon toCWOrder() {
+		if(isCCW()) {
+			return revertOrder();
+		}
+		else {
+			return toCCWOrder();
+		}
+	}
+
+	public VPolygon toCCWOrder() {
+		if(isCCW()) {
+			return this;
+		}
+		else {
+			return revertOrder();
+		}
+	}
+
+	public VPolygon revertOrder() {
+		List<VPoint> points = getPath();
+		Collections.reverse(points);
+		return GeometryUtils.toPolygon(points);
+	}
+
 	/**
 	 * Check whether the given polygon intersects with the open ball around
 	 * "center" with given radius.
 	 * 
-	 * @param center
-	 * @param radius
+	 * @param center the center of the open ball
+	 * @param radius the radius of the open ball
 	 * @return true if any point of the polygon lies within the open ball.
 	 */
 	public boolean intersects(VPoint center, double radius) {
@@ -76,11 +123,11 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	/**
 	 * Returns a list of all points of this geometry.
-	 * 
+	 *
 	 * @return A list of points.
 	 */
 	public List<VPoint> getPoints() {
-		List<VPoint> resultList = new LinkedList<VPoint>();
+		List<VPoint> resultList = new ArrayList<>(); // use ArrayList for better index retrieval
 
 		PathIterator iterator = this.getPathIterator(null);
 		double[] coords = new double[6];
@@ -119,13 +166,16 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	/**
-	 * Check whether all lines of this polygon intersect somewhere with the
-	 * given polygon.
-	 * 
-	 * @param intersectingPolygon
-	 * @return
+	 * Checks whether two polygons (this and another polygon) do intersect.
+	 *
+	 * @param intersectingPolygon   the other polygon
+	 * @return true if the two polygons intersect
 	 */
 	public boolean intersects(final VPolygon intersectingPolygon) {
+
+		if(containsShape(intersectingPolygon) || intersectingPolygon.containsShape(this)) {
+			return true;
+		}
 
 		List<VPoint> pointList = getPoints();
 		for (int i = 0; i < pointList.size() - 1; i++) {
@@ -146,15 +196,30 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return false;
 	}
 
-	public double getArea() {
-		List<VPoint> pointList = getPoints();
+	/**
+	 * Checks whether this polygon and the rectangle intersects.
+	 *
+	 * @param rectangle   the rectangle
+	 * @return true if this polygon intersects with the rectangle
+	 */
+	public boolean intersects(final VRectangle rectangle) {
 
-		double result = 0;
-		for (int i = 0; i < pointList.size() - 1; i++) {
-			result += (pointList.get(i).y + pointList.get(i + 1).y)
-					* (pointList.get(i).x - pointList.get(i + 1).x);
+		if(containsShape(rectangle) || rectangle.containsShape(this)) {
+			return true;
 		}
-		return Math.abs(result) / 2.0;
+
+		return intersectsRectangleLine(rectangle);
+	}
+
+	public boolean intersectsRectangleLine(final VRectangle rectangle) {
+		return intersects(new VLine(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMinY()))
+			|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY()))
+			|| intersects(new VLine(rectangle.getMaxX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMaxY()))
+			|| intersects(new VLine(rectangle.getMinX(), rectangle.getMaxY(), rectangle.getMinX(), rectangle.getMinY()));
+	}
+
+	public double getArea() {
+		return GeometryUtils.areaOfPolygon(getPoints());
 	}
 
 	// Assumed that first and last point are equal
@@ -231,8 +296,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 		}
 	}
 
-	public LinkedList<VPolygon> borderAsShapes(double borderWidth,
-			double shapeShrinkOffset, double segmentGrowOffset) {
+	public LinkedList<VPolygon> borderAsShapes(double borderWidth, double shapeShrinkOffset, double segmentGrowOffset) {
 		LinkedList<VPolygon> border = new LinkedList<VPolygon>();
 		PathIterator vertexItr = getPathIterator(null);
 		double lastVertex[] = null;
@@ -262,61 +326,61 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 			segmentVertices
 					.moveTo(lastVertex[0]
-							- delta[0]
+									- delta[0]
 									* segmentGrowOffset
-							- delta[1]
+									- delta[1]
 									* (borderOffset + shapeShrinkOffset + segmentGrowOffset),
 							lastVertex[1]
 									- delta[1]
-											* segmentGrowOffset
+									* segmentGrowOffset
 									+ delta[0]
-											* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
+									* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
 			segmentVertices
 					.lineTo(lastVertex[0]
-							- delta[0]
+									- delta[0]
 									* segmentGrowOffset
-							+ delta[1]
+									+ delta[1]
 									* (borderOffset - shapeShrinkOffset + segmentGrowOffset),
 							lastVertex[1]
 									- delta[1]
-											* segmentGrowOffset
+									* segmentGrowOffset
 									- delta[0]
-											* (borderOffset - shapeShrinkOffset + segmentGrowOffset));
+									* (borderOffset - shapeShrinkOffset + segmentGrowOffset));
 			segmentVertices
 					.lineTo(curVertex[0]
-							+ delta[0]
+									+ delta[0]
 									* segmentGrowOffset
-							+ delta[1]
+									+ delta[1]
 									* (borderOffset - shapeShrinkOffset + segmentGrowOffset),
 							curVertex[1]
 									+ delta[1]
-											* segmentGrowOffset
+									* segmentGrowOffset
 									- delta[0]
-											* (borderOffset - shapeShrinkOffset + segmentGrowOffset));
+									* (borderOffset - shapeShrinkOffset + segmentGrowOffset));
 			segmentVertices
 					.lineTo(curVertex[0]
-							+ delta[0]
+									+ delta[0]
 									* segmentGrowOffset
-							- delta[1]
+									- delta[1]
 									* (borderOffset + shapeShrinkOffset + segmentGrowOffset),
 							curVertex[1]
 									+ delta[1]
-											* segmentGrowOffset
+									* segmentGrowOffset
 									+ delta[0]
-											* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
+									* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
 
 			/* Insert first vertex as last too. */
 			segmentVertices
 					.lineTo(lastVertex[0]
-							- delta[0]
+									- delta[0]
 									* segmentGrowOffset
-							- delta[1]
+									- delta[1]
 									* (borderOffset + shapeShrinkOffset + segmentGrowOffset),
 							lastVertex[1]
 									- delta[1]
-											* segmentGrowOffset
+									* segmentGrowOffset
 									+ delta[0]
-											* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
+									* (borderOffset + shapeShrinkOffset + segmentGrowOffset));
 
 			border.add(new VPolygon(segmentVertices));
 
@@ -327,7 +391,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public double distance(@NotNull final VPoint target) {
+	public double distance(IPoint target) {
 		if (contains(target)) {
 			return -closestPoint(target).distance(target);
 		} else {
@@ -336,12 +400,13 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
+	public VPoint closestPoint(IPoint point) {
 		double currentMinDistance = java.lang.Double.MAX_VALUE;
 		VPoint resultPoint = null;
 
 		PathIterator iterator = this.getPathIterator(null);
 
+		double[] first = null;
 		double[] last = new double[2];
 		double[] next = new double[2];
 		VPoint currentClosest;
@@ -352,6 +417,10 @@ public class VPolygon extends Path2D.Double implements VShape {
 		while (!iterator.isDone()) {
 			last[0] = next[0];
 			last[1] = next[1];
+
+			if(first == null) {
+				first = new double[]{last[0], last[1]};
+			}
 
 			iterator.currentSegment(next);
 
@@ -364,6 +433,17 @@ public class VPolygon extends Path2D.Double implements VShape {
 			}
 
 			iterator.next();
+		}
+
+		// dont forget the last and first point!
+		if(first != null) {
+			currentClosest = GeometryUtils.closestToSegment(new VLine(next[0],
+					next[1], first[0], first[1]), point);
+
+			if (currentClosest.distance(point) < currentMinDistance) {
+				currentMinDistance = currentClosest.distance(point);
+				resultPoint = currentClosest;
+			}
 		}
 
 		return resultPoint;
@@ -392,19 +472,19 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
-	public boolean contains(VPoint point) {
-		return super.contains(point.x, point.y);
+	public boolean contains(final IPoint point) {
+		return super.contains(point.getX(), point.getY());
 	}
 
 	@Override
-	public VPolygon translatePrecise(final VPoint vector) {
+	public VPolygon translatePrecise(final IPoint vector) {
 		return translate(vector);
 	}
 
 	@Override
-	public VPolygon translate(final VPoint vector) {
+	public VPolygon translate(final IPoint vector) {
 		AffineTransform transform = new AffineTransform();
-		transform.translate(vector.x, vector.y);
+		transform.translate(vector.getX(), vector.getY());
 		return new VPolygon(new Path2D.Double(this, transform));
 	}
 
@@ -415,37 +495,85 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return new VPolygon(new Path2D.Double(this, transform));
 	}
 
+	/**
+	 * based on https://stackoverflow.com/a/2792459
+	 */
 	@Override
 	public VPoint getCentroid() {
-		List<VPoint> pointList = getPoints();
-		double area = 0;
-		double xValue = 0;
-		double yValue = 0;
-		for (int i = 0; i < pointList.size() - 1; i++) {
-			area += pointList.get(i).getX() * pointList.get(i + 1).getY()
-					- pointList.get(i).getY() * pointList.get(i + 1).getX();
-			xValue += (pointList.get(i).getX() + pointList.get(i + 1).getX())
-					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
-							- pointList.get(i).getY() * pointList.get(i + 1).getX());
-			yValue += (pointList.get(i).getY() + pointList.get(i + 1).getY())
-					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
-							- pointList.get(i).getY() * pointList.get(i + 1).getX());
-		}
-		area /= 2;
-		xValue /= (6 * area);
-		yValue /= (6 * area);
-
-		return new VPoint(xValue, yValue);
+//		List<VPoint> pointList = getPoints();
+//		double area = 0;
+//		double xValue = 0;
+//		double yValue = 0;
+//		for (int i = 0; i < pointList.size() - 1; i++) {
+//			area += pointList.get(i).getX() * pointList.get(i + 1).getY()
+//					- pointList.get(i).getY() * pointList.get(i + 1).getX();
+//			xValue += (pointList.get(i).getX() + pointList.get(i + 1).getX())
+//					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
+//					- pointList.get(i).getY() * pointList.get(i + 1).getX());
+//			yValue += (pointList.get(i).getY() + pointList.get(i + 1).getY())
+//					* (pointList.get(i).getX() * pointList.get(i + 1).getY()
+//					- pointList.get(i).getY() * pointList.get(i + 1).getX());
+//		}
+//
+//		// last with first point. This is outside of the loop to remove modulo operation
+//		// only needed in the last loop.
+//		int i = pointList.size() - 1;
+//		area += pointList.get(i).getX() * pointList.get(0).getY()
+//				- pointList.get(i).getY() * pointList.get(0).getX();
+//		xValue += (pointList.get(i).getX() + pointList.get(0).getX())
+//				* (pointList.get(i).getX() * pointList.get(0).getY()
+//				- pointList.get(i).getY() * pointList.get(0).getX());
+//		yValue += (pointList.get(i).getY() + pointList.get(0).getY())
+//				* (pointList.get(i).getX() * pointList.get(0).getY()
+//				- pointList.get(i).getY() * pointList.get(0).getX());
+//
+//		area /= 2;
+//		xValue /= (6 * area);
+//		yValue /= (6 * area);
+//
+//		return new VPoint(xValue, yValue);
+		return GeometryUtils.getCentroid(getPoints());
 	}
 
-	public VPolygon rotate(VPoint anchor, double angle) {
+	public VPolygon rotate(IPoint anchor, double angle) {
 		VPolygon resultPolygon = new VPolygon(this);
-		resultPolygon.transform(AffineTransform.getRotateInstance(angle, anchor.x, anchor.y));
+		resultPolygon.transform(AffineTransform.getRotateInstance(angle, anchor.getX(), anchor.getY()));
 		return resultPolygon;
 	}
 
 	@Override
 	public ShapeType getType() {
 		return ShapeType.POLYGON;
+	}
+
+	@Override
+	public boolean intersects(final VShape shape) {
+		if(shape instanceof VPolygon) {
+			return intersects((VPolygon) shape);
+		}
+		else if(shape instanceof VRectangle){
+			return intersectsRectangleLine(((VRectangle)shape));
+		}
+		else {
+			return VShape.super.intersects(shape);
+		}
+	}
+
+	@Override
+	public List<VPoint> getPath() {
+		return getPoints();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		for(VPoint point : getPoints()) {
+			builder.append("[" + point.getX() + "," + point.getY() + "],");
+		}
+		// remove the last ","
+		builder.deleteCharAt(builder.length()-1);
+		builder.append("]");
+		return builder.toString();
 	}
 }

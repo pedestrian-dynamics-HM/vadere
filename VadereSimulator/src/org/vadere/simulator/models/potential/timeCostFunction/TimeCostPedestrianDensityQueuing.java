@@ -1,11 +1,10 @@
 package org.vadere.simulator.models.potential.timeCostFunction;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.density.IGaussianFilter;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.state.attributes.models.AttributesTimeCost;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.potential.timecost.ITimeCostFunction;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.logging.Logger;
 
 /**
  * TimeCostPedestrianDensityQueuing is a time cost function for the pedestrian
@@ -29,7 +28,7 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 	private final static double EPSILON = 0.000001;
 
 	/** only for logging. */
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(TimeCostPedestrianDensityQueuing.class);
 	private double highestCost = 0.0;
 	private long runtime = 0;
@@ -52,11 +51,11 @@ public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
 	}
 
 	@Override
-	public double costAt(final VPoint p) {
+	public double costAt(final IPoint p) {
 		long ms = System.currentTimeMillis();
 
 		double cost = queueWidthFactor
-				* gaussianCalculator.getFilteredValue(p.x, p.y);
+				* gaussianCalculator.getFilteredValue(p.getX(), p.getY());
 
 		runtime += System.currentTimeMillis() - ms;
 

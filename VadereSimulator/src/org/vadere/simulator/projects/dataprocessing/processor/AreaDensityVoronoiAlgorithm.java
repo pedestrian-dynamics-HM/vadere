@@ -1,20 +1,22 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
- * @author Mario Teixeira Parente
+ * Given a Simulation state this Algorithm computes the Voronoi density defined in zoennchen-2013 section 3, equation 3.7.
+ *
+ * @author Benedikt Zoennchen
  *
  */
-
 public class AreaDensityVoronoiAlgorithm extends AreaDensityAlgorithm {
     private VRectangle measurementArea;
     private VRectangle voronoiArea;
@@ -28,36 +30,31 @@ public class AreaDensityVoronoiAlgorithm extends AreaDensityAlgorithm {
 
     @Override
     public double getDensity(final SimulationState state) {
-        VoronoiDiagram voronoiDiagram = new VoronoiDiagram(this.voronoiArea);
-
-        // convert pedestrians to positions
-        List<VPoint> pedestrianPositions = Agent.getPositions(state.getTopography().getElements(Agent.class));
-        voronoiDiagram.computeVoronoiDiagram(pedestrianPositions);
 
         // compute everything
-        List<org.vadere.util.voronoi.Face> faces = voronoiDiagram.getFaces();
+        List<Face> faces = generateFaces(state);
 
-        Map<Integer, Double> areaMap = new TreeMap<>();
-        Map<Integer, VPoint> faceMap = new TreeMap<>();
+	    double area = 0.0;
+	    int pedCount = 0;
 
-        if (faces != null) {
-            for (org.vadere.util.voronoi.Face face : faces) {
-                areaMap.put(face.getId(), face.computeArea());
-                faceMap.put(face.getId(), face.getSite());
+        for (Face face : faces) {
+            if (this.measurementArea.contains(face.getSite())) {
+	            area += face.computeArea();
+	            pedCount++;
             }
         }
-
-        double area = 0.0;
-        int pedCount = 0;
-
-        // TODO: Possible optimization (do not test all faces)
-        for (Integer site : faceMap.keySet()) {
-            if (this.measurementArea.contains(faceMap.get(site))) {
-                area += areaMap.get(site);
-                pedCount++;
-            }
-        }
-
         return pedCount > 0 ? pedCount / area : 0;
     }
+
+	private List<Face> generateFaces(@NotNull final SimulationState state) {
+		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(this.voronoiArea);
+
+		// convert pedestrians to positions
+		List<VPoint> pedestrianPositions = Agent.getPositions(state.getTopography().getElements(Agent.class));
+		voronoiDiagram.computeVoronoiDiagram(pedestrianPositions);
+
+		// compute everything
+		List<Face> faces = voronoiDiagram.getFaces();
+		return faces == null ? Collections.emptyList() : faces;
+	}
 }

@@ -1,40 +1,32 @@
 package org.vadere.gui.components.view;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.model.SimulationModel;
+import org.vadere.gui.components.utils.CLGaussianCalculator;
+import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.renderer.agent.AgentRender;
+import org.vadere.state.scenario.Agent;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
+
+import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.CLGaussianCalculator;
-import org.vadere.gui.components.utils.ColorHelper;
-import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.renderer.agent.AgentRender;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VTriangle;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
-    private static Logger logger = LogManager.getLogger(SimulationRenderer.class);
+    private static Logger logger = Logger.getLogger(SimulationRenderer.class);
     private static Resources resources = Resources.getInstance("postvisualization");
 
     private static double MAX_POTENTIAL = 1000.0;
     private static double CONTOUR_STEP = 2.0;
-    private static double CONTOUR_THINKNESS = 0.2;
+    private static double CONTOUR_THINKNESS = 0.1;
 
     private SimulationModel model;
     private BufferedImage obstacleDensity = null;
@@ -91,8 +83,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderStairs(model.getTopography().getStairs(), graphics, model.config.getStairColor());
         }
 
-        if (model.config.isShowTargets()) {
-            renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
+		if (model.config.isShowTargets()) {
+			renderScenarioElement(model.getTopography().getTargets(), graphics, model.config.getTargetColor());
+		}
+
+        if (model.config.isShowAbsorbingAreas()) {
+            renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
         }
 
         if (model.config.isShowSources()) {
@@ -101,6 +97,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
         if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
+        }
+
+        if(model.config.isShowTargetPotentielFieldMesh()) {
+	        renderMesh(graphics, model.getDiscretization(), new VRectangle(model.getTopographyBound()));
         }
 
         renderSimulationContent(graphics);
@@ -140,7 +140,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         points.forEachOrdered(
                 p -> path.lineTo(p.getX(), p.getY()));
 
-        g.draw(path);
+        draw(path, g);
         g.setColor(color);
         // g.setStroke(stroke);
     }
@@ -181,7 +181,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     private void renderPotentialFieldOnViewport(final Graphics2D g, final int xPos, final int yPos, final int width, final int height) {
 
-    	logger.info("resolution = " + width + ", " + height);
+    	//logger.info("resolution = " + width + ", " + height);
 		/*
 		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
 		 */
@@ -193,6 +193,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         int startY = (int) (Math.max((dy - viewportBound.getY()), 0) * model.getScaleFactor());
 
         potentialFieldImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+	    double maxDistance = Math.sqrt(model.getTopography().getBounds().getWidth() * model.getTopography().getBounds().getWidth() +
+			    model.getTopography().getBounds().getHeight() * model.getTopography().getBounds().getHeight());
+	    colorHelper = new ColorHelper((int)(maxDistance * 0.7));
 
         for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
             for (int y = 0; y < potentialFieldImage.getHeight(); y++) {
@@ -206,7 +210,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 	                if (potential >= MAX_POTENTIAL) {
 		                c = model.config.getObstacleColor();
-	                } else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
+	                }
+	                else if (potential % CONTOUR_STEP <= CONTOUR_THINKNESS) {
 		                c = Color.BLACK;
 	                } else {
 		                c = colorHelper.numberToColor(potential % 100);

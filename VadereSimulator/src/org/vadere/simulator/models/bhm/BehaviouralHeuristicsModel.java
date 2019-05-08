@@ -118,6 +118,12 @@ public class BehaviouralHeuristicsModel implements MainModel {
 
 	@Override
 	public void update(final double simTimeInSec) {
+
+		// all those foot steps are done in previous sim time steps
+		for(PedestrianBHM ped : pedestrianEventsQueue) {
+			ped.clearFootSteps();
+		}
+
 		// event driven update
 		if (!pedestrianEventsQueue.isEmpty()) {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < simTimeInSec) {
@@ -139,6 +145,7 @@ public class BehaviouralHeuristicsModel implements MainModel {
 				}
 			}
 		}
+		topography.setRecomputeCells(true);
 	}
 
 	@Override

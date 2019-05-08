@@ -8,8 +8,6 @@ import org.vadere.state.attributes.processor.AttributesMeanPedestrianEvacuationT
 import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Mario Teixeira Parente
@@ -26,7 +24,7 @@ public class MeanPedestrianEvacuationTimeProcessor extends NoDataKeyProcessor<Do
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		//ensure that all required DataProcessors are updated.
-		this.pedEvacTimeProc.doUpdate(state);
+		this.pedEvacTimeProc.update(state);
 	}
 
 	@Override

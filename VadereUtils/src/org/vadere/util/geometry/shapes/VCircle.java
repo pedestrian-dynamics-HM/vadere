@@ -8,12 +8,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Comparator;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.ShapeType;
-import org.vadere.util.geometry.Vector2D;
 
 public class VCircle implements VShape, ICircleSector {
 
@@ -35,10 +35,12 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	/**
-	 * A circle at 0,0.
+	 * Construct a circle at (0,0) with a specific radius.
+	 * @param radius the radius of this circle
 	 */
 	public VCircle(double radius) {
 		this(0, 0, radius);
+		assert radius > 0.0;
 	}
 
 	public double getRadius() {
@@ -47,9 +49,10 @@ public class VCircle implements VShape, ICircleSector {
 
 	/**
 	 * The distance to the boundary of the circle.
+	 * @param pos the position to which the distance will be computed
 	 */
 	@Override
-	public double distance(VPoint pos) {
+	public double distance(IPoint pos) {
 		return Math.abs(this.center.distance(pos) - this.radius);
 	}
 
@@ -58,16 +61,26 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	@Override
-	public VPoint closestPoint(VPoint point) {
-		Vector2D direction = new Vector2D(point.x - center.x, point.y
+	public VPoint closestPoint(IPoint point) {
+		Vector2D direction = new Vector2D(point.getX() - center.x, point.getY()
 				- center.y);
 		VPoint vector = direction.normalize(radius);
 		return new VPoint(vector.x + center.x, vector.y + center.y);
 	}
 
+	@Override
+	public boolean contains(@NotNull final VPoint point) {
+		return point.distanceSq(center) < radius * radius;
+	}
+
 	/**
 	 * Returns zero, one or two points which are the intersection of this circle and the line
 	 * defined by p = (x11, y11) and q = (x22, y22).
+	 * @param x11   x-coordinate of the first point p
+	 * @param y11   y-coordinate of the first point p
+	 * @param x22   x-coordinate of the second point q
+	 * @param y22   y-coordinate of the second point q
+	 * @return  returns an immutable list {@link ImmutableList} of all immutable points {@link VPoint} intersecting the circle by the line defined by (p, q)
 	 */
 	public ImmutableList<VPoint> getIntersectionPoints(final double x11, final double y11, final double x22, final double y22) {
 
@@ -83,9 +96,11 @@ public class VCircle implements VShape, ICircleSector {
 		double D = radius * radius * dr * dr - disc * disc;
 		double sign = dy < 0 ? -1 : 1;
 
+		assert (Math.abs(dx) > 0.0 || Math.abs(dy) > 0.0) && dr * dr > 0.0 : "the line ("+x1+","+y1+") -- ("+x2+","+y2+") is invalid";
+
 		if (D == 0) {
-			x1 = (disc * dy + sign * dx * Math.sqrt(D)) / (dr * dr);
-			y1 = (-disc * dx + Math.abs(dy) * Math.sqrt(D)) / (dr * dr);
+			x1 = (disc * dy) / (dr * dr);
+			y1 = (-disc * dx) / (dr * dr);
 			return ImmutableList.of(new VPoint(x1 + this.getCenter().x, y1 + this.getCenter().y));
 		} else if (D < 0) {
 			return ImmutableList.of();
@@ -174,7 +189,7 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	@Override
-	public boolean contains(VPoint p) {
+	public boolean contains(IPoint p) {
 		return p.distance(center) <= radius;
 	}
 
@@ -224,12 +239,12 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	@Override
-	public VShape translate(final VPoint vector) {
+	public VShape translate(final IPoint vector) {
 		return new VCircle(getCenter().add(vector), getRadius());
 	}
 
 	@Override
-	public VShape translatePrecise(final VPoint vector) {
+	public VShape translatePrecise(final IPoint vector) {
 		return new VCircle(getCenter().addPrecise(vector), getRadius());
 	}
 
@@ -256,13 +271,34 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	@Override
-	public boolean intersects(VShape shape) {
-		if(shape instanceof VCircle) {
-			VCircle otherCircle = (VCircle)shape;
-			return otherCircle.getCenter().distance(this.getCenter()) < (otherCircle.getRadius() + this.getRadius());
+	public List<VPoint> getPath() {
+		// approximate the circle!
+		int numberOfSegments = 10;
+		List<VPoint> points = new ArrayList<>();
+		for(int i = 0; i < numberOfSegments; i++) {
+			double rad = 2*Math.PI * i / numberOfSegments;
+			double x = Math.cos(rad);
+			double y = Math.sin(rad);
+			points.add(center.add(new VPoint(x, y)));
 		}
-		else {
+		return points;
+	}
+
+	@Override
+	public boolean intersects(VShape shape) {
+		if (shape instanceof VCircle) {
+			VCircle otherCircle = (VCircle) shape;
+			return otherCircle.getCenter().distance(this.getCenter()) < (otherCircle.getRadius() + this.getRadius());
+		} else {
 			return VShape.super.intersects(shape);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "VCircle{" +
+				"center=" + center +
+				", radius=" + radius +
+				'}';
 	}
 }

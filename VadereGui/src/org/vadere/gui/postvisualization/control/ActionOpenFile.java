@@ -1,18 +1,17 @@
 package org.vadere.gui.postvisualization.control;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +19,10 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.*;
+
 public class ActionOpenFile extends ActionVisualization {
-	private static Logger logger = LogManager.getLogger(ActionOpenFile.class);
+	private static Logger logger = Logger.getLogger(ActionOpenFile.class);
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final PostvisualizationModel model;
 	private String path = null;

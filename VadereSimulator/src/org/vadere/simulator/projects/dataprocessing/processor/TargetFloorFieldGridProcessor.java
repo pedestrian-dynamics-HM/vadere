@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
@@ -14,6 +12,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FloorFieldGridRow;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 @DataProcessorClass()
 public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey, FloorFieldGridRow> {
-	private static Logger logger = LogManager.getLogger(TargetFloorFieldGridProcessor.class);
+	private static Logger logger = Logger.getLogger(TargetFloorFieldGridProcessor.class);
 	private AttributesFloorFieldProcessor att;
 	private List<Integer> targetIds;
 	private boolean hasOnceProcessed = false;
@@ -38,6 +37,7 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 
 		if (optMainModel.isPresent() && optMainModel.get() instanceof PotentialFieldModel) {
 			IPotentialFieldTarget pft = ((PotentialFieldModel) optMainModel.get()).getPotentialFieldTarget();
+
 			Rectangle.Double bound = state.getTopography().getBounds();
 
 			/*

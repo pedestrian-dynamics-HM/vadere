@@ -1,26 +1,25 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import java.awt.Shape;
-import java.util.Random;
-
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
 import org.apache.commons.math.optimization.UnivariateRealOptimizer;
 import org.apache.commons.math.optimization.univariate.BrentOptimizer;
 import org.apache.commons.math.util.MathUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+
+import java.awt.*;
+import java.util.Random;
 
 /**
  * The Class StepCircleOptimizerBrent.
  * 
  */
 public class StepCircleOptimizerBrent implements StepCircleOptimizer {
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(StepCircleOptimizerBrent.class);
 
 	private final UnivariateRealOptimizer optimizer;

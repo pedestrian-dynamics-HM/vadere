@@ -2,16 +2,13 @@ package org.vadere.simulator.projects.migration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
 import org.vadere.simulator.projects.migration.incidents.Incident;
 import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class IncidentMigrationAssistant extends MigrationAssistant {
 
-	private static Logger logger = LogManager.getLogger(IncidentMigrationAssistant.class);
+	private static Logger logger = Logger.getLogger(IncidentMigrationAssistant.class);
 	StringBuilder log;
 
 	public IncidentMigrationAssistant() {
@@ -74,18 +71,18 @@ public class IncidentMigrationAssistant extends MigrationAssistant {
 
 	@Override
 	public String convertFile(Path scenarioFilePath, Version targetVersion) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 	@Override
 	public void migrateFile(Path scenarioFilePath, Version targetVersion,  Path outputFile) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 
 	@Override
 	public void revertFile(Path scenarioFile) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 	// if isScenario is false, its output

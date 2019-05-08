@@ -1,23 +1,32 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
+	private final OSMBehaviorController osmBehaviorController;
 
 	public UpdateSchemeSequential(@NotNull final Topography topography) {
 		this.topography = topography;
+		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
+		clearStrides(topography);
 		update(topography.getElements(Pedestrian.class), timeStepInSec);
 	}
 
@@ -29,18 +38,23 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
-		VPoint oldPosition = pedestrian.getPosition();
-		pedestrian.clearStrides();
-		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-		pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
+		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
-		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-			pedestrian.updateNextPosition();
-			makeStep(topography, pedestrian, timeStepInSec);
-			pedestrian.setDurationNextStep(pedestrian.getStepSize() / pedestrian.getDesiredSpeed());
+		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			VPoint oldPosition = pedestrian.getPosition();
+			pedestrian.clearStrides();
+			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
+
+			while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+				pedestrian.updateNextPosition();
+				osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
+			}
+
+		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+			osmBehaviorController.wait(pedestrian);
+		} else if (mostImportantEvent instanceof BangEvent) {
+			osmBehaviorController.reactToBang(pedestrian, topography);
 		}
-
-		topography.moveElement(pedestrian, oldPosition);
 	}
 
 	@Override

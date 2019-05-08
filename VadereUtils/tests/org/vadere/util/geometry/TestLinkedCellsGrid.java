@@ -1,19 +1,17 @@
 package org.vadere.util.geometry;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.Test;
-import org.vadere.util.geometry.LinkedCellsGrid;
-import org.vadere.util.geometry.shapes.VPoint;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Thorough test of the {@link LinkedCellsGrid}.
@@ -21,7 +19,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  * 
  */
 public class TestLinkedCellsGrid {
-	private static Logger logger = LogManager
+	private static Logger logger = Logger
 			.getLogger(TestLinkedCellsGrid.class);
 
 	private class NotComparableObject implements PointPositioned {

@@ -1,13 +1,9 @@
 package org.vadere.simulator.models.osm.optimization;
 
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.MovementType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector2D;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.ICircleSector;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCircleSector;
@@ -38,7 +34,7 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 		VCircle circle = ((VCircle) reachableArea);
 		double stepSize = circle.getRadius();
 
-		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, random);
+		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle) reachableArea, random);
 		// maximum possible angle of movement relative to ankerAngle
 		double angle;
 
@@ -67,7 +63,7 @@ public class ParticleSwarmOptimizer implements StepCircleOptimizer {
 			circleSector = circle;
 		}
 
-		PSO pso = new PSO(p -> getValue(p, pedestrian, stepSize), circleSector, anchorAngle, anchorAngle + 2 * angle, random, stepSize / 5.0, positions);
+		PSO pso = new PSO(p -> getValue(p, pedestrian, stepSize), circleSector, anchorAngle, anchorAngle + 2 * angle, random, stepSize, positions);
 
 		VPoint curPos = pedestrian.getPosition();
 		double curPosPotential = pedestrian.getPotential(curPos);

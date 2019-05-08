@@ -1,52 +1,46 @@
 package org.vadere.gui.projectview.view;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.prefs.Preferences;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.events.presettings.EventPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.logging.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.prefs.Preferences;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Shows text like the JSON formatted attributes.
- * 
- * 
+ *
+ *
  */
 public class TextView extends JPanel implements IJsonView {
 
-	private static Logger logger = LogManager.getLogger(TextView.class);
+	private static Logger logger = Logger.getLogger(TextView.class);
 
 	private AttributeType attributeType;
 	private String default_folder;
@@ -64,7 +58,7 @@ public class TextView extends JPanel implements IJsonView {
 	private boolean isEditable;
 
 	private DocumentListener documentListener;
-
+	private IScenarioChecker scenarioChecker;
 
 	private JTextArea txtrTextfiletextarea;
 	private ActionListener saveToFileActionListener = new ActionListener() {
@@ -117,15 +111,18 @@ public class TextView extends JPanel implements IJsonView {
 		add(panelTop, BorderLayout.NORTH);
 		panelTop.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
+		generatePresettingsMenu(attributeType);
+
 		JButton btnSaveToFile = new JButton(Messages.getString("TextFileView.btnSaveToFile.text"));
 		btnSaveToFile.addActionListener(saveToFileActionListener);
         btnSaveToFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
+
 		panelTop.add(btnSaveToFile);
 		btnLoadFromFile = new JButton(Messages.getString("TextView.btnLoadFromFile.text"));
         btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
         panelTop.add(btnLoadFromFile);
 
-        jsonValidIndicator = new JsonValidIndicator();
+		jsonValidIndicator = new JsonValidIndicator();
 		panelTop.add(jsonValidIndicator);
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
@@ -186,6 +183,10 @@ public class TextView extends JPanel implements IJsonView {
 						case TOPOGRAPHY:
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
+						case EVENT:
+							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
+							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
+							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");
 						}
@@ -193,6 +194,9 @@ public class TextView extends JPanel implements IJsonView {
 						ScenarioPanel.removeJsonParsingErrorMsg();
 						ProjectView.getMainWindow().refreshScenarioNames();
 						jsonValidIndicator.setValid();
+						if (scenarioChecker != null){
+							scenarioChecker.checkScenario(currentScenario);
+						}
 					} catch (Exception e) {
 						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
@@ -203,6 +207,35 @@ public class TextView extends JPanel implements IJsonView {
 
 		this.attributeType = attributeType;
 		jsonValidIndicator.setValid();
+	}
+
+	private void generatePresettingsMenu(final AttributeType attributeType) {
+		if (attributeType == AttributeType.EVENT) {
+			JMenuBar presetMenuBar = new JMenuBar();
+			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
+			presetMenuBar.add(mnPresetMenu);
+
+			EventPresettings.PRESETTINGS_MAP.forEach(
+					(clazz, jsonString) -> mnPresetMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
+									Messages.getString("Tab.Model.confirmLoadTemplate.text"),
+									Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+									JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								try {
+									txtrTextfiletextarea.setText(jsonString);
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					})));
+
+			panelTop.add(presetMenuBar);
+		}
 	}
 
 	@Override
@@ -229,11 +262,14 @@ public class TextView extends JPanel implements IJsonView {
 		case OUTPUTPROCESSOR:
 			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
-
 		case TOPOGRAPHY:
 			Topography topography = scenario.getTopography().clone();
 			topography.removeBoundary();
 			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			break;
+		case EVENT:
+			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
+			txtrTextfiletextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");
@@ -269,5 +305,9 @@ public class TextView extends JPanel implements IJsonView {
 
 	public void insertAtCursor(String text) {
 		txtrTextfiletextarea.insert(text, txtrTextfiletextarea.getCaretPosition());
+	}
+
+	public void setScenarioChecker(IScenarioChecker scenarioChecker) {
+		this.scenarioChecker = scenarioChecker;
 	}
 }

@@ -1,57 +1,45 @@
-#builds, log/preferences files
-target/
+# Build artifacts, log and preference files
 *.out
 *.preferences.xml
-
-#Tools and build utils
 bin/
+swing-inspector-linux-1.2.3/
+target/
 
-#IntelliJ
+# C extensions
+*.so
+vadere_analysis_tool/build
+
+# IDEs
 .idea/
 *.iml
-
-#Eclipse
 .settings/
 .metadata/
 .classpath
 .project
 
-#package specific
+# Package specific
 VadereGui/*.png
 VadereGui/*.svg
 VadereGui/*.mov
 VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
-VadereUtils/output/*
 VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
-#model test output
-VadereModelTests/TestOSM/output/*
-VadereModelTests/TestOSM_Group/output/*
-VadereModelTests/TestSFM/output/*
-VadereModelTests/TestGNM/output/*
-VadereModelTests/TestOVM/output/*
-VadereModelTests/TestOSM/legacy/*
-VadereModelTests/TestOSM_Group/legacy/*
-VadereModelTests/TestSFM/legacy/*
-VadereModelTests/TestGNM/legacy/*
-VadereModelTests/TestOVM/legacy/*
-VadereModelTests/TESTOVM/legacy/*
-VadereModelTests/TestOSM/processed output/*
-VadereModelTests/TestOSM_Group/processed output/*
-VadereModelTests/TestSFM/processed output/*
-VadereModelTests/TestGNM/processed output/*
-VadereModelTests/TestOVM/processed output/*
-VadereUtils/output/*
+# Python (byte-compiled, optimized, DLL files etc.)
+__pycache__/
+*.py[cod]
+*$py.class
+**/venv/
+Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
+Tools/VadereAnalysisTools/VadereAnalysisTool/build/
+Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 
-#deprecated: can potentially be removed
-VadereGui/output/
-
-#mac osx files
+# Operating system files
 .DS_Store
-
-#linux deskopt dotfiles
 **/.directory
-/VadereModelTests/TestStairs/output
-/VadereModelTests/TestStairs/legacy
+
+# Vadere output directories
+**/output/
+**/legacy/
+**/*_private/

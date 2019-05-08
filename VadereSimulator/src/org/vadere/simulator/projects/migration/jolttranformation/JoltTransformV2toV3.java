@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.migration.jolttranformation;
 
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.simulator.projects.migration.MigrationException;
 
 @MigrationTransformation(targetVersionLabel = "0.3")
 public class JoltTransformV2toV3 extends JoltTransformation {
