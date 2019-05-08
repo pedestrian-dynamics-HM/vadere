@@ -1,7 +1,7 @@
 {
   "name" : "2_bridge_coordinates_kai_navigation_without_offset",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "commithash" : "628b018374f404d2aca1afa3483e308428b6ae20",
   "processWriters" : {
     "files" : [ {
@@ -100,7 +100,6 @@
       "fixedSeed" : -5104110572817619091,
       "simulationSeed" : 0
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -278,6 +277,7 @@
       },
       "dynamicElements" : [ ],
       "teleporter" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }
