@@ -10,6 +10,8 @@ import org.vadere.util.geometry.shapes.Vector2D;
 public class VLine extends Line2D.Double {
     private VPoint p1;
     private VPoint p2;
+    private double length;
+    private double lengthSq;
 
     public VLine(final VPoint p1, final VPoint p2) {
         super(p1.getX(), p1.getY(), p2.getX(), p2.getY());
@@ -18,6 +20,8 @@ public class VLine extends Line2D.Double {
 		}*/
         this.p1 = p1;
         this.p2 = p2;
+        this.length = -1;
+        this.lengthSq = -1;
     }
 
     public VLine(double x1, double y1, double x2, double y2) {
@@ -74,11 +78,17 @@ public class VLine extends Line2D.Double {
     }
 
     public double length() {
-        return getP1().distance(getP2());
+        if(length == -1) {
+        	length = getP1().distance(getP2());
+        }
+    	return length;
     }
 
     public double lengthSq() {
-    	return getP1().distanceSq(getP2());
+    	if(lengthSq == -1) {
+		    lengthSq = getP1().distanceSq(getP2());
+	    }
+    	return lengthSq;
     }
 
 	public double distance(VPoint point) {

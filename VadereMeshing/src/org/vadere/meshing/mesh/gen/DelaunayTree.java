@@ -94,7 +94,7 @@ public class DelaunayTree<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	}
 
 	@Override
-	public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {
 		DAG<DAGElement<P, CF, F>> faceDag = map.remove(original);
 
 		F face = f1;
@@ -117,7 +117,7 @@ public class DelaunayTree<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2) {
+	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {
 		checkRoot();
 		DAG<DAGElement<P, CF, F>> faceDag = map.remove(original);
 

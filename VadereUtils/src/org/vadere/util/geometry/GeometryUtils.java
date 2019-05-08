@@ -35,7 +35,7 @@ public class GeometryUtils {
 	 * Constant for comparison of double values. Everything below this is
 	 * considered equal.
 	 */
-	public static final double DOUBLE_EPS = 1e-12;
+	public static final double DOUBLE_EPS = 1e-11;
 
 	public static final Logger log = Logger.getLogger(GeometryUtils.class);
 
@@ -812,6 +812,10 @@ public class GeometryUtils {
 		return isInsideCircle(a, b, c, p.getX(), p.getY());
 	}
 
+	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, @NotNull final IPoint p, double eps) {
+		return isInsideCircle(a, b, c, p.getX(), p.getY(), eps);
+	}
+
 	/**
 	 * Tests whether or not the point (x,y) lies inside the circumcenter of the triangle (a, b, c).
 	 * The method is more stable than direct use of the circumcenter since we normalize beforehand.
@@ -826,7 +830,7 @@ public class GeometryUtils {
 	 *
 	 * @return true if (x,y) lies inside the circumcenter of the triangle (a, b, c), false otherwise
 	 */
-	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, double x , double y) {
+	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, double x , double y, double eps) {
 		double adx = a.getX() - x;
 		double ady = a.getY() - y;
 		double bdx = b.getX() - x;
@@ -842,7 +846,11 @@ public class GeometryUtils {
 		double clift = cdx * cdx + cdy * cdy;
 
 		double disc = alift * bcdet + blift * cadet + clift * abdet;
-		return disc > 0;
+		return disc > eps;
+	}
+
+	public static boolean isInsideCircle(@NotNull final IPoint a, @NotNull final IPoint b, @NotNull final IPoint c, double x , double y) {
+		return isInsideCircle(a, b, c, x, y, 0.0);
 	}
 
 	/**
@@ -914,7 +922,23 @@ public class GeometryUtils {
 		return result / 2.0;
 	}
 
+	public static double signedAreaOfPolygon(@NotNull final IPoint... vertices) {
+		double result = 0;
+		if(vertices.length >= 3) {
+			for (int i = 0; i < vertices.length - 1; i++) {
+				result += vertices[i].getX() * vertices[i + 1].getY() - vertices[i + 1].getX() * vertices[i].getY();
+			}
+			int n = vertices.length - 1;
+			result += vertices[n].getX() * vertices[0].getY() - vertices[0].getX() * vertices[n].getY();
+		}
+		return result / 2.0;
+	}
+
 	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices){
+		return Math.abs(signedAreaOfPolygon(vertices));
+	}
+
+	public static double areaOfPolygon(@NotNull final IPoint... vertices){
 		return Math.abs(signedAreaOfPolygon(vertices));
 	}
 
@@ -1212,7 +1236,7 @@ public class GeometryUtils {
 	}
 
 	public static <P extends IPoint> VRectangle boundRelative(final Collection<P> points) {
-		return boundRelative(points, 0.5);
+		return boundRelative(points, 0.01);
 	}
 
 	/**
@@ -1674,6 +1698,47 @@ public class GeometryUtils {
 		}
 
 		throw new IllegalArgumentException("unable to find an interior point for the polygon " + polygon);
+	}
 
+	/**
+	 * Computes the projection of a onto b.
+	 * See: https://en.wikipedia.org/wiki/Vector_projection
+	 *
+	 * @param ax x-coordinate of a
+	 * @param ay y-coordinate of a
+	 * @param bx x-coordinate of b
+	 * @param by y-coordinate of b
+	 * @return the projection of a onto b
+	 */
+	public static IPoint projectOnto(double ax, double ay, double bx, double by) {
+		assert bx * bx + by * by > GeometryUtils.DOUBLE_EPS;
+		double blen = Math.sqrt(bx * bx + by * by);
+		double bxn = bx / blen;
+		double byn = by / blen;
+
+		// scalar product
+		double alpha = ax * bxn + ay * byn;
+		IPoint a1 = new VPoint(bxn * alpha, byn * alpha);
+		return a1;
+	}
+
+	/**
+	 * Projects the point (ax, ay) onto the line defined by (p = (px, py), q = (qx, qy)).
+	 *
+	 * @param ax x-coordinate of a
+	 * @param ay y-coordinate of a
+	 * @param px x-coordinate of p
+	 * @param py y-coordinate of p
+	 * @param qx x-coordinate of q
+	 * @param qy y-coordinate of q
+	 *
+	 * @return he projection of a onto the line (p,q)
+	 */
+	public static IPoint projectOntoLine(double ax, double ay, double px, double py, double qx, double qy) {
+		double bx = qx - px;
+		double by = qy - py;
+		double apx = ax - px;
+		double apy = ay - py;
+		return projectOnto(apx, apy, bx, by).add(new VPoint(px, py));
 	}
 }

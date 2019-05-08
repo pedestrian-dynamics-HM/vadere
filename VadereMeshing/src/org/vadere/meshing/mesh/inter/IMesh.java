@@ -32,12 +32,15 @@ import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1006,6 +1009,10 @@ public interface IMesh<
 		return streamFaces().filter(face -> !isBoundary(face)).filter(face -> isAlive(face)).collect(Collectors.toList());
 	}
 
+	default List<F> getBoundaryAndHoles() {
+		return Stream.concat(streamHoles(), Stream.of(getBorder())).collect(Collectors.toList());
+	}
+
 	default List<F> getFacesWithBoundary() {
 		return streamFacesWithBoundary().filter(face -> isAlive(face)).collect(Collectors.toList());
 	}
@@ -1401,6 +1408,10 @@ public interface IMesh<
 		return () -> new EdgeIterator<>(this, edge);
 	}
 
+	default Iterable<E> getEdgeItReverse(@NotNull final E edge) {
+		return () -> new EdgeIterator<>(this, edge, true);
+	}
+
 	/**
 	 * Returns an Iterable {@link Iterable} which can be used to iterate over all vertices of a face.
 	 *
@@ -1440,6 +1451,11 @@ public interface IMesh<
 	 */
 	default Stream<E> streamEdges(@NotNull final E edge) {
 		Iterable<E> iterable = getEdgeIt(edge);
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	default Stream<E> streamEdgesReverse(@NotNull final E edge) {
+		Iterable<E> iterable = getEdgeItReverse(edge);
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 
@@ -2204,5 +2220,63 @@ public interface IMesh<
 		mesh.setNext(yw, wx);
 		mesh.setNext(wx, xz);
 		mesh.setNext(xz, zy);
+	}
+
+	/**
+	 * Constructs and returns a string which can be used to construct a matplotlib Triangulation
+	 * which is helpful to plot the mesh.
+	 *
+	 * @param evalPoint a function to extract double values from vertices.
+	 *
+	 * @return a string representing the mesh
+	 */
+	default String toPythonTriangulation(@NotNull final Function<P, Double> evalPoint) {
+		garbageCollection();
+		StringBuilder builder = new StringBuilder();
+		List<V> vertices = getVertices();
+		Map<V, Integer> indexMap = new HashMap<>();
+
+		// [x1, x2, ...]
+		builder.append("[");
+		for(int i = 0; i < vertices.size(); i++) {
+			V v = vertices.get(i);
+			indexMap.put(v, i);
+			builder.append(v.getX() + ",");
+		}
+		builder.delete(builder.length()-1, builder.length());
+		builder.append("]\n");
+
+		// [y1, y2, ...]
+		builder.append("[");
+		for(V v : vertices) {
+			builder.append(v.getY() + ",");
+		}
+		builder.delete(builder.length()-1, builder.length());
+		builder.append("]\n");
+
+		// [z1, z2, ...] z = value
+		builder.append("[");
+		for(V v : vertices) {
+			builder.append(evalPoint.apply(getPoint(v)) + ",");
+		}
+		builder.delete(builder.length()-1, builder.length());
+		builder.append("]\n");
+
+		// [[vId1, vId2, vId3], ...]
+		List<F> faces = getFaces();
+		builder.append("[");
+		for(F face : faces) {
+			builder.append("[");
+			for(V v : getVertexIt(face)) {
+				int index = indexMap.get(v);
+				builder.append(index + ",");
+			}
+			builder.delete(builder.length()-1, builder.length());
+			builder.append("],");
+		}
+		builder.delete(builder.length()-1, builder.length());
+		builder.append("]\n");
+
+		return builder.toString();
 	}
 }

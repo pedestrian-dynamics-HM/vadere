@@ -36,15 +36,6 @@ public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, C
 	}
 
 	public PEikMeshGen(
-			@NotNull final IEdgeLengthFunction edgeLengthFunc,
-			final double initialEdgeLen,
-			@NotNull final VPolygon bound,
-			@NotNull final Collection<VPolygon> constrains,
-			@NotNull IPointConstructor<P> pointConstructor) {
-		super(edgeLengthFunc, initialEdgeLen, bound, constrains, () -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
-	}
-
-	public PEikMeshGen(
 			@NotNull IDistanceFunction distanceFunc,
 			@NotNull IEdgeLengthFunction edgeLengthFunc,
 			double initialEdgeLen,
@@ -73,7 +64,7 @@ public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, C
 			@NotNull VRectangle bound,
 			@NotNull IPointConstructor<P> pointConstructor
 			) {
-		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, Collections.EMPTY_LIST,() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
+		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, null, Collections.EMPTY_LIST,() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
 	}
 
 
@@ -104,14 +95,6 @@ public class PEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, C
 			@NotNull IPointConstructor<P> pointConstructor) {
 
 		super(p -> 1.0, e -> 1.0, initialEdgeLen, bound,
-				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
-	}
-
-	public PEikMeshGen(
-			@NotNull VPolygon polygon,
-			double initialEdgeLen,
-			@NotNull IPointConstructor<P> pointConstructor) {
-		super(polygon, initialEdgeLen, new ArrayList<>(),
 				() -> new PMesh<>((x, y) -> pointConstructor.create(x, y)));
 	}
 

@@ -46,7 +46,8 @@ public class RunTimeGPUEdgeBased extends JFrame {
 		List<Long> runTimes = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
-			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			final double finitialEdgeLength = initialEdgeLength;
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, p -> uniformEdgeLength.apply(p) * finitialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 			StopWatch overAllTime = new StopWatch();
 			overAllTime.start();
@@ -91,8 +92,9 @@ public class RunTimeGPUEdgeBased extends JFrame {
 		List<Double> initlialEdgeLengths = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
+			double finitialEdgeLength = initialEdgeLength;
 			initlialEdgeLengths.add(initialEdgeLength);
-			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, p->uniformEdgeLength.apply(p) * finitialEdgeLength, bbox, new ArrayList<>(), supplier);
 			meshGenerator.initialize();
 
 			StopWatch overAllTime = new StopWatch();

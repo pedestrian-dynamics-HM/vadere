@@ -49,7 +49,7 @@ public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(distanceFunc, e -> 1.0, initialEdgeLen, bound,
+		super(distanceFunc, e -> initialEdgeLen, initialEdgeLen, bound,
 				(x, y) -> new EikMeshPoint(x, y, false));
 	}
 

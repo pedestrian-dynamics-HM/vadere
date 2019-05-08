@@ -100,6 +100,11 @@ public class TestPointLocation {
 			}
 
 			@Override
+			public boolean isIllegal(@NotNull IHalfEdge edge, @NotNull IVertex p, double eps) {
+				return false;
+			}
+
+			@Override
 			public IHalfEdge insert(@NotNull IPoint point, @NotNull IFace face) {
 				return null;
 			}

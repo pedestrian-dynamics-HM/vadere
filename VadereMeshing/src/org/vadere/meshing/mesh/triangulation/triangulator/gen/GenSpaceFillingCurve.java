@@ -8,7 +8,9 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A {@link GenSpaceFillingCurve} is a (linked-)list of nodes {@link SFCNode} in the order in which
@@ -26,9 +28,11 @@ import java.util.List;
  */
 public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
 	private SFCNode<P, CE, CF, V, E, F> head;
+	private Map<E, SFCNode<P, CE, CF, V, E, F>> edgeToNode;
 
 	public GenSpaceFillingCurve(){
 		head = null;
+		edgeToNode = new HashMap<>();
 	}
 
 	public void insertFirst(final SFCNode<P, CE, CF, V, E, F> node) {
@@ -39,6 +43,7 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 		}
 
 		head = node;
+		edgeToNode.put(head.getEdge(), head);
 	}
 
 	/**
@@ -58,6 +63,10 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 		remove(anchor);
 	}
 
+	public SFCNode<P, CE, CF, V, E, F> getNode(@NotNull final E edge) {
+		return edgeToNode.get(edge);
+	}
+
 	/**
 	 * <p>Removes an element from the SFC in O(1).</p>
 	 *
@@ -75,6 +84,7 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 			anchor.next.prev = anchor.prev;
 		}
 
+		edgeToNode.remove(anchor.getEdge());
 		anchor.destroy();
 	}
 
@@ -97,6 +107,7 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 			anchorNext.prev = node;
 		}
 
+		edgeToNode.put(node.getEdge(), node);
 	}
 
 	/**

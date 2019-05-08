@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 
 import org.vadere.util.geometry.GeometryUtils;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Immutable point.
  * TODO: this class should be final

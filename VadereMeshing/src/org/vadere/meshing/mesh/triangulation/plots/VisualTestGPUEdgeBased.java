@@ -37,7 +37,7 @@ public class VisualTestGPUEdgeBased {
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 
 		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);

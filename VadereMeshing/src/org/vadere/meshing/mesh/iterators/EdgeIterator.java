@@ -24,6 +24,7 @@ public class EdgeIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	private E currentHalfEdge;
 	private E edge;
 	private boolean started = false;
+	private boolean reverse = false;
 	private IMesh<P, CE, CF, V, E, F> mesh;
 
 	public EdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final F face){
@@ -38,6 +39,14 @@ public class EdgeIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		this.mesh = mesh;
 	}
 
+	public EdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final E edge, final boolean reverse){
+		this.edge = edge;
+		this.currentHalfEdge = edge;
+		this.mesh = mesh;
+		this.reverse = reverse;
+	}
+
+
 	@Override
 	public boolean hasNext() {
 		return currentHalfEdge != null && (!started || !currentHalfEdge.equals(edge));
@@ -47,7 +56,7 @@ public class EdgeIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	public E next() {
 		started = true;
 		E result = currentHalfEdge;
-		currentHalfEdge = mesh.getNext(currentHalfEdge);
+		currentHalfEdge = reverse ? mesh.getPrev(currentHalfEdge) : mesh.getNext(currentHalfEdge);
 		return result;
 	}
 }

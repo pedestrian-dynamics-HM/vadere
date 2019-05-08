@@ -125,7 +125,7 @@ public class MeshPanel<P extends IPoint, CE, CF, V extends IVertex<P>, E extends
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			final double width,
 			final double height) {
-		this(mesh, f -> false, width, height, f -> Color.WHITE, e -> Color.GRAY);
+		this(mesh, f -> false, width, height, f -> new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f), e -> Color.GRAY);
 	}
 
 	@Override

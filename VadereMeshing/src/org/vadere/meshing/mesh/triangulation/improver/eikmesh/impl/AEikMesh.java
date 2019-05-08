@@ -24,12 +24,4 @@ public class AEikMesh extends AEikMeshGen<EikMeshPoint, Object, Object> {
         super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
 		        (x, y) -> new EikMeshPoint(x, y, false));
     }
-
-	public AEikMesh(
-			@NotNull VPolygon polygon,
-			double initialEdgeLen,
-			@NotNull Collection<? extends VShape> obstacleShapes) {
-		super(polygon, initialEdgeLen, obstacleShapes,
-				(x, y) -> new EikMeshPoint(x, y, false));
-	}
 }

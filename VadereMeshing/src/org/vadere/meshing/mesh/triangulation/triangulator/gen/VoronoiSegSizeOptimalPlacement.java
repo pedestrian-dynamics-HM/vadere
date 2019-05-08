@@ -39,7 +39,7 @@ public class VoronoiSegSizeOptimalPlacement<P extends IPoint, CE, CF, V extends 
 		VLine line = getMesh().toLine(edge);
 		VPoint midpoint = line.midPoint();
 		VPoint c = triangle.getCircumcenter();
-		double d = 0.5 * getMesh().toLine(edge).length() * Math.atan(0.5 * qmin);
+		double d = 0.5 * line.length() / Math.tan(0.5 * qmin);
 
 		VPoint e;
 		VPoint x;

@@ -2884,7 +2884,7 @@ public class RealWorldPlot {
 		obstacles.addAll(topography.getObstacles());
 
 		List<VShape> shapes = obstacles.stream().map(obstacle -> obstacle.getShape()).collect(Collectors.toList());
-		//IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + 1.0 * Math.max(0, Math.abs(distanceFunc.apply(p)));
+		//IEdgeLengthFunction disc_xadaptive = p -> 1.0 + 1.0 * Math.max(0, Math.abs(distanceFunc.apply(p)));
 
 	}
 

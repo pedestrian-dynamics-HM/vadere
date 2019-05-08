@@ -187,10 +187,10 @@ public class DelaunayHierarchy<P extends IPoint, CE, CF, V extends IVertex<P>, E
 
 
 	@Override
-    public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {}
+    public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
     @Override
-    public void postSplitHalfEdgeEvent(F original, F f1, F f2) {}
+    public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
 
     @Override
     public void postFlipEdgeEvent(F f1, F f2) {}

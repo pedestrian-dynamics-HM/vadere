@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * <p>Triangulation creator: This class is realises an algorithm which refine a given triangulation
+ * <p>Triangulation creator: This class is realises an algorithm which refineSimplex2D a given triangulation
  * (which might be empty), by recursively splitting existing triangles (starting with the super triangle if
  * the triangulation is empty) into parts. In each step for each triangle the longest edge is split which generates
  * two new triangles (four for one edge which is part of two triangles). While splitting we generate the Sierpinski
@@ -114,7 +114,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 
 	private boolean refinementFinished;
 
-	private double minEdgeLength;
+	private final Collection<P> fixPoints;
 
 	/**
 	 * <p>The default constructor.</p>
@@ -123,16 +123,16 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
      * @param bound                 the bounding box containing all boundaries and the topography with respect to the distance function distFunc
      * @param boundary              the boundaries e.g. obstacles
      * @param lenFunc               an edge length function
-	 * @param minEdgeLength         the minimal edge length of the refined triangulation
      * @param distFunc              a signed distance function
+	 * @param fixPoints             a collection of fix points
      */
 	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
-			final double minEdgeLength,
-			final IDistanceFunction distFunc) {
+			final IDistanceFunction distFunc,
+			final Collection<VPoint> fixPoints) {
 
 		this.meshSupplier = meshSupplier;
 		this.initialized = false;
@@ -140,31 +140,38 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	    this.distFunc = distFunc;
 		this.boundary = boundary;
 		this.lenFunc = lenFunc;
-		this.minEdgeLength = minEdgeLength;
 		this.bbox = bound;
 		this.points = new HashSet<>();
 		this.candidates = new ArrayList<>();
 		this.sfc = new GenSpaceFillingCurve<>();
 		this.mesh = meshSupplier.get();
+		this.fixPoints = fixPoints.stream().map(p -> mesh.createPoint(p.getX(), p.getY())).collect(Collectors.toList());
+	}
+
+	public GenUniformRefinementTriangulatorSFC(
+			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
+			final VRectangle bound,
+			final Collection<? extends VShape> boundary,
+			final IEdgeLengthFunction lenFunc,
+			final IDistanceFunction distFunc) {
+		this(meshSupplier, bound, boundary, lenFunc, distFunc, Collections.EMPTY_LIST);
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
-			final double minEdgeLength,
 			final IDistanceFunction distFunc,
 			final Collection<P> fixPoints) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc);
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, distFunc);
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
 			final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
-			final double minEdgeLength,
 			final IDistanceFunction distFunc) {
-		this(meshSupplier, bound, new ArrayList<>(), lenFunc, minEdgeLength, distFunc);
+		this(meshSupplier, bound, new ArrayList<>(), lenFunc, distFunc);
 	}
 
 	/**
@@ -252,7 +259,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 * 	                        SFC by two new nodes. The order of these two nodes and the directions depends on the
 	 * 	                        direction of k.</li>
 	 * 	    <li>
-	 * 	        refine edges:   After the SFC is updated we can refine edges. This won't destroy the edges of the nodes of
+	 * 	        refineSimplex2D edges:   After the SFC is updated we can refineSimplex2D edges. This won't destroy the edges of the nodes of
 	 * 	                        the SFC.
 	 * 	    </li>
 	 * </ol>
@@ -305,7 +312,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 			}
 		}
 
-		// 2. refine
+		// 2. refineSimplex2D
 		for(E edge : toRefineEdges) {
 			// to avoid duplicated splits
 			if(validEdge(edge)) {
@@ -314,6 +321,46 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 		}
 		refinementFinished = tFinished;
 		candidates = newCandidates;
+	}
+
+	private V splitEdge(@NotNull final E edge) {
+		if(!getMesh().isBoundary(edge)) {
+			SFCNode<P, CE, CF, V, E, F> node = sfc.getNode(edge);
+			SFCDirection dir = node.getDirection();
+			E t1 = getMesh().getNext(edge);
+			E t2 = getMesh().getPrev(edge);
+
+			SFCNode<P, CE, CF, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+			SFCNode<P, CE, CF, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
+
+			if(dir == SFCDirection.FORWARD) {
+				sfc.replace(element2, element1, node);
+			}
+			else {
+				sfc.replace(element1, element2, node);
+			}
+		}
+
+
+		E twin = getMesh().getTwin(edge);
+		if(!getMesh().isBoundary(twin)) {
+			SFCNode<P, CE, CF, V, E, F> node = sfc.getNode(twin);
+			SFCDirection dir = node.getDirection();
+			E t1 = getMesh().getNext(edge);
+			E t2 = getMesh().getPrev(edge);
+
+			SFCNode<P, CE, CF, V, E ,F> element1 = new SFCNode<>(t1, dir.next());
+			SFCNode<P, CE, CF, V, E ,F> element2 = new SFCNode<>(t2, dir.next());
+
+			if(dir == SFCDirection.FORWARD) {
+				sfc.replace(element2, element1, node);
+			}
+			else {
+				sfc.replace(element1, element2, node);
+			}
+		}
+
+		return refine(edge);
 	}
 
 	private void nextSFCLevel() {
@@ -376,6 +423,9 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 */
 	@Override
 	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+		if(triangulation == null) {
+			init();
+		}
 		return triangulation;
 	}
 
@@ -411,20 +461,23 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 * the list of points. The triangulation notifies its listeners about this event.</p>
 	 *
 	 * @param edge the edge which will be refined / split
+	 * @return returns the vertex inserted
 	 */
-	private void refine(final E edge) {
+	private V refine(final E edge) {
+		//TODO: magic number 0.01
 		IPoint midPoint = getMesh().toLine(edge).midPoint(random.nextDouble() * 0.01);
-		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
-
+		V v = getMesh().createVertex(midPoint.getX(), midPoint.getY());
+		P p = getMesh().getPoint(v);
 
 		if(!points.contains(p)) {
 			points.add(p);
-			E newEdge = triangulation.getAnyEdge(triangulation.splitEdge(p, edge, true));
+			E newEdge = triangulation.getAnyEdge(triangulation.splitEdge(v, edge, true));
 			triangulation.insertEvent(newEdge);
 		}
 		else {
 			throw new IllegalStateException(p + " point already exist.");
 		}
+		return v;
 	}
 
 	/**
@@ -436,10 +489,9 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 			synchronized (getMesh()) {
 				//nextSFCLevel(0.2);
 				finished = true;
-				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
-
 				// TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
-				//insertFixPoints(fixPoints);
+				insertFixPoints(fixPoints);
+				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 				triangulation.finish();
 
 				// the following calls are quite expensive
@@ -460,6 +512,16 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 		}
     }
 
+	private void insertFixPoints(@NotNull final Collection<P> fixPoints) {
+		getTriangulation().insert(fixPoints);
+	}
+
+	@Override
+	public Collection<P> getFixPoints() {
+		return fixPoints;
+	}
+
+
 	/**
 	 * <p>Insert fix points i.e. point that has to be in the triangulation and which will not be
 	 * moved. If there is a point p very close to the fix, instead of
@@ -468,32 +530,37 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 *
 	 * @param fixPoints a collection of fix points.
 	 */
-	private void insertFixPoints(@NotNull final Collection<P> fixPoints) {
-
-		for(P fixPoint : fixPoints) {
-			Optional<F> optFace = triangulation.locateFace(fixPoint);
+	/*private Map<V, VPoint> insertFixPoints(@NotNull final Collection<VPoint> fixPoints) {
+		Map<V, VPoint> fixPointRelation = new HashMap<>();
+		for(VPoint fixPoint : fixPoints) {
+			Optional<F> optFace = triangulation.locateFace(fixPoint.getX(), fixPoint.getY());
 			if(optFace.isPresent()) {
 				assert triangulation.contains(fixPoint.getX(), fixPoint.getY(), optFace.get());
+				F face = optFace.get();
 				V closestPoint = null;
 				double distance = Double.MAX_VALUE;
-				for(V v : getMesh().getVertexIt(optFace.get())) {
+				for(V v : getMesh().getVertexIt(face)) {
 					P q = getMesh().getPoint(v);
 					double tmpDistance = Math.abs(distFunc.apply(q)- distFunc.apply(fixPoint));
-					if(closestPoint == null ||  tmpDistance < distance) {
+					if(!fixPointRelation.containsKey(v) && (closestPoint == null ||  tmpDistance < distance)) {
 						closestPoint = v;
 						distance = tmpDistance;
 					}
 				}
+				assert closestPoint != null;
 
-				if(closestPoint != null && distance < minEdgeLength) {
-					triangulation.replacePoint(closestPoint, fixPoint);
-				}
-				else {
-					triangulation.insert(fixPoint);
+				// we have a problem here!
+				if(closestPoint == null) {
+					throw new IllegalArgumentException("fix points are to close together: use another set of fix points or a finer mesh");
+					//V vertex = splitEdge(getLongestEdge(face));
+					//fixPointRelation.put(vertex, fixPoint);
+				} else {
+					fixPointRelation.put(closestPoint, fixPoint);
 				}
 			}
 		}
-    }
+		return fixPointRelation;
+    }*/
 
 	/**
 	 * <p>Returns the longest edge of a face.</p>
@@ -571,7 +638,7 @@ public class GenUniformRefinementTriangulatorSFC<P extends IPoint, CE, CF, V ext
 	 */
 	private boolean isSmallEnough(@NotNull final E edge) {
 		VLine line = getMesh().toLine(edge);
-		return (line.length() <= lenFunc.apply(line.midPoint()) * minEdgeLength);
+		return (line.length() <= lenFunc.apply(line.midPoint()));
 	}
 
 	/**

@@ -67,7 +67,6 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
     public CLEikMesh(
             final IDistanceFunction distanceFunc,
             final IEdgeLengthFunction edgeLengthFunc,
-            final double initialEdgeLen,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
             final IMeshSupplier<P, CE, CF, AVertex<P>, AHalfEdge<CE>, AFace<CF>> meshSupplier) {
@@ -100,7 +99,6 @@ public class CLEikMesh<P extends EikMeshPoint, CE, CF> implements IMeshImprover<
                 bound,
                 obstacleShapes,
 		        edgeLengthFunc,
-		        initialEdgeLen,
                 distanceFunc);
         triangulation = uniformRefinementTriangulation.generate();
 

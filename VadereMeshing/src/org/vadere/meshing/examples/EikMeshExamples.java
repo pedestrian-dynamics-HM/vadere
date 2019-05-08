@@ -1,12 +1,17 @@
 package org.vadere.meshing.examples;
 
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PMeshSuppliert;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
+import org.vadere.meshing.utils.io.movie.MovRecorder;
 import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -20,6 +25,13 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,14 +43,14 @@ import java.util.Random;
  */
 public class EikMeshExamples {
 
-	public static void main(String... args) throws InterruptedException {
+	public static void main(String... args) throws InterruptedException, IOException {
 		//delaunayTriangulation();
-		//uniformMeshShapes();
-		uniformMeshDiscFunction();
-		//uniformMeshRingFunction();
-		/*combineDistanceFunctions();
-		edgeLengthFunction();
-		edgeLengthAndDistanceFunction();
+		//distanceFuncCombination();
+		uniformMeshDiscFunction(0.15);
+		//uniformMeshRingFunction(0.05);
+		//combineDistanceFunctions();
+		//edgeLengthFunction();
+		/*edgeLengthAndDistanceFunction();
 		userDefinedPoints();*/
 	}
 
@@ -76,9 +88,6 @@ public class EikMeshExamples {
 			panel.repaint();
 		}
 
-
-
-
 	}
 
 	/**
@@ -96,10 +105,8 @@ public class EikMeshExamples {
 				new VPoint(2,1),
 				new VPoint(2,0));*/
 
-
-
 		// define your holes
-		VRectangle rect = new VRectangle(0.25, 0.25, 0.5, 0.5);
+		VRectangle rect = new VRectangle(0.5, 0.5, 1, 1);
 		List<VShape> obstacleShapes = new ArrayList<>();
 		obstacleShapes.add(rect);
 
@@ -110,38 +117,138 @@ public class EikMeshExamples {
 				new VPoint(1,0));
 
 		// define the EikMesh-Improver
-		double edgeLength = 0.1;
-		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
-				boundary,
+		IDistanceFunction d_c = IDistanceFunction.createDisc(0.5, 0.5, 0.5);
+		IDistanceFunction d_r = IDistanceFunction.create(rect);
+		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
+		double edgeLength = 0.03;
+		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+				d,
+				p -> edgeLength + 0.5 * Math.abs(d.apply(p)),
 				edgeLength,
-				Arrays.asList(new VRectangle(0.25, 0.25, 0.5, 0.5)),
+				GeometryUtils.boundRelative(boundary.getPath()),
+				Arrays.asList(rect),
 				(x, y) -> new EikMeshPoint(x, y, false));
 
 		// generate the mesh
-		meshImprover.generate();
+		//meshImprover.generate();
 
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
 		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
 
-		/*meshPanel.display("Geometry defined by shapes");
+		meshPanel.display("Geometry defined by shapes");
 		meshImprover.initialize();
 		meshPanel.repaint();
 
-		while (true) {
+		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
 
 			try {
-				Thread.sleep(300 );
+				Thread.sleep(10 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			meshPanel.repaint();
+		}
+		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+		// display the mesh
+		//meshPanel.display("Geometry defined by shapes");
+	}
+
+	public static void distanceFuncCombination() throws IOException {
+		// define a bounding box
+		/*VPolygon boundary = GeometryUtils.polygonFromPoints2D(
+				new VPoint(0,0),
+				new VPoint(0, 1),
+				new VPoint(1, 2),
+				new VPoint(2,1),
+				new VPoint(2,0));*/
+
+		// define your holes
+		VRectangle rect = new VRectangle(-0.5, -0.5, 1, 1);
+		VRectangle boundary = new VRectangle(-1.5,-0.7,3,1.4);
+		IDistanceFunction d1_c = IDistanceFunction.createDisc(-0.5, 0, 0.5);
+		IDistanceFunction d2_c = IDistanceFunction.createDisc(0.5, 0, 0.5);
+		IDistanceFunction d_r = IDistanceFunction.create(rect);
+		IDistanceFunction d_b = IDistanceFunction.create(boundary);
+		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
+		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
+		double edgeLength = 0.07;
+		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+				d,
+				p -> edgeLength + 0.3 * Math.abs(d.apply(p)),
+				edgeLength,
+				GeometryUtils.boundRelative(boundary.getPath()),
+				Arrays.asList(rect),
+				(x, y) -> new EikMeshPoint(x, y, false));
+
+		// generate the mesh
+		//meshImprover.generate();
+
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
+		// (optional) define the gui to display the mesh
+		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		recorder.record();
+
+		meshPanel.display("Geometry defined by shapes");
+		//meshImprover.initialize();
+		//meshPanel.repaint();
+
+		/*while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+
+			try {
+				Thread.sleep(10 );
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			meshPanel.repaint();
 		}*/
 
-		// display the mesh
-		meshPanel.display("Geometry defined by shapes");
+		meshImprover.setDistanceFunc(d_b);
+		meshImprover.setEdgeLenFunction(p -> edgeLength + 0.3 * Math.abs(d_b.apply(p)));
+		recorder.record();
+
+		/*while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+
+			try {
+				Thread.sleep(10 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			meshPanel.repaint();
+		}*/
+
+		meshImprover.setDistanceFunc(d_r);
+		meshImprover.setEdgeLenFunction(p -> edgeLength + 0.3 * Math.abs(d_r.apply(p)));
+		recorder.record();
+
+
+		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
+		meshImprover.setDistanceFunc(d_c);
+		meshImprover.setEdgeLenFunction(p -> edgeLength /*+ 0.3 * Math.abs(d_c.apply(p))*/);
+		recorder.record();
+		/*while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+
+			try {
+				Thread.sleep(10 );
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			meshPanel.repaint();
+		}*/
+
+		recorder.finish();
+
+
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
 	}
 
 	/**
@@ -152,7 +259,7 @@ public class EikMeshExamples {
 	 * The edgeLength is a measure for the approximate edge lengths of all edges since it is a uniform triangulation,
 	 * i.e. the desired edge length function is a constant.
 	 */
-	public static void uniformMeshDiscFunction() throws InterruptedException {
+	public static void uniformMeshDiscFunction(double h0) throws InterruptedException, IOException {
 		// define a bounding box
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
@@ -160,24 +267,34 @@ public class EikMeshExamples {
 		VPoint center = new VPoint(1,1);
 		IDistanceFunction d = IDistanceFunction.createDisc(center.x, center.y, 1.0);
 
-		IEdgeLengthFunction h = p -> 1.0 + 5.0 * Math.abs(d.apply(p));
+
 
 		// define the EikMesh-Improver
-		double h0 = 0.1;
+		IEdgeLengthFunction h = p -> h0 + 0.3 * Math.abs(d.apply(p));
 		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
 				d,
-				p -> 1.0,
+				h,
 				Arrays.asList(center),
 				h0,
 				bound,
 				(x, y) -> new EikMeshPoint(x, y, false));
 
+		//meshImprover.setUseVirtualEdges(false);
+		//meshImprover.setAllowEdgeSplits(false);
+		//meshImprover.setAllowVertexCollapse(false);
 		//meshImprover.generate();
 
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		meshImprover.generate();
+
+		String polyString = PolyGenerator.to2DPoly(meshImprover.getMesh());
+		InputStream inputStream = new ByteArrayInputStream(polyString.getBytes(Charset.forName("UTF-8")));
+		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
+		var mesh = PolyGenerator.toMesh(inputStream, meshSuppliert);
+
+		var meshPanel = new PMeshPanel<>(mesh, 1000, 800);
 
 		// generate the mesh
 
@@ -185,13 +302,9 @@ public class EikMeshExamples {
 		// display the mesh
 		meshPanel.display("Geometry defined by a distance function (disc)");
 
-		while (true) {
-			synchronized (meshImprover.getMesh()) {
-				meshImprover.improve();
-			}
-			Thread.sleep(100);
-			meshPanel.repaint();
-		}
+		/*var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		recorder.record();
+		recorder.finish();*/
 
 		//System.out.println(PolyGenerator.to2DPoly(meshImprover.getMesh()));
 	}
@@ -204,7 +317,7 @@ public class EikMeshExamples {
 	 * which contains the whole meshing area. The edgeLength is a measure for the approximate edge lengths of all edges
 	 * since it is a uniform triangulation, i.e. the desired edge length function is a constant.
 	 */
-	public static void uniformMeshRingFunction() {
+	public static void uniformMeshRingFunction(double h0) throws IOException {
 		// define a bounding box
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
@@ -212,23 +325,29 @@ public class EikMeshExamples {
 		IDistanceFunction ringDistance = IDistanceFunction.createRing(1, 1, 0.2, 1.0);
 
 		// define the EikMesh-Improver
-		double edgeLength = 0.1;
 		PEikMesh meshImprover = new PEikMesh(
 				ringDistance,
-				edgeLength,
+				h0,
 				bound);
 
 		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		var meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
-		meshImprover.generate();
+		//meshImprover.generate();
 
-		System.out.println(PolyGenerator.to2DPoly(meshImprover.getMesh()));
+		//System.out.println(PolyGenerator.to2DPoly(meshImprover.getMesh()));
+
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// display the mesh
-		meshPanel.display("Geometry defined by a distance function (ring)");
+		//meshPanel.display("Geometry defined by a distance function (ring)");
+
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		recorder.record();
+		recorder.finish();
+
 	}
 
 	/**
@@ -266,20 +385,21 @@ public class EikMeshExamples {
 	/**
 	 * This example is equal to {@link EikMeshExamples#uniformMeshRingFunction} but we use a so called
 	 * desired relative edge length function. The minimum of the edge length function should be equals 1.0.
-	 * The algorithm will produce edge length approximately as large as: edgeLength times edgeLengthFunction.apply(p),
+	 * The algorithm will produce edge length approximately as large as: edgeLength times disc_xadaptive.apply(p),
 	 * where p is the midpoint of the edge. Here the edge length depend on the x-coordinate, i.e. edges to the right
 	 * will be larger.
 	 */
-	public static void edgeLengthFunction() {
+	public static void edgeLengthFunction() throws IOException {
 		// define a bounding box
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
 		// distance function that defines a ring with inner-radius 0.2 and outer-radius 1 at (1,1).
-		IDistanceFunction ringDistance = IDistanceFunction.createRing(1, 1, 0.2, 1.0);
-		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + p.getX();
+		IDistanceFunction ringDistance = IDistanceFunction.createDisc(1, 1,  1.0);
+
 
 		// define the EikMesh-Improver
-		double edgeLength = 0.05;
+		double edgeLength = 0.02;
+		IEdgeLengthFunction edgeLengthFunction = p -> edgeLength + 0.4 * Math.abs(p.getX()-1);
 		PEikMesh meshImprover = new PEikMesh(
 				ringDistance,
 				edgeLengthFunction,
@@ -291,10 +411,14 @@ public class EikMeshExamples {
 				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
-		meshImprover.generate();
+		/*meshImprover.generate();
 
 		// display the mesh
-		meshPanel.display("Edge length function");
+		meshPanel.display("Edge length function");*/
+
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		recorder.record();
+		recorder.finish();
 	}
 
 	/**

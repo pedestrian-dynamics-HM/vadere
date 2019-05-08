@@ -49,7 +49,6 @@ public class SierpinskyPlot {
 				bbox,
 				obstacles,
 				edgeLengthFunc,
-				initialEdgeLength,
 				distanceFunc);
 
 		IIncrementalTriangulation<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> triangulation = uniformRefinementTriangulation.init();

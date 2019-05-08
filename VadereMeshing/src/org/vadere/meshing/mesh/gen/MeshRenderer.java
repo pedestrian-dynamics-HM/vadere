@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +49,8 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 
 	private Collection<E> edges;
 
+	private Collection<V> vertices;
+
 	/**
 	 * A {@link Predicate} of {@link F} which marks a face to be drawn (not filled) in a special way.
 	 */
@@ -60,6 +63,8 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	@Nullable private Function<F, Color> faceColorFunction;
 
 	@Nullable private Function<E, Color> edgeColorFunction;
+
+	@Nullable private Function<V, Color> vertexColorFunction;
 
 	private BufferedImage bufferedImage = null;
 
@@ -128,6 +133,10 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	}
 
 	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height) {
+		renderGraphics(graphics, width, height, null);
+	}
+
+	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height, VRectangle bound) {
 		/*Font currentFont = graphics.getFont();
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
@@ -136,21 +145,28 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
 
-		VRectangle bound;
 		double scale;
 		synchronized (mesh) {
-			bound = mesh.getBound();
+			if(bound == null) {
+				bound = mesh.getBound();
+			}
+
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 			faces = mesh.clone().getFaces();
 			edges = mesh.getEdges();
+			vertices = mesh.getVertices();
 		}
+
+		//graphics.translate(-bound.getMinX() * scale, height-bound.getMinY() * scale);
+		//graphics.scale(scale, -scale);
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
 		graphics.scale(scale, scale);
 		graphics.fill(bound);
 
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
-		graphics.setStroke(new BasicStroke(0.001f));
+		graphics.setStroke(new BasicStroke(0.5f * (float)(1/scale)));
+		double ptdiameter = 3.0f * (float)(1/scale);
 		//graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -171,12 +187,21 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		}
 
 		for(E edge : edges) {
-			Color ec = Color.GRAY;
+			Color ec = Color.DARK_GRAY;
 			if(edgeColorFunction != null) {
 				ec = edgeColorFunction.apply(edge);
 			}
 			graphics.setColor(ec);
 			graphics.draw(mesh.toLine(edge));
+		}
+
+		for(V vertex : vertices) {
+			Color vc = Color.BLACK;
+			if(vertexColorFunction != null) {
+				vc = vertexColorFunction.apply(vertex);
+			}
+			graphics.setColor(vc);
+			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
 
 		graphics.setColor(c);
@@ -196,6 +221,22 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	//	graphics.fill(new VRectangle(0, 0, width, height));
 		renderGraphics(graphics, scale, bound);
 	}*/
+
+	public BufferedImage renderImage(final int width, final int height, VRectangle bound) {
+		synchronized (mesh) {
+			if(bufferedImage == null) {
+				bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			}
+
+			//if(mesh.getNumberOfVertices() > 6) {
+			Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+			graphics.fillRect(0, 0, width, height);
+			renderGraphics(graphics, width, height, bound);
+			//}
+
+			return bufferedImage;
+		}
+	}
 
 	public BufferedImage renderImage(final int width, final int height) {
 		synchronized (mesh) {

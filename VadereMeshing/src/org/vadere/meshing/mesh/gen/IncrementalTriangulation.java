@@ -81,7 +81,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	private double epsilon = 0.0001;
 	private double edgeCoincidenceTolerance = GeometryUtils.DOUBLE_EPS;
 
-	private final Predicate<E> illegalPredicate;
+	private Predicate<E> illegalPredicate;
 	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
 
 	static {
@@ -262,6 +262,11 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
 	}
 
+	@Override
+	public void setCanIllegalPredicate(@NotNull final Predicate<E> illegalPredicate) {
+		this.illegalPredicate = illegalPredicate;
+	}
+
 	// end constructors
 
 	@Override
@@ -409,9 +414,9 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 		else {
 			//log.info("splitTriangle()");
-			/*if(!contains(vertex.getX(), vertex.getY(), face)) {
-				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), f));
-			}*/
+			if(!contains(vertex.getX(), vertex.getY(), face)) {
+				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), face));
+			}
 			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
 			E newEdge = splitTriangle(face, vertex,  true);
@@ -715,9 +720,19 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 * @return true if the edge with respect to p is illegal, otherwise false
 	 */
 	@Override
-	public boolean isIllegal(E edge, V p) {
+	public boolean isIllegal(@NotNull final E edge, @NotNull final V p) {
 		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
 			return isDelaunayIllegal(edge, p);
+		}
+
+		return false;
+		//return isIllegal(edge, p, mesh);
+	}
+
+	@Override
+	public boolean isIllegal(@NotNull final E edge, @NotNull final V p, final double eps) {
+		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			return isDelaunayIllegal(edge, p, eps);
 		}
 
 		return false;
@@ -826,18 +841,18 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public void splitTriangleEvent(final F original, final F f1, F f2, F f3) {
-		pointLocator.postSplitTriangleEvent(original, f1, f2, f3);
+	public void splitTriangleEvent(final F original, final F f1, F f2, F f3, V v) {
+		pointLocator.postSplitTriangleEvent(original, f1, f2, f3,v );
 		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitTriangleEvent(original, f1, f2, f3);
+			triEventListener.postSplitTriangleEvent(original, f1, f2, f3, v);
 		}
 	}
 
 	@Override
-	public void splitEdgeEvent(F original, F f1, F f2) {
-		pointLocator.postSplitHalfEdgeEvent(original, f1, f2);
+	public void splitEdgeEvent(F original, F f1, F f2, V v) {
+		pointLocator.postSplitHalfEdgeEvent(original, f1, f2,v );
 		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitHalfEdgeEvent(original, f1, f2);
+			triEventListener.postSplitHalfEdgeEvent(original, f1, f2, v);
 		}
 	}
 

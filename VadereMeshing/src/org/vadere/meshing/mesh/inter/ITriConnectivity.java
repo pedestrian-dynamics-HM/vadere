@@ -2,6 +2,7 @@ package org.vadere.meshing.mesh.inter;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
 import org.vadere.util.data.Node;
@@ -14,7 +15,9 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -75,8 +78,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param f1        one of the split results
 	 * @param f2        one of the split results
 	 * @param f3        one of the split results
+	 * @param v         the vertex inserted
 	 */
-	default void splitTriangleEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final F f3) {}
+	default void splitTriangleEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final F f3, @NotNull final V v) {}
 
 	/**
 	 * <p>This will be called whenever a triangle / face is split at a specific edge which
@@ -87,8 +91,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param original  the original face
 	 * @param f1        one of the split results
 	 * @param f2        one of the split results
+	 * @param v         the vertex inserted
 	 */
-	default void splitEdgeEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2) {}
+	default void splitEdgeEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final V v) {}
 
 	/**
 	 * <p>This will replace the point of a vertex. If the point has other coordinates than
@@ -292,6 +297,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 */
 	boolean isIllegal(@NotNull final E edge, @NotNull final V p);
 
+	boolean isIllegal(@NotNull final E edge, @NotNull final V p, final double eps);
+
 	/**
 	 * <p>Tests whether an edge is illegal and should be flipped.</p>
 	 *
@@ -304,11 +311,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
+	default boolean isIllegal(@NotNull final E edge, final double eps) {
+		return isIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)), eps);
+	}
+
 	default boolean isDelaunayIllegal(@NotNull final E edge) {
 		return isDelaunayIllegal(edge, getMesh().getVertex(getMesh().getNext(edge)));
 	}
 
-	default boolean isDelaunayIllegal(@NotNull final E edge, @NotNull final V p) {
+	default boolean isDelaunayIllegal(@NotNull final E edge, @NotNull final V p, final double eps) {
 		//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 		//V p = mesh.getVertex(mesh.getNext(edge));
 		E t0 = getMesh().getTwin(edge);
@@ -323,11 +334,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 
 		//return Utils.isInCircumscribedCycle(x, y, z, p);
 		//if(Utils.ccw(z,x,y) > 0) {
-		return GeometryUtils.isInsideCircle(z, x, y, p);
+		return GeometryUtils.isInsideCircle(z, x, y, p, eps);
 		//}
 		//else {
 		//	return Utils.isInsideCircle(x, z, y, p);
 		//}
+	}
+
+	default boolean isDelaunayIllegal(@NotNull final E edge, @NotNull final V p) {
+		return isDelaunayIllegal(edge, p, 0.0);
 	}
 
 	/**
@@ -432,7 +447,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			mesh.setNext(h2, t1);
 			mesh.setNext(t1, e0);
 
-			splitEdgeEvent(f0, f0, f1);
+			splitEdgeEvent(f0, f0, f1, v);
 		}
 		else {
 			mesh.setNext(mesh.getPrev(h0), t1);
@@ -470,7 +485,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			mesh.setNext(e2, o2);
 			mesh.setNext(o2, o0);
 
-			splitEdgeEvent(f3, f3, f2);
+			splitEdgeEvent(f3, f3, f2, v);
 		}
 		else {
 			mesh.setNext(e1, mesh.getNext(o0));
@@ -600,7 +615,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			mesh.setNext(h2, t1);
 			mesh.setNext(t1, e0);
 
-			splitEdgeEvent(f0, f0, f1);
+			splitEdgeEvent(f0, f0, f1, v);
 		}
 		else {
 			mesh.setNext(mesh.getPrev(h0), t1);
@@ -638,7 +653,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			mesh.setNext(e2, o2);
 			mesh.setNext(o2, o0);
 
-			splitEdgeEvent(f3, f3, f2);
+			splitEdgeEvent(f3, f3, f2, v);
 		}
 		else {
 			mesh.setNext(e1, mesh.getNext(o0));
@@ -728,11 +743,11 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
 	 *         edges and their twins are the faces which took part / where modified / added by the split.
 	 */
-	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize, @NotNull final Consumer<P> action) {
+	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize, @NotNull final Consumer<V> action) {
 		VPoint midPoint = getMesh().toLine(halfEdge).midPoint();
-		P p = getMesh().createPoint(midPoint.getX(), midPoint.getY());
-		action.accept(p);
-		return splitEdge(p, halfEdge, legalize);
+		V v = getMesh().createVertex(midPoint.getX(), midPoint.getY());
+		action.accept(v);
+		return splitEdge(v, halfEdge, legalize);
 	}
 
 
@@ -1184,7 +1199,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		// we reuse the face for efficiency
 		//mesh.destroyFace(face);
 
-		splitTriangleEvent(face, xyp, yzp, zxp);
+		splitTriangleEvent(face, xyp, yzp, zxp, p);
 
 		if(legalize) {
 			legalize(zx, p);
@@ -1848,6 +1863,33 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		}
 	}
 
+	default void smoothHoles(@NotNull final IDistanceFunction distanceFunction, Predicate<V> isBoundary) {
+		for(F hole : getMesh().getHoles()) {
+			for(E edge : getMesh().getEdges(hole)) {
+
+				/*
+				 * to avoid duplicated smoothing
+				 */
+				if(getMesh().getFace(edge).equals(hole)) {
+					V vp = getMesh().getVertex(edge);
+					if(!isBoundary.test(vp)) {
+						VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
+						VPoint p = getMesh().toPoint(edge);
+						VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+						VPoint midPoint = new VLine(r, q).midPoint();
+
+						if((distanceFunction.apply(p) + distanceFunction.apply(midPoint) < 0) && GeometryUtils.isCCW(r, p, q)) {
+							double angle = GeometryUtils.angle(r, p, q);
+							if(angle < 0.5*Math.PI) {
+								createFaceAtBoundary(edge);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * <p>Connects each (current) two consecutive border edge if they form an acute angle
 	 * which smoothes the border of the mesh overall. This requires O(n) time, where n
@@ -1857,32 +1899,54 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 */
 	default void smoothHoles(@NotNull final IDistanceFunction distanceFunction) {
-		for(F hole : getMesh().getHoles()) {
-			for(E edge : getMesh().getEdges(hole)) {
+		smoothBorder(distanceFunction, v -> false);
+	}
 
-				/*
-				 * to avoid duplicated smoothing
-				 */
-				if(getMesh().getFace(edge).equals(hole)) {
-					VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
-					VPoint p = getMesh().toPoint(edge);
-					VPoint q = getMesh().toPoint(getMesh().getNext(edge));
-					VPoint midPoint = new VLine(r, q).midPoint();
-
-					if((distanceFunction.apply(p) + distanceFunction.apply(midPoint) < 0) && GeometryUtils.isCCW(r, p, q)) {
-						double angle = GeometryUtils.angle(r, p, q);
-						if(angle < 0.5*Math.PI) {
-							createFaceAtBoundary(edge);
-						}
-					}
-				}
-			}
-		}
+	default void smoothBoundary(@NotNull final IDistanceFunction distanceFunction, @NotNull final Predicate<V> predicate) {
+		smoothBorder(distanceFunction, predicate);
+		smoothHoles(distanceFunction, predicate);
 	}
 
 	default void smoothBoundary(@NotNull final IDistanceFunction distanceFunction) {
 		smoothBorder(distanceFunction);
 		smoothHoles(distanceFunction);
+	}
+
+	default void smoothBoundary() {
+		smoothBorder(null);
+		smoothHoles(null);
+	}
+
+	default void smoothBorder(@Nullable final IDistanceFunction distanceFunction, @NotNull final Predicate<V> isBoundary) {
+		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
+
+			/*
+			 * to avoid duplicated smoothing
+			 */
+			if(getMesh().getFace(edge).equals(getMesh().getBorder())) {
+				V vr = getMesh().getVertex(getMesh().getPrev(edge));
+				V vp = getMesh().getVertex(edge);
+				V vq = getMesh().getVertex(getMesh().getNext(edge));
+
+				if(!isBoundary.test(vp)) {
+					VPoint r = getMesh().toPoint(vr);
+					VPoint p = getMesh().toPoint(vp);
+					VPoint q = getMesh().toPoint(vq);
+
+
+					VPoint midPoint = new VLine(r, q).midPoint();
+					if(distanceFunction != null && (distanceFunction.apply(p) + distanceFunction.apply(midPoint) < 0)) {
+						if(GeometryUtils.isCCW(r, p, q)) {
+							double angle = GeometryUtils.angle(r, p, q);
+							if(angle < 0.5*Math.PI) {
+								//System.out.println(triangle);
+								F newFace = createFaceAtBoundary(edge);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	default void smoothBorder(@NotNull final IDistanceFunction distanceFunction) {
@@ -1895,6 +1959,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				VPoint r = getMesh().toPoint(getMesh().getPrev(edge));
 				VPoint p = getMesh().toPoint(edge);
 				VPoint q = getMesh().toPoint(getMesh().getNext(edge));
+
+
 				VPoint midPoint = new VLine(r, q).midPoint();
 
 				VTriangle triangle = new VTriangle(r,p,q);
@@ -2082,7 +2148,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			 * Good case (2.1) There are two collinear points but the face contains p => p lies on an edge of the face.
 			 */
 			if(contains(p.getX(), p.getY(), face) || getMesh().isCloseTo(face, p.getX(), p.getY())) {
-				log.debug("no intersection line and not contained.");
+				log.debug("no intersection line but contained or very close.");
 				return Optional.empty();
 			}
 			/**
@@ -2744,9 +2810,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			P p2 = getMesh().getPoint(edge);
 			P p3 = getMesh().getPoint(getMesh().getNext(edge));
 			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
-			/*if (!valid) {
+			if (!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
-			}*/
+			}
 			return valid;
 		};
 
@@ -2773,6 +2839,18 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		};
 
 		return !getMesh().isBoundary(face) && orientationPredicate.test(face);
+	}
+
+	default P[] getPoints(@NotNull final E edge, @NotNull final Class<P> clazz) {
+		final P[] points = (P[]) Array.newInstance(clazz, 3);
+		points[0] = getMesh().getPoint(edge);
+		points[1] = getMesh().getPoint(getMesh().getNext(edge));
+		points[2] = getMesh().getPoint(getMesh().getPrev(edge));
+		return points;
+	}
+
+	default P[] getPoints(F face, Class<P> clazz) {
+		return getPoints(getMesh().getEdge(face), clazz);
 	}
 
 	/**

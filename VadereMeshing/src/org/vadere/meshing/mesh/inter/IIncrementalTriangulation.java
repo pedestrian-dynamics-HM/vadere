@@ -13,19 +13,24 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.impl.VPTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformTriangulator;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,7 +57,11 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 	void addTriEventListener(@NotNull final ITriEventListener<P, CE, CF, V, E, F> triEventListener);
 	void removeTriEventListener(@NotNull final ITriEventListener<P, CE, CF, V, E, F> triEventListener);
 
+	boolean isIllegal(@NotNull E edge, @NotNull V p, double eps);
+
 	IIncrementalTriangulation<P, CE, CF, V, E, F> clone();
+
+	void setCanIllegalPredicate(@NotNull final Predicate<E> illegalPredicate);
 
 	/**
 	 * Returns a list of virtual vertices. Virtual vertices support the construction of the triangulation
@@ -170,7 +179,8 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
 	}
 
 
-	static <P extends IPoint, CE, CF> IIncrementalTriangulation<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> createUniformTriangulation(
+	static <P extends IPoint, CE, CF>
+	IIncrementalTriangulation<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> createUniformTriangulation(
 			final IPointLocator.Type type,
 			final VRectangle bound,
 			final double minTriangleSideLen,
@@ -250,4 +260,34 @@ public interface IIncrementalTriangulation<P extends IPoint, CE, CF, V extends I
         return pointLocator;
     }
 
+	/**
+	 * Generates a background mesh using Ruppert's algorithm.
+	 *
+	 * Assumption there is no angle smaller than 60 degree between two contrains.
+	 *
+	 * @param meshSupplier
+	 * @param pslg
+	 * @param <P>
+	 * @param <CE>
+	 * @param <CF>
+	 * @param <V>
+	 * @param <E>
+	 * @param <F>
+	 * @return
+	 */
+    static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> IIncrementalTriangulation<P, CE, CF, V, E, F>createBackGroundMesh(
+		    IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
+		    @NotNull final PSLG pslg,
+		    final boolean createHoles) {
+
+	    GenRuppertsTriangulator<P, CE, CF, V, E, F> ruppertsTriangulator = new GenRuppertsTriangulator<>(
+	    		meshSupplier,
+			    pslg,
+			    0.0,
+			    h -> Double.POSITIVE_INFINITY,
+			    createHoles
+	    );
+
+		return ruppertsTriangulator.generate();
+    }
 }

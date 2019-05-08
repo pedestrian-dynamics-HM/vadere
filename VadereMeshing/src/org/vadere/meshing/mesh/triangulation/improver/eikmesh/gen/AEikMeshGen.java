@@ -49,13 +49,4 @@ public class AEikMeshGen<P extends EikMeshPoint, CE, CF> extends GenEikMesh<P, C
 		super(distanceFunc, e -> 1.0, initialEdgeLen, bound,
 				() -> new AMesh<>((x, y) -> pointConstructor.create(x, y)));
 	}
-
-	public AEikMeshGen(
-			@NotNull VPolygon polygon,
-			double initialEdgeLen,
-			@NotNull Collection<? extends VShape> obstacleShapes,
-			@NotNull IPointConstructor<P> pointConstructor) {
-		super(polygon, initialEdgeLen, obstacleShapes,
-				() -> new AMesh<>((x, y) -> pointConstructor.create(x, y)));
-	}
 }

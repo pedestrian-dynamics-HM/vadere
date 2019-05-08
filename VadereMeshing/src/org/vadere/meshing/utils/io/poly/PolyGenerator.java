@@ -2,6 +2,7 @@ package org.vadere.meshing.utils.io.poly;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -108,9 +110,111 @@ public class PolyGenerator {
 	 */
 	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> IMesh<P, CE, CF, V, E, F> toMesh(
 			@NotNull final InputStream inputStream,
-			final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier) throws IOException {
-		// TODO
-		throw new UnsupportedOperationException("not jet implemented.");
+			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier) throws IOException {
+		var mesh = meshSupplier.get();
+
+		Map<Integer, V> vertices = new HashMap<>();
+		Map<Pair<Integer, Integer>, E> edges = new HashMap<>();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+		String line = readLine(reader);
+		String[] split = line.split(SPLITTER);
+		int nVertex = Integer.parseInt(split[0].strip());
+		int dimension = Integer.parseInt(split[1].strip());
+		int boundaryMarker = Integer.parseInt(split[2].strip());
+		int targetMarker = Integer.parseInt(split[3].strip());
+		int nAttributes = Integer.parseInt(split[4].strip());
+
+		if(nAttributes > 1) {
+			throw new IOException("number of attributes > 1, is not jet supported.");
+		}
+
+		for(int i = 0; i < nVertex; i++) {
+			String vertexLine = readLine(reader);
+			split = vertexLine.split(SPLITTER);
+			int id = Integer.parseInt(split[0].strip());
+			int boundaryMark = Integer.parseInt(split[1].strip());
+			int targetMark = Integer.parseInt(split[2].strip());
+			double x = Double.parseDouble(split[3].strip());
+			double y = Double.parseDouble(split[4].strip());
+
+			V vertex = mesh.insertVertex(x, y);
+			vertices.put(id, vertex);
+			// TODO: attributes ? boundaryMark?
+			if(nAttributes == 1) {
+
+			}
+		}
+
+		// border
+		// this is always 1
+		String nBorderString = readLine(reader);
+		assert Integer.parseInt(nBorderString.strip()) == 1;
+		String borderVertices = readLine(reader);
+		toFace(borderVertices, vertices, edges, mesh, mesh.getBorder());
+
+		// triangles
+		Integer nTriangles = Integer.parseInt(readLine(reader).strip());
+		for(int i = 0; i < nTriangles; i++) {
+			F face = mesh.createFace();
+			toFace(readLine(reader), vertices, edges, mesh, face);
+		}
+
+		// holes
+		Integer nHoles = Integer.parseInt(readLine(reader).strip());
+		for(int i = 0; i < nHoles; i++) {
+			F face = mesh.createFace(true);
+			toFace(readLine(reader), vertices, edges, mesh, face);
+		}
+
+		assert mesh.isValid();
+		return mesh;
+	}
+
+	private static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> void toFace(
+			@NotNull final String line,
+			@NotNull final Map<Integer, V> vertices,
+			@NotNull final Map<Pair<Integer, Integer>, E> edges,
+			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final F face) {
+		String[] split = line.split(SPLITTER);
+		int nVertices = Integer.parseInt(split[0].strip());
+		assert nVertices == split.length-1;
+		List<Integer> vertexIds = new ArrayList<>(nVertices);
+		for(int i = 0; i < nVertices; i++) {
+			vertexIds.add(Integer.parseInt(split[i+1].strip()));
+		}
+
+		List<E> ccwEdges = new ArrayList<>(nVertices);
+		for(int i = 0; i < nVertices; i++) {
+			int i1 = vertexIds.get(i);
+			int i2 = vertexIds.get((i+1) % nVertices);
+			V v1 = vertices.get(i1);
+			V v2 = vertices.get(i2);
+			E edge = mesh.createEdge(v2);
+			mesh.setFace(edge, face);
+			mesh.setEdge(face, edge);
+
+			if(mesh.getEdge(v2) == null || !mesh.isBoundary(mesh.getEdge(v2))) {
+				mesh.setEdge(v2, edge);
+			}
+
+			edges.put(Pair.of(i1, i2), edge);
+
+			if(edges.containsKey(Pair.of(i2, i1))) {
+				E twin = edges.get(Pair.of(i2, i1));
+				mesh.setTwin(edge, twin);
+			}
+
+			ccwEdges.add(edge);
+		}
+
+		for(int i = 0; i < nVertices; i++) {
+			E edge = ccwEdges.get(i);
+			E next = ccwEdges.get((i+1)%nVertices);
+			mesh.setNext(edge, next);
+		}
 	}
 
 	/**
@@ -205,13 +309,12 @@ public class PolyGenerator {
 	 * The first element of the returning list of polygons is the segment-bounding polygon.
 	 *
 	 * @param inputStream       the input stream
-	 * @param duplicatedLines   if true lines of a polygon will also added to the list of lines.
 	 *
 	 * @return a list of {@link VPolygon} polygons and {@link VLine} lines representing the PSLG
 	 *
 	 * @throws IOException
 	 */
-	public static Pair<List<VPolygon>, List<VLine>> toPSLGtoVShapes(@NotNull final InputStream inputStream, final boolean duplicatedLines) throws IOException {
+	public static PSLG toPSLGtoVShapes(@NotNull final InputStream inputStream) throws IOException {
 		// (1) read input file
 		Map<Integer, VPoint> vertices = new HashMap<>();
 		Map<Integer, VPoint> holes = new HashMap<>();
@@ -354,23 +457,12 @@ public class PolyGenerator {
 				List<VPoint> pointList = polyIndices.stream().map(index -> vertices.get(index)).collect(Collectors.toList());
 				VPolygon polygon = GeometryUtils.toPolygon(pointList);
 
-				// is a hole
-				if(holes.values().stream().noneMatch(p -> polygon.contains(p))) {
+				// is the segment-bound
+				if(holes.values().stream().allMatch(p -> polygon.contains(p))) {
 					polygons.add(0, polygon);
 				}
 				else {
 					polygons.add(polygon);
-				}
-
-				if(duplicatedLines) {
-					for(int i = 0; i < polyIndices.size(); i++) {
-						int vertexId1 = polyIndices.get(i);
-						int vertexId2 = polyIndices.get((i+1) % polyIndices.size());
-						VPoint vertex1 = vertices.get(vertexId1);
-						VPoint vertex2 = vertices.get(vertexId2);
-						VLine line = new VLine(vertex1, vertex2);
-						lines.add(line);
-					}
 				}
 			}
 			else {
@@ -386,7 +478,20 @@ public class PolyGenerator {
 			}
 		}
 
-		return Pair.of(polygons, lines);
+		if(polygons.size() == 2) {
+			if(polygons.get(1).contains(polygons.get(0).getPath().get(0))) {
+				VPolygon tmp = polygons.get(0);
+				polygons.set(0, polygons.get(1));
+				polygons.set(1, tmp);
+			}
+		}
+
+		if(!polygons.isEmpty()) {
+			return new PSLG(polygons.get(0), polygons.subList(1, polygons.size()), lines, Collections.EMPTY_SET);
+		}
+		else {
+			throw new IOException("invalid .poly format.");
+		}
 	}
 
 	/**
@@ -500,6 +605,7 @@ public class PolyGenerator {
 		// 1 boundary
 		builder.append("# nBorders\n");
 		builder.append(1+"\n");
+		builder.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
 		for(P p : mesh.getPoints(mesh.getBorder())) {
 			builder.append(map.get(p) + SEPARATOR);
 		}

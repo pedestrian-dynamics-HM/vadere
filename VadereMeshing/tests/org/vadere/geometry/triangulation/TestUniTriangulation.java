@@ -47,7 +47,7 @@ public class TestUniTriangulation extends JFrame {
 
 	    // the mesh refinement triangulator
         GenUniformRefinementTriangulatorSFC<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation =
-                new GenUniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.1, 1.5, distanceFunc);
+                new GenUniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.15, distanceFunc);
 
         // to measure the time consumption
 	    StopWatch overAllTime = new StopWatch();

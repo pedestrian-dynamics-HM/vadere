@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -33,12 +34,11 @@ import java.util.function.Predicate;
 public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
 
 	private static Logger logger = Logger.getLogger(GenVoronoiVertexInsertion.class);
-	private VPolygon bound;
-	private final Collection<VPolygon> constrains;
 	private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
 
 	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
 	private Set<E> segments;
+	private final PSLG pslg;
 
 	private boolean initialized;
 	private boolean generated;
@@ -56,13 +56,10 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 
 	private VoronoiSegPlacement<P, CE, CF, V, E, F> placementStrategy;
 
-	public GenVoronoiSegmentInsertion(@NotNull final VPolygon bound,
-	                                  @NotNull final Collection<VPolygon> constrains,
+	public GenVoronoiSegmentInsertion(@NotNull final PSLG pslg,
 	                                  @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
 	                                  final boolean createHoles,
 	                                  @NotNull Function<IPoint, Double> circumRadiusFunc) {
-		this.bound = bound;
-		this.constrains = constrains;
 		this.segments = new HashSet<>();
 		this.initialized = false;
 		this.generated = false;
@@ -72,15 +69,13 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 		this.triangles = new HashMap<>();
 		this.createHoles = createHoles;
 		this.circumRadiusFunc = circumRadiusFunc;
-		List<VLine> lines = generateLines();
-
+		this.pslg = pslg.addLines(generateLines(pslg));
 
 		/**
 		 * This prevent the flipping of constrained edges
 		 */
-		Predicate<E> canIllegal = e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e));
-		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, GeometryUtils.boundRelative(bound.getPoints()), lines, Collections.EMPTY_SET, canIllegal);
-		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), circumRadiusFunc, delta);
+		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, pslg, false);
+		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), circumRadiusFunc);
 	}
 
 	private boolean isAccepted(@NotNull final E edge) {
@@ -212,7 +207,7 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 
 	public void removeTriangles() {
 		if(createHoles) {
-			for(VPolygon hole : constrains) {
+			for(VPolygon hole : pslg.getHoles()) {
 				Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
 				Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
 				if(optFace.isPresent()) {
@@ -220,7 +215,7 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 				}
 			}
 
-			Predicate<F> mergeCondition = f -> !bound.contains(getMesh().toTriangle(f).midPoint());
+			Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
 			getTriangulation().shrinkBorder(mergeCondition, true);
 
 		}
@@ -255,7 +250,7 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 		}
 
 		// This might be expensive!
-		if(!bound.contains(getMesh().toTriangle(face).midPoint())) {
+		if(!pslg.getSegmentBound().contains(getMesh().toTriangle(face).midPoint())) {
 			return false;
 		}
 
@@ -269,12 +264,12 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 	}
 
 	// TODO duplicated code
-	private List<VLine> generateLines() {
+	private List<VLine> generateLines(@NotNull final PSLG pslg) {
 		List<VLine> polyLines = new ArrayList<>();
 
-		polyLines.addAll(bound.getLinePath());
+		polyLines.addAll(pslg.getSegmentBound().getLinePath());
 
-		for(VPolygon polygon : constrains) {
+		for(VPolygon polygon : pslg.getHoles()) {
 			polyLines.addAll(polygon.getLinePath());
 		}
 

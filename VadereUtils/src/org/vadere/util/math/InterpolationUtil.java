@@ -1,13 +1,19 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 /**
  * Interpolation utilities not covered by java.lang.Math
@@ -15,31 +21,26 @@ import java.util.List;
  */
 public class InterpolationUtil {
 
-	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
-		assert points.size() == 3;
+	public static <P extends IPoint> double barycentricInterpolation(
+			@NotNull final P p1, @NotNull final P p2, @NotNull final P p3,
+			@NotNull final Function<P, Double> eval,
+			final double totalArea,
+			final double x, final double y){
 
-		IPotentialPoint p1 = points.get(0);
-		IPotentialPoint p2 = points.get(1);
-		IPotentialPoint p3 = points.get(2);
-
-		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
-
-		double totalArea = vtriangle.getArea();
-
-		assert totalArea > 0;
+		assert Math.abs(totalArea-GeometryUtils.areaOfPolygon(Arrays.asList(p1, p2, p3))) < GeometryUtils.DOUBLE_EPS;
 
 		VPoint point = new VPoint(x, y);
 
 		double value = 0.0;
 
 		if(point.distanceSq(p1) < GeometryUtils.DOUBLE_EPS) {
-			value = p1.getPotential();
+			value = eval.apply(p1);
 		}
 		else if(point.distanceSq(p2) < GeometryUtils.DOUBLE_EPS) {
-			value = p2.getPotential();
+			value = eval.apply(p2);
 		}
 		else if(point.distanceSq(p3) < GeometryUtils.DOUBLE_EPS) {
-			value = p3.getPotential();
+			value = eval.apply(p3);
 		}
 		else {
 			double area1 = new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea();
@@ -48,21 +49,48 @@ public class InterpolationUtil {
 
 			if(area1 > 0.0) {
 				double percentP1 = area1 / totalArea;
-				value += percentP1 * p1.getPotential();
+				value += percentP1 * eval.apply(p1);
 			}
 
 			if(area2 > 0.0) {
 				double percentP2 = area2 / totalArea;
-				value += percentP2 * p2.getPotential();
+				value += percentP2 * eval.apply(p2);
 			}
 
 
 			if(area3 > 0.0) {
 				double percentP3 = area3 / totalArea;
-				value += percentP3 * p3.getPotential();
+				value += percentP3 * eval.apply(p3);
 			}
 		}
 		return value;
+
+	}
+
+	public static <P extends IPoint> double barycentricInterpolation(
+			@NotNull final P p1, @NotNull final P p2, @NotNull final P p3,
+			@NotNull final Function<P, Double> eval, final double x, final double y){
+
+		double totalArea = GeometryUtils.areaOfPolygon(Arrays.asList(p1, p2, p3));
+
+		assert totalArea > 0;
+		return barycentricInterpolation(p1, p2, p3, eval, totalArea, x, y);
+	}
+
+	public static double barycentricInterpolation(final IPotentialPoint[] points, final double x, final double y){
+		assert points.length == 3;
+		IPotentialPoint p1 = points[0];
+		IPotentialPoint p2 = points[1];
+		IPotentialPoint p3 = points[2];
+		return barycentricInterpolation(p1, p2, p3, p->p.getPotential(), x, y);
+	}
+
+	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
+		assert points.size() == 3;
+		IPotentialPoint p1 = points.get(0);
+		IPotentialPoint p2 = points.get(1);
+		IPotentialPoint p3 = points.get(2);
+		return barycentricInterpolation(p1, p2, p3, p->p.getPotential(), x, y);
 	}
 
 	/**

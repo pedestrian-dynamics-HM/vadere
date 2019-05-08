@@ -24,8 +24,9 @@ public interface ITriEventListener<P extends IPoint, CE, CF, V extends IVertex<P
 	 * @param f1        the first new triangle / face
 	 * @param f2        the second new triangle / face
 	 * @param f3        the third new triangle / face
+	 * @param v         the new vertex
 	 */
-	void postSplitTriangleEvent(F original, F f1, F f2, F f3);
+	void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v);
 
 	/**
 	 * This method is triggered after an half-edge is split. Note that if the half-edge is not
@@ -35,8 +36,9 @@ public interface ITriEventListener<P extends IPoint, CE, CF, V extends IVertex<P
 	 * @param original  the face of the half-edge
 	 * @param f1        one of the new face, which might be the original
 	 * @param f2        one of the new face, which might be the original
+	 * @param v         the new vertex
 	 */
-	void postSplitHalfEdgeEvent(F original, F f1, F f2);
+	void postSplitHalfEdgeEvent(F original, F f1, F f2, V v);
 
 	/**
 	 * This method is triggered after an edge e with neighbouring faces f1, f2 is flipped.

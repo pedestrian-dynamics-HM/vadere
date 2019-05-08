@@ -28,14 +28,11 @@ import java.util.function.Function;
 public class VoronoiSegPlacement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPlacementStrategy<P, CE, CF, V, E ,F> {
 	private IMesh<P, CE, CF, V, E, F> mesh;
 	private Function<IPoint, Double> circumRadiusFunc;
-	private double maxRadiusRatio;
 
 	public VoronoiSegPlacement(
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-			@NotNull final Function<IPoint, Double> circumRadiusFunc,
-			final double maxRadiusRatio) {
+			@NotNull final Function<IPoint, Double> circumRadiusFunc) {
 		this.mesh = mesh;
-		this.maxRadiusRatio = maxRadiusRatio;
 		this.circumRadiusFunc = circumRadiusFunc;
 	}
 
@@ -58,7 +55,7 @@ public class VoronoiSegPlacement<P extends IPoint, CE, CF, V extends IVertex<P>,
 		VPoint midpoint = line.midPoint();
 		VPoint c = triangle.getCircumcenter();
 		double pq = 0.5 * line.length();
-		double pc = new VLine(c, new VPoint(getMesh().getPoint(shortestEdge))).length();
+		//double pc = new VLine(c, new VPoint(getMesh().getPoint(shortestEdge))).length();
 
 		double r = circumRadiusFunc.apply(midpoint);
 		/*if(getMesh().isAtBoundary(shortestEdge)) {
@@ -69,8 +66,8 @@ public class VoronoiSegPlacement<P extends IPoint, CE, CF, V extends IVertex<P>,
 		}*/
 
 		double mc = new VLine(c, midpoint).length();
-		double rmax = (pq * pq + pc * pc) / (2 * mc);
-		r = Math.min(Math.max(r, 0.5 * line.length()), rmax);
+		double rmax = (pq * pq + mc * mc) / (2 * mc);
+		r = Math.min(Math.max(r, pq), rmax);
 		double d = Math.sqrt(r * r - pq * pq) + r;
 		/*VPoint e;
 		VPoint x;
