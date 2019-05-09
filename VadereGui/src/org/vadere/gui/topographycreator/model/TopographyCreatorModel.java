@@ -419,11 +419,14 @@ public class TopographyCreatorModel<T extends DefaultConfig> extends DefaultMode
 
 	@Override
 	public void addPrototypeShape(final VShape prototypeShape) {
-		prototypes.add(prototypeShape);
+		if (!prototypes.contains(prototypeShape)) {
+			prototypes.add(prototypeShape);
+		}
 	}
 
 	@Override
 	public void addPrototypeShapes(final Collection<VShape> prototypeShapes) {
+		prototypeShapes.removeAll(prototypes);
 		prototypes.addAll(prototypeShapes);
 	}
 

@@ -426,11 +426,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenu mnHelp = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
 		menuBar.add(mnHelp);
 
-		Action showAboutAction = new ActionShowAboutDialog(Messages.getString("ProjectView.mntmAbout.text"));
+/*		Action showAboutAction = new ActionShowAboutDialog(Messages.getString("ProjectView.mntmAbout.text"));
 		setAcceleratorFromLocalizedShortcut(showAboutAction, "ProjectView.mntmAbout.shortcut");
 		JMenuItem mntmAbout = new JMenuItem(showAboutAction);
 
-		mnHelp.add(mntmAbout);
+		mnHelp.add(mntmAbout);*/
 
 		JMenu mntmLanguageChoiceMenu = new JMenu(Messages.getString("ProjectView.mntmLanguageChoiceMenu.text"));
 		mnHelp.add(mntmLanguageChoiceMenu);

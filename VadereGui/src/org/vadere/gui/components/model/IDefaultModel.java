@@ -59,12 +59,12 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	void setStartSelectionPoint(final Point startSelectionPoint);
 
 	/**
-	 * Set a shape that framed the selected area. A renderer can draw this in
+	 * Adds shapes that frame the selected areas. A renderer can draw this in
 	 * a special way so that the user knows what is selected.
 	 * 
-	 * @param shape a shape that framed the selected area in world coordinates
+	 * @param shapes shapes that frame the selected areas in world coordinates
 	 */
-	void setSelectionShape(final VShape shape);
+	void addSelectionShapes(final Collection<VShape> shapes);
 
 
 	/**
@@ -140,7 +140,7 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 * 
 	 * @return the selection shape
 	 */
-	VShape getSelectionShape();
+	Deque<VShape> getSelectionShapes();
 
 	/**
 	 * Return the viewport bound in world coordinates.

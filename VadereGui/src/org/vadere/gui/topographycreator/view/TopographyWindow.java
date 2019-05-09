@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -14,51 +13,19 @@ import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioToolBar;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
-import org.vadere.gui.topographycreator.control.ActionBasic;
-import org.vadere.gui.topographycreator.control.ActionCloseDrawOptionPanel;
-import org.vadere.gui.topographycreator.control.ActionCopyElement;
-import org.vadere.gui.topographycreator.control.ActionDeleteElement;
-import org.vadere.gui.topographycreator.control.ActionInsertCopiedElement;
-import org.vadere.gui.topographycreator.control.ActionMaximizeSize;
-import org.vadere.gui.topographycreator.control.ActionMergeObstacles;
-import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
-import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
-import org.vadere.gui.topographycreator.control.ActionRedo;
-import org.vadere.gui.topographycreator.control.ActionResetTopography;
-import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
-import org.vadere.gui.topographycreator.control.ActionSelectCut;
-import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
-import org.vadere.gui.topographycreator.control.ActionSubtractMeasurementArea;
-import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
-import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
-import org.vadere.gui.topographycreator.control.ActionTranslateElements;
-import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
-import org.vadere.gui.topographycreator.control.ActionUndo;
-import org.vadere.gui.topographycreator.control.ActionZoomIn;
-import org.vadere.gui.topographycreator.control.ActionZoomOut;
-import org.vadere.gui.topographycreator.control.DrawDotMode;
-import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
-import org.vadere.gui.topographycreator.control.DrawLineMode;
-import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
-import org.vadere.gui.topographycreator.control.DrawRectangleMode;
-import org.vadere.gui.topographycreator.control.EraserMode;
-import org.vadere.gui.topographycreator.control.SelectElementMode;
-import org.vadere.gui.topographycreator.control.TopographyAction;
-import org.vadere.gui.topographycreator.control.UndoAdaptor;
+import org.vadere.gui.topographycreator.control.*;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
 
+import javax.swing.*;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEditSupport;
 
 public class TopographyWindow extends JPanel {
 	private static final long serialVersionUID = -2472077480081283655L;
@@ -113,7 +80,9 @@ public class TopographyWindow extends JPanel {
 	private void setTopography(final TopographyCreatorModel panelModel) {
 
 		this.panelModel = panelModel;
-		this.panelModel.setMouseSelectionMode(new SelectElementMode(panelModel, undoSupport));
+		SelectElementMode mode = new SelectElementMode(panelModel, undoSupport);
+		this.panelModel.setMouseSelectionMode(mode);
+		addKeyListener(new CTRLKeyListener(mode::setPersistentSelection));
 		// info panel
 		infoPanel = new InfoPanel(panelModel);
 		selectedElementLabel = new JLabelObserver(JLabelObserver.DEFAULT_TEXT);
@@ -439,6 +408,13 @@ public class TopographyWindow extends JPanel {
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
 				"delete-element");
 		getActionMap().put("delete-element", deleteElement);
+		// select all elements
+		TopographyAction selectAllElements =
+				new ActionSelectAllElements("select all elements", panelModel, undoSupport);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
+				"select-all-elements");
+		getActionMap().put("select-all-elements", selectAllElements);
 
 		// undo
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(

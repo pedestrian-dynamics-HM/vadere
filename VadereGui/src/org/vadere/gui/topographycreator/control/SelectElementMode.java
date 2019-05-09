@@ -36,11 +36,14 @@ public class SelectElementMode extends DefaultSelectionMode {
 		DIRECTIONAL_CURSOR_CODES[7] = Cursor.SE_RESIZE_CURSOR;
 	}
 
-	public SelectElementMode(final IDrawPanelModel panelModel, final UndoableEditSupport undoSupport) {
+    private boolean persistentSelection;
+
+    public SelectElementMode(final IDrawPanelModel panelModel, final UndoableEditSupport undoSupport) {
 		super(panelModel);
 		this.undoSupport = undoSupport;
 		this.panelModel = panelModel;
 		this.resizeElement = false;
+		this.persistentSelection = false;
 	}
 
 	private Point startPoint;
@@ -92,7 +95,7 @@ public class SelectElementMode extends DefaultSelectionMode {
 				panelModel.addPrototypeShape(shape);
 				panelModel.showPrototypeShape();
 			}
-		} else {
+		} else if(!persistentSelection) {
 			panelModel.hidePrototypeShape();
 		}
 		super.mouseDragged(e);
@@ -113,12 +116,13 @@ public class SelectElementMode extends DefaultSelectionMode {
 		} else {
 			super.mouseReleased(e);
 		}
-		System.out.println("left selection: " + panelModel.getSelectedElements().size());
-		resizeElement = false;
-		isModifying = false;
-		startPoint = null;
-		panelModel.getPrototypeShapes().clear();
-		panelModel.hidePrototypeShape();
+		if(!persistentSelection) {
+            resizeElement = false;
+            isModifying = false;
+            startPoint = null;
+            panelModel.getPrototypeShapes().clear();
+            panelModel.hidePrototypeShape();
+        }
 		panelModel.notifyObservers();
 	}
 
@@ -142,8 +146,13 @@ public class SelectElementMode extends DefaultSelectionMode {
 		}
 		return false;
 	}
+
+	public void setPersistentSelection(boolean persistentSelection) {
+		this.persistentSelection = persistentSelection;
+	}
 	@Override
 	public IMode clone() {
 		return new SelectElementMode(panelModel, undoSupport);
 	}
+
 }

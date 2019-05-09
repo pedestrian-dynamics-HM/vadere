@@ -47,7 +47,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	private Rectangle2D.Double windowBound;
 
-	private VShape selectionShape;
+	private Deque<VShape> selectionShapes;
 
 	private VoronoiDiagram voronoiDiagram;
 
@@ -75,6 +75,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.viewportChangeListeners = new ArrayList<>();
 		this.scaleChangeListeners = new ArrayList<>();
 		this.selectedElements = new LinkedList<>();
+		this.selectionShapes = new LinkedList<>();
 	}
 
 	@Override
@@ -237,9 +238,10 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public void setSelectionShape(final VShape shape) {
-		selectionShape = shape;
-		setChanged();
+	public void addSelectionShapes(final Collection<VShape> shapes) {
+		if(selectionShapes.addAll(shapes)) {
+			setChanged();
+		}
 	}
 
 	@Override
@@ -268,8 +270,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public VShape getSelectionShape() {
-		return selectionShape;
+	public Deque<VShape> getSelectionShapes() {
+		return selectionShapes;
 	}
 
 	@Override
