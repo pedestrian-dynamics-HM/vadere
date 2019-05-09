@@ -2,11 +2,10 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -22,22 +21,11 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
 	PedestrianWaitingTimeProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingTimeProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(PedestrianWaitingTimeProcessor.class, PedestrianIdKey.class);
+	}
 
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					PedestrianIdKey.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
+	@Override
+	void initializeDependencies() {
 		AttributesPedestrianWaitingTimeProcessor attr =
 				(AttributesPedestrianWaitingTimeProcessor) testedProcessor.getAttributes();
 
@@ -45,10 +33,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(42, new VRectangle(0, 0, 2, 5)));
 		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
-
-
 	}
-
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {

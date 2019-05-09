@@ -55,7 +55,11 @@ public abstract class ProcessorTest {
 
 		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
 		assertTrue(processorTestEnv.getHeader().contains(header));
-		assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput());
+		if (header.equals("")){
+			assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput(0));
+		} else {
+			assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput(1));
+		}
 	}
 
 	/**
@@ -70,7 +74,13 @@ public abstract class ProcessorTest {
 		}
 		processorTestEnv.getOutputFile().write();
 
-		assertEquals(processorTestEnv.getOutput().size(), p.getData().size());
+		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
+		if (header.equals("")){
+			assertEquals(processorTestEnv.getOutput(0).size(), p.getData().size());
+		} else {
+			assertEquals(processorTestEnv.getOutput(1).size(), p.getData().size());
+
+		}
 		assertEquals(processorTestEnv.getSimStates().size(), (int) r.valOfField("lastStep"));
 
 		p.init(processorTestEnv.getManager());

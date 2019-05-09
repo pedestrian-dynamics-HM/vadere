@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
@@ -22,38 +21,17 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 		this(1);
 	}
 
-	@SuppressWarnings("unchecked")
 	PedestrianDensityCountingProcessorTestEnv(int nextProcessorId) {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianDensityCountingProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setAttributes(new AttributesPedestrianDensityCountingProcessor());
-		testedProcessor.setId(nextProcessorId);
-		this.nextProcessorId = nextProcessorId + 1;
+		super(PedestrianDensityCountingProcessor.class, TimestepPedestrianIdKey.class, nextProcessorId);
+	}
 
-		int pedPosProcId = nextProcessorId();
+	@Override
+	void initializeDependencies() {
+		int pedPosProcId = addDependentProcessor(PedestrianPositionProcessorTestEnv::new);
 		AttributesPedestrianDensityCountingProcessor attr =
 				(AttributesPedestrianDensityCountingProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianPositionProcessorId(pedPosProcId);
 		attr.setRadius(2.0);
-
-		PedestrianPositionProcessorTestEnv pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);
-		DataProcessor pedPosProc = pedPosProcEnv.getTestedProcessor();
-		addRequiredProcessors(pedPosProcEnv);
-		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
 	}
 
 	@Override

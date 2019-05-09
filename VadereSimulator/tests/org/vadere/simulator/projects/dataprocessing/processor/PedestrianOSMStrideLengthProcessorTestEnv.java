@@ -7,7 +7,6 @@ import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.sfm.SocialForceModel;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.ArrayList;
@@ -24,22 +23,7 @@ import static org.mockito.Mockito.when;
 public class PedestrianOSMStrideLengthProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Double> {
 
 	PedestrianOSMStrideLengthProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianOSMStrideLengthProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		super(PedestrianOSMStrideLengthProcessor.class, TimestepPedestrianIdKey.class);
 	}
 
 	public void loadWrongModel() {
@@ -87,7 +71,6 @@ public class PedestrianOSMStrideLengthProcessorTestEnv extends ProcessorTestEnv<
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private PedestrianOSM getPedMock(int id, Double... strides) {
 		PedestrianOSM ped = mock(PedestrianOSM.class, Mockito.RETURNS_DEEP_STUBS);
 		when(ped.getId()).thenReturn(id);

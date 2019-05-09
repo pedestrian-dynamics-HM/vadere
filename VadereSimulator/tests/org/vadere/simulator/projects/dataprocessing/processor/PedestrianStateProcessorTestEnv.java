@@ -1,9 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -21,21 +18,7 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 	private Pedestrian[] peds;
 
 	PedestrianStateProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianStateProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
-
-		try {
-			outputFile = outputFileFactory.createOutputfile(
-					TimestepPedestrianIdOutputFile.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		super(PedestrianStateProcessor.class, TimestepPedestrianIdKey.class);
 	}
 
 	private List<Pedestrian> getPeds(Integer... ids) {
@@ -47,10 +30,8 @@ public class PedestrianStateProcessorTestEnv extends ProcessorTestEnv<TimestepPe
 	}
 
 	private void addToExpectedOutput(int step, List<Pedestrian> peds, String value) {
-		peds.forEach(p -> {
-			super.addToExpectedOutput(
-					new TimestepPedestrianIdKey(step, p.getId()), value);
-		});
+		peds.forEach(p -> super.addToExpectedOutput(
+				new TimestepPedestrianIdKey(step, p.getId()), value));
 	}
 
 	@Override
