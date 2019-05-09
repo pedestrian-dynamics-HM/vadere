@@ -138,7 +138,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		writeLine(this.writer, line);
 	}
 
-	private void printHeader() {
+	void printHeader() {
 		writeLine(this.writer, this.getEntireHeader());
 	}
 
@@ -217,17 +217,28 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	private List<String> composeLine(String[] keyFieldArray,
 									 @SuppressWarnings("rawtypes") Function<DataProcessor, Stream<String>> valueFields){
-		final List<String> fields = new
-				LinkedList<>(Arrays.asList(keyFieldArray));
+		final List<String> fields = new  LinkedList<>();
 
+		addkeysToLine(fields, keyFieldArray);
+		addProcessorToLine(fields, valueFields);
+
+		return fields;
+	}
+
+	List<String> addkeysToLine(final List<String> fields, String[] keyFieldArray){
+		fields.addAll(Arrays.asList(keyFieldArray));
+		return fields;
+	}
+
+	List<String> addProcessorToLine(final List<String> fields, Function<DataProcessor, Stream<String>> valueFields){
 		final List<String> processorFields = dataProcessors.stream()
 				.flatMap(valueFields)
 				.collect(Collectors.toList());
 
 		fields.addAll(processorFields);
-
 		return fields;
 	}
+
 
 	private void writeLine(VadereWriter out, final List<String> fields) {
 		out.println(String.join(this.separator, fields));

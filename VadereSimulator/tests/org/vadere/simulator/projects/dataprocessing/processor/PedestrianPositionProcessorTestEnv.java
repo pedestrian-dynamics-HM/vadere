@@ -1,8 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -24,23 +22,7 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 	}
 
 	PedestrianPositionProcessorTestEnv(int processorId) {
-		super();
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianPositionProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(processorId);
-		this.nextProcessorId = processorId + 1;
-
-		try {
-			outputFile = outputFileFactory.createOutputfile(
-					TimestepPedestrianIdOutputFile.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		super(PedestrianPositionProcessor.class, TimestepPedestrianIdKey.class, processorId);
 	}
 
 	private void addToExpectedOutput(Integer step, List<Pedestrian> m) {

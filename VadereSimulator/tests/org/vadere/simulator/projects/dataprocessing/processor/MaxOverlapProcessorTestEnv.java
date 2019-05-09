@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor;
 import org.vadere.state.scenario.DynamicElement;
@@ -25,41 +24,16 @@ public class MaxOverlapProcessorTestEnv extends ProcessorTestEnv<NoDataKey, Doub
 		this(1);
 	}
 
-	@SuppressWarnings("unchecked")
-	private MaxOverlapProcessorTestEnv(int nextProcessorId) {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(MaxOverlapProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId);
-		this.nextProcessorId = nextProcessorId + 1;
+	MaxOverlapProcessorTestEnv(int nextProcessorId) {
+		super(MaxOverlapProcessor.class, NoDataKey.class, nextProcessorId);
+	}
 
-		DataProcessor pedestrianOverlapProcessor;
-		PedestrianOverlapProcessorTestEnv pedestrianOverlapProcessorTestEnv;
-		int pedestrianOverlapProcessorId = nextProcessorId();
-
+	@Override
+	void initializeDependencies() {
 		//add ProcessorId of required Processors to current Processor under test
+		int pedestrianOverlapProcessorId = addDependentProcessor(PedestrianOverlapProcessorTestEnv::new);
 		AttributesMaxOverlapProcessor attr = (AttributesMaxOverlapProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianOverlapProcessorId(pedestrianOverlapProcessorId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedestrianOverlapProcessorTestEnv = new PedestrianOverlapProcessorTestEnv(pedestrianOverlapProcessorId);
-		pedestrianOverlapProcessor = pedestrianOverlapProcessorTestEnv.getTestedProcessor();
-
-		Mockito.when(manager.getProcessor(pedestrianOverlapProcessorId)).thenReturn(pedestrianOverlapProcessor);
-		addRequiredProcessors(pedestrianOverlapProcessorTestEnv);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					NoDataKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}
 
@@ -71,7 +45,7 @@ public class MaxOverlapProcessorTestEnv extends ProcessorTestEnv<NoDataKey, Doub
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
-		double minDist = 0.195*2;
+		double minDist = 0.195 * 2;
 		clearStates();
 
 
@@ -102,10 +76,10 @@ public class MaxOverlapProcessorTestEnv extends ProcessorTestEnv<NoDataKey, Doub
 				Mockito.when(state.getTopography().getSpatialMap(DynamicElement.class)).thenReturn(getCellGridMock(b));
 				Mockito.when(state.getTopography().getAttributesPedestrian().getRadius()).thenReturn(0.195);
 
-				OverlapData dist1 = b.overlapData(1,5,minDist);
-				OverlapData dist2 = b.overlapData(5,1,minDist);
-				OverlapData dist3 = b.overlapData(1,3,minDist);
-				OverlapData dist4 = b.overlapData(3,1, minDist);
+				OverlapData dist1 = b.overlapData(1, 5, minDist);
+				OverlapData dist2 = b.overlapData(5, 1, minDist);
+				OverlapData dist3 = b.overlapData(1, 3, minDist);
+				OverlapData dist4 = b.overlapData(3, 1, minDist);
 
 				double maxDist = 0;
 				if (dist1.getOverlap() > maxDist)

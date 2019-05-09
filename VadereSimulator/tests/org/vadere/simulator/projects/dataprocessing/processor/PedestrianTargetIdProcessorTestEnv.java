@@ -1,9 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -16,27 +14,13 @@ import java.util.StringJoiner;
 
 public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Integer> {
 
-	PedestrianTargetIdProcessorTestEnv(){
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianTargetIdProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+	PedestrianTargetIdProcessorTestEnv() {
+		super(PedestrianTargetIdProcessor.class, TimestepPedestrianIdKey.class);
 	}
 
-	List<Pedestrian> getPeds(Integer[] ids, Integer[] targets){
+	List<Pedestrian> getPeds(Integer[] ids, Integer[] targets) {
 		List<Pedestrian> peds = new ArrayList<>();
-		for(int i = 0; i < ids.length; i++){
+		for (int i = 0; i < ids.length; i++) {
 			Pedestrian p = new Pedestrian(new AttributesAgent(ids[i]), new Random());
 			p.getTargets().add(targets[i]);
 			peds.add(p);
@@ -50,7 +34,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
-				List<Pedestrian> peds = getPeds(new Integer[]{12,33,40, 2}, new Integer[]{1,1,2, 2});
+				List<Pedestrian> peds = getPeds(new Integer[]{12, 33, 40, 2}, new Integer[]{1, 1, 2, 2});
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(peds);
 
 				int step = state.getStep();
@@ -64,7 +48,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
-				List<Pedestrian> peds = getPeds(new Integer[]{12,33,40, 9}, new Integer[]{1,2,3, 1});
+				List<Pedestrian> peds = getPeds(new Integer[]{12, 33, 40, 9}, new Integer[]{1, 2, 3, 1});
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(peds);
 
 				int step = state.getStep();
@@ -78,7 +62,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
-				List<Pedestrian> peds = getPeds(new Integer[]{ 10, 9 }, new Integer[]{1, 1});
+				List<Pedestrian> peds = getPeds(new Integer[]{10, 9}, new Integer[]{1, 1});
 				peds.get(0).getTargets().clear();
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(peds);
 
@@ -97,7 +81,7 @@ public class PedestrianTargetIdProcessorTestEnv extends ProcessorTestEnv<Timeste
 		expectedOutput.entrySet()
 				.stream()
 				.sorted(Comparator.comparing(Map.Entry::getKey))
-				.forEach(e ->{
+				.forEach(e -> {
 					StringJoiner sj = new StringJoiner(getDelimiter());
 					sj.add(Integer.toString(e.getKey().getTimestep()))
 							.add(Integer.toString(e.getKey().getPedestrianId()))
