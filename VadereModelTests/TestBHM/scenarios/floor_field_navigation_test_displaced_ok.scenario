@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_displaced_ok",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -54,7 +54,8 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel",
@@ -101,8 +102,8 @@
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
-          "standardDeviation" : 0.7,
-          "type" : "OBSTACLES",
+          "standardDeviation" : 0.2,
+          "type" : "UNIT",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
@@ -174,6 +175,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -205,7 +207,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

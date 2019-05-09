@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_ok",
   "description" : "",
-  "release" : "0.6",
+  "release" : "0.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -54,7 +54,8 @@
         "pedestrianOverlapProcessorId" : 3
       }
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel",
@@ -68,9 +69,9 @@
         "navigationFollower" : false,
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
-        "sidewaysEvasion" : false,
+        "sidewaysEvasion" : true,
         "onlyEvadeContraFlow" : false,
-        "makeSmallSteps" : false,
+        "makeSmallSteps" : true,
         "followerProximityNavigation" : true,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
@@ -103,7 +104,7 @@
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "OBSTACLES",
-          "obstacleDensityWeight" : 3.5,
+          "obstacleDensityWeight" : 1.0,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
@@ -138,19 +139,37 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 9.0,
-          "y" : 21.0,
-          "width" : 26.1,
-          "height" : 20.0,
+          "x" : -2.5,
+          "y" : 43.5,
+          "width" : 23.9,
+          "height" : 3.6,
           "type" : "RECTANGLE"
         },
         "id" : -1
       }, {
         "shape" : {
-          "x" : -2.5,
-          "y" : 43.5,
-          "width" : 23.9,
-          "height" : 3.6,
+          "x" : 2.4,
+          "y" : 39.9,
+          "width" : 32.2,
+          "height" : 2.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 0.4,
+          "y" : 36.7,
+          "width" : 29.9,
+          "height" : 1.9,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 1.6,
+          "y" : 33.0,
+          "width" : 33.4,
+          "height" : 1.9,
           "type" : "RECTANGLE"
         },
         "id" : -1
@@ -174,6 +193,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -205,7 +225,9 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0
       },
+      "teleporter" : null,
       "attributesCar" : null
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

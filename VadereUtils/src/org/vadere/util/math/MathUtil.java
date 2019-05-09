@@ -15,6 +15,9 @@ public class MathUtil {
 
 	private final static List<Point> neumannNeighborhood = getNeumannNeighborhood(new Point(0, 0));
 
+	// epsilon for finite differences see https://en.wikipedia.org/wiki/Numerical_differentiation#Practical_considerations_using_floating_point_arithmetic
+	public static double EPSILON = Math.sqrt(Math.ulp(1.0));
+
 	public static double toPositiveSmallestRadian(final double radian) {
 		double result = radian;
 		if(result < 0) {

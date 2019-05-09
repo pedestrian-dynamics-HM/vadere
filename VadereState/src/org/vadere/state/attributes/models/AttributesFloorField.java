@@ -18,6 +18,7 @@ public class AttributesFloorField extends Attributes {
 	private double potentialFieldResolution = 0.1;
 	private double obstacleGridPenalty = 0.1;
 	private double targetAttractionStrength = 1.0;
+	//private double
 
 	private AttributesTimeCost timeCostAttributes;
 

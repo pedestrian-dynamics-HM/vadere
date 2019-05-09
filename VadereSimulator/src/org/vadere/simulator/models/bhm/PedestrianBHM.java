@@ -3,6 +3,7 @@ package org.vadere.simulator.models.bhm;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class PedestrianBHM extends Pedestrian {
 	}
 
 	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
-			AttributesBHM attributesBHM, Random random, IPotentialFieldTarget potentialFieldTarget) {
+			AttributesBHM attributesBHM, Random random, @Nullable IPotentialFieldTarget potentialFieldTarget) {
 		super(attributesPedestrian, random);
 		this.potentialFieldTarget = potentialFieldTarget;
 		this.random = random;
@@ -106,6 +107,10 @@ public class PedestrianBHM extends Pedestrian {
 		setNextTargetListIndex(0);
 
 		setEvasionStrategy();
+	}
+
+	private boolean isPotentialFieldInUse() {
+		return potentialFieldTarget != null;
 	}
 
 	private void setEvasionStrategy() {
@@ -270,7 +275,7 @@ public class PedestrianBHM extends Pedestrian {
 				}
 
 				for (DirectionAddend da : directionAddends) {
-					targetDirection = targetDirection.add(da.getDirectionAddend());
+					targetDirection = targetDirection.add(da.getDirectionAddend(targetDirection));
 				}
 
 				if(targetDirection.distanceToOrigin() < GeometryUtils.DOUBLE_EPS) {
@@ -440,6 +445,22 @@ public class PedestrianBHM extends Pedestrian {
 
 		return result;
 	}
+
+	Optional<Obstacle> detectClosestObstacleProximity(@NotNull final VPoint position, double proximity) {
+
+		Collection<Obstacle> obstacles = topography.getObstacles();
+		Obstacle obs = null;
+		double minDistance = Double.MAX_VALUE;
+
+		for (Obstacle obstacle : obstacles) {
+			double distance = obstacle.getShape().distance(position);
+			if (distance < proximity && distance < minDistance) {
+				obs = obstacle;
+			}
+		}
+		return Optional.ofNullable(obs);
+	}
+
 
 
 	// Java nuisance...
