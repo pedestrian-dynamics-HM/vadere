@@ -21,7 +21,7 @@ public class DrawVoronoiDiagramMode extends DefaultSelectionMode {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if (!SwingUtilities.isRightMouseButton(event)) {
-			Rectangle2D.Double bound = (Rectangle2D.Double) defaultModel.getSelectionShape().getBounds2D();
+			Rectangle2D.Double bound = (Rectangle2D.Double)((VRectangle)defaultModel.getSelectionShapes().getLast()).getBounds2D();
 			if (bound.getHeight() > 0 && bound.getWidth() > 0) {
 				VoronoiDiagram voronoiDiagram = new VoronoiDiagram(new VRectangle(bound));
 				defaultModel.setVoronoiDiagram(voronoiDiagram);

@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -74,8 +75,8 @@ public class DrawLineMode extends DefaultSelectionMode {
 					path.lineTo(panelModel.getMousePosition().x, panelModel.getMousePosition().y);
 					line = new VLine(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
 							panelModel.getMousePosition().x, panelModel.getMousePosition().y);
-
-					panelModel.setSelectionShape(new VPolygon(path));
+					panelModel.getSelectionShapes().clear();
+					panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 					pointList.add(panelModel.getMousePosition());
 
 					state = DrawPathState.END;
@@ -87,14 +88,16 @@ public class DrawLineMode extends DefaultSelectionMode {
 					// dirty trick to see the first line!
 					VPolygon poly = new VPolygon(path);
 					poly.moveTo(line.x2, line.y2 + 0.0001 * panelModel.getScaleFactor());
-					panelModel.setSelectionShape(poly);
+					panelModel.getSelectionShapes().clear();
+					panelModel.addSelectionShapes(Arrays.asList(poly));
 
 					line = new Line2D.Double(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
 							panelModel.getMousePosition().x, panelModel.getMousePosition().y);
 					panelModel.showSelection();
 					lineCount++;
 					path.closePath();
-					panelModel.setSelectionShape(new VPolygon(path));
+					panelModel.getSelectionShapes().clear();
+					panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 					new ActionAddElement("add element", panelModel, undoSupport).actionPerformed(null);
 					pointList.forEach(p -> System.out.println(p));
 					state = DrawPathState.START;
@@ -121,7 +124,8 @@ public class DrawLineMode extends DefaultSelectionMode {
 
 			VPolygon poly = new VPolygon(path);
 			poly.append(line, false);
-			panelModel.setSelectionShape(poly);
+			panelModel.getSelectionShapes().clear();
+			panelModel.addSelectionShapes(Arrays.asList(poly));
 		}
 	}
 

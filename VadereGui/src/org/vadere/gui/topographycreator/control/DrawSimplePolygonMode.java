@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -83,7 +84,8 @@ public class DrawSimplePolygonMode extends DefaultSelectionMode {
 					 * panelModel.addShape(ScenarioShapeFactory.getInstance().createScenarioShape(
 					 * panelModel.getCurrentType(), new VPolygon(path)));
 					 */
-					panelModel.setSelectionShape(new VPolygon(path));
+					panelModel.getSelectionShapes().clear();
+					panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 					pointList.add(panelModel.getMousePosition());
 
 					state = DrawPathState.ADD;
@@ -96,9 +98,11 @@ public class DrawSimplePolygonMode extends DefaultSelectionMode {
 							// dirty trick to see the first line!
 							VPolygon poly = new VPolygon(path);
 							poly.moveTo(line.x2, line.y2 + 0.0001 * panelModel.getScaleFactor());
-							panelModel.setSelectionShape(poly);
+							panelModel.getSelectionShapes().clear();
+							panelModel.addSelectionShapes(Arrays.asList(poly));
 						} else {
-							panelModel.setSelectionShape(new VPolygon(path));
+							panelModel.getSelectionShapes().clear();
+							panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 						}
 
 						line = new Line2D.Double(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
@@ -113,7 +117,8 @@ public class DrawSimplePolygonMode extends DefaultSelectionMode {
 					} else {
 						path.closePath();
 						VPolygon polygon = new VPolygon(path);
-						panelModel.setSelectionShape(polygon);
+						panelModel.getSelectionShapes().clear();
+						panelModel.addSelectionShapes(Arrays.asList(polygon));
 
 						if (isSimplePolygon(pointList)) {
 							new ActionAddElement("add element", panelModel, undoSupport).actionPerformed(null);
@@ -206,7 +211,8 @@ public class DrawSimplePolygonMode extends DefaultSelectionMode {
 				VPolygon poly = new VPolygon(path);
 				poly.append(line, false);
 				// poly.lineTo(line.x2, line.y2);
-				panelModel.setSelectionShape(poly);
+			panelModel.getSelectionShapes().clear();
+			panelModel.addSelectionShapes(Arrays.asList(poly));
 			//}
 		}
 	}

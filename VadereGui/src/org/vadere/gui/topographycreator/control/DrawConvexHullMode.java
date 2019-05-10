@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
@@ -83,7 +84,8 @@ public class DrawConvexHullMode extends DefaultSelectionMode {
 					 * panelModel.addShape(ScenarioShapeFactory.getInstance().createScenarioShape(
 					 * panelModel.getCurrentType(), new VPolygon(path)));
 					 */
-					panelModel.setSelectionShape(new VPolygon(path));
+					panelModel.getSelectionShapes().clear();
+					panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 					pointList.add(panelModel.getMousePosition());
 
 					state = DrawPathState.ADD;
@@ -96,10 +98,12 @@ public class DrawConvexHullMode extends DefaultSelectionMode {
 						// dirty trick to see the first line!
 						VPolygon poly = new VPolygon(path);
 						poly.moveTo(line.x2, line.y2 + 0.0001 * panelModel.getScaleFactor());
-						panelModel.setSelectionShape(poly);
+						panelModel.getSelectionShapes().clear();
+						panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 					} else {
 						GrahamScan scan = new GrahamScan(pointList);
-						panelModel.setSelectionShape(scan.getPolytope());
+						panelModel.getSelectionShapes().clear();
+						panelModel.addSelectionShapes(Arrays.asList(scan.getPolytope()));
 					}
 
 					line = new Line2D.Double(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
@@ -113,7 +117,8 @@ public class DrawConvexHullMode extends DefaultSelectionMode {
 					} else {
 						path.closePath();
 						GrahamScan scan = new GrahamScan(pointList);
-						panelModel.setSelectionShape(scan.getPolytope());
+						panelModel.getSelectionShapes().clear();
+						panelModel.addSelectionShapes(Arrays.asList(scan.getPolytope()));
 
 						if (scan.isPolytope()) {
 							new ActionAddElement("add element", panelModel, undoSupport).actionPerformed(null);
@@ -150,12 +155,14 @@ public class DrawConvexHullMode extends DefaultSelectionMode {
 				List<VPoint> cloneList = new ArrayList<>(pointList);
 				cloneList.add(new VPoint(line.x2, line.y2));
 				GrahamScan scan = new GrahamScan(cloneList);
-				panelModel.setSelectionShape(scan.getPolytope());
+				panelModel.getSelectionShapes().clear();
+				panelModel.addSelectionShapes(Arrays.asList(scan.getPolytope()));
 			} else {
 				VPolygon poly = new VPolygon(path);
 				poly.append(line, false);
 				// poly.lineTo(line.x2, line.y2);
-				panelModel.setSelectionShape(poly);
+				panelModel.getSelectionShapes().clear();
+				panelModel.addSelectionShapes(Arrays.asList(new VPolygon(path)));
 			}
 		}
 	}

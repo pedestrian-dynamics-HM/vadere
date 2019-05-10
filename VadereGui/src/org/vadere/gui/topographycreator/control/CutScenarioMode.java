@@ -30,7 +30,7 @@ public class CutScenarioMode extends RectangleSelectionMode {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		super.mouseReleased(event);
-		final VShape selectionShape = panelModel.getSelectionShape();
+		final VShape selectionShape = (VShape)panelModel.getSelectionShapes().getLast();
 		final Rectangle2D bound = selectionShape.getBounds2D();
 
 		UndoableEdit edit = new EditCutScenario(panelModel, new VRectangle(panelModel.getTopographyBound()));

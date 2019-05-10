@@ -20,10 +20,8 @@ public class DefaultSelectionMode extends RectangleSelectionMode {
 		panelModel.hideSelection();
 		panelModel.getSelectedElements().clear();
 
-		VRectangle rect = (VRectangle) panelModel.getSelectionShape();
-
-		if (SwingUtilities.isRightMouseButton(event) && rect.getWidth() * rect.getHeight() >= MIN_RECT_AREA) {
-			panelModel.fireChangeViewportEvent(rect);
-		}
+		panelModel.getSelectionShapes().stream()
+				.filter(rect -> SwingUtilities.isRightMouseButton(event) && ((VRectangle)rect).getWidth() * ((VRectangle)rect).getHeight() >= MIN_RECT_AREA)
+				.forEach(rect -> panelModel.fireChangeViewportEvent((VRectangle)rect));
 	}
 }

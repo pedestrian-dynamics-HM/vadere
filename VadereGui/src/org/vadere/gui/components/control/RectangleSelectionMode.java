@@ -1,6 +1,7 @@
 package org.vadere.gui.components.control;
 
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 import javax.swing.SwingUtilities;
 
@@ -28,7 +29,7 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 			double height = width;
 			VRectangle shape = new VRectangle(panelModel.getMousePosition().x,
 					panelModel.getMousePosition().y, width, height);
-			panelModel.setSelectionShape(shape);
+			panelModel.addSelectionShapes(Arrays.asList(shape));
 		}
 		panelModel.notifyObservers();
 	}
@@ -61,7 +62,8 @@ public class RectangleSelectionMode extends DefaultModeAdapter {
 			width = Math.round(width * factor) / factor;
 			height = Math.round(height * factor) / factor;
 
-			panelModel.setSelectionShape(new VRectangle(x, y, width, height));
+			panelModel.getSelectionShapes().clear();
+			panelModel.addSelectionShapes(Arrays.asList(new VRectangle(x, y, width, height)));
 
 		}
 		panelModel.notifyObservers();

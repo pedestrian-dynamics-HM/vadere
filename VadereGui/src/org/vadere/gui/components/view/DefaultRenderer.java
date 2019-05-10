@@ -9,12 +9,7 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.voronoi.Face;
@@ -258,7 +253,7 @@ public abstract class DefaultRenderer {
 	protected void renderSelectionShape(final Graphics2D graphics) {
 		graphics.setColor(defaultModel.getMouseSelectionMode().getSelectionColor());
 		graphics.setStroke(new BasicStroke(getSelectionBorderLineWidth()));
-		draw(defaultModel.getSelectionShape(), graphics);
+		defaultModel.getSelectionShapes().forEach(element -> draw((VShape)element, graphics));
 	}
 
 	protected void renderSelectionBorder(final Graphics2D graphics) {

@@ -27,7 +27,7 @@ public class SelectViewportMode extends RectangleSelectionMode {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		super.mouseReleased(event);
-		final Shape selectionShape = panelModel.getSelectionShape();
+		final Shape selectionShape = (Shape)panelModel.getSelectionShapes().getLast();
 		final Rectangle2D.Double bound = (Rectangle2D.Double) selectionShape.getBounds2D();
 
 		if (bound.getWidth() * panelModel.getScaleFactor() * bound.getHeight() * panelModel.getScaleFactor() >= 40) {

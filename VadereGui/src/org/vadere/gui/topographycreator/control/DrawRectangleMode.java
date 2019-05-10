@@ -8,6 +8,7 @@ import javax.swing.undo.UndoableEditSupport;
 import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * In this mode Retangles will be generated.
@@ -28,7 +29,7 @@ public class DrawRectangleMode extends DefaultSelectionMode {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if (!SwingUtilities.isRightMouseButton(event)) {
-			Rectangle2D.Double bound = (Rectangle2D.Double) panelModel.getSelectionShape().getBounds2D();
+			Rectangle2D.Double bound = (Rectangle2D.Double)((VRectangle)panelModel.getSelectionShapes().getLast()).getBounds2D();
 			if (bound.getHeight() > 0 && bound.getWidth() > 0) {
 				new ActionAddElement("add element", panelModel, undoSupport).actionPerformed(null);
 			}

@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 
@@ -39,8 +40,9 @@ public class DrawDotMode extends DefaultSelectionMode {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if (!SwingUtilities.isRightMouseButton(event)) {
-			panelModel.setSelectionShape(new VCircle(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
-					this.dotRadius));
+			panelModel.getSelectionShapes().clear();
+			panelModel.addSelectionShapes(Arrays.asList(new VCircle(panelModel.getMousePosition().x, panelModel.getMousePosition().y,
+					this.dotRadius)));
 			new ActionAddElement("add action", panelModel, undoSupport).actionPerformed(null);
 
 			panelModel.notifyObservers();

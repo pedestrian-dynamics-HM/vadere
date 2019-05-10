@@ -222,7 +222,7 @@ public class TopographyCreatorModel<T extends DefaultConfig> extends DefaultMode
 
 	@Override
 	public boolean isSelectionVisible() {
-		return getSelectionShape() != null && super.isSelectionVisible();
+		return !getSelectionShapes().isEmpty() && super.isSelectionVisible();
 	}
 
 	@Override

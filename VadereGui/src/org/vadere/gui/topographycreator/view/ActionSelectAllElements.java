@@ -27,6 +27,8 @@ public class ActionSelectAllElements extends TopographyAction {
     public void actionPerformed(ActionEvent e) {
         getScenarioPanelModel().getObstacles().forEach(this::addIfNotContained);
         getScenarioPanelModel().getMeasurementAreas().forEach(this::addIfNotContained);
+        getScenarioPanelModel().getScenario().getTopography().getSources().forEach(this::addIfNotContained);
+        getScenarioPanelModel().getScenario().getTopography().getTargets().forEach(this::addIfNotContained);
         System.out.println(getScenarioPanelModel().getSelectedElements().size());
         getScenarioPanelModel().showPrototypeShape();
     }

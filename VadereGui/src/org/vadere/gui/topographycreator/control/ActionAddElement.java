@@ -9,6 +9,7 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyElementFactory;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * Adds a new ScenarioElment to the Model and set the json content of the panelModel.
@@ -33,12 +34,17 @@ class ActionAddElement extends TopographyAction {
 		UndoableEdit edit = new EditDrawShape(getScenarioPanelModel(), type);
 		undoSupport.postEdit(edit);
 
+		getScenarioPanelModel().getSelectionShapes().forEach(this::addElement);
+	}
+
+	private void addElement(VShape shape) {
 		IDrawPanelModel model = getScenarioPanelModel();
 
 		model.getCurrentType();
 		model.hideSelection();
+
 		ScenarioElement element = TopographyElementFactory.getInstance().createScenarioShape(model.getCurrentType(),
-				model.getSelectionShape());
+				shape);
 		model.addShape(element);
 		model.addSelectedElements(element);
 	}

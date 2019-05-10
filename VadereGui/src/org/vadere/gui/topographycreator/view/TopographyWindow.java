@@ -82,7 +82,6 @@ public class TopographyWindow extends JPanel {
 		this.panelModel = panelModel;
 		SelectElementMode mode = new SelectElementMode(panelModel, undoSupport);
 		this.panelModel.setMouseSelectionMode(mode);
-		addKeyListener(new CTRLKeyListener(mode::setPersistentSelection));
 		// info panel
 		infoPanel = new InfoPanel(panelModel);
 		selectedElementLabel = new JLabelObserver(JLabelObserver.DEFAULT_TEXT);

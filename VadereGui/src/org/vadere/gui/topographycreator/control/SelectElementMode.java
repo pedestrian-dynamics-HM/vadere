@@ -18,11 +18,13 @@ import java.awt.event.MouseEvent;
  * 
  */
 public class SelectElementMode extends DefaultSelectionMode {
-	private final UndoableEditSupport undoSupport;
-	private final IDrawPanelModel panelModel;
-	private boolean resizeElement;
 	private boolean isModifying;
+	private boolean persistentSelection;
+	private boolean resizeElement;
 	private static final int[] DIRECTIONAL_CURSOR_CODES;
+	private final IDrawPanelModel panelModel;
+	private final UndoableEditSupport undoSupport;
+
 
 	static{
 		DIRECTIONAL_CURSOR_CODES = new int[8];
@@ -35,8 +37,6 @@ public class SelectElementMode extends DefaultSelectionMode {
 		DIRECTIONAL_CURSOR_CODES[6] = Cursor.S_RESIZE_CURSOR;
 		DIRECTIONAL_CURSOR_CODES[7] = Cursor.SE_RESIZE_CURSOR;
 	}
-
-    private boolean persistentSelection;
 
     public SelectElementMode(final IDrawPanelModel panelModel, final UndoableEditSupport undoSupport) {
 		super(panelModel);
