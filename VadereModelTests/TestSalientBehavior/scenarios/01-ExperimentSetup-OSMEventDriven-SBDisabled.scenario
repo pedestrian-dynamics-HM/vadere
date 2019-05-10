@@ -1,7 +1,8 @@
 {
-  "name" : "02-ExperimentSetup-OSMSequential",
+  "name" : "01-ExperimentSetup-OSMEventDriven-SBDisabled",
   "description" : "",
   "release" : "0.9",
+  "commithash" : "cdf35b188206df9a7fed0cf7362063d21a8b682e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -59,7 +60,7 @@
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
-        "updateType" : "SEQUENTIAL",
+        "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -105,7 +106,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 6138355022448163583,
       "simulationSeed" : 0,
-      "useSalientBehavior" : true
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {

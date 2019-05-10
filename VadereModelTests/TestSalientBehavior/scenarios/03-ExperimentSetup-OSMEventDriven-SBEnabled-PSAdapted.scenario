@@ -1,12 +1,13 @@
 {
-  "name" : "01-ExperimentSetup-OSMEventDriven",
+  "name" : "03-ExperimentSetup-OSMEventDriven-SBEnabled-PSAdapted",
   "description" : "",
   "release" : "0.9",
+  "commithash" : "cdf35b188206df9a7fed0cf7362063d21a8b682e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 5, 6 ]
+      "processors" : [ 1, 2, 5, 6, 7 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -38,6 +39,13 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMostImportantEventProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "id" : 7,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaProcessor",
+      "attributes" : {
+        "measurementAreaId" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -67,8 +75,8 @@
         "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.45,
-        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialIntimateSpaceWidth" : 0.2,
+        "pedPotentialPersonalSpaceWidth" : 0.4,
         "pedPotentialHeight" : 50.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,

@@ -1,8 +1,8 @@
 {
-  "name" : "05-CounterFlow-OSMSequential",
+  "name" : "07-CounterFlow-OSMSequential-SBEnabled",
   "description" : "",
   "release" : "0.9",
-  "commithash" : "6ecd3422b6ffd2495735d5194e72ce9b2b85867c",
+  "commithash" : "cdf35b188206df9a7fed0cf7362063d21a8b682e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
