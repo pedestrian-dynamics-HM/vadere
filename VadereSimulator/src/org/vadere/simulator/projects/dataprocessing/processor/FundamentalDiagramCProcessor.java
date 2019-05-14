@@ -42,13 +42,10 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	@Override
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
+
 		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
-		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
-		if (measurementArea == null)
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-		if (!measurementArea.isRectangular())
-			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
 		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 

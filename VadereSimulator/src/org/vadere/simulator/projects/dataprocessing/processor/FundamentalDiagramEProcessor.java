@@ -33,12 +33,8 @@ public class FundamentalDiagramEProcessor extends AreaDataProcessor<Pair<Double,
 		super.init(manager);
 		AttributesFundamentalDiagramEProcessor att = (AttributesFundamentalDiagramEProcessor) this.getAttributes();
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
-		MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
-		MeasurementArea voronoiMeasurementArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId());
-		if (measurementArea == null || voronoiMeasurementArea == null)
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-		if (!measurementArea.isRectangular() || !voronoiMeasurementArea.isRectangular())
-			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+		MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+		MeasurementArea voronoiMeasurementArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId(), true);
 
 		sumVoronoiAlgorithm = new SumVoronoiAlgorithm(
 				key -> pedestrianVelocityProcessor.getValue(key),

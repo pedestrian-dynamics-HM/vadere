@@ -40,7 +40,7 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		attr.setMeasurementAreaId(99);
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(99, new VRectangle(0, 0, 4, 5)));
-		Mockito.when(manager.getMeasurementArea(99)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(99, false)).thenReturn(measurementArea);
 	}
 
 	@Override

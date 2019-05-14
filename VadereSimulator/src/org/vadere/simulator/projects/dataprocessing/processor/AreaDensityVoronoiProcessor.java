@@ -7,9 +7,6 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.util.factory.processors.Flag;
-
-import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
@@ -28,11 +25,7 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor implements
         super.init(manager);
 
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
-        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
-        if (measurementArea == null)
-            throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-        if (!measurementArea.isRectangular())
-            throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
 
         this.setAlgorithm(new AreaDensityVoronoiAlgorithm(this.getMeasurementArea(), measurementArea));
     }
