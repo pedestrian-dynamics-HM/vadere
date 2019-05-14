@@ -22,12 +22,7 @@ public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepKey, V>
     public void init(final ProcessorManager manager) {
         super.init(manager);
         AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
-        this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
-        if (measurementArea == null)
-            throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-        if (!measurementArea.isRectangular())
-            throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
-
+        this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
     }
 
     public MeasurementArea getMeasurementArea() {

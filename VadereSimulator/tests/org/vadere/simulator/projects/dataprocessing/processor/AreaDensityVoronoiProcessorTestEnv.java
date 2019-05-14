@@ -36,7 +36,8 @@ public class AreaDensityVoronoiProcessorTestEnv extends ProcessorTestEnv<Timeste
 		attr.setMeasurementAreaId(42);
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(42, new VRectangle(0, 0, 16, 16)));
-		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, false)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, true)).thenReturn(measurementArea);
 
 	}
 

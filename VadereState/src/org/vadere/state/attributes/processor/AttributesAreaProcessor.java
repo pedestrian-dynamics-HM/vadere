@@ -2,6 +2,7 @@ package org.vadere.state.attributes.processor;
 
 /**
  * @author Mario Teixeira Parente
+ * @author Stefan Schuhbäck (major update)
  */
 
 public class AttributesAreaProcessor extends AttributesProcessor {

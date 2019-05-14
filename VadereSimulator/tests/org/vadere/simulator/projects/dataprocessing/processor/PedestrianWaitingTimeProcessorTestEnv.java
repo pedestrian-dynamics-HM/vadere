@@ -32,7 +32,7 @@ public class PedestrianWaitingTimeProcessorTestEnv extends ProcessorTestEnv<Pede
 		attr.setWaitingAreaId(42);
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(42, new VRectangle(0, 0, 2, 5)));
-		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, true)).thenReturn(measurementArea);
 	}
 
 	@Override

@@ -53,11 +53,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		super.init(manager);
 		AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
 		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(att.getPedestrianTrajectoryProcessorId());
-		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
-		if (measurementArea == null)
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-		if (!measurementArea.isRectangular())
-			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
 		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 

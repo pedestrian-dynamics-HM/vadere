@@ -54,8 +54,19 @@ public class ProcessorManager {
 		return this.processorMap.getOrDefault(id, null);
 	}
 
-	public MeasurementArea getMeasurementArea(int measurementAreaId){
-		return topography.getMeasurementArea(measurementAreaId);
+	public MeasurementArea getMeasurementArea(int measurementAreaId, boolean requireRectangular){
+
+		MeasurementArea measurementArea = topography.getMeasurementArea(measurementAreaId);
+
+		if (measurementArea == null){
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", measurementAreaId));
+		}
+
+		if (requireRectangular && !measurementArea.isRectangular()) {
+			throw new RuntimeException(String.format("Measurement area for %d is required to be rectangular", measurementAreaId));
+		}
+
+		return measurementArea;
 	}
 
 	public MainModel getMainModel() {
