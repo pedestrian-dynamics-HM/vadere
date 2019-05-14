@@ -120,15 +120,12 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
-		// TODO: Clarify with Bene if it ensured, that "pedestrianTrajectoryProcessor.doUpdate()"
-		//   is always invoked automatically by underlying processor manager.
-		AttributesSpeedInAreaProcessor processorAttributes = (AttributesSpeedInAreaProcessor) this.getAttributes();
+		pedestrianTrajectoryProcessor.update(state);
 
 		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
 			double speed = -1;
 
 			if (measurementArea.getShape().contains(pedestrian.getPosition())) {
-				// Use pedestrian's trajectory to calculate the speed.
 				VTrajectory wholeTrajectory = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
 				VTrajectory cuttedTrajectory = wholeTrajectory.cut(measurementArea.asVRectangle());
 
