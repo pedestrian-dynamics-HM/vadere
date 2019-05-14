@@ -16,6 +16,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFacto
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 
 import java.io.IOException;
@@ -281,14 +282,14 @@ public class DataProcessingJsonManager {
 		return main;
 	}
 
-	public ProcessorManager createProcessorManager(MainModel mainModel) {
+	public ProcessorManager createProcessorManager(MainModel mainModel, final Topography topography) {
 		// this function is called when the simulation starts running
 
 		for (OutputFile f : outputFiles) {
 			f.setWriteMetaData(isWriteMetaData()); // allow to write meta data
 		}
 
-		return new ProcessorManager(dataProcessors, outputFiles, mainModel);
+		return new ProcessorManager(dataProcessors, outputFiles, mainModel, topography);
 
 	}
 

@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -672,6 +673,11 @@ public class GeometryUtils {
 
 	public static VPolygon polygonFromPoints2D(@NotNull final List<VPoint> vertices) {
 		return polygonFromPoints2D(vertices.toArray(new VPoint[0]));
+	}
+
+	public static VPolygon polygonFromArea(@NotNull final Area area){
+		VPolygon tmpPolygon = new VPolygon(area);
+		return polygonFromPoints2D(tmpPolygon.getPoints());
 	}
 
 	/**

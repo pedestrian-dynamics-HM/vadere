@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.lookup.MainMapLookup;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
@@ -11,7 +12,6 @@ import org.apache.logging.log4j.spi.ExtendedLoggerWrapper;
 import org.apache.logging.log4j.util.MessageSupplier;
 import org.apache.logging.log4j.util.Supplier;
 
-import javax.security.auth.login.Configuration;
 
 /**
  * Extended Logger interface with convenience methods for
@@ -23,9 +23,28 @@ public final class Logger extends ExtendedLoggerWrapper {
 	private final ExtendedLoggerWrapper logger;
 
 	private static final String FQCN = Logger.class.getName();
-	private static final Level STDERR = Level.forName("STDERR", 199);
-	private static final Level STDOUT = Level.forName("STDOUT", 401);
+	private static final Level STDERR = Level.forName("STDERR", 200);
+	private static final Level STDOUT = Level.forName("STDOUT", 400);
 
+
+	/**
+	 * Add all arguments to the Log4j2 MapLookup and use them as variabes in the setup process.
+	 *
+	 * @param args arguments given in the main method.
+	 */
+	public static void setMainArguments(String[] args){
+		// [LOG4J2-1013] workaround:
+		// see https://issues.apache.org/jira/browse/LOG4J2-1013 and
+		// see https://stackoverflow.com/a/42498964
+		// This call allows to use ${main:myString} within the log4j2 config files where --myString
+		// is some argument given in the args[] array in the main method. Based on the bug
+		// [LOG4J2-1013] leading '-' must be removed.
+		String[] cleanedArgs = new String[args.length];
+		for (int i = 0; i < args.length; i++) {
+			cleanedArgs[i] = args[i].replaceAll("-", "");
+		}
+		MainMapLookup.setMainArguments(cleanedArgs);
+	}
 
 	private Logger(final org.apache.logging.log4j.Logger logger) {
 		super((AbstractLogger) logger, logger.getName(), logger.getMessageFactory());

@@ -1,7 +1,7 @@
 {
   "name" : "chicken_floorfield_displaced_ok",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -28,13 +28,7 @@
       "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 10.0,
-          "y" : 32.0,
-          "width" : 15.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
@@ -159,6 +153,16 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      } ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 10.0,
+          "y" : 32.0,
+          "width" : 15.0,
+          "height" : 8.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
       } ],
       "stairs" : [ ],
       "targets" : [ {

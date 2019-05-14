@@ -12,37 +12,35 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.SetLogLevelCommand;
-import org.vadere.simulator.entrypoints.cmd.commands.SetLogNameCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
-import org.vadere.util.opencl.CLUtils;
 
-import javax.swing.*;
+import java.util.Arrays;
 
 
 /**
  * Provides the possibility to start Vadere in console mode.
+ * Do not use Logging in this Class! The Logging framework needs information generated here
+ * to configure itself.
  */
 public class VadereConsole {
 
-	private final static Logger logger = Logger.getLogger(VadereConsole.class);
-
 	public static void main(String[] args) {
+		Logger.setMainArguments(args);
 //		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
-//			String[] tmp = {"migrate", "--create-new-version", "0.7",  "VadereSimulator/resources/"};
+//			String[] tmp = {"project-run", "-p", "/home/lphex/hm.d/vadere/VadereModelTests/TestOSM_Group_calibration"};
 //			args = tmp;
 		ArgumentParser parser = createArgumentParser();
 
 		try {
-			StdOutErrLog.addStdOutErrToLog();
 			//if (!CLUtils.isOpenCLSupported()) {
 			//	System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
 			//}
 			Namespace ns = parser.parseArgs(args);
 			SubCommandRunner sRunner = ns.get("func");
+			StdOutErrLog.addStdOutErrToLog();
 			sRunner.run(ns, parser);
 
 		} catch (UnsatisfiedLinkError linkError) {
@@ -70,20 +68,20 @@ public class VadereConsole {
 	}
 
     private static void addOptionsToParser(ArgumentParser parser) {
+		// no action required call to  Logger.setMainArguments(args) already configured Logger.
         parser.addArgument("--loglevel")
                 .required(false)
                 .type(String.class)
                 .dest("loglevel")
-                .choices("OFF", "FATAL", "TOPOGRAPHY_ERROR", "TOPOGRAPHY_WARN", "INFO", "DEBUG", "ALL")
+                .choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
                 .setDefault("INFO")
-                .action(new SetLogLevelCommand())
                 .help("Set Log Level.");
 
+		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--logname")
 				.required(false)
 				.type(String.class)
 				.dest("logname")
-				.action(new SetLogNameCommand())
 				.help("Write log to given file.");
     }
 
@@ -103,11 +101,6 @@ public class VadereConsole {
 				.type(String.class)
 				.dest("project-dir")
 				.help("Path to project directory.");
-		projectRun.addArgument("--scenario-file", "-f")
-				.required(false)
-				.type(String.class)
-				.dest("scenario-file")
-				.help("Name of Scenario file.");
 		projectRun.addArgument("--scenario-checker")
 				.required(false)
 				.type(String.class)
@@ -182,7 +175,7 @@ public class VadereConsole {
 				.help("The scenario files or directories on to operate on. Directories containing" +
 						"the files DO_NOT_MIGRATE or DO_NOT_MIGRATE_TREE will be ignored.");
 
-		String[] versions = Version.stringValues(Version.NOT_A_RELEASE);
+		String[] versions = Version.stringValues(Version.NOT_A_RELEASE, true);
 		migrationAssistant.addArgument("--target-version")
 				.required(false)
 				.type(String.class)

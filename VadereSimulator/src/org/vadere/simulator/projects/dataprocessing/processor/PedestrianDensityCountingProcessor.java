@@ -28,7 +28,7 @@ public class PedestrianDensityCountingProcessor extends PedestrianDensityProcess
 
     @Override
     public AttributesProcessor getAttributes() {
-        if(super.getAttributes() == null) {
+        if(super.getAttributes() == null || !(super.getAttributes() instanceof AttributesPedestrianDensityCountingProcessor)) {
             setAttributes(new AttributesPedestrianDensityCountingProcessor());
         }
 

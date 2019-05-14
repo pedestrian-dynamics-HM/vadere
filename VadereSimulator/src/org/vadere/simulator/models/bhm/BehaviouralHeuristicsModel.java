@@ -54,11 +54,9 @@ public class BehaviouralHeuristicsModel implements MainModel {
 	private Random random;
 	private Topography topography;
 	private double lastSimTimeInSec;
-	private int pedestrianIdCounter;
 	private PriorityQueue<PedestrianBHM> pedestrianEventsQueue;
 
 	public BehaviouralHeuristicsModel() {
-		this.pedestrianIdCounter = 0;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianBHM());
 	}
 
@@ -90,9 +88,8 @@ public class BehaviouralHeuristicsModel implements MainModel {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("BHM cannot initialize " + type.getCanonicalName());
 
-		pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
+				this.attributesPedestrian, registerDynamicElementId(topography, id));
 
 		PedestrianBHM pedestrian = createElement(position, pedAttributes);
 		pedestrian.setPosition(position);

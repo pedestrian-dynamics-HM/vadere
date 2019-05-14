@@ -2,8 +2,10 @@ package org.vadere.util.geometry.shapes;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -81,6 +83,25 @@ public class VPolygon extends Path2D.Double implements VShape {
 		List<VPoint> points = getPath();
 		Collections.reverse(points);
 		return GeometryUtils.toPolygon(points);
+	}
+
+	public boolean isRectangular(){
+		Area tmp = new Area(this);
+		return tmp.isRectangular();
+	}
+
+	public VRectangle asVRectangle(){
+		if (!isRectangular())
+			return null;
+
+		// retuns list of points.
+		// width points[0] -- points[1]
+		// height points[0] -- points[3]
+		ArrayList<VPoint> points = new ArrayList<>(getPoints());
+		assert points.size() == 4 : "This is not a VRectangle";
+		double width = points.get(0).distance(points.get(1));
+		double height = points.get(0).distance(points.get(3));
+		return new VRectangle(points.get(0).x, points.get(0).y, width, height);
 	}
 
 	/**

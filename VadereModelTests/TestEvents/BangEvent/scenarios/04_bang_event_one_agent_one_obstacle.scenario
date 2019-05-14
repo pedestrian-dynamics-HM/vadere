@@ -1,7 +1,7 @@
 {
   "name" : "04_bang_event_one_agent_one_obstacle",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -121,6 +121,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

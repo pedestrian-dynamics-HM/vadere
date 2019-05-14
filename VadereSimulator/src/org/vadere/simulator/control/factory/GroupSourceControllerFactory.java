@@ -4,6 +4,8 @@ import org.vadere.simulator.control.GroupSourceController;
 import org.vadere.simulator.control.SourceController;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
+import org.vadere.simulator.models.groups.GroupSizeDeterminator;
+import org.vadere.simulator.models.groups.GroupSizeDeterminatorRandom;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
@@ -23,7 +25,7 @@ public class GroupSourceControllerFactory extends SourceControllerFactory {
 								   DynamicElementFactory dynamicElementFactory,
 								   AttributesDynamicElement attributesDynamicElement,
 								   Random random) {
-		groupModel.initializeGroupFactory(source.getId(), source.getAttributes().getGroupSizeDistribution());
-		return new GroupSourceController(scenario, source, dynamicElementFactory, attributesDynamicElement, random, groupModel);
+		GroupSizeDeterminator gsd = new GroupSizeDeterminatorRandom(source.getAttributes().getGroupSizeDistribution(), random);
+		return new GroupSourceController(scenario, source, dynamicElementFactory, attributesDynamicElement, random, groupModel, gsd);
 	}
 }

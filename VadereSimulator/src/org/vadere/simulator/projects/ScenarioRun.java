@@ -97,7 +97,7 @@ public class ScenarioRun implements Runnable {
 
 				// prepare processors and simulation data writer
 				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
-					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel);
+					processorManager = dataProcessingJsonManager.createProcessorManager(mainModel, scenarioStore.getTopography());
 					processorManager.setSimulationResult(simulationResult);
 				}
 

@@ -1,7 +1,7 @@
 {
   "name" : "rimea_05_react_gnm1",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -90,6 +90,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

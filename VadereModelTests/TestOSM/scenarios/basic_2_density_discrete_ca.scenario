@@ -1,7 +1,7 @@
 {
   "name" : "basic_2_density_discrete_ca",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -144,7 +144,7 @@
             "y" : 12.0
           } ]
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -162,8 +162,9 @@
             "y" : 0.0
           } ]
         },
-        "id" : -1
+        "id" : 4
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -185,7 +186,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 1.0,
           "y" : 1.0,

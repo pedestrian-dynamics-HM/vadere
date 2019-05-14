@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesMeanPedestrianEvacuationTimeProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -16,41 +16,15 @@ public class MeanPedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestE
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
-	@SuppressWarnings("unchecked")
 	MeanPedestrianEvacuationTimeProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(MeanPedestrianEvacuationTimeProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(MeanPedestrianEvacuationTimeProcessor.class, NoDataKey.class);
+	}
 
-		DataProcessor pedEvacTimeProc;
-		PedestrianEvacuationTimeProcessorTestEnv pedEvacTimeProcEnv;
-		int pedEvacTimeProcId = nextProcessorId();
-
-		//add ProcessorId of required Processors to current Processor under test
+	@Override
+	void initializeDependencies() {
+		int pedEvacTimeProcId = addDependentProcessor(PedestrianEvacuationTimeProcessorTestEnv::new);
 		AttributesMeanPedestrianEvacuationTimeProcessor attr = (AttributesMeanPedestrianEvacuationTimeProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianEvacuationTimeProcessorId(pedEvacTimeProcId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedEvacTimeProcEnv = new PedestrianEvacuationTimeProcessorTestEnv(pedEvacTimeProcId);
-		pedEvacTimeProc = pedEvacTimeProcEnv.getTestedProcessor();
-
-		Mockito.when(manager.getProcessor(pedEvacTimeProcId)).thenReturn(pedEvacTimeProc);
-		addRequiredProcessors(pedEvacTimeProcEnv);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					NoDataKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
 	}
 
 	@Override

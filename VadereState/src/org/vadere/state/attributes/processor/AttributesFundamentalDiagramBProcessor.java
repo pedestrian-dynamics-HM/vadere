@@ -1,22 +1,21 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
 
 public class AttributesFundamentalDiagramBProcessor extends AttributesProcessor {
 	private int pedestrianTrajectoryProcessorId;
-	private VRectangle measurementArea;
+	private int measurementAreaId;
 
 	public int getPedestrianTrajectoryProcessorId() {
 		return pedestrianTrajectoryProcessorId;
 	}
 
-	public VRectangle getMeasurementArea() {
-		return measurementArea;
+	public int getMeasurementAreaId() {
+		return measurementAreaId;
 	}
 
-	public void setMeasurementArea(VRectangle measurementArea) {
+	public void setMeasurementAreaId(int measurementAreaId) {
 		checkSealed();
-		this.measurementArea = measurementArea;
+		this.measurementAreaId = measurementAreaId;
 	}
 
 	public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {

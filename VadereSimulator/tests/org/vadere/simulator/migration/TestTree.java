@@ -10,9 +10,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.vadere.simulator.projects.migration.MigrationException;
-import org.vadere.simulator.projects.migration.Tree;
-import org.vadere.simulator.projects.migration.incidents.DeleteInArrayIncident;
-import org.vadere.simulator.projects.migration.incidents.ExceptionIncident;
+import org.vadere.simulator.projects.migration.incident.Tree;
+import org.vadere.simulator.projects.migration.incident.incidents.DeleteInArrayIncident;
+import org.vadere.simulator.projects.migration.incident.incidents.ExceptionIncident;
 import org.vadere.state.util.StateJsonConverter;
 
 import java.io.IOException;

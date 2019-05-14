@@ -1,7 +1,7 @@
 {
   "name" : "basic_2_density_pso",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -152,6 +152,7 @@
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,

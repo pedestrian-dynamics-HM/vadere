@@ -43,7 +43,7 @@ public class AreaSpeedProcessor extends AreaDataProcessor<Double> {
             final int pedId = entry.getKey().getPedestrianId();
             final VPoint pos = entry.getValue();
 
-            if (getMeasurementArea().contains(pos)) {
+            if (getMeasurementArea().asVRectangle().contains(pos)) {
                 sumVelocities += this.pedVelProc.getValue(new TimestepPedestrianIdKey(step, pedId));
                 pedCount++;
             }

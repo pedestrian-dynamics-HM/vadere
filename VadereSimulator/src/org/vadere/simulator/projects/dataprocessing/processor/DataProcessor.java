@@ -1,6 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
@@ -8,6 +11,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -52,6 +56,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 
 		this.lastStep = 0;
 	}
+
 
 	protected Map<K, V> getData() {
 		return this.data;
@@ -111,6 +116,17 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		if (this.lastStep < step) {
 			this.doUpdate(state);
 			this.lastStep = step;
+		}
+	}
+
+	public Optional<Model> getSubModel(SimulationState state, Class clazz){
+		Optional<MainModel> mainModel = state.getMainModel();
+		if(mainModel.isPresent()){
+			Optional<Model> model = mainModel.get().getSubmodels()
+					.stream().filter(clazz::isInstance).findAny();
+			return model;
+		} else {
+			return Optional.empty();
 		}
 	}
 

@@ -6,7 +6,7 @@ import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepRowKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesFloorFieldProcessor;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.data.FloorFieldGridRow;
@@ -29,27 +29,15 @@ public class TargetFloorFieldGridProcessorTestEnv extends ProcessorTestEnv<Times
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	TargetFloorFieldGridProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(TargetFloorFieldGridProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(TargetFloorFieldGridProcessor.class, TimestepRowKey.class);
+	}
 
+	@Override
+	void initializeDependencies() {
 		AttributesFloorFieldProcessor attr =
 				(AttributesFloorFieldProcessor) testedProcessor.getAttributes();
 		attr.setResolution(1.0);
 		attr.setTargetId(1);
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepRowKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	@Override

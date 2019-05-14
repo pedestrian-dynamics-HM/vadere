@@ -1,8 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -18,43 +17,21 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
-	PedestrianEvacuationTimeProcessorTestEnv(){this(1);}
+	PedestrianEvacuationTimeProcessorTestEnv() {
+		this(1);
+	}
 
-	PedestrianEvacuationTimeProcessorTestEnv(int nextProcesorId) {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianEvacuationTimeProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcesorId);
-		this.nextProcessorId = nextProcesorId + 1;
+	PedestrianEvacuationTimeProcessorTestEnv(int nextProcessorId) {
+		super(PedestrianEvacuationTimeProcessor.class, PedestrianIdKey.class, nextProcessorId);
+	}
 
-		DataProcessor pedStartTimeProc;
-		PedestrianStartTimeProcessorTestEnv pedStartTimeProcEnv;
-		int pedStartTimeProcId = nextProcessorId();
-
+	@Override
+	void initializeDependencies() {
+		int pedStartTimeProcId = addDependentProcessor(PedestrianStartTimeProcessorTestEnv::new);
 		//add ProcessorId of required Processors to current Processor under test
 		AttributesPedestrianEvacuationTimeProcessor attr =
 				(AttributesPedestrianEvacuationTimeProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianStartTimeProcessorId(pedStartTimeProcId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedStartTimeProcEnv = new PedestrianStartTimeProcessorTestEnv(pedStartTimeProcId);
-		pedStartTimeProc = pedStartTimeProcEnv.getTestedProcessor();
-		Mockito.when(manager.getProcessor(pedStartTimeProcId)).thenReturn(pedStartTimeProc);
-		addRequiredProcessors(pedStartTimeProcEnv);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					PedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
 	}
 
 	@Override
@@ -63,7 +40,7 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 			@Override
 			public void mockIt() {
 
-				b.clear().add(new Integer[]{1, 3, 4});
+				b.clear().add(1, 3, 4);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(0.4);
@@ -79,7 +56,7 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 			@Override
 			public void mockIt() {
 
-				b.clear().add(new Integer[]{1, 3, 4, 5, 8});
+				b.clear().add(1, 3, 4, 5, 8);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(12.8);
@@ -97,7 +74,7 @@ public class PedestrianEvacuationTimeProcessorTestEnv extends ProcessorTestEnv<P
 			@Override
 			public void mockIt() {
 
-				b.clear().add(new Integer[]{1, 5, 8});
+				b.clear().add(1, 5, 8);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(34.7);
