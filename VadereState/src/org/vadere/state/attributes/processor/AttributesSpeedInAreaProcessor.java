@@ -1,22 +1,22 @@
 package org.vadere.state.attributes.processor;
 
-/**
- * @author Mario Teixeira Parente
- */
+import org.vadere.state.attributes.processor.enums.SpeedCalculationStrategy;
 
 public class AttributesSpeedInAreaProcessor extends AttributesProcessor {
 
     // Variables
 	private int measurementAreaId = -1;
-    private int pedestrianVelocityProcessorId = -1;
+    private int pedestrianTrajectoryProcessorId = -1;
+    private SpeedCalculationStrategy speedCalculationStrategy = SpeedCalculationStrategy.BY_TRAJECTORY;
 
     // Getter
     public int getMeasurementAreaId() {
         return this.measurementAreaId;
     }
-    public int getPedestrianVelocityProcessorId() {
-        return this.pedestrianVelocityProcessorId;
+    public int getPedestrianTrajectoryProcessorId() {
+        return this.pedestrianTrajectoryProcessorId;
     }
+    public SpeedCalculationStrategy getSpeedCalculationStrategy() { return speedCalculationStrategy; }
 
     // Setter
     public void setMeasurementAreaId(int measurementAreaId) {
@@ -24,8 +24,13 @@ public class AttributesSpeedInAreaProcessor extends AttributesProcessor {
         this.measurementAreaId = measurementAreaId;
     }
 
-    public void setPedestrianVelocityProcessorId(int pedestrianVelocityProcessorId) {
+    public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
         checkSealed();
-        this.pedestrianVelocityProcessorId = pedestrianVelocityProcessorId;
+        this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
     }
+
+    public void setSpeedCalculationStrategy(SpeedCalculationStrategy speedCalculationStrategy) {
+        this.speedCalculationStrategy = speedCalculationStrategy;
+    }
+
 }

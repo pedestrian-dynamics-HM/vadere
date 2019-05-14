@@ -1,5 +1,5 @@
 {
-  "name" : "TestProcessor",
+  "name" : "TestSpeedInAreaProcessor-SpeedByWidth",
   "description" : "",
   "release" : "0.9",
   "processWriters" : {
@@ -33,20 +33,16 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 1,
-        "backSteps" : 1
-      }
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "id" : 5
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
       "attributes" : {
         "measurementAreaId" : 1,
-        "pedestrianVelocityProcessorId" : 5
+        "pedestrianTrajectoryProcessorId" : 5,
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_WIDTH"
       }
     } ],
     "isTimestamped" : true,
