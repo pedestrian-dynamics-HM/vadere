@@ -7,6 +7,9 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.Flag;
+
+import java.util.List;
 
 /**
  * @author Mario Teixeira Parente
@@ -23,11 +26,12 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor implements
     @Override
     public void init(final ProcessorManager manager) {
         super.init(manager);
-
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
-        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
 
-        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(this.getMeasurementArea(), measurementArea));
+        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+        MeasurementArea measurementVoronoiArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId(), true);
+
+        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(measurementVoronoiArea, measurementArea));
     }
 
     @Override

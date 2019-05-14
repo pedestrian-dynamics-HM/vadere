@@ -63,7 +63,7 @@ public class ProcessorManager {
 		}
 
 		if (requireRectangular && !measurementArea.isRectangular()) {
-			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+			throw new RuntimeException(String.format("Measurement area for %d is required to be rectangular", measurementAreaId));
 		}
 
 		return measurementArea;

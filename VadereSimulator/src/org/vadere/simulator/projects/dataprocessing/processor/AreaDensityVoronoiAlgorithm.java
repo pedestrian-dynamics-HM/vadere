@@ -35,27 +35,27 @@ public class AreaDensityVoronoiAlgorithm extends AreaDensityAlgorithm {
         // compute everything
         List<Face> faces = generateFaces(state);
 
-	    double area = 0.0;
-	    int pedCount = 0;
+        double area = 0.0;
+        int pedCount = 0;
 
         for (Face face : faces) {
             if (this.measurementArea.contains(face.getSite())) {
-	            area += face.computeArea();
-	            pedCount++;
+                area += face.computeArea();
+                pedCount++;
             }
         }
         return pedCount > 0 ? pedCount / area : 0;
     }
 
-	private List<Face> generateFaces(@NotNull final SimulationState state) {
-		VoronoiDiagram voronoiDiagram = new VoronoiDiagram(this.voronoiArea);
+    private List<Face> generateFaces(@NotNull final SimulationState state) {
+        VoronoiDiagram voronoiDiagram = new VoronoiDiagram(this.voronoiArea);
 
-		// convert pedestrians to positions
-		List<VPoint> pedestrianPositions = Agent.getPositions(state.getTopography().getElements(Agent.class));
-		voronoiDiagram.computeVoronoiDiagram(pedestrianPositions);
+        // convert pedestrians to positions
+        List<VPoint> pedestrianPositions = Agent.getPositions(state.getTopography().getElements(Agent.class));
+        voronoiDiagram.computeVoronoiDiagram(pedestrianPositions);
 
-		// compute everything
-		List<Face> faces = voronoiDiagram.getFaces();
-		return faces == null ? Collections.emptyList() : faces;
-	}
+        // compute everything
+        List<Face> faces = voronoiDiagram.getFaces();
+        return faces == null ? Collections.emptyList() : faces;
+    }
 }
