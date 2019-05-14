@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.vadere.util.geometry.shapes.ShapeType;
 
@@ -156,6 +157,24 @@ public class VRing implements VShape {
 	@Override
 	public VPoint closestPoint(IPoint point) {
 		throw new UnsupportedOperationException("method is not implemented jet.");
+	}
+
+	@Override
+	public Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r) {
+		VCircle circle1 = new VCircle(center, radiusInnerCircle);
+		VCircle circle2 = new VCircle(center, radiusOuterCircle);
+		Optional<VPoint> optionalVPoint1 = circle1.getClosestIntersectionPoint(q1, q2, r);
+		Optional<VPoint> optionalVPoint2 = circle2.getClosestIntersectionPoint(q1, q2, r);
+
+		if(!optionalVPoint1.isPresent()) {
+			return optionalVPoint2;
+		} else if(!optionalVPoint2.isPresent()) {
+			return optionalVPoint1;
+		} else if(optionalVPoint1.get().distance(r) < optionalVPoint2.get().distance(r)) {
+			return optionalVPoint1;
+		} else {
+			return optionalVPoint2;
+		}
 	}
 
 	@Override

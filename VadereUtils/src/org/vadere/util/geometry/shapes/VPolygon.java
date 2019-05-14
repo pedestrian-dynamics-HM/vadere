@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -392,11 +393,20 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	@Override
 	public double distance(IPoint target) {
-		if (contains(target)) {
-			return -closestPoint(target).distance(target);
-		} else {
-			return closestPoint(target).distance(target);
+		try {
+			if (contains(target)) {
+				return -closestPoint(target).distance(target);
+			} else {
+				return closestPoint(target).distance(target);
+			}
+		} catch (NullPointerException ex) {
+			if (contains(target)) {
+				return -closestPoint(target).distance(target);
+			} else {
+				return closestPoint(target).distance(target);
+			}
 		}
+
 	}
 
 	@Override
@@ -447,6 +457,60 @@ public class VPolygon extends Path2D.Double implements VShape {
 		}
 
 		return resultPoint;
+	}
+
+	@Override
+	public Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r) {
+		double currentMinDistance = java.lang.Double.MAX_VALUE;
+		VPoint resultPoint = null;
+
+		PathIterator iterator = this.getPathIterator(null);
+
+		double[] first = null;
+		double[] last = new double[2];
+		double[] next = new double[2];
+		VPoint currentIntersectionPoint;
+
+		iterator.currentSegment(next);
+		iterator.next();
+
+		while (!iterator.isDone()) {
+			last[0] = next[0];
+			last[1] = next[1];
+
+			if(first == null) {
+				first = new double[]{last[0], last[1]};
+			}
+
+			iterator.currentSegment(next);
+			VLine line = new VLine(last[0], last[1], next[0], next[1]);
+			if(GeometryUtils.intersectLine(line, q1, q2)) {
+				currentIntersectionPoint = GeometryUtils.lineIntersectionPoint(new VLine(last[0],
+						last[1], next[0], next[1]), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+
+				if (currentIntersectionPoint.distance(r) < currentMinDistance) {
+					currentMinDistance = currentIntersectionPoint.distance(r);
+					resultPoint = currentIntersectionPoint;
+				}
+			}
+			iterator.next();
+		}
+
+		// dont forget the last and first point!
+		if(first != null) {
+			VLine line = new VLine(last[0], last[1], next[0], next[1]);
+			if(GeometryUtils.intersectLine(line, q1, q2)) {
+				currentIntersectionPoint = GeometryUtils.lineIntersectionPoint(new VLine(last[0],
+						last[1], next[0], next[1]), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+
+				if (currentIntersectionPoint.distance(r) < currentMinDistance) {
+					currentMinDistance = currentIntersectionPoint.distance(r);
+					resultPoint = currentIntersectionPoint;
+				}
+			}
+		}
+
+		return Optional.ofNullable(resultPoint);
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package org.vadere.util.geometry.shapes;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -65,6 +66,23 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		}
 
 		return result;
+	}
+
+	@Override
+	public Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r) {
+		double minDinstance = java.lang.Double.MAX_VALUE;
+		VPoint intersectionPoint = null;
+		for(VLine line : getLines()) {
+			if(GeometryUtils.intersectLineSegment(line, q1, q2)) {
+				VPoint tmpIntersectionPoint = GeometryUtils.lineIntersectionPoint(line, q1.getX(), q1.getY(), q2.getX(), q2.getY());
+				double distance = tmpIntersectionPoint.distance(r);
+				if(distance < minDinstance) {
+					minDinstance = distance;
+					intersectionPoint = tmpIntersectionPoint;
+				}
+			}
+		}
+		return Optional.ofNullable(intersectionPoint);
 	}
 
 	public VLine[] getLines() {

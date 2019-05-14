@@ -17,6 +17,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 
 	@Override
 	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
-		double potential = getPotential(pos, ped);
+		//double potential = getPotential(pos, ped);
 		// according to https://en.wikipedia.org/wiki/Numerical_differentiation#Practical_considerations_using_floating_point_arithmetic
 		double eps = Math.max(pos.x, pos.y) * MathUtil.EPSILON;
 		//double eps = 0.001;

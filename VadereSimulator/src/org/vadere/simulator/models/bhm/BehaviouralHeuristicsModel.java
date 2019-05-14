@@ -62,6 +62,10 @@ public class BehaviouralHeuristicsModel implements MainModel {
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianBHM());
 	}
 
+	public IPotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random) {

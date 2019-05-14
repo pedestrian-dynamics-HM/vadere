@@ -1,12 +1,17 @@
 package org.vadere.simulator.models.bhm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.models.AttributesBHM;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class NavigationProximity implements Navigation {
@@ -23,17 +28,75 @@ public class NavigationProximity implements Navigation {
 		this.attributesBHM = me.getAttributesBHM();
 	}
 
+	private VPoint findSmallerStep(List<Obstacle> collideObstacles, VPoint currentNextPosition) {
+		VPoint newNextPosition = currentNextPosition;
+		for(Obstacle obstacle : collideObstacles) {
+			newNextPosition = findCollisionFreePosition(obstacle, me.getPosition(), newNextPosition);
+		}
+		return newNextPosition;
+	}
+
+	private VPoint findCollisionFreePosition(@NotNull final Obstacle obstacle, VPoint start, VPoint end) {
+		VPoint direction = end.subtract(start);
+		VShape shape = obstacle.getShape();
+		boolean contains = shape.contains(end);
+		VPoint closestPoint;
+
+		if(contains) {
+			Optional<VPoint> closestIntersectionPoint = shape.getClosestIntersectionPoint(start, end, start);
+			// this should never happen!
+			if(!closestIntersectionPoint.isPresent()) {
+				return end;
+			}
+
+			closestPoint = closestIntersectionPoint.get();
+		} else {
+			closestPoint = shape.closestPoint(end);
+		}
+
+		double distance = contains ? -closestPoint.distance(end) : closestPoint.distance(end);
+		double diff = me.getRadius() - distance + 0.1;
+		assert diff > 0;
+		VPoint normal = end.subtract(closestPoint);
+		if(contains) {
+			normal = normal.scalarMultiply(-1.0);
+		}
+
+		VPoint q1 = end.add(normal.setMagnitude(diff));
+		VPoint q2 = q1.add(normal.rotate(Math.PI * 0.5));
+
+		VPoint newEnd = GeometryUtils.lineIntersectionPoint(q1, q2, start, end);
+		VPoint newDirection = newEnd.subtract(start);
+
+		// the new end generates a shorter step in the same direction?
+		if(newDirection.distanceToOrigin() < direction.distanceToOrigin() && direction.subtract(newDirection).distanceToOrigin() < direction.distanceToOrigin()) {
+			return newEnd;
+		} else {
+			return end;
+		}
+		//return newEnd;
+	}
+
 	@Override
 	public VPoint getNavigationPosition() {
 
 		me.action = 1; // LOGGING
 
 		VPoint result = me.computeTargetStep();
+		boolean targetDirection = true;
+
+		// this is a problem since the ped will never move!
+		List<Obstacle> collideObstacles = me.detectObstacleProximity(result, me.getRadius());
+		if(attributesBHM.isMakeSmallSteps() && !collideObstacles.isEmpty()) {
+			collideObstacles = me.detectObstacleProximity(result, me.getRadius());
+			result = findSmallerStep(collideObstacles, result);
+		}
 
 		if (me.evadesTangentially()) {
 			Pedestrian collisionPed = me.findCollisionPedestrian(result, false);
 
 			if (collisionPed != null) {
+				targetDirection = false;
 
 				// walk away if currently in a collision
 				if (me.collidesWithPedestrian(me.getPosition(), attributesBHM.getSpaceToKeep())
@@ -55,6 +118,7 @@ public class NavigationProximity implements Navigation {
 
 					if (angleBetween > attributesBHM.getOnlyEvadeContraFlowAngle()) {
 						result = evadeCollision(collisionPed);
+
 					}
 				} else {
 					result = evadeCollision(collisionPed);
@@ -62,10 +126,18 @@ public class NavigationProximity implements Navigation {
 			}
 		}
 
-		if (me.collidesWithPedestrianOnPath(result) || me.collidesWithObstacle(result) ||
-		// make sure that more distance is kept for numerical stability with step or wait heuristic
-				(!me.evadesTangentially() &&
-						me.collidesWithPedestrian(result, 2 * attributesBHM.getSpaceToKeep()))) {
+
+		/*
+		 * Make no step if:
+		 * 1) there would be a collision with another pedestrian
+		 * 2) there would be a collision with an obstacle and me does not walk in the origin target direction.
+		 *      Remark: if we would not allow collisions me would never move again
+		 * 3) me does not evade tangentially and there is a collision with another pedestrian in a larger area.
+		 *      Remark: this is for numerical stability of the step or wait heuristic
+		 */
+		if (me.collidesWithPedestrianOnPath(result) ||
+				(me.collidesWithObstacle(result) && !targetDirection) ||
+				(!me.evadesTangentially() &&  me.collidesWithPedestrian(result, 2 * attributesBHM.getSpaceToKeep()))) {
 
 			/*if( me.collidesWithObstacle(result) ) {
 				System.out.println("obs collision " + me.getId());
