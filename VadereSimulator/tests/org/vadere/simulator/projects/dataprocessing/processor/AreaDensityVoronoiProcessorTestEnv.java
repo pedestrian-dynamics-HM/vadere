@@ -1,9 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -20,26 +23,21 @@ public class AreaDensityVoronoiProcessorTestEnv extends ProcessorTestEnv<Timeste
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	AreaDensityVoronoiProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(AreaDensityVoronoiProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(AreaDensityVoronoiProcessor.class, TimestepKey.class);
+	}
+
+	@Override
+	void initializeDependencies() {
+		// add measurement area
 		AttributesAreaDensityVoronoiProcessor attr =
 				(AttributesAreaDensityVoronoiProcessor) testedProcessor.getAttributes();
-		attr.setVoronoiArea(new VRectangle(0, 0, 16, 16));
-		attr.setMeasurementArea(new VRectangle(0, 0, 16, 16));
 
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		attr.setVoronoiMeasurementAreaId(42);
+		attr.setMeasurementAreaId(42);
+		MeasurementArea measurementArea = new MeasurementArea(
+				new AttributesMeasurementArea(42, new VRectangle(0, 0, 16, 16)));
+		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
+
 	}
 
 	public void loadCollinearSetup() {

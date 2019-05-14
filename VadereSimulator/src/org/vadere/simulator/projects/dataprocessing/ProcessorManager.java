@@ -5,6 +5,8 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Topography;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -19,14 +21,17 @@ import java.util.Map;
 public class ProcessorManager {
 
 	private MainModel mainModel;
+	private final Topography topography;
 
 	private Map<Integer, DataProcessor<?, ?>> processorMap;
 	private List<OutputFile<?>> outputFiles;
 	private SimulationResult simulationResult;
 
 	public ProcessorManager(List<DataProcessor<?, ?>> dataProcessors,
-							List<OutputFile<?>> outputFiles, MainModel mainModel) {
+							List<OutputFile<?>> outputFiles, MainModel mainModel,
+							final Topography topography) {
 		this.mainModel = mainModel;
+		this.topography = topography;
 
 		this.outputFiles = outputFiles;
 
@@ -47,6 +52,10 @@ public class ProcessorManager {
 
 	public DataProcessor<?, ?> getProcessor(int id) {
 		return this.processorMap.getOrDefault(id, null);
+	}
+
+	public MeasurementArea getMeasurementArea(int measurementAreaId){
+		return topography.getMeasurementArea(measurementAreaId);
 	}
 
 	public MainModel getMainModel() {

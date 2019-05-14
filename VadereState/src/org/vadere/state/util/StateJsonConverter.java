@@ -52,7 +52,11 @@ public abstract class StateJsonConverter {
 	public static ObjectMapper getMapper() {
 		return mapper;
 	}
-	
+
+	public static ObjectWriter getPrettyWriter() {
+		return prettyWriter;
+	}
+
 	// TODO handle exception
 	public static <T> T deserializeObjectFromJson(String json, Class<T> objectClass) {
 		
@@ -104,6 +108,7 @@ public abstract class StateJsonConverter {
 		Collection<AttributesTarget> targets = new LinkedList<>();
 		Collection<AttributesAbsorbingArea> absorbingAreas = new LinkedList<>();
 		Collection<AttributesSource> sources = new LinkedList<>();
+		Collection<AttributesMeasurementArea> measurementAreas = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
 		AttributesTeleporter teleporter = null;
 	}
@@ -144,6 +149,7 @@ public abstract class StateJsonConverter {
 		store.targets.forEach(target -> topography.addTarget(new Target(target)));
 		store.absorbingAreas.forEach(absorbingArea -> topography.addAbsorbingArea(new AbsorbingArea(absorbingArea)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
+		store.measurementAreas.forEach(area -> topography.addMeasurementArea(new MeasurementArea(area)));
 		store.dynamicElements.forEach(topography::addInitialElement);
 		if (store.teleporter != null)
 			topography.setTeleporter(new Teleporter(store.teleporter));
@@ -208,6 +214,8 @@ public abstract class StateJsonConverter {
 				return mapper.readValue(json, AttributesAbsorbingArea.class);
 			case STAIRS:
 				return mapper.readValue(json, AttributesStairs.class);
+			case MEASUREMENT_AREA:
+				return mapper.readValue(json, AttributesMeasurementArea.class);
 			case TELEPORTER:
 				return mapper.readValue(json, AttributesTeleporter.class);
 			case CAR:
@@ -260,6 +268,11 @@ public abstract class StateJsonConverter {
 		topography.getObstacles()
 				.forEach(obstacle -> obstacleNodes.add(mapper.convertValue(obstacle.getAttributes(), JsonNode.class)));
 		topographyNode.set("obstacles", obstacleNodes);
+
+		ArrayNode measurementAreaNodes = mapper.createArrayNode();
+		topography.getMeasurementAreas()
+				.forEach(area -> measurementAreaNodes.add(mapper.convertValue(area.getAttributes(), JsonNode.class)));
+		topographyNode.set("measurementAreas", measurementAreaNodes);
 
 		ArrayNode stairNodes = mapper.createArrayNode();
 		topography.getStairs()

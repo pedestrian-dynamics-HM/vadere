@@ -7,9 +7,14 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VRectangle;
+
+import java.util.List;
 
 /**
  * <p>This processor computes the fundamental diagram by computing at a certain time the
@@ -23,9 +28,11 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>> implements UsesMeasurementArea {
 
-	private VRectangle measurementArea;
+	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
+
 	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
 	public FundamentalDiagramCProcessor() {
@@ -36,8 +43,13 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
-		measurementArea = att.getMeasurementArea();
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+		if (measurementArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+		if (!measurementArea.isRectangular())
+			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 
 	@Override
@@ -58,11 +70,11 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 		pedestrianVelocityProcessor.update(state);
 		long N = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
 				.count();
 		double velocity = state.getTopography().getPedestrianDynamicElements().getElements()
 				.stream()
-				.filter(pedestrian -> measurementArea.contains(pedestrian.getPosition()))
+				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
 				.mapToDouble(pedestrian ->
 						//pedestrian.getVelocity().getLength()
 						pedestrianVelocityProcessor.getValue(new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId()))
@@ -76,7 +88,7 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 			velocity /= N;
 		}
 
-		double density = N / measurementArea.getArea();
+		double density = N / measurementAreaVRec.getArea();
 
 		putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));
 	}
@@ -84,5 +96,11 @@ public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double,
 	@Override
 	public String[] toStrings(@NotNull final TimestepKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
+		return new int[]{att.getMeasurementAreaId()};
 	}
 }

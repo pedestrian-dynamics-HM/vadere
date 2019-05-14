@@ -2,16 +2,11 @@ package org.vadere.gui.postvisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
-import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
-import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
-import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
-import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
-import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
@@ -23,20 +18,17 @@ import org.vadere.gui.postvisualization.control.*;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Observer;
 import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 /**
  * Main Window of the new post visualization.
@@ -54,6 +46,9 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private JMenuBar menuBar;
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final ScenarioElementView textView;
+	private JButton playButton;
+	private JButton pauseButton;
+	private JButton stopButton;
 
 	public PostvisualizationWindow(final String projectPath) {
 		this(false, projectPath);
@@ -132,14 +127,14 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
 		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
-		addActionToToolbar(toolbar,
+		playButton = addActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
-		addActionToToolbar(toolbar,
+		pauseButton = addActionToToolbar(toolbar,
 				new ActionPause("pause", resources.getIcon("pause.png", iconWidth, iconHeight), model),
 				"PostVis.btnPause.tooltip");
-		addActionToToolbar(toolbar,
-				new ActionStop("play", resources.getIcon("stop.png", iconWidth, iconHeight), model),
+		stopButton = addActionToToolbar(toolbar,
+				new ActionStop("stop", resources.getIcon("stop.png", iconWidth, iconHeight), model),
 				"PostVis.btnStop.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -299,6 +294,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 			}
 		}
 
+		buildKeyboardShortcuts();
 
 		miGlobalSettings.addActionListener(e -> DialogFactory.createSettingsDialog(model).setVisible(true));
 
@@ -316,6 +312,24 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
 		repaint();
 		revalidate();
+	}
+
+	private void buildKeyboardShortcuts() {
+		Action spaceKeyReaction = new ActionVisualization("Typed Space Key Reaction", model){
+			boolean isRunning = false;
+			@Override
+			public void actionPerformed(ActionEvent e){
+				(isRunning ? pauseButton : playButton).getAction().actionPerformed(null);
+				isRunning = !isRunning;
+			}
+		};
+		addKeyboardShortcut("SPACE","Typed Space", spaceKeyReaction);
+		addKeyboardShortcut("BACK_SPACE","Typed Backspace", stopButton.getAction());
+	}
+
+	private void addKeyboardShortcut(String key, String actionKey, Action action) {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), actionKey);
+		getActionMap().put(actionKey, action);
 	}
 
 	private JMenuBar getMenu() {

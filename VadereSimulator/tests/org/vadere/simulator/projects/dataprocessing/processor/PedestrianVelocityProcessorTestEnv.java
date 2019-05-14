@@ -1,8 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -25,41 +24,17 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 		this(1);
 	}
 
-	@SuppressWarnings("unchecked")
 	PedestrianVelocityProcessorTestEnv(int nextProcessorId) {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianVelocityProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId);
-		this.nextProcessorId = nextProcessorId + 1;
+		super(PedestrianVelocityProcessor.class, TimestepPedestrianIdKey.class, nextProcessorId);
+	}
 
-		DataProcessor pedPosProc;
-		PedestrianPositionProcessorTestEnv pedPosProcEnv;
-		int pedPosProcId = nextProcessorId();
-
+	@Override
+	void initializeDependencies() {
+		int pedPosProcId = addDependentProcessor(PedestrianPositionProcessorTestEnv::new);
 		//add ProcessorId of required Processors to current Processor under test
 		AttributesPedestrianVelocityProcessor attr =
 				(AttributesPedestrianVelocityProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianPositionProcessorId(pedPosProcId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);
-		pedPosProc = pedPosProcEnv.getTestedProcessor();
-		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
-		addRequiredProcessors(pedPosProcEnv);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	void loadSimulationStateMocksWithBackstep2() {

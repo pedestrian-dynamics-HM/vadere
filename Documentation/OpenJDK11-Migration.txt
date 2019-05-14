@@ -1,0 +1,61 @@
+The java_migration branch has used the following steps to compile and run vadere with JDK-11 on Windows 10:
+
+0. Ensure that OpenJDK11 and Git is set in the environment variables
+
+1. Adjust the IDE (IntelliJ)
+   -> Make sure that you have the latest version of IntelliJ (in some older versions, Java 11 is not supported!)
+1.1 Select File -> Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler
+1.1.1 Select 11 for "Project bytecode version"
+1.1.2 Select 1.11 in "Per-module bytecode version" for each module
+1.2 Select File -> Project Structure -> Project Settings -> Modules
+1.2.1 Select "11 ..." for "Language level" for each module
+
+2. Adjust pom.xml
+2.1 search for <properties>
+2.1.1 Change <maven-compiler.[source|target].version> to 1.11
+2.2 Insert:
+  <build>
+     <plugins>
+        <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0</version>
+                                </requireMavenVersion>
+                        </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                   <release>10</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+3. Remove local Maven repository to avoid conflicts with older Java packages
+3.1 rm -R "~/.m2"
+
+4. Compile
+4.1 Run "mvn -e clean test-compile compile" (-e for error stack trace)
+4.* possibly required updates: "mvn versions:display-dependency-updates" and "mvn versions:display-plugin-updates"
+
+5. Optional: Create local runtime for Vadere which omits unnecessary Java packages
+5.1 Run "jdeps --list-deps VadereGui/target/vadere.jar"
+5.2 Run "jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.base,java.compiler,java.datatransfer,java.desktop,java.logging,java.management,java.naming,java.prefs,java.rmi,java.scripting,java.sql,java.xml --output java-runtime"
+// The main output of jdeps is used as the parameter for jlink --add-modules.
+5.3 Run "java-runtime/bin/java -jar VadereGui/target/vadere.jar"

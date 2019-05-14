@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -25,12 +26,12 @@ public class SumVoronoiAlgorithm extends AreaDensityAlgorithm implements IAreaVe
 	private VRectangle voronoiArea;
 	private final Function<TimestepPedestrianIdKey, Double> agentVelocityFunc;
 
-	public SumVoronoiAlgorithm(@NotNull final Function<TimestepPedestrianIdKey, Double> agentVelocityFunc, @NotNull final VRectangle measurementArea, @NotNull final VRectangle voronoiArea) {
+	public SumVoronoiAlgorithm(@NotNull final Function<TimestepPedestrianIdKey, Double> agentVelocityFunc, @NotNull final MeasurementArea measurementArea, @NotNull final MeasurementArea voronoiArea) {
 		super("areaVoronoi");
 
-		this.measurementArea = measurementArea;
-		this.measurementAreaPolygon = new VPolygon(measurementArea);
-		this.voronoiArea = voronoiArea;
+		this.measurementArea = measurementArea.asVRectangle();
+		this.measurementAreaPolygon = new VPolygon(measurementArea.getShape());
+		this.voronoiArea = voronoiArea.asVRectangle();
 		this.agentVelocityFunc = agentVelocityFunc;
 	}
 

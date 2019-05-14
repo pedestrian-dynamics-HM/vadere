@@ -79,6 +79,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderScenarioElement(model.getTopography().getObstacles(), graphics, model.config.getObstacleColor());
         }
 
+        if (model.config.isShowMeasurementArea()){
+			renderMeasurementAreas(model.getTopography().getMeasurementAreas(), graphics, model.config.getMeasurementAreaColor());
+		}
+
         if (model.config.isShowStairs()) {
             renderStairs(model.getTopography().getStairs(), graphics, model.config.getStairColor());
         }

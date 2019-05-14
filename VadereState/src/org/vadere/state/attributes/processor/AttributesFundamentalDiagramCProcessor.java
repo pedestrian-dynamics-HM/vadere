@@ -1,9 +1,7 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
-
 public class AttributesFundamentalDiagramCProcessor extends AttributesAreaProcessor {
-	private VRectangle measurementArea;
+	private int measurementAreaId;
 	private int pedestrianVelocityProcessorId;
 
 	public int getPedestrianVelocityProcessorId() {
@@ -15,12 +13,12 @@ public class AttributesFundamentalDiagramCProcessor extends AttributesAreaProces
 		this.pedestrianVelocityProcessorId = pedestrianVelocityProcessorId;
 	}
 
-	public VRectangle getMeasurementArea() {
-		return measurementArea;
+	public int getMeasurementAreaId() {
+		return measurementAreaId;
 	}
 
-	public void setMeasurementArea(VRectangle measurementArea) {
+	public void setMeasurementAreaId(int measurementAreaId) {
 		checkSealed();
-		this.measurementArea = measurementArea;
+		this.measurementAreaId= measurementAreaId;
 	}
 }

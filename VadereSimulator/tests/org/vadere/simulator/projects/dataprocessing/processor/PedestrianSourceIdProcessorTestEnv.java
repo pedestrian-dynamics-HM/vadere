@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Pedestrian;
@@ -18,21 +17,7 @@ import java.util.StringJoiner;
 public class PedestrianSourceIdProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Integer> {
 
 	PedestrianSourceIdProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianSourceIdProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					PedestrianIdKey.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		super(PedestrianSourceIdProcessor.class, PedestrianIdKey.class);
 	}
 
 	List<Pedestrian> getPeds(Integer[] ids, Integer[] source) {

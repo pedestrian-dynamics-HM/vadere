@@ -61,16 +61,28 @@ public class TestSourceControllerUsingConstantSpawnRate {
 			@Override
 			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
 				AttributesAgent att = new AttributesAgent(
-						d.attributesPedestrian, id > 0 ? id : ++pedestrianIdCounter);
+						d.attributesPedestrian, registerDynamicElementId(null, id));
 				Pedestrian ped = new Pedestrian(att, d.random);
 				ped.setPosition(position);
 				return ped;
 			}
 
 			@Override
-			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
-				return createElement(position, -1, Pedestrian.class).getShape();
+			public int registerDynamicElementId(Topography topography, int id) {
+				return id > 0 ? id : ++pedestrianIdCounter;
 			}
+
+			@Override
+			public int getNewDynamicElementId(Topography topography) {
+				return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
+			}
+
+			@Override
+			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+				return createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class).getShape();
+			}
+
+
 		};
 
 		d.sourceControllerFactory = getSourceControllerFactory(d);

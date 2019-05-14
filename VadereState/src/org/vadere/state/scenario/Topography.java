@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -69,6 +70,11 @@ public class Topography implements DynamicElementMover{
 	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
+	 * MeasurementAreas.
+	 */
+	private final LinkedList<MeasurementArea> measurementAreas;
+
+	/**
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
 	private List<Obstacle> boundaryObstacles;
@@ -89,6 +95,9 @@ public class Topography implements DynamicElementMover{
 	
 	/** Used to store links to all attributes that are not part of scenario elements. */
 	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
+
+	/** set dynamicElementIds to values bigger than the biggest initial element to ensure unique ids.**/
+	private AtomicInteger dynamicElementIdCounter;
 
 	public Topography(
 			AttributesTopography attributes,
@@ -114,12 +123,14 @@ public class Topography implements DynamicElementMover{
 		targets = new LinkedList<>();
 		absorbingAreas = new LinkedList<>();
 		boundaryObstacles = new LinkedList<>();
-		
+		measurementAreas = new LinkedList<>();
+
 		allScenarioElements.add(obstacles);
 		allScenarioElements.add(stairs);
 		allScenarioElements.add(sources);
 		allScenarioElements.add(targets);
 		allScenarioElements.add(boundaryObstacles);
+		allScenarioElements.add(measurementAreas);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -128,7 +139,7 @@ public class Topography implements DynamicElementMover{
 		recomputeCells = false;
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
-		
+		this.dynamicElementIdCounter = new AtomicInteger(1);
 	}
 
 	/** Clean up a set by removing {@code null}. */
@@ -240,6 +251,10 @@ public class Topography implements DynamicElementMover{
 		throw new IllegalArgumentException("Class " + elementType + " does not have a container.");
 	}
 
+	private boolean checkDynamicElementIdExist(int id){
+		return pedestrians.idExists(id) || cars.idExists(id);
+	}
+
 	public <T extends DynamicElement> LinkedCellsGrid<T> getSpatialMap(Class<T> elementType) {
 		return getContainer(elementType).getCellsElements();
 	}
@@ -265,6 +280,39 @@ public class Topography implements DynamicElementMover{
 	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
+	}
+
+	/**
+	 * The counter does not represent the total number of pedestrians. If initial pedestrians exist
+	 * @return next free Id for a pedestrian.
+	 */
+	public int getNextDynamicElementId(){
+		int nextId = this.dynamicElementIdCounter.get();
+		assert !checkDynamicElementIdExist(nextId): "Same dynamicElementId issued twice!";
+		dynamicElementIdCounter.incrementAndGet();
+		return nextId;
+	}
+
+	/**
+	 * This is called for initial pedestrians to set their Ids. If the id equals AttributesAgent.ID_NOT_SET (-1)
+	 * a real id is used. Otherwise the fixedId value is used.
+	 *
+	 * @param fixedId	fixedId Id for a pedestrian. If this id is free use it. If not genrate a new one.
+	 * @return				free Id. May be requestedId if it was free.
+	 */
+	public int getNextDynamicElementId(int fixedId){
+		assert !checkDynamicElementIdExist(fixedId): "Same dynamicElementId issued twice!";
+		return fixedId;
+	}
+
+	/**
+	 * Initialize dynamicElementIdCounter based on initial pedestrians placed in the topography.
+	 * To prevent duplicated ids later on in the simulation.
+	 */
+	public void initializePedestrianCount() {
+		int maxIdUsed  = pedestrians.getElements().stream().mapToInt(Pedestrian::getId).max().orElse(0);
+		this.dynamicElementIdCounter.set(maxIdUsed + 1);
+		logger.info(String.format("Set PedestrianIdCount to start value: %d", this.dynamicElementIdCounter.get()));
 	}
 
 	public boolean isRecomputeCells() {
@@ -299,6 +347,12 @@ public class Topography implements DynamicElementMover{
 		return teleporter;
 	}
 
+	public List<MeasurementArea> getMeasurementAreas() {return  measurementAreas; }
+
+	public MeasurementArea getMeasurementArea(int id){
+		return measurementAreas.stream().filter(area -> area.getId() == id).findFirst().orElse(null);
+	}
+
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;
 	}
@@ -321,6 +375,10 @@ public class Topography implements DynamicElementMover{
 
 	public void addObstacle(Obstacle obstacle) {
 		this.obstacles.add(obstacle);
+	}
+
+	public void addMeasurementArea(MeasurementArea measurementArea){
+		this.measurementAreas.add(measurementArea);
 	}
 
 	public void addStairs(Stairs stairs) {
@@ -434,6 +492,11 @@ public class Topography implements DynamicElementMover{
 			else
 				s.addObstacle(obstacle.clone());
 		}
+
+		for (MeasurementArea measurementArea : this.getMeasurementAreas()){
+			s.addMeasurementArea(measurementArea);
+		}
+
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs);
 		}
@@ -532,6 +595,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
 		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
 		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
+		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 
 		sources.stream()
@@ -549,6 +613,10 @@ public class Topography implements DynamicElementMover{
 		stairs.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		measurementAreas.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 
 		absorbingAreas.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -572,6 +640,7 @@ public class Topography implements DynamicElementMover{
 		all.addAll(targets);
 		all.addAll(sources);
 		all.addAll(boundaryObstacles);
+		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
 		return  all;
 

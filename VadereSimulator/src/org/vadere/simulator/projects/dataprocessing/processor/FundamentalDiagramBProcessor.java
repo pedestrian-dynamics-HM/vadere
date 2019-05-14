@@ -6,12 +6,18 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.VTrajectory;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,9 +36,12 @@ import java.util.Map;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>  {
+public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>> implements UsesMeasurementArea {
 
-	private VRectangle measurementArea;
+	private static Logger logger = Logger.getLogger(Topography.class);
+
+	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
 	private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
 
 	public FundamentalDiagramBProcessor() {
@@ -44,7 +53,12 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		super.init(manager);
 		AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
 		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(att.getPedestrianTrajectoryProcessorId());
-		measurementArea = att.getMeasurementArea();
+		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
+		if (measurementArea == null)
+			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
+		if (!measurementArea.isRectangular())
+			throw new RuntimeException("DataProcessor only supports Rectangular measurement areas.");
+		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 
 	@Override
@@ -78,7 +92,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		for(Map.Entry<PedestrianIdKey, VTrajectory> trajectoryEntry : trajectoryMap.entrySet()) {
 			PedestrianIdKey key = trajectoryEntry.getKey();
 			VTrajectory trajectory = trajectoryEntry.getValue();
-			VTrajectory clone = trajectory.cut(measurementArea);
+			VTrajectory clone = trajectory.cut(measurementAreaVRec);
 			cutTrajectoryMap.put(key, clone);
 		}
 
@@ -109,7 +123,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 				.sum();
 
 		densityIntegral /= duration;
-		densityIntegral /= measurementArea.getArea();
+		densityIntegral /= measurementAreaVRec.getArea();
 		return densityIntegral;
 
 		/*List<Triple<Double, Double, Integer>> integralValues = new LinkedList<>();
@@ -158,5 +172,12 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 	@Override
 	public String[] toStrings(@NotNull final PedestrianIdKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesFundamentalDiagramBProcessor att = (AttributesFundamentalDiagramBProcessor) this.getAttributes();
+		return new int[]{att.getMeasurementAreaId()};
 	}
 }

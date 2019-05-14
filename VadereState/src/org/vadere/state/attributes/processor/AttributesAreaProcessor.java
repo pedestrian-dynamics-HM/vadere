@@ -1,20 +1,18 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.geometry.shapes.VRectangle;
-
 /**
  * @author Mario Teixeira Parente
  */
 
 public class AttributesAreaProcessor extends AttributesProcessor {
-	private VRectangle measurementArea = new VRectangle(0, 0, 1, 1);
+	private int measurementAreaId = -1;
 
-    public VRectangle getMeasurementArea() {
-        return this.measurementArea;
+    public int getMeasurementAreaId() {
+        return this.measurementAreaId;
     }
 
-    public void setMeasurementArea(VRectangle measurementArea) {
+    public void setMeasurementAreaId(int measurementAreaId) {
         checkSealed();
-        this.measurementArea = measurementArea;
+        this.measurementAreaId = measurementAreaId;
     }
 }
