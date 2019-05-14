@@ -105,7 +105,8 @@ public class Simplex2D {
 	}
 
 	public boolean hasConverged(final double threashold) {
-		if(values[0] >= MAX_VAL && values[1] >= MAX_VAL && values[2] >= MAX_VAL) {
+		if((values[0] >= MAX_VAL || values[1] >= MAX_VAL || values[2] >= MAX_VAL)
+		|| values[0] <= 0) {
 			//logger.warn("illegal initial simplex");
 			// abort!
 			return true;

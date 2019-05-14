@@ -19,6 +19,10 @@ import java.util.stream.Stream;
 public class NelderMead1D {
 
 	private static final Logger logger = Logger.getLogger(NelderMead1D.class);
+	static {
+		logger.setInfo();
+	}
+
 	private final VCircle evalArea;
 	private final Function<IPoint, Double> eval;
 	private final double threashold;
@@ -65,7 +69,7 @@ public class NelderMead1D {
 			logger.warn("max iteration reached!");
 		}
 
-		logger.info("iterations: " + overallIterations);
+		logger.debug("iterations: " + overallIterations);
 
 	}
 

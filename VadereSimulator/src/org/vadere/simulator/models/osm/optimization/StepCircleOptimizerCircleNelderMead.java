@@ -87,8 +87,9 @@ public class StepCircleOptimizerCircleNelderMead implements StepCircleOptimizer 
 			double dist = p1.distance(stepCircle.getCenter());
 			VPoint midPoint = new VLine(p1, p2).midPoint();
 			VPoint p3;
-			if(Math.abs(dist-radDist) > GeometryUtils.DOUBLE_EPS) {
-				VPoint e = midPoint.subtract(ped.getPosition()).setMagnitude(dist-radDist);
+			double circRadius = ped.getPosition().distance(p1);
+			if(Math.abs(circRadius-radDist) > GeometryUtils.DOUBLE_EPS) {
+				VPoint e = midPoint.subtract(ped.getPosition()).setMagnitude(circRadius-radDist);
 				p3 = ped.getPosition().add(e);
 			} else {
 				p3 = ped.getPosition();

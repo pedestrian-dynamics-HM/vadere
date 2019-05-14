@@ -24,6 +24,7 @@ public class Simplex1D {
 	private double distance;
 	private static final double TINY = 1.0E-10;
 	private final VCircle circle;
+	private final double MAX_VAL = 1000;
 
 
 	public Simplex1D(@NotNull final Function<IPoint,Double> eval, @NotNull final double rad1, final double rad2, @NotNull final VCircle circle) {
@@ -93,6 +94,11 @@ public class Simplex1D {
 	}
 
 	public boolean hasConverged(final double threashold) {
+		if(values[0] >= MAX_VAL || values[1] >= MAX_VAL
+		|| values[0] <= 0){
+
+		}
+
 		if(changed) {
 			sqrtMean = sqrtMean();
 			distance = getDistance();
