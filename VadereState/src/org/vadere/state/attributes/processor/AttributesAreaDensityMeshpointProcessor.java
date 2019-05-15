@@ -1,5 +1,10 @@
 package org.vadere.state.attributes.processor;
 
+/**
+ * @author Daniel Lehmberg
+ *
+**/
+
 public class AttributesAreaDensityMeshpointProcessor extends AttributesAreaProcessor {
 
     // TODO: possible options for user setting see issue #123
