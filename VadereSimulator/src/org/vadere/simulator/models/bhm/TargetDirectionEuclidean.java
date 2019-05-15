@@ -18,6 +18,7 @@ public class TargetDirectionEuclidean implements TargetDirection {
 	}
 
 	public VPoint getTargetDirection(final Target target) {
-		return target.getShape().closestPoint(pedestrianBHM.getPosition());
+		VPoint position = pedestrianBHM.getPosition();
+		return target.getShape().closestPoint(pedestrianBHM.getPosition()).subtract(position).norm();
 	}
 }
