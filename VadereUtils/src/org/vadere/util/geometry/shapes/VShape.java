@@ -6,6 +6,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Geometric shape and position.
@@ -17,6 +18,8 @@ public interface VShape extends Shape, Cloneable {
 	double distance(IPoint point);
 
 	VPoint closestPoint(IPoint point);
+
+	Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r);
 
 	boolean contains(IPoint point);
 

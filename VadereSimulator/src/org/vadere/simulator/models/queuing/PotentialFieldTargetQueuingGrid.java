@@ -9,7 +9,7 @@ import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunctio
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
-import org.vadere.state.attributes.models.AttributesTimeCost.TimeCostFunctionType;
+import org.vadere.state.attributes.models.TimeCostFunctionType;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElementAddListener;
