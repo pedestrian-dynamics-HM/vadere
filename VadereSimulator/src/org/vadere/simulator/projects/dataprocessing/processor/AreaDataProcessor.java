@@ -4,7 +4,6 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesAreaProcessor;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
  * @author Mario Teixeira Parente
