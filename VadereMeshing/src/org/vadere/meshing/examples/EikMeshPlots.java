@@ -55,8 +55,9 @@ public class EikMeshPlots {
 		discSubtractRect2(0.03);
 		discSubtractRect2(0.01);
 
-		kaiserslautern();*/
-		ruppertsAndEikMeshKaiserslautern();
+		kaiserslautern();
+		ruppertsAndEikMeshKaiserslautern();*/
+		bridge();
 	}
 
 	public static void randomDelaunay() throws IOException {
@@ -110,6 +111,42 @@ public class EikMeshPlots {
 
 		meshImprover.generate();
 		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void bridge() throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/bridge.poly");
+		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+
+		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+
+
+		// (3) use EikMesh to improve the mesh
+		double h0 = 1.0;
+		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+				distanceFunction,
+				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
+				h0,
+				new VRectangle(segmentBound.getBounds2D()),
+				pslg.getHoles(),
+				pointConstructor
+		);
+
+		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		meshPanel.display("Combined distance functions " + h0);
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(20);
+			meshPanel.repaint();
+		}
+		//meshImprover.generate();
+
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh

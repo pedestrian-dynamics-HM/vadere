@@ -2237,7 +2237,7 @@ public interface IMesh<
 		Map<V, Integer> indexMap = new HashMap<>();
 
 		// [x1, x2, ...]
-		builder.append("[");
+		builder.append("x =[");
 		for(int i = 0; i < vertices.size(); i++) {
 			V v = vertices.get(i);
 			indexMap.put(v, i);
@@ -2247,7 +2247,7 @@ public interface IMesh<
 		builder.append("]\n");
 
 		// [y1, y2, ...]
-		builder.append("[");
+		builder.append("y = [");
 		for(V v : vertices) {
 			builder.append(v.getY() + ",");
 		}
@@ -2255,7 +2255,7 @@ public interface IMesh<
 		builder.append("]\n");
 
 		// [z1, z2, ...] z = value
-		builder.append("[");
+		builder.append("z = [");
 		for(V v : vertices) {
 			builder.append(evalPoint.apply(getPoint(v)) + ",");
 		}
@@ -2264,7 +2264,7 @@ public interface IMesh<
 
 		// [[vId1, vId2, vId3], ...]
 		List<F> faces = getFaces();
-		builder.append("[");
+		builder.append("tris = [");
 		for(F face : faces) {
 			builder.append("[");
 			for(V v : getVertexIt(face)) {

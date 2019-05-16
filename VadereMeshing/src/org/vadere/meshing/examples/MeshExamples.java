@@ -254,7 +254,7 @@ public class MeshExamples {
 		var allConstrains = cdt.getConstrains();
 		Function<PHalfEdge<VPoint, Double, Double>, Color> colorFunction = e -> allConstrains.contains(e) ? red : Color.GRAY;
 
-		System.out.println(TexGraphGenerator.toTikz(cdt.getMesh(), f -> Color.WHITE, colorFunction, 1.0f));
+		System.out.println(TexGraphGenerator.toTikz(cdt.getMesh(), f -> Color.WHITE, colorFunction, 1.0f, false));
 		//System.out.println(TexGraphGenerator.toTikz(dt.getMesh(), 1.0f));
 
 

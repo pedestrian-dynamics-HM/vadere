@@ -146,7 +146,8 @@ public class TexGraphGenerator {
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
 			@Nullable final Function<E, Color> edgeColorFunction,
-			final float scaling) {
+			final float scaling,
+			final boolean drawVertices) {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
@@ -172,6 +173,12 @@ public class TexGraphGenerator {
 				VLine line = mesh.toLine(edge);
 				String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 				builder.append("\\draw[color="+tikzColor+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
+			}
+		}
+		double pt = 1.5;
+		if(drawVertices) {
+			for(P point : mesh.getPoints()) {
+				builder.append("\\draw[color=black, fill=black]("+toString(point.getX())+","+toString(point.getY())+") circle ("+pt+"pt);\n");
 			}
 		}
 
@@ -205,7 +212,7 @@ public class TexGraphGenerator {
 			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
 			final float scaling) {
-		return toTikz(mesh, coloring, null, scaling);
+		return toTikz(mesh, coloring, null, scaling, false);
 	}
 
 	/**

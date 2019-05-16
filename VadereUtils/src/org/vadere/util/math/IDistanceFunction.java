@@ -41,6 +41,34 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 		};
 	}
 
+	static IDistanceFunction createToTargets(final Collection<? extends VShape> targets) {
+		assert !targets.isEmpty();
+		return p -> {
+			double min = Double.POSITIVE_INFINITY;
+			for (VShape shape : targets) {
+				double dist = shape.distance(p);
+				if(dist < min) {
+					min = dist;
+				}
+			}
+			return min;
+		};
+	}
+
+	static IDistanceFunction createToTargetPoints(final Collection<? extends IPoint> targetPoints) {
+		assert !targetPoints.isEmpty();
+		return p -> {
+			double min = Double.POSITIVE_INFINITY;
+			for (IPoint targetPoint : targetPoints) {
+				double dist = targetPoint.distance(p);
+				if(dist < min) {
+					min = dist;
+				}
+			}
+			return min;
+		};
+	}
+
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final Collection<? extends VShape> obstacles) {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}

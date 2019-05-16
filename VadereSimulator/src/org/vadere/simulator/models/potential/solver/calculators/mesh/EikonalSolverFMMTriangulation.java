@@ -21,6 +21,7 @@ import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,6 +63,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 */
 	private ITimeCostFunction timeCostFunction;
 
+	/**
+	 * Gives the distance to the boundary i.e. the targets
+	 */
 	private IDistanceFunction distFunc;
 
 	private Collection<V> targetVertices;
@@ -114,10 +118,15 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
+	    this.targetVertices = new HashSet<>();
+	    this.distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
 
         for(IPoint point : targetPoints) {
             F face = triangulation.locateFace(point.getX(), point.getY()).get();
-            initialFace(face, p -> point.distance(p));
+            if(!getMesh().isBoundary(face)) {
+	            targetVertices.addAll(getMesh().getVertices(face));
+            }
+            //initialFace(face, p -> point.distance(p));
         }
     }
 
@@ -136,12 +145,14 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
+	    this.targetVertices = new HashSet<>();
+	    this.distFunc = IDistanceFunction.createToTargets(targetShapes);
 
         for(VShape shape : targetShapes) {
             getMesh().streamFaces()
                     .filter(f -> !getMesh().isBoundary(f))
                     .filter(f -> shape.intersects(getMesh().toTriangle(f)))
-                    .forEach(f -> initialFace(f, p -> Math.max(shape.distance(p), 0)));
+                    .forEach(f -> targetVertices.addAll(getMesh().getVertices(f)));
         }
     }
 
@@ -164,6 +175,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.narrowBand = new PriorityQueue<>(pointComparator);
         this.distFunc = distFunc;
         this.targetVertices = targetVertices;
+
         for(F face : triangulation.getMesh().getFaces()) {
         	if(isNonAcute(face)) {
         		nonAccuteTris.add(face);
@@ -216,7 +228,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
 	    for(V vertex : targetVertices) {
 		    P potentialPoint = getMesh().getPoint(vertex);
-		    double distance = -distFunc.apply(potentialPoint);
+		    double distance = Math.max(distFunc.apply(potentialPoint), 0);
 
 		    if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
 			    narrowBand.remove(vertex);
@@ -230,7 +242,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 			    P potentialP = getMesh().getPoint(v);
 
 			    if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
-				    double dist = Math.max(-distFunc.apply(potentialP), 0);
+				    double dist = Math.max(distFunc.apply(potentialP), 0);
 				    logger.debug("T at " + potentialP + " = " + dist);
 				    potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
 				    potentialP.setPathFindingTag(PathFindingTag.Reachable);
