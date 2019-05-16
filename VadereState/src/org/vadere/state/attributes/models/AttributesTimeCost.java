@@ -4,38 +4,12 @@ import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 /**
- * Provides attributes for a pedestrian, like body radius, height, gender...
- * Currently implemented: radius [m, default: 0.195].
- * 
+ * Provides all! parameters for all! time cost functions.
+ *
+ * TODO: split AttributesTimeCost timeCostAttributes into multiple classes see comment in {@link AttributesFloorField}
  */
 @ModelAttributeClass
 public class AttributesTimeCost extends Attributes {
-	/**
-	 * The different time cost function types that represents different scenario
-	 * types.
-	 * 
-	 */
-	public enum TimeCostFunctionType {
-		/** a static middle scale navigation. */
-		UNIT,
-		/** a dynamic middle scale navigation (navigation around groups). */
-		NAVIGATION,
-
-		/** a dynamic middle scale navigation (queuing). */
-		QUEUEING,
-
-		/** for the queueing game */
-		QUEUEING_GAME,
-
-		/** for the queueing game */
-		NAVIGATION_GAME,
-
-		/**
-		 * uses TimeCostObstacleDensity to get a smooth potential field around
-		 * obstacles
-		 */
-		OBSTACLES
-	}
 
 	public enum LoadingType {
 		/** use one single loading for all pedestrians. */
@@ -92,7 +66,25 @@ public class AttributesTimeCost extends Attributes {
 	// @SerializedName("loadingType")
 	private LoadingType loadingType = LoadingType.CONSTANT;
 
+	/**
+	 * only used in TimeCostFunctionObstacleDistance
+	 */
+	private double width = 0.2;
+
+	/**
+	 * only used in TimeCostFunctionObstacleDistance
+	 */
+	private double height = 1.0;
+
 	// Getters...
+	public double getWidth() {
+		return width;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
 	public double getStandardDeviation() {
 		return standardDeviation;
 	}

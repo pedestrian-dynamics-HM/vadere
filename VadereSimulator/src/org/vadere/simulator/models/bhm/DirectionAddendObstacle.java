@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.bhm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -20,7 +21,7 @@ public class DirectionAddendObstacle implements DirectionAddend {
 	}
 
 	@Override
-	public VPoint getDirectionAddend() {
+	public VPoint getDirectionAddend(@NotNull final VPoint targetDirection) {
 		return getTargetObstacleDirection();
 	}
 

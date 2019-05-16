@@ -10,6 +10,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 /**
  * The TimeCostFunctionFactory creates the TimeCostFunctions with the currently
@@ -129,6 +130,12 @@ public class TimeCostFunctionFactory {
 			case OBSTACLES: {
 				return create(timeCostAttributes, topography, scale);
 			}
+			case DISTANCE_TO_OBSTACLES:
+				return new TimeCostFunctionObstacleDistance(
+						new UnitTimeCostFunction(),
+						p -> topography.distanceToObstacle(p),
+						timeCostAttributes.getHeight(),
+						timeCostAttributes.getWidth());
 			default: {
 				throw new IllegalArgumentException(timeCostAttributes.getType()
 						+ " - no such time-cost function exists!");

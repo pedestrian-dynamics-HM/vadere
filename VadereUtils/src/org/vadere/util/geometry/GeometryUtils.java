@@ -1,6 +1,7 @@
 package org.vadere.util.geometry;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -180,13 +181,14 @@ public class GeometryUtils {
 	 * @return a set of points which are positioned inside a disc segment
 	 */
 	public static List<VPoint> getDiscDiscretizationPoints(
-			@NotNull final Random random,
+			@Nullable final Random random,
 			final boolean varyDirection,
 			@NotNull final VCircle circle,
 			final int numberOfCircles,
 			final int numberOfPointsOfLargestCircle,
 			final double anchorAngle,
 			final double angle) {
+		assert !varyDirection || random != null;
 		double randOffset = varyDirection ? random.nextDouble() : 0;
 
 		List<VPoint> reachablePositions = new ArrayList<>();
@@ -217,6 +219,15 @@ public class GeometryUtils {
 		}
 
 		return reachablePositions;
+	}
+
+	public static List<VPoint> getDiscDiscretizationPoints(
+			@NotNull final VCircle circle,
+			final int numberOfCircles,
+			final int numberOfPointsOfLargestCircle,
+			final double anchorAngle,
+			final double angle) {
+		return getDiscDiscretizationPoints(null, false, circle, numberOfCircles, numberOfPointsOfLargestCircle, anchorAngle, angle);
 	}
 
 	/**
@@ -453,6 +464,12 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	public static boolean intersectLine(@NotNull final VLine line, @NotNull final IPoint p1, @NotNull final IPoint p2) {
+		double ccw1 = ccw(new VPoint(line.getP1()), new VPoint(line.getP2()), p1);
+		double ccw2 = ccw(new VPoint(line.getP1()), new VPoint(line.getP2()), p2);
+		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
+	}
+
 	public static boolean intersectLine(final double pX, final double pY, final double qX, final double qY, final double p1X, final double p1Y, final double p2X, final double p2Y) {
 		double ccw1 = ccw(pX, pY, qX, qY, p1X, p1Y);
 		double ccw2 = ccw(pX, pY, qX, qY, p2X, p2Y);
@@ -530,6 +547,10 @@ public class GeometryUtils {
 	 */
 	public static boolean intersectLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		return intersectLine(p, q, p1, p2) && intersectLine(p1, p2, p, q);
+	}
+
+	public static boolean intersectLineSegment(@NotNull VLine line, @NotNull final IPoint p1, @NotNull final IPoint p2) {
+		return intersectLine(new VPoint(line.getP1()), new VPoint(line.getP2()), p1, p2) && intersectLine(p1, p2, new VPoint(line.getP1()), new VPoint(line.getP2()));
 	}
 
 	/**
@@ -1006,12 +1027,13 @@ public class GeometryUtils {
 											   final double x4,
 											   final double y4) {
 		assert new VLine(new VPoint(x1, y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
-		double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+		return intersectionPoint(x1, y1, x2, y2, x3, y3, x4, y4);
+		/*double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 		assert d != 0;
 
 		double x = ((x1 * y2 - y1 - x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
 		double y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (y3 * y4 - y3 * x4)) / d;
-		return new VPoint(x, y);
+		return new VPoint(x, y);*/
 	}
 
 	public static VPoint lineIntersectionPoint(final VPoint p1, final VPoint p2, final VPoint q1, final VPoint q2) {
@@ -1214,5 +1236,47 @@ public class GeometryUtils {
 		path2D.lineTo(points[0].getX(), points[0].getY());
 
 		return new VPolygon(path2D);
+	}
+
+	/**
+	 * Computes the projection of a onto b.
+	 * See: https://en.wikipedia.org/wiki/Vector_projection
+	 *
+	 * @param ax x-coordinate of a
+	 * @param ay y-coordinate of a
+	 * @param bx x-coordinate of b
+	 * @param by y-coordinate of b
+	 * @return the projection of a onto b
+	 */
+	public static IPoint projectOnto(double ax, double ay, double bx, double by) {
+		assert bx * bx + by * by > GeometryUtils.DOUBLE_EPS;
+		double blen = Math.sqrt(bx * bx + by * by);
+		double bxn = bx / blen;
+		double byn = by / blen;
+
+		// scalar product
+		double alpha = ax * bxn + ay * byn;
+		IPoint a1 = new VPoint(bxn * alpha, byn * alpha);
+		return a1;
+	}
+
+	/**
+	 * Projects the point (ax, ay) onto the line defined by (p = (px, py), q = (qx, qy)).
+	 *
+	 * @param ax x-coordinate of a
+	 * @param ay y-coordinate of a
+	 * @param px x-coordinate of p
+	 * @param py y-coordinate of p
+	 * @param qx x-coordinate of q
+	 * @param qy y-coordinate of q
+	 *
+	 * @return he projection of a onto the line (p,q)
+	 */
+	public static IPoint projectOntoLine(double ax, double ay, double px, double py, double qx, double qy) {
+		double bx = qx - px;
+		double by = qy - py;
+		double apx = ax - px;
+		double apy = ay - py;
+		return projectOnto(apx, apy, bx, by).add(new VPoint(px, py));
 	}
 }
