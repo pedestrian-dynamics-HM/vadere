@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 6, 7 ]
+      "processors" : [ 1, 2, 6, 7, 9, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -41,6 +41,24 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSalientBehaviorProcessor",
       "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
+      "attributes" : {
+        "measurementAreaId" : 1,
+        "pedestrianTrajectoryProcessorId" : 5,
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
+      "attributes" : {
+        "measurementAreaId" : 2,
+        "pedestrianTrajectoryProcessorId" : 5,
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -140,7 +158,25 @@
         },
         "id" : -1
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 11.0,
+          "width" : 4.0,
+          "height" : 2.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      }, {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 13.1,
+          "width" : 4.0,
+          "height" : 9.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
