@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
+import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
@@ -26,11 +27,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class PedestrianOSM extends Pedestrian {
 
@@ -172,7 +169,7 @@ public class PedestrianOSM extends Pedestrian {
 	 *
 	 * @return the free flow step size
 	 */
-	private double getFreeFlowStepSize() {
+	public double getFreeFlowStepSize() {
 		/*if (attributesOSM.isDynamicStepLength()) {
 			double step = attributesOSM.getStepLengthIntercept()
 					+ attributesOSM.getStepLengthSlopeSpeed()
@@ -355,6 +352,12 @@ public class PedestrianOSM extends Pedestrian {
 
 	public double getMinStepLength() {
 		return minStepLength;
+	}
+
+	public ArrayList<OptimizationMetric> getOptimizationMetricElements(){
+		var values = this.stepCircleOptimizer.getCurrentMetricValues();
+		this.stepCircleOptimizer.resetHashMap();  // resets
+		return values;
 	}
 
 	@Override

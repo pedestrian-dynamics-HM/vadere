@@ -16,17 +16,13 @@ public class OptimizationMetric {
     private VPoint foundPoint;
     private double foundFuncValue;
 
-    public OptimizationMetric(){
+    public OptimizationMetric(final VPoint optimalPoint, double optimalFuncValue){
 
-    }
-
-    public OptimizationMetric(final VPoint optimalPoint, double optimalFuncValue, VPoint foundPoint,
-                              double foundFuncValue){
         this.optimalPoint = optimalPoint;
         this.optimalFuncValue = optimalFuncValue;
 
-        this.foundPoint = foundPoint;
-        this.foundFuncValue = foundFuncValue;
+        this.foundPoint = null;  // Can only be set afterwards optimal point
+        this.foundFuncValue = -1;
     }
 
     public VPoint getOptimalPoint() {
@@ -43,5 +39,13 @@ public class OptimizationMetric {
 
     public double getFoundFuncValue() {
         return foundFuncValue;
+    }
+
+    public void setFoundPoint(VPoint foundPoint) {
+        this.foundPoint = foundPoint;
+    }
+
+    public void setFoundFuncValue(double foundFuncValue) {
+        this.foundFuncValue = foundFuncValue;
     }
 }

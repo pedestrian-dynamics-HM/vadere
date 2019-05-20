@@ -21,7 +21,7 @@ import java.util.Random;
  */
 public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
-	private final double movementThreshold;
+	private final double movementThreshold;  // the next position must improve at least by this amount
 	private final Random random;
 	private final static Logger log = Logger.getLogger(StepCircleOptimizerDiscrete.class);
 
@@ -33,9 +33,14 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 	@Override
 	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, @NotNull final Shape reachableArea) {
 		assert reachableArea instanceof VCircle;
-		double stepSize = ((VCircle) reachableArea).getRadius();
 
+		double stepSize = ((VCircle) reachableArea).getRadius();
 		List<VPoint> positions = getReachablePositions(pedestrian, (VCircle) reachableArea, random);
+
+		return getNextPosition(pedestrian, positions, stepSize);
+	}
+
+	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, List<VPoint> positions, double stepSize){
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
@@ -52,7 +57,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 				if (tmpPotential < potential
 						|| (Math.abs(tmpPotential - potential) <= 0.0001 && random
-								.nextBoolean())) {
+						.nextBoolean())) {
 					potential = tmpPotential;
 					nextPos = tmpPos;
 				}
@@ -69,12 +74,12 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		return nextPos;
 	}
 
-
 	public StepCircleOptimizer clone() {
 		return new StepCircleOptimizerDiscrete(movementThreshold, random);
 	}
 
-	public static List<VPoint> getReachablePositions(@NotNull final PedestrianOSM pedestrian, @NotNull VCircle reachableArea, @NotNull final Random random) {
+	public static List<VPoint> getReachablePositions(@NotNull final PedestrianOSM pedestrian,
+													 @NotNull VCircle reachableArea, @NotNull final Random random) {
 
 		final AttributesOSM attributesOSM = pedestrian.getAttributesOSM();
 		int numberOfCircles = attributesOSM.getNumberOfCircles();
