@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.state.attributes.processor.AttributesPedestrianWaitingEndTimeProcessor;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
@@ -16,31 +15,19 @@ import java.util.StringJoiner;
 
 public class PedestrianWaitingEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
-	PedestrianWaitingEndTimeProcessorTestEnv(){
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianWaitingEndTimeProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+	PedestrianWaitingEndTimeProcessorTestEnv() {
+		super(PedestrianWaitingEndTimeProcessor.class, PedestrianIdKey.class);
+	}
 
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					PedestrianIdKey.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
+	@Override
+	void initializeDependencies() {
 		AttributesPedestrianWaitingEndTimeProcessor attr =
 				(AttributesPedestrianWaitingEndTimeProcessor) testedProcessor.getAttributes();
 		attr.setWaitingAreaId(42);
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(42, new VRectangle(0, 0, 16, 16)));
-		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, true)).thenReturn(measurementArea);
 	}
-
 
 	@Override
 	public void loadDefaultSimulationStateMocks() {
@@ -53,7 +40,7 @@ public class PedestrianWaitingEndTimeProcessorTestEnv extends ProcessorTestEnv<P
 		expectedOutput.entrySet()
 				.stream()
 				.sorted(Comparator.comparing(Map.Entry::getKey))
-				.forEach(e ->{
+				.forEach(e -> {
 					StringJoiner sj = new StringJoiner(getDelimiter());
 					sj.add(Integer.toString(e.getKey().getPedestrianId()))
 							.add(Double.toString(e.getValue()));

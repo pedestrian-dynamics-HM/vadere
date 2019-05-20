@@ -47,11 +47,7 @@ public class PedestrianWaitingEndTimeProcessor extends DataProcessor<PedestrianI
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesPedestrianWaitingEndTimeProcessor att = (AttributesPedestrianWaitingEndTimeProcessor) this.getAttributes();
-		this.waitingArea = manager.getMeasurementArea(att.getWaitingAreaId());
-		if (waitingArea == null )
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getWaitingAreaId()));
-		if (!waitingArea.isRectangular())
-			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+		this.waitingArea = manager.getMeasurementArea(att.getWaitingAreaId(), true);
 		waitingAreaVRec = waitingArea.asVRectangle();
 	}
 

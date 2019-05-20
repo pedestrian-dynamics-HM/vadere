@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor;
 import org.vadere.state.scenario.DynamicElement;
@@ -24,42 +23,16 @@ public class NumberOverlapsProcessorTestEnv extends ProcessorTestEnv<NoDataKey, 
 		this(1);
 	}
 
-	@SuppressWarnings("unchecked")
 	private NumberOverlapsProcessorTestEnv(int nextProcessorId) {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(NumberOverlapsProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId);
-		this.nextProcessorId = nextProcessorId + 1;
+		super(NumberOverlapsProcessor.class, NoDataKey.class, nextProcessorId);
+	}
 
-		DataProcessor pedestrianOverlapProcessor;
-		PedestrianOverlapProcessorTestEnv pedestrianOverlapProcessorTestEnv;
-		int pedestrianOverlapProcessorId = nextProcessorId();
-
+	@Override
+	void initializeDependencies() {
+		int pedestrianOverlapProcessorId = addDependentProcessor(PedestrianOverlapProcessorTestEnv::new);
 		//add ProcessorId of required Processors to current Processor under test
 		AttributesNumberOverlapsProcessor attr = (AttributesNumberOverlapsProcessor) testedProcessor.getAttributes();
 		attr.setPedestrianOverlapProcessorId(pedestrianOverlapProcessorId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedestrianOverlapProcessorTestEnv = new PedestrianOverlapProcessorTestEnv(pedestrianOverlapProcessorId);
-		pedestrianOverlapProcessor = pedestrianOverlapProcessorTestEnv.getTestedProcessor();
-
-		Mockito.when(manager.getProcessor(pedestrianOverlapProcessorId)).thenReturn(pedestrianOverlapProcessor);
-		addRequiredProcessors(pedestrianOverlapProcessorTestEnv);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					NoDataKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
-
 	}
 
 	private LinkedCellsGrid<DynamicElement> getCellGridMock(PedestrianListBuilder b) {

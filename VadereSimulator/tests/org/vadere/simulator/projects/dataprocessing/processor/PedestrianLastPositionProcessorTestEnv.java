@@ -1,8 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
 import org.vadere.state.scenario.Pedestrian;
@@ -21,36 +19,15 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	PedestrianLastPositionProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianLastPositionProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(PedestrianLastPositionProcessor.class, PedestrianIdKey.class);
+	}
 
-		DataProcessor pedPosProc;
-		PedestrianPositionProcessorTestEnv pedPosProcEnv;
-		int pedPosProcId = nextProcessorId();
-
+	@Override
+	void initializeDependencies() {
+		int pedPosProcId = addDependentProcessor(PedestrianPositionProcessorTestEnv::new);
 		//add ProcessorId of required Processors to current Processor under test
 		((AttributesPedestrianLastPositionProcessor) testedProcessor.getAttributes())
 				.setPedestrianPositionProcessorId(pedPosProcId);
-
-		//create required Processor enviroment and add it to current Processor under test
-		pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);
-		pedPosProc = pedPosProcEnv.getTestedProcessor();
-		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
-
-		//setup output file with different VadereWriter impl for test
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					PedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	@Override

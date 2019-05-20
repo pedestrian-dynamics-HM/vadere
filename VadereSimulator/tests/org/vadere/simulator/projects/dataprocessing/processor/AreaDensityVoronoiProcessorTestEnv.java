@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
@@ -24,12 +23,12 @@ public class AreaDensityVoronoiProcessorTestEnv extends ProcessorTestEnv<Timeste
 	PedestrianListBuilder b = new PedestrianListBuilder();
 
 	AreaDensityVoronoiProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(AreaDensityVoronoiProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(AreaDensityVoronoiProcessor.class, TimestepKey.class);
+	}
+
+	@Override
+	void initializeDependencies() {
+		// add measurement area
 		AttributesAreaDensityVoronoiProcessor attr =
 				(AttributesAreaDensityVoronoiProcessor) testedProcessor.getAttributes();
 
@@ -37,17 +36,9 @@ public class AreaDensityVoronoiProcessorTestEnv extends ProcessorTestEnv<Timeste
 		attr.setMeasurementAreaId(42);
 		MeasurementArea measurementArea = new MeasurementArea(
 				new AttributesMeasurementArea(42, new VRectangle(0, 0, 16, 16)));
-		Mockito.when(manager.getMeasurementArea(42)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, false)).thenReturn(measurementArea);
+		Mockito.when(manager.getMeasurementArea(42, true)).thenReturn(measurementArea);
 
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 	}
 
 	public void loadCollinearSetup() {

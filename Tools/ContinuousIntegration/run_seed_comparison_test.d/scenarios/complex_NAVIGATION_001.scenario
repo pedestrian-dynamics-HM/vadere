@@ -1,7 +1,7 @@
 {
   "name" : "complex_NAVIGATION_001",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -89,7 +89,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 90.0,
+      "finishTime" : 60.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,

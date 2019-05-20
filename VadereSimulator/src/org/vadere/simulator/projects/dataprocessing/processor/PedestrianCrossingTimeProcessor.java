@@ -81,11 +81,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
-		this.measurementArea  = manager.getMeasurementArea(att.getMeasurementAreaId());
-		if (measurementArea == null)
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-		if (!measurementArea.isRectangular())
-			throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
+		this.measurementArea  = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
 		measurementAreaVRec = measurementArea.asVRectangle();
 
 	}

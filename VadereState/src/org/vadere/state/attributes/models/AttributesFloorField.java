@@ -14,10 +14,16 @@ public class AttributesFloorField extends Attributes {
 	 *
 	 * TODO [refactoring]: However potentialFieldResolution is also used for the {@link org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction}
 	 * for the density computation, i.e. it is the resolution of the matrix used in the discrete convolution. This should be changed!
+	 * Furthermore, theare are many unused parameters in {@link AttributesTimeCost}.
+	 * Solution:
+	 * (1) change AttributesTimeCost timeCostAttributes to ITimeCostFunction like the potential classes in AttributesOSM
+	 * (2) split AttributesTimeCost timeCostAttributes into multiple classes
+	 * (3) add a new AttributesTimeCost into the top level (i.e. attributesModel) json.
 	 */
 	private double potentialFieldResolution = 0.1;
 	private double obstacleGridPenalty = 0.1;
 	private double targetAttractionStrength = 1.0;
+	//private double
 
 	private AttributesTimeCost timeCostAttributes;
 

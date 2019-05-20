@@ -89,11 +89,14 @@ public class VTrajectory implements Iterable<FootStep> {
 		return clone().cut(startSimTime, endSimTime).length();
 	}
 
-	public double duration() {
-		if (footSteps.isEmpty()) {
-			return 0;
-		} else {
-			return footSteps.peekLast().getEndTime() - footSteps.peekFirst().getStartTime();
+	public Optional<Double> duration() {
+		if(footSteps.isEmpty()) {
+			return Optional.empty();
+		}
+		else {
+			double duration = footSteps.peekLast().getEndTime() - footSteps.peekFirst().getStartTime();
+			return Optional.of(duration);
+		}
 		}
 	}
 
@@ -102,7 +105,7 @@ public class VTrajectory implements Iterable<FootStep> {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of(length() / duration());
+			return Optional.of(length() / duration().get());
 		}
 	}
 

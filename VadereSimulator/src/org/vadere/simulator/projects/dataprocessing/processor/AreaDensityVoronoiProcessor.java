@@ -26,15 +26,12 @@ public class AreaDensityVoronoiProcessor extends AreaDensityProcessor implements
     @Override
     public void init(final ProcessorManager manager) {
         super.init(manager);
-
         AttributesAreaDensityVoronoiProcessor att = (AttributesAreaDensityVoronoiProcessor) this.getAttributes();
-        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId());
-        if (measurementArea == null)
-            throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", att.getMeasurementAreaId()));
-        if (!measurementArea.isRectangular())
-            throw new RuntimeException("DataProcessor and IntegralVoronoiAlgorithm only supports Rectangular measurement areas.");
 
-        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(this.getMeasurementArea(), measurementArea));
+        MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+        MeasurementArea measurementVoronoiArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId(), true);
+
+        this.setAlgorithm(new AreaDensityVoronoiAlgorithm(measurementVoronoiArea, measurementArea));
     }
 
     @Override
