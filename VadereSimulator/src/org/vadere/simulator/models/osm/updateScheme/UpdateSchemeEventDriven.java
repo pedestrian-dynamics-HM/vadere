@@ -54,9 +54,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			VPoint oldPosition = pedestrian.getPosition();
 
 			// for the first step after creation, timeOfNextStep has to be initialized
-			if (pedestrian.getTimeOfNextStep() == 0) {
+			/*if (pedestrian.getTimeOfNextStep() == 0) {
 				pedestrian.setTimeOfNextStep(currentTimeInSec);
-			}
+			}*/
 			
 			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 			pedestrian.updateNextPosition();
