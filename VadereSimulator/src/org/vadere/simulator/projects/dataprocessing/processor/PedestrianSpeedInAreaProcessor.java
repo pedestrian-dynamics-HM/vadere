@@ -53,9 +53,15 @@ import java.util.function.BiFunction;
  * - ByTrajectory: Use {@link VTrajectory#speed()}, i.e. trajectory.length() / trajectory.duration()
  * - ByMeasurementAreaHeight: Use measurementArea.height() / trajectory.duration()
  * - ByMeasurementAreaWidth: Use measurementArea.width() / trajectory.duration()
+ *
+ * Note: If "trajectory.isEmpty()", log -2.
  */
 @DataProcessorClass()
 public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
+
+	// Static variables
+	public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
+	public static double ERROR_NO_TRAJECTORY_AVAILABLE = -2;
 
 	// Variables
 	private MeasurementArea measurementArea;
@@ -81,15 +87,12 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 
 		AttributesSpeedInAreaProcessor processorAttributes = (AttributesSpeedInAreaProcessor) this.getAttributes();
 
-		measurementArea = manager.getMeasurementArea(processorAttributes.getMeasurementAreaId());
+		// manager.getMeasurementArea() throws an exception if area is "null" or not rectangular. Though, no checks required here.
+		boolean rectangularAreaRequired = true;
+		measurementArea = manager.getMeasurementArea(processorAttributes.getMeasurementAreaId(), rectangularAreaRequired);
+
 		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(processorAttributes.getPedestrianTrajectoryProcessorId());
 
-		if (measurementArea == null) {
-			throw new RuntimeException(String.format("MeasurementArea with index %d does not exist.", processorAttributes.getMeasurementAreaId()));
-		}
-		if (measurementArea.getShape() instanceof VRectangle == false) {
-			throw new RuntimeException("MeasurementArea should be rectangular.");
-		}
 		if (pedestrianTrajectoryProcessor == null) {
 			throw new RuntimeException(String.format("PedestrianVelocityProcessor with index %d does not exist.", processorAttributes.getPedestrianTrajectoryProcessorId()));
 		}
@@ -123,7 +126,7 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 		pedestrianTrajectoryProcessor.update(state);
 
 		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			double speed = -1;
+			double speed = ERROR_PED_NOT_IN_MEASUREMENT_AREA;
 
 			if (measurementArea.getShape().contains(pedestrian.getPosition())) {
 				VTrajectory wholeTrajectory = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
@@ -138,7 +141,7 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 	}
 
 	private double calculateSpeedByTrajectory(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = Double.NaN;
+		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
 
 		if (trajectory.speed().isPresent()) {
 			speed = trajectory.speed().get();
@@ -148,12 +151,22 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 	}
 
 	private double calculateSpeedByMeasurementAreaHeight(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = (measurementArea.height / trajectory.duration());
+		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
+
+		if (trajectory.duration().isPresent()) {
+			speed = (measurementArea.height / trajectory.duration().get());
+		}
+
 		return speed;
 	}
 
 	private double calculateSpeedByMeasurementAreaWidth(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = measurementArea.width / trajectory.duration();
+		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
+
+		if (trajectory.duration().isPresent()) {
+			speed = measurementArea.width / trajectory.duration().get();
+		}
+
 		return speed;
 	}
 

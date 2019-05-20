@@ -97,7 +97,6 @@ public class VTrajectory implements Iterable<FootStep> {
 			double duration = footSteps.peekLast().getEndTime() - footSteps.peekFirst().getStartTime();
 			return Optional.of(duration);
 		}
-		}
 	}
 
 	public Optional<Double> speed() {
