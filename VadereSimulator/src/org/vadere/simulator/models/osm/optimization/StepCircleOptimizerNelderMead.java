@@ -22,7 +22,7 @@ import java.util.Random;
  * The Class StepCircleOptimizerNelderMead.
  * 
  */
-public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
+public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 
 	private static Logger logger = Logger
 			.getLogger(StepCircleOptimizerNelderMead.class);

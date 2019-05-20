@@ -9,10 +9,24 @@ import org.vadere.util.geometry.shapes.VPoint;
  * The Interface StepCircleOptimizer.
  * 
  */
-public interface StepCircleOptimizer {
+public abstract class StepCircleOptimizer {
+
+	private OptimizationMetric currentMetricValues;
+
+	protected StepCircleOptimizer(){
+		// TODO: read if the metric should be computed
+
+		boolean computeMetric = true;
+
+		if(computeMetric){
+			this.currentMetricValues = new OptimizationMetric();
+		}else{
+			this.currentMetricValues = null;
+		}
+	}
 
 	/** Returns the reachable position with the minimal potential. */
-	VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea);
+	abstract VPoint getNextPosition(PedestrianOSM pedestrian, Shape reachableArea);
 
-	StepCircleOptimizer clone();
+	//abstract StepCircleOptimizer clone();
 }

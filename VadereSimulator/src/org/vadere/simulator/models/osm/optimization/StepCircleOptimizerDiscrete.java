@@ -19,7 +19,7 @@ import java.util.Random;
  * in [Seitz, 2012]
  * 
  */
-public class StepCircleOptimizerDiscrete implements StepCircleOptimizer {
+public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 	private final double movementThreshold;
 	private final Random random;
