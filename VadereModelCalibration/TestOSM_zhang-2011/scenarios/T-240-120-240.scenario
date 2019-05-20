@@ -1,7 +1,7 @@
 {
   "name" : "T-240-120-240",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -51,6 +51,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "aTimeStep_right.fundamentalDiagram",
       "processors" : [ 20 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "trajectories.txt",
+      "processors" : [ 21 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -121,13 +125,7 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 16.3,
-          "y" : 6.0,
-          "width" : 2.4,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 13
       }
     }, {
@@ -143,13 +141,7 @@
       "id" : 15,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 13.0,
-          "y" : 1.8,
-          "width" : 2.0,
-          "height" : 2.4,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 2,
         "pedestrianVelocityProcessorId" : 13
       }
     }, {
@@ -157,13 +149,7 @@
       "id" : 16,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 20.0,
-          "y" : 1.8,
-          "width" : 2.0,
-          "height" : 2.4,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 3,
         "pedestrianVelocityProcessorId" : 13
       }
     }, {
@@ -212,6 +198,9 @@
         "pedestrianVelocityProcessorId" : 7,
         "deltaTime" : 10.0
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "id" : 21
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -233,7 +222,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 0.1,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -390,6 +381,34 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      } ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 16.3,
+          "y" : 6.0,
+          "width" : 2.4,
+          "height" : 2.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 13.0,
+          "y" : 1.8,
+          "width" : 2.0,
+          "height" : 2.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      }, {
+        "shape" : {
+          "x" : 20.0,
+          "y" : 1.8,
+          "width" : 2.0,
+          "height" : 2.4,
+          "type" : "RECTANGLE"
+        },
+        "id" : 3
       } ],
       "stairs" : [ ],
       "targets" : [ {

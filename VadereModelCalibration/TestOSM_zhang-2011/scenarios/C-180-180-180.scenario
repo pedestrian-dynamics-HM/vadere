@@ -1,7 +1,7 @@
 {
   "name" : "C-180-180-180",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -92,13 +92,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor",
       "attributes" : {
         "pedestrianTrajectoryProcessorId" : 10,
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        }
+        "measurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
@@ -119,13 +113,7 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 13
       }
     }, {
@@ -133,20 +121,8 @@
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 17.0,
-          "y" : 10.1,
-          "width" : 12.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 2,
         "pedestrianVelocityProcessorId" : 13
       }
     }, {
@@ -162,20 +138,8 @@
       "id" : 14,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramEProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 17.0,
-          "y" : 10.1,
-          "width" : 12.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 2,
         "pedestrianVelocityProcessorId" : 13
       }
     } ],
@@ -199,7 +163,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 0.1,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -320,6 +286,25 @@
           "type" : "RECTANGLE"
         },
         "id" : -1
+      } ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 22.0,
+          "y" : 10.1,
+          "width" : 2.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 17.0,
+          "y" : 10.1,
+          "width" : 12.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
       } ],
       "stairs" : [ ],
       "targets" : [ {
