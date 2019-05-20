@@ -141,7 +141,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			parallelUpdatablePeds.stream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
-				update(ped, currentTimeInSec);
+				update(ped, timeStepInSec, currentTimeInSec);
 			});
 
 

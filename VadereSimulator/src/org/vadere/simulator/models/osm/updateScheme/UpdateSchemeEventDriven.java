@@ -40,27 +40,28 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
-				update(ped, currentTimeInSec);
+				update(ped, timeStepInSec, currentTimeInSec);
 				//System.out.println(ped.getId());
 				pedestrianEventsQueue.add(ped);
 			}
 		}
 	}
 
-	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
+	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			VPoint oldPosition = pedestrian.getPosition();
 
+			double stepDuration = pedestrian.getDurationNextStep();
+
 			// for the first step after creation, timeOfNextStep has to be initialized
-			/*if (pedestrian.getTimeOfNextStep() == 0) {
-				pedestrian.setTimeOfNextStep(currentTimeInSec);
-			}*/
+			if (pedestrian.getTimeOfNextStep() == 0) {
+				pedestrian.setTimeOfNextStep(currentTimeInSec - timeStepInSec);
+			}
 			
 			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 			pedestrian.updateNextPosition();
-			double stepDuration = pedestrian.getDurationNextStep();
 			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
