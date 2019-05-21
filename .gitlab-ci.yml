@@ -70,7 +70,7 @@ stages:
     artifacts:
         when: on_failure
         paths:
-            - "log_dir"
+            - "vadere_logs"
         expire_in: 1 week
     when: on_success
 

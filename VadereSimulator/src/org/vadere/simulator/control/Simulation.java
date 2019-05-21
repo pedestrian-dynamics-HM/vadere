@@ -6,6 +6,7 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -111,6 +112,11 @@ public class Simulation {
 			IPotentialField pt = null;
 			if(mainModel instanceof PotentialFieldModel) {
 				pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+			} else if(mainModel instanceof BehaviouralHeuristicsModel) {
+				pft = ((BehaviouralHeuristicsModel) mainModel).getPotentialFieldTarget();
+			}
+
+			if(pft != null) {
 				pt = (pos, agent) -> {
 					if(agent instanceof PedestrianOSM) {
 						return ((PedestrianOSM)agent).getPotential(pos);
