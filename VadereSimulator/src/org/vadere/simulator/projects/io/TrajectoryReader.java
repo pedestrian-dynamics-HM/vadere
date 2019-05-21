@@ -54,10 +54,12 @@ public class TrajectoryReader {
 	private Set<String> groupIdKeys;
 	private Set<String> groupSizeKeys;
 	private Set<String> stridesKeys;
+	private Set<String> simTimeKeys;
 
 
 	private int pedIdIndex;
 	private int stepIndex;
+	private int simTimeIndex;
 	private int xIndex;
 	private int yIndex;
 	private int targetIdIndex;
@@ -84,12 +86,15 @@ public class TrajectoryReader {
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
 		stridesKeys = new HashSet<>();
+		simTimeKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
 		pedestrianIdKeys.add("pedestrianId");
 		stepKeys.add("timeStep");
 		stepKeys.add("step");
+		simTimeKeys.add("simTime");
+		simTimeKeys.add("time");
 		xKeys.add("x");
 		yKeys.add("y");
 		targetIdKeys.add("targetId");
@@ -100,6 +105,7 @@ public class TrajectoryReader {
 
 		pedIdIndex = -1;
 		stepIndex = -1;
+		simTimeIndex = -1;
 		xIndex = -1;
 		yIndex = -1;
 		targetIdIndex = -1;
@@ -145,6 +151,9 @@ public class TrajectoryReader {
 			}
 			else if(stridesKeys.contains(columns[index])) {
 				stridesIndex = index;
+			}
+			else if(simTimeKeys.contains(columns[index])) {
+				simTimeIndex = index;
 			}
 		}
 		try {
@@ -212,6 +221,7 @@ public class TrajectoryReader {
 	private Pair<Step, Agent> parseRowTokens(@NotNull final String[] rowTokens) {
 		// time step
 		int step = Integer.parseInt(rowTokens[stepIndex]);
+		double simTime = 0.0;
 
 		// pedestrian id
 		int pedestrianId = Integer.parseInt(rowTokens[pedIdIndex]);
@@ -227,6 +237,10 @@ public class TrajectoryReader {
 		targets.addFirst(targetId);
 		ped.setTargets(targets);
 
+		if(simTimeIndex != -1) {
+			simTime = Double.parseDouble(rowTokens[simTimeIndex]);
+		}
+
 		if(groupIdIndex != -1) {
 			int groupId = Integer.parseInt(rowTokens[groupIdIndex]);
 			int groupSize = groupSizeIndex != -1 ? Integer.parseInt(rowTokens[groupSizeIndex]) : -1;
@@ -240,6 +254,6 @@ public class TrajectoryReader {
 			}
 		}
 
-		return Pair.create(new Step(step), ped);
+		return simTimeIndex == -1 ? Pair.create(new Step(step), ped) : Pair.create(new Step(step, simTime), ped);
 	}
 }
