@@ -338,8 +338,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
-		model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
-		model.notifyObservers();
+
+		try {
+			model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
+			model.notifyObservers();
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public void loadOutputFile(final Scenario scenario) {
