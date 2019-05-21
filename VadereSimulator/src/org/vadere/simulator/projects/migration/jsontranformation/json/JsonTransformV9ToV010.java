@@ -6,11 +6,11 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
 
-@MigrationTransformation(targetVersionLabel = "0.9")
-public class JsonTransformV8ToV9 extends SimpleJsonTransformation {
+@MigrationTransformation(targetVersionLabel = "0.10")
+public class JsonTransformV9ToV010 extends SimpleJsonTransformation {
 
-    public JsonTransformV8ToV9() {
-        super(Version.V0_9);
+    public JsonTransformV9ToV010() {
+        super(Version.V0_10);
     }
 
     @Override
