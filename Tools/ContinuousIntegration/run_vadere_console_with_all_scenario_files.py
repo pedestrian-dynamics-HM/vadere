@@ -21,7 +21,7 @@ short_timeout_in_seconds = 2 * 60
 
 def parse_command_line_arguments():
     parser = argparse.ArgumentParser(description="Run all scenario files.")
-    parser.add_argument("--scenario", "-s", type=str, nargs="?", help="Run only the given scenario file and not all. E.g. \"VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
+    parser.add_argument("scenario", type=str, nargs="?", help="Run only the given scenario file and not all. E.g., \"VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
 
     args = parser.parse_args()
 
@@ -80,13 +80,10 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
 def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar", scenario_timeout_in_sec=short_timeout_in_seconds):
     output_dir = "output"
-    log_dir = "log_dir"
+    log_base_dir = "vadere_logs"
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    makedirs_if_non_existing(output_dir)
+    makedirs_if_non_existing(log_base_dir)
 
     total_scenario_files = len(scenario_files)
 
@@ -98,10 +95,18 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
         try:
             print("Running scenario file ({}/{}): {}".format(i + 1, total_scenario_files, scenario_file))
+            
+            # A scenario filename has the form "VadereModelTests/TestOSM/scenarios/chicken_floorfield_ok.scenario"
+            # Use second-level directory as subdirectory for logging (e.g., "TestOSM").
+            log_sub_dir = scenario_file.split(os.path.sep)[1]
+            log_dir = os.path.join(".", log_base_dir, log_sub_dir)
+            
+            makedirs_if_non_existing(log_dir)
+            
             scenario_name = os.path.basename(scenario_file).split('.')[0]
-            log_file = os.path.join(".", log_dir, scenario_name + ".log")
+            log_file = os.path.join(log_dir, scenario_name + ".log")
 
-            print(log_file)
+            print("  Log file: " + log_file)
 
             # Measure wall time and not CPU time.
             wall_time_start = time.time()
@@ -124,17 +129,16 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         except subprocess.TimeoutExpired as exception:
             print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: timeout after {} s".format(exception.timeout))
+            
             failed_summary.append("Scenario file failed: {}".format(scenario_file))
             failed_summary.append("->  Reason: timeout after {} s".format(exception.timeout))
             failed_scenarios_with_exception.append((scenario_file, exception))
         except subprocess.CalledProcessError as exception:
-            prefix = ""
-            if "TestOSM" in scenario_file:
-                prefix = " * OSM * "
-            print(prefix + "Scenario file failed: {}".format(scenario_file))
+            print("Scenario file failed: {}".format(scenario_file))
             print("->  Reason: non-zero return value {}".format(exception.returncode))
             print("            {}".format(read_first_error_linies(exception.stderr)))
-            failed_summary.append(prefix + "Scenario file failed: {}".format(scenario_file))
+            
+            failed_summary.append("Scenario file failed: {}".format(scenario_file))
             failed_summary.append("->  Reason: non-zero return value {}".format(exception.returncode))
             failed_summary.append("            {}".format(read_first_error_linies(exception.stderr)))
 
@@ -144,6 +148,10 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         shutil.rmtree(output_dir)
 
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception, "failed_summary": failed_summary}
+
+def makedirs_if_non_existing(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 def read_first_error_linies(error_byte_string):
     err_string_lines = error_byte_string.decode('utf-8').split('\n')
