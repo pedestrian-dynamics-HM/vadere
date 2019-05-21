@@ -178,18 +178,22 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		return String.join(DataProcessingJsonManager.DEFAULT_SEPARATOR, this.getIndices());
 	}
 
+	public static String addHeaderProcInfo(String columnName, int procId){
+		return columnName + headerNameAdd.replace("?", "" + procId);
+	}
 
 	private List<String> uniqueHeaderNames(){
 		// This function adds to every header "headerNameAdd", for ALL headers EVERY time
 		// (cmp. headersWithNameMangling)
 		LinkedList<String> headers = new LinkedList<>();
 
-		for (DataProcessor l: dataProcessors) {
-			List<String> allProcHeaders = Arrays.asList(l.getHeaders());
+		for (DataProcessor dataProcessor: dataProcessors) {
+			List<String> allProcHeaders = Arrays.asList(dataProcessor.getHeaders());
 
 			for (String singleHeader: allProcHeaders) {
 				// add the processor id to make header unique
-				headers.addLast(singleHeader + headerNameAdd.replace("?", "" + l.getId()));
+				String adaptedColumnName = OutputFile.addHeaderProcInfo(singleHeader, dataProcessor.getId());
+				headers.addLast(adaptedColumnName);
 			}
 		}
 
