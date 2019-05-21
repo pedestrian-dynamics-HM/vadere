@@ -69,6 +69,7 @@
   * vadere.jar -> vadere-gui.jar
   * postvis.jar -> vadere-postvis.jar
   * vadere-console.jar -> remained unchanged
+- Header in output file have now the following form "[NAME]-PID[ID]". This avoids name conflicts and makes mapping to the relevant processor easy and fast.
 - Migration to Java 11 (OpenJDK).
 - Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
   **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build. 
