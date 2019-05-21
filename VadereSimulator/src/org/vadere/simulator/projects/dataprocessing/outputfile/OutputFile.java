@@ -54,7 +54,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private boolean isWriteMetaData;
 
 	private String separator;
-	private final static String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
+	public final static String nameConflictAdd = "-PID?"; // the # is replaced with the processor id
 	private VadereWriterFactory writerFactory;
 	private VadereWriter writer;
 
@@ -199,7 +199,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 				for (String h: list) {
 					// ... but now add the processor id
 					headers.addLast(h +
-							nameConflictAdd.replace('?', (char) (l.getId()+'0')));
+							nameConflictAdd.replace("?", "" + l.getId()+'0'));
 				}
 			}
 		}
