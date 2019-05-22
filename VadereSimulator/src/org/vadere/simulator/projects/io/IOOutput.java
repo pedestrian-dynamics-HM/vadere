@@ -76,7 +76,9 @@ public abstract class IOOutput {
 	private static boolean testTrajectories (final VadereProject project, final File directory) {
 		try {
 			TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
-			return reader.checkFile();
+			reader.checkFile();
+			return true;
+
 		} catch (IOException | VadereClassNotFoundException e) {
 			logger.error("Error in output file " + directory.getName());
 			return false;
