@@ -73,7 +73,7 @@ public class TrajectoryReader {
 	private int mostImportantEventIndex;
 	private int salientBehaviorIndex;
 
-	private static final int notSetColumnIndexIdentifier = -1;
+	private static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
@@ -112,16 +112,16 @@ public class TrajectoryReader {
 		mostImportantEventKeys.add("mostImportantEvent");
 		salientBehaviorKeys.add("salientBehavior");
 
-		pedIdIndex = notSetColumnIndexIdentifier;
-		stepIndex = notSetColumnIndexIdentifier;
-		xIndex = notSetColumnIndexIdentifier;
-		yIndex = notSetColumnIndexIdentifier;
-		targetIdIndex = notSetColumnIndexIdentifier;
-		groupIdIndex = notSetColumnIndexIdentifier;
-		groupSizeIndex = notSetColumnIndexIdentifier;
-		stridesIndex = notSetColumnIndexIdentifier;
-		mostImportantEventIndex = notSetColumnIndexIdentifier;
-		salientBehaviorIndex = notSetColumnIndexIdentifier;
+		pedIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		stepIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		xIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		yIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		targetIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		groupIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		groupSizeIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		stridesIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		mostImportantEventIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		salientBehaviorIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
@@ -130,7 +130,7 @@ public class TrajectoryReader {
 	}
 
 	private void errorWhenNotUniqueColumn(int currentValue, String columnName) throws IOException{
-		if(currentValue != notSetColumnIndexIdentifier){
+		if(currentValue != NOT_SET_COLUMN_INDEX_IDENTIFIER){
 			throw new IOException("The header " + columnName + " is not unique in the file. This is likely to have " +
 					     "unwanted side effects");
 		}
@@ -185,12 +185,13 @@ public class TrajectoryReader {
 			}
 		}
 
-		if (! (pedIdIndex != notSetColumnIndexIdentifier && xIndex != notSetColumnIndexIdentifier &&
-				yIndex != notSetColumnIndexIdentifier && stepIndex != notSetColumnIndexIdentifier)) {
-			// load default values with no groups
-			throw new IOException(String.format("All columns with " + notSetColumnIndexIdentifier + " value could " +
-							"not be found in the trajectory file pedIdIndex=%d, x-values=%d, y-values=%d, step " +
-							"values=%d", pedIdIndex, xIndex, yIndex, stepIndex));
+		if (pedIdIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| xIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| yIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| stepIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			throw new IOException(String.format("No valid header found in output file: " +
+					"pedIdIndex=%d, x-values=%d, y-values=%d, step values=%d",
+					pedIdIndex, xIndex, yIndex, stepIndex));
 		}
 	}
 
