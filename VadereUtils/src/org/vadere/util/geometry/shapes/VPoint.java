@@ -162,6 +162,8 @@ public class VPoint implements Cloneable, IPoint {
 		return x * point.getX() + y * point.getY();
 	}
 
+
+
 	@Override
 	public VPoint norm() {
 		return norm(distanceToOrigin());

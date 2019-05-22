@@ -130,6 +130,18 @@ public interface IPoint extends Cloneable {
 	}
 
 	/**
+	 * Computes the dot product of this and the other point.
+	 *
+	 * This does not effect the coordinates of this.
+	 *
+	 * @param point the other point
+	 * @return the dot product of this and the other
+	 */
+	default double dotProduct(IPoint point) {
+		return (getX() * point.getX()) + (getY() * point.getY());
+	}
+
+	/**
 	 * Clones the point. This will return a copy if the point
 	 * is immutable, otherwise this will return this.
 	 *
