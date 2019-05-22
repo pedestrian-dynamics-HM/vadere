@@ -83,10 +83,10 @@ public class Pedestrian extends Agent {
 		trajectory.clear();
 	}
 
+	// Getter
 	public VTrajectory getFootSteps() {
 		return trajectory;
 	}
-	// Getter
 	public int getIdAsTarget() {
 		return this.idAsTarget;
 	}

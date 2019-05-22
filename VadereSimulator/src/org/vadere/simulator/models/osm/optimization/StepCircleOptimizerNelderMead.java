@@ -132,6 +132,13 @@ public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 		// System.out.println(potentialEvaluationFunction.counter);
 		//logger.info("["+(minimum[0]-pedestrian.getPosition().getX())+","+(minimum[1]-pedestrian.getPosition().getY())+"]");
 		//lastSolution.put(pedestrian, new VPoint(minimum[0]-pedestrian.getPosition().getX(), minimum[1]-pedestrian.getPosition().getY()));
+
+		if(getComputeMetric()){
+			// See merge request !65
+			this.computeAndAddBruteForceSolutionMetric(pedestrian,
+                    new SolutionPair(new VPoint(minimum[0], minimum[1]), minimumValue));
+		}
+
 		return new VPoint(minimum[0], minimum[1]);
 
 	}

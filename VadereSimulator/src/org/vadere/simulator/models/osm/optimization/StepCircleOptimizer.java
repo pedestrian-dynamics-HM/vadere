@@ -1,33 +1,37 @@
 package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.data.SortedList;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 /**
- * The Interface StepCircleOptimizer.
- * 
+ * Abstract Base Class for StepCircleOptimizer.
+ *
+ * The abstract functions need to be implemented by every StepCircleOptimizer.
+ * The additional functions only serve to compute a true solution (obtained via computationally expensive brute force).
+ * This allows to compute a metric that measures the quality of the respective concrete subclass of StepCircleOptimizer.
+ *
+ * Currently, only the StepCircleOptimizerNelderMead uses the metric functionality. To compute the brute force
+ * solution only the "computeAndAddBruteForceSolutionMetric" function has to be called (NOTE: depending on the setting
+ * in "getReachablePositions" this can be very expensive.
  */
 public abstract class StepCircleOptimizer {
 
-	private ArrayList<OptimizationMetric> currentMetricValues;
+	private boolean computeMetric;
+    private ArrayList<OptimizationMetric> currentMetricValues;
 
 	protected StepCircleOptimizer(){
 		// TODO: read if the metric should be computed from a config file, see issue #243
-		boolean computeMetric = true;
+		this.computeMetric = true;
 
-		if(computeMetric){
+		if(this.computeMetric){
 			this.currentMetricValues = new ArrayList<>();
 		}else{
 			this.currentMetricValues = null;
@@ -43,7 +47,22 @@ public abstract class StepCircleOptimizer {
 	 * quality of a optimization algorithm.
 	 */
 
-	private OptimizationMetric bruteForceOptimalValue(PedestrianOSM pedestrian){
+	protected class SolutionPair {
+		/* Data class to store point and function value of either */
+		public final VPoint point;
+		public final double funcValue;
+		public SolutionPair(VPoint point, double funcValue){
+			this.point = point;
+			this.funcValue = funcValue;
+		}
+	}
+
+
+	protected boolean getComputeMetric(){
+	    return computeMetric;
+    }
+
+	private SolutionPair bruteForceOptimalValue(PedestrianOSM pedestrian){
 
 		var reachableArea = new VCircle( pedestrian.getFreeFlowStepSize() );
 		var potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
@@ -57,25 +76,25 @@ public abstract class StepCircleOptimizer {
 		try{
 			optimalFuncValue = potentialEvaluationFunction.getValue(optimalPoint);
 		}catch (Exception e) {
-			Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw error. Setting value " +
-					"to invalid (-1)");
+			Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw error. " +
+                    "Setting value to invalid (-1)");
 			optimalFuncValue = -1;
 		}
 
-		return new OptimizationMetric(optimalPoint, optimalFuncValue);
+        return new SolutionPair(optimalPoint, optimalFuncValue);
 	}
 
-	protected void setBruteForceSolution(PedestrianOSM pedestrian){
-		this.currentMetricValues.add(bruteForceOptimalValue(pedestrian));  // adds at the end of the list
-	}
+	protected void computeAndAddBruteForceSolutionMetric(final PedestrianOSM pedestrian,
+														 final SolutionPair foundSolution){
 
-	protected void setFoundSolution(VPoint foundSolution, double funcValue){
-		// Always add at the last, currently this is not very secure bc. there is no checking if it overwrites other
-		// values
-		OptimizationMetric metric = this.currentMetricValues.get(this.currentMetricValues.size()-1);
-		metric.setFoundPoint(foundSolution);
-		metric.setFoundFuncValue(funcValue);
-	}
+        var bruteForceSolution = bruteForceOptimalValue(pedestrian);
+
+        // TODO: maybe time of nextStep is not the actual correct one, possibly adapt
+        var optimizationMetric = new OptimizationMetric(pedestrian.getId(), pedestrian.getTimeOfNextStep(),
+                bruteForceSolution.point, bruteForceSolution.funcValue, foundSolution.point, foundSolution.funcValue);
+
+        currentMetricValues.add(optimizationMetric);
+    }
 
 	public ArrayList<OptimizationMetric> getCurrentMetricValues(){
 		return this.currentMetricValues;
@@ -86,15 +105,15 @@ public abstract class StepCircleOptimizer {
 	}
 
 	private static List<VPoint> getReachablePositions(VCircle reachableArea){
-		// TODO: numberPointsOfLargestCircle and numberOfCircles are parameters with a trade off between runtime and
+		// NOTE: numberPointsOfLargestCircle and numberOfCircles are parameters with a trade off between runtime and
 		// precision of brute force solution
 
 		return GeometryUtils.getDiscDiscretizationPoints(
 				null,
 				false,
 				reachableArea,
-				20,
-				10000,
+				30,
+				5000,
 				0,
 				2 * Math.PI);
 	}
