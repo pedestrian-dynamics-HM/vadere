@@ -1,7 +1,8 @@
 {
   "name" : "06_bang_event_guimaraes_platz",
   "description" : "",
-  "release" : "0.9",
+  "release" : "0.10",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -106,7 +107,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : -5666974701049342956,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -1173,7 +1175,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : {

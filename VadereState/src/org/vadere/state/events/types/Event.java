@@ -98,4 +98,8 @@ public abstract class Event {
         return string;
     }
 
+    public String toStringForOutputProcessor() {
+        return this.getClass().getSimpleName();
+    }
+
 }

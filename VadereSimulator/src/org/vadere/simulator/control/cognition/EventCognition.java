@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The CognitionLayer class should provide logic to prioritize {@link Event}
- * objects based on attributes of a pedestrian.
+ * The EventCognition class should provide logic to prioritize {@link Event}s for a pedestrian based on its
+ * current state/attributes (e.g., a {@link BangEvent} is more important than a {@link WaitEvent}.
  */
-public class CognitionLayer {
+public class EventCognition {
 
     public void prioritizeEventsForPedestrians(List<Event> events, Collection<Pedestrian> pedestrians){
         for (Pedestrian pedestrian : pedestrians) {
