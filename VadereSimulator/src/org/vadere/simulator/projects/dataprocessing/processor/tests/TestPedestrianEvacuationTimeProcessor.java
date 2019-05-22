@@ -63,7 +63,7 @@ public class TestPedestrianEvacuationTimeProcessor extends TestProcessor {
 	@Override
 	public AttributesTestPedestrianEvacuationTimeProcessor getAttributes() {
 		if (super.getAttributes() == null) {
-			setAttributes(new AttributesTestNumberOverlapsProcessor());
+			setAttributes(new AttributesTestPedestrianEvacuationTimeProcessor());
 		}
 
 		return (AttributesTestPedestrianEvacuationTimeProcessor)super.getAttributes();

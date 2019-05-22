@@ -4,7 +4,18 @@
   "release" : "0.10",
   "processWriters" : {
     "files" : [ ],
-    "processors" : [ ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestOptimizationMetricNelderMeadProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestOptimizationMetricProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "optimizationMetricProcessorId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
+      "id" : 2
+    } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
   },
