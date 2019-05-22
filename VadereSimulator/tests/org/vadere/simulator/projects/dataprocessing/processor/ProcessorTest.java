@@ -8,7 +8,6 @@ import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.utils.reflection.ReflectionHelper;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Base Test for all Processors.
@@ -51,11 +50,19 @@ public abstract class ProcessorTest {
 		}
 		int l = processorTestEnv.getSimStates().size();
 		p.postLoop(processorTestEnv.getSimStates().get(l - 1));
-		processorTestEnv.getOutputFile().write();
+
+		OutputFile outputFile = processorTestEnv.getOutputFile();
+		outputFile.write();
+
+		// NOTE: these are the column names that have the additional information of the data processor ID.
+		assertEquals(processorTestEnv.getHeader(), outputFile.getHeaderLine());
 
 		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
-		assertTrue(processorTestEnv.getHeader().contains(header));
-		assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput());
+		if (header.equals("")){
+			assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput(0));
+		} else {
+			assertEquals(processorTestEnv.getExpectedOutputAsList(), processorTestEnv.getOutput(1));
+		}
 	}
 
 	/**
@@ -70,7 +77,13 @@ public abstract class ProcessorTest {
 		}
 		processorTestEnv.getOutputFile().write();
 
-		assertEquals(processorTestEnv.getOutput().size(), p.getData().size());
+		String header = String.join(processorTestEnv.getDelimiter(), p.getHeaders());
+		if (header.equals("")){
+			assertEquals(processorTestEnv.getOutput(0).size(), p.getData().size());
+		} else {
+			assertEquals(processorTestEnv.getOutput(1).size(), p.getData().size());
+
+		}
 		assertEquals(processorTestEnv.getSimStates().size(), (int) r.valOfField("lastStep"));
 
 		p.init(processorTestEnv.getManager());

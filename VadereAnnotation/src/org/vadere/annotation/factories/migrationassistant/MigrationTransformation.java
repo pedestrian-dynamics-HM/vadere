@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @FactoryType(
-		factoryClassName = "JoltTransformationFactory",
-		extendedClassName = "JoltTransformationBaseFactory",
-		factoryImports = {"org.vadere.simulator.projects.migration.jolttranformation.JoltTransformationBaseFactory"},
-		factoryPackage = "org.vadere.simulator.projects.migration.jolttranformation"
+		factoryClassName = "JsonTransformationFactory",
+		extendedClassName = "JsonTransformationBaseFactory",
+		factoryImports = {"org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationBaseFactory"},
+		factoryPackage = "org.vadere.simulator.projects.migration.jsontranformation"
 
 )
 public @interface MigrationTransformation {

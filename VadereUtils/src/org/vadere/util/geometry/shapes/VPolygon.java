@@ -2,12 +2,15 @@ package org.vadere.util.geometry.shapes;
 
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.vadere.util.geometry.GeometryUtils;
 
@@ -80,6 +83,25 @@ public class VPolygon extends Path2D.Double implements VShape {
 		List<VPoint> points = getPath();
 		Collections.reverse(points);
 		return GeometryUtils.toPolygon(points);
+	}
+
+	public boolean isRectangular(){
+		Area tmp = new Area(this);
+		return tmp.isRectangular();
+	}
+
+	public VRectangle asVRectangle(){
+		if (!isRectangular())
+			return null;
+
+		// retuns list of points.
+		// width points[0] -- points[1]
+		// height points[0] -- points[3]
+		ArrayList<VPoint> points = new ArrayList<>(getPoints());
+		assert points.size() == 4 : "This is not a VRectangle";
+		double width = points.get(0).distance(points.get(1));
+		double height = points.get(0).distance(points.get(3));
+		return new VRectangle(points.get(0).x, points.get(0).y, width, height);
 	}
 
 	/**
@@ -392,11 +414,20 @@ public class VPolygon extends Path2D.Double implements VShape {
 
 	@Override
 	public double distance(IPoint target) {
-		if (contains(target)) {
-			return -closestPoint(target).distance(target);
-		} else {
-			return closestPoint(target).distance(target);
+		try {
+			if (contains(target)) {
+				return -closestPoint(target).distance(target);
+			} else {
+				return closestPoint(target).distance(target);
+			}
+		} catch (NullPointerException ex) {
+			if (contains(target)) {
+				return -closestPoint(target).distance(target);
+			} else {
+				return closestPoint(target).distance(target);
+			}
 		}
+
 	}
 
 	@Override
@@ -447,6 +478,60 @@ public class VPolygon extends Path2D.Double implements VShape {
 		}
 
 		return resultPoint;
+	}
+
+	@Override
+	public Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r) {
+		double currentMinDistance = java.lang.Double.MAX_VALUE;
+		VPoint resultPoint = null;
+
+		PathIterator iterator = this.getPathIterator(null);
+
+		double[] first = null;
+		double[] last = new double[2];
+		double[] next = new double[2];
+		VPoint currentIntersectionPoint;
+
+		iterator.currentSegment(next);
+		iterator.next();
+
+		while (!iterator.isDone()) {
+			last[0] = next[0];
+			last[1] = next[1];
+
+			if(first == null) {
+				first = new double[]{last[0], last[1]};
+			}
+
+			iterator.currentSegment(next);
+			VLine line = new VLine(last[0], last[1], next[0], next[1]);
+			if(GeometryUtils.intersectLine(line, q1, q2)) {
+				currentIntersectionPoint = GeometryUtils.lineIntersectionPoint(new VLine(last[0],
+						last[1], next[0], next[1]), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+
+				if (currentIntersectionPoint.distance(r) < currentMinDistance) {
+					currentMinDistance = currentIntersectionPoint.distance(r);
+					resultPoint = currentIntersectionPoint;
+				}
+			}
+			iterator.next();
+		}
+
+		// dont forget the last and first point!
+		if(first != null) {
+			VLine line = new VLine(last[0], last[1], next[0], next[1]);
+			if(GeometryUtils.intersectLine(line, q1, q2)) {
+				currentIntersectionPoint = GeometryUtils.lineIntersectionPoint(new VLine(last[0],
+						last[1], next[0], next[1]), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+
+				if (currentIntersectionPoint.distance(r) < currentMinDistance) {
+					currentMinDistance = currentIntersectionPoint.distance(r);
+					resultPoint = currentIntersectionPoint;
+				}
+			}
+		}
+
+		return Optional.ofNullable(resultPoint);
 	}
 
 	@Override

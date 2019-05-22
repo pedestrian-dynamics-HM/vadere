@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor;
 import org.vadere.state.attributes.processor.AttributesPedestrianFlowProcessor;
 import org.vadere.state.scenario.Pedestrian;
@@ -14,48 +14,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
+import static junit.framework.TestCase.fail;
+
 public class PedestrianFlowProcessorTestEnv extends ProcessorTestEnv<TimestepPedestrianIdKey, Double> {
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 	private DataProcessor pedDensCountProc;
 
-	@SuppressWarnings("unchecked")
 	PedestrianFlowProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianFlowProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(PedestrianFlowProcessor.class, TimestepPedestrianIdKey.class);
+	}
 
+	@Override
+	void initializeDependencies() {
+		int pedDensCountProcId = addDependentProcessor(PedestrianDensityCountingProcessorTestEnv::new);
+		pedDensCountProc = getProcessorById(pedDensCountProcId);
+		if (pedDensCountProc == null)
+			fail("Faild in initializeDependencies: No Processor found for id " + pedDensCountProcId);
+
+		int pedVelProcId = addDependentProcessor(PedestrianVelocityProcessorTestEnv::new);
 		AttributesPedestrianFlowProcessor attr =
 				(AttributesPedestrianFlowProcessor) testedProcessor.getAttributes();
-
-		int pedDensCountProcId = nextProcessorId();
-		int pedVelProcId = nextProcessorId();
 		attr.setPedestrianDensityProcessorId(pedDensCountProcId);
 		attr.setPedestrianVelocityProcessorId(pedVelProcId);
-
-		PedestrianDensityCountingProcessorTestEnv pedDensCountProcEnv =
-				new PedestrianDensityCountingProcessorTestEnv(pedDensCountProcId);
-		pedDensCountProc = pedDensCountProcEnv.getTestedProcessor();
-		PedestrianVelocityProcessorTestEnv pedVelProcEnv =
-				new PedestrianVelocityProcessorTestEnv(pedVelProcId);
-		DataProcessor pedVelProc = pedVelProcEnv.getTestedProcessor();
-		Mockito.when(manager.getProcessor(pedDensCountProcId)).thenReturn(pedDensCountProc);
-		Mockito.when(manager.getProcessor(pedVelProcId)).thenReturn(pedVelProc);
-		addRequiredProcessors(pedVelProcEnv);
-		addRequiredProcessors(pedDensCountProcEnv);
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepPedestrianIdKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
 
 	}
 

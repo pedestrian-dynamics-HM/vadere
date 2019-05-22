@@ -6,6 +6,8 @@
 
 ### Added
 
+- Scenario elements like obstacles and targets can now be resized using the mouse in the topography creator tab (first, select element via left-click and then move mouse to one of its edges to get the resize handles).
+- Draw also Voronoi diagram in `TikeGenerator`.
 - Added new scenario element `AbsorbingArea` to absorb agents immediately.
   * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
   * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
@@ -67,6 +69,7 @@
   * vadere.jar -> vadere-gui.jar
   * postvis.jar -> vadere-postvis.jar
   * vadere-console.jar -> remained unchanged
+- Header in output file have now the following form "[NAME]-PID[ID]". This avoids name conflicts and makes mapping to the relevant processor easy and fast.
 - Migration to Java 11 (OpenJDK).
 - Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
   **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build. 

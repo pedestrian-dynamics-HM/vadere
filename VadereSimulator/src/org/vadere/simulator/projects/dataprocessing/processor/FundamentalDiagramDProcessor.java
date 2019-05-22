@@ -6,9 +6,13 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.util.factory.processors.Flag;
+
+import java.util.List;
 
 /**
  * <p>This processor computes the fundamental diagram by computing at a certain time the
@@ -24,7 +28,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  {
+public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double, Double>>  implements UsesMeasurementArea {
 
 	private IntegralVoronoiAlgorithm integralVoronoiAlgorithm;
 	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
@@ -38,7 +42,13 @@ public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double,
 		super.init(manager);
 		AttributesFundamentalDiagramDProcessor att = (AttributesFundamentalDiagramDProcessor) this.getAttributes();
 		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
-		integralVoronoiAlgorithm = new IntegralVoronoiAlgorithm(key -> pedestrianVelocityProcessor.getValue(key), att.getMeasurementArea(), att.getVoronoiArea());
+		MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+		MeasurementArea voronoiMeasurementArea = manager.getMeasurementArea(att.getVoronoiMeasurementAreaId(), true);
+
+		integralVoronoiAlgorithm = new IntegralVoronoiAlgorithm(
+				key -> pedestrianVelocityProcessor.getValue(key),
+				measurementArea,
+				voronoiMeasurementArea);
 	}
 
 	@Override
@@ -64,5 +74,12 @@ public class FundamentalDiagramDProcessor extends AreaDataProcessor<Pair<Double,
 	@Override
 	public String[] toStrings(@NotNull final TimestepKey key) {
 		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
+	}
+
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesFundamentalDiagramDProcessor att = (AttributesFundamentalDiagramDProcessor) this.getAttributes();
+		return new int[]{att.getVoronoiMeasurementAreaId(), att.getMeasurementAreaId()};
 	}
 }

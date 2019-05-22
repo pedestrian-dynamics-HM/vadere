@@ -47,7 +47,9 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 			while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 				pedestrian.updateNextPosition();
+				double stepDuration = pedestrian.getDurationNextStep();
 				osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
+				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 			}
 
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {

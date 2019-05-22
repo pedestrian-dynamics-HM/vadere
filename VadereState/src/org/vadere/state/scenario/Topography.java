@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -95,6 +96,9 @@ public class Topography implements DynamicElementMover{
 	/** Used to store links to all attributes that are not part of scenario elements. */
 	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
+	/** set dynamicElementIds to values bigger than the biggest initial element to ensure unique ids.**/
+	private AtomicInteger dynamicElementIdCounter;
+
 	public Topography(
 			AttributesTopography attributes,
 			AttributesAgent attributesPedestrian,
@@ -135,7 +139,7 @@ public class Topography implements DynamicElementMover{
 		recomputeCells = false;
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
-		
+		this.dynamicElementIdCounter = new AtomicInteger(1);
 	}
 
 	/** Clean up a set by removing {@code null}. */
@@ -247,6 +251,10 @@ public class Topography implements DynamicElementMover{
 		throw new IllegalArgumentException("Class " + elementType + " does not have a container.");
 	}
 
+	private boolean checkDynamicElementIdExist(int id){
+		return pedestrians.idExists(id) || cars.idExists(id);
+	}
+
 	public <T extends DynamicElement> LinkedCellsGrid<T> getSpatialMap(Class<T> elementType) {
 		return getContainer(elementType).getCellsElements();
 	}
@@ -272,6 +280,39 @@ public class Topography implements DynamicElementMover{
 	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
+	}
+
+	/**
+	 * The counter does not represent the total number of pedestrians. If initial pedestrians exist
+	 * @return next free Id for a pedestrian.
+	 */
+	public int getNextDynamicElementId(){
+		int nextId = this.dynamicElementIdCounter.get();
+		assert !checkDynamicElementIdExist(nextId): "Same dynamicElementId issued twice!";
+		dynamicElementIdCounter.incrementAndGet();
+		return nextId;
+	}
+
+	/**
+	 * This is called for initial pedestrians to set their Ids. If the id equals AttributesAgent.ID_NOT_SET (-1)
+	 * a real id is used. Otherwise the fixedId value is used.
+	 *
+	 * @param fixedId	fixedId Id for a pedestrian. If this id is free use it. If not genrate a new one.
+	 * @return				free Id. May be requestedId if it was free.
+	 */
+	public int getNextDynamicElementId(int fixedId){
+		assert !checkDynamicElementIdExist(fixedId): "Same dynamicElementId issued twice!";
+		return fixedId;
+	}
+
+	/**
+	 * Initialize dynamicElementIdCounter based on initial pedestrians placed in the topography.
+	 * To prevent duplicated ids later on in the simulation.
+	 */
+	public void initializePedestrianCount() {
+		int maxIdUsed  = pedestrians.getElements().stream().mapToInt(Pedestrian::getId).max().orElse(0);
+		this.dynamicElementIdCounter.set(maxIdUsed + 1);
+		logger.info(String.format("Set PedestrianIdCount to start value: %d", this.dynamicElementIdCounter.get()));
 	}
 
 	public boolean isRecomputeCells() {
@@ -307,6 +348,10 @@ public class Topography implements DynamicElementMover{
 	}
 
 	public List<MeasurementArea> getMeasurementAreas() {return  measurementAreas; }
+
+	public MeasurementArea getMeasurementArea(int id){
+		return measurementAreas.stream().filter(area -> area.getId() == id).findFirst().orElse(null);
+	}
 
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;

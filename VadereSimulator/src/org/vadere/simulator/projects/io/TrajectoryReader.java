@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.io;
 import org.apache.commons.math3.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -65,6 +66,8 @@ public class TrajectoryReader {
 	private int groupSizeIndex;
 	private int stridesIndex;
 
+	private static final int notSetColumnIndexIdentifier = -1;
+
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
 	}
@@ -98,18 +101,29 @@ public class TrajectoryReader {
 		stridesKeys.add("strides");
 		stridesKeys.add("footSteps");
 
-		pedIdIndex = -1;
-		stepIndex = -1;
-		xIndex = -1;
-		yIndex = -1;
-		targetIdIndex = -1;
-		groupIdIndex = -1;
-		groupSizeIndex = -1;
-		stridesIndex = -1;
-
+		pedIdIndex = notSetColumnIndexIdentifier;
+		stepIndex = notSetColumnIndexIdentifier;
+		xIndex = notSetColumnIndexIdentifier;
+		yIndex = notSetColumnIndexIdentifier;
+		targetIdIndex = notSetColumnIndexIdentifier;
+		groupIdIndex = notSetColumnIndexIdentifier;
+		groupSizeIndex = notSetColumnIndexIdentifier;
+		stridesIndex = notSetColumnIndexIdentifier;
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
+		checkFile();
+		return readStandardTrajectoryFile();
+	}
+
+	private void errorWhenNotUniqueColumn(int currentValue, String columnName) throws IOException{
+		if(currentValue != notSetColumnIndexIdentifier){
+			throw new IOException("The header " + columnName + " is not unique in the file. This is likely to have " +
+					     "unwanted side effects");
+		}
+	}
+
+	public void checkFile () throws IOException {
 		// 1. Get the correct column
 		String header;
 		//read only first line.
@@ -119,51 +133,58 @@ public class TrajectoryReader {
 		String[] columns = header.split(SPLITTER);
 
 		for (int index = 0; index < columns.length; index++) {
-			if (pedestrianIdKeys.contains(columns[index])) {
+
+			// header name without processor ID
+			String headerName = columns[index].split(OutputFile.headerProcSep)[0];
+
+			if (pedestrianIdKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(pedIdIndex, headerName);
 				pedIdIndex = index;
-			} else if (stepKeys.contains(columns[index])) {
+			} else if (stepKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(stepIndex, headerName);
 				stepIndex = index;
-			} else if (xKeys.contains(columns[index])) {
+			} else if (xKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(xIndex, headerName);
 				xIndex = index;
-			} else if (yKeys.contains(columns[index])) {
+			} else if (yKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(yIndex, headerName);
 				yIndex = index;
-			} else if (targetIdKeys.contains(columns[index])) {
+			} else if (targetIdKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(targetIdIndex, headerName);
 				targetIdIndex = index;
-			} else if (groupIdKeys.contains(columns[index])){
+			} else if (groupIdKeys.contains(headerName)){
+				errorWhenNotUniqueColumn(groupIdIndex, headerName);
 				groupIdIndex = index;
 			}
-			else if (groupSizeKeys.contains(columns[index])){
+			else if (groupSizeKeys.contains(headerName)){
+				errorWhenNotUniqueColumn(groupSizeIndex, headerName);
 				groupSizeIndex = index;
 			}
-			else if(stridesKeys.contains(columns[index])) {
+			else if(stridesKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(stridesIndex, headerName);
 				stridesIndex = index;
 			}
 		}
-		try {
-			if (pedIdIndex != -1 && xIndex != -1 && yIndex != -1 && stepIndex != -1) {
-				// load default values with no groups
-				return readStandardTrajectoryFile();
-			}
-			else {
-				throw new IOException("could not read trajectory file, some colums are missing.");
-			}
-		} catch (Exception e) {
-			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
-			throw e;
-		}
 
+		if (! (pedIdIndex != notSetColumnIndexIdentifier && xIndex != notSetColumnIndexIdentifier &&
+				yIndex != notSetColumnIndexIdentifier && stepIndex != notSetColumnIndexIdentifier)) {
+			// load default values with no groups
+			throw new IOException(String.format("All columns with " + notSetColumnIndexIdentifier + " value could " +
+							"not be found in the trajectory file pedIdIndex=%d, x-values=%d, y-values=%d, step " +
+							"values=%d", pedIdIndex, xIndex, yIndex, stepIndex));
+		}
 	}
 
 	private Map<Step, List<Agent>> readStandardTrajectoryFile() throws IOException {
 		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
 			return in.lines()                                       // a stream of lines
 					.skip(1)                                        // skip the first line i.e. the header
-					.map(line -> split(line))              // split the line into string tokens
+					.map(line -> split(line))                       // split the line into string tokens
 					.map(rowTokens -> parseRowTokens(rowTokens))    // transform those tokens into a pair of java objects (step, agent)
 					.collect(Collectors.groupingBy(Pair::getKey,    // group all agent objects by the step.
 							Collectors.mapping(Pair::getValue, Collectors.toList())));
 		} catch (Exception e){
-			logger.warn("could not read trajectory file. The file format might not be compatible or it is missing.");
+			logger.warn("Could not read trajectory file. The file format might not be compatible or it is missing.");
 			throw e;
 		}
 	}

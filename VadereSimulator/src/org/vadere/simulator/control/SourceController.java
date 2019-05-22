@@ -2,6 +2,7 @@ package org.vadere.simulator.control;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Agent;
@@ -177,10 +178,10 @@ public abstract class SourceController {
 		Agent result;
 		switch (sourceAttributes.getDynamicElementType()) {
 			case PEDESTRIAN:
-				result = (Agent) dynamicElementFactory.createElement(position, 0, Pedestrian.class);
+				result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
 				break;
 			case CAR:
-				result = (Agent) dynamicElementFactory.createElement(position, 0, Car.class);
+				result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Car.class);
 				break;
 			default:
 				throw new IllegalArgumentException("The controller's source has an unsupported element type: "

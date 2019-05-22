@@ -1,15 +1,5 @@
 package org.vadere.gui.topographycreator.model;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observer;
-import java.util.function.Predicate;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
@@ -25,6 +15,16 @@ import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observer;
+import java.util.function.Predicate;
 
 
 /**
@@ -353,6 +353,13 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	public void translateElements(final double dx, final double dy) {
 		topographyBuilder.translateElements(dx, dy);
 		setChanged();
+	}
+
+	@Override
+	public VShape resize(final Point start, final Point end) {
+		VPoint startVector = translateVectorCoordinates(start);
+		VPoint endVector = translateVectorCoordinates(end);
+		return getSelectedElement().getShape().resize(startVector, endVector);
 	}
 
 	@Override

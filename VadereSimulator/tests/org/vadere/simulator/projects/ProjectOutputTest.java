@@ -3,12 +3,12 @@ package org.vadere.simulator.projects;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationOptions;
+import org.vadere.simulator.utils.reflection.TestResourceHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -25,19 +24,37 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class ProjectOutputTest {
+public class ProjectOutputTest implements TestResourceHandler {
 
 	private VadereProject project;
 	private ProjectOutput projectOutput;
 
+
+	@Override
+	public Path getTestDir() {
+		Path path = null;
+		try {
+			path = Paths.get(getClass().getResource("/data/simpleProject").toURI());
+		} catch (URISyntaxException e) {
+			fail("Test resources not found");
+		}
+		return path;
+	}
+
 	@Before
 	public void setup() throws URISyntaxException, IOException {
-		Path projectPath = Paths.get(getClass().getResource("/data/simpleProject").toURI());
+		backupTestDir();
+		Path projectPath = getTestDir();
 		project = IOVadere.readProject(projectPath.toString());
 		projectOutput = new ProjectOutput(project);
 	}
 
+	@After
+	public void after(){
+		loadFromBackup();
+	}
 
 	@Test
 	public void getAllOutputDirs() throws Exception {
@@ -72,17 +89,17 @@ public class ProjectOutputTest {
 		projectOutput.update();
 		assertFalse(projectOutput.getSimulationOutput("testOutput2").isPresent());
 		assertFalse(Files.exists(project.getOutputDir().resolve("testOutput2")));
-
-		//cleanup
-		Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
-		FileUtils.copyDirectoryToDirectory(backup.toFile(), project.getOutputDir().toFile());
-		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("corrupt/testOutput2").toFile());
+//
+//		//cleanup
+//		Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
+//		FileUtils.copyDirectoryToDirectory(backup.toFile(), project.getOutputDir().toFile());
+//		IOOutput.deleteOutputDirectory(project.getOutputDir().resolve("corrupt/testOutput2").toFile());
 	}
 
 	@Test
 	public void bi(){
 		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
-//		System.out.println(m.convertFile());
+//		System.out.println(m.migrateScenarioFile());
 	}
 	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 
@@ -105,4 +122,5 @@ public class ProjectOutputTest {
 		VadereProject proj = new VadereProject("test", new LinkedList<>());
 		assertNotNull(proj.getProjectOutput());
 	}
+
 }

@@ -1,21 +1,25 @@
 package org.vadere.util.geometry.shapes;
 
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.vadere.util.geometry.shapes.ShapeType;
+import java.util.Optional;
 
 /**
  * Geometric shape and position.
  */
 public interface VShape extends Shape, Cloneable {
+
+	double BORDER_TOLERANCE = 0.1;
+
 	double distance(IPoint point);
 
 	VPoint closestPoint(IPoint point);
+
+	Optional<VPoint> getClosestIntersectionPoint(VPoint q1, VPoint q2, VPoint r);
 
 	boolean contains(IPoint point);
 
@@ -24,6 +28,28 @@ public interface VShape extends Shape, Cloneable {
 	VShape translatePrecise(final IPoint vector);
 
 	VShape scale(final double scalar);
+
+
+
+	default boolean atBorder(final VPoint point){
+		VShape circle = new VCircle(new VPoint(point.getX(), point.getY()), BORDER_TOLERANCE);
+		return intersects(circle) && !containsShape(circle);
+	}
+
+	default VShape resize(final IPoint start, final IPoint end){
+		double startDistance = distanceToCenter(start);
+		double endDistance = distanceToCenter(end);
+		VPoint center = this.getCentroid();
+		VShape scaled = this.scale(endDistance / startDistance);
+		return scaled.translatePrecise(center.subtract(scaled.getCentroid()));
+	}
+
+	default double distanceToCenter(final IPoint point){
+		final int squareExponent = 2;
+		double deltaXSquared = Math.pow(point.getX() - this.getCentroid().getX(), squareExponent);
+		double deltaYSquared = Math.pow(point.getY() - this.getCentroid().getY(), squareExponent);
+		return Math.sqrt(deltaXSquared + deltaYSquared);
+	}
 
 	boolean intersects(VLine intersectingLine);
 
@@ -97,5 +123,17 @@ public interface VShape extends Shape, Cloneable {
 		Area thisShapeCpy = new Area(this);
 		thisShape.subtract(otherShape);
 		return !thisShape.equals(thisShapeCpy);
+	}
+
+	default int getDirectionalCode(Point startPoint, int directions) {
+		return getDirectionalCode(new VPoint(startPoint), directions);
+	}
+
+	default int getDirectionalCode(IPoint startPoint, int directions) {
+		VPoint direction = new VPoint(startPoint).subtract(getCentroid());
+		double angle = Math.atan(direction.getY() / direction.getX());
+		angle += Math.PI + Math.PI / (directions);
+		double indexRatio = (angle) / (2 * Math.PI);
+		return (int)(indexRatio * directions);
 	}
 }

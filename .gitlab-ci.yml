@@ -33,9 +33,9 @@ variables:
 #   (i.e.,the virtual machines). We have to track that!
 stages:
     - unit_test
-    - deploy
     - integration_test
     - seed_test
+    - deploy
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
 #
@@ -70,7 +70,7 @@ stages:
     artifacts:
         when: on_failure
         paths:
-            - "log_dir"
+            - "vadere_logs"
         expire_in: 1 week
     when: on_success
 
@@ -79,7 +79,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
     only:
         refs:
@@ -91,7 +91,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} CHANGELOG.md README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
     # Run job only for "tags" (usually on the "stable" branch). Watch out: Multiple "only" tags are ORed together.
     # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/27818
@@ -104,7 +104,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
     when: manual
 

@@ -1,7 +1,7 @@
 {
   "name" : "rimea_06_corner",
   "description" : "",
-  "release" : "0.7",
+  "release" : "0.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -25,13 +25,7 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
       "attributes" : {
-        "waitingArea" : {
-          "x" : 1.0,
-          "y" : 3.0,
-          "width" : 9.5,
-          "height" : 10.5,
-          "type" : "RECTANGLE"
-        }
+        "waitingAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
@@ -171,7 +165,16 @@
         },
         "id" : -1
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 1.0,
+          "y" : 3.0,
+          "width" : 9.5,
+          "height" : 10.5,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -213,7 +216,73 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
-      "dynamicElements" : [ ],
+      "dynamicElements" : [ {
+        "source" : null,
+        "targetIds" : [ ],
+        "position" : {
+          "x" : 5.7,
+          "y" : 2.2
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "nextTargetListIndex" : 0,
+        "freeFlowSpeed" : 1.420734624122518,
+        "attributes" : {
+          "id" : -1,
+          "radius" : 0.195,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0
+        },
+        "idAsTarget" : -1,
+        "modelPedestrianMap" : { },
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "type" : "PEDESTRIAN",
+        "groupSizes" : [ ]
+      }, {
+        "source" : null,
+        "targetIds" : [ ],
+        "position" : {
+          "x" : 6.3,
+          "y" : 1.6
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "nextTargetListIndex" : 0,
+        "freeFlowSpeed" : 1.2304233694270243,
+        "attributes" : {
+          "id" : -1,
+          "radius" : 0.195,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0
+        },
+        "idAsTarget" : -1,
+        "modelPedestrianMap" : { },
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "groupIds" : [ ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "type" : "PEDESTRIAN",
+        "groupSizes" : [ ]
+      } ],
       "attributesPedestrian" : {
         "radius" : 0.195,
         "densityDependentSpeed" : false,

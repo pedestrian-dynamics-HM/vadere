@@ -7,6 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFileFactory;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriter;
+import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
 import org.vadere.simulator.utils.reflection.ReflectionHelper;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
@@ -43,7 +45,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	/**
 	 * Factories
 	 */
-	DataProcessorFactory processorFactory;
+	org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory processorFactory;
 	OutputFileFactory outputFileFactory;
 	/**
 	 * Needed for DataProcessor doUpdate call. (mocked)
@@ -59,19 +61,93 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	private List<ProcessorTestEnv> requiredProcessors;
 	private String delimiter;
 
+	/**
+	 * Needed to access class of K in a type safe manner.
+	 */
+	private final Class<K> dataKeyType;
+	/**
+	 * Needed to access class of testedProcessor in a type safe manner.
+	 */
+	private final Class<? extends DataProcessor> testedProcessorClass;
 
-	ProcessorTestEnv() {
-		manager = mock(ProcessorManager.class, Mockito.RETURNS_DEEP_STUBS);
-		states = new ArrayList<>();
-		nextProcessorId = 1;
-		expectedOutput = new HashMap<>();
-		new ArrayList<>();
-		delimiter = " ";
-		testedProcessor = null;
-		outputFile = null;
-		requiredProcessors = new LinkedList<>();
-		processorFactory = DataProcessorFactory.instance();
-		outputFileFactory = OutputFileFactory.instance();
+	ProcessorTestEnv(Class<? extends DataProcessor> testedProcessorClass, Class<K> dataKeyType) {
+		this(testedProcessorClass, dataKeyType, 1);
+	}
+
+	ProcessorTestEnv(Class<? extends DataProcessor> testedProcessorClass, Class<K> dataKeyType, int nextProcessorId) {
+		this.testedProcessorClass = testedProcessorClass;
+		this.dataKeyType = dataKeyType;
+		this.manager = mock(ProcessorManager.class, Mockito.RETURNS_DEEP_STUBS);
+		this.states = new ArrayList<>();
+		this.nextProcessorId = nextProcessorId;
+		this.expectedOutput = new HashMap<>();
+		this.delimiter = " ";
+		this.testedProcessor = null;
+		this.outputFile = null;
+		this.requiredProcessors = new LinkedList<>();
+		this.processorFactory = org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFactory.instance();
+		this.outputFileFactory = OutputFileFactory.instance();
+
+		// create processor under test an set processor id.
+		initializeTestedProcessor();
+		// add all dependencies such as other processors or measurement areas.
+		initializeDependencies();
+		// change writer in output file to use a StringWriter instead of a file writer.
+		initializeOutputFile();
+
+	}
+
+
+	void initializeTestedProcessor() {
+		try {
+			testedProcessor = processorFactory.createDataProcessor(testedProcessorClass);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		testedProcessor.setId(nextProcessorId());
+	}
+
+	void initializeDependencies() {
+		// default no dependencies. Override to add new ones.
+	}
+
+	void initializeOutputFile() {
+		try {
+			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
+					getDataKeyType(),
+					testedProcessor.getId()
+			);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+	}
+
+	@SuppressWarnings("unchecked")
+	int addDependentProcessor(Function<Integer, ProcessorTestEnv<?, ?>> envProducer) {
+		int id = nextProcessorId();
+		ProcessorTestEnv<?, ?> env = envProducer.apply(id);
+		DataProcessor processor = env.getTestedProcessor();
+		Mockito.when(manager.getProcessor(id)).thenReturn(processor);
+		addRequiredProcessors(env);
+
+		// if dependency also has dependencies ensure that no id is used twice.
+		if (env.nextProcessorId > this.nextProcessorId)
+			this.nextProcessorId = env.nextProcessorId + 1;
+
+		return id;
+	}
+
+	public Class<K> getDataKeyType() {
+		return this.dataKeyType;
+	}
+
+	DataProcessor<?, ?> getProcessorById(int id) {
+		for (ProcessorTestEnv env : requiredProcessors) {
+			if (env.getTestedProcessor().getId() == id)
+				return env.getTestedProcessor();
+		}
+		return null;
 	}
 
 	/**
@@ -160,9 +236,13 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	}
 
 	List<String> getOutput() throws NoSuchFieldException, IllegalAccessException {
+		return getOutput(1);
+	}
+
+	List<String> getOutput(int fromLine) throws NoSuchFieldException, IllegalAccessException {
 		ReflectionHelper r = ReflectionHelper.create(outputFile);
 		VadereStringWriter writer = r.valOfField("writer");
-		return writer.getOutput().subList(1, writer.getOutput().size());
+		return writer.getOutput().subList(fromLine, writer.getOutput().size());
 	}
 
 	String getHeader() throws NoSuchFieldException, IllegalAccessException {

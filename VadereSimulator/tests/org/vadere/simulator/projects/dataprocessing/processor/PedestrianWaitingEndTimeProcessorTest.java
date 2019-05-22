@@ -24,7 +24,6 @@ public class PedestrianWaitingEndTimeProcessorTest extends ProcessorTest {
 		assertInit(p);
 		AttributesPedestrianWaitingEndTimeProcessor attr =
 				(AttributesPedestrianWaitingEndTimeProcessor) p.getAttributes();
-		assertEquals(attr.getWaitingArea(), r.valOfField("waitingArea"));
 
 		for (SimulationState s : processorTestEnv.getSimStates()) {
 			p.update(s);

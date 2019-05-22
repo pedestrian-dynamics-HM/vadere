@@ -34,6 +34,16 @@ __pycache__/
 Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
 Tools/VadereAnalysisTools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
+# Jupyter Notebooks
+**/.ipynb_checkpoints
+
+#model test output
+VadereModelTests/**/output
+VadereModelTests/*_private
+VadereModelCalibration/**/output
+VadereModelTests/**/legacy
+VadereUtils/output/**
+VadereModelTests/*_private
 
 # Operating system files
 .DS_Store

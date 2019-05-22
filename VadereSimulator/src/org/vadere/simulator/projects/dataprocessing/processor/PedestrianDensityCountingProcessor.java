@@ -7,7 +7,8 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 
 /**
  * @author Mario Teixeira Parente
- *
+ * This processor counts the density for each pedestrian (density per pedestrian id) by counting pedestrians that are
+ * in 'radius'. To count pedestrians in a measurement area look at AreaDensityCountingProcessor.
  */
 @DataProcessorClass()
 public class PedestrianDensityCountingProcessor extends PedestrianDensityProcessor {
@@ -28,7 +29,7 @@ public class PedestrianDensityCountingProcessor extends PedestrianDensityProcess
 
     @Override
     public AttributesProcessor getAttributes() {
-        if(super.getAttributes() == null) {
+        if(super.getAttributes() == null || !(super.getAttributes() instanceof AttributesPedestrianDensityCountingProcessor)) {
             setAttributes(new AttributesPedestrianDensityCountingProcessor());
         }
 
