@@ -1,7 +1,8 @@
 {
   "name" : "group_OSM_1Source2Places_noGroups",
   "description" : "",
-  "release" : "0.9",
+  "release" : "0.10",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -80,7 +81,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 1,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -218,7 +220,11 @@
         "speedDistributionStandardDeviation" : 0.0,
         "minimumSpeed" : 0.3,
         "maximumSpeed" : 3.0,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : {

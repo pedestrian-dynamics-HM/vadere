@@ -1,8 +1,10 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.LastFootSteps;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 
@@ -20,7 +22,8 @@ public class Pedestrian extends Agent {
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
-	private Event mostImportantEvent; /** Evaluated in each time step in "CognitionLayer". */
+	private Event mostImportantEvent; /** Evaluated in each time step in "EventCognition". */
+	private SalientBehavior salientBehavior;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	/**
 	 * Footsteps is a list of foot steps a pedestrian made during the duration of one time step.
@@ -36,9 +39,8 @@ public class Pedestrian extends Agent {
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
 
 	// Constructors
-	@SuppressWarnings("unused")
 	private Pedestrian() {
-		// TODO constructor may be required for Jackson?
+		// Default constructor required for JSON de-/serialization.
 		this(new AttributesAgent());
 	}
 
@@ -53,10 +55,11 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		mostImportantEvent = null;
+		salientBehavior = SalientBehavior.TARGET_ORIENTED;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
-		trajectory = new VTrajectory();
+		trajectory = new VTrajectory(attributesAgent.getFootStepsToStore());
 	}
 
 	private Pedestrian(Pedestrian other) {
@@ -66,6 +69,7 @@ public class Pedestrian extends Agent {
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 		mostImportantEvent = other.mostImportantEvent;
+		salientBehavior = other.salientBehavior;
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -79,14 +83,7 @@ public class Pedestrian extends Agent {
 		trajectory = other.trajectory;
 	}
 
-	public void clearFootSteps() {
-		trajectory.clear();
-	}
-
 	// Getter
-	public VTrajectory getFootSteps() {
-		return trajectory;
-	}
 	public int getIdAsTarget() {
 		return this.idAsTarget;
 	}
@@ -97,6 +94,7 @@ public class Pedestrian extends Agent {
 		return isLikelyInjured;
 	}
 	public Event getMostImportantEvent() { return mostImportantEvent; }
+	public SalientBehavior getSalientBehavior() { return salientBehavior; }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -105,6 +103,11 @@ public class Pedestrian extends Agent {
 	@Override
 	public ScenarioElementType getType() {
 		return ScenarioElementType.PEDESTRIAN;
+	}
+
+	// TODO Rename "getFootSteps()" to "getTrajectory()".
+	public VTrajectory getFootSteps() {
+		return trajectory;
 	}
 
 	// Setter
@@ -116,6 +119,7 @@ public class Pedestrian extends Agent {
 		this.isLikelyInjured = likelyInjured;
 	}
 	public void setMostImportantEvent(Event mostImportantEvent) { this.mostImportantEvent = mostImportantEvent; }
+	public void setSalientBehavior(SalientBehavior salientBehavior) { this.salientBehavior = salientBehavior; }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
@@ -135,6 +139,12 @@ public class Pedestrian extends Agent {
 		groupIds.add(groupId);
 		groupSizes.add(size);
 	}
+
+	public void clearFootSteps() {
+		trajectory.clear();
+	}
+
+	// Overridden Methods
 
 	@Override
 	public Pedestrian clone() {

@@ -6,6 +6,9 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.behavior.SalientBehavior;
+import org.vadere.state.events.types.Event;
+import org.vadere.state.events.types.EventFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
@@ -45,6 +48,7 @@ public class TrajectoryReader {
 
 	private static final String SPLITTER = " ";
 	private static Logger logger = Logger.getLogger(IOVadere.class);
+
 	private Path trajectoryFilePath;
 	private AttributesAgent attributesPedestrian;
 	private Set<String> pedestrianIdKeys;
@@ -55,18 +59,24 @@ public class TrajectoryReader {
 	private Set<String> groupIdKeys;
 	private Set<String> groupSizeKeys;
 	private Set<String> stridesKeys;
+	private Set<String> simTimeKeys;
 
+	private Set<String> mostImportantEventKeys;
+	private Set<String> salientBehaviorKeys;
 
 	private int pedIdIndex;
 	private int stepIndex;
+	private int simTimeIndex;
 	private int xIndex;
 	private int yIndex;
 	private int targetIdIndex;
 	private int groupIdIndex;
 	private int groupSizeIndex;
 	private int stridesIndex;
+	private int mostImportantEventIndex;
+	private int salientBehaviorIndex;
 
-	private static final int notSetColumnIndexIdentifier = -1;
+	private static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
 		this(trajectoryFilePath, scenario.getAttributesPedestrian());
@@ -87,12 +97,17 @@ public class TrajectoryReader {
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
 		stridesKeys = new HashSet<>();
+		mostImportantEventKeys = new HashSet<>();
+		salientBehaviorKeys = new HashSet<>();
+		simTimeKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
 		pedestrianIdKeys.add("pedestrianId");
 		stepKeys.add("timeStep");
 		stepKeys.add("step");
+		simTimeKeys.add("simTime");
+		simTimeKeys.add("time");
 		xKeys.add("x");
 		yKeys.add("y");
 		targetIdKeys.add("targetId");
@@ -100,15 +115,20 @@ public class TrajectoryReader {
 		groupSizeKeys.add("groupSize");
 		stridesKeys.add("strides");
 		stridesKeys.add("footSteps");
+		mostImportantEventKeys.add("mostImportantEvent");
+		salientBehaviorKeys.add("salientBehavior");
 
-		pedIdIndex = notSetColumnIndexIdentifier;
-		stepIndex = notSetColumnIndexIdentifier;
-		xIndex = notSetColumnIndexIdentifier;
-		yIndex = notSetColumnIndexIdentifier;
-		targetIdIndex = notSetColumnIndexIdentifier;
-		groupIdIndex = notSetColumnIndexIdentifier;
-		groupSizeIndex = notSetColumnIndexIdentifier;
-		stridesIndex = notSetColumnIndexIdentifier;
+		pedIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		stepIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		simTimeIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		xIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		yIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		targetIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		groupIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		groupSizeIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		stridesIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		mostImportantEventIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		salientBehaviorIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
@@ -117,7 +137,7 @@ public class TrajectoryReader {
 	}
 
 	private void errorWhenNotUniqueColumn(int currentValue, String columnName) throws IOException{
-		if(currentValue != notSetColumnIndexIdentifier){
+		if(currentValue != NOT_SET_COLUMN_INDEX_IDENTIFIER){
 			throw new IOException("The header " + columnName + " is not unique in the file. This is likely to have " +
 					     "unwanted side effects");
 		}
@@ -163,15 +183,25 @@ public class TrajectoryReader {
 			else if(stridesKeys.contains(headerName)) {
 				errorWhenNotUniqueColumn(stridesIndex, headerName);
 				stridesIndex = index;
+			} else if (mostImportantEventKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(mostImportantEventIndex, headerName);
+				mostImportantEventIndex = index;
+			} else if (salientBehaviorKeys.contains(headerName)) {
+				errorWhenNotUniqueColumn(salientBehaviorIndex, headerName);
+				salientBehaviorIndex = index;
+			}
+			else if(simTimeKeys.contains(columns[index])) {
+				simTimeIndex = index;
 			}
 		}
 
-		if (! (pedIdIndex != notSetColumnIndexIdentifier && xIndex != notSetColumnIndexIdentifier &&
-				yIndex != notSetColumnIndexIdentifier && stepIndex != notSetColumnIndexIdentifier)) {
-			// load default values with no groups
-			throw new IOException(String.format("All columns with " + notSetColumnIndexIdentifier + " value could " +
-							"not be found in the trajectory file pedIdIndex=%d, x-values=%d, y-values=%d, step " +
-							"values=%d", pedIdIndex, xIndex, yIndex, stepIndex));
+		if (pedIdIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| xIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| yIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
+				|| stepIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			throw new IOException(String.format("No valid header found in output file: " +
+					"pedIdIndex=%d, x-values=%d, y-values=%d, step values=%d",
+					pedIdIndex, xIndex, yIndex, stepIndex));
 		}
 	}
 
@@ -226,6 +256,7 @@ public class TrajectoryReader {
 	private Pair<Step, Agent> parseRowTokens(@NotNull final String[] rowTokens) {
 		// time step
 		int step = Integer.parseInt(rowTokens[stepIndex]);
+		double simTime = 0.0;
 
 		// pedestrian id
 		int pedestrianId = Integer.parseInt(rowTokens[pedIdIndex]);
@@ -235,25 +266,39 @@ public class TrajectoryReader {
 		VPoint pos = new VPoint(Double.parseDouble(rowTokens[xIndex]), Double.parseDouble(rowTokens[yIndex]));
 
 		// pedestrian target
-		int targetId = targetIdIndex != -1 ? Integer.parseInt(rowTokens[targetIdIndex]) : -1;
+		int targetId = targetIdIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER ? Integer.parseInt(rowTokens[targetIdIndex]) : NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		ped.setPosition(pos);
 		LinkedList<Integer> targets = new LinkedList<>();
 		targets.addFirst(targetId);
 		ped.setTargets(targets);
 
-		if(groupIdIndex != -1) {
+		if(simTimeIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			simTime = Double.parseDouble(rowTokens[simTimeIndex]);
+		}
+
+		if(groupIdIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			int groupId = Integer.parseInt(rowTokens[groupIdIndex]);
 			int groupSize = groupSizeIndex != -1 ? Integer.parseInt(rowTokens[groupSizeIndex]) : -1;
 			ped.addGroupId(groupId, groupSize);
 		}
 
-		if(stridesIndex != -1) {
+		if(stridesIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			FootStep[] footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
 			for(FootStep footStep : footSteps) {
 				ped.getFootSteps().add(footStep);
 			}
 		}
 
-		return Pair.create(new Step(step), ped);
+		if (mostImportantEventIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			Event mostImportantEvent = EventFactory.stringToEvent(rowTokens[mostImportantEventIndex]);
+			ped.setMostImportantEvent(mostImportantEvent);
+		}
+
+		if (salientBehaviorIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			SalientBehavior salientBehavior = SalientBehavior.valueOf(rowTokens[salientBehaviorIndex]);
+			ped.setSalientBehavior(salientBehavior);
+		}
+
+		return simTimeIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER ? Pair.create(new Step(step), ped) : Pair.create(new Step(step, simTime), ped);
 	}
 }
