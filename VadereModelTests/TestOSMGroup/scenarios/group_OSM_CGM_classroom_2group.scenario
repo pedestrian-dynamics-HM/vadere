@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_classroom_2group",
   "description" : "",
-  "release" : "0.8",
+  "release" : "0.10",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -129,9 +129,9 @@
       "digitsPerCoordinate" : 4,
       "useFixedSeed" : false,
       "fixedSeed" : -8686918998450722109,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : false
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -1283,7 +1283,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : {
@@ -1302,6 +1306,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }
