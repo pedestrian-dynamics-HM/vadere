@@ -7,7 +7,7 @@
 ### Added
 
 - Scenario elements like obstacles and targets can now be resized using the mouse in the topography creator tab (first, select element via left-click and then move mouse to one of its edges to get the resize handles).
-- Draw also Voronoi diagram in `TikeGenerator`.
+- Draw also Voronoi diagram in `TikzGenerator`.
 - Added new scenario element `AbsorbingArea` to absorb agents immediately.
   * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
   * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
