@@ -2,6 +2,7 @@
 
 package org.vadere.simulator.projects.dataprocessing.outputfile;
 
+import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriter;
@@ -54,7 +55,11 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	private boolean isWriteMetaData;
 
 	private String separator;
-	private final static String nameConflictAdd = "-Proc?"; // the # is replaced with the processor id
+
+	// Check also the PostVis where there is a dependency
+	public final static String headerProcSep = "-";
+	public final static String headerNameAdd = headerProcSep + "PID?"; // the # is replaced with the processor id
+
 	private VadereWriterFactory writerFactory;
 	private VadereWriter writer;
 
@@ -129,7 +134,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 		// characters
 		String md = "#IDXCOL=" + dataIndices.length +
 				",DATACOL="+(getEntireHeader().size()-dataIndices.length)+","+
-				"SEP=\'"+ this.separator+"\'";
+				"SEP=\'"+ DataProcessingJsonManager.DEFAULT_SEPARATOR +"\'";
 
 		//Make a list with one element to reuse 'writeLine' function
 		List<String> line = new LinkedList<>();
@@ -166,16 +171,41 @@ public abstract class OutputFile<K extends DataKey<K>> {
 	}
 
 	public String getHeaderLine() {
-		return String.join(this.separator, this.getEntireHeader());
+		return String.join(DataProcessingJsonManager.DEFAULT_SEPARATOR, this.getEntireHeader());
 	}
 
 	public String getIndicesLine() {
-		return String.join(this.separator, this.getIndices());
+		return String.join(DataProcessingJsonManager.DEFAULT_SEPARATOR, this.getIndices());
+	}
+
+	public static String addHeaderProcInfo(String columnName, int procId){
+		return columnName + headerNameAdd.replace("?", "" + procId);
+	}
+
+	private List<String> uniqueHeaderNames(){
+		// This function adds to every header "headerNameAdd", for ALL headers EVERY time
+		// (cmp. headersWithNameMangling)
+		LinkedList<String> headers = new LinkedList<>();
+
+		for (DataProcessor dataProcessor: dataProcessors) {
+			List<String> allProcHeaders = Arrays.asList(dataProcessor.getHeaders());
+
+			for (String singleHeader: allProcHeaders) {
+				// add the processor id to make header unique
+				String adaptedColumnName = OutputFile.addHeaderProcInfo(singleHeader, dataProcessor.getId());
+				headers.addLast(adaptedColumnName);
+			}
+		}
+
+		return headers;
 	}
 
 	private List<String> headersWithNameMangling(){
+		// This function adds to every header "headerNameAdd", ONLY if there is a name conflict detected
+		// (cmp. uniqueHeaderNames)
+
 		LinkedList<String> headers = new LinkedList<>();
-		boolean isNameMangle = false; // assume there is no nameing conflict
+		boolean isNameMangleDetected = false; // assume there is no nameing conflict
 
 		mainloop:
 		for (DataProcessor l: dataProcessors) {
@@ -183,7 +213,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 			for(String el: list) {
 				if(headers.contains(el)){
-					isNameMangle = true;  // conflict found: stop collecting headers
+					isNameMangleDetected = true;  // conflict found: stop collecting and name make every header unique
 					break mainloop;
 				}else{
 					headers.addLast(el);
@@ -191,24 +221,16 @@ public abstract class OutputFile<K extends DataKey<K>> {
 			}
 		}
 
-		if(isNameMangle){
-			headers.clear();  //start from new...
-			for (DataProcessor l: dataProcessors) {
-				List<String> list = Arrays.asList(l.getHeaders());
-
-				for (String h: list) {
-					// ... but now add the processor id
-					headers.addLast(h +
-							nameConflictAdd.replace('?', (char) (l.getId()+'0')));
-				}
-			}
+		if(isNameMangleDetected){
+			headers = (LinkedList<String>) uniqueHeaderNames();
 		}
+
 		return headers;
 	}
 
 	private List<String> composeHeaderLine(){
 		final List<String> allHeaders = new LinkedList<>(Arrays.asList(dataIndices));
-		List<String> procHeaders = this.headersWithNameMangling();
+		List<String> procHeaders = this.uniqueHeaderNames();
 
 		allHeaders.addAll(procHeaders);
 
