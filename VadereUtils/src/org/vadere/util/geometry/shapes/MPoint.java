@@ -34,7 +34,14 @@ public class MPoint implements org.vadere.util.geometry.shapes.IPoint, Cloneable
         return this;
     }
 
-    @Override
+	@Override
+	public IPoint add(double x, double y) {
+		this.point = this.point.add(x, y);
+		hashCode = -1;
+		return this;
+	}
+
+	@Override
     public MPoint addPrecise(final IPoint point) {
         this.point = this.point.addPrecise(point);
 	    hashCode = -1;

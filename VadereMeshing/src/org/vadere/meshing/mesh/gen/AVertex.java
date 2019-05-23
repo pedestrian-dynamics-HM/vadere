@@ -122,6 +122,11 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	}
 
 	@Override
+	public IPoint add(double x, double y) {
+		return point.add(x, y);
+	}
+
+	@Override
 	public IPoint norm(double len) {
 		return point.norm(len);
 	}
