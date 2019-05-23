@@ -87,7 +87,7 @@ public class SettingsDialog extends JDialog {
 
 		// Layout definition for sub panels
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		FormLayout colorLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
 				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
 		colorLayeredPane.setLayout(colorLayout);
@@ -107,6 +107,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowTargets = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargets.text")));
 		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
+		JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
 
@@ -144,6 +145,12 @@ public class SettingsDialog extends JDialog {
 		chShowAbsorbingAreas.setSelected(model.config.isShowAbsorbingAreas());
 		chShowAbsorbingAreas.addItemListener(e -> {
 			model.config.setShowAbsorbingAreas(!model.config.isShowAbsorbingAreas());
+			model.notifyObservers();
+		});
+
+		chShowMeasurementAreas.setSelected(model.config.isShowMeasurementArea());
+		chShowMeasurementAreas.addItemListener(e -> {
+			model.config.setShowMeasurementArea(!model.config.isShowMeasurementArea());
 			model.notifyObservers();
 		});
 
@@ -263,7 +270,8 @@ public class SettingsDialog extends JDialog {
 		additionalLayeredPane.add(chShowSources, cc.xyw(2, 8, 5));
 		additionalLayeredPane.add(chShowStairs, cc.xyw(2, 10, 5));
 		additionalLayeredPane.add(chShowAbsorbingAreas, cc.xyw(2, 12, 5));
-		additionalLayeredPane.add(chShowPedIds, cc.xyw(2, 14, 5));
+		additionalLayeredPane.add(chShowMeasurementAreas, cc.xyw(2, 14, 5));
+		additionalLayeredPane.add(chShowPedIds, cc.xyw(2, 16, 5));
 
 		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
 		chChowLogo.setSelected(model.config.isShowLogo());
@@ -271,19 +279,19 @@ public class SettingsDialog extends JDialog {
 			model.config.setShowLogo(!model.config.isShowLogo());
 			model.notifyObservers();
 		});
-		additionalLayeredPane.add(chChowLogo, cc.xyw(2, 16, 5));
+		additionalLayeredPane.add(chChowLogo, cc.xyw(2, 18, 5));
 
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
-				cc.xy(2, 18));
+				cc.xy(2, 20));
 
 		JTextField tSnapshotDir = new JTextField(
 				Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
 		tSnapshotDir.setEditable(false);
 		tSnapshotDir.setPreferredSize(new Dimension(130, 20));
-		additionalLayeredPane.add(tSnapshotDir, cc.xy(4, 18));
+		additionalLayeredPane.add(tSnapshotDir, cc.xy(4, 20));
 		final JButton bSnapshotDir = new JButton(Messages.getString("SettingsDialog.btnEditSnapshot.text"));
 		bSnapshotDir.addActionListener(new ActionSetSnapshotDirectory("Set Snapshot Directory", model, tSnapshotDir));
-		additionalLayeredPane.add(bSnapshotDir, cc.xy(6, 18));
+		additionalLayeredPane.add(bSnapshotDir, cc.xy(6, 22));
 
 		final JSpinner spinnerCellWidth = new JSpinner();
 		final SpinnerNumberModel sModelCellWidth = new SpinnerNumberModel(model.config.getGridWidth(),
@@ -296,8 +304,8 @@ public class SettingsDialog extends JDialog {
 		});
 
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblCellWidth.text") + ":"),
-				cc.xy(2, 20));
-		additionalLayeredPane.add(spinnerCellWidth, cc.xy(4, 20));
+				cc.xy(2, 22));
+		additionalLayeredPane.add(spinnerCellWidth, cc.xy(4, 22));
 
 		mainPanel.add(getAdditionalOptionPanel(), cc.xy(2, 6));
 

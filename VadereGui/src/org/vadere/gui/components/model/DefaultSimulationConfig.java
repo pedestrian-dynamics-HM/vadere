@@ -118,6 +118,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showAbsorbingAreas;
 	}
 
+	public boolean isShowMeasurementAreas() {
+		return showMeasurementArea;
+	}
+
 	public void setShowTargetPotentielFieldMesh(final boolean showTargetPotentielFieldMesh) {
 		this.showTargetPotentielFieldMesh = showTargetPotentielFieldMesh;
 		setChanged();
