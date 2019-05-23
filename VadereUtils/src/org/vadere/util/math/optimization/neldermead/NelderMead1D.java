@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 /**
  * Implementation of the 1-dimensional Nelder-Mead. The algorithm walks on the circle.
+ * Multiple simplexes can be solved in parallel (default).
  *
  * @author Benedikt Zoennchen
  */
@@ -29,11 +30,6 @@ public class NelderMead1D {
 	 * the step circle
 	 */
 	private final VCircle evalArea;
-
-	/**
-	 * the evaluation function which is optimized.
-	 */
-	private final Function<IPoint, Double> eval;
 
 	/**
 	 * a simplex instance converges if the area of the triangle is smaller than <tt>threshold</tt> and
@@ -79,7 +75,6 @@ public class NelderMead1D {
 	                    @NotNull final Collection<Pair<Double, Double>> simplexes){
 
 		this.evalArea = evalArea;
-		this.eval = eval;
 		this.threshold = threshold;
 		this.simplices = simplexes.stream().map(s -> new Simplex1D(eval, s.getLeft(), s.getRight(), evalArea, minimize, NelderMead2D.MAX_VAL)).collect(Collectors.toList());
 		this.iterationCount = 0;
@@ -101,7 +96,7 @@ public class NelderMead1D {
 		}
 
 		// second run
-		simplices.stream().forEach(s -> s.restart(evalArea.getRadius() / 10.0));
+		/*simplices.stream().forEach(s -> s.restart(evalArea.getRadius() / 10.0));
 
 		iterationCount = 0;
 		while (!hasConverged() && iterationCount < NMAX) {
@@ -113,7 +108,7 @@ public class NelderMead1D {
 			logger.warn("max iteration reached!");
 		}
 
-		logger.debug("iterations: " + overallIterations);
+		logger.debug("iterations: " + overallIterations);*/
 
 	}
 

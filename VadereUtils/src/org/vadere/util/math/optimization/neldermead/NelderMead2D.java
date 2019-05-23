@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 /**
  * Implementation of the 2-dimensional Nelder-Mead.
+ * Multiple simplexes can be solved in parallel (default).
  *
  * @author Benedikt Zoennchen
  */
