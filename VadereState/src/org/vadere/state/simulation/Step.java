@@ -15,6 +15,11 @@ public class Step implements Comparable<Step> {
 		this.simTimeInSec = null;
 	}
 
+	public Step(final int stepNumber, final double simTimeInSec) {
+		this.stepNumber = stepNumber;
+		this.simTimeInSec = simTimeInSec;
+	}
+
 	/**
 	 * Returns an Optional<Double> since the simulation time in seconds may not stored.
 	 * 

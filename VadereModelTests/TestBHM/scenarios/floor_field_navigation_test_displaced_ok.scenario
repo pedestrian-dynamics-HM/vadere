@@ -2,7 +2,6 @@
   "name" : "floor_field_navigation_test_displaced_ok",
   "description" : "",
   "release" : "0.10",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

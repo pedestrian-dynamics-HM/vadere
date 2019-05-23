@@ -59,11 +59,14 @@ public class TrajectoryReader {
 	private Set<String> groupIdKeys;
 	private Set<String> groupSizeKeys;
 	private Set<String> stridesKeys;
+	private Set<String> simTimeKeys;
+
 	private Set<String> mostImportantEventKeys;
 	private Set<String> salientBehaviorKeys;
 
 	private int pedIdIndex;
 	private int stepIndex;
+	private int simTimeIndex;
 	private int xIndex;
 	private int yIndex;
 	private int targetIdIndex;
@@ -96,12 +99,15 @@ public class TrajectoryReader {
 		stridesKeys = new HashSet<>();
 		mostImportantEventKeys = new HashSet<>();
 		salientBehaviorKeys = new HashSet<>();
+		simTimeKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
 		pedestrianIdKeys.add("pedestrianId");
 		stepKeys.add("timeStep");
 		stepKeys.add("step");
+		simTimeKeys.add("simTime");
+		simTimeKeys.add("time");
 		xKeys.add("x");
 		yKeys.add("y");
 		targetIdKeys.add("targetId");
@@ -114,6 +120,7 @@ public class TrajectoryReader {
 
 		pedIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		stepIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		simTimeIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		xIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		yIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		targetIdIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
@@ -183,6 +190,9 @@ public class TrajectoryReader {
 				errorWhenNotUniqueColumn(salientBehaviorIndex, headerName);
 				salientBehaviorIndex = index;
 			}
+			else if(simTimeKeys.contains(columns[index])) {
+				simTimeIndex = index;
+			}
 		}
 
 		if (pedIdIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER
@@ -246,6 +256,7 @@ public class TrajectoryReader {
 	private Pair<Step, Agent> parseRowTokens(@NotNull final String[] rowTokens) {
 		// time step
 		int step = Integer.parseInt(rowTokens[stepIndex]);
+		double simTime = 0.0;
 
 		// pedestrian id
 		int pedestrianId = Integer.parseInt(rowTokens[pedIdIndex]);
@@ -255,35 +266,39 @@ public class TrajectoryReader {
 		VPoint pos = new VPoint(Double.parseDouble(rowTokens[xIndex]), Double.parseDouble(rowTokens[yIndex]));
 
 		// pedestrian target
-		int targetId = targetIdIndex != -1 ? Integer.parseInt(rowTokens[targetIdIndex]) : -1;
+		int targetId = targetIdIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER ? Integer.parseInt(rowTokens[targetIdIndex]) : NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		ped.setPosition(pos);
 		LinkedList<Integer> targets = new LinkedList<>();
 		targets.addFirst(targetId);
 		ped.setTargets(targets);
 
-		if(groupIdIndex != -1) {
+		if(simTimeIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			simTime = Double.parseDouble(rowTokens[simTimeIndex]);
+		}
+
+		if(groupIdIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			int groupId = Integer.parseInt(rowTokens[groupIdIndex]);
 			int groupSize = groupSizeIndex != -1 ? Integer.parseInt(rowTokens[groupSizeIndex]) : -1;
 			ped.addGroupId(groupId, groupSize);
 		}
 
-		if(stridesIndex != -1) {
+		if(stridesIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			FootStep[] footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
 			for(FootStep footStep : footSteps) {
 				ped.getFootSteps().add(footStep);
 			}
 		}
 
-		if (mostImportantEventIndex != -1) {
+		if (mostImportantEventIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			Event mostImportantEvent = EventFactory.stringToEvent(rowTokens[mostImportantEventIndex]);
 			ped.setMostImportantEvent(mostImportantEvent);
 		}
 
-		if (salientBehaviorIndex != -1) {
+		if (salientBehaviorIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			SalientBehavior salientBehavior = SalientBehavior.valueOf(rowTokens[salientBehaviorIndex]);
 			ped.setSalientBehavior(salientBehavior);
 		}
 
-		return Pair.create(new Step(step), ped);
+		return simTimeIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER ? Pair.create(new Step(step), ped) : Pair.create(new Step(step, simTime), ped);
 	}
 }
