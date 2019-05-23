@@ -57,7 +57,6 @@ public abstract class StepCircleOptimizer {
 		}
 	}
 
-
 	protected boolean getComputeMetric(){
 	    return computeMetric;
     }
@@ -70,14 +69,14 @@ public abstract class StepCircleOptimizer {
 		var bruteForceMethod = new StepCircleOptimizerDiscrete(0, new Random());
 
 		VPoint optimalPoint = bruteForceMethod.getNextPosition(pedestrian, getReachablePositions(reachableArea),
-				reachableArea.getRadius());
+				reachableArea.getRadius(), true);
 
 		double optimalFuncValue;  // -1 = invalid number
 		try{
 			optimalFuncValue = potentialEvaluationFunction.getValue(optimalPoint);
 		}catch (Exception e) {
-			Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw error. " +
-                    "Setting value to invalid (-1)");
+			Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation for computing the brute " +
+					"force solution threw error. Setting value to invalid (-1).");
 			optimalFuncValue = -1;
 		}
 
@@ -112,9 +111,9 @@ public abstract class StepCircleOptimizer {
 				null,
 				false,
 				reachableArea,
-				30,
-				5000,
+				100,
+				100000,
 				0,
-				2 * Math.PI);
+				2.0 * Math.PI);
 	}
 }

@@ -1,6 +1,8 @@
 package org.vadere.simulator.models.osm.optimization;
 
+import org.vadere.simulator.projects.dataprocessing.processor.tests.TestOptimizationMetricNelderMeadProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 /**
  * Stores the values of the true solution (which can be computed analytically or by brute force) and the solution that
@@ -33,6 +35,14 @@ public class OptimizationMetric {
 
         this.foundPoint = foundPoint;
         this.foundFuncValue = foundFuncValue;
+
+        if(optimalFuncValue > foundFuncValue){
+            Logger.getLogger(TestOptimizationMetricNelderMeadProcessor.class).warn(
+                    "Found optimal value is better than brute force. This can indicate that the " +
+                            "brute force is not fine grained enough. BRUTE FORCE: " + optimalFuncValue +
+                            " OPTIMIZER: " + foundFuncValue);
+        }
+
     }
 
     public double getSimTime() {

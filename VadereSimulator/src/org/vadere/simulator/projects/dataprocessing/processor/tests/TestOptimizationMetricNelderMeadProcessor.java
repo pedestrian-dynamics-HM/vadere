@@ -36,7 +36,6 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 
 	public TestOptimizationMetricNelderMeadProcessor() {
 		super("test-pedestrianMetricOptimizationProcessor");
-		// TODO: for now there are no Attributes needed, but maybe it is possible to the test cases via attributes?
 		setAttributes(new AttributesTestOptimizationMetricProcessor());
 	}
 
@@ -44,13 +43,13 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 	public void init(@NotNull final ProcessorManager manager) {
 		super.init(manager);
 
-		// will be set by during "doUpdate", because the name is only accessible via the SimualtionState
+		// will be set by during "doUpdate", because the name is only accessible via the SimulationState
 		this.scenarioName = null;
 
 		AttributesTestOptimizationMetricProcessor att = this.getAttributes();
 		pedestrianMetricOptimizationProcessor =
 				(PedestrianMetricOptimizationProcessor) manager.getProcessor(
-						att.getOptimizationMetricNelderMeadProcessor());
+						att.getOptimizationMetricProcessorId());
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 			this.scenarioName = state.getName();
 		}else{
 			if(!this.scenarioName.equals(state.getName())){
-				throw new RuntimeException("This should never happen!");
+				throw new RuntimeException("The scenario name should never get changed during simulation!");
 			}
 		}
 
@@ -80,32 +79,71 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		ArrayList<Double> pointDistanceL2Values = new ArrayList<>();
 		ArrayList<Double> differenceFuncValues = new ArrayList<>();
 
-		for(OptimizationMetric singleMetic : processorData.values()){
+		for(OptimizationMetric singleMetric : processorData.values()){
 
-			pointDistanceL2Values.add(singleMetic.getOptimalPoint().distance(singleMetic.getFoundPoint()));
+			pointDistanceL2Values.add(singleMetric.getOptimalPoint().distance(singleMetric.getFoundPoint()));
 
 			// Insert all values for difference in the function values.
-			if(singleMetic.getOptimalFuncValue() > singleMetic.getFoundFuncValue()){
-				Logger.getLogger(TestOptimizationMetricNelderMeadProcessor.class).warn(
-						"Found optimal value is better than brute force. This can indicate that the " +
-						"brute force is not fine grained enough.");
-			}
-
-			differenceFuncValues.add(singleMetic.getOptimalFuncValue() - singleMetic.getFoundFuncValue());
+			differenceFuncValues.add(singleMetric.getOptimalFuncValue() - singleMetric.getFoundFuncValue());
 		}
 
 		var metricStatistics = computeStatistics(pointDistanceL2Values, differenceFuncValues);
 
+		printStatistics(metricStatistics);
 
-		System.out.println("---------------------------------------------------------------");
-		System.out.println("OUTPUT FROM PedestrianMetricOptimizationProcessor: ");
-		System.out.println("SCENARIO: " + scenarioName);
-		System.out.println("STATISTICS: " + metricStatistics);
-		System.out.println("---------------------------------------------------------------");
+		// TODO: test also that all pedestrian get to the target, this is required for optimization.
 
-		// TODO: later on checks are required
-/*		String msg = invalidEvacuationTimes + "(#invalid evacuation times) <= " + 0;
-		handleAssertion(invalidEvacuationTimes <= 0, msg);*/
+		AttributesTestOptimizationMetricProcessor attr = this.getAttributes();
+		String msg = getCompareValuesString("mean difference in point distance",
+				metricStatistics.get("meanPointDistance"), attr.getMaxMeanPointDistance());
+
+		handleAssertion(metricStatistics.get("meanPointDistance")<=attr.getMaxMeanPointDistance(), msg);
+
+		msg = getCompareValuesString("mean difference in function value",
+				metricStatistics.get("meanDifferenceFuncValue"), attr.getMaxMeanPointDistance());
+		handleAssertion(
+				metricStatistics.get("meanDifferenceFuncValue")<=attr.getMaxMeanDifferenceFuncValue(), msg);
+	}
+
+	private String getCompareValuesString(String valueName, double newValue, double referenceValue){
+		double diff = newValue - referenceValue;
+		String msg;
+
+		if(newValue < referenceValue){
+			msg = "POSITIVE -- The statistics '" + valueName + "' decreased by " + diff
+					+ " (BEFORE:" + referenceValue + " NOW: " + newValue + ")";
+		}else if(newValue > referenceValue){
+			msg = "NEGATIVE -- The statistics '" + valueName + "' increased by " + diff +
+					" (BEFORE:" + referenceValue + " NOW: " + newValue + ")";
+		}else{
+			msg = "NEUTRAL  -- The statistics '" + valueName + "' is equal to the reference value.";
+		}
+		return msg;
+	}
+
+
+	private void printStatistics(HashMap<String, Double> statistics){
+
+		AttributesTestOptimizationMetricProcessor attr = this.getAttributes();
+
+		System.out.println("######################################################################################");
+		System.out.println("######################################################################################");
+		System.out.println("######################################################################################");
+
+		System.out.println("INFORMATION FROM TestOptimizationMetricNelderMeadProcessor");
+		System.out.println();
+
+		System.out.println(getCompareValuesString("minimum point distance", statistics.get("minPointDistanceL2"), attr.getInfoMinPointDistanceL2()));
+		System.out.println(getCompareValuesString("maximum point distance", statistics.get("maxPointDistanceL2"), attr.getInfoMaxPointDistanceL2()));
+		System.out.println(getCompareValuesString("standard deviation point distance", statistics.get("stddevPointDistance"), attr.getInfoStddevPointDistance()));
+
+		System.out.println(getCompareValuesString("minimum function difference", statistics.get("minDifferenceFuncValue"), attr.getInfoMinFuncDifference()));
+		System.out.println(getCompareValuesString("maximum function difference", statistics.get("maxDifferenceFuncValue"), attr.getInfoMaxFuncDifference()));
+		System.out.println(getCompareValuesString("standard deviation function difference", statistics.get("stddevDifferenceFuncValue"), attr.getInfoStddevDifferenceFuncValue()));
+
+		System.out.println("######################################################################################");
+		System.out.println("######################################################################################");
+
 	}
 
 
@@ -150,7 +188,6 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		return statistics;
 
 	}
-
 
 	@Override
 	public AttributesTestOptimizationMetricProcessor getAttributes() {

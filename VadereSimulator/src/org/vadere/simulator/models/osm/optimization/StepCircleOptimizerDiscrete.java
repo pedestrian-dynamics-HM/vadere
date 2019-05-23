@@ -37,10 +37,15 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		double stepSize = ((VCircle) reachableArea).getRadius();
 		List<VPoint> positions = getReachablePositions(pedestrian, (VCircle) reachableArea, random);
 
-		return getNextPosition(pedestrian, positions, stepSize);
+		return getNextPosition(pedestrian, positions, stepSize, false);
 	}
 
-	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, List<VPoint> positions, double stepSize){
+	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, final List<VPoint> positions,
+								  final double stepSize, final boolean bruteForce){
+
+		/*bruteForce gets exactly the best (numerical) position among the tested 'positions' without any side
+		* conditions.
+		* */
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
@@ -49,17 +54,19 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		VPoint nextPos = curPos.clone();
 		double curPosPotential = pedestrian.getPotential(curPos);
 		double potential = curPosPotential;
-		double tmpPotential = 0;
+		double currentPotential = 0;
 
-		for (VPoint tmpPos : positions) {
+		for (VPoint currentPosition : positions) {
 			try {
-				tmpPotential = potentialEvaluationFunction.getValue(tmpPos);
+				currentPotential = potentialEvaluationFunction.getValue(currentPosition);
 
-				if (tmpPotential < potential
-						|| (Math.abs(tmpPotential - potential) <= 0.0001 && random
-						.nextBoolean())) {
-					potential = tmpPotential;
-					nextPos = tmpPos;
+				// DL: it is not exactly clear how this condition works (where is the value 0.0001 coming from?, Why
+				// is there a random boolean?
+				boolean fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
+
+				if (currentPotential < potential || (bruteForce || fineTuneCondition)) {
+					potential = currentPotential;
+					nextPos = currentPosition;
 				}
 			} catch (Exception e) {
 				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an topographyError.");
@@ -67,7 +74,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 		}
 
-		if (curPosPotential - potential <= movementThreshold) {
+		if (bruteForce || curPosPotential - potential <= movementThreshold) {
 			nextPos = curPos;
 		}
 
