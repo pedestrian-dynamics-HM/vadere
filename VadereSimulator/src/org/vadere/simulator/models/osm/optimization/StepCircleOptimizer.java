@@ -48,7 +48,7 @@ public abstract class StepCircleOptimizer {
 	 */
 
 	protected class SolutionPair {
-		/* Data class to store point and function value of either */
+		/* Inner data class to store point and function value. */
 		public final VPoint point;
 		public final double funcValue;
 		public SolutionPair(VPoint point, double funcValue){
@@ -57,14 +57,14 @@ public abstract class StepCircleOptimizer {
 		}
 	}
 
-
-	protected boolean getComputeMetric(){
+	protected boolean getIsComputeMetric(){
 	    return computeMetric;
     }
 
 	private SolutionPair bruteForceOptimalValue(PedestrianOSM pedestrian){
+        //TODO move this function (rename!) to StepCircleOptimizerDiscrete
 
-		var reachableArea = new VCircle( pedestrian.getFreeFlowStepSize() );
+		var reachableArea = new VCircle(pedestrian.getPosition(), pedestrian.getFreeFlowStepSize());
 		var potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 
 		var bruteForceMethod = new StepCircleOptimizerDiscrete(0, new Random());
@@ -100,13 +100,15 @@ public abstract class StepCircleOptimizer {
 		return this.currentMetricValues;
 	}
 
-	public void resetHashMap(){
+	public void clearMetricValues(){
 		this.currentMetricValues = new ArrayList<>();
 	}
 
 	private static List<VPoint> getReachablePositions(VCircle reachableArea){
 		// NOTE: numberPointsOfLargestCircle and numberOfCircles are parameters with a trade off between runtime and
 		// precision of brute force solution
+
+        //TODO move this function (rename!) to StepCircleOptimizerDiscrete
 
 		return GeometryUtils.getDiscDiscretizationPoints(
 				null,

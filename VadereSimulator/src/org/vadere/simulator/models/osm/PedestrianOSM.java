@@ -355,8 +355,9 @@ public class PedestrianOSM extends Pedestrian {
 	}
 
 	public ArrayList<OptimizationMetric> getOptimizationMetricElements(){
+		// Function that can be called by a processor to obtain metric data (PedestrianMetricOptimizationProcessor).
 		var values = this.stepCircleOptimizer.getCurrentMetricValues();
-		this.stepCircleOptimizer.resetHashMap();  // resets
+		this.stepCircleOptimizer.clearMetricValues();
 		return values;
 	}
 

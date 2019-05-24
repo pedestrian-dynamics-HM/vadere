@@ -3,11 +3,8 @@ package org.vadere.simulator.models.osm.optimization;
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
-import org.apache.commons.math.optimization.MultivariateRealOptimizer;
-import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.NelderMead;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -133,7 +130,7 @@ public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 		//logger.info("["+(minimum[0]-pedestrian.getPosition().getX())+","+(minimum[1]-pedestrian.getPosition().getY())+"]");
 		//lastSolution.put(pedestrian, new VPoint(minimum[0]-pedestrian.getPosition().getX(), minimum[1]-pedestrian.getPosition().getY()));
 
-		if(getComputeMetric()){
+		if(getIsComputeMetric()){
 			// See merge request !65
 			this.computeAndAddBruteForceSolutionMetric(pedestrian,
                     new SolutionPair(new VPoint(minimum[0], minimum[1]), minimumValue));
