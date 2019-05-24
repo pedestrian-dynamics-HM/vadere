@@ -1,4 +1,4 @@
-package org.vadere.util.math.pso;
+package org.vadere.util.math.optimization.pso;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;

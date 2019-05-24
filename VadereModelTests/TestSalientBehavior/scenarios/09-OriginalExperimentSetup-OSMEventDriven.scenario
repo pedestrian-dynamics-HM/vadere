@@ -125,7 +125,7 @@
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
+      "useFixedSeed" : false,
       "fixedSeed" : -7548557034348592525,
       "simulationSeed" : 0,
       "useSalientBehavior" : true
@@ -202,9 +202,9 @@
       "sources" : [ {
         "id" : -1,
         "shape" : {
-          "x" : 2.0,
+          "x" : 1.5,
           "y" : 0.5,
-          "width" : 1.0,
+          "width" : 2.0,
           "height" : 0.5,
           "type" : "RECTANGLE"
         },

@@ -46,7 +46,7 @@
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
+        "targetAttractionStrength" : 2.0,
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",

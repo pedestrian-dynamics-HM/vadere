@@ -196,6 +196,11 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		}
 
 		@Override
+		public IPoint add(double x, double y) {
+			return point.add(x, y);
+		}
+
+		@Override
 		public IPoint addPrecise(IPoint point) {
 			return this.point.addPrecise(point);
 		}

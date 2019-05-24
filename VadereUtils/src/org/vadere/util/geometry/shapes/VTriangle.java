@@ -216,6 +216,6 @@ public class VTriangle extends VPolygon {
 
     @Override
     public String toString() {
-        return p1 + "-" + p2 + "-" + p3;
+        return "["+p1 + "," + p2 + "," + p3 + "]";
     }
 }
