@@ -14,6 +14,8 @@ public interface IPoint extends Cloneable {
 
 	IPoint add(final IPoint point);
 
+	IPoint add(final double x, final double y);
+
 	IPoint addPrecise(final IPoint point);
 
 	IPoint subtract(final IPoint point);

@@ -167,6 +167,31 @@ public class GeometryUtils {
 		return circumcenter.distance(point) < circumcenter.distance(p1);
 	}
 
+	public static List<VPoint> getDiscDiscretizationPoints(
+			@NotNull final VCircle circle,
+			final int numberOfCircles,
+			final int numberOfPointsOfLargestCircle,
+			final double anchorAngle,
+			final double angle) {
+		return getDiscDiscretizationPoints(null, false, circle, numberOfCircles, numberOfPointsOfLargestCircle, anchorAngle, angle);
+	}
+
+	public static List<VPoint> getDiscDiscretizationGridPoints(@Nullable final VCircle circle, double edgeLen) {
+		int n = (int)(circle.getRadius() * 2 / edgeLen) + 1;
+		List<VPoint> points = new ArrayList<>(n * n);
+		double x = circle.getCenter().x - circle.getRadius();
+		double y = circle.getCenter().y - circle.getRadius();
+		for (int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				VPoint point = new VPoint(x+i * edgeLen, y+j * edgeLen);
+				if(circle.contains(point)) {
+					points.add(point);
+				}
+			}
+		}
+		return points;
+	}
+
 	/**
 	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
 	 * with the center at the center of the disc and the radius smaller or equals the radius of the disc.
@@ -188,8 +213,8 @@ public class GeometryUtils {
 			final int numberOfPointsOfLargestCircle,
 			final double anchorAngle,
 			final double angle) {
-		assert !varyDirection || random != null;
 
+		assert random != null || !varyDirection;
 		double randOffset = varyDirection ? random.nextDouble() : 0;
 
 		List<VPoint> reachablePositions = new ArrayList<>();
@@ -220,14 +245,6 @@ public class GeometryUtils {
 		return reachablePositions;
 	}
 
-	public static List<VPoint> getDiscDiscretizationPoints(
-			@NotNull final VCircle circle,
-			final int numberOfCircles,
-			final int numberOfPointsOfLargestCircle,
-			final double anchorAngle,
-			final double angle) {
-		return getDiscDiscretizationPoints(null, false, circle, numberOfCircles, numberOfPointsOfLargestCircle, anchorAngle, angle);
-	}
 
 	/**
 	 * Computes the point on the line segment that is closest to the given point
