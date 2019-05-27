@@ -24,6 +24,8 @@ public class OptimizationMetric {
     private VPoint foundPoint;
     private double foundFuncValue;
 
+    private final double tolerance;
+
     public OptimizationMetric(int pedId, double simTime, final VPoint optimalPoint, double optimalFuncValue,
                               final VPoint foundPoint, final double foundFuncValue){
 
@@ -36,14 +38,14 @@ public class OptimizationMetric {
         this.foundPoint = foundPoint;
         this.foundFuncValue = foundFuncValue;
 
-        // TODO: insert tolerance
-        if(optimalFuncValue > foundFuncValue){
+        tolerance = 1E-2;
+
+        if( optimalFuncValue - foundFuncValue > tolerance ){
             Logger.getLogger(TestOptimizationMetricNelderMeadProcessor.class).warn(
                     "Found optimal value is better than brute force. This can indicate that the " +
                             "brute force is not fine grained enough. BRUTE FORCE: " + optimalFuncValue +
                             " OPTIMIZER: " + foundFuncValue);
         }
-
     }
 
     public double getSimTime() {

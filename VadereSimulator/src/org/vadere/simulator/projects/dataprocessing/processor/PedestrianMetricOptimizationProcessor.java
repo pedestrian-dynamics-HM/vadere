@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
+import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
@@ -24,8 +25,11 @@ import java.util.Collection;
 @DataProcessorClass()
 public class PedestrianMetricOptimizationProcessor extends DataProcessor<EventtimePedestrianIdKey, OptimizationMetric>{
 
+    private boolean receivedValues;
+
     public PedestrianMetricOptimizationProcessor() {
         super("optX", "optY", "optFunc", "foundX", "foundY", "foundFunc");
+        receivedValues = false;
     }
 
     @Override
@@ -40,11 +44,21 @@ public class PedestrianMetricOptimizationProcessor extends DataProcessor<Eventti
                 throw new RuntimeException("Pedestrian OptimizationMetric is null. This means that there the " +
                         "configuration is not to measure the quality is not active.");
             }else if (!pedestrianMetrics.isEmpty()) {
+                receivedValues = true;
                 for (OptimizationMetric singleMetric : pedestrianMetrics) {
                     putValue(new EventtimePedestrianIdKey(singleMetric.getSimTime(), singleMetric.getPedId()), singleMetric);
                 }
             } //else (if empty) do nothing, no event occured for this pedestrians in the last simulation step.
 
+        }
+    }
+
+    @Override
+    public void postLoop(final SimulationState state){
+        if(!this.receivedValues){
+            throw new RuntimeException("PedestrianMetricOptimizationProcessor received no values. This can be because" +
+                    "Vadere is not configured to compare to the brute force solution or the selected optimizer does " +
+                    "not support it. (See file StepCircleOptimizer)");
         }
     }
 

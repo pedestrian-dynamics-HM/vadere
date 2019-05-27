@@ -95,7 +95,13 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 			pointDistanceL2Values.add(singleMetric.getOptimalPoint().distance(singleMetric.getFoundPoint()));
 
 			// Insert all values for difference in the function values.
-			differenceFuncValues.add(singleMetric.getOptimalFuncValue() - singleMetric.getFoundFuncValue());
+			differenceFuncValues.add(singleMetric.getFoundFuncValue() - singleMetric.getOptimalFuncValue());
+		}
+
+		if(pointDistanceL2Values.isEmpty() || differenceFuncValues.isEmpty()){
+			throw new NullPointerException("No values to compare. Reasons can be that i) there are no agents in the " +
+					"scenario, ii) the option to compare with the brute force is turned off or iii) or the optimizer " +
+					"does not support setting the OptimizationMetric. ");
 		}
 
 		var metricStatistics = computeStatistics(pointDistanceL2Values, differenceFuncValues);
@@ -125,7 +131,7 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 			msg = "NEGATIVE -- The statistics '" + valueName + "' increased by " + diff +
 					" (BEFORE:" + referenceValue + " NOW: " + newValue + ")";
 		}else{
-			msg = "NEUTRAL  -- The statistics '" + valueName + "' is equal to the reference value.";
+			msg = "NEUTRAL  -- The statistics '" + valueName + "' is equal to the reference value. Value = " + newValue;
 		}
 		return msg;
 	}

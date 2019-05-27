@@ -52,14 +52,26 @@ public class StepCircleOptimizerCircleNelderMead extends StepCircleOptimizer {
 		double twoDimResult = ped.getPotential(point2D);
 		double currentPotential = ped.getPotential(ped.getPosition());
 
+		VPoint resultPoint;
+		double minFuncValue;
+
 		if(oneDimResult < twoDimResult && oneDimResult < currentPotential) {
-			return point1D;
+			minFuncValue = oneDimResult;
+			resultPoint = point1D;
 		} else if(twoDimResult < currentPotential) {
-			return point2D;
+			minFuncValue = oneDimResult;
+			resultPoint = point2D;
 		} else {
-			return ped.getPosition();
+			minFuncValue = currentPotential;
+			resultPoint = ped.getPosition();
 		}
-		//return point2D;
+
+		if(getIsComputeMetric()){
+			// See merge request !65
+			this.computeAndAddBruteForceSolutionMetric(ped, new SolutionPair(resultPoint.clone(), minFuncValue));
+		}
+
+		return resultPoint;
 	}
 
 	private List<Pair<Double, Double>> generate1DSimplexes(@NotNull final PedestrianOSM ped, @NotNull final VCircle stepCircle) {
