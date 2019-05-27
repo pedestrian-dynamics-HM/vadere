@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class AttributesTestOptimizationMetricProcessor extends AttributesTestProcessor {
 
     private int optimizationMetricProcessorId;
+    private int testEvacuationProcessorId;
 
     /** Following have to be fulfilled (i.e. the mean has to be below this. If the mean increases the value, the
      * processor will fail. */
@@ -29,6 +30,10 @@ public class AttributesTestOptimizationMetricProcessor extends AttributesTestPro
 
     public int getOptimizationMetricProcessorId() {
         return optimizationMetricProcessorId;
+    }
+
+    public int getTestEvacuationProcessorId() {
+        return testEvacuationProcessorId;
     }
 
     public double getMaxMeanPointDistance() {

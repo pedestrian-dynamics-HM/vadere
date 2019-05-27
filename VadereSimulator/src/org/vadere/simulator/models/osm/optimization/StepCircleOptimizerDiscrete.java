@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm.optimization;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.MovementType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -11,6 +12,7 @@ import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -69,7 +71,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 					nextPos = currentPosition;
 				}
 			} catch (Exception e) {
-				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an topographyError.");
+				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an error: " + e.getMessage());
 			}
 
 		}
@@ -79,6 +81,28 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		}
 
 		return nextPos;
+	}
+
+	public SolutionPair computeBruteForceSolution(final PedestrianOSM pedestrian){
+		// SolutionPair is defined in super class
+
+		var reachableArea = new VCircle(pedestrian.getPosition(), pedestrian.getFreeFlowStepSize());
+		var potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
+		potentialEvaluationFunction.setStepSize(reachableArea.getRadius());
+
+		VPoint optimalPoint = getNextPosition(pedestrian, getBruteForcePointsCircles(reachableArea),
+				reachableArea.getRadius(), true);
+
+		double optimalFuncValue;  // -1 = invalid number
+		try{
+			optimalFuncValue = potentialEvaluationFunction.getValue(optimalPoint);
+		}catch (Exception e) {
+			Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation for computing the brute " +
+					"force solution threw error. Setting value to invalid (-1).");
+			optimalFuncValue = -1;
+		}
+
+		return new SolutionPair(optimalPoint, optimalFuncValue);
 	}
 
 	public StepCircleOptimizer clone() {
@@ -133,6 +157,49 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 				anchorAngle,
 				angle);
 
+	}
+
+	private static List<VPoint> getBruteForcePointsCircles(VCircle reachableArea){
+		// NOTE: numberPointsOfLargestCircle and numberOfCircles are parameters with a trade off between runtime and
+		// precision of brute force solution
+
+		return GeometryUtils.getDiscDiscretizationPoints(
+				null,
+				false,
+				reachableArea,
+				100,
+				2000,
+				0,
+				2.0 * Math.PI);
+	}
+
+	private static List<VPoint> getBruteForcePointsLines(VCircle reachableArea) {
+		/* Just an alternative to the getBruteForcePointsCircles (which is recommended to use).*/
+
+		// both have to be larger than 2
+		final int nrLines = 2000;
+		final int nrPointsPerLine = 2000;
+
+		VPoint centerPoint = reachableArea.getCenter();
+
+		final double intervalXDirection = 2 * reachableArea.getRadius() / (nrPointsPerLine - 1);
+		final double intervalYDirection = 2 * reachableArea.getRadius() / (nrLines - 1);
+
+		VPoint refPoint = new VPoint(centerPoint.x - reachableArea.getRadius(), centerPoint.y + reachableArea.getRadius());
+
+		List<VPoint> returnList = new ArrayList<>();
+
+		for (int i = 0; i < nrLines; ++i) {
+			for (int j = 0; j < nrPointsPerLine; ++j) {
+				VPoint currentPoint = new VPoint(refPoint.x + intervalXDirection * j, refPoint.y);
+				if(currentPoint.distance(centerPoint) <= reachableArea.getRadius()){
+					returnList.add(currentPoint.clone());
+				}
+			}
+			refPoint.y -= intervalYDirection;
+		}
+
+		return returnList;
 	}
 
 	/**

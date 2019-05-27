@@ -32,6 +32,7 @@ import static java.util.Map.entry;
 public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 
 	private PedestrianMetricOptimizationProcessor pedestrianMetricOptimizationProcessor;
+	private TestEvacuationTimeProcessor testEvacuationTimeProcessor;
 	private String scenarioName;
 
 	public TestOptimizationMetricNelderMeadProcessor() {
@@ -47,9 +48,19 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		this.scenarioName = null;
 
 		AttributesTestOptimizationMetricProcessor att = this.getAttributes();
+
 		pedestrianMetricOptimizationProcessor =
-				(PedestrianMetricOptimizationProcessor) manager.getProcessor(
-						att.getOptimizationMetricProcessorId());
+				(PedestrianMetricOptimizationProcessor) manager.getProcessor(att.getOptimizationMetricProcessorId());
+
+		testEvacuationTimeProcessor =
+				(TestEvacuationTimeProcessor) manager.getProcessor(att.getTestEvacuationProcessorId());
+
+	}
+
+	@Override
+	public void preLoop(SimulationState state) {
+		pedestrianMetricOptimizationProcessor.preLoop(state);
+		testEvacuationTimeProcessor.preLoop(state);
 	}
 
 	@Override
@@ -64,17 +75,17 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		}
 
 		pedestrianMetricOptimizationProcessor.update(state);
-	}
-
-	@Override
-	public void preLoop(SimulationState state) {
-		pedestrianMetricOptimizationProcessor.preLoop(state);
+		testEvacuationTimeProcessor.update(state);
 	}
 
 	@Override
 	public void postLoop(SimulationState state) {
+		// Check if every agent reached the target
+		testEvacuationTimeProcessor.postLoop(state);
 
-		Map<EventtimePedestrianIdKey, OptimizationMetric> processorData = pedestrianMetricOptimizationProcessor.getData();
+		// Check how the metric changed compared to the set values
+		Map<EventtimePedestrianIdKey, OptimizationMetric> processorData =
+				pedestrianMetricOptimizationProcessor.getData();
 
 		ArrayList<Double> pointDistanceL2Values = new ArrayList<>();
 		ArrayList<Double> differenceFuncValues = new ArrayList<>();

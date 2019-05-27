@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * The Class StepCircleOptimizerNelderMead.
+ * The class StepCircleOptimizerNelderMead.
  * 
  */
 public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
@@ -25,11 +25,9 @@ public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 			.getLogger(StepCircleOptimizerNelderMead.class);
 
 	private final Random random;
-	private Map<PedestrianOSM, VPoint> lastSolution;
 
 	public StepCircleOptimizerNelderMead(Random random) {
 		this.random = random;
-		this.lastSolution = new HashMap<>();
 	}
 
 	@Override
@@ -132,7 +130,6 @@ public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 
 		if(getIsComputeMetric()){
 			// See merge request !65
-			System.out.println("NM: " + new VPoint(minimum[0], minimum[1]).toString() + "minimum value " + minimumValue);
 			this.computeAndAddBruteForceSolutionMetric(pedestrian,
                     new SolutionPair(new VPoint(minimum[0], minimum[1]), minimumValue));
 		}
