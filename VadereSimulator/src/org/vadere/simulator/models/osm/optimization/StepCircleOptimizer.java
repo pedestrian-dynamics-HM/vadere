@@ -25,7 +25,7 @@ public abstract class StepCircleOptimizer {
 
 	protected StepCircleOptimizer(){
 		// TODO: read if the metric should be computed from a config file, see issue #243
-		this.computeMetric = false;
+		this.computeMetric = true;
 
 		if(this.computeMetric){
 			this.currentMetricValues = new ArrayList<>();

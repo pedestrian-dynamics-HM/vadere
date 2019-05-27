@@ -36,6 +36,7 @@ public class OptimizationMetric {
         this.foundPoint = foundPoint;
         this.foundFuncValue = foundFuncValue;
 
+        // TODO: insert tolerance
         if(optimalFuncValue > foundFuncValue){
             Logger.getLogger(TestOptimizationMetricNelderMeadProcessor.class).warn(
                     "Found optimal value is better than brute force. This can indicate that the " +

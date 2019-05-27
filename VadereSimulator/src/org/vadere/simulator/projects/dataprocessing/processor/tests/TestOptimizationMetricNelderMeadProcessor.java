@@ -102,8 +102,6 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 
 		printStatistics(metricStatistics);
 
-		// TODO: test also that all pedestrian get to the target, this is required for optimization.
-
 		AttributesTestOptimizationMetricProcessor attr = this.getAttributes();
 		String msg = getCompareValuesString("mean difference in point distance",
 				metricStatistics.get("meanPointDistance"), attr.getMaxMeanPointDistance());
@@ -156,7 +154,6 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		System.out.println("######################################################################################");
 
 	}
-
 
 	private HashMap<String, Double> computeStatistics(ArrayList<Double> pointDistanceL2Values, ArrayList<Double> differenceFuncValues){
 		if(differenceFuncValues.size() != pointDistanceL2Values.size()){
