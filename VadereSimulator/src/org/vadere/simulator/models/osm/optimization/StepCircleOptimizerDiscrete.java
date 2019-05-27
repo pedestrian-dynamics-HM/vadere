@@ -58,13 +58,13 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 		for (VPoint currentPosition : positions) {
 			try {
-				currentPotential = potentialEvaluationFunction.getValue(currentPosition);
+				currentPotential = potentialEvaluationFunction.getPotential(currentPosition);
 
 				// DL: it is not exactly clear how this condition works (where is the value 0.0001 coming from?, Why
 				// is there a random boolean?
 				boolean fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
 
-				if (currentPotential < potential || (bruteForce || fineTuneCondition)) {
+				if (currentPotential < potential && (bruteForce || fineTuneCondition)) {
 					potential = currentPotential;
 					nextPos = currentPosition;
 				}
@@ -74,7 +74,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 		}
 
-		if (bruteForce || curPosPotential - potential <= movementThreshold) {
+		if (curPosPotential - potential <= movementThreshold) {
 			nextPos = curPos;
 		}
 

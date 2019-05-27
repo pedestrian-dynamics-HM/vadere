@@ -135,6 +135,7 @@ public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 
 		if(getComputeMetric()){
 			// See merge request !65
+			System.out.println("NM: " + new VPoint(minimum[0], minimum[1]).toString() + "minimum value " + minimumValue);
 			this.computeAndAddBruteForceSolutionMetric(pedestrian,
                     new SolutionPair(new VPoint(minimum[0], minimum[1]), minimumValue));
 		}
