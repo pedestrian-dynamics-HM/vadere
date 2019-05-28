@@ -66,7 +66,10 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 				// is there a random boolean?
 				boolean fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
 
-				if (currentPotential < potential && (bruteForce || fineTuneCondition)) {
+				if(bruteForce && currentPotential < potential) {
+					potential = currentPotential;
+					nextPos = currentPosition;
+				}else if (currentPotential < potential || fineTuneCondition) {
 					potential = currentPotential;
 					nextPos = currentPosition;
 				}
