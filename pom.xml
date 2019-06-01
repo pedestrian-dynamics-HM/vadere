@@ -112,6 +112,7 @@
       <module>./VadereMeshing</module>
       <module>./VadereUtils</module>
       <module>./VadereAnnotation</module>
+      <module>./VadereManager</module>
   </modules>
 
 
