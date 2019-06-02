@@ -1,14 +1,13 @@
 package org.vadere.manager;
 
-import de.tudresden.sumo.config.Constants;
 import de.uniluebeck.itm.tcpip.Storage;
-
-import it.polito.appeal.traci.protocol.Command;
 
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class ClientHandler implements Runnable{
 
@@ -36,25 +35,20 @@ public class ClientHandler implements Runnable{
 	public void run() {
 
 		try{
-			Storage myInputStorage = new Storage();
-			Storage myOutputStorage = new Storage();
+			Queue<TraciCommand> receivedCommands = new ArrayDeque<>();
+			TraCiMessageBuilder msgBuilder = new TraCiMessageBuilder();
 
 			while (true){
 
-				traCISocket.receiveExact(myInputStorage);
-				Storage copy = copy(myInputStorage);
-				Command cmd = new Command(copy);
-				logger.infof("Recieved Command: 0x%02X", cmd.id());
-				boolean status =false;
-				if (cmd.id() == Constants.CMD_GETVERSION)
-					status = cmdExecutor.execute(cmd.id(), myInputStorage, myOutputStorage);
+				traCISocket.receiveExact(receivedCommands);
 
-				if (status){
-					traCISocket.sendExact(myOutputStorage);
+				for(TraciCommand cmd: receivedCommands){
+					logger.infof("Recieved Command: 0x%02X", cmd.getId());
+					boolean status = cmdExecutor.execute(cmd, msgBuilder);
+					if (status){
+						traCISocket.send(msgBuilder.build());
+					}
 				}
-
-				myInputStorage.reset();
-				myOutputStorage.reset();
 
 			}
 		} catch (IOException e) {

@@ -1,0 +1,2 @@
+cat getVersionTest | xxd -r -p | nc -p 9998 -o out.txt '127.0.0.1' 9999
+

@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.util.Queue;
 
 public class TraCISocket implements Closeable {
 
@@ -33,6 +35,10 @@ public class TraCISocket implements Closeable {
 
 	public void send(final byte[] buf) throws IOException {
 		outStream.write(buf);
+	}
+
+	public void send(ByteBuffer buf) throws IOException {
+		outStream.write(buf.array(), buf.arrayOffset(), buf.array().length);
 	}
 
 	public void sendExact(final Storage storage) throws IOException{
@@ -66,20 +72,18 @@ public class TraCISocket implements Closeable {
 		return buf;
 	}
 
-	public boolean receiveExact(Storage msg) throws IOException{
+	public boolean receiveExact(Queue<TraciCommand> queue) throws IOException{
 
-		Storage length_Storage = new Storage(receive(TRACI_LEN_LENGTH));
-		int data_length = length_Storage.readInt() - TRACI_LEN_LENGTH;
+		ByteBuffer msgLength = ByteBuffer.wrap(receive(TRACI_LEN_LENGTH));
+		int data_length = msgLength.getInt() - TRACI_LEN_LENGTH;
 		assert (data_length > 0);
 
 		// copy message content into msg.
-		byte[] data = receive(data_length);
-		msg.reset();
-		for(byte b : data)
-			msg.writeByte(b);
-
+		TraciMessageBuffer commands = TraciMessageBuffer.wrap(receive(data_length));
+		TraciCommand.extractCommandsFromByteBuffer(queue, commands);
 		return true;
 	}
+
 
 	@Override
 	public void close() throws IOException {

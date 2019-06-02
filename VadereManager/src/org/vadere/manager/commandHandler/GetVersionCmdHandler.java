@@ -2,26 +2,27 @@ package org.vadere.manager.commandHandler;
 
 
 import de.tudresden.sumo.config.Constants;
-import de.uniluebeck.itm.tcpip.Storage;
+
+import org.vadere.manager.TraCiCommandBuilder;
+import org.vadere.manager.TraCiMessageBuilder;
+import org.vadere.manager.TraciCommand;
 
 public class GetVersionCmdHandler implements CommandHandler{
 
 
 	@Override
-	public boolean handelCommand(Storage inputStorage, Storage outputStorage) {
+	public boolean handelCommand(TraciCommand cmd, TraCiMessageBuilder builder) {
 
 
-		writeStatusCmd(outputStorage, Constants.CMD_GETVERSION, Constants.RTYPE_OK, "");
+		writeStatusCmd(builder, Constants.CMD_GETVERSION, Constants.RTYPE_OK, "");
 
-		Storage tmp = new Storage();
-		tmp.writeInt(Constants.TRACI_VERSION);
-		tmp.writeStringASCII("Vaderer TraCI Server" );
+		TraCiCommandBuilder b = new TraCiCommandBuilder();
 
-		// cmdLen + cmdID + data (Int + String)
-		outputStorage.writeUnsignedByte(1 + 1 + tmp.size());
-		outputStorage.writeUnsignedByte(Constants.CMD_GETVERSION);
-		for (Byte b : tmp.getStorageList())
-			outputStorage.writeByte(b);
+//		b.writeUnsignedByte(Constants.CMD_GETVERSION);
+		b.writeUnsignedByte(0x33);
+		b.writeStringASCII("Vaderer TraCI Server");
+
+		builder.writeBytes(b.build());
 
 		return true;
 	}

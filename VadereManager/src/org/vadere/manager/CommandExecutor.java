@@ -1,7 +1,6 @@
 package org.vadere.manager;
 
 import de.tudresden.sumo.config.Constants;
-import de.uniluebeck.itm.tcpip.Storage;
 
 import org.vadere.manager.commandHandler.CommandHandler;
 import org.vadere.manager.commandHandler.GetVersionCmdHandler;
@@ -20,14 +19,14 @@ public class CommandExecutor {
 		cmdMap.put(Constants.CMD_GETVERSION, new GetVersionCmdHandler());
 	}
 
-	boolean execute(int cmd, Storage in, Storage out){
-		CommandHandler handler = cmdMap.get(cmd);
+	boolean execute(TraciCommand cmd, TraCiMessageBuilder builder){
+		CommandHandler handler = cmdMap.get(cmd.getId());
 		if (handler == null){
 			logger.errorf("No CommandHandler found for command: %02X", cmd);
 			return false;
 		}
 
-		return handler.handelCommand(in, out);
+		return handler.handelCommand(cmd, builder);
 
 	}
 }
