@@ -17,13 +17,13 @@ import java.util.stream.IntStream;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class TraCIWriterTest {
+public class TraCIOutputWriterTest {
 
-	TraCIWriter writer;
+	TraCIOutputWriter writer;
 
 	@Before
 	public void before(){
-		writer = new TraCIWriter();
+		writer = new TraCIOutputWriter();
 	}
 
 	@After
@@ -97,6 +97,20 @@ public class TraCIWriterTest {
 		byte[] dataOut = writer.asByteArray();
 		assertThat(dataOut, equalTo(new byte[]{19, 20} ));
 
+	}
+
+	@Test
+	public void writeEmptyString(){
+		writer.writeString("");
+
+
+		ByteBuffer buf= writer.asByteBuffer();
+
+		assertThat(buf.capacity(), equalTo(4));
+		assertThat(buf.getInt(), equalTo(0));
+
+		// buf must be empty
+		checkEmpty(buf);
 	}
 
 	@Test

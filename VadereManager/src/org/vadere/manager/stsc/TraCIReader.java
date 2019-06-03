@@ -26,6 +26,12 @@ public class TraCIReader implements ByteReader {
 		return traCIReader;
 	}
 
+	static TraCIReader wrap(ByteBuffer buffer){
+		TraCIReader traCIReader = new TraCIReader();
+		traCIReader.buf =  buffer;
+		return traCIReader;
+	}
+
 	private TraCIReader(){ }
 
 	@Override
@@ -35,6 +41,7 @@ public class TraCIReader implements ByteReader {
 
 	@Override
 	public byte[] readBytes(int num) {
+		ensureBytes(num);
 		byte[] data = new byte[num];
 		buf.get(data, 0, data.length);
 		return data;

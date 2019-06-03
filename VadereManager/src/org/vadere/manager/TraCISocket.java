@@ -1,6 +1,7 @@
 package org.vadere.manager;
 
-import de.uniluebeck.itm.tcpip.Storage;
+import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.TraCIPacketBuffer;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -8,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Queue;
+import java.util.Arrays;
 
 public class TraCISocket implements Closeable {
 
@@ -33,34 +34,22 @@ public class TraCISocket implements Closeable {
 		return socket.isConnected();
 	}
 
-	public void send(final byte[] buf) throws IOException {
+	// send //
+
+	private void send(final byte[] buf) throws IOException {
 		outStream.write(buf);
 	}
 
-	public void send(ByteBuffer buf) throws IOException {
+	private void send(ByteBuffer buf) throws IOException {
 		outStream.write(buf.array(), buf.arrayOffset(), buf.array().length);
 	}
 
-	public void sendExact(final Storage storage) throws IOException{
-		int totalLength = TRACI_LEN_LENGTH + storage.size();
-		Storage length_storage = new Storage();
-		length_storage.writeInt(totalLength);
-
-		byte[] data = new byte[totalLength];
-		int n = 0;
-		// write length of total package
-		for(Byte b : length_storage.getStorageList()){
-			data[n++] = b;
-		}
-		// write data
-		for(Byte b : storage.getStorageList()){
-			data[n++] = b;
-		}
-
-		send(data);
+	public void sendExact(final TraCIPacket packet) throws IOException{
+		send(packet.send());
 	}
 
 
+	// receive //
 
 	public void receiveComplete(byte[] buf, int len) throws IOException {
 		inStream.readFully(buf, 0, len);
@@ -72,16 +61,18 @@ public class TraCISocket implements Closeable {
 		return buf;
 	}
 
-	public boolean receiveExact(Queue<TraciCommand> queue) throws IOException{
+	public TraCIPacketBuffer receiveExact() throws IOException{
 
+		// read first 4 bytes (containing TracCI packet length)
 		ByteBuffer msgLength = ByteBuffer.wrap(receive(TRACI_LEN_LENGTH));
 		int data_length = msgLength.getInt() - TRACI_LEN_LENGTH;
-		assert (data_length > 0);
 
-		// copy message content into msg.
-		TraciMessageBuffer commands = TraciMessageBuffer.wrap(receive(data_length));
-		TraciCommand.extractCommandsFromByteBuffer(queue, commands);
-		return true;
+		if (data_length <=0){
+			return TraCIPacketBuffer.empty();
+		} else {
+			byte[] data = receive(data_length);
+			return  TraCIPacketBuffer.wrap(data);
+		}
 	}
 
 

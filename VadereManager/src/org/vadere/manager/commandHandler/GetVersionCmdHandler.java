@@ -3,27 +3,29 @@ package org.vadere.manager.commandHandler;
 
 import de.tudresden.sumo.config.Constants;
 
-import org.vadere.manager.TraCiCommandBuilder;
-import org.vadere.manager.TraCiMessageBuilder;
-import org.vadere.manager.TraciCommand;
+import org.vadere.manager.TraCICommand;
+import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.TraCIWriter;
 
 public class GetVersionCmdHandler implements CommandHandler{
 
 
 	@Override
-	public boolean handelCommand(TraciCommand cmd, TraCiMessageBuilder builder) {
+	public TraCIPacket handelCommand(TraCICommand cmd) {
 
 
-		writeStatusCmd(builder, Constants.CMD_GETVERSION, Constants.RTYPE_OK, "");
+		TraCIPacket response = TraCIPacket.createDynamicPacket();
 
-		TraCiCommandBuilder b = new TraCiCommandBuilder();
+		response.add_OK_StatusResponse(Constants.CMD_GETVERSION);
 
-//		b.writeUnsignedByte(Constants.CMD_GETVERSION);
-		b.writeUnsignedByte(0x33);
-		b.writeStringASCII("Vaderer TraCI Server");
+		TraCIWriter writer = response.getWriter();
 
-		builder.writeBytes(b.build());
+		int cmdLen = 10 + writer.stringByteCount("Vaderer TraCI Server");
+		writer.writeCommandLength(cmdLen);	// 1b or 5b
+		writer.writeInt(Constants.CMD_GETVERSION); // 1b
+		writer.writeUnsignedByte(Constants.TRACI_VERSION); // 4b
+		writer.writeString("Vaderer TraCI Server"); // 4b + X
 
-		return true;
+		return response;
 	}
 }

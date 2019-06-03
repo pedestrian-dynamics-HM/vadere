@@ -20,12 +20,12 @@ import static org.junit.Assert.assertThat;
 
 public class TraCIReaderTest {
 
-	TraCIWriter writer;
+	TraCIOutputWriter writer;
 	TraCIReader reader;
 
 	@Before
 	public void before(){
-		writer = new TraCIWriter();
+		writer = new TraCIOutputWriter();
 	}
 
 	@After
