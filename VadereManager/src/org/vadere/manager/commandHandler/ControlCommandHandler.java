@@ -49,8 +49,4 @@ public class ControlCommandHandler extends CommandHandler{
 	}
 
 
-	@Override
-	public TraCIPacket handel(TraCICommand cmd) {
-		return null;
-	}
 }

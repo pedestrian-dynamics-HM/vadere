@@ -104,18 +104,6 @@ public class PersonCommandHandler extends CommandHandler{
 		throw TraCIException.getNotImplemented(cmd);
 	}
 
-	@Override
-	public TraCIPacket handel(TraCICommand cmd) {
-		switch (cmd.getCmdType()){
-			case VALUE_GET:
-				return processGet((TraCIGetCommand) cmd);
-			case VALUE_SET:
-				return processSet((TraCISetCommand) cmd);
-			default:
-				throw new TraCIException("Wrong command type for TraCI/Person API");
-		}
-	}
-
 	public TraCIPacket processGet(TraCICommand cmd){
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
 //		switch (cmd.getVariableId()){

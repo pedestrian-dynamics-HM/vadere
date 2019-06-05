@@ -1,7 +1,6 @@
 package org.vadere.manager.commandHandler;
 
-public abstract class CommandHandler implements TraCICmdHandler{
-
+public abstract class CommandHandler {
 
 
 }
