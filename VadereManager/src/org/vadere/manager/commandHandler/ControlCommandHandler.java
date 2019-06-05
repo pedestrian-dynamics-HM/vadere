@@ -16,11 +16,11 @@ public class ControlCommandHandler extends CommandHandler{
 
 	public TraCIPacket process_getVersion(TraCICommand cmd) {
 
-		TraCIPacket response = TraCIPacket.createDynamicPacket();
+		TraCIPacket response = TraCIPacket.create();
 
 		//	@Override
 //	public TraCIPacket handleCommand(TraCIPacket response) {
-//		response = TraCIPacket.createDynamicPacket();
+//		response = TraCIPacket.create();
 //
 //		response.add_OK_StatusResponse(Constants.CMD_GETVERSION);
 //

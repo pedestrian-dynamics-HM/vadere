@@ -4,42 +4,86 @@ import org.vadere.manager.stsc.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 
-public interface TraCIWriter extends ByteWriter {
+public interface TraCIWriter {
 
 
-	void writeUnsignedByteWithId(int val);
-	void writeByteWithId(byte val);
-	void writeIntWithId(int val);
-	void writeDoubleWithId(double val);
-	void writeStringWithId(String val);
-	void writeStringListWithId(List<String> val);
+	ByteBuffer asByteBuffer();
 
+	byte[] asByteArray();
 
-	void writeString(String val);
+	TraCIWriter rest();
 
-	void writeStringList(List<String> val);
+	TraCIWriter writeUnsignedByteWithId(int val);
+	TraCIWriter writeByteWithId(byte val);
+	TraCIWriter writeIntWithId(int val);
+	TraCIWriter writeDoubleWithId(double val);
+	TraCIWriter writeStringWithId(String val);
+	TraCIWriter writeStringListWithId(List<String> val);
 
-	void write2DPosition(double x, double y);
+	TraCIWriter writeByte(int val);
 
-	void write3DPosition(double x, double y, double z);
+	default TraCIWriter writeUnsignedByte(int val){
+		if (val>= 0 && val<=255){
+			writeByte(val);
+		} else {
+			throw new IllegalArgumentException(
+					"unsignedByte must be within (including) 0..255 but was: " + val);
+		}
+		return this;
+	}
 
-	void writeRoadMapPosition(String roadId, double pos, int laneId);
+	TraCIWriter writeBytes(byte[] buf);
+	TraCIWriter writeBytes(byte[] buf, int offset, int len);
 
-	void writeLonLatPosition(double lon, double lat);
+	default TraCIWriter writeBytes(ByteBuffer buf, int offset, int len){
+		writeBytes(buf.array(), offset, len);
+		return this;
+	}
+	default TraCIWriter writeBytes(ByteBuffer buf){
+		writeBytes(buf, 0, buf.array().length);
+		return this;
+	}
 
-	void writeLonLatAltPosition(double lon, double lat, double alt);
+	default TraCIWriter writeInt(int val){
+		writeBytes(ByteBuffer.allocate(4).putInt(val).array());
+		return this;
+	}
 
-	void writePolygon(VPoint... points);
+	default TraCIWriter writeDouble(double val){
+		writeBytes(ByteBuffer.allocate(8).putDouble(val).array());
+		return this;
+	}
 
-	void writePolygon(List<VPoint> points);
+	TraCIWriter writeString(String val);
 
-	void writeTrafficLightPhaseList(List<TrafficLightPhase> phases);
+	TraCIWriter writeStringList(List<String> val);
 
-	void writeColor(Color color);
+	TraCIWriter write2DPosition(double x, double y);
 
-	void writeCommandLength(int cmdLen);
+	TraCIWriter write3DPosition(double x, double y, double z);
+
+	TraCIWriter writeRoadMapPosition(String roadId, double pos, int laneId);
+
+	TraCIWriter writeLonLatPosition(double lon, double lat);
+
+	TraCIWriter writeLonLatAltPosition(double lon, double lat, double alt);
+
+	TraCIWriter writePolygon(VPoint... points);
+
+	TraCIWriter writePolygon(List<VPoint> points);
+
+	TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases);
+
+	TraCIWriter writeColor(Color color);
+
+	TraCIWriter writeCommandLength(int cmdLen);
 
 	int stringByteCount(String str);
+
+	int size();
+	int getStringByteCount(String val);
+
 }

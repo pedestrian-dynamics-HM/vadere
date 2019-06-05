@@ -32,7 +32,7 @@ public class CommandExecutor {
 		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd());
 		if (handler == null){
 			logger.errorf("No CommandHandler found for command: %02X", cmd.getTraCICmd());
-			return TraCIPacket.createDynamicPacket().add_Err_StatusResponse(cmd.getTraCICmd().id, "ID not found.");
+			return TraCIPacket.create().add_Err_StatusResponse(cmd.getTraCICmd().id, "ID not found.");
 		}
 
 		return handler.handel(cmd);

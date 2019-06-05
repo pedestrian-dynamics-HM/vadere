@@ -22,134 +22,161 @@ public class TraCIWriterImpl implements TraCIWriter {
 		data = new ByteArrayOutputStream();
 	}
 
+	@Override
 	public ByteBuffer asByteBuffer(){
 		return ByteBuffer.wrap(data.toByteArray());
 	}
 
+	@Override
 	public byte[] asByteArray(){
 		return data.toByteArray();
 	}
 
-	public void rest(){
+	@Override
+	public TraCIWriter rest(){
 		data.reset();
+		return this;
 	}
 
 	@Override
-	public void writeByte(int val) {
+	public TraCIWriter writeByte(int val) {
 		data.write(val);
+		return this;
 	}
 
 	@Override
-	public void writeBytes(byte[] buf) {
+	public TraCIWriter writeBytes(byte[] buf) {
 		data.writeBytes(buf);
+		return this;
 	}
 
 	@Override
-	public void writeBytes(byte[] buf, int offset, int len) {
+	public TraCIWriter writeBytes(byte[] buf, int offset, int len) {
 		data.write(buf, offset, len);
+		return this;
 	}
 
 
 	@Override
-	public void writeUnsignedByteWithId(int val) {
+	public TraCIWriter writeUnsignedByteWithId(int val) {
 		writeUnsignedByte(TraCIDataType.U_BYTE.identifier);
 		writeUnsignedByte(val);
+		return this;
 	}
 
 	@Override
-	public void writeByteWithId(byte val) {
+	public TraCIWriter writeByteWithId(byte val) {
 		writeUnsignedByte(TraCIDataType.BYTE.identifier);
 		writeByte(val);
+		return this;
 	}
 
 	@Override
-	public void writeIntWithId(int val) {
+	public TraCIWriter writeIntWithId(int val) {
 		writeUnsignedByte(TraCIDataType.INTEGER.identifier);
 		writeInt(val);
+		return this;
 	}
 
 	@Override
-	public void writeDoubleWithId(double val) {
+	public TraCIWriter writeDoubleWithId(double val) {
 		writeUnsignedByte(TraCIDataType.DOUBLE.identifier);
 		writeDouble(val);
+		return this;
 	}
 
 	@Override
-	public void writeStringWithId(String val) {
+	public TraCIWriter writeStringWithId(String val) {
 		writeUnsignedByte(TraCIDataType.STRING.identifier);
 		writeString(val);
+		return this;
 	}
 
 	@Override
-	public void writeStringListWithId(List<String> val) {
+	public TraCIWriter writeStringListWithId(List<String> val) {
 		writeUnsignedByte(TraCIDataType.STRING_LIST.identifier);
 		writeStringList(val);
+		return this;
 	}
 
 	@Override
-	public void writeString(String val){
+	public TraCIWriter writeString(String val){
 		writeString(val, StandardCharsets.US_ASCII);
+		return this;
 	}
 
 	@Override
-	public void writeStringList(List<String> val){
+	public TraCIWriter writeStringList(List<String> val){
 		writeInt(val.size());
 		val.forEach(this::writeString);
+		return this;
 	}
 
-	private void writeString(String val, Charset c){
+	@Override
+	public int getStringByteCount(String val){
+		return  val.getBytes(StandardCharsets.US_ASCII).length;
+	}
+
+	private TraCIWriter writeString(String val, Charset c){
 		byte[] byteString = val.getBytes(c);
 		writeInt(byteString.length);
 		if (byteString.length > 0)
 			writeBytes(byteString);
+		return this;
 	}
 
 	@Override
-	public void write2DPosition(double x, double y){
+	public TraCIWriter write2DPosition(double x, double y){
 		writeUnsignedByte(TraCIDataType.POS_2D.identifier);
 		writeDouble(x);
 		writeDouble(y);
+		return this;
 	}
 
 	@Override
-	public void write3DPosition(double x, double y, double z){
+	public TraCIWriter write3DPosition(double x, double y, double z){
 		writeUnsignedByte(TraCIDataType.POS_3D.identifier);
 		writeDouble(x);
 		writeDouble(y);
 		writeDouble(z);
+		return this;
 	}
 
 
 	@Override
-	public void writeRoadMapPosition(String roadId, double pos, int laneId){
+	public TraCIWriter writeRoadMapPosition(String roadId, double pos, int laneId){
 		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.identifier);
 		writeString(roadId);
 		writeDouble(pos);
 		writeUnsignedByte(laneId);
+		return this;
 	}
 
 	@Override
-	public void writeLonLatPosition(double lon, double lat){
+	public TraCIWriter writeLonLatPosition(double lon, double lat){
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT.identifier);
 		writeDouble(lon);
 		writeDouble(lat);
+		return this;
 	}
 
 	@Override
-	public void writeLonLatAltPosition(double lon, double lat, double alt){
+	public TraCIWriter writeLonLatAltPosition(double lon, double lat, double alt){
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.identifier);
 		writeDouble(lon);
 		writeDouble(lat);
 		writeDouble(alt);
+		return this;
 	}
 
 	@Override
-	public void writePolygon(VPoint... points){
+	public TraCIWriter writePolygon(VPoint... points){
 		writePolygon(Arrays.asList(points));
+		return this;
 	}
 
 	@Override
-	public void writePolygon(List<VPoint> points){
+	public TraCIWriter writePolygon(List<VPoint> points){
 		writeUnsignedByte(TraCIDataType.POLYGON.identifier);
 		if(points.size() > 255)
 			throw new TraCIException("Polygon to big. TraCI only supports polygon up to 255 points.");
@@ -158,10 +185,11 @@ public class TraCIWriterImpl implements TraCIWriter {
 			writeDouble(p.getX());
 			writeDouble(p.getY());
 		});
+		return this;
 	}
 
 	@Override
-	public void writeTrafficLightPhaseList(List<TrafficLightPhase> phases){
+	public TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases){
 		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
 		if(phases.size() > 255)
 			throw new TraCIException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
@@ -171,15 +199,17 @@ public class TraCIWriterImpl implements TraCIWriter {
 			writeString(phase.getSuccRoad());
 			writeUnsignedByte(phase.getPhase().id);
 		});
+		return this;
 	}
 
 	@Override
-	public void writeColor(Color color){
+	public TraCIWriter writeColor(Color color){
 		writeUnsignedByte(TraCIDataType.COLOR.identifier);
 		writeUnsignedByte(color.getRed());
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());
 		writeUnsignedByte(color.getAlpha());
+		return this;
 	}
 
 	@Override
@@ -195,7 +225,7 @@ public class TraCIWriterImpl implements TraCIWriter {
 	 * @param cmdLen	number of bytes of command *including* one byte for the cmdLen field.
 	 */
 	@Override
-	public void writeCommandLength(int cmdLen) {
+	public TraCIWriter writeCommandLength(int cmdLen) {
 
 		if (cmdLen <= 255){ //
 			writeUnsignedByte(cmdLen);
@@ -205,8 +235,10 @@ public class TraCIWriterImpl implements TraCIWriter {
 			writeUnsignedByte(0); // first byte must be null
 			writeInt(cmdLen); // write cmdLen as integer
 		}
+		return this;
 	}
 
+	@Override
 	public int size(){
 		return data.size();
 	}

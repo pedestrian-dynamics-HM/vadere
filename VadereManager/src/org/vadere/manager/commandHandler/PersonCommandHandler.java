@@ -1,10 +1,13 @@
 package org.vadere.manager.commandHandler;
 
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.commands.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.commands.TraCISetCommand;
+import org.vadere.util.geometry.shapes.VPoint;
+
+import java.util.List;
 
 public class PersonCommandHandler extends CommandHandler{
 
@@ -19,48 +22,50 @@ public class PersonCommandHandler extends CommandHandler{
 
 	}
 
-
 	protected TraCIPacket process_getIDList(TraCIGetCommand cmd){
 
+		List<String> pedestrians = null; // get....
 
-
-		TraCIPacket packet = TraCIPacket.createDynamicPacket();
-		packet.add_OK_StatusResponse(cmd.getTraCICmd());
-
-		// Test
-		// get Data ...
-//		List<String> list = new ArrayList<>();
-//		packet.getWriter().writeCommandLength(4); // cmd leng
-//		packet.getWriter().writeUnsignedByte(1);
-
-		throw TraCIException.getNotImplemented(cmd);
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedestrians);
 	}
 
 	protected TraCIPacket process_getIDCount(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
+
+		int numPerson = 0; // get...
+
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, numPerson);
 	}
 
 	protected TraCIPacket process_getSpeed(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
+
+		double speed = 0.0; // get...
+
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, speed);
 	}
 
 	protected TraCIPacket process_getPosition(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
+
+		VPoint point = new VPoint(1.0, 1.0); // get
+
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, point);
 	}
 
 
 	protected TraCIPacket process_getLength(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
+
+
+		double pedLength = 0.4; // get... (durchmesser)
+
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedLength);
 	}
 
 
 	protected TraCIPacket process_getWidth(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
+		double pedWidth = 0.4; // get.. (durchmesser)
+
+		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedWidth);
 	}
 
-	protected TraCIPacket process_getWaitingTime(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
 
 	public TraCIPacket processGet(TraCICommand cmd){
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
@@ -79,7 +84,6 @@ public class PersonCommandHandler extends CommandHandler{
 			case WIDTH:
 				return process_getWidth(getCmd);
 			case WAITING_TIME:
-				return process_getWaitingTime(getCmd);
 			case POS_3D:
 			case ANGLE:
 			case ROAD_ID:
