@@ -2,17 +2,15 @@ package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICommandBuffer;
-import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.commands.control.CmdClose;
-import org.vadere.manager.stsc.commands.control.CmdGetVersion;
-import org.vadere.manager.stsc.commands.control.CmdSimStep;
+import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
+import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 
 import java.nio.ByteBuffer;
 
 public abstract class TraCICommand {
 
 	protected TraCICmd traCICmd;
-//	protected TraCICommandBuffer data;
 
 	public static TraCICommand createCommand(ByteBuffer rawCmd){
 		TraCICommandBuffer cmdBuffer = TraCICommandBuffer.wrap(rawCmd);
@@ -42,11 +40,11 @@ public abstract class TraCICommand {
 
 		switch (cmd){
 			case GET_VERSION:
-				return new CmdGetVersion(cmd);
+				return new TraCIGetVersionCommand(cmd);
 			case SIM_STEP:
-				return new CmdSimStep(cmd, cmdBuffer);
+				return new TraCISimStepCommand(cmd, cmdBuffer);
 			case CLOSE:
-				return new CmdClose(cmd);
+				return new TraCICloseCommand(cmd);
 
 			default:
 				throw  new IllegalStateException("Should not be reached. Only TraCI control commands expected");
@@ -66,9 +64,6 @@ public abstract class TraCICommand {
 	protected TraCICommand(TraCICmd traCICmd){
 		this.traCICmd = traCICmd;
 	}
-
-
-	public abstract TraCIPacket handleCommand(TraCIPacket response);
 
 	public TraCICmd getTraCICmd() {
 		return traCICmd;

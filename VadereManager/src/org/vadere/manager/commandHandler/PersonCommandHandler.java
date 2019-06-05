@@ -9,6 +9,17 @@ import org.vadere.manager.stsc.commands.TraCISetCommand;
 public class PersonCommandHandler extends CommandHandler{
 
 
+	public static PersonCommandHandler instance;
+
+	static {
+		instance = new PersonCommandHandler();
+	}
+
+	private PersonCommandHandler(){
+
+	}
+
+
 	protected TraCIPacket process_getIDList(TraCIGetCommand cmd){
 		TraCIPacket packet = TraCIPacket.createDynamicPacket();
 		packet.add_OK_StatusResponse(cmd.getTraCICmd());
@@ -105,7 +116,8 @@ public class PersonCommandHandler extends CommandHandler{
 		}
 	}
 
-	public TraCIPacket processGet(TraCIGetCommand cmd){
+	public TraCIPacket processGet(TraCICommand cmd){
+		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
 //		switch (cmd.getVariableId()){
 //			case TraCIVariable.ID_LIST.id:
 //
@@ -113,7 +125,8 @@ public class PersonCommandHandler extends CommandHandler{
 		return null;
 	}
 
-	public TraCIPacket processSet(TraCISetCommand cmd){
+	public TraCIPacket processSet(TraCICommand cmd){
+		TraCISetCommand setCmd = (TraCISetCommand) cmd;
 		return null;
 	}
 

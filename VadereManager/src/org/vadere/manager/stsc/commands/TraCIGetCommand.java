@@ -2,7 +2,6 @@ package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICommandBuffer;
-import org.vadere.manager.stsc.TraCIPacket;
 
 import java.util.EnumSet;
 
@@ -31,12 +30,5 @@ public class TraCIGetCommand extends TraCICommand {
 		return elementId;
 	}
 
-	public void setElementId(String elementId) {
-		this.elementId = elementId;
-	}
 
-	@Override
-	public TraCIPacket handleCommand(TraCIPacket response) {
-		return null;
-	}
 }
