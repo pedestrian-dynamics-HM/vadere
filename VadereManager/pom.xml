@@ -145,6 +145,13 @@
             <artifactId>traas</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.vadere</groupId>
+            <artifactId>simulator</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 

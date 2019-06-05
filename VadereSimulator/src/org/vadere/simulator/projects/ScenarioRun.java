@@ -2,6 +2,7 @@ package org.vadere.simulator.projects;
 
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.RemoteManagerListener;
 import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,9 +37,13 @@ public class ScenarioRun implements Runnable {
 
 	private final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
+	private final List<RemoteManagerListener> remoteManagerListeners = new ArrayList<>();
+
 	private final DataProcessingJsonManager dataProcessingJsonManager;
 
 	private Simulation simulation;
+
+	private boolean singleStepMode = false;
 
 	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
 	private @Nullable
@@ -112,7 +118,7 @@ public class ScenarioRun implements Runnable {
 				// Run simulation main loop from start time = 0 seconds
 				simulation = new Simulation(mainModel, 0,
 						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
-						processorManager, simulationResult);
+						processorManager, simulationResult, remoteManagerListeners, singleStepMode);
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
@@ -184,6 +190,14 @@ public class ScenarioRun implements Runnable {
 
 	public void addPassiveCallback(final PassiveCallback pc) {
 		passiveCallbacks.add(pc);
+	}
+
+	public void addRemoteManagerListener(final RemoteManagerListener listener){
+		remoteManagerListeners.add(listener);
+	}
+
+	public boolean isSingleStepMode() {
+		return singleStepMode;
 	}
 
 	public void setOutputPaths(final Path outputPath, boolean overwriteTimestampSetting){

@@ -18,7 +18,11 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.AbsorbingArea;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -43,11 +47,12 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
+	private final List<RemoteManagerListener> remoteManagerListeners;
 	private List<Model> models;
 
 	private boolean isRunSimulation = false;
 	private boolean isPaused = false;
-	private boolean singleStepMode = false;
+	private boolean singleStepMode; // constructor
 	private boolean waitForSimCommand = false;
 	private double simulateUntilInSec = -1;
 
@@ -81,7 +86,7 @@ public class Simulation {
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult) {
+					  SimulationResult simulationResult, List<RemoteManagerListener> remoteManagerListeners, boolean singleStepMode) {
 
 		this.name = name;
 		this.mainModel = mainModel;
@@ -105,6 +110,8 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
+		this.remoteManagerListeners = remoteManagerListeners;
+		this.singleStepMode = singleStepMode;
 
 		// "eventController" is final. Therefore, create object here and not in helper method.
 		this.eventController = new EventController(scenarioStore);
@@ -264,14 +271,10 @@ public class Simulation {
 						// check reached next simTime (-1 simulate one step)
 						if (simTimeInSec >= simulateUntilInSec || simulateUntilInSec == -1){
 							logger.warnf("Simulated until: %.4f", simTimeInSec);
-							logger.warn("check command queue");
-							logger.warn("check subscriptions");
-							// check command queue and execute (GET, SET Value)
-							// check subscriptions
-							// todo: add some control manger (i.e. TraCI-Manager, ...)
 
 							setWaitForSimCommand(true);
 							while (waitForSimCommand){
+								remoteManagerListeners.forEach(RemoteManagerListener::simulationStepFinishedListener);
 								logger.warn("wait for next SimCommand...");
 								try {
 									wait();

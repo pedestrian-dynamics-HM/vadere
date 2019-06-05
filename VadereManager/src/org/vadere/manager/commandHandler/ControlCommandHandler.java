@@ -14,6 +14,18 @@ public class ControlCommandHandler extends CommandHandler{
 
 	private ControlCommandHandler(){}
 
+	public TraCIPacket process_load(TraCICommand cmd) {
+		return null;
+	}
+
+	public TraCIPacket process_close(TraCICommand cmd) {
+		return null;
+	}
+
+	public TraCIPacket process_simStep(TraCICommand cmd) {
+		return null;
+	}
+
 	public TraCIPacket process_getVersion(TraCICommand cmd) {
 
 		TraCIPacket response = TraCIPacket.create();
