@@ -4,7 +4,6 @@ import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
-import org.vadere.manager.stsc.commands.TraCISetCommand;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.List;
@@ -102,8 +101,7 @@ public class PersonCommandHandler extends CommandHandler{
 	}
 
 	public TraCIPacket processSet(TraCICommand cmd){
-		TraCISetCommand setCmd = (TraCISetCommand) cmd;
-		return null;
+		return process_NotImplemented(cmd);
 	}
 
 
