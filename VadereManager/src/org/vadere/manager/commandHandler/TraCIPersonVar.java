@@ -2,7 +2,7 @@ package org.vadere.manager.commandHandler;
 
 import org.vadere.manager.stsc.TraCIDataType;
 
-public enum TraCIVariable {
+public enum TraCIPersonVar {
 
 	ID_LIST(0x00, TraCIDataType.STRING_LIST),
 	COUNT(0x01, TraCIDataType.INTEGER),
@@ -29,7 +29,7 @@ public enum TraCIVariable {
 	int id;
 	TraCIDataType returnType;
 
-	TraCIVariable(int id, TraCIDataType retVal) {
+	TraCIPersonVar(int id, TraCIDataType retVal) {
 		this.id = id;
 		this.returnType = retVal;
 	}
@@ -38,10 +38,17 @@ public enum TraCIVariable {
 		return this.id == UNKNOWN.id;
 	}
 
+	public static TraCIPersonVar fromId(int id){
+		for(TraCIPersonVar var : values()){
+			if (var.id == id)
+				return var;
+		}
+		return UNKNOWN;
+	}
 
 	@Override
 	public String toString() {
-		return "TraCIVariable{" +
+		return "TraCIPersonVar{" +
 				"id=" + id +
 				", returnType=" + returnType +
 				'}';

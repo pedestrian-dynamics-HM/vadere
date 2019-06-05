@@ -21,6 +21,9 @@ public class PersonCommandHandler extends CommandHandler{
 
 
 	protected TraCIPacket process_getIDList(TraCIGetCommand cmd){
+
+
+
 		TraCIPacket packet = TraCIPacket.createDynamicPacket();
 		packet.add_OK_StatusResponse(cmd.getTraCICmd());
 
@@ -46,43 +49,10 @@ public class PersonCommandHandler extends CommandHandler{
 	}
 
 
-	protected TraCIPacket process_getPosition3D(TraCIGetCommand cmd){
+	protected TraCIPacket process_getLength(TraCIGetCommand cmd){
 		throw TraCIException.getNotImplemented(cmd);
 	}
 
-	protected TraCIPacket process_getAngle(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getSlope(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getRoadID(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getTypeID(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getColor(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-
-	protected TraCIPacket process_getLanePosition(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-
-	protected TraCIPacket process_Length(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_MinGap(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
 
 	protected TraCIPacket process_getWidth(TraCIGetCommand cmd){
 		throw TraCIException.getNotImplemented(cmd);
@@ -92,25 +62,39 @@ public class PersonCommandHandler extends CommandHandler{
 		throw TraCIException.getNotImplemented(cmd);
 	}
 
-	protected TraCIPacket process_getNextEdge(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getRemainingStages(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
-	protected TraCIPacket process_getVehicle(TraCIGetCommand cmd){
-		throw TraCIException.getNotImplemented(cmd);
-	}
-
 	public TraCIPacket processGet(TraCICommand cmd){
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
-//		switch (cmd.getVariableId()){
-//			case TraCIVariable.ID_LIST.id:
-//
-//		}
-		return null;
+
+		switch (TraCIPersonVar.fromId(getCmd.getVariableId())){
+			case ID_LIST:
+				return process_getIDList(getCmd);
+			case COUNT:
+				return process_getIDCount(getCmd);
+			case SPEED:
+				return process_getSpeed(getCmd);
+			case POS_2D:
+				return process_getPosition(getCmd);
+			case LENGTH:
+				return process_getLength(getCmd);
+			case WIDTH:
+				return process_getWidth(getCmd);
+			case WAITING_TIME:
+				return process_getWaitingTime(getCmd);
+			case POS_3D:
+			case ANGLE:
+			case ROAD_ID:
+			case TYPE:
+			case COLOR:
+			case EDGE_POS:
+			case MIN_GAP:
+			case NEXT_EDGE:
+			case REMAINING_STAGES:
+			case VEHICLE:
+				return process_NotImplemented(getCmd);
+			case UNKNOWN:
+			default:
+				return process_UnknownCommand(getCmd);
+		}
 	}
 
 	public TraCIPacket processSet(TraCICommand cmd){

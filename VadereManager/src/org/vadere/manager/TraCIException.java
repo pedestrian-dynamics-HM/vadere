@@ -22,7 +22,7 @@ public class TraCIException extends RuntimeException {
 	}
 
 	public static TraCIException cmdErrVariableType(TraCICmd cmd, Throwable cause){
-		return new TraCIException("Error creating TraCIVariable: " + cmd.toString(), cause);
+		return new TraCIException("Error creating TraCIPersonVar: " + cmd.toString(), cause);
 	}
 
 	public static TraCIException getNotImplemented(TraCIGetCommand cmd){
