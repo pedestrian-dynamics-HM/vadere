@@ -47,6 +47,10 @@ public class Simulation {
 
 	private boolean isRunSimulation = false;
 	private boolean isPaused = false;
+	private boolean singleStepMode = false;
+	private boolean waitForSimCommand = false;
+	private double simulateUntilInSec = -1;
+
 	/**
 	 * current simulation time (seconds)
 	 */
@@ -252,6 +256,36 @@ public class Simulation {
 					c.postUpdate(simTimeInSec);
 				}
 
+
+				// Single step hook
+				// Remote Control Hook
+				synchronized (this){
+					if (singleStepMode){
+						// check reached next simTime (-1 simulate one step)
+						if (simTimeInSec >= simulateUntilInSec || simulateUntilInSec == -1){
+							logger.warnf("Simulated until: %.4f", simTimeInSec);
+							logger.warn("check command queue");
+							logger.warn("check subscriptions");
+							// check command queue and execute (GET, SET Value)
+							// check subscriptions
+							// todo: add some control manger (i.e. TraCI-Manager, ...)
+
+							setWaitForSimCommand(true);
+							while (waitForSimCommand){
+								logger.warn("wait for next SimCommand...");
+								try {
+									wait();
+								} catch (InterruptedException e) {
+									waitForSimCommand = false;
+									Thread.currentThread().interrupt();
+									logger.warn("interrupt while waitForSimCommand");
+								}
+							}
+						}
+					}
+				}
+
+
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
@@ -362,11 +396,34 @@ public class Simulation {
 	}
 
 	public synchronized boolean isRunning() {
-		return isRunSimulation && !isPaused();
+		return isRunSimulation && !isPaused() && !isWaitForSimCommand();
+	}
+
+	public synchronized boolean isSingleStepMode(){ return singleStepMode;}
+
+	public void setSingleStepMode(boolean singleStepMode) {
+		this.singleStepMode = singleStepMode;
+	}
+
+	public boolean isWaitForSimCommand() {
+		return waitForSimCommand;
+	}
+
+	public void setWaitForSimCommand(boolean waitForSimCommand) {
+		this.waitForSimCommand = waitForSimCommand;
+	}
+
+	public synchronized void nextSimCommand(double simulateUntilInSec){
+		this.simulateUntilInSec = simulateUntilInSec;
+		waitForSimCommand = false;
+		isPaused = false;
+		notify();
 	}
 
 	public synchronized void resume() {
 		isPaused = false;
+		waitForSimCommand = false;
+		singleStepMode = false;
 		notify();
 	}
 

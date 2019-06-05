@@ -165,6 +165,22 @@ public class VadereProject {
 		return !currentScenarioRun.isRunning();
 	}
 
+	public boolean isScenarioInSingleStepMode(){
+		return currentScenarioRun.isScenarioInSingleStepMode();
+	}
+
+	public void setSingleStepMode(boolean singleStepMode){
+		currentScenarioRun.setSingleStepMode(singleStepMode);
+	}
+
+	public boolean isWaitForSimCommand(){
+		return currentScenarioRun.isWaitForSimCommand();
+	}
+
+	public void nextSimCommand(double simulateUntilInSec){
+		currentScenarioRun.nextSimCommand(simulateUntilInSec);
+	}
+
 	public void resumePausedScenarios() {
 		currentScenarioRun.resume();
 	}

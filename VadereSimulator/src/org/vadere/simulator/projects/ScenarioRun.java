@@ -143,6 +143,45 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isRunning();
 	}
 
+	public boolean isScenarioInSingleStepMode(){
+		return simulation != null && simulation.isSingleStepMode();
+	}
+
+	public void setSingleStepMode(boolean singleStepMode){
+
+		simulation.setSingleStepMode(singleStepMode);
+	}
+
+	public boolean isWaitForSimCommand(){
+		return simulation != null && simulation.isWaitForSimCommand();
+	}
+
+	public void nextSimCommand(double simulateUntilInSec){
+
+		if ( !simulation.isSingleStepMode())
+			throw new IllegalStateException("Simulation is not in 'remoteControl' state");
+
+		simulation.nextSimCommand(simulateUntilInSec);
+	}
+
+	public void pause() {
+
+		if(! simulation.isRunning())
+			throw new IllegalStateException("Received trigger to pause the simulation, but it is not running!");
+
+		if (simulation != null)
+			simulation.pause();
+	}
+
+	public void resume() {
+
+		if(simulation.isRunning())
+			throw new IllegalStateException("Received trigger to resume the simulation, but it is not paused!");
+
+		if (simulation != null)
+			simulation.resume();
+	}
+
 	public void addPassiveCallback(final PassiveCallback pc) {
 		passiveCallbacks.add(pc);
 	}
@@ -166,28 +205,6 @@ public class ScenarioRun implements Runnable {
 
 	public Path getOutputPath() {
 		return Paths.get(this.outputPath.toString());
-	}
-
-	public void pause() {
-
-		if(! simulation.isRunning()){
-			throw new IllegalStateException("Received trigger to pause the simulation, but it is not running!");
-		}
-
-		if (simulation != null) {
-			simulation.pause();
-		}
-	}
-
-	public void resume() {
-
-		if(simulation.isRunning()){
-			throw new IllegalStateException("Received trigger to resume the simulation, but it is not paused!");
-		}
-
-		if (simulation != null) {
-			simulation.resume();
-		}
 	}
 
 	private void createAndSetOutputDirectory() {
