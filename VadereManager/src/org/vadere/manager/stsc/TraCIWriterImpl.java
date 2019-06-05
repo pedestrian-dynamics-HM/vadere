@@ -1,6 +1,6 @@
 package org.vadere.manager.stsc;
 
-import org.vadere.manager.TraCiException;
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -12,25 +12,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-public class TraCIOutputWriter implements TraCIWriter {
+public class TraCIWriterImpl implements TraCIWriter {
 
 	ByteArrayOutputStream data;
 
 
 
-	public TraCIOutputWriter() {
+	public TraCIWriterImpl() {
 		data = new ByteArrayOutputStream();
 	}
 
-	ByteBuffer asByteBuffer(){
+	public ByteBuffer asByteBuffer(){
 		return ByteBuffer.wrap(data.toByteArray());
 	}
 
-	byte[] asByteArray(){
+	public byte[] asByteArray(){
 		return data.toByteArray();
 	}
 
-	void rest(){
+	public void rest(){
 		data.reset();
 	}
 
@@ -49,6 +49,42 @@ public class TraCIOutputWriter implements TraCIWriter {
 		data.write(buf, offset, len);
 	}
 
+
+	@Override
+	public void writeUnsignedByteWithId(int val) {
+		writeUnsignedByte(TraCIDataType.U_BYTE.identifier);
+		writeUnsignedByte(val);
+	}
+
+	@Override
+	public void writeByteWithId(byte val) {
+		writeUnsignedByte(TraCIDataType.BYTE.identifier);
+		writeByte(val);
+	}
+
+	@Override
+	public void writeIntWithId(int val) {
+		writeUnsignedByte(TraCIDataType.INTEGER.identifier);
+		writeInt(val);
+	}
+
+	@Override
+	public void writeDoubleWithId(double val) {
+		writeUnsignedByte(TraCIDataType.DOUBLE.identifier);
+		writeDouble(val);
+	}
+
+	@Override
+	public void writeStringWithId(String val) {
+		writeUnsignedByte(TraCIDataType.STRING.identifier);
+		writeString(val);
+	}
+
+	@Override
+	public void writeStringListWithId(List<String> val) {
+		writeUnsignedByte(TraCIDataType.STRING_LIST.identifier);
+		writeStringList(val);
+	}
 
 	@Override
 	public void writeString(String val){
@@ -70,14 +106,14 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void write2DPosition(double x, double y){
-		writeUnsignedByte(TraCIDataTypes.POS_2D.identifier);
+		writeUnsignedByte(TraCIDataType.POS_2D.identifier);
 		writeDouble(x);
 		writeDouble(y);
 	}
 
 	@Override
 	public void write3DPosition(double x, double y, double z){
-		writeUnsignedByte(TraCIDataTypes.POS_3D.identifier);
+		writeUnsignedByte(TraCIDataType.POS_3D.identifier);
 		writeDouble(x);
 		writeDouble(y);
 		writeDouble(z);
@@ -86,7 +122,7 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void writeRoadMapPosition(String roadId, double pos, int laneId){
-		writeUnsignedByte(TraCIDataTypes.POS_ROAD_MAP.identifier);
+		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.identifier);
 		writeString(roadId);
 		writeDouble(pos);
 		writeUnsignedByte(laneId);
@@ -94,14 +130,14 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void writeLonLatPosition(double lon, double lat){
-		writeUnsignedByte(TraCIDataTypes.POS_LON_LAT.identifier);
+		writeUnsignedByte(TraCIDataType.POS_LON_LAT.identifier);
 		writeDouble(lon);
 		writeDouble(lat);
 	}
 
 	@Override
 	public void writeLonLatAltPosition(double lon, double lat, double alt){
-		writeUnsignedByte(TraCIDataTypes.POS_LON_LAT_ALT.identifier);
+		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.identifier);
 		writeDouble(lon);
 		writeDouble(lat);
 		writeDouble(alt);
@@ -114,9 +150,9 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void writePolygon(List<VPoint> points){
-		writeUnsignedByte(TraCIDataTypes.POLYGON.identifier);
+		writeUnsignedByte(TraCIDataType.POLYGON.identifier);
 		if(points.size() > 255)
-			throw new TraCiException("Polygon to big. TraCI only supports polygon up to 255 points.");
+			throw new TraCIException("Polygon to big. TraCI only supports polygon up to 255 points.");
 		writeUnsignedByte(points.size());
 		points.forEach(p -> {
 			writeDouble(p.getX());
@@ -126,9 +162,9 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void writeTrafficLightPhaseList(List<TrafficLightPhase> phases){
-		writeUnsignedByte(TraCIDataTypes.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
 		if(phases.size() > 255)
-			throw new TraCiException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
+			throw new TraCIException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
 		writeUnsignedByte(phases.size());
 		phases.forEach( phase -> {
 			writeString(phase.getPrecRoad());
@@ -139,7 +175,7 @@ public class TraCIOutputWriter implements TraCIWriter {
 
 	@Override
 	public void writeColor(Color color){
-		writeUnsignedByte(TraCIDataTypes.COLOR.identifier);
+		writeUnsignedByte(TraCIDataType.COLOR.identifier);
 		writeUnsignedByte(color.getRed());
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());

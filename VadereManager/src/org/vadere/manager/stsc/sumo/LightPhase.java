@@ -19,7 +19,7 @@ public enum LightPhase {
 			if (value.id == id)
 				return value;
 		}
-		throw new IllegalArgumentException("No LightPhase for id: " + id);
+		throw new IllegalArgumentException("No LightPhase for traCICmd: " + id);
 	}
 
 }

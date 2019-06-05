@@ -9,6 +9,14 @@ import java.util.List;
 public interface TraCIWriter extends ByteWriter {
 
 
+	void writeUnsignedByteWithId(int val);
+	void writeByteWithId(byte val);
+	void writeIntWithId(int val);
+	void writeDoubleWithId(double val);
+	void writeStringWithId(String val);
+	void writeStringListWithId(List<String> val);
+
+
 	void writeString(String val);
 
 	void writeStringList(List<String> val);

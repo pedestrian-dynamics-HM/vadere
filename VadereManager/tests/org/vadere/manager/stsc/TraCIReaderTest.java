@@ -20,12 +20,12 @@ import static org.junit.Assert.assertThat;
 
 public class TraCIReaderTest {
 
-	TraCIOutputWriter writer;
-	TraCIReader reader;
+	TraCIWriterImpl writer;
+	TraCIReaderImpl reader;
 
 	@Before
 	public void before(){
-		writer = new TraCIOutputWriter();
+		writer = new TraCIWriterImpl();
 	}
 
 	@After
@@ -34,11 +34,11 @@ public class TraCIReaderTest {
 	}
 
 	private void createReader(){
-		reader = TraCIReader.wrap(writer.asByteArray());
+		reader = TraCIReaderImpl.wrap(writer.asByteArray());
 	}
 
 	private void checkEmpty(){
-		assertThat("TraCIReader must be empty at this point", reader.hasRemaining(), equalTo(false));
+		assertThat("TraCIReaderImpl must be empty at this point", reader.hasRemaining(), equalTo(false));
 	}
 
 	private void checkIdentifier( int matchWith){
@@ -124,7 +124,7 @@ public class TraCIReaderTest {
 		writer.write2DPosition(22.3, 4.0);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.POS_2D.identifier);
+		checkIdentifier(TraCIDataType.POS_2D.identifier);
 		VPoint p = reader.read2DPosition();
 		assertThat(p.x, equalTo(22.3));
 		assertThat(p.y, equalTo(4.0));
@@ -138,7 +138,7 @@ public class TraCIReaderTest {
 		writer.write3DPosition(11.1, 22.2, 33.3);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.POS_3D.identifier);
+		checkIdentifier(TraCIDataType.POS_3D.identifier);
 		Vector3D vec = reader.read3DPosition();
 		assertThat(vec.x, equalTo(11.1));
 		assertThat(vec.y, equalTo(22.2));
@@ -153,7 +153,7 @@ public class TraCIReaderTest {
 		writer.writeRoadMapPosition("road_001", 12.5, 0);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.POS_ROAD_MAP.identifier);
+		checkIdentifier(TraCIDataType.POS_ROAD_MAP.identifier);
 		RoadMapPosition roadMapPosition = reader.readRoadMapPosition();
 		assertThat(roadMapPosition.getRoadId(), equalTo("road_001"));
 		assertThat(roadMapPosition.getPos(), equalTo(12.5));
@@ -168,7 +168,7 @@ public class TraCIReaderTest {
 		writer.writeLonLatPosition(23.3, 11.9);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.POS_LON_LAT.identifier);
+		checkIdentifier(TraCIDataType.POS_LON_LAT.identifier);
 		VPoint lonLat = reader.readLonLatPosition();
 		assertThat(lonLat.x, equalTo(23.3));
 		assertThat(lonLat.y, equalTo(11.9));
@@ -182,7 +182,7 @@ public class TraCIReaderTest {
 		writer.writeLonLatAltPosition(34.5, 34.0, 11.3436);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.POS_LON_LAT_ALT.identifier);
+		checkIdentifier(TraCIDataType.POS_LON_LAT_ALT.identifier);
 		Vector3D lonlatalt = reader.readLonLatAltPosition();
 		assertThat(lonlatalt.x, equalTo(34.5));
 		assertThat(lonlatalt.y, equalTo(34.0));
@@ -199,7 +199,7 @@ public class TraCIReaderTest {
 		createReader();
 
 		VPolygon match = GeometryUtils.polygonFromPoints2D(points);
-		checkIdentifier(TraCIDataTypes.POLYGON.identifier);
+		checkIdentifier(TraCIDataType.POLYGON.identifier);
 		VPolygon actual = reader.readPolygon();
 		assertThat(actual, equalTo(match));
 
@@ -215,7 +215,7 @@ public class TraCIReaderTest {
 		writer.writeTrafficLightPhaseList(phases);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		checkIdentifier(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
 		List<TrafficLightPhase> actualPhases = reader.readTrafficLightPhaseList();
 		assertThat(actualPhases, equalTo(phases));
 
@@ -229,7 +229,7 @@ public class TraCIReaderTest {
 		writer.writeColor(color);
 		createReader();
 
-		checkIdentifier(TraCIDataTypes.COLOR.identifier);
+		checkIdentifier(TraCIDataType.COLOR.identifier);
 		assertThat(reader.readColor(), equalTo(color));
 
 		// buf must be empty

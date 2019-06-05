@@ -1,10 +1,12 @@
 package org.vadere.manager.stsc;
 
+import org.vadere.manager.stsc.commands.TraCICmd;
+
 import java.nio.ByteBuffer;
 
 public class TraCIPacket extends Packet {
 
-	private TraCIOutputWriter data;
+	private TraCIWriterImpl data;
 	private boolean containsLengthField;
 
 
@@ -17,7 +19,7 @@ public class TraCIPacket extends Packet {
 	}
 
 	private TraCIPacket() {
-		data = new TraCIOutputWriter();
+		data = new TraCIWriterImpl();
 	}
 
 
@@ -51,6 +53,14 @@ public class TraCIPacket extends Packet {
 		return packet.array();
 	}
 
+	public byte[] extractCommandsOnly(){
+		byte[] ret = new byte[data.size()-4];
+		ByteBuffer buffer = data.asByteBuffer();
+		buffer.position(4);
+		buffer.get(ret, 0, ret.length);
+		return ret;
+	}
+
 	public TraCIPacket addCommand(ByteBuffer buf){
 		data.writeBytes(buf);
 		return this;
@@ -59,6 +69,14 @@ public class TraCIPacket extends Packet {
 	public TraCIPacket addCommand(byte[] buf){
 		data.writeBytes(buf);
 		return this;
+	}
+
+	public TraCIPacket add_Err_StatusResponse(int cmdIdentifier, String description){
+		return addStatusResponse(cmdIdentifier, TraCIStatusResponse.ERR, description);
+	}
+
+	public TraCIPacket add_OK_StatusResponse(TraCICmd traCICmd){
+		return add_OK_StatusResponse(traCICmd.id);
 	}
 
 	public TraCIPacket add_OK_StatusResponse(int cmdIdentifier){

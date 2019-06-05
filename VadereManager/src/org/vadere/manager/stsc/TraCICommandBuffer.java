@@ -30,7 +30,7 @@ public class TraCICommandBuffer extends TraCIBuffer{
 			throw new IllegalStateException("TraCI Command Identifier already consumed. readCmdIdentifier() must only be called once. Something went wrong in the TraCI message handling.");
 
 		cmdIdentifierRead = true;
-		return buffer.readUnsignedByte();
+		return reader.readUnsignedByte();
 	}
 
 

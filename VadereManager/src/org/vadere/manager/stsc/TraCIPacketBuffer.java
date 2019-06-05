@@ -1,6 +1,6 @@
 package org.vadere.manager.stsc;
 
-import org.vadere.manager.TraCICommand;
+import org.vadere.manager.stsc.commands.TraCICommand;
 
 import java.nio.ByteBuffer;
 
@@ -31,19 +31,20 @@ public class TraCIPacketBuffer extends TraCIBuffer {
 	}
 
 	public TraCICommand nextCommand(){
-		if (!buffer.hasRemaining())
+		if (!reader.hasRemaining())
 			return null;
 
 		int cmdLen = getCommandDataLen();
-		return new TraCICommand(TraCICommandBuffer.wrap(buffer.readByteBuffer(cmdLen)));
+
+		return TraCICommand.createCommand(reader.readByteBuffer(cmdLen));
 	}
 
 
 	private int getCommandDataLen(){
-		int cmdLen = buffer.readUnsignedByte();
+		int cmdLen = reader.readUnsignedByte();
 		if (cmdLen == 0 ){
 			// extended cmdLen field used.
-			cmdLen = buffer.readInt() - 5; // subtract cmdLen field:  1 ubyte + 1 int (4)
+			cmdLen = reader.readInt() - 5; // subtract cmdLen field:  1 ubyte + 1 int (4)
 		} else {
 			cmdLen -= 1; // subtract cmdLen field: 1 ubyte
 		}

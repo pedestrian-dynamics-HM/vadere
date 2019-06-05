@@ -5,4 +5,6 @@ public abstract class Packet {
 
 	public abstract byte[] send();
 
+	public abstract byte[] extractCommandsOnly();
+
 }

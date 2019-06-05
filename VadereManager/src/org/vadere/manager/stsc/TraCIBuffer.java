@@ -4,18 +4,18 @@ import java.nio.ByteBuffer;
 
 public abstract class TraCIBuffer {
 
-	protected TraCIReader buffer;
+	public TraCIReader reader;
 
 	protected TraCIBuffer (byte[] buf){
-		buffer = TraCIReader.wrap(buf);
+		reader = TraCIReaderImpl.wrap(buf);
 	}
 
 	protected TraCIBuffer (ByteBuffer buf){
-		buffer = TraCIReader.wrap(buf);
+		reader = TraCIReaderImpl.wrap(buf);
 	}
 
 
 	public boolean hasRemaining(){
-		return buffer.hasRemaining();
+		return reader.hasRemaining();
 	}
 }

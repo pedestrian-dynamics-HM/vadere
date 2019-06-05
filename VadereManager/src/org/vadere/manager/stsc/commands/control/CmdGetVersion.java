@@ -1,20 +1,21 @@
-package org.vadere.manager.commandHandler;
-
+package org.vadere.manager.stsc.commands.control;
 
 import de.tudresden.sumo.config.Constants;
 
-import org.vadere.manager.TraCICommand;
 import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.TraCIWriter;
+import org.vadere.manager.stsc.commands.TraCICmd;
+import org.vadere.manager.stsc.commands.TraCICommand;
 
-public class GetVersionCmdHandler implements CommandHandler{
+public class CmdGetVersion extends TraCICommand {
 
+	public CmdGetVersion(TraCICmd traCICmd){
+		super(traCICmd);
+	}
 
 	@Override
-	public TraCIPacket handelCommand(TraCICommand cmd) {
-
-
-		TraCIPacket response = TraCIPacket.createDynamicPacket();
+	public TraCIPacket handleCommand(TraCIPacket response) {
+		response = TraCIPacket.createDynamicPacket();
 
 		response.add_OK_StatusResponse(Constants.CMD_GETVERSION);
 

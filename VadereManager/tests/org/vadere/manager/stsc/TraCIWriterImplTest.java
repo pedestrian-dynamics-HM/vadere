@@ -3,7 +3,7 @@ package org.vadere.manager.stsc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.manager.TraCiException;
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -17,13 +17,13 @@ import java.util.stream.IntStream;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class TraCIOutputWriterTest {
+public class TraCIWriterImplTest {
 
-	TraCIOutputWriter writer;
+	TraCIWriterImpl writer;
 
 	@Before
 	public void before(){
-		writer = new TraCIOutputWriter();
+		writer = new TraCIWriterImpl();
 	}
 
 	@After
@@ -166,7 +166,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POS_2D.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POS_2D.identifier);
 
 		// check x, y
 		assertThat(buf.getDouble(), equalTo(23.456));
@@ -182,7 +182,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POS_3D.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POS_3D.identifier);
 
 		// check x, y, z
 		assertThat(buf.getDouble(), equalTo(3.34));
@@ -201,7 +201,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POS_ROAD_MAP.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POS_ROAD_MAP.identifier);
 
 		// check roadId
 		checkString(buf, "r001");
@@ -222,7 +222,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POS_LON_LAT.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT.identifier);
 
 		// check lon, lat
 		assertThat(buf.getDouble(), equalTo(49.3345));
@@ -238,7 +238,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POS_LON_LAT_ALT.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT_ALT.identifier);
 
 		// check lon, lat, alt
 		assertThat(buf.getDouble(), equalTo(49.33));
@@ -249,7 +249,7 @@ public class TraCIOutputWriterTest {
 		checkEmpty(buf);
 	}
 
-	@Test(expected = TraCiException.class)
+	@Test(expected = TraCIException.class)
 	public void writePolygonWithError(){
 		ArrayList<VPoint> points = new ArrayList<>();
 		IntStream.range(0, 300).forEach( i -> points.add(new VPoint(i,i)));
@@ -268,7 +268,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.POLYGON.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.POLYGON.identifier);
 
 		// check number of points (ubyte)
 		assertThat(buf.get() & 0xff, equalTo(3));
@@ -288,7 +288,7 @@ public class TraCIOutputWriterTest {
 	}
 
 
-	@Test(expected = TraCiException.class)
+	@Test(expected = TraCIException.class)
 	public void writeTrafficLightPhaseListError(){
 		ArrayList<TrafficLightPhase> phases = new ArrayList<>();
 		IntStream.range(0, 256)
@@ -308,7 +308,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
 
 		// check number of phases
 		assertThat(buf.get() & 0xff, equalTo(1));
@@ -330,7 +330,7 @@ public class TraCIOutputWriterTest {
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataTypes.COLOR.identifier);
+		checkIdentifier(buf.get(), TraCIDataType.COLOR.identifier);
 
 		// check color rgba
 		assertThat(buf.get() & 0xff, equalTo(10) );

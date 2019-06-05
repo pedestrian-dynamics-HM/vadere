@@ -1,5 +1,6 @@
 package org.vadere.manager;
 
+import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.TraCIPacketBuffer;
 import org.vadere.util.logging.Logger;
