@@ -7,6 +7,7 @@ public enum TraCICmd {
 	CLOSE(0x7F, CmdType.CTRL),
 	LOAD(0x01,CmdType.CTRL),
 	SET_ORDER(0x03, CmdType.CTRL),
+	SEND_FILE(0x75, CmdType.CTRL),
 	// Value Retrieval
 	GET_INDUCTION_LOOP(0xa0, CmdType.VALUE_GET),
 	RESPONSE_GET_INDUCTION_LOOP(0xb0, CmdType.RESPONSE),

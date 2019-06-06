@@ -10,10 +10,10 @@ public class TraCIGetVersionCommand extends TraCICommand {
 	private TraCIGetVersionResponse response;
 
 	public static TraCIPacket build(){
-		TraCIPacket packet = TraCIPacket.create(6);
+		TraCIPacket packet = TraCIPacket.create(6); // 4
 		packet.getWriter()
-				.writeUnsignedByte(2)
-				.writeUnsignedByte(TraCICmd.GET_VERSION.id);
+				.writeCommandLength(2) // 1
+				.writeUnsignedByte(TraCICmd.GET_VERSION.id); // 1
 		return packet;
 	}
 

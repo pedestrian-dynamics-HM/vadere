@@ -49,7 +49,7 @@ public class TraCIPacketBuffer extends TraCIBuffer {
 
 		if (!reader.hasRemaining()){
 			// only StatusResponse
-			return TraCIResponse.create(statusResponse, ByteBuffer.wrap(new byte[0]));
+			return TraCIResponse.create(statusResponse);
 		} else {
 			int responseDataLen = getCommandDataLen();
 			ByteBuffer buffer = reader.readByteBuffer(responseDataLen);

@@ -12,6 +12,10 @@ public class TraCIResponse {
 	protected TraCICmd responseIdentifier;
 
 
+	public static TraCIResponse create(StatusResponse statusResponse){
+		return new TraCIResponse(statusResponse, statusResponse.getCmdIdentifier());
+	}
+
 	public static TraCIResponse create(StatusResponse statusResponse, ByteBuffer rawCmd){
 		TraCICommandBuffer cmdResponseBuffer = TraCICommandBuffer.wrap(rawCmd);
 

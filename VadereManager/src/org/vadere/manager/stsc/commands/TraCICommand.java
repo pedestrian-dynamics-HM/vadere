@@ -4,6 +4,7 @@ import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.CmdType;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
@@ -49,9 +50,10 @@ public abstract class TraCICommand {
 				return new TraCISimStepCommand(cmd, cmdBuffer);
 			case CLOSE:
 				return new TraCICloseCommand(cmd);
-
+			case SEND_FILE:
+				return new TraCISendFileCommand(cmd, cmdBuffer);
 			default:
-				throw  new IllegalStateException("Should not be reached. Only TraCI control commands expected");
+				throw  new IllegalStateException(String.format("Should not be reached. Only TraCI control commands expected: %0X", cmd.id));
 		}
 
 	}

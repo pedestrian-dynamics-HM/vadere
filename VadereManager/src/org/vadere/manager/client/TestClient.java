@@ -2,9 +2,11 @@ package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
 import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.respons.TraCIResponse;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
+import org.vadere.manager.stsc.respons.TraCIResponse;
+import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -31,20 +33,9 @@ public class TestClient implements Runnable{
 	}
 
 
-	void getVersion(String[] args) throws IOException {
-		TraCIPacket p = TraCIGetVersionCommand.build();
-
-		traCISocket.sendExact(p);
-
-		TraCIPacketBuffer buf = traCISocket.receiveExact();
-		TraCIResponse cmd = buf.nextResponse();
-
-		System.out.println(cmd.toString());
-
-	}
-
 	private void addCommands(ConsoleReader consoleReader){
 		consoleReader.addCommand("getVersion", "", this::getVersion);
+		consoleReader.addCommand("sendFile", "send file. default: scenario001", this::sendFile);
 	}
 
 
@@ -110,4 +101,35 @@ public class TestClient implements Runnable{
 		}
 
 	}
+
+	// Commands
+
+	void getVersion(String[] args) throws IOException {
+		TraCIPacket p = TraCIGetVersionCommand.build();
+
+		traCISocket.sendExact(p);
+
+		TraCIPacketBuffer buf = traCISocket.receiveExact();
+		TraCIResponse cmd = buf.nextResponse();
+
+		System.out.println(cmd.toString());
+	}
+
+	void sendFile(String[] args) throws IOException {
+
+		String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/scenario001.scenario";
+
+		if (args.length > 1)
+			filePath = args[1];
+
+		TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand(IOUtils.readTextFile(filePath));
+
+		traCISocket.sendExact(packet);
+
+		TraCIPacketBuffer buf = traCISocket.receiveExact();
+		TraCIResponse cmd = buf.nextResponse();
+
+		System.out.println(cmd.toString());
+	}
+
 }

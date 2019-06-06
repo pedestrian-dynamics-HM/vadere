@@ -3,11 +3,16 @@ package org.vadere.manager.commandHandler;
 
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.util.logging.Logger;
 
 public class ControlCommandHandler extends CommandHandler{
+
+	private static Logger logger = Logger.getLogger(CommandExecutor.class);
 
 	public static ControlCommandHandler instance;
 
@@ -44,4 +49,15 @@ public class ControlCommandHandler extends CommandHandler{
 	}
 
 
+	public TraCICommand process_load_file(TraCICommand rawCmd) {
+
+		TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
+
+		Scenario s = new Scenario(cmd.getFile());
+
+		logger.infof("Received scenario File: %s", s.getName());
+
+
+		return cmd;
+	}
 }

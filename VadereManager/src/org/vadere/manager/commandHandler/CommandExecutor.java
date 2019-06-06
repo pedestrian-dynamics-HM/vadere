@@ -38,6 +38,7 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.LOAD.id, ControlCommandHandler.instance::process_load);
 		cmdMap.put(TraCICmd.SIM_STEP.id, ControlCommandHandler.instance::process_simStep);
 		cmdMap.put(TraCICmd.CLOSE.id, ControlCommandHandler.instance::process_close);
+		cmdMap.put(TraCICmd.SEND_FILE.id, ControlCommandHandler.instance::process_load_file);
 		cmdMap.put(TraCICmd.GET_PERSON_VALUE.id, PersonCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_PERSON_STATE.id, PersonCommandHandler.instance::processSet);
 	}
