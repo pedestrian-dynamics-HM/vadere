@@ -1,7 +1,10 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.reader;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Wraps single command with command length removed.
+ */
 public class TraCICommandBuffer extends TraCIBuffer{
 
 	private boolean cmdIdentifierRead;
@@ -13,6 +16,11 @@ public class TraCICommandBuffer extends TraCIBuffer{
 	public static TraCICommandBuffer wrap(ByteBuffer buf){
 		return new TraCICommandBuffer(buf);
 	}
+
+	public static TraCICommandBuffer empty(){
+		return new TraCICommandBuffer(new byte[0]);
+	}
+
 
 	protected TraCICommandBuffer(byte[] buf) {
 		super(buf);

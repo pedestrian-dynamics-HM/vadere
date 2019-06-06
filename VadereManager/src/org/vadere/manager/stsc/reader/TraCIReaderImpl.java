@@ -1,6 +1,7 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.reader;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
@@ -20,13 +21,13 @@ public class TraCIReaderImpl implements TraCIReader {
 
 	private ByteBuffer byteBuffer;
 
-	static TraCIReaderImpl wrap(byte[] data){
+	public static TraCIReaderImpl wrap(byte[] data){
 		TraCIReaderImpl traCIReaderImpl = new TraCIReaderImpl();
 		traCIReaderImpl.byteBuffer = ByteBuffer.wrap(data);
 		return traCIReaderImpl;
 	}
 
-	static TraCIReaderImpl wrap(ByteBuffer buffer){
+	public static TraCIReaderImpl wrap(ByteBuffer buffer){
 		TraCIReaderImpl traCIReaderImpl = new TraCIReaderImpl();
 		traCIReaderImpl.byteBuffer =  buffer;
 		return traCIReaderImpl;
@@ -61,6 +62,9 @@ public class TraCIReaderImpl implements TraCIReader {
 	public String readString(){
 		ensureBytes(4);
 		int len = byteBuffer.getInt();
+
+		if(len == 0)
+			return "";
 
 		ensureBytes(len);
 		byte[] stringBytes = new byte[len];

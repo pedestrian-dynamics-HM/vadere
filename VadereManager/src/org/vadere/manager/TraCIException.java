@@ -1,6 +1,6 @@
 package org.vadere.manager;
 
-import org.vadere.manager.stsc.commands.TraCICmd;
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 
 public class TraCIException extends RuntimeException {

@@ -3,9 +3,11 @@ package org.vadere.manager.stsc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.manager.stsc.reader.TraCIReaderImpl;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
+import org.vadere.manager.stsc.writer.TraCIWriterImpl;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -121,7 +123,7 @@ public class TraCIReaderTest {
 
 	@Test
 	public void read2DPosition() {
-		writer.write2DPosition(22.3, 4.0);
+		writer.write2DPosition(new VPoint(22.3, 4.0));
 		createReader();
 
 		checkIdentifier(TraCIDataType.POS_2D.identifier);
@@ -135,7 +137,7 @@ public class TraCIReaderTest {
 
 	@Test
 	public void read3DPosition() {
-		writer.write3DPosition(11.1, 22.2, 33.3);
+		writer.write3DPosition(new Vector3D(11.1, 22.2, 33.3));
 		createReader();
 
 		checkIdentifier(TraCIDataType.POS_3D.identifier);
@@ -150,7 +152,7 @@ public class TraCIReaderTest {
 
 	@Test
 	public void readRoadMapPosition() {
-		writer.writeRoadMapPosition("road_001", 12.5, 0);
+		writer.writeRoadMapPosition(new RoadMapPosition("road_001", 12.5, 0));
 		createReader();
 
 		checkIdentifier(TraCIDataType.POS_ROAD_MAP.identifier);
@@ -165,7 +167,7 @@ public class TraCIReaderTest {
 
 	@Test
 	public void readLonLatPosition() {
-		writer.writeLonLatPosition(23.3, 11.9);
+		writer.writeLonLatPosition(new VPoint(23.3, 11.9));
 		createReader();
 
 		checkIdentifier(TraCIDataType.POS_LON_LAT.identifier);
@@ -179,7 +181,7 @@ public class TraCIReaderTest {
 
 	@Test
 	public void readLonLatAltPosition() {
-		writer.writeLonLatAltPosition(34.5, 34.0, 11.3436);
+		writer.writeLonLatAltPosition(new Vector3D(34.5, 34.0, 11.3436));
 		createReader();
 
 		checkIdentifier(TraCIDataType.POS_LON_LAT_ALT.identifier);

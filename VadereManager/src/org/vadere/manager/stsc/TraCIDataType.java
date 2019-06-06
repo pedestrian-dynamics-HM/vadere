@@ -21,9 +21,9 @@ public enum TraCIDataType {
 
 
 
-	int identifier;
-	int size_in_byte;
-	boolean isAtomar;
+	public int identifier;
+	public int size_in_byte;
+	public boolean isAtomar;
 
 
 	TraCIDataType(int identifier, int size_in_byte, boolean isAtomar){

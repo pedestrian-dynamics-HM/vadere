@@ -1,4 +1,4 @@
-package org.vadere.manager.stsc.commands;
+package org.vadere.manager.stsc;
 
 public enum TraCICmd {
 	// TraCI/Control-related commands
@@ -78,8 +78,6 @@ public enum TraCICmd {
 	// TraCI/Object Context Subscription
 
 	UNKNOWN_CMD(-1, CmdType.UNKNOWN)
-
-
 	;
 
 	public int id;
@@ -91,7 +89,7 @@ public enum TraCICmd {
 
 	}
 
-	static TraCICmd fromId(int id){
+	public static TraCICmd fromId(int id){
 		for(TraCICmd traCICmd : values()){
 			if (traCICmd.id == id)
 				return traCICmd;
@@ -100,15 +98,13 @@ public enum TraCICmd {
 		return UNKNOWN_CMD;
 	}
 
-	boolean isUnknown(){
+	public boolean isUnknown(){
 		return this.id == UNKNOWN_CMD.id;
 	}
 
 	@Override
 	public String toString() {
-		return "TraCICmd{" +
-				"id=" + id +
-				", type=" + type +
-				'}';
+
+		return String.format("TraCICmd{id=0x%02X, type=%s}", id, type );
 	}
 }

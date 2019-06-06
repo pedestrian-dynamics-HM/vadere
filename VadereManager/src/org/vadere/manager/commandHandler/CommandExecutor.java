@@ -1,10 +1,8 @@
-package org.vadere.manager;
+package org.vadere.manager.commandHandler;
 
-import org.vadere.manager.commandHandler.ControlCommandHandler;
-import org.vadere.manager.commandHandler.PersonCommandHandler;
-import org.vadere.manager.commandHandler.TraCICmdHandler;
+import org.vadere.manager.RemoteManager;
 import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.commands.TraCICmd;
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.util.logging.Logger;
 
@@ -44,14 +42,14 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.SET_PERSON_STATE.id, PersonCommandHandler.instance::processSet);
 	}
 
-	TraCIPacket execute(TraCICommand cmd){
-		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd());
+	public TraCIPacket execute(TraCICommand cmd){
+		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd().id);
 		if (handler == null){
-			logger.errorf("No CommandHandler found for command: %02X", cmd.getTraCICmd());
+			logger.errorf("No CommandHandler found for command: %02X", cmd.getTraCICmd().id);
 			return TraCIPacket.create().add_Err_StatusResponse(cmd.getTraCICmd().id, "ID not found.");
 		}
 
-		return handler.handel(cmd);
+		return handler.handel(cmd).buildResponsePacket();
 
 	}
 }

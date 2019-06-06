@@ -1,7 +1,10 @@
 package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.TraCICommandBuffer;
+import org.vadere.manager.stsc.CmdType;
+import org.vadere.manager.stsc.TraCICmd;
+import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
@@ -11,8 +14,9 @@ import java.nio.ByteBuffer;
 public abstract class TraCICommand {
 
 	protected TraCICmd traCICmd;
+	protected TraCIPacket NOK_response = null;
 
-	public static TraCICommand createCommand(ByteBuffer rawCmd){
+	public static TraCICommand create(ByteBuffer rawCmd){
 		TraCICommandBuffer cmdBuffer = TraCICommandBuffer.wrap(rawCmd);
 
 		int identifier = cmdBuffer.readCmdIdentifier();
@@ -73,4 +77,11 @@ public abstract class TraCICommand {
 		return traCICmd.type;
 	}
 
+
+	public TraCICommand setNOK_response(TraCIPacket NOK_response) {
+		this.NOK_response = NOK_response;
+		return this;
+	}
+
+	public abstract TraCIPacket buildResponsePacket();
 }

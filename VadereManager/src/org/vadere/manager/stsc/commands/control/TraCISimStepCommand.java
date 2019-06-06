@@ -1,13 +1,18 @@
 package org.vadere.manager.stsc.commands.control;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.TraCICommandBuffer;
-import org.vadere.manager.stsc.commands.TraCICmd;
+import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.reader.TraCICommandBuffer;
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 
 public class TraCISimStepCommand extends TraCICommand {
 
 	private double targetTime;
+
+	private TraCISimTimeResponse response;
+
 
 	public TraCISimStepCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
@@ -22,4 +27,24 @@ public class TraCISimStepCommand extends TraCICommand {
 		return targetTime;
 	}
 
+
+	public void setTargetTime(double targetTime) {
+		this.targetTime = targetTime;
+	}
+
+	public TraCISimTimeResponse getResponse() {
+		return response;
+	}
+
+	public void setResponse(TraCISimTimeResponse response) {
+		this.response = response;
+	}
+
+	@Override
+	public TraCIPacket buildResponsePacket() {
+		if (NOK_response != null)
+			return NOK_response;
+		else
+			return TraCIPacket.create().wrapSimTimeStepCommand(this); // TODO
+	}
 }

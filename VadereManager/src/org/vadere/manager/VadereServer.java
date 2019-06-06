@@ -23,6 +23,7 @@ public class VadereServer implements Runnable{
 	@Override
 	public void run() {
 		try {
+			logger.infof("listening on port %d...", serverSocket.getLocalPort());
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 

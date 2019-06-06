@@ -1,12 +1,16 @@
 package org.vadere.manager.stsc;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.commands.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
+import org.vadere.manager.stsc.respons.StatusResponse;
+import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
+import org.vadere.manager.stsc.respons.TraCIStatusResponse;
+import org.vadere.manager.stsc.writer.TraCIWriter;
+import org.vadere.manager.stsc.writer.TraCIWriterImpl;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 public class TraCIPacket {
 
@@ -54,8 +58,9 @@ public class TraCIPacket {
 		return response;
 	}
 
-	private void finalizePacket(){
+	public TraCIPacket finalizePacket(){
 		finalized = true;
+		return this;
 	}
 
 	private void throwIfFinalized(){
@@ -69,12 +74,6 @@ public class TraCIPacket {
 		emptyLengthField = false;
 	}
 
-
-
-	public TraCIPacket reset(){
-		writer.rest();
-		return this;
-	}
 
 	private TraCIPacket addEmptyLengthField(){
 		if(emptyLengthField)
@@ -103,67 +102,58 @@ public class TraCIPacket {
 
 	}
 
+	private TraCIWriter getCmdBuilder(){
+		return new TraCIWriterImpl();
+	}
 
-	private TraCIWriter getCmdBuilder(TraCIGetCommand cmd, TraCICmd responseCMD){
-		return new TraCIWriterImpl()
-				.writeUnsignedByte(responseCMD.id)
+	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd){
+		add_OK_StatusResponse(cmd.getTraCICmd());
+
+		TraCIWriter cmdBuilder = getCmdBuilder();
+		cmdBuilder.writeUnsignedByte(cmd.getResponseIdentifier().id)
 				.writeUnsignedByte(cmd.getVariableId())
-				.writeString(cmd.getElementId());
-	}
+				.writeString(cmd.getElementId())
+				.writeObjectWithId(cmd.getResponseDataType(), cmd.getResponseData());
 
-
-	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd, TraCICmd responseCMD, List<String> data){
-
-		add_OK_StatusResponse(cmd.getTraCICmd());
-
-		addCommand(getCmdBuilder(cmd, responseCMD)
-						.writeStringListWithId(data)
-						.asByteArray());
-		return this;
-	}
-
-
-	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd, TraCICmd responseCMD, int data){
-
-		add_OK_StatusResponse(cmd.getTraCICmd());
-
-		addCommand(getCmdBuilder(cmd, responseCMD)
-				.writeIntWithId(data)
-				.asByteArray());
+		addCommandWithoutLen(cmdBuilder.asByteArray());
 
 		return this;
 	}
 
-	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd, TraCICmd responseCMD, double data){
+	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
+		TraCIGetVersionResponse res = cmd.getResponse();
 
-		add_OK_StatusResponse(cmd.getTraCICmd());
+		if(res.isOKResponseStatus())
+			add_OK_StatusResponse(cmd.getTraCICmd());
+		else
+			addStatusResponse(res.getStatusResponse());
 
-		addCommand(getCmdBuilder(cmd, responseCMD)
-				.writeDoubleWithId(data)
-				.asByteArray());
+		TraCIWriter cmdBuilder = getCmdBuilder();
+		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+				.writeInt(res.getVersionId())
+				.writeString(res.getVersionString());
+
+		addCommandWithoutLen(cmdBuilder.asByteArray());
 
 		return this;
 	}
 
-	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd, TraCICmd responseCMD, VPoint data){
+	public TraCIPacket wrapSimTimeStepCommand(TraCISimStepCommand cmd){
+		addStatusResponse(cmd.getResponse().getStatusResponse());
 
-		add_OK_StatusResponse(cmd.getTraCICmd());
-
-		addCommand(getCmdBuilder(cmd, responseCMD)
-				.write2DPosition(data.x, data.y)
-				.asByteArray());
+		// todo: send subscription data...
 
 		return this;
 	}
 
 
-	private void addCommand(byte[] buffer){
+	public void addCommandWithoutLen(byte[] buffer){
 		if (buffer.length > 255){
 			writer.writeUnsignedByte(0);
-			writer.writeInt(buffer.length);
+			writer.writeInt(buffer.length + 5); // 1 + 4 length field
 			writer.writeBytes(buffer);
 		} else {
-			writer.writeUnsignedByte(buffer.length);
+			writer.writeUnsignedByte(buffer.length + 1); // 1 length field
 			writer.writeBytes(buffer);
 		}
 	}
@@ -186,6 +176,11 @@ public class TraCIPacket {
 		writer.writeUnsignedByte(cmdIdentifier);
 		writer.writeUnsignedByte(TraCIStatusResponse.OK.code);
 		writer.writeInt(0);
+		return this;
+	}
+
+	public TraCIPacket addStatusResponse(StatusResponse res) {
+		addStatusResponse(res.getCmdIdentifier().id, res.getResponse(), res.getDescription());
 		return this;
 	}
 

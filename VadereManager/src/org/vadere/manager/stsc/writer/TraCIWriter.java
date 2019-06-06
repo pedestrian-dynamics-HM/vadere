@@ -1,6 +1,9 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.writer;
 
+import org.vadere.manager.stsc.TraCIDataType;
+import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
+import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
@@ -15,6 +18,8 @@ public interface TraCIWriter {
 	byte[] asByteArray();
 
 	TraCIWriter rest();
+
+	TraCIWriter writeObjectWithId(TraCIDataType dataType, Object data);
 
 	TraCIWriter writeUnsignedByteWithId(int val);
 	TraCIWriter writeByteWithId(byte val);
@@ -61,15 +66,15 @@ public interface TraCIWriter {
 
 	TraCIWriter writeStringList(List<String> val);
 
-	TraCIWriter write2DPosition(double x, double y);
+	TraCIWriter write2DPosition(VPoint val);
 
-	TraCIWriter write3DPosition(double x, double y, double z);
+	TraCIWriter write3DPosition(Vector3D val);
 
-	TraCIWriter writeRoadMapPosition(String roadId, double pos, int laneId);
+	TraCIWriter writeRoadMapPosition(RoadMapPosition val);
 
-	TraCIWriter writeLonLatPosition(double lon, double lat);
+	TraCIWriter writeLonLatPosition(VPoint lonLat);
 
-	TraCIWriter writeLonLatAltPosition(double lon, double lat, double alt);
+	TraCIWriter writeLonLatAltPosition(Vector3D lonLatAlt);
 
 	TraCIWriter writePolygon(VPoint... points);
 

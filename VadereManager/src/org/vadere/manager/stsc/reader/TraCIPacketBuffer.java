@@ -1,12 +1,13 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.reader;
 
+import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.respons.TraCIResponse;
 
 import java.nio.ByteBuffer;
 
 /**
- *  Contains a {@link ByteBuffer} which encodes
- *  possible multiple commands.
+ *  Wraps the whole packet received over the socket with packet length removed.
  */
 public class TraCIPacketBuffer extends TraCIBuffer {
 
@@ -36,9 +37,25 @@ public class TraCIPacketBuffer extends TraCIBuffer {
 
 		int cmdLen = getCommandDataLen();
 
-		return TraCICommand.createCommand(reader.readByteBuffer(cmdLen));
+		return TraCICommand.create(reader.readByteBuffer(cmdLen));
 	}
 
+	public TraCIResponse nextResponse(){
+		if (!reader.hasRemaining())
+			return null;
+
+		int statusLen = getCommandDataLen();
+		StatusResponse statusResponse = StatusResponse.createFromByteBuffer(reader.readByteBuffer(statusLen));
+
+		if (!reader.hasRemaining()){
+			// only StatusResponse
+			return TraCIResponse.create(statusResponse, ByteBuffer.wrap(new byte[0]));
+		} else {
+			int responseDataLen = getCommandDataLen();
+			ByteBuffer buffer = reader.readByteBuffer(responseDataLen);
+			return TraCIResponse.create(statusResponse, buffer);
+		}
+	}
 
 	private int getCommandDataLen(){
 		int cmdLen = reader.readUnsignedByte();

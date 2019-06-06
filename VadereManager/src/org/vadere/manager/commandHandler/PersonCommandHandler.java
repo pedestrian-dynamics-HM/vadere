@@ -1,7 +1,7 @@
 package org.vadere.manager.commandHandler;
 
-import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.commands.TraCICmd;
+import org.vadere.manager.stsc.TraCIDataType;
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -21,52 +21,75 @@ public class PersonCommandHandler extends CommandHandler{
 
 	}
 
-	protected TraCIPacket process_getIDList(TraCIGetCommand cmd){
+	protected TraCICommand process_getIDList(TraCIGetCommand cmd){
 
 		List<String> pedestrians = null; // get....
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedestrians);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.STRING_LIST)
+				.addResponseData(pedestrians);
+		return cmd;
 	}
 
-	protected TraCIPacket process_getIDCount(TraCIGetCommand cmd){
+	protected TraCICommand process_getIDCount(TraCIGetCommand cmd){
 
 		int numPerson = 0; // get...
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, numPerson);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.INTEGER)
+				.addResponseData(numPerson);
+
+		return cmd;
+
 	}
 
-	protected TraCIPacket process_getSpeed(TraCIGetCommand cmd){
+	protected TraCICommand process_getSpeed(TraCIGetCommand cmd){
 
 		double speed = 0.0; // get...
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, speed);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.DOUBLE)
+				.addResponseData(speed);
+		return cmd;
 	}
 
-	protected TraCIPacket process_getPosition(TraCIGetCommand cmd){
+	protected TraCICommand process_getPosition(TraCIGetCommand cmd){
 
 		VPoint point = new VPoint(1.0, 1.0); // get
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, point);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.POS_2D)
+				.addResponseData(point);
+
+		return cmd;
 	}
 
 
-	protected TraCIPacket process_getLength(TraCIGetCommand cmd){
+	protected TraCICommand process_getLength(TraCIGetCommand cmd){
 
 
 		double pedLength = 0.4; // get... (durchmesser)
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedLength);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.DOUBLE)
+				.addResponseData(pedLength);
+
+		return cmd;
 	}
 
 
-	protected TraCIPacket process_getWidth(TraCIGetCommand cmd){
+	protected TraCICommand process_getWidth(TraCIGetCommand cmd){
 		double pedWidth = 0.4; // get.. (durchmesser)
 
-		return TraCIPacket.create().wrapGetResponse(cmd, TraCICmd.RESPONSE_GET_PERSON_VALUE, pedWidth);
+		cmd.addResponseIdentifier(TraCICmd.RESPONSE_GET_PERSON_VALUE)
+				.addResponseVariableType(TraCIDataType.DOUBLE)
+				.addResponseData(pedWidth);
+
+		return cmd;
 	}
 
 
-	public TraCIPacket processGet(TraCICommand cmd){
+	public TraCICommand processGet(TraCICommand cmd){
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
 
 		switch (TraCIPersonVar.fromId(getCmd.getVariableId())){
@@ -100,7 +123,7 @@ public class PersonCommandHandler extends CommandHandler{
 		}
 	}
 
-	public TraCIPacket processSet(TraCICommand cmd){
+	public TraCICommand processSet(TraCICommand cmd){
 		return process_NotImplemented(cmd);
 	}
 

@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.sumo.LightPhase;
+import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
+import org.vadere.manager.stsc.writer.TraCIWriterImpl;
+import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
@@ -162,7 +165,7 @@ public class TraCIWriterImplTest {
 
 	@Test
 	public void write2DPosition() {
-		writer.write2DPosition(23.456,3.3);
+		writer.write2DPosition(new VPoint(23.456,3.3));
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
@@ -178,7 +181,7 @@ public class TraCIWriterImplTest {
 
 	@Test
 	public void write3DPosition() {
-		writer.write3DPosition(3.34, 12.33, 56.8889);
+		writer.write3DPosition(new Vector3D(3.34, 12.33, 56.8889));
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
@@ -196,7 +199,7 @@ public class TraCIWriterImplTest {
 	@Test
 	public void writeRoadMapPosition() {
 
-		writer.writeRoadMapPosition("r001", 12.4, 3);
+		writer.writeRoadMapPosition(new RoadMapPosition("r001", 12.4, 3));
 		int roadIdLen = "r001".getBytes(StandardCharsets.US_ASCII).length;
 		ByteBuffer buf = writer.asByteBuffer();
 
@@ -218,7 +221,7 @@ public class TraCIWriterImplTest {
 
 	@Test
 	public void writeLonLatPosition() {
-		writer.writeLonLatPosition(49.3345, 10.10453);
+		writer.writeLonLatPosition(new VPoint(49.3345, 10.10453));
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)
@@ -234,7 +237,7 @@ public class TraCIWriterImplTest {
 
 	@Test
 	public void writeLonLatAltPosition() {
-		writer.writeLonLatAltPosition(49.33, 15.223, 12.33);
+		writer.writeLonLatAltPosition(new Vector3D(49.33, 15.223, 12.33));
 		ByteBuffer buf = writer.asByteBuffer();
 
 		// identifier (ubyte)

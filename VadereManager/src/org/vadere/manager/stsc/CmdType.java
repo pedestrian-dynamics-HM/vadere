@@ -1,4 +1,4 @@
-package org.vadere.manager.stsc.commands;
+package org.vadere.manager.stsc;
 
 public enum CmdType {
 

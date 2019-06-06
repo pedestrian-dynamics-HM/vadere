@@ -18,7 +18,7 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 	private Thread currentSimulationThread;
 
 
-	RemoteManager() { }
+	public RemoteManager() { }
 
 	public void loadScenario(String scenarioString) throws IOException {
 		Scenario scenario = ScenarioFactory.createScenarioWithScenarioJson(scenarioString);

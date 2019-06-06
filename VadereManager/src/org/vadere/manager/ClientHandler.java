@@ -1,8 +1,9 @@
 package org.vadere.manager;
 
+import org.vadere.manager.commandHandler.CommandExecutor;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.TraCIPacketBuffer;
+import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
 import org.vadere.util.logging.Logger;
 
 import java.io.EOFException;
@@ -41,6 +42,7 @@ public class ClientHandler implements Runnable{
 
 	private void handleClient() throws IOException{
 		try{
+			logger.info("client connected...");
 			while (true){
 
 				TraCIPacketBuffer traCIPacketBuffer = traCISocket.receiveExact();

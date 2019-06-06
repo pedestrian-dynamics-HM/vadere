@@ -1,8 +1,11 @@
 package org.vadere.manager.commandHandler;
 
 
-import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
+import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
+import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 
 public class ControlCommandHandler extends CommandHandler{
 
@@ -14,50 +17,30 @@ public class ControlCommandHandler extends CommandHandler{
 
 	private ControlCommandHandler(){}
 
-	public TraCIPacket process_load(TraCICommand cmd) {
+	public TraCICommand process_load(TraCICommand rawCmd) {
 		return null;
 	}
 
-	public TraCIPacket process_close(TraCICommand cmd) {
+	public TraCICommand process_close(TraCICommand rawCmd) {
 		return null;
 	}
 
-	public TraCIPacket process_simStep(TraCICommand cmd) {
-		return null;
+	public TraCICommand process_simStep(TraCICommand rawCmd) {
+		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
+		Object data = null; // handle subscriptions
+
+		cmd.setResponse(new TraCISimTimeResponse(data));
+
+		return cmd;
 	}
 
-	public TraCIPacket process_getVersion(TraCICommand cmd) {
+	public TraCICommand process_getVersion(TraCICommand rawCmd) {
 
-		TraCIPacket response = TraCIPacket.create();
+		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand)rawCmd;
+		cmd.setResponse(new TraCIGetVersionResponse(33, "Version 33 From Vadere"));
 
-		//	@Override
-//	public TraCIPacket handleCommand(TraCIPacket response) {
-//		response = TraCIPacket.create();
-//
-//		response.add_OK_StatusResponse(Constants.CMD_GETVERSION);
-//
-//		TraCIWriter writer = response.getWriter();
-//
-//		int cmdLen = 10 + writer.stringByteCount("Vaderer TraCI Server");
-//		writer.writeCommandLength(cmdLen);	// 1b or 5b
-//		writer.writeInt(Constants.CMD_GETVERSION); // 1b
-//		writer.writeUnsignedByte(Constants.TRACI_VERSION); // 4b
-//		writer.writeString("Vaderer TraCI Server"); // 4b + X
-//
-//		return response;
-//	}
+		return cmd;
 
-//		response.add_OK_StatusResponse(Constants.CMD_GETVERSION);
-//
-//		TraCIWriter writer = response.getWriter();
-//
-//		int cmdLen = 10 + writer.stringByteCount("Vaderer TraCI Server");
-//		writer.writeCommandLength(cmdLen);	// 1b or 5b
-//		writer.writeInt(Constants.CMD_GETVERSION); // 1b
-//		writer.writeUnsignedByte(Constants.TRACI_VERSION); // 4b
-//		writer.writeString("Vaderer TraCI Server"); // 4b + X
-
-		return response;
 	}
 
 

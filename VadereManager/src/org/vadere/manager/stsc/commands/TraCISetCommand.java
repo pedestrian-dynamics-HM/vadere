@@ -1,7 +1,9 @@
 package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.TraCICommandBuffer;
+import org.vadere.manager.stsc.TraCICmd;
+import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.TraCIDataType;
 
 public class TraCISetCommand extends TraCICommand{
@@ -43,4 +45,8 @@ public class TraCISetCommand extends TraCICommand{
 		return returnDataType;
 	}
 
+	@Override
+	public TraCIPacket buildResponsePacket() {
+		return null;
+	}
 }

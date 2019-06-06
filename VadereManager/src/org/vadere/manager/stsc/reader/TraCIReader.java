@@ -1,5 +1,6 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.reader;
 
+import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -7,10 +8,26 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 
-public interface TraCIReader extends ByteReader {
+public interface TraCIReader {
 
+
+	byte readByte();
+	default int readUnsignedByte(){
+		// (signed)byte --cast--> (signed)int --(& 0xff)--> cut highest three bytes.
+		// This result represents the an unsigned byte value (0..255) as an int.
+		return (int)readByte() & 0xff;
+	}
+
+	byte[] readBytes(int num);
+	default ByteBuffer readByteBuffer(int num){
+		return ByteBuffer.wrap(readBytes(num));
+	}
+
+	int readInt();
+	double readDouble();
 
 	String readString();
 

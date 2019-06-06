@@ -1,8 +1,12 @@
-package org.vadere.manager.stsc;
+package org.vadere.manager.stsc.writer;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.stsc.TraCIDataType;
+import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
+import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
@@ -13,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TraCIWriterImpl implements TraCIWriter {
+
+	private static Logger logger = Logger.getLogger(TraCIWriterImpl.class);
 
 	ByteArrayOutputStream data;
 
@@ -35,6 +41,60 @@ public class TraCIWriterImpl implements TraCIWriter {
 	@Override
 	public TraCIWriter rest(){
 		data.reset();
+		return this;
+	}
+
+	@Override
+	public TraCIWriter writeObjectWithId(TraCIDataType dataType, Object data) {
+
+		switch (dataType){
+			case U_BYTE:
+				writeUnsignedByteWithId((int) data);
+				break;
+			case BYTE:
+				writeByteWithId((byte) data);
+				break;
+			case INTEGER:
+				writeIntWithId((int) data);
+				break;
+			case DOUBLE:
+				writeDoubleWithId((double) data);
+				break;
+			case STRING:
+				writeStringWithId((String) data);
+				break;
+			case STRING_LIST:
+				writeStringListWithId((List<String>) data);
+				break;
+			case POS_2D:
+				write2DPosition((VPoint) data);
+				break;
+			case POS_3D:
+				write3DPosition((Vector3D) data);
+				break;
+			case POS_ROAD_MAP:
+				writeRoadMapPosition((RoadMapPosition) data);
+				break;
+			case POS_LON_LAT:
+				writeLonLatPosition((VPoint) data);
+				break;
+			case POS_LON_LAT_ALT:
+				writeLonLatAltPosition((Vector3D) data);
+				break;
+			case POLYGON:
+				writePolygon((List<VPoint>) data);
+				break;
+			case TRAFFIC_LIGHT_PHASE_LIST:
+				writeTrafficLightPhaseList((List<TrafficLightPhase>) data);
+				break;
+			case COLOR:
+				writeColor((Color) data);
+				break;
+			default:
+				logger.errorf("cannot write %s", dataType.toString());
+
+		}
+
 		return this;
 	}
 
@@ -126,46 +186,46 @@ public class TraCIWriterImpl implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter write2DPosition(double x, double y){
+	public TraCIWriter write2DPosition(VPoint val){
 		writeUnsignedByte(TraCIDataType.POS_2D.identifier);
-		writeDouble(x);
-		writeDouble(y);
+		writeDouble(val.x);
+		writeDouble(val.y);
 		return this;
 	}
 
 	@Override
-	public TraCIWriter write3DPosition(double x, double y, double z){
+	public TraCIWriter write3DPosition(Vector3D val){
 		writeUnsignedByte(TraCIDataType.POS_3D.identifier);
-		writeDouble(x);
-		writeDouble(y);
-		writeDouble(z);
+		writeDouble(val.x);
+		writeDouble(val.y);
+		writeDouble(val.z);
 		return this;
 	}
 
 
 	@Override
-	public TraCIWriter writeRoadMapPosition(String roadId, double pos, int laneId){
+	public TraCIWriter writeRoadMapPosition(RoadMapPosition val){
 		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.identifier);
-		writeString(roadId);
-		writeDouble(pos);
-		writeUnsignedByte(laneId);
+		writeString(val.getRoadId());
+		writeDouble(val.getPos());
+		writeUnsignedByte(val.getLaneId());
 		return this;
 	}
 
 	@Override
-	public TraCIWriter writeLonLatPosition(double lon, double lat){
+	public TraCIWriter writeLonLatPosition(VPoint lonLat){
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT.identifier);
-		writeDouble(lon);
-		writeDouble(lat);
+		writeDouble(lonLat.x);
+		writeDouble(lonLat.y);
 		return this;
 	}
 
 	@Override
-	public TraCIWriter writeLonLatAltPosition(double lon, double lat, double alt){
+	public TraCIWriter writeLonLatAltPosition(Vector3D lonLatAlt){
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.identifier);
-		writeDouble(lon);
-		writeDouble(lat);
-		writeDouble(alt);
+		writeDouble(lonLatAlt.x);
+		writeDouble(lonLatAlt.y);
+		writeDouble(lonLatAlt.z);
 		return this;
 	}
 
