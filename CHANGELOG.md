@@ -6,6 +6,7 @@
 
 ### Added
 
+- Open a trajectory file in the stand-alone application `vadere-postvis.jar` via drag and drop from file explorer.
 - Scenario elements like obstacles and targets can now be resized using the mouse in the topography creator tab (first, select element via left-click and then move mouse to one of its edges to get the resize handles).
 - Draw also Voronoi diagram in `TikzGenerator`.
 - Added new scenario element `AbsorbingArea` to absorb agents immediately.

@@ -137,6 +137,7 @@ public class OSMBehaviorController {
                 boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
                 boolean targetOrientationDiffers = false;
 
+                // TODO: Use "pedestrian.getTargetGradient()" instead of "calculateAngleBetweenTargets()".
                 double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
 
                 if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
