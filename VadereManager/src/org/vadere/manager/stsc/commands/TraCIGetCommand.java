@@ -14,7 +14,6 @@ public class TraCIGetCommand extends TraCICommand {
 	protected String elementId;
 
 	// response
-
 	private TraCICmd responseIdentifier;
 	private TraCIDataType responseDataType;
 	private Object responseData;

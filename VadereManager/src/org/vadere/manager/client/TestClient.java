@@ -4,8 +4,10 @@ import org.vadere.manager.TraCISocket;
 import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
+import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
 import org.vadere.manager.stsc.respons.TraCIResponse;
+import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -36,6 +38,7 @@ public class TestClient implements Runnable{
 	private void addCommands(ConsoleReader consoleReader){
 		consoleReader.addCommand("getVersion", "", this::getVersion);
 		consoleReader.addCommand("sendFile", "send file. default: scenario001", this::sendFile);
+		consoleReader.addCommand("nextStep", "default(-1) one loop.", this::nextSimTimeStep);
 	}
 
 
@@ -106,13 +109,30 @@ public class TestClient implements Runnable{
 
 	void getVersion(String[] args) throws IOException {
 		TraCIPacket p = TraCIGetVersionCommand.build();
-
 		traCISocket.sendExact(p);
 
 		TraCIPacketBuffer buf = traCISocket.receiveExact();
 		TraCIResponse cmd = buf.nextResponse();
 
 		System.out.println(cmd.toString());
+	}
+
+	void nextSimTimeStep(String[] args) throws IOException{
+		double nextSimTime = -1.0;
+
+		if (args.length>2)
+			nextSimTime = Double.parseDouble(args[1]);
+
+		TraCIPacket packet = TraCISimStepCommand.build(nextSimTime);
+		traCISocket.sendExact(packet);
+
+		TraCIPacketBuffer buf = traCISocket.receiveExact();
+		TraCISimTimeResponse cmd = (TraCISimTimeResponse) buf.nextResponse();
+		System.out.println(cmd.toString());
+	}
+
+	void getPersonList(String[] args) throws IOException{
+
 	}
 
 	void sendFile(String[] args) throws IOException {

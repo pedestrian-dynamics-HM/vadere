@@ -69,7 +69,7 @@ public class ConsoleReader implements Runnable{
 			try {
 				System.out.print("> ");
 				String cmd = reader.readLine();
-				executeCmd(cmd);
+				executeCmd(cmd.trim());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

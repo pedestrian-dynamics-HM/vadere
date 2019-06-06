@@ -50,7 +50,7 @@ public class CommandExecutor {
 			return TraCIPacket.create().add_Err_StatusResponse(cmd.getTraCICmd().id, "ID not found.");
 		}
 
-		return handler.handel(cmd).buildResponsePacket();
+		return handler.handel(cmd, remoteManager).buildResponsePacket();
 
 	}
 }

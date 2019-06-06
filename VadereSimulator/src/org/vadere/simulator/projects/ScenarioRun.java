@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.RemoteManagerListener;
 import org.vadere.simulator.control.Simulation;
+import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -55,6 +56,11 @@ public class ScenarioRun implements Runnable {
 	private final RunnableFinishedListener finishedListener;
 
 	private SimulationResult simulationResult;
+
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, boolean singleStepMode) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+		this.singleStepMode = singleStepMode;
+	}
 
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
@@ -186,6 +192,10 @@ public class ScenarioRun implements Runnable {
 
 		if (simulation != null)
 			simulation.resume();
+	}
+
+	public SimulationState getSimulationState(){
+		return simulation.getSimulationState();
 	}
 
 	public void addPassiveCallback(final PassiveCallback pc) {

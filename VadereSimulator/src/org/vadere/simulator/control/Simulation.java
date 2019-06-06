@@ -273,8 +273,8 @@ public class Simulation {
 							logger.warnf("Simulated until: %.4f", simTimeInSec);
 
 							setWaitForSimCommand(true);
+							remoteManagerListeners.forEach(RemoteManagerListener::simulationStepFinishedListener);
 							while (waitForSimCommand){
-								remoteManagerListeners.forEach(RemoteManagerListener::simulationStepFinishedListener);
 								logger.warn("wait for next SimCommand...");
 								try {
 									wait();
@@ -463,5 +463,9 @@ public class Simulation {
 
 	public void setStartTimeInSec(double startTimeInSec) {
 		this.startTimeInSec = startTimeInSec;
+	}
+
+	public synchronized SimulationState getSimulationState(){
+		return simulationState;
 	}
 }

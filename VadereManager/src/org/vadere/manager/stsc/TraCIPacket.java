@@ -6,6 +6,7 @@ import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
+import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 import org.vadere.manager.stsc.respons.TraCIStatusResponse;
 import org.vadere.manager.stsc.writer.TraCIWriter;
 import org.vadere.manager.stsc.writer.TraCIWriterImpl;
@@ -139,9 +140,16 @@ public class TraCIPacket {
 	}
 
 	public TraCIPacket wrapSimTimeStepCommand(TraCISimStepCommand cmd){
-		addStatusResponse(cmd.getResponse().getStatusResponse());
+		TraCISimTimeResponse res = cmd.getResponse();
 
-		// todo: send subscription data...
+		addStatusResponse(res.getStatusResponse());
+
+
+		TraCIWriter cmdBuilder = getCmdBuilder();
+		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+				.writeObjectWithId(res.getSubscriptionDataType(), res.getSubscriptionData());
+
+		addCommandWithoutLen(cmdBuilder.asByteArray());
 
 		return this;
 	}
