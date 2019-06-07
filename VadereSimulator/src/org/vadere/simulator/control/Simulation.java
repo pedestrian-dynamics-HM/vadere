@@ -216,6 +216,9 @@ public class Simulation {
 			processorManager.postLoop(this.simulationState);
 		}
 
+		// notify remoteManger that simulation ended. If a command waited for the next
+		// simulation step notify it and execute command with current SimulationState.
+		remoteManagerListeners.forEach(RemoteManagerListener::lastSimulationStepFinishedListener);
 	}
 
 	/**

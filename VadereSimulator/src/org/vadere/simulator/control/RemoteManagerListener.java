@@ -7,4 +7,6 @@ public interface RemoteManagerListener {
 	 *  is ready to be read/changed. The simulation thread will wait after the call is finished.
 	 */
 	void simulationStepFinishedListener();
+
+	void lastSimulationStepFinishedListener();
 }

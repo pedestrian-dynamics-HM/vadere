@@ -2,6 +2,7 @@ package org.vadere.manager.commandHandler;
 
 
 import org.vadere.manager.RemoteManager;
+import org.vadere.manager.VadereServer;
 import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
@@ -36,7 +37,7 @@ public class ControlCommandHandler extends CommandHandler{
 
 		remoteManager.nextStep(cmd.getTargetTime());
 
-		remoteManager.accessState(state -> {
+		remoteManager.accessState((manger, state) -> {
 			cmd.setResponse(new TraCISimTimeResponse(state.getStep(), TraCIDataType.INTEGER));
 		});
 
@@ -49,10 +50,10 @@ public class ControlCommandHandler extends CommandHandler{
 	public TraCICommand process_getVersion(TraCICommand rawCmd, RemoteManager remoteManager) {
 
 		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand)rawCmd;
-		cmd.setResponse(new TraCIGetVersionResponse(33, "Version 33 From Vadere"));
+		cmd.setResponse(new TraCIGetVersionResponse(VadereServer.SUPPORTED_TRACI_VERSION,
+				VadereServer.SUPPORTED_TRACI_VERSION_STRING));
 
 		return cmd;
-
 	}
 
 

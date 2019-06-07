@@ -24,7 +24,7 @@ public class PersonCommandHandler extends CommandHandler{
 
 	protected TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager){
 
-		remoteManager.accessState(state -> {
+		remoteManager.accessState((manger, state) -> {
 			cmd.setResponseData(new ArrayList<>(state.getTopography().getPedestrianDynamicElements().getElements()));
 		});
 

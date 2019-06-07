@@ -20,15 +20,17 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 	private Thread currentSimulationThread;
 	private final Object waitForLoopEnd;
 	private ReentrantLock lock;
+	private boolean lastSimulationStep;
 
 
 	public RemoteManager() {
 		waitForLoopEnd = new Object();
 		lock = new ReentrantLock();
+		lastSimulationStep = false;
 	}
 
 	public void loadScenario(String scenarioString) {
-		Scenario scenario = null;
+		Scenario scenario;
 		try {
 			scenario = ScenarioFactory.createScenarioWithScenarioJson(scenarioString);
 		} catch (IOException e) {
@@ -48,7 +50,7 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 				}
 			}
 			lock.lock();
-			stateAccessHandler.execute(currentSimulationRun.getSimulationState());
+			stateAccessHandler.execute(this, currentSimulationRun.getSimulationState());
 
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -73,6 +75,18 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 		synchronized (waitForLoopEnd){
 			waitForLoopEnd.notify();
 		}
+	}
+
+	@Override
+	public void lastSimulationStepFinishedListener() {
+		synchronized (waitForLoopEnd){
+			lastSimulationStep = true;
+			waitForLoopEnd.notify();
+		}
+	}
+
+	public boolean isLastSimulationStep() {
+		return lastSimulationStep;
 	}
 
 	@Override
