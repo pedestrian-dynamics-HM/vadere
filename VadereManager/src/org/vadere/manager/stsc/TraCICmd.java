@@ -2,6 +2,9 @@ package org.vadere.manager.stsc;
 
 import org.vadere.manager.TraCIException;
 
+/**
+ * List of all TraCI Commands and there Types.
+ */
 public enum TraCICmd {
 	// TraCI/Control-related commands
 	GET_VERSION(0x00, CmdType.CTRL),
@@ -79,7 +82,6 @@ public enum TraCICmd {
 	SUB_SIMULATION_VALUE(0xdb, CmdType.VALUE_SUB),
 	RESPONSE_SUB_SIMULATION_VALUE(0xeb, CmdType.RESPONSE),
 	// TraCI/Object Context Subscription
-
 	;
 
 	public int id;

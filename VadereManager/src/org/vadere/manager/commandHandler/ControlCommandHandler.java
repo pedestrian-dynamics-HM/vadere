@@ -13,6 +13,9 @@ import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 import org.vadere.util.logging.Logger;
 
+/**
+ * Handel {@link org.vadere.manager.stsc.commands.TraCICommand}s for the Control API
+ */
 public class ControlCommandHandler extends CommandHandler{
 
 	private static Logger logger = Logger.getLogger(CommandExecutor.class);
@@ -33,7 +36,7 @@ public class ControlCommandHandler extends CommandHandler{
 
 		TraCICloseCommand cmd = (TraCICloseCommand)rawCmd;
 
-		if (remoteManager.stopSimulation())
+		if (remoteManager.stopSimulationIfRunning())
 			cmd.getResponse().getStatusResponse().setDescription("Stop simulation waiting for client close EOF");
 		else
 			cmd.getResponse().getStatusResponse().setDescription("waiting for client close EOF");

@@ -5,6 +5,13 @@ import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
 import java.util.Objects;
 
+/**
+ *  Response object for {@link org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand}
+ *  command. It returns the numerical {@link #versionId} and string {@link #versionString}
+ *  representation of the current TraCI version.
+ *
+ *  See {@link TraCIResponse} for static factory methods used to create objects from byte[]
+ */
 public class TraCIGetVersionResponse extends TraCIResponse{
 
 	private int versionId;

@@ -6,6 +6,12 @@ import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
+
+/**
+ * {@link StatusResponse} object send with each response.
+ *
+ * see {@link TraCIStatusResponse} for status codes.
+ */
 public class StatusResponse {
 
 	private TraCICmd cmdIdentifier;

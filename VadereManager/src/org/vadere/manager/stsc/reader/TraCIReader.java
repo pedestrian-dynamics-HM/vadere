@@ -11,6 +11,11 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+
+/**
+ * Definition of read methods used to deserialize TraCICommands / TraCIResponses received
+ * over a socket.
+ */
 public interface TraCIReader {
 
 

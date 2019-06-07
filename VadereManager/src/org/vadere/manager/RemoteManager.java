@@ -11,6 +11,9 @@ import org.vadere.util.logging.Logger;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ *  //todo comment
+ */
 public class RemoteManager implements RemoteManagerListener, RunnableFinishedListener, Runnable {
 
 
@@ -40,7 +43,7 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 		currentSimulationRun.addRemoteManagerListener(this);
 	}
 
-	public boolean stopSimulation(){
+	public boolean stopSimulationIfRunning(){
 		if (currentSimulationThread != null && currentSimulationThread.isAlive()){
 			currentSimulationThread.interrupt();
 			return true;

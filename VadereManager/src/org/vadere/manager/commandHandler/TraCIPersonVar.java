@@ -3,6 +3,10 @@ package org.vadere.manager.commandHandler;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCIDataType;
 
+
+/**
+ * VariableId list for Person API.
+ */
 public enum TraCIPersonVar {
 
 	ID_LIST(0x00, TraCIDataType.STRING_LIST), // get

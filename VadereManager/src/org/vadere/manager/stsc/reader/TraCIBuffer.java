@@ -11,11 +11,11 @@ public abstract class TraCIBuffer {
 	public TraCIReader reader;
 
 	protected TraCIBuffer (byte[] buf){
-		reader = TraCIReaderImpl.wrap(buf);
+		reader = ByteBufferTraCIReader.wrap(buf);
 	}
 
 	protected TraCIBuffer (ByteBuffer buf){
-		reader = TraCIReaderImpl.wrap(buf);
+		reader = ByteBufferTraCIReader.wrap(buf);
 	}
 
 

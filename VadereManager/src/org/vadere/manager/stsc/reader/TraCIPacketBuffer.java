@@ -7,7 +7,12 @@ import org.vadere.manager.stsc.respons.TraCIResponse;
 import java.nio.ByteBuffer;
 
 /**
- *  Wraps the whole packet received over the socket with packet length removed.
+ *  A simple Wrapper around a {@link TraCIReader} which knows how to retrieve *
+ *  single commands from a TraCI byte[] array.
+ *
+ *  The class expects that the given buffer only contains commands. The packet length filed (int)
+ *  must be removed before!
+ *
  */
 public class TraCIPacketBuffer extends TraCIBuffer {
 

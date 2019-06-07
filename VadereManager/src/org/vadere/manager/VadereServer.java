@@ -8,6 +8,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *  //todo comment
+ */
 public class VadereServer implements Runnable{
 
 	private static Logger logger = Logger.getLogger(VadereServer.class);

@@ -2,6 +2,13 @@ package org.vadere.manager.stsc.respons;
 
 import org.vadere.manager.TraCIException;
 
+/**
+ * Status Codes for each Response send from a TraCI-Server. These codes are wrapped within a
+ * {@link TraCIStatusResponse} response send back to the client. Depending on the command
+ * an additional response appended.
+ *
+ * See {@link TraCIResponse} for more information.
+ */
 public enum TraCIStatusResponse {
 
 	OK(0x00),

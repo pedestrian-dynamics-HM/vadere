@@ -3,7 +3,11 @@ package org.vadere.manager.stsc.reader;
 import java.nio.ByteBuffer;
 
 /**
- * Wraps single command with command length removed.
+ *  A simple Wrapper around a {@link TraCIReader} which knows how to traverse a single command.
+ *
+ *  The class expects that the given buffer only contains *one* command. The command length filed
+ *  (1 byte or 5 bytes, depending on the command size) must be removed before creating an instance.
+ *
  */
 public class TraCICommandBuffer extends TraCIBuffer{
 

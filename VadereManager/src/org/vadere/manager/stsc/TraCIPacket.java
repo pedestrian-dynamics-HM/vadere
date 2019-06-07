@@ -13,6 +13,9 @@ import org.vadere.manager.stsc.writer.TraCIWriterImpl;
 
 import java.nio.ByteBuffer;
 
+/**
+ *  //todo comment
+ */
 public class TraCIPacket {
 
 	private TraCIWriter writer;

@@ -4,6 +4,12 @@ import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
+/**
+ *  Response object for {@link org.vadere.manager.stsc.commands.control.TraCISimStepCommand}
+ *  command. It includes all subscriptions previously added by each client.
+ *
+ *  See {@link TraCIResponse} for static factory methods used to create objects from byte[]
+ */
 public class TraCISimTimeResponse extends TraCIResponse {
 
 	private Object subscriptionData;

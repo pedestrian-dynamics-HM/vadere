@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+/**
+ *  //todo comment
+ */
 public class TraCISocket implements Closeable {
 
 	private final static int TRACI_LEN_LENGTH = 4;

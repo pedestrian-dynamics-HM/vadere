@@ -12,6 +12,24 @@ import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Abstract Class for TraCICommands.
+ *
+ * Object of this Class only hold the state (input parameters, response data) for each
+ * command. The execution is handed by {@link org.vadere.manager.commandHandler.CommandHandler}
+ * classes.
+ *
+ * Each command has an Id managed as an enum {@link TraCICmd}. This enum also contains
+ * the type of the command (i.e. GET, SET, Control). Depending on the type (and sometimes on
+ * the variable queried) different sub classes are used to manage the command.
+ *
+ * Construction Methods: (compare with {@link org.vadere.manager.stsc.respons.TraCIResponse})
+ *
+ * 1) created from serialized data (byte[] / {@link ByteBuffer} / {@link TraCICommandBuffer})
+ *
+ * 2) created from simple static factories which are used by clients.
+ *
+ */
 public abstract class TraCICommand {
 
 	protected TraCICmd traCICmd;
@@ -33,8 +51,6 @@ public abstract class TraCICommand {
 			case VALUE_SUB:
 			case CONTEXT_SUB:
 				throw new TraCIException("Subscrtipons not implemente");
-			case UNKNOWN:
-				throw new TraCIException("Unknown command found found with identifier: " + identifier);
 			default:
 				throw new IllegalStateException("Should not be reached. All CmdType enums are tested in switch statement");
 		}

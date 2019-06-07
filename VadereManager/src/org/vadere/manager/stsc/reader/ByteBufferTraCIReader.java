@@ -17,23 +17,30 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TraCIReaderImpl implements TraCIReader {
+
+/**
+ * A {@link ByteBuffer} based implementation of the {@link TraCIReader} interface.
+ * The {@link ByteBuffer} wraps a byte[] array and allows getX access to the given
+ * byte[] array.
+ *
+ */
+public class ByteBufferTraCIReader implements TraCIReader {
 
 	private ByteBuffer byteBuffer;
 
-	public static TraCIReaderImpl wrap(byte[] data){
-		TraCIReaderImpl traCIReaderImpl = new TraCIReaderImpl();
-		traCIReaderImpl.byteBuffer = ByteBuffer.wrap(data);
-		return traCIReaderImpl;
+	public static ByteBufferTraCIReader wrap(byte[] data){
+		ByteBufferTraCIReader byteBufferTraCIReader = new ByteBufferTraCIReader();
+		byteBufferTraCIReader.byteBuffer = ByteBuffer.wrap(data);
+		return byteBufferTraCIReader;
 	}
 
-	public static TraCIReaderImpl wrap(ByteBuffer buffer){
-		TraCIReaderImpl traCIReaderImpl = new TraCIReaderImpl();
-		traCIReaderImpl.byteBuffer =  buffer;
-		return traCIReaderImpl;
+	public static ByteBufferTraCIReader wrap(ByteBuffer buffer){
+		ByteBufferTraCIReader byteBufferTraCIReader = new ByteBufferTraCIReader();
+		byteBufferTraCIReader.byteBuffer =  buffer;
+		return byteBufferTraCIReader;
 	}
 
-	private TraCIReaderImpl(){ }
+	private ByteBufferTraCIReader(){ }
 
 	@Override
 	public byte readByte() {

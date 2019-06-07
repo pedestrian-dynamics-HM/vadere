@@ -2,6 +2,9 @@ package org.vadere.manager.stsc;
 
 import org.vadere.manager.TraCIException;
 
+/**
+ * Possible data types used in TraCI
+ */
 public enum TraCIDataType {
 	U_BYTE(0x07, 1, true),
 	BYTE(0x08, 1, true),

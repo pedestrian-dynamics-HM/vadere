@@ -6,6 +6,21 @@ import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
 import java.nio.ByteBuffer;
 
+
+/**
+ * Generic response object for each command. It contains the {@link StatusResponse} object
+ * as well as optional response data warped in a second command.
+ *
+ * If no additional data is send the responseIdentifier will be ignored.
+ *
+ * Construction Methods: (compare with {@link org.vadere.manager.stsc.commands.TraCICommand})
+ *
+ * Each {@link TraCIResponse} class is build in two ways. Either it is created from bytes
+ * (i.e. some byte[] wrapped in a {@link ByteBuffer} or {@link TraCICommandBuffer} for ease of use)
+ * or manually to prepaid a response to a client.
+ *
+ *
+ */
 public class TraCIResponse {
 
 	protected StatusResponse statusResponse;
@@ -54,7 +69,6 @@ public class TraCIResponse {
 
 
 	private static TraCIResponse createSetResponse(TraCICmd commandIdentifier, TraCICmd responseIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse){
-
 		return null;
 	}
 

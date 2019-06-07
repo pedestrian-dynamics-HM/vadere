@@ -8,6 +8,9 @@ import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
 
+/**
+ * Dispatcher for {@link TraCICommand}s.
+ */
 public class CommandExecutor {
 
 	private static Logger logger = Logger.getLogger(CommandExecutor.class);
@@ -31,8 +34,8 @@ public class CommandExecutor {
 	//
 	private RemoteManager remoteManager;
 
-	public CommandExecutor() {
-		remoteManager = new RemoteManager();
+	public CommandExecutor(RemoteManager remoteManager) {
+		this.remoteManager = remoteManager;
 		cmdMap = new HashMap<>();
 		cmdMap.put(TraCICmd.GET_VERSION.id, ControlCommandHandler.instance::process_getVersion );
 		cmdMap.put(TraCICmd.LOAD.id, ControlCommandHandler.instance::process_load);
@@ -54,7 +57,4 @@ public class CommandExecutor {
 
 	}
 
-	public void stop(){
-		remoteManager.stopSimulation();
-	}
 }

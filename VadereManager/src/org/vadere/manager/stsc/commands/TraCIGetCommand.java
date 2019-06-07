@@ -7,6 +7,24 @@ import org.vadere.manager.stsc.respons.TraCIGetResponse;
 
 import java.nio.charset.StandardCharsets;
 
+
+/**
+ * Sub class of {@link TraCICommand} which represents a get request to some API.
+ *
+ * An API in this context is for instance the Person(GET/SET), Simulation(GET/SET/SUB)
+ *
+ * Command Structure
+ *
+ * [ cmdIdentifier(based on API) ] [ variableId ] [ elementId]
+ *
+ * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_****
+ * - variableId: Id for the variable. The numbers may be the same between different APIs
+ *   see {@link org.vadere.manager.commandHandler.TraCIPersonVar} enum
+ * - elementId: String based identifier for the object (i.e. a pedestrianId)
+ *
+ * see {@link org.vadere.manager.commandHandler.PersonCommandHandler} for execution handing.
+ *
+ */
 public class TraCIGetCommand extends TraCICommand {
 
 	protected int variableIdentifier;

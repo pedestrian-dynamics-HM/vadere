@@ -10,6 +10,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+/**
+ *  //todo comment
+ */
 public class ClientHandler implements Runnable{
 
 	private static Logger logger = Logger.getLogger(ClientHandler.class);
@@ -17,12 +20,14 @@ public class ClientHandler implements Runnable{
 	private final ServerSocket serverSocket;
 	private final TraCISocket traCISocket;
 	private final CommandExecutor cmdExecutor;
+	private RemoteManager remoteManager;
 
 
 	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket) {
 		this.serverSocket = serverSocket;
 		this.traCISocket = traCISocket;
-		this.cmdExecutor = new CommandExecutor();
+		this.remoteManager = new RemoteManager();
+		this.cmdExecutor = new CommandExecutor(remoteManager);
 
 	}
 
@@ -63,7 +68,7 @@ public class ClientHandler implements Runnable{
 			}
 		} finally {
 			traCISocket.close();
-			cmdExecutor.stop();
+			remoteManager.stopSimulationIfRunning();
 		}
 
 	}

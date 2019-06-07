@@ -13,6 +13,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * Handel GET/SET {@link org.vadere.manager.stsc.commands.TraCICommand}s for the Person API
+ */
 public class PersonCommandHandler extends CommandHandler{
 
 
@@ -31,8 +35,8 @@ public class PersonCommandHandler extends CommandHandler{
 
 //	private void init(){
 //		for (Method m : this.getClass().getDeclaredMethods()){
-//			if (m.isAnnotationPresent(GetHandler.class)){
-//				GetHandler an = m.getAnnotation(GetHandler.class);
+//			if (m.isAnnotationPresent(PersonHandler.class)){
+//				PersonHandler an = m.getAnnotation(PersonHandler.class);
 //				handler.put(an.variable(), m);
 //			}
 //		}
@@ -47,12 +51,11 @@ public class PersonCommandHandler extends CommandHandler{
 		return res;
 	}
 
-	@GetHandler(
+	@PersonHandler(
 		commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-		returnType = TraCIDataType.STRING_LIST,
 		variable = TraCIPersonVar.ID_LIST,
 		clientCommandName = "getIDList")
-	protected TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 		// elementIdentifier ignored.
 		remoteManager.accessState((manager, state) -> {
 			List<String> data = state.getTopography().getPedestrianDynamicElements()
@@ -60,95 +63,90 @@ public class PersonCommandHandler extends CommandHandler{
 					.stream()
 					.map(p -> Integer.toString(p.getId()))
 					.collect(Collectors.toList());
-			TraCIGetResponse res = response(TraCIDataType.STRING_LIST, data);
+			TraCIGetResponse res = response(traCIVar.returnType, data);
 			cmd.setResponse(res);
 		});
 
 		return cmd;
 	}
 
-	@GetHandler(
+	@PersonHandler(
 			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-			returnType = TraCIDataType.INTEGER,
 			variable = TraCIPersonVar.COUNT,
 			clientCommandName = "getIDCount")
-	protected TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			int numPeds = state.getTopography().getPedestrianDynamicElements().getElements().size();
-			cmd.setResponse(response(TraCIDataType.INTEGER, numPeds));
+			cmd.setResponse(response(traCIVar.returnType, numPeds));
 		});
 
 		return cmd;
 
 	}
 
-	@GetHandler(
+	@PersonHandler(
 			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-			returnType = TraCIDataType.DOUBLE,
 			variable = TraCIPersonVar.SPEED,
 			clientCommandName = "getSpeed")
-	protected TraCICommand process_getSpeed(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getSpeed(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			double speed = state.getTopography()
 					.getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
 					.getVelocity().getLength();
-			cmd.setResponse(response(TraCIDataType.DOUBLE, speed));
+			cmd.setResponse(response(traCIVar.returnType, speed));
 		});
 
 		return cmd;
 	}
 
-	@GetHandler(
+	@PersonHandler(
 			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-			returnType = TraCIDataType.POS_2D,
 			variable = TraCIPersonVar.POS_2D,
 			clientCommandName = "getPosition2D")
-	protected TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			VPoint pos = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
 					.getPosition();
-			cmd.setResponse(response(TraCIDataType.POS_2D, pos));
+			cmd.setResponse(response(traCIVar.returnType, pos));
 		});
 
 		return cmd;
 	}
 
 
-	@GetHandler(
+	@PersonHandler(
 			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-			returnType = TraCIDataType.DOUBLE,
 			variable = TraCIPersonVar.LENGTH,
 			clientCommandName = "getLength")
-	protected TraCICommand process_getLength(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getLength(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			double pedLength = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
 					.getRadius() *2;
-			cmd.setResponse(response(TraCIDataType.DOUBLE, pedLength));
+			cmd.setResponse(response(traCIVar.returnType, pedLength));
 		});
 
 		return cmd;
 	}
 
 
-	@GetHandler(
+	@PersonHandler(
 			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
-			returnType = TraCIDataType.DOUBLE,
 			variable = TraCIPersonVar.WIDTH,
 			clientCommandName = "getWidth")
-	protected TraCICommand process_getWidth(TraCIGetCommand cmd, RemoteManager remoteManager){
+	protected TraCICommand process_getWidth(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			double pedWidth= state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
 					.getRadius() *2;
-			cmd.setResponse(response(TraCIDataType.DOUBLE, pedWidth));
+			cmd.setResponse(response(traCIVar.returnType, pedWidth));
 		});
 
 		return cmd;
@@ -165,7 +163,7 @@ public class PersonCommandHandler extends CommandHandler{
 //			return process_NotImplemented(getCmd, remoteManager);
 //		} else {
 //			try {
-//				return (TraCIGetCommand) m.invoke(this, getCmd, remoteManager);
+//				return (TraCIGetCommand) m.invoke(this, getCmd, remoteManager, var);
 //			} catch (IllegalAccessException | InvocationTargetException e) {
 //				e.printStackTrace();
 //			}
@@ -174,17 +172,17 @@ public class PersonCommandHandler extends CommandHandler{
 
 		switch (var){
 			case ID_LIST:
-				return process_getIDList(getCmd, remoteManager);
+				return process_getIDList(getCmd, remoteManager, var);
 			case COUNT:
-				return process_getIDCount(getCmd, remoteManager);
+				return process_getIDCount(getCmd, remoteManager, var);
 			case SPEED:
-				return process_getSpeed(getCmd, remoteManager);
+				return process_getSpeed(getCmd, remoteManager, var);
 			case POS_2D:
-				return process_getPosition(getCmd, remoteManager);
+				return process_getPosition(getCmd, remoteManager, var);
 			case LENGTH:
-				return process_getLength(getCmd, remoteManager);
+				return process_getLength(getCmd, remoteManager, var);
 			case WIDTH:
-				return process_getWidth(getCmd, remoteManager);
+				return process_getWidth(getCmd, remoteManager, var);
 			case WAITING_TIME:
 			case POS_3D:
 			case ANGLE:

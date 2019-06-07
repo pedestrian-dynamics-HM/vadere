@@ -6,6 +6,23 @@ import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
 import java.util.Objects;
 
+
+/**
+ *  Response object for {@link org.vadere.manager.stsc.commands.TraCIGetCommand}
+ *  command. This command is used to retrieve generic data from the simulator.
+ *
+ *  The structure of the response:
+ *  
+ *  [ responseID(based on API) ] [ variableId ] [ elementId ] [ dataTypeId ] [ data ]
+ *
+ *  - responseID(based on API): Each API (Person, Vehicle, Simulation, ...) has a different Id.
+ *  - variableId: Id for the variable. The numbers may be the same between different APIs
+ *  - elementId: String based identifier for the object (i.e. a pedestrianId)
+ *  - dataTypeId: see {@link TraCIDataType}
+ *  - data: data to be returned.
+ *
+ *  See {@link TraCIResponse} for static factory methods used to create objects from byte[]
+ */
 public class TraCIGetResponse extends TraCIResponse{
 
 	private int variableIdentifier;
