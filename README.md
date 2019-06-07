@@ -27,7 +27,7 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 ### Dependencies
 
 * Java 11 (OpenJDK recommended -> see the official [Java website](https://jdk.java.net/))
-* OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details))
+* OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details)
 
 ### Pre-Built Releases
 
@@ -46,17 +46,16 @@ The ZIP file contains:
 
 ### Run the Application
 
-1. Start the Application: After building the application, you can start Vadere by running `java -jar VadereGui/target/vadere-gui.jar`.
-2. (If you only want to use the Postvisualization-Tool you can do so by running `java -jar VadereGui/target/postvis.jar`).
+Open a terminal and enter `path/to/openjdk/java -jar vadere-gui.jar`.
 
 ### Run Built-In Examples
 
 With the following steps, you can run a simulation with one of the built-in examples from [VadereModelTests](VadereModelTests):
 
-- start Vadere 
-- *Project* > *Open* 
-- choose `vadere.project` of one of the projects e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
-- select the scenario on the left and press *run selected scenario*
+- Start Vadere 
+- Click *Project* > *Open* 
+- Choose `vadere.project` of one of the test projects, e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
+- Select tahe scenario on the left and press *run selected scenario*
 
 ## Build from Source
 
