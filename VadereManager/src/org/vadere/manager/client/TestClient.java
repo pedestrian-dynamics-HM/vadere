@@ -120,7 +120,7 @@ public class TestClient implements Runnable{
 	void nextSimTimeStep(String[] args) throws IOException{
 		double nextSimTime = -1.0;
 
-		if (args.length>2)
+		if (args.length > 1)
 			nextSimTime = Double.parseDouble(args[1]);
 
 		TraCIPacket packet = TraCISimStepCommand.build(nextSimTime);
