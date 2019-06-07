@@ -18,11 +18,25 @@ public class PersonCommandHandler extends CommandHandler{
 
 	public static PersonCommandHandler instance;
 
+//	private HashMap<TraCIPersonVar, Method> handler;
+
 	static {
 		instance = new PersonCommandHandler();
 	}
 
-	private PersonCommandHandler(){ }
+	private PersonCommandHandler(){
+//		handler = new HashMap<>();
+//		init();
+	}
+
+//	private void init(){
+//		for (Method m : this.getClass().getDeclaredMethods()){
+//			if (m.isAnnotationPresent(GetHandler.class)){
+//				GetHandler an = m.getAnnotation(GetHandler.class);
+//				handler.put(an.variable(), m);
+//			}
+//		}
+//	}
 
 	private TraCIGetResponse response(TraCIDataType responseDataType, Object responseData){
 		TraCIGetResponse res = new TraCIGetResponse(
@@ -33,6 +47,11 @@ public class PersonCommandHandler extends CommandHandler{
 		return res;
 	}
 
+	@GetHandler(
+		commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+		returnType = TraCIDataType.STRING_LIST,
+		variable = TraCIPersonVar.ID_LIST,
+		clientCommandName = "getIDList")
 	protected TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager){
 		// elementIdentifier ignored.
 		remoteManager.accessState((manager, state) -> {
@@ -48,6 +67,11 @@ public class PersonCommandHandler extends CommandHandler{
 		return cmd;
 	}
 
+	@GetHandler(
+			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+			returnType = TraCIDataType.INTEGER,
+			variable = TraCIPersonVar.COUNT,
+			clientCommandName = "getIDCount")
 	protected TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -59,6 +83,11 @@ public class PersonCommandHandler extends CommandHandler{
 
 	}
 
+	@GetHandler(
+			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+			returnType = TraCIDataType.DOUBLE,
+			variable = TraCIPersonVar.SPEED,
+			clientCommandName = "getSpeed")
 	protected TraCICommand process_getSpeed(TraCIGetCommand cmd, RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -72,7 +101,11 @@ public class PersonCommandHandler extends CommandHandler{
 		return cmd;
 	}
 
-
+	@GetHandler(
+			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+			returnType = TraCIDataType.POS_2D,
+			variable = TraCIPersonVar.POS_2D,
+			clientCommandName = "getPosition2D")
 	protected TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -86,6 +119,11 @@ public class PersonCommandHandler extends CommandHandler{
 	}
 
 
+	@GetHandler(
+			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+			returnType = TraCIDataType.DOUBLE,
+			variable = TraCIPersonVar.LENGTH,
+			clientCommandName = "getLength")
 	protected TraCICommand process_getLength(TraCIGetCommand cmd, RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -99,6 +137,11 @@ public class PersonCommandHandler extends CommandHandler{
 	}
 
 
+	@GetHandler(
+			commandIdentifier = TraCICmd.GET_PERSON_VALUE,
+			returnType = TraCIDataType.DOUBLE,
+			variable = TraCIPersonVar.WIDTH,
+			clientCommandName = "getWidth")
 	protected TraCICommand process_getWidth(TraCIGetCommand cmd, RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -115,7 +158,21 @@ public class PersonCommandHandler extends CommandHandler{
 	public TraCICommand processGet(TraCICommand cmd, RemoteManager remoteManager){
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
 
-		switch (TraCIPersonVar.fromId(getCmd.getVariableIdentifier())){
+		TraCIPersonVar var = TraCIPersonVar.fromId(getCmd.getVariableIdentifier());
+
+//		Method m = handler.getOrDefault(var, null);
+//		if(m == null){
+//			return process_NotImplemented(getCmd, remoteManager);
+//		} else {
+//			try {
+//				return (TraCIGetCommand) m.invoke(this, getCmd, remoteManager);
+//			} catch (IllegalAccessException | InvocationTargetException e) {
+//				e.printStackTrace();
+//			}
+//			return process_UnknownCommand(getCmd, remoteManager);
+//		}
+
+		switch (var){
 			case ID_LIST:
 				return process_getIDList(getCmd, remoteManager);
 			case COUNT:

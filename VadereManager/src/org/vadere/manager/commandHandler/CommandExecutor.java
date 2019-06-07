@@ -34,7 +34,7 @@ public class CommandExecutor {
 	public CommandExecutor() {
 		remoteManager = new RemoteManager();
 		cmdMap = new HashMap<>();
-		cmdMap.put(TraCICmd.GET_VERSION.id, ControlCommandHandler.instance::process_getVersion);
+		cmdMap.put(TraCICmd.GET_VERSION.id, ControlCommandHandler.instance::process_getVersion );
 		cmdMap.put(TraCICmd.LOAD.id, ControlCommandHandler.instance::process_load);
 		cmdMap.put(TraCICmd.SIM_STEP.id, ControlCommandHandler.instance::process_simStep);
 		cmdMap.put(TraCICmd.CLOSE.id, ControlCommandHandler.instance::process_close);
