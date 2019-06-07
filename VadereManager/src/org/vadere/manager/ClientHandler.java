@@ -63,6 +63,7 @@ public class ClientHandler implements Runnable{
 			}
 		} finally {
 			traCISocket.close();
+			cmdExecutor.stop();
 		}
 
 	}

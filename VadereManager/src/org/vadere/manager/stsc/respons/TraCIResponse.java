@@ -70,7 +70,7 @@ public class TraCIResponse {
 
 	// instance methods
 
-	protected TraCIResponse (StatusResponse statusResponse, TraCICmd responseIdentifier
+	public TraCIResponse (StatusResponse statusResponse, TraCICmd responseIdentifier
 	){
 		this.statusResponse = statusResponse;
 		this.responseIdentifier = responseIdentifier;

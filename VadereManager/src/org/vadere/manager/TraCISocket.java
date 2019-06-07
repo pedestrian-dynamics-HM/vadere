@@ -2,6 +2,7 @@ package org.vadere.manager;
 
 import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
+import org.vadere.manager.stsc.respons.TraCIResponse;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -72,6 +73,11 @@ public class TraCISocket implements Closeable {
 			byte[] data = receive(data_length);
 			return  TraCIPacketBuffer.wrap(data);
 		}
+	}
+
+	public TraCIResponse receiveResponse() throws IOException {
+		TraCIPacketBuffer buf = receiveExact();
+		return buf.nextResponse();
 	}
 
 

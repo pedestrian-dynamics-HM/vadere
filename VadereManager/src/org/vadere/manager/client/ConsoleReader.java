@@ -23,7 +23,6 @@ public class ConsoleReader implements Runnable{
 		running = true;
 
 		addCommand("help", "Print this Help", this::cmd_help);
-		addCommand("close", "Close Application", this::cmd_Close);
 	}
 
 	private void cmd_help(String[] args){
@@ -37,10 +36,6 @@ public class ConsoleReader implements Runnable{
 		System.out.println("");
 	}
 
-	private void cmd_Close(String[] args){
-		System.out.println("Close...");
-		stop();
-	}
 
 	private void executeCmd(String cmdStr){
 		if(cmdStr.equals(""))

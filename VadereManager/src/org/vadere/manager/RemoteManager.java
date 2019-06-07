@@ -40,6 +40,15 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 		currentSimulationRun.addRemoteManagerListener(this);
 	}
 
+	public boolean stopSimulation(){
+		if (currentSimulationThread != null && currentSimulationThread.isAlive()){
+			currentSimulationThread.interrupt();
+			return true;
+		}
+
+		return false;
+	}
+
 
 	synchronized public void accessState(StateAccessHandler stateAccessHandler){
 		try {

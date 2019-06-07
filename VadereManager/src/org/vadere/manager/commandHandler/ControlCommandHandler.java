@@ -5,6 +5,7 @@ import org.vadere.manager.RemoteManager;
 import org.vadere.manager.VadereServer;
 import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
@@ -29,7 +30,15 @@ public class ControlCommandHandler extends CommandHandler{
 	}
 
 	public TraCICommand process_close(TraCICommand rawCmd, RemoteManager remoteManager) {
-		return null;
+
+		TraCICloseCommand cmd = (TraCICloseCommand)rawCmd;
+
+		if (remoteManager.stopSimulation())
+			cmd.getResponse().getStatusResponse().setDescription("Stop simulation waiting for client close EOF");
+		else
+			cmd.getResponse().getStatusResponse().setDescription("waiting for client close EOF");
+
+		return cmd;
 	}
 
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {

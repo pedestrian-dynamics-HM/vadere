@@ -53,4 +53,8 @@ public class CommandExecutor {
 		return handler.handel(cmd, remoteManager).buildResponsePacket();
 
 	}
+
+	public void stop(){
+		remoteManager.stopSimulation();
+	}
 }
