@@ -1,25 +1,25 @@
 package org.vadere.manager.stsc.respons;
 
+import org.vadere.manager.TraCIException;
+
 public enum TraCIStatusResponse {
 
 	OK(0x00),
 	ERR(0xFF),
 	NOT_IMPLEMENTED(0x01),
-	UNKNOWN(0xaa);
+	;
 
+	public int id;
 
-	public int code;
-
-
-	public static TraCIStatusResponse fromId(int code){
+	public static TraCIStatusResponse fromId(int id){
 		for(TraCIStatusResponse status : values()){
-			if (status.code == code)
+			if (status.id == id)
 				return status;
 		}
-		return UNKNOWN;
+		throw new TraCIException(String.format("No status id found with id: %02X", id));
 	}
 
-	TraCIStatusResponse(int code) {
-		this.code = code;
+	TraCIStatusResponse(int id) {
+		this.id = id;
 	}
 }

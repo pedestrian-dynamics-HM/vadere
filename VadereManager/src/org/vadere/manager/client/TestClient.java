@@ -1,14 +1,19 @@
 package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
+import org.vadere.manager.commandHandler.TraCIPersonVar;
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
+import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.manager.stsc.respons.TraCIResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -41,6 +46,8 @@ public class TestClient implements Runnable{
 		consoleReader.addCommand("sendFile", "send file. default: scenario001", this::sendFile);
 		consoleReader.addCommand("nextStep", "default(-1) one loop.", this::nextSimTimeStep);
 		consoleReader.addCommand("close", "Close application and stop running simulations", this::close);
+		consoleReader.addCommand("pedIdList", "Get Pedestrian Ids as list", this::getIDs);
+		consoleReader.addCommand("getPos", "arg: idStr of pedestrian", this::getPos);
 	}
 
 
@@ -118,11 +125,32 @@ public class TestClient implements Runnable{
 
 		System.out.println(cmd.toString());
 
-		System.out.println("Bye");
-		consoleReader.stop();
+	}
+
+	void getIDs(String[] args) throws IOException {
+		TraCIPacket p = TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, TraCIPersonVar.ID_LIST.id, "1");
+		traCISocket.sendExact(p);
+
+		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
+		System.out.println(res.getResponseData());
 	}
 
 
+	void getPos(String[] args) throws IOException {
+
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, TraCIPersonVar.POS_2D.id, elementIdentifier));
+
+		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
+		VPoint p = (VPoint) res.getResponseData();
+		System.out.println(p.toString());
+
+	}
 
 	void close(String[] args) throws IOException {
 
@@ -130,6 +158,9 @@ public class TestClient implements Runnable{
 
 		TraCIResponse cmd = traCISocket.receiveResponse();
 		System.out.println(cmd);
+
+		System.out.println("Bye");
+		consoleReader.stop();
 	}
 
 
@@ -146,9 +177,6 @@ public class TestClient implements Runnable{
 		System.out.println(cmd.toString());
 	}
 
-	void getPersonList(String[] args) throws IOException{
-
-	}
 
 	void sendFile(String[] args) throws IOException {
 

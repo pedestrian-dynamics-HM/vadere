@@ -19,10 +19,7 @@ public class TraCISetCommand extends TraCICommand{
 		try{
 			variableId = cmdBuffer.reader.readUnsignedByte();
 			elementId = cmdBuffer.reader.readString();
-			int dataTye = cmdBuffer.reader.readUnsignedByte();
-			returnDataType = TraCIDataType.fromId(dataTye);
-			if (returnDataType.isUnknown())
-				throw new TraCIException("unknown TraCIDataType found in command: " + dataTye);
+			returnDataType = TraCIDataType.fromId(cmdBuffer.reader.readUnsignedByte());
 			variableValue = cmdBuffer.reader.readTypeValue(returnDataType);
 		} catch (Exception e){
 			throw TraCIException.cmdErr(traCICmd, e);

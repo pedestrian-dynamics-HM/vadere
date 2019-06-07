@@ -26,7 +26,7 @@ public class TraCIException extends RuntimeException {
 	}
 
 	public static TraCIException getNotImplemented(TraCIGetCommand cmd){
-		return new TraCIException("GetCommand for variableId " + cmd.getVariableId()
+		return new TraCIException("GetCommand for variableIdentifier " + cmd.getVariableIdentifier()
 				+ "not supported in API: " + cmd.getTraCICmd().toString());
 	}
 

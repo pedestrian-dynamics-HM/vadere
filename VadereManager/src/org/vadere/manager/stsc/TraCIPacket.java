@@ -1,10 +1,10 @@
 package org.vadere.manager.stsc;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.respons.StatusResponse;
+import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 import org.vadere.manager.stsc.respons.TraCIStatusResponse;
@@ -30,14 +30,6 @@ public class TraCIPacket {
 		return packet;
 	}
 
-	public static TraCIPacket sendStatusOK(TraCICmd cmd){
-		TraCIPacket response = new TraCIPacket();
-		response.writer.writeInt(11); // packet size (4 + 7) [4]
-		response.add_OK_StatusResponse(cmd);
-		response.finalizePacket();
-		return response;
-	}
-
 	public static TraCIPacket sendStatus(TraCICmd cmd, TraCIStatusResponse status, String description){
 		TraCIPacket response = new TraCIPacket();
 		int cmdLen = 7 + response.writer.getStringByteCount(description);
@@ -53,7 +45,7 @@ public class TraCIPacket {
 			response.writer.writeUnsignedByte(cmdLen);  // [1]
 		}
 		response.writer.writeUnsignedByte(cmd.id); // [1]
-		response.writer.writeUnsignedByte(status.code); // [1]
+		response.writer.writeUnsignedByte(status.id); // [1]
 		response.writer.writeString(description); //[4 + strLen]
 		response.finalizePacket();
 		return response;
@@ -107,14 +99,14 @@ public class TraCIPacket {
 		return new TraCIWriterImpl();
 	}
 
-	public TraCIPacket wrapGetResponse(TraCIGetCommand cmd){
-		add_OK_StatusResponse(cmd.getTraCICmd());
+	public TraCIPacket wrapGetResponse(TraCIGetResponse res){
+		addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-		cmdBuilder.writeUnsignedByte(cmd.getResponseIdentifier().id)
-				.writeUnsignedByte(cmd.getVariableId())
-				.writeString(cmd.getElementId())
-				.writeObjectWithId(cmd.getResponseDataType(), cmd.getResponseData());
+		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+				.writeUnsignedByte(res.getVariableIdentifier())
+				.writeString(res.getElementIdentifier())
+				.writeObjectWithId(res.getResponseDataType(), res.getResponseData());
 
 		addCommandWithoutLen(cmdBuilder.asByteArray());
 
@@ -182,7 +174,7 @@ public class TraCIPacket {
 		// simple OK Status without description.
 		writer.writeUnsignedByte(7);
 		writer.writeUnsignedByte(cmdIdentifier);
-		writer.writeUnsignedByte(TraCIStatusResponse.OK.code);
+		writer.writeUnsignedByte(TraCIStatusResponse.OK.id);
 		writer.writeInt(0);
 		return this;
 	}
@@ -201,7 +193,7 @@ public class TraCIPacket {
 
 		writer.writeCommandLength(cmdLen); // 1b
 		writer.writeUnsignedByte(cmdIdentifier); // 1b
-		writer.writeUnsignedByte(response.code); // 4b
+		writer.writeUnsignedByte(response.id); // 4b
 		writer.writeString(description); // 4b + X
 
 		return this;

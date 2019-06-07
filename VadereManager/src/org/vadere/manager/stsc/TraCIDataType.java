@@ -1,5 +1,7 @@
 package org.vadere.manager.stsc;
 
+import org.vadere.manager.TraCIException;
+
 public enum TraCIDataType {
 	U_BYTE(0x07, 1, true),
 	BYTE(0x08, 1, true),
@@ -16,7 +18,6 @@ public enum TraCIDataType {
 	POLYGON(0x06,-1,false),
 	TRAFFIC_LIGHT_PHASE_LIST(0x0D,-1,false),
 	COLOR(0x11,5,false),
-	UNKNOWN(-1, -1, false)
 	;
 
 
@@ -32,16 +33,12 @@ public enum TraCIDataType {
 		this.isAtomar = isAtomar;
 	}
 
-	public boolean isUnknown(){
-		return this.identifier == UNKNOWN.identifier;
-	}
-
 	public static TraCIDataType fromId(int id){
 		for(TraCIDataType dataType : values()){
 			if (dataType.identifier == id)
 				return dataType;
 		}
-		return UNKNOWN;
+		throw new TraCIException(String.format("No TraCI data type found for given id: %02X", id));
 	}
 
 	@Override

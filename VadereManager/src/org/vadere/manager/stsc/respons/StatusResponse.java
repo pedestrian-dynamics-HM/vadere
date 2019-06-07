@@ -1,6 +1,5 @@
 package org.vadere.manager.stsc.respons;
 
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
@@ -16,14 +15,8 @@ public class StatusResponse {
 	public static StatusResponse createFromByteBuffer(ByteBuffer rawCmd){
 		StatusResponse ret = new StatusResponse();
 		TraCICommandBuffer buf = TraCICommandBuffer.wrap(rawCmd);
-		int cmdIdentifierCode = buf.readCmdIdentifier();
-		ret.cmdIdentifier = TraCICmd.fromId(cmdIdentifierCode);
-		if (ret.cmdIdentifier.equals(TraCICmd.UNKNOWN_CMD))
-			throw new TraCIException("Unknown command in status response: " + cmdIdentifierCode);
-		int status = buf.reader.readUnsignedByte();
-		ret.response = TraCIStatusResponse.fromId(status);
-		if (ret.response.equals(TraCIStatusResponse.UNKNOWN))
-			throw new TraCIException("Unknown status response: " + status);
+		ret.cmdIdentifier = TraCICmd.fromId(buf.readCmdIdentifier());
+		ret.response = TraCIStatusResponse.fromId(buf.reader.readUnsignedByte());
 
 		ret.description = buf.reader.readString();
 

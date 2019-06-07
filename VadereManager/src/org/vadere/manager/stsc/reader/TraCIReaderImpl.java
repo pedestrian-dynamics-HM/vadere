@@ -184,7 +184,6 @@ public class TraCIReaderImpl implements TraCIReader {
 	@Override
 	public Object readTypeValue(TraCIDataType type) {
 
-
 		switch (type){
 			case U_BYTE:
 				return readUnsignedByte();
@@ -215,10 +214,8 @@ public class TraCIReaderImpl implements TraCIReader {
 			case COLOR:
 				return readColor();
 			case COMPOUND_OBJECT:
-			case UNKNOWN:
 			default:
 				throw new TraCIException("Unknown Datatype: " + type.toString());
-
 		}
 	}
 

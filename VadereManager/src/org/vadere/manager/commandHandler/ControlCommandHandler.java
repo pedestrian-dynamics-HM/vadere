@@ -50,7 +50,6 @@ public class ControlCommandHandler extends CommandHandler{
 			cmd.setResponse(new TraCISimTimeResponse(state.getStep(), TraCIDataType.INTEGER));
 		});
 
-
 		logger.infof("Simulate next step %f", cmd.getTargetTime());
 
 		return cmd;
@@ -64,7 +63,6 @@ public class ControlCommandHandler extends CommandHandler{
 
 		return cmd;
 	}
-
 
 	public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
 

@@ -21,18 +21,14 @@ public class TraCIResponse {
 
 		TraCICmd commandIdentifier = statusResponse.getCmdIdentifier();
 
-		int identifier = cmdResponseBuffer.readCmdIdentifier();
-		TraCICmd responseIdentifier = TraCICmd.fromId(identifier);
-		if (responseIdentifier.equals(TraCICmd.UNKNOWN_CMD))
-			throw new TraCIException("Unknown response identifier: " + identifier +
-					" for command: " + commandIdentifier.id);
+		TraCICmd responseIdentifier = TraCICmd.fromId(cmdResponseBuffer.readCmdIdentifier());
 
 		// build correct versions. based on actual command
 		switch (commandIdentifier.type){
 			case CTRL:
 				return createControlResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
 			case VALUE_GET:
-				return createGetResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
+				return new TraCIGetResponse(statusResponse, responseIdentifier, cmdResponseBuffer);
 			case VALUE_SET:
 				return createSetResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
 			case VALUE_SUB:
@@ -52,21 +48,15 @@ public class TraCIResponse {
 				return new TraCIGetVersionResponse(statusResponse, cmdResponseBuffer);
 			case SIM_STEP:
 				return new TraCISimTimeResponse(statusResponse, cmdResponseBuffer);
-
 		}
 		return null;
 	}
 
-	private static TraCIResponse createGetResponse(TraCICmd commandIdentifier, TraCICmd responseIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse){
-
-		return null;
-	}
 
 	private static TraCIResponse createSetResponse(TraCICmd commandIdentifier, TraCICmd responseIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse){
 
 		return null;
 	}
-
 
 	// instance methods
 

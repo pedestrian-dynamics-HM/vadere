@@ -1,5 +1,6 @@
 package org.vadere.manager.commandHandler;
 
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCIDataType;
 
 public enum TraCIPersonVar {
@@ -26,29 +27,24 @@ public enum TraCIPersonVar {
 	APPEND_STAGE(0xc4, TraCIDataType.COMPOUND_OBJECT), // set
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
 	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set
-
-	UNKNOWN(-1, TraCIDataType.UNKNOWN),
 	;
 
 
-	int id;
-	TraCIDataType returnType;
+	public int id;
+	public TraCIDataType returnType;
 
 	TraCIPersonVar(int id, TraCIDataType retVal) {
 		this.id = id;
 		this.returnType = retVal;
 	}
 
-	public boolean isUnknown(){
-		return this.id == UNKNOWN.id;
-	}
 
 	public static TraCIPersonVar fromId(int id){
 		for(TraCIPersonVar var : values()){
 			if (var.id == id)
 				return var;
 		}
-		return UNKNOWN;
+		throw new TraCIException(String.format("No person variable found with id: %02X", id));
 	}
 
 	@Override

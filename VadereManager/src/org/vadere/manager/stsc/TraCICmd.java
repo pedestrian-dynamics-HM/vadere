@@ -1,5 +1,7 @@
 package org.vadere.manager.stsc;
 
+import org.vadere.manager.TraCIException;
+
 public enum TraCICmd {
 	// TraCI/Control-related commands
 	GET_VERSION(0x00, CmdType.CTRL),
@@ -78,7 +80,6 @@ public enum TraCICmd {
 	RESPONSE_SUB_SIMULATION_VALUE(0xeb, CmdType.RESPONSE),
 	// TraCI/Object Context Subscription
 
-	UNKNOWN_CMD(-1, CmdType.UNKNOWN)
 	;
 
 	public int id;
@@ -95,12 +96,7 @@ public enum TraCICmd {
 			if (traCICmd.id == id)
 				return traCICmd;
 		}
-
-		return UNKNOWN_CMD;
-	}
-
-	public boolean isUnknown(){
-		return this.id == UNKNOWN_CMD.id;
+		throw new TraCIException(String.format("No TraCI command found with id: %02X", id));
 	}
 
 	@Override
