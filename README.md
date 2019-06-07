@@ -26,8 +26,8 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Dependencies
 
-* Java 11 (OpenJDK recommended)
-* OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details)
+* Java 11 (OpenJDK recommended -> see the official [Java website](https://jdk.java.net/))
+* OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details))
 
 ### Pre-Built Releases
 
