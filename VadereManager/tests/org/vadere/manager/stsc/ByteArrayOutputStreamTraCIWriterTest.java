@@ -7,7 +7,7 @@ import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
-import org.vadere.manager.stsc.writer.TraCIWriterImpl;
+import org.vadere.manager.stsc.writer.ByteArrayOutputStreamTraCIWriter;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -20,13 +20,13 @@ import java.util.stream.IntStream;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class TraCIWriterImplTest {
+public class ByteArrayOutputStreamTraCIWriterTest {
 
-	TraCIWriterImpl writer;
+	ByteArrayOutputStreamTraCIWriter writer;
 
 	@Before
 	public void before(){
-		writer = new TraCIWriterImpl();
+		writer = new ByteArrayOutputStreamTraCIWriter();
 	}
 
 	@After

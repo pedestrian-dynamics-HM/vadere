@@ -2,7 +2,7 @@ package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.TraCIDataType;
 

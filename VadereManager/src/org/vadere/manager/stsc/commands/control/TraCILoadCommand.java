@@ -1,7 +1,7 @@
 package org.vadere.manager.stsc.commands.control;
 
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 

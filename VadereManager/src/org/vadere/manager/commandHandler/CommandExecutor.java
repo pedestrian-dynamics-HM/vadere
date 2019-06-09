@@ -1,7 +1,7 @@
 package org.vadere.manager.commandHandler;
 
 import org.vadere.manager.RemoteManager;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.util.logging.Logger;

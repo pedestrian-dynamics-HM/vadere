@@ -16,15 +16,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-public class TraCIWriterImpl implements TraCIWriter {
+public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
-	private static Logger logger = Logger.getLogger(TraCIWriterImpl.class);
+	private static Logger logger = Logger.getLogger(ByteArrayOutputStreamTraCIWriter.class);
 
 	ByteArrayOutputStream data;
 
 
 
-	public TraCIWriterImpl() {
+	public ByteArrayOutputStreamTraCIWriter() {
 		data = new ByteArrayOutputStream();
 	}
 

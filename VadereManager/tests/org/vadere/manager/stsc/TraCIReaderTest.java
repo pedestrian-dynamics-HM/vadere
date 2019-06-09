@@ -7,7 +7,7 @@ import org.vadere.manager.stsc.reader.TraCIByteBuffer;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
-import org.vadere.manager.stsc.writer.TraCIWriterImpl;
+import org.vadere.manager.stsc.writer.ByteArrayOutputStreamTraCIWriter;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -22,12 +22,12 @@ import static org.junit.Assert.assertThat;
 
 public class TraCIReaderTest {
 
-	TraCIWriterImpl writer;
+	ByteArrayOutputStreamTraCIWriter writer;
 	TraCIByteBuffer reader;
 
 	@Before
 	public void before(){
-		writer = new TraCIWriterImpl();
+		writer = new ByteArrayOutputStreamTraCIWriter();
 	}
 
 	@After

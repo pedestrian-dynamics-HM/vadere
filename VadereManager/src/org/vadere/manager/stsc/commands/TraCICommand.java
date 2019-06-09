@@ -3,7 +3,7 @@ package org.vadere.manager.stsc.commands;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.CmdType;
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.commands.control.TraCILoadCommand;
 import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
@@ -46,9 +46,9 @@ public abstract class TraCICommand {
 			case CTRL:
 				return createControlCommand(cmd, cmdBuffer);
 			case VALUE_GET:
-				return createGetCommand(cmd, cmdBuffer);
+				return new TraCIGetCommand(cmd, cmdBuffer);
 			case VALUE_SET:
-				return createSetCommand(cmd, cmdBuffer);
+				return new TraCISetCommand(cmd, cmdBuffer);
 			case VALUE_SUB:
 			case CONTEXT_SUB:
 				throw new TraCIException("Subscrtipons not implemente");
@@ -75,14 +75,6 @@ public abstract class TraCICommand {
 				throw  new IllegalStateException(String.format("Should not be reached. Only TraCI control commands expected: %0X", cmd.id));
 		}
 
-	}
-
-	private static TraCICommand createGetCommand(TraCICmd cmd, TraCICommandBuffer cmdBuffer){
-		return new TraCIGetCommand(cmd, cmdBuffer);
-	}
-
-	private static TraCICommand createSetCommand(TraCICmd cmd, TraCICommandBuffer cmdBuffer){
-		return new TraCISetCommand(cmd, cmdBuffer);
 	}
 
 

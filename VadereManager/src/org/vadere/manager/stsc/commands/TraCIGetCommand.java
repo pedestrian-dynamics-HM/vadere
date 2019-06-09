@@ -1,7 +1,7 @@
 package org.vadere.manager.stsc.commands;
 
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.respons.TraCIGetResponse;
 
@@ -36,8 +36,7 @@ public class TraCIGetCommand extends TraCICommand {
 	public static TraCIPacket build(TraCICmd commandIdentifier, int variableIdentifier, String elementIdentifier){
 		int cmdLen = 1 + 1 + 1 + 4 + elementIdentifier.getBytes(StandardCharsets.US_ASCII).length;
 		TraCIPacket packet = TraCIPacket.create();
-		packet.getWriter()
-				.writeCommandLength(cmdLen) // [1|5]
+		packet.writeCommandLength(cmdLen) // [1|5]
 				.writeUnsignedByte(commandIdentifier.id) // 1
 				.writeUnsignedByte(variableIdentifier) // 1
 				.writeString(elementIdentifier); // 4+strLen

@@ -1,6 +1,6 @@
 package org.vadere.manager.stsc.commands.control;
 
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
@@ -11,8 +11,7 @@ public class TraCIGetVersionCommand extends TraCICommand {
 
 	public static TraCIPacket build(){
 		TraCIPacket packet = TraCIPacket.create(6); // 4
-		packet.getWriter()
-				.writeCommandLength(2) // 1
+		packet.writeCommandLength(2) // 1
 				.writeUnsignedByte(TraCICmd.GET_VERSION.id); // 1
 		return packet;
 	}

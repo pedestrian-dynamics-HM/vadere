@@ -1,7 +1,7 @@
 package org.vadere.manager.stsc.commands.control;
 
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
@@ -14,8 +14,7 @@ public class TraCISendFileCommand extends TraCICommand {
 	public static TraCIPacket TraCISendFileCommand(String file){
 		int strLen = file.getBytes(StandardCharsets.US_ASCII).length;
 		TraCIPacket packet = TraCIPacket.create(); // 4 (add later)
-		packet.getWriter()
-				.writeCommandLength(1 + 1 + 4 + strLen) // [1|5]
+		packet.writeCommandLength(1 + 1 + 4 + strLen) // [1|5]
 				.writeUnsignedByte(TraCICmd.SEND_FILE.id) // 1
 				.writeString(file); // 4+strLen
 		return packet;

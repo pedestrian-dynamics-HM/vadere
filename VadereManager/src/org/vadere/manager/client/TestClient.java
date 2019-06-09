@@ -3,7 +3,7 @@ package org.vadere.manager.client;
 import org.vadere.manager.TraCISocket;
 import org.vadere.manager.commandHandler.TraCIPersonVar;
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIPacket;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
