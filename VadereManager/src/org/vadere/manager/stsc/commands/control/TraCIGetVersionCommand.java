@@ -17,8 +17,8 @@ public class TraCIGetVersionCommand extends TraCICommand {
 		return packet;
 	}
 
-	public TraCIGetVersionCommand(TraCICmd traCICmd){
-		super(traCICmd);
+	public TraCIGetVersionCommand(){
+		super(TraCICmd.GET_VERSION);
 		response = new TraCIGetVersionResponse();
 	}
 

@@ -1,10 +1,9 @@
 package org.vadere.manager.stsc.commands.control;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.stsc.TraCIPacket;
-import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.TraCICmd;
+import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 
 public class TraCISimStepCommand extends TraCICommand {
@@ -21,13 +20,9 @@ public class TraCISimStepCommand extends TraCICommand {
 		return packet;
 	}
 
-	public TraCISimStepCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
-		super(traCICmd);
-		try{
-			this.targetTime = cmdBuffer.reader.readDouble();
-		} catch (Exception e){
-			throw TraCIException.cmdErr(traCICmd, e);
-		}
+	public TraCISimStepCommand(TraCICommandBuffer cmdBuffer) {
+		super(TraCICmd.SIM_STEP);
+		this.targetTime = cmdBuffer.reader.readDouble();
 	}
 
 	public double getTargetTime() {

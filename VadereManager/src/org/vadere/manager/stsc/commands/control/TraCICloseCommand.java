@@ -21,8 +21,8 @@ public class TraCICloseCommand extends TraCICommand {
 		return packet;
 	}
 
-	public TraCICloseCommand(TraCICmd traCICmd) {
-		super(traCICmd);
+	public TraCICloseCommand() {
+		super(TraCICmd.CLOSE);
 		this.response = new TraCIResponse(
 				new StatusResponse(TraCICmd.CLOSE, TraCIStatusResponse.OK, ""),
 				TraCICmd.CLOSE);

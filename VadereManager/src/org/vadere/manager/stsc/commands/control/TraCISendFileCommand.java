@@ -1,6 +1,5 @@
 package org.vadere.manager.stsc.commands.control;
 
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.TraCIPacket;
 import org.vadere.manager.stsc.commands.TraCICommand;
@@ -22,13 +21,9 @@ public class TraCISendFileCommand extends TraCICommand {
 		return packet;
 	}
 
-	public TraCISendFileCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
-		super(traCICmd);
-		try{
-			this.file = cmdBuffer.reader.readString();
-		} catch (Exception e){
-			throw TraCIException.cmdErr(traCICmd, e);
-		}
+	public TraCISendFileCommand(TraCICommandBuffer cmdBuffer) {
+		super(TraCICmd.SEND_FILE);
+		this.file = cmdBuffer.reader.readString();
 	}
 
 
