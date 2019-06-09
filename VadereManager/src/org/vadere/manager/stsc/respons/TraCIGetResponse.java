@@ -34,10 +34,10 @@ public class TraCIGetResponse extends TraCIResponse{
 	public TraCIGetResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, TraCICommandBuffer buffer) {
 		super(statusResponse, responseIdentifier);
 
-		variableIdentifier = buffer.reader.readUnsignedByte();
-		elementIdentifier = buffer.reader.readString();
-		responseDataType = TraCIDataType.fromId(buffer.reader.readUnsignedByte());
-		responseData = buffer.reader.readTypeValue(responseDataType);
+		variableIdentifier = buffer.readUnsignedByte();
+		elementIdentifier = buffer.readString();
+		responseDataType = TraCIDataType.fromId(buffer.readUnsignedByte());
+		responseData = buffer.readTypeValue(responseDataType);
 	}
 
 	public TraCIGetResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {

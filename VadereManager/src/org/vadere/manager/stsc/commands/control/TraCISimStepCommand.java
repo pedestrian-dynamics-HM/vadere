@@ -22,7 +22,7 @@ public class TraCISimStepCommand extends TraCICommand {
 
 	public TraCISimStepCommand(TraCICommandBuffer cmdBuffer) {
 		super(TraCICmd.SIM_STEP);
-		this.targetTime = cmdBuffer.reader.readDouble();
+		this.targetTime = cmdBuffer.readDouble();
 	}
 
 	public double getTargetTime() {

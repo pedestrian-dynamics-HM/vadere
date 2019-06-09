@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
  *  must be removed before!
  *
  */
-public class TraCIPacketBuffer extends TraCIBuffer {
+public class TraCIPacketBuffer extends TraCIByteBuffer {
 
 	public  static TraCIPacketBuffer wrap(byte[] buf){
 		return new TraCIPacketBuffer(buf);
@@ -37,36 +37,36 @@ public class TraCIPacketBuffer extends TraCIBuffer {
 	}
 
 	public TraCICommand nextCommand(){
-		if (!reader.hasRemaining())
+		if (!hasRemaining())
 			return null;
 
 		int cmdLen = getCommandDataLen();
 
-		return TraCICommand.create(reader.readByteBuffer(cmdLen));
+		return TraCICommand.create(readByteBuffer(cmdLen));
 	}
 
 	public TraCIResponse nextResponse(){
-		if (!reader.hasRemaining())
+		if (!hasRemaining())
 			return null;
 
 		int statusLen = getCommandDataLen();
-		StatusResponse statusResponse = StatusResponse.createFromByteBuffer(reader.readByteBuffer(statusLen));
+		StatusResponse statusResponse = StatusResponse.createFromByteBuffer(readByteBuffer(statusLen));
 
-		if (!reader.hasRemaining()){
+		if (!hasRemaining()){
 			// only StatusResponse
 			return TraCIResponse.create(statusResponse);
 		} else {
 			int responseDataLen = getCommandDataLen();
-			ByteBuffer buffer = reader.readByteBuffer(responseDataLen);
+			ByteBuffer buffer = readByteBuffer(responseDataLen);
 			return TraCIResponse.create(statusResponse, buffer);
 		}
 	}
 
 	private int getCommandDataLen(){
-		int cmdLen = reader.readUnsignedByte();
+		int cmdLen = readUnsignedByte();
 		if (cmdLen == 0 ){
 			// extended cmdLen field used.
-			cmdLen = reader.readInt() - 5; // subtract cmdLen field:  1 ubyte + 1 int (4)
+			cmdLen = readInt() - 5; // subtract cmdLen field:  1 ubyte + 1 int (4)
 		} else {
 			cmdLen -= 1; // subtract cmdLen field: 1 ubyte
 		}

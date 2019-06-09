@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  *  (1 byte or 5 bytes, depending on the command size) must be removed before creating an instance.
  *
  */
-public class TraCICommandBuffer extends TraCIBuffer{
+public class TraCICommandBuffer extends TraCIByteBuffer {
 
 	private boolean cmdIdentifierRead;
 
@@ -26,12 +26,12 @@ public class TraCICommandBuffer extends TraCIBuffer{
 	}
 
 
-	protected TraCICommandBuffer(byte[] buf) {
+	private TraCICommandBuffer(byte[] buf) {
 		super(buf);
 		cmdIdentifierRead = false;
 	}
 
-	protected TraCICommandBuffer(ByteBuffer buf) {
+	private TraCICommandBuffer(ByteBuffer buf) {
 		super(buf);
 		cmdIdentifierRead = false;
 	}
@@ -42,7 +42,7 @@ public class TraCICommandBuffer extends TraCIBuffer{
 			throw new IllegalStateException("TraCI Command Identifier already consumed. readCmdIdentifier() must only be called once. Something went wrong in the TraCI message handling.");
 
 		cmdIdentifierRead = true;
-		return reader.readUnsignedByte();
+		return readUnsignedByte();
 	}
 
 

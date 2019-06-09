@@ -20,8 +20,8 @@ public class TraCIGetVersionResponse extends TraCIResponse{
 	// deserialize from buffer (wrap byte[])
 	public TraCIGetVersionResponse(StatusResponse statusResponse, TraCICommandBuffer buffer) {
 		super(statusResponse, TraCICmd.GET_VERSION);
-		this.versionId = buffer.reader.readInt();
-		this.versionString = buffer.reader.readString();
+		this.versionId = buffer.readInt();
+		this.versionString = buffer.readString();
 	}
 
 	public TraCIGetVersionResponse(){

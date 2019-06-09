@@ -47,8 +47,8 @@ public class TraCIGetCommand extends TraCICommand {
 
 	public TraCIGetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
-		variableIdentifier = cmdBuffer.reader.readUnsignedByte();
-		elementIdentifier = cmdBuffer.reader.readString();
+		variableIdentifier = cmdBuffer.readUnsignedByte();
+		elementIdentifier = cmdBuffer.readString();
 	}
 
 	public int getVariableIdentifier() {

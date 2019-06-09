@@ -24,23 +24,31 @@ import java.util.List;
  * byte[] array.
  *
  */
-public class ByteBufferTraCIReader implements TraCIReader {
+public class TraCIByteBuffer implements TraCIReader {
 
 	private ByteBuffer byteBuffer;
 
-	public static ByteBufferTraCIReader wrap(byte[] data){
-		ByteBufferTraCIReader byteBufferTraCIReader = new ByteBufferTraCIReader();
-		byteBufferTraCIReader.byteBuffer = ByteBuffer.wrap(data);
-		return byteBufferTraCIReader;
+	public static TraCIByteBuffer wrap(byte[] data){
+		TraCIByteBuffer traCIByteBuffer = new TraCIByteBuffer();
+		traCIByteBuffer.byteBuffer = ByteBuffer.wrap(data);
+		return traCIByteBuffer;
 	}
 
-	public static ByteBufferTraCIReader wrap(ByteBuffer buffer){
-		ByteBufferTraCIReader byteBufferTraCIReader = new ByteBufferTraCIReader();
-		byteBufferTraCIReader.byteBuffer =  buffer;
-		return byteBufferTraCIReader;
+	public static TraCIByteBuffer wrap(ByteBuffer buffer){
+		TraCIByteBuffer traCIByteBuffer = new TraCIByteBuffer();
+		traCIByteBuffer.byteBuffer =  buffer;
+		return traCIByteBuffer;
 	}
 
-	private ByteBufferTraCIReader(){ }
+	protected TraCIByteBuffer(){ }
+
+	protected TraCIByteBuffer(byte[] buffer){
+		byteBuffer = ByteBuffer.wrap(buffer);
+	}
+
+	protected TraCIByteBuffer(ByteBuffer buffer){
+		byteBuffer = buffer;
+	}
 
 	@Override
 	public byte readByte() {

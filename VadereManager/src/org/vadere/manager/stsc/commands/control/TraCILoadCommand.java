@@ -18,7 +18,7 @@ public class TraCILoadCommand extends TraCICommand {
 
 	public TraCILoadCommand(TraCICommandBuffer cmdBuffer) {
 		super(TraCICmd.LOAD);
-		this.optionList = cmdBuffer.reader.readStringList();
+		this.optionList = cmdBuffer.readStringList();
 	}
 
 	@Override

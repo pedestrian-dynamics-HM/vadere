@@ -23,7 +23,7 @@ public class TraCISendFileCommand extends TraCICommand {
 
 	public TraCISendFileCommand(TraCICommandBuffer cmdBuffer) {
 		super(TraCICmd.SEND_FILE);
-		this.file = cmdBuffer.reader.readString();
+		this.file = cmdBuffer.readString();
 	}
 
 

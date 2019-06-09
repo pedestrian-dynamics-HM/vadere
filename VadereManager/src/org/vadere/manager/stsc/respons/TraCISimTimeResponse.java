@@ -18,8 +18,8 @@ public class TraCISimTimeResponse extends TraCIResponse {
 
 	public TraCISimTimeResponse (StatusResponse statusResponse, TraCICommandBuffer buffer){
 		super(statusResponse, TraCICmd.SIM_STEP);
-		subscriptionDataType = TraCIDataType.fromId(buffer.reader.readUnsignedByte());
-		subscriptionData = buffer.reader.readTypeValue(subscriptionDataType);
+		subscriptionDataType = TraCIDataType.fromId(buffer.readUnsignedByte());
+		subscriptionData = buffer.readTypeValue(subscriptionDataType);
 	}
 
 	public TraCISimTimeResponse( Object subscriptionData, TraCIDataType subscriptionDataType) {

@@ -36,10 +36,10 @@ public class TraCISetCommand extends TraCICommand{
 	public TraCISetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
 		try{
-			variableId = cmdBuffer.reader.readUnsignedByte();
-			elementId = cmdBuffer.reader.readString();
-			returnDataType = TraCIDataType.fromId(cmdBuffer.reader.readUnsignedByte());
-			variableValue = cmdBuffer.reader.readTypeValue(returnDataType);
+			variableId = cmdBuffer.readUnsignedByte();
+			elementId = cmdBuffer.readString();
+			returnDataType = TraCIDataType.fromId(cmdBuffer.readUnsignedByte());
+			variableValue = cmdBuffer.readTypeValue(returnDataType);
 		} catch (Exception e){
 			throw TraCIException.cmdErr(traCICmd, e);
 		}

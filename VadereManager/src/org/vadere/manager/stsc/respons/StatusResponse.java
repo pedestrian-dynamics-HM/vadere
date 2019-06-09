@@ -22,9 +22,9 @@ public class StatusResponse {
 		StatusResponse ret = new StatusResponse();
 		TraCICommandBuffer buf = TraCICommandBuffer.wrap(rawCmd);
 		ret.cmdIdentifier = TraCICmd.fromId(buf.readCmdIdentifier());
-		ret.response = TraCIStatusResponse.fromId(buf.reader.readUnsignedByte());
+		ret.response = TraCIStatusResponse.fromId(buf.readUnsignedByte());
 
-		ret.description = buf.reader.readString();
+		ret.description = buf.readString();
 
 		return ret;
 	}

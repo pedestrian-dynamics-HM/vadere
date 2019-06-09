@@ -3,7 +3,7 @@ package org.vadere.manager.stsc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.manager.stsc.reader.ByteBufferTraCIReader;
+import org.vadere.manager.stsc.reader.TraCIByteBuffer;
 import org.vadere.manager.stsc.sumo.LightPhase;
 import org.vadere.manager.stsc.sumo.RoadMapPosition;
 import org.vadere.manager.stsc.sumo.TrafficLightPhase;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 public class TraCIReaderTest {
 
 	TraCIWriterImpl writer;
-	ByteBufferTraCIReader reader;
+	TraCIByteBuffer reader;
 
 	@Before
 	public void before(){
@@ -36,11 +36,11 @@ public class TraCIReaderTest {
 	}
 
 	private void createReader(){
-		reader = ByteBufferTraCIReader.wrap(writer.asByteArray());
+		reader = TraCIByteBuffer.wrap(writer.asByteArray());
 	}
 
 	private void checkEmpty(){
-		assertThat("ByteBufferTraCIReader must be empty at this point", reader.hasRemaining(), equalTo(false));
+		assertThat("TraCIByteBuffer must be empty at this point", reader.hasRemaining(), equalTo(false));
 	}
 
 	private void checkIdentifier( int matchWith){
