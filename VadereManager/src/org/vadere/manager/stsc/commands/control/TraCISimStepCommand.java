@@ -28,7 +28,6 @@ public class TraCISimStepCommand extends TraCICommand {
 		return targetTime;
 	}
 
-
 	public void setTargetTime(double targetTime) {
 		this.targetTime = targetTime;
 	}
@@ -46,6 +45,6 @@ public class TraCISimStepCommand extends TraCICommand {
 		if (NOK_response != null)
 			return NOK_response;
 		else
-			return TraCIPacket.create().wrapSimTimeStepCommand(this); // TODO
+			return TraCIPacket.create().wrapSimTimeStepCommand(response); // TODO
 	}
 }

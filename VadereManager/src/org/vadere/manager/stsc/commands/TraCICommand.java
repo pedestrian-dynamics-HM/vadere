@@ -50,8 +50,9 @@ public abstract class TraCICommand {
 			case VALUE_SET:
 				return new TraCISetCommand(cmd, cmdBuffer);
 			case VALUE_SUB:
+				return new TraCIValueSubscriptionCommand(cmd, cmdBuffer);
 			case CONTEXT_SUB:
-				throw new TraCIException("Subscrtipons not implemente");
+				throw new TraCIException("Subscription not implement. Command: 0x%02X", cmd.id);
 			default:
 				throw new IllegalStateException("Should not be reached. All CmdType enums are tested in switch statement");
 		}

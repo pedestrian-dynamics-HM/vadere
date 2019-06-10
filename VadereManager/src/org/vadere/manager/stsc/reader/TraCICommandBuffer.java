@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
  *  A simple Wrapper around a {@link TraCIReader} which knows how to traverse a single command.
  *
  *  The class expects that the given buffer only contains *one* command. The command length filed
- *  (1 byte or 5 bytes, depending on the command size) must be removed before creating an instance.
+ *  (1 byte or 5 bytes, depending on the command limit) must be removed before creating an instance.
  *
  */
 public class TraCICommandBuffer extends TraCIByteBuffer {

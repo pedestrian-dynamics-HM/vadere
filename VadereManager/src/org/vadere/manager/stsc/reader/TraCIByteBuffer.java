@@ -246,6 +246,10 @@ public class TraCIByteBuffer implements TraCIReader {
 			throw new TraCIException("Not enough bytes left." + "Expected " + num + "Bytes but only " + bytesLeft + " found.");
 	}
 
+	@Override
+	public int limit() {
+		return byteBuffer.limit();
+	}
 
 
 }

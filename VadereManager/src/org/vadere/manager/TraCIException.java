@@ -9,6 +9,14 @@ public class TraCIException extends RuntimeException {
 		super(message);
 	}
 
+	public TraCIException(String message, Object... arg) {
+		super(String.format(message, arg));
+	}
+
+	public TraCIException(String message, Throwable cause, Object... arg) {
+		super(String.format(message, arg), cause);
+	}
+
 	public TraCIException(String message, Throwable cause) {
 		super(message, cause);
 	}

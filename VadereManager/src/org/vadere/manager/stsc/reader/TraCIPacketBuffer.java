@@ -1,5 +1,6 @@
 package org.vadere.manager.stsc.reader;
 
+import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.respons.TraCIResponse;
@@ -56,9 +57,18 @@ public class TraCIPacketBuffer extends TraCIByteBuffer {
 			// only StatusResponse
 			return TraCIResponse.create(statusResponse);
 		} else {
-			int responseDataLen = getCommandDataLen();
-			ByteBuffer buffer = readByteBuffer(responseDataLen);
-			return TraCIResponse.create(statusResponse, buffer);
+			if (statusResponse.getCmdIdentifier().equals(TraCICmd.SIM_STEP)){
+				// The sim step command does follow the standard command structure.
+				// After the status command follows a single int encoding the number of
+				// subscription results which will follow. Thus in case of SIM_STEP
+				// give all remaining data to the factory.
+				return TraCIResponse.create(statusResponse, readByteBuffer(limit()));
+			} else {
+				int responseDataLen = getCommandDataLen();
+				ByteBuffer buffer = readByteBuffer(responseDataLen);
+				return TraCIResponse.create(statusResponse, buffer);
+			}
+
 		}
 	}
 

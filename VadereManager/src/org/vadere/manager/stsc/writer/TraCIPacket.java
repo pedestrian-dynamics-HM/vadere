@@ -3,12 +3,12 @@ package org.vadere.manager.stsc.writer;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
 import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
 import org.vadere.manager.stsc.respons.TraCIStatusResponse;
+import org.vadere.manager.stsc.respons.TraCISubscriptionResponse;
 
 import java.nio.ByteBuffer;
 
@@ -39,7 +39,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		if (cmdLen > 255){
 			//extended CMD
 			cmdLen += 4; // add int field
-			response.writeInt(4 + cmdLen); // packet size (4 + cmdLen) [4]
+			response.writeInt(4 + cmdLen); // packet limit (4 + cmdLen) [4]
 			response.writeUnsignedByte(0); // [1]
 			response.writeInt(cmdLen); // [4]
 		} else {
@@ -85,7 +85,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		if (finalized)
 			return asByteArray();
 
-		// packet size must be set to correct value
+		// packet limit must be set to correct value
 		if (emptyLengthField){
 			ByteBuffer packet = asByteBuffer();
 			packet.putInt(packet.capacity());
@@ -104,6 +104,9 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 	public TraCIPacket wrapGetResponse(TraCIGetResponse res){
 		addStatusResponse(res.getStatusResponse());
 
+		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
+			return this; // ERR or NOT_IMPLEMENTED --> only StatusResponse
+
 		TraCIWriter cmdBuilder = getCmdBuilder();
 		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
 				.writeUnsignedByte(res.getVariableIdentifier())
@@ -113,6 +116,31 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		addCommandWithoutLen(cmdBuilder.asByteArray());
 
 		return this;
+	}
+
+	public TraCIPacket wrapValueSubscriptionCommand(TraCISubscriptionResponse res){
+		addStatusResponse(res.getStatusResponse());
+
+		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
+			return this; // ERR or NOT_IMPLEMENTED --> only StatusResponse
+
+		wrapSubscription(res);
+
+		return this;
+	}
+
+	private void wrapSubscription(TraCISubscriptionResponse res){
+		TraCIWriter cmdBuilder = getCmdBuilder();
+		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id) // (i.e. TraCICmd.RESPONSE_SUB_PERSON_VARIABLE)
+				.writeString(res.getElementId())
+				.writeUnsignedByte(res.getNumberOfVariables());
+		res.getResponses().forEach( var -> {
+			cmdBuilder.writeUnsignedByte(var.getVariableId())
+					.writeUnsignedByte(var.getStatus().id)
+					.writeObjectWithId(var.getVariableDataType(), var.getVariableValue());
+		});
+
+		addCommandWithExtendedLenField(cmdBuilder.asByteArray());
 	}
 
 	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
@@ -133,19 +161,27 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public TraCIPacket wrapSimTimeStepCommand(TraCISimStepCommand cmd){
-		TraCISimTimeResponse res = cmd.getResponse();
-
+	public TraCIPacket wrapSimTimeStepCommand(TraCISimTimeResponse res){
 		addStatusResponse(res.getStatusResponse());
 
+		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
+			return this; // ERR or NOT_IMPLEMENTED --> only StatusResponse
 
-		TraCIWriter cmdBuilder = getCmdBuilder();
-		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
-				.writeObjectWithId(res.getSubscriptionDataType(), res.getSubscriptionData());
 
-		addCommandWithoutLen(cmdBuilder.asByteArray());
+		// not length field! Directly add number of subscription responses.
+		writeInt(res.getNumberOfSubscriptions());
+
+		// add each SubscriptionsResponse as its own command (with length and responseID)
+		res.getSubscriptionResponses().forEach(this::wrapSubscription);
+
 
 		return this;
+	}
+
+	public void addCommandWithExtendedLenField(byte[] buffer){
+		writeUnsignedByte(0);
+		writeInt(buffer.length + 5); // 1 + 4 length field
+		writeBytes(buffer);
 	}
 
 

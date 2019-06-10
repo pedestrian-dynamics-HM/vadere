@@ -1,6 +1,7 @@
 package org.vadere.manager;
 
 import org.vadere.manager.commandHandler.StateAccessHandler;
+import org.vadere.manager.commandHandler.Subscription;
 import org.vadere.simulator.control.RemoteManagerListener;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
@@ -9,6 +10,8 @@ import org.vadere.simulator.projects.ScenarioRun;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -25,11 +28,14 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 	private ReentrantLock lock;
 	private boolean lastSimulationStep;
 
+	private List<Subscription> subscriptions;
+
 
 	public RemoteManager() {
 		waitForLoopEnd = new Object();
 		lock = new ReentrantLock();
 		lastSimulationStep = false;
+		subscriptions = new ArrayList<>();
 	}
 
 	public void loadScenario(String scenarioString) {
@@ -53,9 +59,19 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 	}
 
 
-	synchronized public void accessState(StateAccessHandler stateAccessHandler){
-		try {
+	public void addValueSubscription(Subscription sub){
+		subscriptions.add(sub);
+	}
 
+	public List<Subscription> getSubscriptions(){
+		return subscriptions;
+	}
+
+	synchronized public boolean accessState(StateAccessHandler stateAccessHandler){
+		if (currentSimulationRun == null)
+			return false;
+
+		try {
 			if (!currentSimulationRun.isWaitForSimCommand()) {
 				synchronized (waitForLoopEnd){
 					waitForLoopEnd.wait();
@@ -70,6 +86,7 @@ public class RemoteManager implements RemoteManagerListener, RunnableFinishedLis
 		} finally {
 			lock.unlock();
 		}
+		return true;
 	}
 
 	synchronized public void nextStep(double simTime){

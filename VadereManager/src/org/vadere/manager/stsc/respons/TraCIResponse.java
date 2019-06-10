@@ -74,12 +74,14 @@ public class TraCIResponse {
 
 	// instance methods
 
-	public TraCIResponse (StatusResponse statusResponse, TraCICmd responseIdentifier
-	){
+	public TraCIResponse (StatusResponse statusResponse, TraCICmd responseIdentifier){
 		this.statusResponse = statusResponse;
 		this.responseIdentifier = responseIdentifier;
 	}
 
+	public TraCIResponse(TraCICmd responseIdentifier){
+
+	}
 
 	public StatusResponse getStatusResponse() {
 		return statusResponse;

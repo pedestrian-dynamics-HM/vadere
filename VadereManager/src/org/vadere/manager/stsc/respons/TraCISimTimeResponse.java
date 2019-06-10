@@ -1,8 +1,10 @@
 package org.vadere.manager.stsc.respons;
 
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Response object for {@link org.vadere.manager.stsc.commands.control.TraCISimStepCommand}
@@ -12,44 +14,46 @@ import org.vadere.manager.stsc.reader.TraCICommandBuffer;
  */
 public class TraCISimTimeResponse extends TraCIResponse {
 
-	private Object subscriptionData;
-	private TraCIDataType subscriptionDataType;
+//	private int numberOfSubscriptions;
+	private List<TraCISubscriptionResponse> subscriptionResponses;
+
 
 
 	public TraCISimTimeResponse (StatusResponse statusResponse, TraCICommandBuffer buffer){
+		this(statusResponse);
+		int numberOfSubscriptions = buffer.readInt();
+		for(int i=0; i<numberOfSubscriptions; i++){
+			int zeroByte = buffer.readUnsignedByte();
+			int length = buffer.readInt();
+			TraCICmd responseIdentifier = TraCICmd.fromId(buffer.readUnsignedByte());
+			subscriptionResponses.add(new TraCISubscriptionResponse(statusResponse, responseIdentifier, buffer));
+		}
+	}
+
+	public TraCISimTimeResponse (StatusResponse statusResponse){
 		super(statusResponse, TraCICmd.SIM_STEP);
-		subscriptionDataType = TraCIDataType.fromId(buffer.readUnsignedByte());
-		subscriptionData = buffer.readTypeValue(subscriptionDataType);
+		subscriptionResponses = new ArrayList<>();
 	}
 
-	public TraCISimTimeResponse( Object subscriptionData, TraCIDataType subscriptionDataType) {
-		super(new StatusResponse(TraCICmd.SIM_STEP, TraCIStatusResponse.OK, ""),
-				TraCICmd.SIM_STEP);
-		this.subscriptionData = subscriptionData;
-		this.subscriptionDataType = subscriptionDataType;
+	public int getNumberOfSubscriptions() {
+		return subscriptionResponses.size();
 	}
 
-	public Object getSubscriptionData() {
-		return subscriptionData;
+	public List<TraCISubscriptionResponse> getSubscriptionResponses() {
+		return subscriptionResponses;
 	}
 
-	public void setSubscriptionData(Object subscriptionData) {
-		this.subscriptionData = subscriptionData;
+	public void setSubscriptionResponses(List<TraCISubscriptionResponse> subscriptionResponses) {
+		this.subscriptionResponses = subscriptionResponses;
 	}
 
-	public TraCIDataType getSubscriptionDataType() {
-		return subscriptionDataType;
+	public void addSubscriptionResponse(TraCISubscriptionResponse response){
+		this.subscriptionResponses.add(response);
 	}
 
-	public void setSubscriptionDataType(TraCIDataType subscriptionDataType) {
-		this.subscriptionDataType = subscriptionDataType;
-	}
 
-	@Override
-	public String toString() {
-		return "TraCISimTimeResponse{" +
-				"subscriptionData=" + subscriptionData +
-				", subscriptionDataType=" + subscriptionDataType +
-				'}';
-	}
+
+
+
+
 }

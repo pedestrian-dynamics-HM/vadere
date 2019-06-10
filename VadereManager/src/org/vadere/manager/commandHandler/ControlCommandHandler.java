@@ -3,14 +3,15 @@ package org.vadere.manager.commandHandler;
 
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.VadereServer;
-import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
 import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
 import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
+import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.respons.TraCIGetVersionResponse;
 import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
+import org.vadere.manager.stsc.respons.TraCIStatusResponse;
 import org.vadere.util.logging.Logger;
 
 /**
@@ -47,13 +48,21 @@ public class ControlCommandHandler extends CommandHandler{
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
 		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
-		remoteManager.nextStep(cmd.getTargetTime());
-
-		remoteManager.accessState((manger, state) -> {
-			cmd.setResponse(new TraCISimTimeResponse(state.getStep(), TraCIDataType.INTEGER));
-		});
-
 		logger.infof("Simulate next step %f", cmd.getTargetTime());
+//		remoteManager.nextStep(cmd.getTargetTime());
+		remoteManager.nextStep(-1); //todo problem if 0.4 is used direclty
+
+		// execute all
+		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+
+		// get responses
+		TraCISimTimeResponse response = new TraCISimTimeResponse(
+				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
+
+		remoteManager.getSubscriptions().forEach(sub -> {
+			response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
+		});
+		cmd.setResponse(response);
 
 		return cmd;
 	}

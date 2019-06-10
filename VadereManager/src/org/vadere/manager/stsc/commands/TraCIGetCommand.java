@@ -44,6 +44,12 @@ public class TraCIGetCommand extends TraCICommand {
 		return packet;
 	}
 
+	public TraCIGetCommand(TraCICmd traCICmd, int variableIdentifier, String elementIdentifier) {
+		super(traCICmd);
+		this.variableIdentifier = variableIdentifier;
+		this.elementIdentifier = elementIdentifier;
+	}
+
 	public TraCIGetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
 		variableIdentifier = cmdBuffer.readUnsignedByte();
@@ -76,13 +82,8 @@ public class TraCIGetCommand extends TraCICommand {
 		this.response = response;
 	}
 
-
-
 	@Override
 	public TraCIPacket buildResponsePacket() {
-		if (NOK_response != null)
-			return NOK_response;
-		else
-			return TraCIPacket.create().wrapGetResponse(response);
+		return TraCIPacket.create().wrapGetResponse(response);
 	}
 }

@@ -59,4 +59,6 @@ public interface TraCIReader {
 	boolean hasRemaining();
 
 	void ensureBytes(int num);
+
+	int limit();
 }

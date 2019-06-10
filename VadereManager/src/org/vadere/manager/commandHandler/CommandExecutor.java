@@ -1,9 +1,9 @@
 package org.vadere.manager.commandHandler;
 
 import org.vadere.manager.RemoteManager;
-import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.commands.TraCICommand;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
@@ -44,7 +44,14 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.SEND_FILE.id, ControlCommandHandler.instance::process_load_file);
 		cmdMap.put(TraCICmd.GET_PERSON_VALUE.id, PersonCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_PERSON_STATE.id, PersonCommandHandler.instance::processSet);
+		cmdMap.put(TraCICmd.SUB_PERSON_VARIABLE.id, PersonCommandHandler.instance::processValueSub);
+		cmdMap.put(TraCICmd.GET_SIMULATION_VALUE.id, SimulationCommandHandler.instance::processGet);
+		cmdMap.put(TraCICmd.SET_SIMULATION_STATE.id, SimulationCommandHandler.instance::processSet);
+		cmdMap.put(TraCICmd.SUB_SIMULATION_VALUE.id, SimulationCommandHandler.instance::processValueSub);
+		cmdMap.put(TraCICmd.GET_VEHICLE_VALUE.id, VehicleCommandHandler.instance::processGet);
+		cmdMap.put(TraCICmd.SUB_VEHICLE_VALUE.id, VehicleCommandHandler.instance::processValueSub);
 	}
+
 
 	public TraCIPacket execute(TraCICommand cmd){
 		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd().id);
