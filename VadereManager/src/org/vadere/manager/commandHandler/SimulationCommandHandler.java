@@ -9,6 +9,8 @@ import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.geom.Rectangle2D;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 /**
@@ -51,8 +53,9 @@ public class SimulationCommandHandler  extends CommandHandler{
 	private TraCICommand process_getSimTime(TraCIGetCommand cmd, RemoteManager remoteManager, TraCISimulationVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
-			double time = state.getSimTimeInSec();
-			cmd.setResponse(responseOK(traCIVar.returnType, time));
+			// BigDecimal to ensure correct comparison in omentpp
+			BigDecimal time = BigDecimal.valueOf(state.getSimTimeInSec());
+			cmd.setResponse(responseOK(traCIVar.returnType, time.setScale(1, RoundingMode.HALF_UP).doubleValue()));
 		});
 
 		return cmd;

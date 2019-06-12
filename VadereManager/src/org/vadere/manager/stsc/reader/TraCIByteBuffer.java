@@ -74,6 +74,13 @@ public class TraCIByteBuffer implements TraCIReader {
 	}
 
 	@Override
+	public String readString(int numOfBytes) {
+		byte [] data = readBytes(numOfBytes);
+
+		return new String(data, StandardCharsets.US_ASCII);
+	}
+
+	@Override
 	public String readString(){
 		ensureBytes(4);
 		int len = byteBuffer.getInt();
@@ -229,6 +236,7 @@ public class TraCIByteBuffer implements TraCIReader {
 			case COLOR:
 				return readColor();
 			case COMPOUND_OBJECT:
+				return null; // todo: simple fix. For now we ignore Compound Objects.
 			default:
 				throw new TraCIException("Unknown Datatype: " + type.toString());
 		}

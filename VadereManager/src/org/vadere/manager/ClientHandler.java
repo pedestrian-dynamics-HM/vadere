@@ -4,7 +4,6 @@ import org.vadere.manager.commandHandler.CommandExecutor;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
 import org.vadere.manager.stsc.writer.TraCIPacket;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.io.EOFException;
@@ -49,12 +48,12 @@ public class ClientHandler implements Runnable{
 	private void handleClient() throws IOException{
 		try{
 			logger.info("client connected...");
-			String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/roVerTest001.scenario";
-
-			String scenario = IOUtils.readTextFile(filePath);
-			logger.infof("load File...");
-			remoteManager.loadScenario(scenario);
-			remoteManager.run();
+//			String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/roVerTest001.scenario";
+//
+//			String scenario = IOUtils.readTextFile(filePath);
+//			logger.infof("load File...");
+//			remoteManager.loadScenario(scenario);
+//			remoteManager.run();
 
 			while (true){
 

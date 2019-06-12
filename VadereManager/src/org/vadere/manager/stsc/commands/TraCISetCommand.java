@@ -1,10 +1,9 @@
 package org.vadere.manager.stsc.commands;
 
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.writer.TraCIPacket;
-import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 import org.vadere.manager.stsc.TraCIDataType;
+import org.vadere.manager.stsc.reader.TraCICommandBuffer;
+import org.vadere.manager.stsc.writer.TraCIPacket;
 
 /**
  * Sub class of {@link TraCICommand} which represents a set request to some API.
@@ -35,14 +34,11 @@ public class TraCISetCommand extends TraCICommand{
 
 	public TraCISetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
-		try{
-			variableId = cmdBuffer.readUnsignedByte();
-			elementId = cmdBuffer.readString();
-			returnDataType = TraCIDataType.fromId(cmdBuffer.readUnsignedByte());
-			variableValue = cmdBuffer.readTypeValue(returnDataType);
-		} catch (Exception e){
-			throw TraCIException.cmdErr(traCICmd, e);
-		}
+		variableId = cmdBuffer.readUnsignedByte();
+		elementId = cmdBuffer.readString();
+		returnDataType = TraCIDataType.fromId(cmdBuffer.readUnsignedByte());
+		variableValue = cmdBuffer.readTypeValue(returnDataType);
+
 	}
 
 	public Object getVariableValue(){
@@ -63,6 +59,6 @@ public class TraCISetCommand extends TraCICommand{
 
 	@Override
 	public TraCIPacket buildResponsePacket() {
-		return null;
+		return TraCIPacket.create().add_OK_StatusResponse(traCICmd);
 	}
 }

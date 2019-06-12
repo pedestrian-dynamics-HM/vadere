@@ -7,7 +7,9 @@ import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
  */
 public class PersonCommandHandler extends CommandHandler{
 
+	private static Logger logger = Logger.getLogger(PersonCommandHandler.class);
 
 	public static PersonCommandHandler instance;
 
@@ -62,6 +65,7 @@ public class PersonCommandHandler extends CommandHandler{
 					.collect(Collectors.toList());
 			TraCIGetResponse res = responseOK(traCIVar.returnType, data);
 			cmd.setResponse(res);
+			logger.debugf("time: %f ID's: %s", state.getSimTimeInSec(), Arrays.toString(data.toArray(String[]::new)));
 		});
 
 		return cmd;
@@ -110,6 +114,10 @@ public class PersonCommandHandler extends CommandHandler{
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
 					.getPosition();
 			cmd.setResponse(responseOK(traCIVar.returnType, pos));
+			logger.debugf("time: %f Pedestrian: %s Position: %s",
+					state.getSimTimeInSec() ,
+					cmd.getElementIdentifier(),
+					pos.toString());
 		});
 
 		return cmd;

@@ -50,6 +50,10 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.SUB_SIMULATION_VALUE.id, SimulationCommandHandler.instance::processValueSub);
 		cmdMap.put(TraCICmd.GET_VEHICLE_VALUE.id, VehicleCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SUB_VEHICLE_VALUE.id, VehicleCommandHandler.instance::processValueSub);
+		cmdMap.put(TraCICmd.GET_POLYGON.id, PolygonCommandHandler.instance::processGet);
+		cmdMap.put(TraCICmd.SET_POLYGON_STATE.id, PolygonCommandHandler.instance::processSet);
+		cmdMap.put(TraCICmd.SUB_POLYGON_VALUE.id, PolygonCommandHandler.instance::processValueSub);
+		cmdMap.put(TraCICmd.SET_VEHICLE_STATE.id, (cmd, manager) -> cmd );
 	}
 
 

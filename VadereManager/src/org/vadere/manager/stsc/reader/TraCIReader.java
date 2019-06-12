@@ -34,6 +34,8 @@ public interface TraCIReader {
 	int readInt();
 	double readDouble();
 
+	String readString(int numOfBytes);
+
 	String readString();
 
 	List<String> readStringList();

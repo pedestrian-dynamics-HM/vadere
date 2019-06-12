@@ -48,11 +48,12 @@ public class ControlCommandHandler extends CommandHandler{
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
 		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
-		logger.infof("Simulate next step %f", cmd.getTargetTime());
+		logger.infof("Simulate to: %f", cmd.getTargetTime());
 //		remoteManager.nextStep(cmd.getTargetTime());
 		remoteManager.nextStep(-1); //todo problem if 0.4 is used direclty
 
 		// execute all
+		logger.debug("execute subscriptions");
 		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
 		// get responses
@@ -64,6 +65,7 @@ public class ControlCommandHandler extends CommandHandler{
 		});
 		cmd.setResponse(response);
 
+		logger.debug("process_simStep done.");
 		return cmd;
 	}
 

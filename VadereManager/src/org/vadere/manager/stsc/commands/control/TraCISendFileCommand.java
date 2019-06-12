@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 public class TraCISendFileCommand extends TraCICommand {
 
+	private String fileName;
 	private String file;
 
 	public static TraCIPacket TraCISendFileCommand(String file){
@@ -22,7 +23,9 @@ public class TraCISendFileCommand extends TraCICommand {
 
 	public TraCISendFileCommand(TraCICommandBuffer cmdBuffer) {
 		super(TraCICmd.SEND_FILE);
+		this.fileName = cmdBuffer.readString();
 		this.file = cmdBuffer.readString();
+
 	}
 
 

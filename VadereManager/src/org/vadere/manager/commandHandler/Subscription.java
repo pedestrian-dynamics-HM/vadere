@@ -36,8 +36,9 @@ public class Subscription {
 		}
 
 		valueSubscriptionCommand.setResponse(subResponse);
-
 	}
+
+
 
 	public TraCICmdHandler getTraCICmdHandler() {
 		return traCICmdHandler;

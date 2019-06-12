@@ -16,6 +16,7 @@ public class VadereServer implements Runnable{
 	private static Logger logger = Logger.getLogger(VadereServer.class);
 
 	public static int SUPPORTED_TRACI_VERSION = 20;
+//	public static int SUPPORTED_TRACI_VERSION = 1;
 	public static String SUPPORTED_TRACI_VERSION_STRING = "Vadere Simulator. Supports subset of commands based von TraCI Version " + SUPPORTED_TRACI_VERSION;
 
 	private final ServerSocket serverSocket;

@@ -234,6 +234,7 @@ public class Simulation {
 			preLoop();
 
 			while (isRunSimulation) {
+
 				synchronized (this) {
 					while (isPaused) {
 						try {
@@ -256,7 +257,7 @@ public class Simulation {
 
 				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
-				updateWriters(simTimeInSec);
+				updateWriters(simTimeInSec); // set SimulationState with Time!!!
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -290,6 +291,7 @@ public class Simulation {
 						}
 					}
 				}
+
 
 
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
