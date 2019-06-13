@@ -33,6 +33,14 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return responseERR(err, TraCICmd.GET_POLYGON, TraCICmd.RESPONSE_GET_POLYGON);
 	}
 
+	public boolean checkIfObstacleExists(Obstacle obstacle, TraCIGetCommand cmd){
+		if (obstacle == null) {
+			cmd.setResponse(responseERR(CommandHandler.ELEMENT_ID_NOT_FOUND));
+			return false;
+		}
+		return true;
+	}
+
 	private TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
@@ -67,10 +75,8 @@ public class PolygonCommandHandler  extends CommandHandler{
 			Optional<Obstacle> obstacle = state.getTopography().getObstacles().stream()
 					.filter(o-> cmd.getElementIdentifier().equals(Integer.toString(o.getId())))
 					.findFirst();
-			if (obstacle.isPresent())
+			if (checkIfObstacleExists(obstacle.get(), cmd))
 				cmd.setResponse(responseOK(traCIVar.returnType, obstacle.get().getShape().getPath()));
-			else
-				cmd.setResponse(responseERR("Cannot find shape with objectId "+ cmd.getElementIdentifier()));
 
 		});
 		return cmd;
@@ -86,10 +92,8 @@ public class PolygonCommandHandler  extends CommandHandler{
 			Optional<Obstacle> obstacle = state.getTopography().getObstacles().stream()
 					.filter(o-> cmd.getElementIdentifier().equals(Integer.toString(o.getId())))
 					.findFirst();
-			if (obstacle.isPresent())
+			if (checkIfObstacleExists(obstacle.get(), cmd))
 				cmd.setResponse(responseOK(traCIVar.returnType, obstacle.get().getShape().getCentroid()));
-			else
-				cmd.setResponse(responseERR("Cannot find shape with objectId "+ cmd.getElementIdentifier()));
 
 		});
 		return cmd;

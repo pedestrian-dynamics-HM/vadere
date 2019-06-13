@@ -19,7 +19,7 @@ import org.vadere.util.logging.Logger;
  */
 public class ControlCommandHandler extends CommandHandler{
 
-	private static Logger logger = Logger.getLogger(CommandExecutor.class);
+	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
 
 	public static ControlCommandHandler instance;
 
@@ -50,11 +50,17 @@ public class ControlCommandHandler extends CommandHandler{
 
 		logger.infof("Simulate to: %f", cmd.getTargetTime());
 //		remoteManager.nextStep(cmd.getTargetTime());
-		remoteManager.nextStep(-1); //todo problem if 0.4 is used direclty
-
+		if (!remoteManager.nextStep(cmd.getTargetTime())) {
+			//simulation finished;
+			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+			return cmd;
+		}
 		// execute all
 		logger.debug("execute subscriptions");
 		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+
+		// remove subscriptions no longer valid
+		remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);
 
 		// get responses
 		TraCISimTimeResponse response = new TraCISimTimeResponse(
@@ -83,7 +89,7 @@ public class ControlCommandHandler extends CommandHandler{
 		TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
 
 		remoteManager.loadScenario(cmd.getFile());
-		remoteManager.run();
+		remoteManager.startSimulation();
 
 		return cmd;
 	}

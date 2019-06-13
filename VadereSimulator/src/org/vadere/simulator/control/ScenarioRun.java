@@ -1,12 +1,12 @@
-package org.vadere.simulator.projects;
+package org.vadere.simulator.control;
 
 import org.jetbrains.annotations.Nullable;
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.RemoteManagerListener;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.projects.RunnableFinishedListener;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.util.io.IOUtils;
@@ -32,30 +32,30 @@ import java.util.Random;
  */
 public class ScenarioRun implements Runnable {
 
-	private static Logger logger = Logger.getLogger(ScenarioRun.class);
+	protected static Logger logger = Logger.getLogger(ScenarioRun.class);
 
-	private Path outputPath;
+	protected Path outputPath;
 
-	private final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
+	protected final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
-	private final List<RemoteManagerListener> remoteManagerListeners = new ArrayList<>();
+	protected final List<RemoteRunListener> remoteRunListeners = new ArrayList<>();
 
-	private final DataProcessingJsonManager dataProcessingJsonManager;
+	protected final DataProcessingJsonManager dataProcessingJsonManager;
 
-	private Simulation simulation;
+	protected Simulation simulation;
 
-	private boolean singleStepMode = false;
+	protected boolean singleStepMode = false;
 
 	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
-	private @Nullable
+	protected @Nullable
 	ProcessorManager processorManager;
 
-	private final Scenario scenario;
-	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
+	protected final Scenario scenario;
+	protected final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
 
-	private final RunnableFinishedListener finishedListener;
+	protected final RunnableFinishedListener finishedListener;
 
-	private SimulationResult simulationResult;
+	protected SimulationResult simulationResult;
 
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, boolean singleStepMode) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
@@ -124,7 +124,7 @@ public class ScenarioRun implements Runnable {
 				// Run simulation main loop from start time = 0 seconds
 				simulation = new Simulation(mainModel, 0,
 						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
-						processorManager, simulationResult, remoteManagerListeners, singleStepMode);
+						processorManager, simulationResult, remoteRunListeners, singleStepMode);
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
@@ -194,7 +194,9 @@ public class ScenarioRun implements Runnable {
 			simulation.resume();
 	}
 
-	public SimulationState getSimulationState(){
+	// only allow subclasses access to the not final state.
+	// this is needed to allow vadere to receive SET-Commands.
+	protected SimulationState getSimulationState(){
 		return simulation.getSimulationState();
 	}
 
@@ -202,8 +204,8 @@ public class ScenarioRun implements Runnable {
 		passiveCallbacks.add(pc);
 	}
 
-	public void addRemoteManagerListener(final RemoteManagerListener listener){
-		remoteManagerListeners.add(listener);
+	public void addRemoteManagerListener(final RemoteRunListener listener){
+		remoteRunListeners.add(listener);
 	}
 
 	public boolean isSingleStepMode() {

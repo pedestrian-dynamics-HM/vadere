@@ -1,6 +1,6 @@
 package org.vadere.simulator.control;
 
-public interface RemoteManagerListener {
+public interface RemoteRunListener {
 
 	/**
 	 *  Notify RemoteManger that the simulation reached end of loop and the {@link SimulationState}

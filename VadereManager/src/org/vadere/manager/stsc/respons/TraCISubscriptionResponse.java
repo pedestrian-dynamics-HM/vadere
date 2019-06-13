@@ -2,6 +2,7 @@ package org.vadere.manager.stsc.respons;
 
 import org.vadere.manager.stsc.TraCICmd;
 import org.vadere.manager.stsc.TraCIDataType;
+import org.vadere.manager.stsc.commands.TraCIValueSubscriptionCommand;
 import org.vadere.manager.stsc.reader.TraCICommandBuffer;
 
 import java.util.ArrayList;
@@ -10,11 +11,20 @@ import java.util.Objects;
 
 public class TraCISubscriptionResponse extends TraCIResponse {
 
+	public static final String SUB_REMOVED = "Subscription removed.";
+
 	private String elementId;
 	private int numberOfVariables;
 	private List<SingeVarResponse> responses;
 
 
+	public static TraCISubscriptionResponse removeResponse(TraCIValueSubscriptionCommand cmd, TraCICmd res){
+		TraCISubscriptionResponse subResponse = new TraCISubscriptionResponse(
+				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.ERR, SUB_REMOVED),
+				res, cmd.getElementIdentifier(), cmd.getNumberOfVariables());
+
+		return subResponse;
+	}
 
 
 	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, TraCICommandBuffer buffer) {

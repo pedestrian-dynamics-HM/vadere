@@ -25,6 +25,7 @@ import java.util.List;
  */
 public abstract class CommandHandler {
 
+	public static final String ELEMENT_ID_NOT_FOUND = "No element found with given object id";
 
 	public TraCICommand process_NotImplemented(TraCICommand cmd, RemoteManager remoteManager){
 		return cmd.setNOK_response(TraCIPacket.sendStatus(cmd.getTraCICmd(),

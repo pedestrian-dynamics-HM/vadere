@@ -47,7 +47,7 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
-	private final List<RemoteManagerListener> remoteManagerListeners;
+	private final List<RemoteRunListener> remoteRunListeners;
 	private List<Model> models;
 
 	private boolean isRunSimulation = false;
@@ -86,7 +86,7 @@ public class Simulation {
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult, List<RemoteManagerListener> remoteManagerListeners, boolean singleStepMode) {
+					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners, boolean singleStepMode) {
 
 		this.name = name;
 		this.mainModel = mainModel;
@@ -110,7 +110,7 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
-		this.remoteManagerListeners = remoteManagerListeners;
+		this.remoteRunListeners = remoteRunListeners;
 		this.singleStepMode = singleStepMode;
 
 		// "eventController" is final. Therefore, create object here and not in helper method.
@@ -218,7 +218,8 @@ public class Simulation {
 
 		// notify remoteManger that simulation ended. If a command waited for the next
 		// simulation step notify it and execute command with current SimulationState.
-		remoteManagerListeners.forEach(RemoteManagerListener::lastSimulationStepFinishedListener);
+		setWaitForSimCommand(true); // its save to read the state now.
+		remoteRunListeners.forEach(RemoteRunListener::lastSimulationStepFinishedListener);
 	}
 
 	/**
@@ -273,11 +274,13 @@ public class Simulation {
 				synchronized (this){
 					if (singleStepMode){
 						// check reached next simTime (-1 simulate one step)
-						if (simTimeInSec >= simulateUntilInSec || simulateUntilInSec == -1){
+						// round to long to ensure correct trap.
+						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
+						if (timeReached || simulateUntilInSec == -1){
 							logger.warnf("Simulated until: %.4f", simTimeInSec);
 
 							setWaitForSimCommand(true);
-							remoteManagerListeners.forEach(RemoteManagerListener::simulationStepFinishedListener);
+							remoteRunListeners.forEach(RemoteRunListener::simulationStepFinishedListener);
 							while (waitForSimCommand){
 								logger.warn("wait for next SimCommand...");
 								try {
@@ -395,11 +398,11 @@ public class Simulation {
 		}
 	}
 
-	public synchronized void pause() {
+	synchronized void pause() {
 		isPaused = true;
 	}
 
-	public synchronized boolean isPaused() {
+	private synchronized boolean isPaused() {
 		return isPaused;
 	}
 
@@ -407,32 +410,36 @@ public class Simulation {
 		return isRunSimulation && !isPaused() && !isWaitForSimCommand();
 	}
 
-	public synchronized boolean isSingleStepMode(){ return singleStepMode;}
+	synchronized boolean isSingleStepMode(){ return singleStepMode;}
 
-	public void setSingleStepMode(boolean singleStepMode) {
+	void setSingleStepMode(boolean singleStepMode) {
 		this.singleStepMode = singleStepMode;
 	}
 
-	public boolean isWaitForSimCommand() {
+	boolean isWaitForSimCommand() {
 		return waitForSimCommand;
 	}
 
-	public void setWaitForSimCommand(boolean waitForSimCommand) {
+	private void setWaitForSimCommand(boolean waitForSimCommand) {
 		this.waitForSimCommand = waitForSimCommand;
 	}
 
-	public synchronized void nextSimCommand(double simulateUntilInSec){
+	synchronized void nextSimCommand(double simulateUntilInSec){
 		this.simulateUntilInSec = simulateUntilInSec;
 		waitForSimCommand = false;
 		isPaused = false;
 		notify();
 	}
 
-	public synchronized void resume() {
+	synchronized void resume() {
 		isPaused = false;
 		waitForSimCommand = false;
 		singleStepMode = false;
 		notify();
+	}
+
+	synchronized SimulationState getSimulationState(){
+		return simulationState;
 	}
 
 	/**
@@ -470,7 +477,4 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 	}
 
-	public synchronized SimulationState getSimulationState(){
-		return simulationState;
-	}
 }

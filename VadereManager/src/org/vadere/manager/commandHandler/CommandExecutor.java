@@ -16,22 +16,6 @@ public class CommandExecutor {
 	private static Logger logger = Logger.getLogger(CommandExecutor.class);
 
 	private HashMap<Integer, TraCICmdHandler> cmdMap;
-	// TODO: RemoteManager verwaltet die Simulation.
-	// Sobald ein Simulationsschrit fertig ist, wird der RemoteManager über den
-	// RemoteManagerListener informiert. Jetzt kann der org.vadere.simulator.control.SimulationState
-	// ausgelesen werden.
-	// vorghen:
-	// 1. LOAD_Command: Laden der String Representation und erzeugen des Scenario Objekts
-	// 2. erstellen von Subscriptions (später)
-	// 3. SIM_STEP_Command:
-	//    - wenn die Simulatoin noch nicht gestarter wurde starte simulation
-	//    - erstes RemoteManagerListener kommt
-	//    - Sende Antwort auf SIM_STEP_Command
-	// 4. Warte auf GET/SET commands und beantworte dies über den RemoteManager
-	// 5. nächste SIM_STEP_Command: Führe den nächsten Simulatoinsschrit aus
-	//	      - remoteManager.currentSimulationRun.nextSimCommand(-1);
-	// Soll der remoteManager mit in den TraCICmdHandler übergeben werden?
-	//
 	private RemoteManager remoteManager;
 
 	public CommandExecutor(RemoteManager remoteManager) {
@@ -56,7 +40,6 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.SET_VEHICLE_STATE.id, (cmd, manager) -> cmd );
 	}
 
-
 	public TraCIPacket execute(TraCICommand cmd){
 		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd().id);
 		if (handler == null){
@@ -65,7 +48,5 @@ public class CommandExecutor {
 		}
 
 		return handler.handel(cmd, remoteManager).buildResponsePacket();
-
 	}
-
 }

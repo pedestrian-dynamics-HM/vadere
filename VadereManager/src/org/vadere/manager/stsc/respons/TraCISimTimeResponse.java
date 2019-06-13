@@ -18,6 +18,12 @@ public class TraCISimTimeResponse extends TraCIResponse {
 	private List<TraCISubscriptionResponse> subscriptionResponses;
 
 
+	public static TraCISimTimeResponse simEndReached(){
+		TraCISimTimeResponse res = new TraCISimTimeResponse(
+				new StatusResponse(TraCICmd.SIM_STEP, TraCIStatusResponse.ERR, "Simulation end reached."));
+
+		return res;
+	}
 
 	public TraCISimTimeResponse (StatusResponse statusResponse, TraCICommandBuffer buffer){
 		this(statusResponse);

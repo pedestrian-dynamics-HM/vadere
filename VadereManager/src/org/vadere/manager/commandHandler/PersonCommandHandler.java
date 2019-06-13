@@ -6,7 +6,7 @@ import org.vadere.manager.stsc.TraCIDataType;
 import org.vadere.manager.stsc.commands.TraCICommand;
 import org.vadere.manager.stsc.commands.TraCIGetCommand;
 import org.vadere.manager.stsc.respons.TraCIGetResponse;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.logging.Logger;
 
 import java.util.Arrays;
@@ -51,6 +51,15 @@ public class PersonCommandHandler extends CommandHandler{
 		return responseERR(err, TraCICmd.GET_PERSON_VALUE, TraCICmd.RESPONSE_GET_PERSON_VALUE);
 	}
 
+	public boolean checkIfPedestrianExists(Pedestrian ped, TraCIGetCommand cmd){
+		if (ped == null) {
+			cmd.setResponse(responseERR(CommandHandler.ELEMENT_ID_NOT_FOUND));
+			logger.debugf("Pedestrian: %s not found.", cmd.getElementIdentifier());
+			return false;
+		}
+		return true;
+	}
+
 	@PersonHandler(
 		commandIdentifier = TraCICmd.GET_PERSON_VALUE,
 		variable = TraCIPersonVar.ID_LIST,
@@ -93,11 +102,12 @@ public class PersonCommandHandler extends CommandHandler{
 	private TraCICommand process_getSpeed(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
-			double speed = state.getTopography()
-					.getPedestrianDynamicElements()
-					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
-					.getVelocity().getLength();
-			cmd.setResponse(responseOK(traCIVar.returnType, speed));
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd))
+				cmd.setResponse(responseOK(traCIVar.returnType, ped.getVelocity().getLength()));
+
 		});
 
 		return cmd;
@@ -110,14 +120,16 @@ public class PersonCommandHandler extends CommandHandler{
 	private TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
-			VPoint pos = state.getTopography().getPedestrianDynamicElements()
-					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
-					.getPosition();
-			cmd.setResponse(responseOK(traCIVar.returnType, pos));
-			logger.debugf("time: %f Pedestrian: %s Position: %s",
-					state.getSimTimeInSec() ,
-					cmd.getElementIdentifier(),
-					pos.toString());
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd)) {
+				cmd.setResponse(responseOK(traCIVar.returnType, ped.getPosition()));
+				logger.debugf("time: %f Pedestrian: %s Position: %s",
+						state.getSimTimeInSec(),
+						cmd.getElementIdentifier(),
+						ped.getPosition().toString());
+			}
 		});
 
 		return cmd;
@@ -131,10 +143,11 @@ public class PersonCommandHandler extends CommandHandler{
 	private TraCICommand process_getLength(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
-			double pedLength = state.getTopography().getPedestrianDynamicElements()
-					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
-					.getRadius() *2;
-			cmd.setResponse(responseOK(traCIVar.returnType, pedLength));
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd))
+				cmd.setResponse(responseOK(traCIVar.returnType, ped.getRadius()*2));
 		});
 
 		return cmd;
@@ -148,10 +161,11 @@ public class PersonCommandHandler extends CommandHandler{
 	private TraCICommand process_getWidth(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPersonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
-			double pedWidth= state.getTopography().getPedestrianDynamicElements()
-					.getElement(Integer.parseInt(cmd.getElementIdentifier()))
-					.getRadius() *2;
-			cmd.setResponse(responseOK(traCIVar.returnType, pedWidth));
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd))
+				cmd.setResponse(responseOK(traCIVar.returnType, ped.getRadius()*2));
 		});
 
 		return cmd;

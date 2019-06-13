@@ -8,17 +8,24 @@ import org.vadere.manager.stsc.respons.StatusResponse;
 import org.vadere.manager.stsc.respons.TraCIGetResponse;
 import org.vadere.manager.stsc.respons.TraCIStatusResponse;
 import org.vadere.manager.stsc.respons.TraCISubscriptionResponse;
+import org.vadere.util.logging.Logger;
+
+import java.util.Arrays;
 
 public class Subscription {
 
-	TraCICmdHandler traCICmdHandler;
-	TraCICmd responseIdentifier;
-	TraCIValueSubscriptionCommand valueSubscriptionCommand;
+	private static Logger logger = Logger.getLogger(Subscription.class);
+
+	private final TraCICmdHandler traCICmdHandler;
+	private final TraCICmd responseIdentifier;
+	private final TraCIValueSubscriptionCommand valueSubscriptionCommand;
+	private boolean markedForRemoval;
 
 	public Subscription(TraCICmdHandler traCICmdHandler, TraCICmd responseIdentifier, TraCIValueSubscriptionCommand valueSubscriptionCommand) {
 		this.traCICmdHandler = traCICmdHandler;
 		this.responseIdentifier = responseIdentifier;
 		this.valueSubscriptionCommand = valueSubscriptionCommand;
+		this.markedForRemoval = false;
 	}
 
 	public void executeSubscription(RemoteManager remoteManager){
@@ -29,38 +36,60 @@ public class Subscription {
 		for (TraCIGetCommand getCmd : valueSubscriptionCommand.getGetCommands()) {
 			traCICmdHandler.handel(getCmd, remoteManager);
 			TraCIGetResponse getResponse = getCmd.getResponse();
+
+			if (getResponse.getStatusResponse().getResponse().equals(TraCIStatusResponse.ERR)){
+				logger.warn("Get command returned error: " + getResponse.getStatusResponse().getDescription());
+				if (getResponse.getStatusResponse().getDescription().equals(CommandHandler.ELEMENT_ID_NOT_FOUND)){
+					logger.warn("Mark Subscription for removal. Subscribed element no longer exists");
+					markForRemoval();
+					logger.warnf(toString());
+					break;
+				}
+			}
+
 			subResponse.addVariableResponse(getResponse.getVariableIdentifier(),
 					getResponse.getStatusResponse().getResponse(),
 					getResponse.getResponseDataType(),
 					getResponse.getResponseData());
 		}
 
-		valueSubscriptionCommand.setResponse(subResponse);
+		if (markedForRemoval){
+			valueSubscriptionCommand.setResponse(
+					TraCISubscriptionResponse.removeResponse(valueSubscriptionCommand, responseIdentifier));
+		} else {
+			valueSubscriptionCommand.setResponse(subResponse);
+		}
 	}
 
+	public void markForRemoval(){
+		this.markedForRemoval = true;
+	}
 
+	public boolean isMarkedForRemoval() {
+		return markedForRemoval;
+	}
 
 	public TraCICmdHandler getTraCICmdHandler() {
 		return traCICmdHandler;
-	}
-
-	public void setTraCICmdHandler(TraCICmdHandler traCICmdHandler) {
-		this.traCICmdHandler = traCICmdHandler;
 	}
 
 	public TraCICmd getResponseIdentifier() {
 		return responseIdentifier;
 	}
 
-	public void setResponseIdentifier(TraCICmd responseIdentifier) {
-		this.responseIdentifier = responseIdentifier;
-	}
-
 	public TraCIValueSubscriptionCommand getValueSubscriptionCommand() {
 		return valueSubscriptionCommand;
 	}
 
-	public void setValueSubscriptionCommand(TraCIValueSubscriptionCommand valueSubscriptionCommand) {
-		this.valueSubscriptionCommand = valueSubscriptionCommand;
+	public String getSubscriptionId(){
+		return "SubID_" + valueSubscriptionCommand.getTraCICmd().name() + "-" + valueSubscriptionCommand.getElementIdentifier();
+	}
+
+	@Override
+	public String toString() {
+		String varList = Arrays.toString(valueSubscriptionCommand.getVariables().toArray());
+		return "Subscription{ API="+valueSubscriptionCommand.getTraCICmd().name()+
+				  " objectId='" + valueSubscriptionCommand.getElementIdentifier() + "' " +
+				  "subscribedVariables=" + varList + "}";
 	}
 }
