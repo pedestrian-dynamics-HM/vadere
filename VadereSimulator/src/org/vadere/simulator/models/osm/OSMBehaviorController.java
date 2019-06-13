@@ -52,13 +52,13 @@ public class OSMBehaviorController {
         VPoint currentPosition = pedestrian.getPosition();
         VPoint nextPosition = pedestrian.getNextPosition();
 
-        // end time
-        double endTimeOfStep = pedestrian.getTimeOfNextStep();
-
 	    // start time
-	    double timeOfNextStep = pedestrian.getTimeOfNextStep() - pedestrian.getDurationNextStep();
+        double stepStartTime = pedestrian.getTimeOfNextStep();
 
-	    assert endTimeOfStep > timeOfNextStep && endTimeOfStep >= 0.0;
+	    // end time
+	    double stepEndTime = pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep();
+
+	    assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0;
 
         if (nextPosition.equals(currentPosition)) {
             pedestrian.setTimeCredit(0);
@@ -78,8 +78,8 @@ public class OSMBehaviorController {
         }
 
         // strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
-        pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), timeOfNextStep));
-        pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, timeOfNextStep, endTimeOfStep));
+        pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
+        pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime));
     }
 
     public void wait(PedestrianOSM pedestrian) {
