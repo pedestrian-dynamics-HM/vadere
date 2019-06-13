@@ -153,6 +153,9 @@ public class PedestrianOSM extends Pedestrian {
 				if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
 					nextPosition = getPosition();
 				}
+				/*else if(potentialFieldTarget.getPotential(nextPosition, this) >= potentialFieldTarget.getPotential(getPosition(), this)) {
+					nextPosition = getPosition();
+				}*/
 
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
