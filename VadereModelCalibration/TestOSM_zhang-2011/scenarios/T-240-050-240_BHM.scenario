@@ -1,7 +1,7 @@
 {
   "name" : "T-240-050-240_BHM",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
