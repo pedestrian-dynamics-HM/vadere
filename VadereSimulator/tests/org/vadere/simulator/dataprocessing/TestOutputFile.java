@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -68,13 +69,13 @@ public class TestOutputFile {
 
 		List<String> header = testScenario.getDataProcessingJsonManager().getOutputFiles().get(0).getEntireHeader();
 
-		//Note these fail if the name conflict is handled differently, for now hard coded.
 		assertTrue(header.contains("timeStep"));
 		assertTrue(header.contains("pedestrianId"));
-		assertTrue(header.contains("x-Proc1"));
-		assertTrue(header.contains("y-Proc1"));
-		assertTrue(header.contains("x-Proc2"));
-		assertTrue(header.contains("y-Proc2"));
+
+		assertTrue(header.contains(OutputFile.addHeaderProcInfo("x", 1)));
+		assertTrue(header.contains(OutputFile.addHeaderProcInfo("y", 1)));
+		assertTrue(header.contains(OutputFile.addHeaderProcInfo("x", 2)));
+		assertTrue(header.contains(OutputFile.addHeaderProcInfo("y", 2)));
 	}
 
 

@@ -28,7 +28,12 @@ public class TimeCostFunctionObstacleDistance implements ITimeCostFunction {
 	public double costAt(IPoint p) {
 		double timeCost = timeCostFunction.costAt(p);
 		double distance = obstacleDistanceFunction.apply(p);
-		if(distance > 0 && distance < width) {
+
+		if(distance <= 0) {
+			timeCost += height;
+		}
+		else if(distance > 0 && distance < width) {
+			//timeCost += height * Math.exp(2 / (Math.pow(distance / (width), 2) - 1));
 			timeCost += (1-(distance/ width)) * height;
 		}
 		return timeCost;

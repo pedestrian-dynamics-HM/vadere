@@ -48,6 +48,16 @@ public interface JsonNodeExplorer {
 		parent.put(keyName, value);
 	}
 
+	default  void addDoubleField(JsonNode root, String keyName, double value){
+		ObjectNode parent = (ObjectNode) root;
+		parent.put(keyName, value);
+	}
+
+	default  void addBooleanField(JsonNode root, String keyName, boolean value){
+		ObjectNode parent = (ObjectNode) root;
+		parent.put(keyName, value);
+	}
+
 	default JsonNode pathMustExist(JsonNode root, String path) throws MigrationException {
 		JsonNode ret = path(root, path);
 		if (ret.isMissingNode()) {

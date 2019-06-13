@@ -138,6 +138,11 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 	@Override
+	public VPoint add(double x, double y) {
+		return new VPoint(this.x + x, this.y + y);
+	}
+
+	@Override
 	public VPoint addPrecise(final IPoint point) {
 		return VPoint.addPrecise(this, point);
 	}
@@ -161,6 +166,8 @@ public class VPoint implements Cloneable, IPoint {
 	public double scalarProduct(IPoint point) {
 		return x * point.getX() + y * point.getY();
 	}
+
+
 
 	@Override
 	public VPoint norm() {
@@ -215,7 +222,7 @@ public class VPoint implements Cloneable, IPoint {
 
 	@Override
 	public String toString() {
-		return "(" + x + "," + y + ")";
+		return "[" + x + "," + y + "]";
 	}
 
 	public static VPoint addPrecise(final IPoint p1, final IPoint p2) {

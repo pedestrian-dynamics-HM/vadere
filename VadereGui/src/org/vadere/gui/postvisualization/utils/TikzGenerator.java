@@ -137,6 +137,8 @@ public class TikzGenerator {
 		Color agentColor = model.getConfig().getPedestrianDefaultColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentIdColor", 255, 127, 0); // This orange color is hard-coded in "DefaultRenderer".
+
 		colorDefinitions += "\n";
 
 		return colorDefinitions;
@@ -262,8 +264,19 @@ public class TikzGenerator {
             generatedCode += "% Agents\n";
             generatedCode += drawAgents(config);
         } else {
-            generatedCode = "% Agents (not enabled in config)\n";
+            generatedCode += "% Agents (not enabled in config)\n";
         }
+
+        if (config.isShowPedestrianIds()) {
+			generatedCode += "% Agent Ids\n";
+
+			for (Agent agent : model.getAgents()) {
+				generatedCode += String.format(Locale.US, "\\node[text=AgentIdColor] (id%d) at (%f,%f) {\\textbf{%d}};\n",
+						agent.getId(), agent.getPosition().x, agent.getPosition().y, agent.getId());
+			}
+		} else {
+        	generatedCode += "% Agent Ids (not enabled in config)\n";
+		}
 
         return generatedCode;
 	}

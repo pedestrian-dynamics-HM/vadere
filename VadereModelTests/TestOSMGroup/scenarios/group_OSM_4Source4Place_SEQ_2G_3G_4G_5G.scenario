@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_4Source4Place_SEQ_2G_3G_4G_5G",
   "description" : "",
-  "release" : "0.8",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
@@ -90,9 +90,9 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 8544059563994946215,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : false
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -265,7 +265,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : {
@@ -284,6 +288,7 @@
           "y" : 0.0
         }
       }
-    }
+    },
+    "eventInfos" : [ ]
   }
 }

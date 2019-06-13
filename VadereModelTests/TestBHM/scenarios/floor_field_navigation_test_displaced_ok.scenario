@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_displaced_ok",
   "description" : "",
-  "release" : "0.9",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -26,7 +26,7 @@
         "navigationCluster" : false,
         "navigationFollower" : false,
         "directionWallDistance" : false,
-        "tangentialEvasion" : true,
+        "tangentialEvasion" : false,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
@@ -69,7 +69,7 @@
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
           "loadingType" : "CONSTANT",
-          "width" : 0.4,
+          "width" : 1.0,
           "height" : 5.0
         }
       }
@@ -84,7 +84,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 1,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -184,7 +185,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

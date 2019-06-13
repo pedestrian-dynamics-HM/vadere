@@ -16,8 +16,10 @@ import org.vadere.simulator.models.groups.cgm.CentroidGroupStepSizeAdjuster;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
+import org.vadere.simulator.models.osm.optimization.PatternSearchOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
+import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerCircleNelderMead;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerEvolStrat;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerGradient;
@@ -250,11 +252,17 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			case NELDER_MEAD:
 				result = new StepCircleOptimizerNelderMead(random);
 				break;
+			case NELDER_MEAD_CIRCLE:
+				result = new StepCircleOptimizerCircleNelderMead(random, attributesOSM);
+				break;
 			case POWELL:
 				result = new StepCircleOptimizerPowell(random);
 				break;
 			case PSO:
 				result = new ParticleSwarmOptimizer(movementThreshold, random);
+				break;
+			case PATTERN_SEARCH:
+				result = new PatternSearchOptimizer(movementThreshold, attributesOSM, random);
 				break;
 			case GRADIENT:
 				result = new StepCircleOptimizerGradient(topography,

@@ -5,6 +5,8 @@ import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.state.behavior.SalientBehavior;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -59,11 +61,15 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			if (pedestrian.getTimeOfNextStep() == 0) {
 				pedestrian.setTimeOfNextStep(currentTimeInSec - timeStepInSec);
 			}
-			
-			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-			pedestrian.updateNextPosition();
-			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
+				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+				pedestrian.updateNextPosition();
+				osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
+				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
+				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
+			}
+
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {

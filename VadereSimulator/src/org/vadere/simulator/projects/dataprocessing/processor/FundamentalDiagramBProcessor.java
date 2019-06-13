@@ -19,6 +19,7 @@ import org.vadere.util.logging.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * <p>This processor computes the fundamental diagram by computing an (average) velocity and the density for each
@@ -108,7 +109,8 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 
 	private double density(@NotNull final PedestrianIdKey key, @NotNull final Map<PedestrianIdKey, VTrajectory> cutTrajectoryMap) {
 		VTrajectory pedTrajectory = cutTrajectoryMap.get(key);
-		double duration = pedTrajectory.duration();
+		Optional<Double> duration = pedTrajectory.duration();
+
 		double densityIntegral = cutTrajectoryMap.values()
 				.stream()
 				.map(trajectory -> trajectory.cut(pedTrajectory.getStartTime().get(), pedTrajectory.getEndTime().get()))
@@ -118,8 +120,9 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 				.mapToDouble(trajectory -> (trajectory.getEndTime().get() - trajectory.getStartTime().get()))
 				.sum();
 
-		densityIntegral /= duration;
+		densityIntegral /= duration.get();
 		densityIntegral /= measurementAreaVRec.getArea();
+
 		return densityIntegral;
 
 		/*List<Triple<Double, Double, Integer>> integralValues = new LinkedList<>();
