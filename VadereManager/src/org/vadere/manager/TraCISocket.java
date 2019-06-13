@@ -1,8 +1,8 @@
 package org.vadere.manager;
 
-import org.vadere.manager.stsc.writer.TraCIPacket;
-import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
-import org.vadere.manager.stsc.respons.TraCIResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
+import org.vadere.manager.traci.respons.TraCIResponse;
 
 import java.io.Closeable;
 import java.io.DataInputStream;

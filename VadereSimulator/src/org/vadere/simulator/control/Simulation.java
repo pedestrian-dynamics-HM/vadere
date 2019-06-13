@@ -277,12 +277,12 @@ public class Simulation {
 						// round to long to ensure correct trap.
 						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
 						if (timeReached || simulateUntilInSec == -1){
-							logger.warnf("Simulated until: %.4f", simTimeInSec);
+							logger.debugf("Simulated until: %.4f", simTimeInSec);
 
 							setWaitForSimCommand(true);
 							remoteRunListeners.forEach(RemoteRunListener::simulationStepFinishedListener);
 							while (waitForSimCommand){
-								logger.warn("wait for next SimCommand...");
+								logger.debugf("wait for next SimCommand...");
 								try {
 									wait();
 								} catch (InterruptedException e) {

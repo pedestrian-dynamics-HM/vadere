@@ -1,9 +1,9 @@
 package org.vadere.manager;
 
-import org.vadere.manager.commandHandler.CommandExecutor;
-import org.vadere.manager.stsc.commands.TraCICommand;
-import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
-import org.vadere.manager.stsc.writer.TraCIPacket;
+import org.vadere.manager.traci.commandHandler.CommandExecutor;
+import org.vadere.manager.traci.commands.TraCICommand;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
+import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.util.logging.Logger;
 
 import java.io.EOFException;

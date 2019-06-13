@@ -1,7 +1,6 @@
 package org.vadere.manager;
 
-import org.vadere.manager.commandHandler.StateAccessHandler;
-import org.vadere.manager.commandHandler.Subscription;
+import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -22,12 +21,14 @@ public class RemoteManager implements RunnableFinishedListener {
 	private RemoteScenarioRun currentSimulationRun;
 	private Thread currentSimulationThread;
 	private boolean simulationFinished;
+	private boolean clientCloseCommandReceived;
 
 	private List<Subscription> subscriptions;
 
 
 	public RemoteManager() {
 		subscriptions = new ArrayList<>();
+		clientCloseCommandReceived = false;
 	}
 
 	public void loadScenario(String scenarioString) {
@@ -73,6 +74,14 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		currentSimulationRun.nextStep(simTime);
 		return true;
+	}
+
+	public boolean isClientCloseCommandReceived() {
+		return clientCloseCommandReceived;
+	}
+
+	public void setClientCloseCommandReceived(boolean clientCloseCommandReceived) {
+		this.clientCloseCommandReceived = clientCloseCommandReceived;
 	}
 
 	@Override

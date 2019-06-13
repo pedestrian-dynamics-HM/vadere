@@ -1,7 +1,6 @@
 package org.vadere.manager;
 
-import org.vadere.manager.commandHandler.StateAccessHandler;
-import org.vadere.manager.commandHandler.Subscription;
+import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.simulator.control.RemoteRunListener;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;

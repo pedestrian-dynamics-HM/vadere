@@ -1,18 +1,18 @@
 package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
-import org.vadere.manager.commandHandler.TraCIPersonVar;
-import org.vadere.manager.stsc.TraCICmd;
-import org.vadere.manager.stsc.writer.TraCIPacket;
-import org.vadere.manager.stsc.commands.TraCIGetCommand;
-import org.vadere.manager.stsc.commands.control.TraCICloseCommand;
-import org.vadere.manager.stsc.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.stsc.commands.control.TraCISendFileCommand;
-import org.vadere.manager.stsc.commands.control.TraCISimStepCommand;
-import org.vadere.manager.stsc.reader.TraCIPacketBuffer;
-import org.vadere.manager.stsc.respons.TraCIGetResponse;
-import org.vadere.manager.stsc.respons.TraCIResponse;
-import org.vadere.manager.stsc.respons.TraCISimTimeResponse;
+import org.vadere.manager.traci.commandHandler.TraCIPersonVar;
+import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.manager.traci.commands.TraCIGetCommand;
+import org.vadere.manager.traci.commands.control.TraCICloseCommand;
+import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
+import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
+import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.manager.traci.respons.TraCIResponse;
+import org.vadere.manager.traci.respons.TraCISimTimeResponse;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
