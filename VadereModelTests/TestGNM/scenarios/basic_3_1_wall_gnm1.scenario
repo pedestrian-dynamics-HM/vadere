@@ -1,7 +1,7 @@
 {
   "name" : "basic_3_1_wall_gnm1",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ ],

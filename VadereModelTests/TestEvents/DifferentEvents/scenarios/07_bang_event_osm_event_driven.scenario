@@ -1,7 +1,7 @@
 {
   "name" : "07_bang_event_osm_event_driven",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {

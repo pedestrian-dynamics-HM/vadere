@@ -2,7 +2,7 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-## In Progress: v0.7
+## v1.0 (2019-06-13)
 
 ### Added
 

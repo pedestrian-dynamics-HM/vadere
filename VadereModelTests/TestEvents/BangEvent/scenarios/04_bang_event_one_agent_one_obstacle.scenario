@@ -1,7 +1,7 @@
 {
   "name" : "04_bang_event_one_agent_one_obstacle",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
