@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.respons;
 
 import org.junit.Test;
-import org.vadere.manager.traci.commandHandler.TraCIPersonVar;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
@@ -14,7 +14,7 @@ public class TraCIGetResponseTest {
 
 	@Test
 	public void createFromBuffer(){
-		byte[] data = new byte[]{(byte)TraCIPersonVar.COUNT.id, 0,0,0,2, 65, 65, (byte)TraCIDataType.INTEGER.identifier, 0,0,0,78};
+		byte[] data = new byte[]{(byte) PersonVar.COUNT.id, 0,0,0,2, 65, 65, (byte)TraCIDataType.INTEGER.id, 0,0,0,78};
 		TraCIGetResponse response = new TraCIGetResponse(
 				new StatusResponse(TraCICmd.GET_PERSON_VALUE, TraCIStatusResponse.OK, ""),
 				TraCICmd.RESPONSE_GET_PERSON_VALUE,

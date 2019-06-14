@@ -47,9 +47,9 @@ public class TraCIResponse {
 			case VALUE_SET:
 				return createSetResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
 			case VALUE_SUB:
-//				return createControlResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer);
+//				return createControlResponse(cmd, responseIdentifier, cmdResponseBuffer);
 			case CONTEXT_SUB:
-//				return createControlResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer);
+//				return createControlResponse(cmd, responseIdentifier, cmdResponseBuffer);
 			default:
 				throw new TraCIException("Response Object not implemented for command: " + commandIdentifier.toString());
 		}

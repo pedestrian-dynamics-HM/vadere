@@ -3,12 +3,16 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.commandHandler.annotation.PolygonHandler;
+import org.vadere.manager.traci.commandHandler.annotation.PolygonHandlers;
+import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.state.scenario.Obstacle;
 
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Polygon API
  */
-public class PolygonCommandHandler  extends CommandHandler{
+public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 
 	public static PolygonCommandHandler instance;
 
@@ -24,6 +28,26 @@ public class PolygonCommandHandler  extends CommandHandler{
 	static {
 		instance = new PolygonCommandHandler();
 	}
+
+	public PolygonCommandHandler() {
+		super();
+		init(PolygonHandler.class, PolygonHandlers.class);
+	}
+
+	@Override
+	protected void init_HandlerSingle(Method m) {
+		PolygonHandler an = m.getAnnotation(PolygonHandler.class);
+		putHandler(an.cmd(), an.var(), m);
+	}
+
+	@Override
+	protected void init_HandlerMult(Method m) {
+		PolygonHandler[] ans = m.getAnnotation(PolygonHandlers.class).value();
+		for(PolygonHandler a : ans){
+			putHandler(a.cmd(), a.var(), m);
+		}
+	}
+
 
 	public TraCIGetResponse responseOK(TraCIDataType responseDataType, Object responseData){
 		return  responseOK(responseDataType, responseData, TraCICmd.GET_POLYGON, TraCICmd.RESPONSE_GET_POLYGON);
@@ -41,7 +65,7 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return true;
 	}
 
-	private TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			List<String> ret = state.getTopography().getObstacles()
@@ -54,7 +78,7 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return cmd;
 	}
 
-	private TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			int ret = state.getTopography().getObstacles().size();
@@ -64,12 +88,12 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return cmd;
 	}
 
-	private TraCICommand process_getType(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getType(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseOK(traCIVar.returnType, "building"));
 		return cmd;
 	}
 
-	private TraCICommand process_getShape(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getShape(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
 			Optional<Obstacle> obstacle = state.getTopography().getObstacles().stream()
@@ -82,12 +106,12 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return cmd;
 	}
 
-	private TraCICommand process_getColor(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getColor(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseOK(traCIVar.returnType, Color.BLACK));
 		return cmd;
 	}
 
-	private TraCICommand process_getPosition2D(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getPosition2D(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		remoteManager.accessState((manager, state) -> {
 			Optional<Obstacle> obstacle = state.getTopography().getObstacles().stream()
 					.filter(o-> cmd.getElementIdentifier().equals(Integer.toString(o.getId())))
@@ -99,35 +123,35 @@ public class PolygonCommandHandler  extends CommandHandler{
 		return cmd;
 	}
 
-	private TraCICommand process_getImageFile(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getImageFile(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
-	private TraCICommand process_getImageWidth(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getImageWidth(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
-	private TraCICommand process_getImageHeight(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getImageHeight(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
-	private TraCICommand process_getImageAngle(TraCIGetCommand cmd, RemoteManager remoteManager, TraCIPolygonVar traCIVar){
+	public TraCICommand process_getImageAngle(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager){
 		return processValueSub(rawCmd, remoteManager, this::processGet,
-				TraCICmd.SUB_POLYGON_VALUE, TraCICmd.RESPONSE_SUB_POLYGON_VALUE);
+				TraCICmd.GET_POLYGON, TraCICmd.RESPONSE_SUB_POLYGON_VALUE);
 	}
 
 	public TraCICommand processGet(TraCICommand cmd, RemoteManager remoteManager) {
 		TraCIGetCommand getCmd = (TraCIGetCommand) cmd;
 
-		TraCIPolygonVar var = TraCIPolygonVar.fromId(getCmd.getVariableIdentifier());
+		PolygonVar var = PolygonVar.fromId(getCmd.getVariableIdentifier());
 
 		switch (var){
 			case ID_LIST:
@@ -155,4 +179,5 @@ public class PolygonCommandHandler  extends CommandHandler{
 		// do nothing just say ok...
 		return cmd;
 	}
+
 }

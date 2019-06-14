@@ -1,9 +1,9 @@
-package org.vadere.manager.traci.commandHandler;
+package org.vadere.manager.traci.commandHandler.variables;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
 
-public enum TraCISimulationVar {
+public enum SimulationVar {
 
 	CURR_SIM_TIME(0x66, TraCIDataType.DOUBLE),
 	NUM_LOADED_VEHICLES(0x71, TraCIDataType.INTEGER),
@@ -22,26 +22,26 @@ public enum TraCISimulationVar {
 	;
 
 	public int id;
-	public TraCIDataType returnType;
+	public TraCIDataType type;
 
-	TraCISimulationVar(int id, TraCIDataType retVal) {
+	SimulationVar(int id, TraCIDataType retVal) {
 		this.id = id;
-		this.returnType = retVal;
+		this.type = retVal;
 	}
 
-	public static TraCISimulationVar fromId(int id){
-		for(TraCISimulationVar var : values()){
+	public static SimulationVar fromId(int id){
+		for(SimulationVar var : values()){
 			if (var.id == id)
 				return var;
 		}
-		throw new TraCIException(String.format("No simulation variable found with id: %02X", id));
+		throw new TraCIException(String.format("No simulation var found with id: %02X", id));
 	}
 
 	@Override
 	public String toString() {
-		return "TraCISimulationVar{" +
+		return "SimulationVar{" +
 				"id=" + id +
-				", returnType=" + returnType +
+				", type=" + type +
 				'}';
 	}
 }

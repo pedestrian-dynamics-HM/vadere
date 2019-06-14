@@ -2,6 +2,7 @@ package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 import org.vadere.manager.traci.writer.TraCIPacket;
 
@@ -15,9 +16,9 @@ import org.vadere.manager.traci.writer.TraCIPacket;
  * [ cmdIdentifier(based on API) ] [ variableId ] [ elementId] [ dataTypeId ] [ data ]
  *
  * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_****
- * - variableId: Id for the variable. The numbers may be the same between different APIs
- *   see {@link org.vadere.manager.traci.commandHandler.TraCIPersonVar} enum
- * - elementId: String based identifier for the object (i.e. a pedestrianId)
+ * - variableId: Id for the var. The numbers may be the same between different APIs
+ *   see {@link PersonVar} enum
+ * - elementId: String based id for the object (i.e. a pedestrianId)
  * - dataTypeId: see {@link TraCIDataType}
  * - data: data to be returned.
  *

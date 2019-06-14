@@ -126,7 +126,7 @@ public class TraCIReaderTest {
 		writer.write2DPosition(new VPoint(22.3, 4.0));
 		createReader();
 
-		checkIdentifier(TraCIDataType.POS_2D.identifier);
+		checkIdentifier(TraCIDataType.POS_2D.id);
 		VPoint p = reader.read2DPosition();
 		assertThat(p.x, equalTo(22.3));
 		assertThat(p.y, equalTo(4.0));
@@ -140,7 +140,7 @@ public class TraCIReaderTest {
 		writer.write3DPosition(new Vector3D(11.1, 22.2, 33.3));
 		createReader();
 
-		checkIdentifier(TraCIDataType.POS_3D.identifier);
+		checkIdentifier(TraCIDataType.POS_3D.id);
 		Vector3D vec = reader.read3DPosition();
 		assertThat(vec.x, equalTo(11.1));
 		assertThat(vec.y, equalTo(22.2));
@@ -155,7 +155,7 @@ public class TraCIReaderTest {
 		writer.writeRoadMapPosition(new RoadMapPosition("road_001", 12.5, 0));
 		createReader();
 
-		checkIdentifier(TraCIDataType.POS_ROAD_MAP.identifier);
+		checkIdentifier(TraCIDataType.POS_ROAD_MAP.id);
 		RoadMapPosition roadMapPosition = reader.readRoadMapPosition();
 		assertThat(roadMapPosition.getRoadId(), equalTo("road_001"));
 		assertThat(roadMapPosition.getPos(), equalTo(12.5));
@@ -170,7 +170,7 @@ public class TraCIReaderTest {
 		writer.writeLonLatPosition(new VPoint(23.3, 11.9));
 		createReader();
 
-		checkIdentifier(TraCIDataType.POS_LON_LAT.identifier);
+		checkIdentifier(TraCIDataType.POS_LON_LAT.id);
 		VPoint lonLat = reader.readLonLatPosition();
 		assertThat(lonLat.x, equalTo(23.3));
 		assertThat(lonLat.y, equalTo(11.9));
@@ -184,7 +184,7 @@ public class TraCIReaderTest {
 		writer.writeLonLatAltPosition(new Vector3D(34.5, 34.0, 11.3436));
 		createReader();
 
-		checkIdentifier(TraCIDataType.POS_LON_LAT_ALT.identifier);
+		checkIdentifier(TraCIDataType.POS_LON_LAT_ALT.id);
 		Vector3D lonlatalt = reader.readLonLatAltPosition();
 		assertThat(lonlatalt.x, equalTo(34.5));
 		assertThat(lonlatalt.y, equalTo(34.0));
@@ -201,7 +201,7 @@ public class TraCIReaderTest {
 		createReader();
 
 		VPolygon match = GeometryUtils.polygonFromPoints2D(points);
-		checkIdentifier(TraCIDataType.POLYGON.identifier);
+		checkIdentifier(TraCIDataType.POLYGON.id);
 		VPolygon actual = reader.readPolygon();
 		assertThat(actual, equalTo(match));
 
@@ -217,7 +217,7 @@ public class TraCIReaderTest {
 		writer.writeTrafficLightPhaseList(phases);
 		createReader();
 
-		checkIdentifier(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		checkIdentifier(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.id);
 		List<TrafficLightPhase> actualPhases = reader.readTrafficLightPhaseList();
 		assertThat(actualPhases, equalTo(phases));
 
@@ -231,7 +231,7 @@ public class TraCIReaderTest {
 		writer.writeColor(color);
 		createReader();
 
-		checkIdentifier(TraCIDataType.COLOR.identifier);
+		checkIdentifier(TraCIDataType.COLOR.id);
 		assertThat(reader.readColor(), equalTo(color));
 
 		// buf must be empty

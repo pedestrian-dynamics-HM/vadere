@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
  *
  * Each command has an Id managed as an enum {@link TraCICmd}. This enum also contains
  * the type of the command (i.e. GET, SET, Control). Depending on the type (and sometimes on
- * the variable queried) different sub classes are used to manage the command.
+ * the var queried) different sub classes are used to manage the command.
  *
  * Construction Methods: (compare with {@link org.vadere.manager.traci.respons.TraCIResponse})
  *

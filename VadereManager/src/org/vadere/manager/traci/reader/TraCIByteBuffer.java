@@ -110,7 +110,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public VPoint read2DPosition(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(16); // 2x double
 		double x = byteBuffer.getDouble();
 		double y = byteBuffer.getDouble();
@@ -119,7 +119,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public Vector3D read3DPosition(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(24); // 3x double
 		double x = byteBuffer.getDouble();
 		double y = byteBuffer.getDouble();
@@ -129,7 +129,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public RoadMapPosition readRoadMapPosition(){
-		// identifier already consumed
+		// id already consumed
 		String roadId = readString();
 		ensureBytes(9); // double + ubyte
 		double pos = readDouble();
@@ -139,7 +139,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public VPoint readLonLatPosition(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(16); // 2x double
 		double lon = byteBuffer.getDouble();
 		double lat = byteBuffer.getDouble();
@@ -148,7 +148,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public Vector3D readLonLatAltPosition(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(24); // 3x double
 		double lon = byteBuffer.getDouble();
 		double lat = byteBuffer.getDouble();
@@ -158,7 +158,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public VPolygon readPolygon(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(1); // ubyte
 		int numberOfPoints = readUnsignedByte();
 
@@ -174,7 +174,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public List<TrafficLightPhase> readTrafficLightPhaseList(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(1); // 1x ubyte
 		int numberOfPhases = readUnsignedByte();
 
@@ -192,7 +192,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public Color readColor(){
-		// identifier already consumed
+		// id already consumed
 		ensureBytes(4); // 4x ubyte (RGBA)
 
 		int r = readUnsignedByte();

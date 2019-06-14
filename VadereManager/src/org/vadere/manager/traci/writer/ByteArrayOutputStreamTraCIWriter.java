@@ -119,42 +119,42 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeUnsignedByteWithId(int val) {
-		writeUnsignedByte(TraCIDataType.U_BYTE.identifier);
+		writeUnsignedByte(TraCIDataType.U_BYTE.id);
 		writeUnsignedByte(val);
 		return this;
 	}
 
 	@Override
 	public TraCIWriter writeByteWithId(byte val) {
-		writeUnsignedByte(TraCIDataType.BYTE.identifier);
+		writeUnsignedByte(TraCIDataType.BYTE.id);
 		writeByte(val);
 		return this;
 	}
 
 	@Override
 	public TraCIWriter writeIntWithId(int val) {
-		writeUnsignedByte(TraCIDataType.INTEGER.identifier);
+		writeUnsignedByte(TraCIDataType.INTEGER.id);
 		writeInt(val);
 		return this;
 	}
 
 	@Override
 	public TraCIWriter writeDoubleWithId(double val) {
-		writeUnsignedByte(TraCIDataType.DOUBLE.identifier);
+		writeUnsignedByte(TraCIDataType.DOUBLE.id);
 		writeDouble(val);
 		return this;
 	}
 
 	@Override
 	public TraCIWriter writeStringWithId(String val) {
-		writeUnsignedByte(TraCIDataType.STRING.identifier);
+		writeUnsignedByte(TraCIDataType.STRING.id);
 		writeString(val);
 		return this;
 	}
 
 	@Override
 	public TraCIWriter writeStringListWithId(List<String> val) {
-		writeUnsignedByte(TraCIDataType.STRING_LIST.identifier);
+		writeUnsignedByte(TraCIDataType.STRING_LIST.id);
 		writeStringList(val);
 		return this;
 	}
@@ -187,7 +187,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter write2DPosition(VPoint val){
-		writeUnsignedByte(TraCIDataType.POS_2D.identifier);
+		writeUnsignedByte(TraCIDataType.POS_2D.id);
 		writeDouble(val.x);
 		writeDouble(val.y);
 		return this;
@@ -195,7 +195,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter write3DPosition(Vector3D val){
-		writeUnsignedByte(TraCIDataType.POS_3D.identifier);
+		writeUnsignedByte(TraCIDataType.POS_3D.id);
 		writeDouble(val.x);
 		writeDouble(val.y);
 		writeDouble(val.z);
@@ -205,7 +205,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeRoadMapPosition(RoadMapPosition val){
-		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.identifier);
+		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.id);
 		writeString(val.getRoadId());
 		writeDouble(val.getPos());
 		writeUnsignedByte(val.getLaneId());
@@ -214,7 +214,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeLonLatPosition(VPoint lonLat){
-		writeUnsignedByte(TraCIDataType.POS_LON_LAT.identifier);
+		writeUnsignedByte(TraCIDataType.POS_LON_LAT.id);
 		writeDouble(lonLat.x);
 		writeDouble(lonLat.y);
 		return this;
@@ -222,7 +222,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeLonLatAltPosition(Vector3D lonLatAlt){
-		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.identifier);
+		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.id);
 		writeDouble(lonLatAlt.x);
 		writeDouble(lonLatAlt.y);
 		writeDouble(lonLatAlt.z);
@@ -237,7 +237,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writePolygon(List<VPoint> points){
-		writeUnsignedByte(TraCIDataType.POLYGON.identifier);
+		writeUnsignedByte(TraCIDataType.POLYGON.id);
 		if(points.size() > 255)
 			throw new TraCIException("Polygon to big. TraCI only supports polygon up to 255 points.");
 		writeUnsignedByte(points.size());
@@ -250,7 +250,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases){
-		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.id);
 		if(phases.size() > 255)
 			throw new TraCIException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
 		writeUnsignedByte(phases.size());
@@ -264,7 +264,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeColor(Color color){
-		writeUnsignedByte(TraCIDataType.COLOR.identifier);
+		writeUnsignedByte(TraCIDataType.COLOR.id);
 		writeUnsignedByte(color.getRed());
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());

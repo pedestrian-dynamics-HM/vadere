@@ -25,20 +25,20 @@ public enum TraCIDataType {
 
 
 
-	public int identifier;
+	public int id;
 	public int size_in_byte;
 	public boolean isAtomar;
 
 
 	TraCIDataType(int identifier, int size_in_byte, boolean isAtomar){
-		this.identifier = identifier;
+		this.id = identifier;
 		this.size_in_byte = size_in_byte;
 		this.isAtomar = isAtomar;
 	}
 
 	public static TraCIDataType fromId(int id){
 		for(TraCIDataType dataType : values()){
-			if (dataType.identifier == id)
+			if (dataType.id == id)
 				return dataType;
 		}
 		throw new TraCIException(String.format("No TraCI data type found for given id: %02X", id));
@@ -47,9 +47,8 @@ public enum TraCIDataType {
 	@Override
 	public String toString() {
 		return "TraCIDataType{" +
-				"identifier=" + identifier +
-				", size_in_byte=" + size_in_byte +
-				", isAtomar=" + isAtomar +
+				 name() +
+				": id=" + id +
 				'}';
 	}
 }

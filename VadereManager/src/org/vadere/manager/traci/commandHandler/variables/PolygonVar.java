@@ -1,9 +1,9 @@
-package org.vadere.manager.traci.commandHandler;
+package org.vadere.manager.traci.commandHandler.variables;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
 
-public enum TraCIPolygonVar {
+public enum PolygonVar {
 	ID_LIST(0x00, TraCIDataType.STRING_LIST), // get
 	COUNT(0x01, TraCIDataType.INTEGER), // get
 	TYPE(0x4f, TraCIDataType.STRING), // get, set
@@ -19,17 +19,17 @@ public enum TraCIPolygonVar {
 	public int id;
 	public TraCIDataType returnType;
 
-	TraCIPolygonVar(int id, TraCIDataType retVal) {
+	PolygonVar(int id, TraCIDataType retVal) {
 		this.id = id;
 		this.returnType = retVal;
 	}
 
 
-	public static TraCIPolygonVar fromId(int id){
-		for(TraCIPolygonVar var : values()){
+	public static PolygonVar fromId(int id){
+		for(PolygonVar var : values()){
 			if (var.id == id)
 				return var;
 		}
-		throw new TraCIException(String.format("No polygon variable found with id: %02X", id));
+		throw new TraCIException(String.format("No polygon var found with id: %02X", id));
 	}
 }

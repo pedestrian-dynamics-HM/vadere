@@ -1,7 +1,7 @@
 package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
-import org.vadere.manager.traci.commandHandler.TraCIPersonVar;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -128,7 +128,7 @@ public class TestClient implements Runnable{
 	}
 
 	void getIDs(String[] args) throws IOException {
-		TraCIPacket p = TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, TraCIPersonVar.ID_LIST.id, "1");
+		TraCIPacket p = TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.ID_LIST.id, "1");
 		traCISocket.sendExact(p);
 
 		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
@@ -144,7 +144,7 @@ public class TestClient implements Runnable{
 		}
 
 		String elementIdentifier = args[1];
-		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, TraCIPersonVar.POS_2D.id, elementIdentifier));
+		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.POS_2D.id, elementIdentifier));
 
 		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
 		VPoint p = (VPoint) res.getResponseData();

@@ -106,6 +106,6 @@ public enum TraCICmd {
 	@Override
 	public String toString() {
 
-		return String.format("TraCICmd{id=0x%02X, type=%s}", id, type );
+		return String.format("TraCICmd{%s: id=0x%02X, type=%s}", name(), id, type );
 	}
 }

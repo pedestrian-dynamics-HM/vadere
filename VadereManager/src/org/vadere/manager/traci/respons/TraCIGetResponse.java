@@ -16,8 +16,8 @@ import java.util.Objects;
  *  [ responseID(based on API) ] [ variableId ] [ elementId ] [ dataTypeId ] [ data ]
  *
  *  - responseID(based on API): Each API (Person, Vehicle, Simulation, ...) has a different Id.
- *  - variableId: Id for the variable. The numbers may be the same between different APIs
- *  - elementId: String based identifier for the object (i.e. a pedestrianId)
+ *  - variableId: Id for the var. The numbers may be the same between different APIs
+ *  - elementId: String based id for the object (i.e. a pedestrianId)
  *  - dataTypeId: see {@link TraCIDataType}
  *  - data: data to be returned.
  *

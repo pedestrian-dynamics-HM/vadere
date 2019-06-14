@@ -1,4 +1,4 @@
-package org.vadere.manager.traci.commandHandler;
+package org.vadere.manager.traci.commandHandler.variables;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
@@ -7,7 +7,7 @@ import org.vadere.manager.traci.TraCIDataType;
 /**
  * VariableId list for Person API.
  */
-public enum TraCIPersonVar {
+public enum PersonVar {
 
 	ID_LIST(0x00, TraCIDataType.STRING_LIST), // get
 	COUNT(0x01, TraCIDataType.INTEGER), // get
@@ -35,27 +35,28 @@ public enum TraCIPersonVar {
 
 
 	public int id;
-	public TraCIDataType returnType;
+	public TraCIDataType type;
 
-	TraCIPersonVar(int id, TraCIDataType retVal) {
+	PersonVar(int id, TraCIDataType retVal) {
 		this.id = id;
-		this.returnType = retVal;
+		this.type = retVal;
 	}
 
 
-	public static TraCIPersonVar fromId(int id){
-		for(TraCIPersonVar var : values()){
+	public static PersonVar fromId(int id){
+		for(PersonVar var : values()){
 			if (var.id == id)
 				return var;
 		}
-		throw new TraCIException(String.format("No person variable found with id: %02X", id));
+		throw new TraCIException(String.format("No person var found with id: %02X", id));
 	}
 
 	@Override
 	public String toString() {
-		return "TraCIPersonVar{" +
-				"id=" + id +
-				", returnType=" + returnType +
+		return "PersonVar{" +
+				name() +
+				": id=" + id +
+				", type=" + type +
 				'}';
 	}
 }

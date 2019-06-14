@@ -168,8 +168,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.write2DPosition(new VPoint(23.456,3.3));
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POS_2D.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POS_2D.id);
 
 		// check x, y
 		assertThat(buf.getDouble(), equalTo(23.456));
@@ -184,8 +184,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.write3DPosition(new Vector3D(3.34, 12.33, 56.8889));
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POS_3D.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POS_3D.id);
 
 		// check x, y, z
 		assertThat(buf.getDouble(), equalTo(3.34));
@@ -203,8 +203,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		int roadIdLen = "r001".getBytes(StandardCharsets.US_ASCII).length;
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POS_ROAD_MAP.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POS_ROAD_MAP.id);
 
 		// check roadId
 		checkString(buf, "r001");
@@ -224,8 +224,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.writeLonLatPosition(new VPoint(49.3345, 10.10453));
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT.id);
 
 		// check lon, lat
 		assertThat(buf.getDouble(), equalTo(49.3345));
@@ -240,8 +240,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.writeLonLatAltPosition(new Vector3D(49.33, 15.223, 12.33));
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT_ALT.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POS_LON_LAT_ALT.id);
 
 		// check lon, lat, alt
 		assertThat(buf.getDouble(), equalTo(49.33));
@@ -270,8 +270,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.writePolygon(points);
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.POLYGON.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.POLYGON.id);
 
 		// check number of points (ubyte)
 		assertThat(buf.get() & 0xff, equalTo(3));
@@ -310,8 +310,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.writeTrafficLightPhaseList(phases);
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.id);
 
 		// check number of phases
 		assertThat(buf.get() & 0xff, equalTo(1));
@@ -332,8 +332,8 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		writer.writeColor(new Color(10, 20, 40, 50));
 		ByteBuffer buf = writer.asByteBuffer();
 
-		// identifier (ubyte)
-		checkIdentifier(buf.get(), TraCIDataType.COLOR.identifier);
+		// id (ubyte)
+		checkIdentifier(buf.get(), TraCIDataType.COLOR.id);
 
 		// check color rgba
 		assertThat(buf.get() & 0xff, equalTo(10) );

@@ -4,6 +4,9 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
 import org.vadere.manager.VadereServer;
+import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
+import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;
+import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
@@ -15,10 +18,12 @@ import org.vadere.manager.traci.respons.TraCISimTimeResponse;
 import org.vadere.manager.traci.respons.TraCIStatusResponse;
 import org.vadere.util.logging.Logger;
 
+import java.lang.reflect.Method;
+
 /**
  * Handel {@link org.vadere.manager.traci.commands.TraCICommand}s for the Control API
  */
-public class ControlCommandHandler extends CommandHandler{
+public class ControlCommandHandler extends CommandHandler<ControlVar>{
 
 	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
 
@@ -28,7 +33,24 @@ public class ControlCommandHandler extends CommandHandler{
 		instance = new ControlCommandHandler();
 	}
 
-	private ControlCommandHandler(){}
+	private ControlCommandHandler(){
+		super();
+		init(ControlHandler.class, ControlHandlers.class);
+	}
+
+	@Override
+	protected void init_HandlerSingle(Method m) {
+		ControlHandler an = m.getAnnotation(ControlHandler.class);
+		putHandler(an.cmd(), an.var(), m);
+	}
+
+	@Override
+	protected void init_HandlerMult(Method m) {
+		ControlHandler[] ans = m.getAnnotation(ControlHandlers.class).value();
+		for(ControlHandler a : ans){
+			putHandler(a.cmd(), a.var(), m);
+		}
+	}
 
 	public TraCICommand process_load(TraCICommand rawCmd, RemoteManager remoteManager) {
 		return null;

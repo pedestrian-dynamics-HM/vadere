@@ -1,8 +1,10 @@
-package org.vadere.manager.traci.commandHandler;
+package org.vadere.manager.traci.commandHandler.annotation;
 
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.commandHandler.variables.VehicleVar;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -18,8 +20,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PersonHandler {
-	TraCICmd commandIdentifier();
-	TraCIPersonVar variable();
-	String clientCommandName();
+@Repeatable(VehicleHandlers.class)
+public @interface VehicleHandler {
+	TraCICmd cmd();
+	VehicleVar var() ;
+	String name(); // name of client function.
 }
