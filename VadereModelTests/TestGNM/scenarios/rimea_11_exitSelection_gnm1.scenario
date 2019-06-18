@@ -1,8 +1,7 @@
 {
   "name" : "rimea_11_exitSelection_gnm1",
   "description" : "",
-  "release" : "0.10",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -26,13 +25,15 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesGNM" : {
         "attributesODEIntegrator" : {
-          "solverType" : "DORMAND_PRINCE_45",
-          "stepSizeMin" : 1.0E-4,
+          "solverType" : "EULER",
+          "stepSizeMin" : 0.05,
           "stepSizeMax" : 1.0,
           "toleranceAbsolute" : 1.0E-5,
           "toleranceRelative" : 1.0E-4

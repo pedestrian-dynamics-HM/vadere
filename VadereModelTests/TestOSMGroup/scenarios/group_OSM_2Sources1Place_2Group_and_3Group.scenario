@@ -1,8 +1,7 @@
 {
   "name" : "group_OSM_2Sources1Place_2Group_and_3Group",
   "description" : "",
-  "release" : "0.10",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -39,7 +38,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -81,7 +82,7 @@
     "attributesSimulation" : {
       "finishTime" : 120.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -225,6 +226,10 @@
         "minimumSpeed" : 0.3,
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0,
         "length" : 4.5,
         "width" : 1.7,
         "direction" : {

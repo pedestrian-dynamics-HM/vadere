@@ -1,7 +1,7 @@
 {
   "name" : "C-050-180-180",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {

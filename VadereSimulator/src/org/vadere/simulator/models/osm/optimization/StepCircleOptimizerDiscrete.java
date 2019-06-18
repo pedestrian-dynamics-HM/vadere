@@ -79,7 +79,8 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 
 		}
 
-		if (curPosPotential - potential <= movementThreshold) {
+		// pedestrian.getTargetPotential(nextPos) > 0 => agent is not jet on his target otherwise the agent would wait forever
+		if (curPosPotential - potential <= movementThreshold && pedestrian.getTargetPotential(nextPos) > 0) {
 			nextPos = curPos;
 		}
 
