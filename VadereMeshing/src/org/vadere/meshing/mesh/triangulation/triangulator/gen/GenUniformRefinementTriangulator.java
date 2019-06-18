@@ -28,24 +28,21 @@ import java.util.*;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenUniformRefinementTriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITriangulator<V, E, F> {
 	private final Collection<? extends VShape> boundary;
 	private final VRectangle bbox;
 	private final IEdgeLengthFunction lenFunc;
-	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
-	private Set<P> points;
-	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IIncrementalTriangulation<V, E, F> triangulation;
+	private Set<IPoint> points;
+	private IMesh<V, E, F> mesh;
 	private  LinkedList<F> toRefineEdges;
 	private static final Logger logger = Logger.getLogger(GenUniformRefinementTriangulator.class);
 	private final IDistanceFunction distFunc;
-	private final Map<P,Integer> creationOrder;
+	private final Map<IPoint,Integer> creationOrder;
 	private boolean initialized;
 	private boolean generated;
 
@@ -59,7 +56,7 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
      * @param distFunc      a signed distance function
      */
 	public GenUniformRefinementTriangulator(
-			final ITriangulationSupplier<P, CE, CF, V, E, F> supplier,
+			final ITriangulationSupplier<V, E, F> supplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -109,7 +106,7 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
     }
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 
@@ -132,12 +129,12 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 	 *
 	 * @return the generated triangulation
 	 */
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+	public IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			logger.info("start triangulation generation");
 			init();
@@ -157,7 +154,7 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
@@ -205,7 +202,7 @@ public class GenUniformRefinementTriangulator<P extends IPoint, CE, CF, V extend
 
     private void refine(final E edge) {
         IPoint midPoint = mesh.toLine(edge).midPoint();
-        P p = mesh.createPoint(midPoint.getX(), midPoint.getY());
+	    IPoint p = mesh.createPoint(midPoint.getX(), midPoint.getY());
 
         if(!points.contains(p)) {
             points.add(p);

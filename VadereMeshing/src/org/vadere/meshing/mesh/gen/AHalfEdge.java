@@ -1,18 +1,13 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * An array-based implementation of {@link IHalfEdge}.
  *
- * @param <CE> the type of container of the half-edges
- *
  * @author Benedikt Zoennchen
  */
-public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
+public class AHalfEdge implements IHalfEdge, Cloneable {
 
 	/**
 	 * The array-index of this half-edge
@@ -44,26 +39,20 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 	 */
 	private int face;
 
-	private @Nullable CE data;
 
 	/**
 	 * Indicates that the half-edge is destroyed and can be removed from the array-based data structure.
 	 */
 	private boolean destroyed;
 
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face, @Nullable final CE data) {
+	protected AHalfEdge(final int id, final int end, final int face) {
 		this.id = id;
 	    this.end = end;
 		this.face = face;
 		this.destroyed = false;
-		this.data = data;
 	}
 
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
-		this(id, end, face, null);
-	}
-
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end) {
+	protected AHalfEdge(final int id, final int end) {
 		this.id = id;
 	    this.end = end;
 		this.face = -1;
@@ -80,10 +69,6 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 
 	int getEnd() {
 		return end;
-	}
-
-	boolean hasNext() {
-		return next != -1;
 	}
 
 	int getNext() {
@@ -142,28 +127,9 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
 	 *
 	 * @param id the new array-index of this face
 	 */
-    void setId(@NotNull final int id) {
+    void setId(final int id) {
         this.id = id;
     }
-
-	/**
-	 * Returns the data associated with this half-edge.
-	 *
-	 * @return the data associated with this half-edge
-	 */
-	@Nullable
-	CE getData() {
-		return data;
-	}
-
-	/**
-	 * Sets and overrides the data associated with this half-edge.
-	 *
-	 * @param data the data
-	 */
-	void setData(@Nullable final CE data) {
-		this.data = data;
-	}
 
 	@Override
     public String toString() {
@@ -171,9 +137,9 @@ public class AHalfEdge<CE> implements IHalfEdge<CE>, Cloneable {
     }
 
     @Override
-    protected AHalfEdge<CE> clone() {
+    protected AHalfEdge clone() {
         try {
-            return (AHalfEdge<CE>)super.clone();
+            return (AHalfEdge)super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }

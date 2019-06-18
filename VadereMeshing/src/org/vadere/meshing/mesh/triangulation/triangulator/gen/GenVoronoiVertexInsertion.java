@@ -35,18 +35,15 @@ import java.util.function.Predicate;
  *     <li>Efficient Unstructured Mesh Generation by Means of Delaunay Triangulation and Bowyer-Watson Algorithm</li>
  * </ol>
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenVoronoiVertexInsertion<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
+public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(GenVoronoiVertexInsertion.class);
 	private final PSLG pslg;
-	private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
+	private final GenConstrainedDelaunayTriangulator<V, E, F> cdt;
 
 	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
 	private Set<E> segments;
@@ -64,10 +61,10 @@ public class GenVoronoiVertexInsertion<P extends IPoint, CE, CF, V extends IVert
 	private double minRadius;
 	private Function<IPoint, Double> circumRadiusFunc;
 	private final static int MAX_POINTS = 200_000;
-	private DelaunayPlacement<P, CE, CF, V, E, F> placementStrategy;
+	private DelaunayPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiVertexInsertion(@NotNull final PSLG pslg,
-	                                 @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
+	                                 @NotNull final IMeshSupplier<V, E, F> meshSupplier,
 	                                 final boolean createHoles,
 	                                 @NotNull Function<IPoint, Double> circumRadiusFunc) {
 
@@ -109,7 +106,7 @@ public class GenVoronoiVertexInsertion<P extends IPoint, CE, CF, V extends IVert
 			Optional<F> locatedFace = locateFace(circumcenter.getX(), circumcenter.getY(), face);
 
 			if(locatedFace.isPresent()) {
-				//logger.info("insert" + circumcenter);
+				//logger.info("insertVertex" + circumcenter);
 				E edge = getTriangulation().splitTriangle(locatedFace.get(), getMesh().createPoint(circumcenter.getX(), circumcenter.getY()));
 				V v = getMesh().getVertex(edge);
 
@@ -161,7 +158,7 @@ public class GenVoronoiVertexInsertion<P extends IPoint, CE, CF, V extends IVert
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			while (!refinementFinished()) {
 				refine();
@@ -193,12 +190,12 @@ public class GenVoronoiVertexInsertion<P extends IPoint, CE, CF, V extends IVert
 		}
 	}
 
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return cdt.getTriangulation();
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return cdt.getMesh();
 	}
 

@@ -9,6 +9,5 @@ import org.vadere.util.geometry.shapes.IPoint;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
  */
-public interface IPMeshImprover<P extends IPoint> extends IMeshImprover<P, Object, Object, PVertex<P, Object, Object>, PHalfEdge<P, Object, Object>, PFace<P, Object, Object>> {}
+public interface IPMeshImprover extends IMeshImprover<PVertex, PHalfEdge, PFace> {}

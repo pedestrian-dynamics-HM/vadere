@@ -25,12 +25,12 @@ import java.util.stream.StreamSupport;
 /**
  * @author Benedikt Zoennchen
  */
-public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
+public class LaplacianSmother implements IPMeshImprover {
     private static final Logger log = Logger.getLogger(LaplacianSmother.class);
 
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private IIncrementalTriangulation<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> triangulation;
+    private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
     private final VRectangle bound;
@@ -55,7 +55,7 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
 
-        PMesh<EikMeshPoint, Object, Object> mesh = new PMesh<>((x, y) -> new EikMeshPoint(x, y, false));
+        PMesh mesh = new PMesh();
         /**
          * Start with a uniform refined triangulation
          */
@@ -86,22 +86,20 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
     }
 
 	@Override
-	public IIncrementalTriangulation<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> getTriangulation() {
+	public IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
 		return triangulation;
 	}
 
-	private VPoint laplacian(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        VPoint p = getMesh().getPoint(vertex).toVPoint();
+	private IPoint laplacian(final PVertex vertex) {
+        IPoint p = getMesh().getPoint(vertex);
         long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
 
         double weightsSum = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
                 .map(v -> getMesh().getPoint(v))
-                .map(m -> m.toVPoint())
                 .mapToDouble(m -> 1.0 / m.distance(p)).sum();
 
-        VPoint laplacian = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
+        IPoint laplacian = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
                 .map(v -> getMesh().getPoint(v))
-                .map(m -> m.toVPoint())
                 .map(m -> m.scalarMultiply(1.0 / m.distance(p)))
                 .reduce(new VPoint(0,0), (p1, p2) -> p1.add(p2))
                 .scalarMultiply(1.0 / weightsSum);
@@ -109,11 +107,11 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
         return laplacian;
     }
 
-    private VPoint laplacianSquare(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        VPoint laplacian = laplacian(vertex);
+    private IPoint laplacianSquare(final PVertex vertex) {
+	    IPoint laplacian = laplacian(vertex);
 
         long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
-        VPoint laplacianSquare = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
+	    IPoint laplacianSquare = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
                 .map(v -> laplacian(v).subtract(laplacian))
                 .reduce(new VPoint(0, 0), (p1, p2) -> p1.add(p2))
                 .scalarMultiply(1.0 / numberOfNeighbours);
@@ -121,61 +119,42 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
         return laplacianSquare;
     }
 
-    private void shrinkForce(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        VPoint p = getMesh().getPoint(vertex).toVPoint();
+    private void shrinkForce(final PVertex vertex) {
+	    IPoint p = getMesh().getPoint(vertex);
 
 
         double alpha = 0.05;
         double beta = 0.5;
 
-        VPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
-        VPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
+	    IPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
+	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-        getMesh().getPoint(vertex).setVelocity(p.add(shrink));
+	    getMesh().setData(vertex, "velocity", p.add(shrink));
     }
 
-    private void inflateForce(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        VPoint p = getMesh().getPoint(vertex).toVPoint();
+    private void inflateForce(final PVertex vertex) {
+	    IPoint p = getMesh().getPoint(vertex);
 
 
         double alpha = 1;
         double beta = 0.5;
 
-        VPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
-        VPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
+	    IPoint shrink = laplacian(vertex).subtract(p).scalarMultiply(alpha);
+	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-        getMesh().getPoint(vertex).setVelocity(p.add(inflate));
+	    getMesh().setData(vertex, "velocity", p.add(inflate));
     }
 
-    private void applyLaplacian(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        VPoint p = getMesh().getPoint(vertex).toVPoint();
-        IPoint force = getMesh().getPoint(vertex).getVelocity();
-
-        getMesh().getPoint(vertex).set(force.getX(), force.getY());
-
-    }
-
-    /**
-     * projects the vertex back if it is no longer inside the boundary or inside an obstacle.
-     *
-     * @param vertex the vertex
-     */
-    private void projectBackVertex(final PVertex<EikMeshPoint, Object, Object> vertex) {
-        EikMeshPoint position = getMesh().getPoint(vertex);
-        double distance = distanceFunc.apply(position);
-        if(distance > 0) {
-            double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps, 0))) - distance) / deps;
-            double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0, deps))) - distance) / deps;
-            VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
-            position.subtract(projection);
-        }
+    private void applyLaplacian(final PVertex vertex) {
+        IPoint force = getMesh().getData(vertex, "velocity", IPoint.class).get();
+        getMesh().setCoords(vertex, force.getX(), force.getY());
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<PFace<EikMeshPoint, Object, Object>> faces = triangulation.getMesh().getFaces();
-        for(PFace<EikMeshPoint, Object, Object> face : faces) {
+        List<PFace> faces = triangulation.getMesh().getFaces();
+        for(PFace face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
                 triangulation.removeFaceAtBorder(face, true);
             }
@@ -183,22 +162,22 @@ public class LaplacianSmother implements IPMeshImprover<EikMeshPoint> {
     }
 
     // helper methods
-    private Stream<PHalfEdge<EikMeshPoint, Object, Object>> streamEdges() {
+    private Stream<PHalfEdge> streamEdges() {
         return runParallel ? getMesh().streamEdgesParallel() : getMesh().streamEdges();
     }
 
-    private Stream<PVertex<EikMeshPoint, Object, Object>> streamVertices() {
+    private Stream<PVertex> streamVertices() {
         return runParallel ? getMesh().streamVerticesParallel() : getMesh().streamVertices();
     }
 
     @Override
-    public IMesh<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> getMesh() {
+    public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
         return triangulation.getMesh();
     }
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints(), (x, y) -> new EikMeshPoint(x, y, false));
+        triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints());
         removeTrianglesInsideObstacles();
         triangulation.finish();
     }

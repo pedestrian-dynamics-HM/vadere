@@ -8,7 +8,6 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -41,26 +40,23 @@ public class PolyGenerator {
 	/**
 	 * Transforms a mesh into a String which can be displayed by the gmesh vis-tool.
 	 * @param mesh the mesh
-	 * @param <P> the type of the points (containers)
-	 * @param <CE> the type of container of the half-edges
-	 * @param <CF> the type of the container of the faces
 	 * @param <V> the type of the vertices
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
 	 *
 	 * @return a string which can be saved into a .poly file to display the mesh via the gmesh vis-tool
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String to3DPoly(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String to3DPoly(
+			@NotNull final IMesh<V, E, F> mesh) {
 		int dimension = 3;
 		StringBuilder builder = new StringBuilder();
 		builder.append("#node\n");
 		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + "\n");
-		Map<P, Integer> map = new HashMap<>();
+		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
-		for(P p : mesh.getPoints()) {
-			map.put(p, id);
-			builder.append(id + SEPARATOR + p.getX() + SEPARATOR + p.getY() + SEPARATOR + 0.0 + "\n");
+		for(V v : mesh.getVertices()) {
+			map.put(v, id);
+			builder.append(id + SEPARATOR + v.getX() + SEPARATOR + v.getY() + SEPARATOR + 0.0 + "\n");
 			id++;
 		}
 
@@ -70,8 +66,8 @@ public class PolyGenerator {
 		for(F face : mesh.getFaces()) {
 			builder.append("1 0\n");
 			builder.append(mesh.getPoints(face).size() + SEPARATOR);
-			for(P p : mesh.getPoints(face)) {
-				builder.append(map.get(p) + SEPARATOR);
+			for(V v : mesh.getVertices(face)) {
+				builder.append(map.get(v) + SEPARATOR);
 			}
 			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
 			builder.append("\n");
@@ -97,9 +93,6 @@ public class PolyGenerator {
 	 * @param inputStream   the input stream
 	 * @param meshSupplier  mesh suppliert to construct an empty mesh
 	 *
-	 * @param <P> the type of the points (containers)
-	 * @param <CE> the type of container of the half-edges
-	 * @param <CF> the type of the container of the faces
 	 * @param <V> the type of the vertices
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
@@ -108,9 +101,9 @@ public class PolyGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> IMesh<P, CE, CF, V, E, F> toMesh(
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> IMesh<V, E, F> toMesh(
 			@NotNull final InputStream inputStream,
-			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier) throws IOException {
+			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier) throws IOException {
 		var mesh = meshSupplier.get();
 
 		Map<Integer, V> vertices = new HashMap<>();
@@ -172,11 +165,11 @@ public class PolyGenerator {
 		return mesh;
 	}
 
-	private static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> void toFace(
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> void toFace(
 			@NotNull final String line,
 			@NotNull final Map<Integer, V> vertices,
 			@NotNull final Map<Pair<Integer, Integer>, E> edges,
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final F face) {
 		String[] split = line.split(SPLITTER);
 		int nVertices = Integer.parseInt(split[0].strip());
@@ -499,18 +492,15 @@ public class PolyGenerator {
 	 *
 	 * @param mesh  the mesh
 	 *
-	 * @param <P> the type of the points (containers)
-	 * @param <CE> the type of container of the half-edges
-	 * @param <CF> the type of the container of the faces
 	 * @param <V> the type of the vertices
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
 	 *
 	 * @return a PSLG-{@link String}
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toPSLG(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
-		return toPSLG(mesh, p -> 0.0);
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPSLG(
+			@NotNull final IMesh<V, E, F> mesh) {
+		return toPSLG(mesh, v -> 0.0);
 	}
 
 	/**
@@ -519,29 +509,26 @@ public class PolyGenerator {
 	 * @param mesh  the mesh
 	 * @param eval  gives the values which should be added to the vertices of the PSLG
 	 *
-	 * @param <P> the type of the points (containers)
-	 * @param <CE> the type of container of the half-edges
-	 * @param <CF> the type of the container of the faces
 	 * @param <V> the type of the vertices
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
 	 *
 	 * @return a PSLG-{@link String}
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toPSLG(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-			@NotNull final Function<P, Double> eval) {
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPSLG(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Function<V, Double> eval) {
 		int dimension = 2;
 		int nAttributes = 0;
 		int boundaryMarker = 0; // no boundary marker
 		StringBuilder builder = new StringBuilder();
 		builder.append("#node\n");
 		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + nAttributes + SEPARATOR + boundaryMarker + "\n");
-		Map<P, Integer> map = new HashMap<>();
+		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
-		for(P p : mesh.getPoints()) {
-			map.put(p, id);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY(), eval.apply(p)));
+		for(V v : mesh.getVertices()) {
+			map.put(v, id);
+			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, v.getX(), v.getY(), eval.apply(v)));
 			id++;
 		}
 
@@ -577,13 +564,13 @@ public class PolyGenerator {
 		return builder.toString();
 	}
 
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String to2DPoly(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String to2DPoly(
+			@NotNull final IMesh<V, E, F> mesh) {
 		return to2DPoly(mesh, v -> 0.0, v -> false);
 	}
 
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String to2DPoly(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh, @NotNull Function<V, Double> vertexFunc, @NotNull Predicate<V> targetPred) {
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String to2DPoly(
+			@NotNull final IMesh<V, E, F> mesh, @NotNull Function<V, Double> vertexFunc, @NotNull Predicate<V> targetPred) {
 		int dimension = 2;
 		int nAttributes = 1;
 		int boundaryMarker = 1;
@@ -591,14 +578,13 @@ public class PolyGenerator {
 		StringBuilder builder = new StringBuilder();
 		builder.append("#nVertices dimension boundaryMarker targetMarker nAttributes\n");
 		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
-		Map<P, Integer> map = new HashMap<>();
+		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
 		for(V v : mesh.getVertices()) {
-			P p = mesh.getPoint(v);
 			int boundary = mesh.isAtBoundary(v) ? 1 : 0;
 			int target = targetPred.test(v) ? targetMarker : 0;
-			map.put(p, id);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, boundary, target, p.getX(), p.getY(), vertexFunc.apply(v)));
+			map.put(v, id);
+			builder.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, boundary, target, v.getX(), v.getY(), vertexFunc.apply(v)));
 			id++;
 		}
 
@@ -606,8 +592,8 @@ public class PolyGenerator {
 		builder.append("# nBorders\n");
 		builder.append(1+"\n");
 		builder.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
-		for(P p : mesh.getPoints(mesh.getBorder())) {
-			builder.append(map.get(p) + SEPARATOR);
+		for(V v : mesh.getVertices(mesh.getBorder())) {
+			builder.append(map.get(v) + SEPARATOR);
 		}
 		builder.delete(builder.length()-SEPARATOR.length(), builder.length());
 		builder.append("\n");
@@ -619,8 +605,8 @@ public class PolyGenerator {
 		for(F face : mesh.getFaces()) {
 			//builder.append("1 0\n");
 			builder.append(mesh.getPoints(face).size() + SEPARATOR);
-			for(P p : mesh.getPoints(face)) {
-				builder.append(map.get(p) + SEPARATOR);
+			for(V v : mesh.getVertices(face)) {
+				builder.append(map.get(v) + SEPARATOR);
 			}
 			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
 			builder.append("\n");
@@ -633,8 +619,8 @@ public class PolyGenerator {
 		for(F hole : holes) {
 			int size = mesh.getPoints(hole).size();
 			builder.append(size + SEPARATOR);
-			for(P p : mesh.getPoints(hole)) {
-				builder.append(map.get(p) + SEPARATOR);
+			for(V V : mesh.getVertices(hole)) {
+				builder.append(map.get(V) + SEPARATOR);
 			}
 			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
 			builder.append("\n");

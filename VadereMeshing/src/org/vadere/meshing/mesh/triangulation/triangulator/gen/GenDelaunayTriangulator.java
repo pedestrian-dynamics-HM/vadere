@@ -14,34 +14,34 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Collection;
 
-public class GenDelaunayTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenDelaunayTriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITriangulator<V, E, F> {
 
-	private final Collection<P> pointSet;
-	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+	private final Collection<? extends IPoint> pointSet;
+	private IIncrementalTriangulation<V, E, F> triangulation;
 	private boolean generated;
 
-	public GenDelaunayTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public GenDelaunayTriangulator(@NotNull final IMesh<V, E, F> mesh,
 	                               @NotNull final VRectangle bound,
-	                               @NotNull final Collection<P> pointSet) {
+	                               @NotNull final Collection<? extends IPoint> pointSet) {
 		this.pointSet = pointSet;
 		this.triangulation = new IncrementalTriangulation<>(mesh, bound, halfEdge -> true);
 		this.generated = false;
 	}
 
-	public GenDelaunayTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
-	                               @NotNull final Collection<P> pointSet) {
+	public GenDelaunayTriangulator(@NotNull final IMesh<V, E, F> mesh,
+	                               @NotNull final Collection<? extends IPoint> pointSet) {
 		this.pointSet = pointSet;
 		this.triangulation = new IncrementalTriangulation<>(mesh, GeometryUtils.boundRelative(pointSet), halfEdge -> true);
 		this.generated = false;
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+	public IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			triangulation.init();
 			triangulation.insert(pointSet);
@@ -55,12 +55,12 @@ public class GenDelaunayTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 }

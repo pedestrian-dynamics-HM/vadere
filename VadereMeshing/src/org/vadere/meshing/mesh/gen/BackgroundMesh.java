@@ -11,17 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class BackgroundMesh<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public class BackgroundMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
-	private ITriConnectivity<P, CE, CF, V, E, F> triConnectivity;
+	private ITriConnectivity<V, E, F> triConnectivity;
 	private Map<Object, F> cache;
 
-	public BackgroundMesh(@NotNull final ITriConnectivity<P, CE, CF, V, E, F> triConnectivity) {
+	public BackgroundMesh(@NotNull final ITriConnectivity<V, E, F> triConnectivity) {
 		this.triConnectivity = triConnectivity;
 		this.cache = new HashMap<>();
 	}
 
-	public Optional<F> locate(@NotNull final Object obj, @NotNull final P point) {
+	public Optional<F> locate(@NotNull final Object obj, @NotNull final IPoint point) {
 		return locate(obj, point.getX(), point.getY());
 	}
 

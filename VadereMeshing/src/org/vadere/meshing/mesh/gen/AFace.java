@@ -1,18 +1,13 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * An array-based implementation of {@link IFace}.
  *
- * @param <CF> the type of the container of the faces
- *
  * @author Benedikt Zoennchen
  */
-public class AFace<CF> implements IFace<CF>, Cloneable {
+public class AFace implements IFace, Cloneable {
 
 	/**
 	 * One of the array index of the half-edges bordering this face.
@@ -35,34 +30,23 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	private boolean destroyed = false;
 
 	/**
-	 * The data accesible via and associated with this face.
-	 */
-	private @Nullable CF data;
-
-	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
-	 *
-	 * @param id     the array-index of this face
+	 *  @param id     the array-index of this face
 	 * @param edge   the array-index of one edge of this face
 	 * @param border indicator if this face is a border face or not
 	 */
-	AFace(@NotNull final int id, @NotNull final int edge, boolean border, final @Nullable CF data) {
+	AFace(final int id, final int edge, boolean border) {
 		this.border = border;
 		this.edge = edge;
 		this.id = id;
-		this.data = data;
-	}
-
-	AFace(@NotNull final int id,@NotNull final int edge, boolean border) {
-		this(id, edge, border, null);
 	}
 
 	/**
 	 * This constructor can be used for constructing a new face without having
 	 * constructed the bordering half-edges jet.
 	 */
-	AFace(@NotNull final int id, @NotNull boolean border) {
+	AFace(final int id, boolean border) {
 		this.border = border;
 		this.edge = -1;
 		this.id = id;
@@ -90,7 +74,7 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	 *
 	 * @param edge the array-index of a half-edge bordering this face
 	 */
-	void setEdge(@NotNull final int edge) {
+	void setEdge(final int edge) {
 		this.edge = edge;
 	}
 
@@ -101,7 +85,7 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	 *
 	 * @param id the new array-index of this face
 	 */
-	void setId(@NotNull final int id) {
+	void setId(final int id) {
 		this.id = id;
 	}
 
@@ -112,25 +96,6 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	 */
 	int getEdge() {
 		return edge;
-	}
-
-	/**
-	 * Returns the data associated with and saved via this face.
-	 *
-	 * @return the data associated with and saved via this face
-	 */
-	@Nullable
-	CF getData() {
-		return data;
-	}
-
-	/**
-	 * Sets the data associated with and saved via this face.
-	 *
-	 * @param data the data
-	 */
-	void setData(@Nullable CF data) {
-		this.data = data;
 	}
 
 	/**
@@ -163,9 +128,9 @@ public class AFace<CF> implements IFace<CF>, Cloneable {
 	}
 
 	@Override
-    protected AFace<CF> clone()  {
+    protected AFace clone()  {
         try {
-            return (AFace<CF>) super.clone();
+            return (AFace) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }

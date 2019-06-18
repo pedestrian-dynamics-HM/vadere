@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Color each visited face to show the walk and Create a straight line between start q and target p
  */
-public class WalkCanvas<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+public class WalkCanvas<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
 		extends SimpleTriCanvas<P, CE, CF, V, E, F> {
 
 	protected final VPoint q;
@@ -35,7 +35,7 @@ public class WalkCanvas<P extends IPoint, CE, CF, V extends IVertex<P>, E extend
 	 * @param startEdge    Start edge which should be crossed (it seems this is not used...).
 	 * @param visitedFaces List of Faces already visited.
 	 */
-	public WalkCanvas(IMesh<P, CE, CF, V, E, F> mesh, VPoint q, VPoint p,
+	public WalkCanvas(IMesh<V, E, F> mesh, VPoint q, VPoint p,
 	                  F startFace,
 	                  E startEdge,
 	                  List<F> visitedFaces) {
@@ -50,8 +50,8 @@ public class WalkCanvas<P extends IPoint, CE, CF, V extends IVertex<P>, E extend
 
 	//statics - Factory Methods
 
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
-	WalkCanvas<P, CE, CF, V, E, F> getDefault(IMesh<P, CE, CF, V, E, F> mesh,
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
+	WalkCanvas<P, CE, CF, V, E, F> getDefault(IMesh<V, E, F> mesh,
 									  VPoint p,
 									  VPoint q,
 									  F startFace,

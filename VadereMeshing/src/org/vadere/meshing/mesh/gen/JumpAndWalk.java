@@ -16,13 +16,13 @@ import java.util.Random;
 /**
  * @author Benedikt Zoennchen
  */
-public class JumpAndWalk<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPointLocator<P, CE, CF, V, E, F> {
+public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPointLocator<V, E, F> {
 
-	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private Random random;
 	private static Logger logger = Logger.getLogger(JumpAndWalk.class);
 
-	public JumpAndWalk(@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
+	public JumpAndWalk(@NotNull final IIncrementalTriangulation<V, E, F> triangulation) {
 		this.triangulation = triangulation;
 		this.random = new Random();
 	}
@@ -53,12 +53,12 @@ public class JumpAndWalk<P extends IPoint, CE, CF, V extends IVertex<P>, E exten
 	}
 
 	@Override
-	public F locatePoint(P point) {
+	public F locatePoint(IPoint point) {
 		return locate(point).get();
 	}
 
 	@Override
-	public Optional<F> locate(P point) {
+	public Optional<F> locate(IPoint point) {
 		Optional<F> startFace = getStartFace(point);
 		if(startFace.isPresent()) {
 

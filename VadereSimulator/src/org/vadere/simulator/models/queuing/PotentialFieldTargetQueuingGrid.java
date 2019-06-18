@@ -21,7 +21,6 @@ import org.vadere.state.types.PedestrianAttitudeType;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -165,7 +164,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
     }
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization() {
+	public Function<Agent, IMesh<?, ?, ?>> getDiscretization() {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 

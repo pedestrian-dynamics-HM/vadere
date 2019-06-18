@@ -24,20 +24,20 @@ public class TestSimplePointLocation {
 	private static PFace face2;
 	private static PFace border;
 	private static double EPSILON = 1.0e-10;
-	private IMesh<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> mesh;
+	private IMesh<PVertex, PHalfEdge, PFace> mesh;
 
 	@Before
 	public void setUp() throws Exception {
-		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+		mesh = new PMesh();
 		face1 = mesh.createFace();
 		face2 = mesh.createFace();
 		border = mesh.createFace(true);
 
 
-		PVertex<VPoint, Object, Object> x = mesh.createVertex(0,0);
-		PVertex<VPoint, Object, Object> y = mesh.createVertex(3,0);
-		PVertex<VPoint, Object, Object> z = mesh.createVertex(1.5,3.0);
-		PVertex<VPoint, Object, Object> w = mesh.createVertex(4.5,3.0);
+		PVertex x = mesh.createVertex(0,0);
+		PVertex y = mesh.createVertex(3,0);
+		PVertex z = mesh.createVertex(1.5,3.0);
+		PVertex w = mesh.createVertex(4.5,3.0);
 
 
 		PHalfEdge zx = mesh.createEdge(x, face1);
@@ -90,7 +90,7 @@ public class TestSimplePointLocation {
 
 	@Test
 	public void testFaceIterator() {
-		PointLocation<VPoint, Object, Object> pointLocation = new PointLocation<>(Arrays.asList(face1, face2), mesh);
+		PointLocation pointLocation = new PointLocation(Arrays.asList(face1, face2), mesh);
 
 		assertEquals(face1, pointLocation.getFace(new VPoint(0,0)).get());
 

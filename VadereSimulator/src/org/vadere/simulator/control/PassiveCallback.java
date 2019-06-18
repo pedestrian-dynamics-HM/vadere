@@ -5,7 +5,6 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Map;
 
@@ -30,5 +29,5 @@ public interface PassiveCallback {
 
 	default void setPotentialField(@Nullable IPotentialField potentialField) {}
 
-	default void setPotentialFieldTargetMesh(@Nullable Map<Integer, PMesh<VPoint, Object, Object>> meshMap) {}
+	default void setPotentialFieldTargetMesh(@Nullable Map<Integer, PMesh> meshMap) {}
 }

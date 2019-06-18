@@ -30,7 +30,6 @@ import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 
@@ -2915,15 +2914,15 @@ public class RealWorldPlot {
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + 0.1*Math.max(0, Math.abs(distanceFunc.apply(p)));
 		IEdgeLengthFunction edgeLengthFunction2 = p -> Math.min(1.0 + Math.max(distanceFunc.apply(p)*distanceFunc.apply(p), 0)*0.5, 5.0);
 
-		GenEikMesh<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				5.0,
 				bound,
 				topography.getObstacles().stream().map(obs -> new VPolygon(obs.getShape())).collect(Collectors.toList()),
-				() -> new PMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+				() -> new PMesh());
 
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);
 
 
@@ -2996,15 +2995,15 @@ public class RealWorldPlot {
 		Function<IPoint, Double> interpolationFunction = cellGrid.getInterpolationFunction();
 		IDistanceFunction approxDistance = p -> interpolationFunction.apply(p);
 
-		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				approxDistance,
 				//p -> 1.0 + Math.abs(approxDistance.apply(p)),
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
 				0.4,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				() -> new AMesh<>((x, y) -> new EikMeshPoint(x, y, false)));
+				() -> new AMesh());
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<AVertex, AHalfEdge, AFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);
 
 

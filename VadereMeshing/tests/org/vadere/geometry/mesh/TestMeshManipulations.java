@@ -3,7 +3,7 @@ package org.vadere.geometry.mesh;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
+import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -22,7 +22,7 @@ public class TestMeshManipulations {
 	 * Building a geometry containing 2 triangles
 	 * xyz and wyx
 	 */
-	private VPTriangulation triangulation;
+	private PTriangulation triangulation;
 	private VRectangle bound;
 
 	@Before
@@ -49,10 +49,10 @@ public class TestMeshManipulations {
 		int numberOfFaces = triangulation.getMesh().getNumberOfFaces();
 
 		// locate a face / triangle containing (4, 5)
-		PFace<VPoint, Object, Object> face = triangulation.locateFace(6, 6).get();
+		PFace face = triangulation.locateFace(6, 6).get();
 
 		// merge faces until infinity, therefore consumes all faces!
-		Predicate<PFace<VPoint, Object, Object>> mergePredicate = f -> true;
+		Predicate<PFace> mergePredicate = f -> true;
 
 		int maxDept = 1;
 
@@ -66,10 +66,10 @@ public class TestMeshManipulations {
 	@Test
 	public void testRemoveAllFaces() {
 		// locate a face / triangle containing (4, 5)
-		PFace<VPoint, Object, Object> face = triangulation.locateFace(4, 5).get();
+		PFace face = triangulation.locateFace(4, 5).get();
 
 		// merge faces until infinity, therefore consumes all faces!
-		Predicate<PFace<VPoint, Object, Object>> shrinkCondition = f -> true;
+		Predicate<PFace> shrinkCondition = f -> true;
 
 		triangulation.shrinkBorder(shrinkCondition, true);
 

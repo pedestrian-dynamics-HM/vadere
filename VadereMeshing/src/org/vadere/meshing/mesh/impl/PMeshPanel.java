@@ -7,49 +7,48 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.awt.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class PMeshPanel<P extends IPoint, CE, CF> extends MeshPanel<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
+public class PMeshPanel extends MeshPanel<PVertex, PHalfEdge, PFace> {
 
 	public PMeshPanel(
-			@NotNull MeshRenderer<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> meshRenderer,
+			@NotNull MeshRenderer<PVertex, PHalfEdge, PFace> meshRenderer,
 			double width,
 			double height) {
 		super(meshRenderer, width, height);
 	}
 
 	public PMeshPanel(
-			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
+			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
 			double width,
 			double height) {
 		super(mesh, width, height);
 	}
 
 	public PMeshPanel(
-			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
+			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
 			double width,
 			double height,
-			@NotNull final Function<PFace<P, CE, CF>, Color> colorFunction) {
+			@NotNull final Function<PFace, Color> colorFunction) {
 		super(mesh, f -> false, width, height, colorFunction);
 	}
 
 	public PMeshPanel(
-			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
+			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
 			double width,
 			double height,
-			@NotNull final Function<PFace<P, CE, CF>, Color> faceColorFunction,
-			@NotNull final Function<PHalfEdge<P, CE, CF>, Color> edgeColorFunction) {
+			@NotNull final Function<PFace, Color> faceColorFunction,
+			@NotNull final Function<PHalfEdge, Color> edgeColorFunction) {
 		super(mesh, f -> false, width, height, faceColorFunction, edgeColorFunction);
 	}
 
 	public PMeshPanel(
-			@NotNull final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh,
-			@NotNull Predicate<PFace<P, CE, CF>> predicate,
+			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
+			@NotNull Predicate<PFace> predicate,
 			double width,
 			double height) {
 		super(mesh, predicate, width, height);

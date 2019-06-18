@@ -1,17 +1,15 @@
 package org.vadere.meshing.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PMeshSuppliert;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
-
-import java.util.Collection;
 
 public interface IMeshDistanceFunction extends IDistanceFunction {
 
@@ -20,15 +18,15 @@ public interface IMeshDistanceFunction extends IDistanceFunction {
 		// (1) construct the exact distance function
 		IDistanceFunction distanceFunction = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
 
-		// (2) construct a background mesh
-		PMeshSuppliert<DoubleDataPoint, Double, MarkedTriangle> meshSuppliert = new PMeshSuppliert<>((x, y) -> new DoubleDataPoint(x ,y));
+		String propNameMarkedTriangle = "markedTriangle";
+		String propNameDistance = "distance";
 
-		final var backgroundGrid = IIncrementalTriangulation.createBackGroundMesh(meshSuppliert, pslg, false);
+		final var backgroundGrid = IIncrementalTriangulation.createBackGroundMesh(() -> new PMesh(), pslg, false);
 		final var mesh = backgroundGrid.getMesh();
 
 		// (3) set distance values for each background vertex
-		for(var point : mesh.getPoints()) {
-			point.setData(distanceFunction.apply(point));
+		for(var vertex : mesh.getVertices()) {
+			mesh.setData(vertex, propNameDistance, distanceFunction.apply(vertex));
 		}
 
 		// (4) pre-compute triangles to accelerate interpolation
@@ -36,12 +34,12 @@ public interface IMeshDistanceFunction extends IDistanceFunction {
 			if(!mesh.isBoundary(face)) {
 				VTriangle triangle = mesh.toTriangle(face);
 				boolean inside = pslg.getHoles().stream().allMatch(polygon -> !polygon.contains(triangle.midPoint()));
-				mesh.setData(face, new MarkedTriangle(triangle, inside));
+				mesh.setData(face, propNameMarkedTriangle, new MarkedTriangle(triangle, inside));
 			}
 		}
 
 		// TOODO: remove this
-		var panel = new PMeshPanel<>(mesh, 1000, 1000);
+		var panel = new PMeshPanel(mesh, 1000, 1000);
 		panel.display("dist func.");
 
 		// (4) construct a distance function based on the background mesh
@@ -55,14 +53,25 @@ public interface IMeshDistanceFunction extends IDistanceFunction {
 			if(mesh.isBoundary(face)) {
 				return pslg.getSegmentBound().distance(p);
 			} else {
-				MarkedTriangle markedTriangle = mesh.getData(face).get();
+				MarkedTriangle markedTriangle = mesh.getData(face, propNameMarkedTriangle, MarkedTriangle.class).get();
 				VTriangle triangle = markedTriangle.triangle;
-				DoubleDataPoint[] points = backgroundGrid.getPoints(face, DoubleDataPoint.class);
-				double distance = InterpolationUtil.barycentricInterpolation(points[0], points[1], points[2], dataPoint -> dataPoint.getData(), triangle.getArea(), p.getX(), p.getY());
+
+				double x[] = new double[3];
+				double y[] = new double[3];
+				double z[] = new double[3];
+				backgroundGrid.getTriPoints(face, x, y, z, "distance");
+
+				double distance = InterpolationUtil.barycentricInterpolation(
+						x[0], y[0], z[0],
+						x[1], y[1], z[1],
+						x[2], y[2], z[2],
+						triangle.getArea(), p.getX(), p.getY());
+
+				//TODO: outside inside triangles.
 				if(markedTriangle.inside) {
 
 				}
-				return InterpolationUtil.barycentricInterpolation(points[0], points[1], points[2], dataPoint -> dataPoint.getData(), triangle.getArea(), p.getX(), p.getY());
+				return distance;
 			}
 		};
 		return approxDistance;

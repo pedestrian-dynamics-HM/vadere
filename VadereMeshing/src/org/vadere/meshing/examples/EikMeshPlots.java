@@ -67,13 +67,13 @@ public class EikMeshPlots {
 			points.add(new EikMeshPoint(random.nextDouble() * 10, random.nextDouble() * 10));
 		}
 
-		PDelaunayTriangulator<EikMeshPoint, Double, Double> dt = new PDelaunayTriangulator<>(points, (x, y) -> new EikMeshPoint(x, y));
+		PDelaunayTriangulator dt = new PDelaunayTriangulator(points);
 		dt.generate();
 
 		write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_random_before");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
-		var meshImprover = new PEikMeshGen<>(
+		var meshImprover = new PEikMeshGen(
 				p -> 1.0 + Math.abs(bound.distance(p)),
 				dt.getTriangulation()
 		);
@@ -84,7 +84,7 @@ public class EikMeshPlots {
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_random_after");
 
 		// display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(dt.getMesh(), 1000, 1000);
+		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh(), 1000, 1000);
 		meshPanel.display("Random Delaunay triangulation");
 	}
 
@@ -100,17 +100,16 @@ public class EikMeshPlots {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 5.0;
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				distanceFunction,
 				p -> h0 + 0.3 * Math.abs(distanceFunction.apply(p)),
 				h0,
 				new VRectangle(segmentBound.getBounds2D()),
-				pslg.getHoles(),
-				pointConstructor
+				pslg.getHoles()
 		);
 
 		meshImprover.generate();
-		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
@@ -129,16 +128,15 @@ public class EikMeshPlots {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 1.0;
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				distanceFunction,
 				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
 				h0,
 				new VRectangle(segmentBound.getBounds2D()),
-				pslg.getHoles(),
-				pointConstructor
+				pslg.getHoles()
 		);
 
-		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 		meshPanel.display("Combined distance functions " + h0);
 		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
@@ -162,7 +160,7 @@ public class EikMeshPlots {
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_a_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
-		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 1000);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
 		meshPanel.display("A");
 	}
 
@@ -176,13 +174,13 @@ public class EikMeshPlots {
 		IDistanceFunction d_b = IDistanceFunction.create(boundary);
 		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
 		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
 				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect),
-				(x, y) -> new EikMeshPoint(x, y, false));
+				Arrays.asList(rect)
+		);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -190,7 +188,7 @@ public class EikMeshPlots {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_d_combined_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
@@ -204,13 +202,13 @@ public class EikMeshPlots {
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
 				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect),
-				(x, y) -> new EikMeshPoint(x, y, false));
+				Arrays.asList(rect)
+		);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -218,7 +216,7 @@ public class EikMeshPlots {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_disc_rect_non_uniform_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
@@ -232,13 +230,13 @@ public class EikMeshPlots {
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
 				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect),
-				(x, y) -> new EikMeshPoint(x, y, false));
+				Arrays.asList(rect)
+		);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -246,7 +244,7 @@ public class EikMeshPlots {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_disc_rect_sub_non_uniform_"+ Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
@@ -263,17 +261,17 @@ public class EikMeshPlots {
 
 		// define the EikMesh-Improver
 		IEdgeLengthFunction h = p -> h0;
-		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+		PEikMeshGen meshImprover = new PEikMeshGen(
 				d,
 				h,
 				Arrays.asList(center),
 				h0,
-				bound,
-				(x, y) -> new EikMeshPoint(x, y, false));
+				bound
+		);
 
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
 		meshImprover.generate();
@@ -321,14 +319,13 @@ public class EikMeshPlots {
 
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		IEdgeLengthFunction h = p -> 0.01 /*+ 0.2*Math.abs(distanceFunction.apply(p))*/;
-		var ruppert = new PRuppertsTriangulator<EikMeshPoint, Double, Double>(
+		var ruppert = new PRuppertsTriangulator(
 				pslg,
 				p -> 0.01,
-				0.0,
-				(x, y) -> new EikMeshPoint(x, y)
+				0.0
 		);
 
-		PMeshPanel<EikMeshPoint, Double, Double> panel = new PMeshPanel<>(ruppert.getMesh(), 1000, 1000);
+		PMeshPanel panel = new PMeshPanel(ruppert.getMesh(), 1000, 1000);
 		panel.display(" Voronoi Vertex Insertion");
 
 		while (!ruppert.isFinished()) {
@@ -344,7 +341,7 @@ public class EikMeshPlots {
 			panel.repaint();
 		}
 
-		var eikMesh = new PEikMeshGen<>(h, ruppert.getTriangulation());
+		var eikMesh = new PEikMeshGen(h, ruppert.getTriangulation());
 
 		while (!eikMesh.isFinished()) {
 			try {

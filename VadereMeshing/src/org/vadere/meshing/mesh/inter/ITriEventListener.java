@@ -1,20 +1,15 @@
 package org.vadere.meshing.mesh.inter;
 
-import org.vadere.util.geometry.shapes.IPoint;
-
 /**
  * A {@link ITriEventListener} listens to events that change the topography of the triangulation.
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface ITriEventListener<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public interface ITriEventListener<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	/**
 	 * This method is triggered after a triangle is split into 3 new faces by inserting a

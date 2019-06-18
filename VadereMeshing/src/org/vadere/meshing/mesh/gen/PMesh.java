@@ -5,20 +5,19 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * @author Benedikt Zoennchen
  */
-public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> {
+public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 
 	private static Logger log = Logger.getLogger(PMesh.class);
 
@@ -27,31 +26,14 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	private int numberOfHoles;
 	private int numberOfVertices;
 
-	private List<PFace<P, CE, CF>> faces;
-	private List<PFace<P, CE, CF>> holes;
-	private PFace<P, CE, CF> boundary;
-	private List<PHalfEdge<P, CE, CF>> edges;
-	private IPointConstructor<P> pointConstructor;
-	private List<PVertex<P, CE, CF>> vertices;
-	private @Nullable final Supplier<CE> edgeSupplier;
-	private @Nullable final Supplier<CF> faceSupplier;
+	private List<PFace> faces;
+	private List<PFace> holes;
+	private PFace boundary;
+	private List<PHalfEdge> edges;
+	private List<PVertex> vertices;
 
-	public PMesh(@NotNull final IPointConstructor<P> pointConstructor,
-	             @Nullable final Supplier<CE> edgeSupplier,
-	             @Nullable final Supplier<CF> faceSupplier) {
+	public PMesh() {
 		clear();
-		this.pointConstructor = pointConstructor;
-		this.edgeSupplier = edgeSupplier;
-		this.faceSupplier = faceSupplier;
-	}
-
-	public PMesh(@NotNull final IPointConstructor<P> pointConstructor,
-	             @Nullable final Supplier<CE> edgeSupplier) {
-		this(pointConstructor, edgeSupplier, null);
-	}
-
-	public PMesh(final IPointConstructor<P> pointConstructor) {
-		this(pointConstructor, null, null);
 	}
 
 	@Override
@@ -60,7 +42,7 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 		this.holes = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.vertices = new ArrayList<>();
-		this.boundary = new PFace<>(true);
+		this.boundary = new PFace(true);
 		this.numberOfEdges = 0;
 		this.numberOfFaces = 0;
 		this.numberOfHoles = 0;
@@ -68,8 +50,8 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public PMesh<P, CE, CF> construct() {
-		return new PMesh<>(pointConstructor);
+	public PMesh construct() {
+		return new PMesh();
 	}
 
 	@Override
@@ -80,140 +62,140 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> getNext(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public PHalfEdge getNext(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.getNext();
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> getPrev(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public PHalfEdge getPrev(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.getPrevious();
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> getTwin(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public PHalfEdge getTwin(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.getTwin();
 	}
 
 	@Override
-	public PFace<P, CE, CF> getFace(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public PFace getFace(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.getFace();
 	}
 
 	@Override
-	public IPointConstructor<P> getPointConstructor() {
-		return pointConstructor;
-	}
-
-	@Override
-	public PHalfEdge<P, CE, CF> getEdge(@NotNull final PVertex<P, CE, CF> vertex) {
+	public PHalfEdge getEdge(@NotNull final PVertex vertex) {
 		return vertex.getEdge();
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> getEdge(@NotNull final PFace<P, CE, CF> face) {
+	public double getX(@NotNull final PVertex vertex) {
+		return vertex.getX();
+	}
+
+	@Override
+	public double getY(@NotNull final PVertex vertex) {
+		return vertex.getY();
+	}
+
+	@Override
+	public PHalfEdge getEdge(@NotNull final PFace face) {
 		return face.getEdge();
 	}
 
 	@Override
-	public P getPoint(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public IPoint getPoint(@NotNull final PHalfEdge halfEdge) {
 		return getVertex(halfEdge).getPoint();
 	}
 
 	@Override
-	public PVertex<P, CE, CF> getVertex(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public PVertex getVertex(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.getEnd();
 	}
 
 	@Override
-	public P getPoint(@NotNull final PVertex<P, CE, CF> vertex) {
+	public IPoint getPoint(@NotNull final PVertex vertex) {
 		return vertex.getPoint();
 	}
 
 	@Override
-	public Optional<CF> getData(@NotNull final PFace<P, CE, CF> face) {
-		return Optional.ofNullable(face.getData());
+	public <CV> void setData(@NotNull PVertex vertex, @NotNull String name, CV data) {
+		throw new UnsupportedOperationException("not jet implemented");
 	}
 
 	@Override
-	public void setData(@NotNull final PFace<P, CE, CF> face, @Nullable final CF data) {
-		face.setData(data);
+	public <CE> void setData(@NotNull PHalfEdge edge, @NotNull String name, @Nullable CE data) {
+		throw new UnsupportedOperationException("not jet implemented");
 	}
 
 	@Override
-	public Optional<CE> getData(@NotNull final PHalfEdge<P, CE, CF> edge) {
-		return Optional.ofNullable(edge.getData());
+	public <CF> void setData(@NotNull final PFace face, @NotNull final String name, @Nullable final CF data) {
+		throw new UnsupportedOperationException("not jet implemented");
 	}
 
 	@Override
-	public void setData(@NotNull PHalfEdge<P, CE, CF> edge, @Nullable CE data) {
-		edge.setData(data);
-	}
-
-	@Override
-	public PFace<P, CE, CF> getFace() {
+	public PFace getFace() {
 		return faces.stream().filter(face -> !isDestroyed(face)).filter(f -> !isBoundary(f)).findAny().get();
 	}
 
 	@Override
-	public boolean isBoundary(@NotNull final PFace<P, CE, CF> face) {
+	public boolean isBoundary(@NotNull final PFace face) {
 		return face.isBoundary();
 	}
 
 	@Override
-	public boolean isHole(@NotNull final PFace<P, CE, CF> face) {
+	public boolean isHole(@NotNull final PFace face) {
 		return isBoundary(face) && face != boundary;
 	}
 
 	@Override
-	public boolean isBoundary(@NotNull final PHalfEdge<P, CE, CF> halfEdge) {
+	public boolean isBoundary(@NotNull final PHalfEdge halfEdge) {
 		return halfEdge.isBoundary();
 	}
 
 	@Override
-	public boolean isDestroyed(@NotNull final PFace<P, CE, CF> face) {
+	public boolean isDestroyed(@NotNull final PFace face) {
 		return face.isDestroyed();
 	}
 
 	@Override
-	public boolean isDestroyed(@NotNull final PHalfEdge<P, CE, CF> edge) {
+	public boolean isDestroyed(@NotNull final PHalfEdge edge) {
 		return !edge.isValid();
 	}
 
 	@Override
-	public boolean isDestroyed(@NotNull final PVertex<P, CE, CF> vertex) {
+	public boolean isDestroyed(@NotNull final PVertex vertex) {
 		return vertex.isDestroyed();
 	}
 
 	@Override
-	public void setTwin(@NotNull final PHalfEdge<P, CE, CF> halfEdge, @NotNull final PHalfEdge<P, CE, CF> twin) {
+	public void setTwin(@NotNull final PHalfEdge halfEdge, @NotNull final PHalfEdge twin) {
 		halfEdge.setTwin(twin);
 		twin.setTwin(halfEdge);
 	}
 
 	@Override
-	public void setNext(@NotNull final PHalfEdge<P, CE, CF> halfEdge, @NotNull final PHalfEdge<P, CE, CF> next) {
+	public void setNext(@NotNull final PHalfEdge halfEdge, @NotNull final PHalfEdge next) {
 		halfEdge.setNext(next);
 		next.setPrevious(halfEdge);
 	}
 
 	@Override
-	public void setPrev(@NotNull final PHalfEdge<P, CE, CF> halfEdge, @NotNull final PHalfEdge<P, CE, CF> prev) {
+	public void setPrev(@NotNull final PHalfEdge halfEdge, @NotNull final PHalfEdge prev) {
 		halfEdge.setPrevious(prev);
 		prev.setNext(halfEdge);
 	}
 
 	@Override
-	public void setFace(@NotNull final PHalfEdge<P, CE, CF> halfEdge, @NotNull final PFace<P, CE, CF> face) {
+	public void setFace(@NotNull final PHalfEdge halfEdge, @NotNull final PFace face) {
 		halfEdge.setFace(face);
 	}
 
 	@Override
-	public void setEdge(@NotNull final PFace<P, CE, CF> face, @NotNull final PHalfEdge<P, CE, CF> edge) {
+	public void setEdge(@NotNull final PFace face, @NotNull final PHalfEdge edge) {
 		face.setEdge(edge);
 	}
 
 	@Override
-	public void setEdge(@NotNull final PVertex<P, CE, CF> vertex, @NotNull final PHalfEdge<P, CE, CF> edge) {
+	public void setEdge(@NotNull final PVertex vertex, @NotNull final PHalfEdge edge) {
 		assert edge.getEnd().equals(vertex);
 		if(!edge.getEnd().equals(vertex)) {
 			throw new IllegalArgumentException("end of the edge is not equals to the vertex:" + vertex + " != " + edge.getEnd());
@@ -222,7 +204,7 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public void setVertex(@NotNull final PHalfEdge<P, CE, CF> halfEdge, @NotNull final PVertex<P, CE, CF> vertex) {
+	public void setVertex(@NotNull final PHalfEdge halfEdge, @NotNull final PVertex vertex) {
 		/*if(halfEdge.getEnd().getEdge() == halfEdge) {
 			System.out.println("error44");
 		}
@@ -251,55 +233,40 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public boolean tryLock(@NotNull final PVertex<P, CE, CF> vertex) {
+	public boolean tryLock(@NotNull final PVertex vertex) {
 		return vertex.getLock().tryLock();
 	}
 
 	@Override
-	public void unlock(@NotNull final PVertex<P, CE, CF> vertex) {
+	public void unlock(@NotNull final PVertex vertex) {
 		vertex.getLock().unlock();
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> createEdge(@NotNull final PVertex<P, CE, CF> vertex) {
-		PHalfEdge<P, CE, CF> edge = new PHalfEdge<>(vertex);
+	public PHalfEdge createEdge(@NotNull final PVertex vertex) {
+		PHalfEdge edge = new PHalfEdge(vertex);
 		edges.add(edge);
-
-		if(edgeSupplier != null) {
-			edge.setData(edgeSupplier.get());
-		}
-
 		numberOfEdges++;
 		return edge;
 	}
 
 	@Override
-	public PHalfEdge<P, CE, CF> createEdge(@NotNull final PVertex<P, CE, CF> vertex, @NotNull final PFace<P, CE, CF> face) {
-		PHalfEdge<P, CE, CF> edge = new PHalfEdge<>(vertex, face);
+	public PHalfEdge createEdge(@NotNull final PVertex vertex, @NotNull final PFace face) {
+		PHalfEdge edge = new PHalfEdge(vertex, face);
 		edges.add(edge);
-
-		if(edgeSupplier != null) {
-			edge.setData(edgeSupplier.get());
-		}
-
 		numberOfEdges++;
 		return edge;
 	}
 
 	@Override
-	public PFace<P, CE, CF> createFace() {
+	public PFace createFace() {
 		return createFace(false);
 	}
 
 	@Override
-	public PFace<P, CE, CF> createFace(final boolean hole) {
-		PFace<P, CE, CF> face = new PFace<>(hole);
+	public PFace createFace(final boolean hole) {
+		PFace face = new PFace(hole);
 		faces.add(face);
-
-		if(faceSupplier != null) {
-			setData(face, faceSupplier.get());
-		}
-
 		if(hole) {
 			numberOfHoles++;
 			holes.add(face);
@@ -311,41 +278,41 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public P createPoint(double x, double y) {
-		return pointConstructor.create(x, y);
+	public IPoint createPoint(double x, double y) {
+		return new VPoint(x, y);
 	}
 
 
 	// TODO: maybe remove insertVertex!
 	@Override
-	public PVertex<P, CE, CF> createVertex(double x, double y) {
-		return createVertex(pointConstructor.create(x, y));
+	public PVertex createVertex(double x, double y) {
+		return createVertex(createPoint(x, y));
 	}
 
 	@Override
-	public PVertex<P, CE, CF> createVertex(@NotNull final P point) {
-		return new PVertex<>(point);
+	public PVertex createVertex(@NotNull final IPoint point) {
+		return new PVertex(point);
 	}
 
 	@Override
-	public PFace<P, CE, CF> getBorder() {
+	public PFace getBorder() {
 		return boundary;
 	}
 
 	@Override
-	public void insert(@NotNull final PVertex<P, CE, CF> vertex) {
+	public void insert(@NotNull final PVertex vertex) {
 		numberOfVertices++;
 		vertices.add(vertex);
 	}
 
 	@Override
-	public void insertVertex(@NotNull final PVertex<P, CE, CF> vertex) {
+	public void insertVertex(@NotNull final PVertex vertex) {
 		numberOfVertices++;
 		vertices.add(vertex);
 	}
 
 	@Override
-	public void toHole(@NotNull final PFace<P, CE, CF> face) {
+	public void toHole(@NotNull final PFace face) {
 		assert !isHole(face);
 		if(!isHole(face)) {
 			holes.add(face);
@@ -356,7 +323,7 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public void destroyFace(@NotNull final PFace<P, CE, CF> face) {
+	public void destroyFace(@NotNull final PFace face) {
 		//faces.remove(face);
 		if(isHole(face)) {
 			//holes.remove(face);
@@ -369,24 +336,24 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public void destroyEdge(@NotNull final PHalfEdge<P, CE, CF> edge) {
+	public void destroyEdge(@NotNull final PHalfEdge edge) {
 		//edges.remove(edge);
 		edge.destroy();
 		numberOfEdges--; // we destroy the edge and its twin!
 	}
 
 	@Override
-	public void setDown(@NotNull final PVertex<P, CE, CF> up, @NotNull final PVertex<P, CE, CF> down) {
+	public void setDown(@NotNull final PVertex up, @NotNull final PVertex down) {
 		up.setDown(down);
 	}
 
 	@Override
-	public PVertex<P, CE, CF> getDown(@NotNull final PVertex<P, CE, CF> vertex) {
+	public PVertex getDown(@NotNull final PVertex vertex) {
 		return vertex.getDown();
 	}
 
 	@Override
-	public void destroyVertex(@NotNull final PVertex<P, CE, CF> vertex) {
+	public void destroyVertex(@NotNull final PVertex vertex) {
 		//vertices.remove(vertex);
 		if(!isDestroyed(vertex)) {
 			vertex.destroy();
@@ -395,35 +362,35 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public void setPoint(@NotNull final PVertex<P, CE, CF> vertex, @NotNull final P point) {
+	public void setPoint(@NotNull final PVertex vertex, @NotNull final IPoint point) {
 		vertex.setPoint(point);
 	}
 
 	@Override
-	public Stream<PHalfEdge<P, CE, CF>> streamEdges() {
+	public Stream<PHalfEdge> streamEdges() {
 		return edges.stream().filter(e -> !isDestroyed(e));
 	}
 
 	@Override
-	public Stream<PHalfEdge<P, CE, CF>> streamEdgesParallel() {
+	public Stream<PHalfEdge> streamEdgesParallel() {
 		return edges.parallelStream().filter(e -> !isDestroyed(e));
 	}
 
 	@Override
-	public Stream<PVertex<P, CE, CF>> streamVertices() { return vertices.stream().filter(v -> !isDestroyed(v)); }
+	public Stream<PVertex> streamVertices() { return vertices.stream().filter(v -> !isDestroyed(v)); }
 
 	@Override
-	public Stream<PVertex<P, CE, CF>> streamVerticesParallel() {
+	public Stream<PVertex> streamVerticesParallel() {
 		return vertices.parallelStream().filter(v -> !isDestroyed(v));
 	}
 
 	@Override
-	public Iterable<PHalfEdge<P, CE, CF>> getEdgeIt() {
+	public Iterable<PHalfEdge> getEdgeIt() {
 		return () -> edges.iterator();
 	}
 
 	@Override
-	public PVertex<P, CE, CF> getRandomVertex(@NotNull final Random random) {
+	public PVertex getRandomVertex(@NotNull final Random random) {
 		int startIndex = random.nextInt(vertices.size());
 		int index = startIndex;
 
@@ -445,12 +412,12 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public Stream<PFace<P, CE, CF>> streamFaces(@NotNull final Predicate<PFace<P, CE, CF>> predicate) {
+	public Stream<PFace> streamFaces(@NotNull final Predicate<PFace> predicate) {
 		return faces.stream().filter(f -> !isDestroyed(f)).filter(predicate);
 	}
 
 	@Override
-	public Stream<PFace<P, CE, CF>> streamHoles() {
+	public Stream<PFace> streamHoles() {
 		return holes.stream().filter(h -> !isDestroyed(h));
 	}
 
@@ -465,12 +432,12 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> toTriangulation(@NotNull final IPointLocator.Type type) {
+	public IIncrementalTriangulation<PVertex, PHalfEdge, PFace> toTriangulation(@NotNull final IPointLocator.Type type) {
 		return IIncrementalTriangulation.createPTriangulation(type, this);
 	}
 
 	@Override
-	public void arrangeMemory(@NotNull final Iterable<PFace<P, CE, CF>> faceOrder) {
+	public void arrangeMemory(@NotNull final Iterable<PFace> faceOrder) {
 		try {
 			throw new UnsupportedOperationException("not jet implemented.");
 		} catch (UnsupportedOperationException e) {
@@ -479,10 +446,9 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 	}
 
 	@Override
-	public synchronized PMesh<P, CE, CF> clone() {
+	public synchronized PMesh clone() {
 		try {
-			PMesh<P, CE, CF> clone = (PMesh<P, CE, CF>)super.clone();
-			clone.pointConstructor = pointConstructor;
+			PMesh clone = (PMesh)super.clone();
 			clone.faces = new ArrayList<>();
 			clone.holes = new ArrayList<>();
 			clone.edges = new ArrayList<>();
@@ -492,20 +458,20 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 			clone.numberOfHoles = numberOfHoles;
 			clone.numberOfFaces = numberOfFaces;
 
-			Map<PVertex<P, CE, CF>, PVertex<P, CE, CF>> vertexMap = new HashMap<>();
-			Map<PHalfEdge<P, CE, CF>, PHalfEdge<P, CE, CF>> edgeMap = new HashMap<>();
-			Map<PFace<P, CE, CF>, PFace<P, CE, CF>> faceMap = new HashMap<>();
+			Map<PVertex, PVertex> vertexMap = new HashMap<>();
+			Map<PHalfEdge, PHalfEdge> edgeMap = new HashMap<>();
+			Map<PFace, PFace> faceMap = new HashMap<>();
 
 			// faces are not complete: missing edge
-			for(PVertex<P, CE, CF> v : vertices) {
-				PVertex<P, CE, CF> cV = v.clone();
+			for(PVertex v : vertices) {
+				PVertex cV = v.clone();
 				clone.vertices.add(cV);
 				vertexMap.put(v, cV);
 			}
 
 			// edges are not complete: missing next, prev, twin, face
-			for(PHalfEdge<P, CE, CF> e : edges) {
-				PHalfEdge<P, CE, CF> cE = e.clone();
+			for(PHalfEdge e : edges) {
+				PHalfEdge cE = e.clone();
 				edgeMap.put(e, cE);
 				cE.setEnd(vertexMap.get(e.getEnd()));
 				clone.edges.add(cE);
@@ -515,19 +481,19 @@ public class PMesh<P extends IPoint, CE, CF> implements IMesh<P, CE, CF, PVertex
 			clone.boundary = boundary.clone();
 			faceMap.put(boundary, clone.boundary);
 			clone.boundary.setEdge(edgeMap.get(boundary.getEdge()));
-			for(PFace<P, CE, CF> f : faces) {
-				PFace<P, CE, CF> cF = f.clone();
+			for(PFace f : faces) {
+				PFace cF = f.clone();
 				faceMap.put(f, cF);
 				cF.setEdge(edgeMap.get(f.getEdge()));
 				clone.faces.add(cF);
 			}
 
-			for(PVertex<P, CE, CF> cV : clone.vertices) {
+			for(PVertex cV : clone.vertices) {
 				cV.setEdge(edgeMap.get(cV.getEdge()));
 				cV.setDown(null);
 			}
 
-			for(PHalfEdge<P, CE, CF> cE : clone.edges) {
+			for(PHalfEdge cE : clone.edges) {
 				cE.setFace(faceMap.get(cE.getFace()));
 				cE.setNext(edgeMap.get(cE.getNext()));
 				cE.setPrevious(edgeMap.get(cE.getPrevious()));

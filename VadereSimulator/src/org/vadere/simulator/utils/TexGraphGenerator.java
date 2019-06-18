@@ -33,8 +33,8 @@ public class TexGraphGenerator extends org.vadere.meshing.utils.io.tex.TexGraphG
 	 * @param scaling   the scaling of the tikz graphics
 	 * @return a string representing a tikz graphics
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> String toTikz(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toTikz(
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
 			final float scaling,
 			@NotNull final Topography topography) {

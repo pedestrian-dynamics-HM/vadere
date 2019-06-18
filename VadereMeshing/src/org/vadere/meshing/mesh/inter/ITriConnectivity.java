@@ -17,7 +17,6 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -41,16 +40,13 @@ import java.util.stream.Collectors;
  * The certificate for an edge to be legal relies on the concrete implementation of the triangulation. E. g. for a strict Delaunay-Triangulation the Delaunay-Criterion
  * has to be fulfilled.</p>
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  *
  * @author Benedikt Zoennchen
  */
-public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> extends IPolyConnectivity<P, CE, CF, V, E, F> {
+public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F extends IFace> extends IPolyConnectivity<V, E, F> {
 
 	/**
 	 * A logger for debug and information reasons.
@@ -109,7 +105,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param vertex    the vertex
 	 * @param point     the new point of the vertex
 	 */
-	default void replacePoint(@NotNull final V vertex, @NotNull final P point) {
+	default void replacePoint(@NotNull final V vertex, @NotNull final IPoint point) {
 		assert ringContainsPoint(vertex, point);
 		getMesh().setPoint(vertex, point);
 	}
@@ -122,11 +118,11 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param point     the point
 	 * @return true if the point is contained, false otherwise
 	 */
-	default boolean ringContainsPoint(@NotNull final V vertex, @NotNull final P point)  {
-		java.util.List<P> points = getMesh().getPoints(vertex);
+	default boolean ringContainsPoint(@NotNull final V vertex, @NotNull final IPoint point)  {
+		java.util.List<IPoint> points = getMesh().getPoints(vertex);
 
 		if(getMesh().isAtBoundary(vertex)) {
-			points.add(getMesh().getPoint(vertex));
+			points.add(getMesh().toPoint(vertex));
 		}
 
 		double distance = GeometryUtils.toPolygon(points).distance(point);
@@ -222,7 +218,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param boundary      the boundary of the edge
 	 * @return the created face
 	 */
-	default F insertOutsidePoint(@NotNull final P point, @NotNull final E boundaryEdge, @NotNull final F boundary) {
+	default F insertOutsidePoint(@NotNull final IPoint point, @NotNull final E boundaryEdge, @NotNull final F boundary) {
 		assert getMesh().isBoundary(boundaryEdge) &&
 				getMesh().isBoundary(boundary) &&
 				getMesh().getFace(boundaryEdge).equals(boundary) &&
@@ -364,7 +360,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
     }
 
 	default Pair<E, E> splitEdge(@NotNull V v, @NotNull E halfEdge, boolean legalize) {
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
     	mesh.insertVertex(v);
 
 		/*
@@ -525,14 +521,14 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
      *         edges and their twins are the faces which took part / where modified / added by the split.
      */
-	default Pair<E, E> splitEdge(@NotNull P p, @NotNull E halfEdge, boolean legalize) {
-        IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+	default Pair<E, E> splitEdge(@NotNull IPoint p, @NotNull E halfEdge, boolean legalize) {
+        IMesh<V, E, F> mesh = getMesh();
         V v = mesh.createVertex(p);
         return splitEdge(v, halfEdge, legalize);
 	}
 
 	default List<E> splitEdgeAndReturn(@NotNull final V v, @NotNull E halfEdge, boolean legalize) {
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 		mesh.insertVertex(v);
 
 		/*
@@ -709,7 +705,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
 	 *         edges and their twins are the faces which took part / where modified / added by the split.
 	 */
-	default Pair<E, E> splitEdge(@NotNull final P p, @NotNull final E halfEdge) {
+	default Pair<E, E> splitEdge(@NotNull final IPoint p, @NotNull final E halfEdge) {
 		return splitEdge(p, halfEdge, true);
 	}
 
@@ -764,7 +760,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param edge the edge which will be flipped.
 	 */
 	default void flipSync(@NotNull final E edge) {
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 
 		E a0 = edge;
 		E a1 = mesh.getNext(a0);
@@ -826,7 +822,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 */
 	default void flip(@NotNull final E edge) {
 
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 
 		// 1. gather all the references required
 		E a0 = edge;
@@ -896,9 +892,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		assert getMesh().getEdges(triangleFace).size() == 3;
 
 		E edge = getMesh().getEdge(triangleFace);
-		P p1 = getMesh().getPoint(edge);
-		P p2 = getMesh().getPoint(getMesh().getNext(edge));
-		P p3 = getMesh().getPoint(getMesh().getPrev(edge));
+		IPoint p1 = getMesh().getPoint(edge);
+		IPoint p2 = getMesh().getPoint(getMesh().getNext(edge));
+		IPoint p3 = getMesh().getPoint(getMesh().getPrev(edge));
 
 		return GeometryUtils.isCCW(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 	}
@@ -923,7 +919,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param face  the face which contains the point.
 	 * @return one of the new created half-edges
 	 */
-	E insert(@NotNull final P p, @NotNull final F face);
+	E insert(@NotNull final IPoint p, @NotNull final F face);
 
 	default E splitTriangle(@NotNull final F face, final boolean legalize) {
 		VPoint circumcenter = getMesh().toTriangle(face).getCircumcenter();
@@ -1002,9 +998,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		getMesh().setFace(ringEdges.get(ringEdges.size()-1), face);
 		getMesh().destroyVertex(vertex);
 
-		NodeLinkedList<GenEar<P, CE, CF, V, E, F>> list = new NodeLinkedList<>();
-		GenEar.EarNodeComparator<P, CE, CF, V, E, F> comparator = new GenEar.EarNodeComparator<>();
-		PriorityQueue<Node<GenEar<P, CE, CF, V, E, F>>> heap = new PriorityQueue<>(comparator);
+		NodeLinkedList<GenEar<V, E, F>> list = new NodeLinkedList<>();
+		GenEar.EarNodeComparator<V, E, F> comparator = new GenEar.EarNodeComparator<>();
+		PriorityQueue<Node<GenEar<V, E, F>>> heap = new PriorityQueue<>(comparator);
 
 		assert getMesh().isValid();
 		// (2) re-triangulate
@@ -1013,15 +1009,15 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			E e2 = ringEdges.get((i+1) % ringEdges.size());
 			E e3 = ringEdges.get((i+2) % ringEdges.size());
 
-			GenEar<P, CE, CF, V, E, F> ear = new GenEar<>(e1, e2, e3, power(e1, e2, e3, vertex));
-			Node<GenEar<P, CE, CF, V, E, F>> earNode = list.add(ear);
+			GenEar<V, E, F> ear = new GenEar<>(e1, e2, e3, power(e1, e2, e3, vertex));
+			Node<GenEar<V, E, F>> earNode = list.add(ear);
 			heap.add(earNode);
 
 		}
 
 		while (heap.size() > 3) {
-			Node<GenEar<P, CE, CF, V, E, F>> earNode = heap.poll();
-			GenEar<P, CE, CF, V, E, F> ear = earNode.getElement();
+			Node<GenEar<V, E, F>> earNode = heap.poll();
+			GenEar<V, E, F> ear = earNode.getElement();
 
 			// create triangle ear and link it to its two or three existing neighbors
 			E e1 = ear.getEdges().get(0);
@@ -1050,8 +1046,8 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 			// end
 
 			if(heap.size() > 3) {
-				Node<GenEar<P, CE, CF, V, E, F>> prevEarNode = earNode.getPrev();
-				Node<GenEar<P, CE, CF, V, E, F>> nextEarNode = earNode.getNext();
+				Node<GenEar<V, E, F>> prevEarNode = earNode.getPrev();
+				Node<GenEar<V, E, F>> nextEarNode = earNode.getNext();
 
 				if(prevEarNode == null) {
 					prevEarNode = list.getTail();
@@ -1061,7 +1057,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 					nextEarNode = list.getHead();
 				}
 
-				Node<GenEar<P, CE, CF, V, E, F>> nnextEarNode = nextEarNode.getNext();
+				Node<GenEar<V, E, F>> nnextEarNode = nextEarNode.getNext();
 				if(nnextEarNode == null) {
 					nnextEarNode = list.getHead();
 				}
@@ -1079,9 +1075,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 				nnextEarNode.getElement().setFirst(t);
 				earNode.remove();
 
-				GenEar<P, CE, CF, V, E, F> prevEar = prevEarNode.getElement();
-				GenEar<P, CE, CF, V, E, F> nextEar = nextEarNode.getElement();
-				GenEar<P, CE, CF, V, E, F> nnextEar = nnextEarNode.getElement();
+				GenEar<V, E, F> prevEar = prevEarNode.getElement();
+				GenEar<V, E, F> nextEar = nextEarNode.getElement();
+				GenEar<V, E, F> nnextEar = nnextEarNode.getElement();
 				prevEar.setPower(power(prevEar.getEdges().get(0), prevEar.getEdges().get(1), prevEar.getEdges().get(2), vertex));
 				nextEar.setPower(power(nextEar.getEdges().get(0), nextEar.getEdges().get(1), nextEar.getEdges().get(2), vertex));
 				nnextEar.setPower(power(nnextEar.getEdges().get(0), nnextEar.getEdges().get(1), nnextEar.getEdges().get(2), vertex));
@@ -1107,7 +1103,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	}
 
 	private double power(@NotNull final E e1, @NotNull final E e2, @NotNull final E e3, @NotNull final IPoint p) {
-		P point = getMesh().getPoint(e1);
+		IPoint point = getMesh().getPoint(e1);
 		if(!isLeftOf(point.getX(), point.getY(), e3)) {
 			return Double.MAX_VALUE;
 		}
@@ -1130,13 +1126,13 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 * <p>Mesh changing method.</p>
 	 *
-	 * @param point     the point which splits the triangle
 	 * @param face      the triangle face we split
+	 * @param point     the point which splits the triangle
 	 * @param legalize  if true the triangulation will be legalized locally at the split to preserve a feasible triangulation
 	 *
 	 * @return an half-edge which has point as its end-point
 	 */
-	default E splitTriangle(@NotNull F face, @NotNull final P point, boolean legalize) {
+	default E splitTriangle(@NotNull F face, @NotNull final IPoint point, boolean legalize) {
 		V p = getMesh().createVertex(point);
 		return splitTriangle(face, p, legalize);
 	}
@@ -1145,7 +1141,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		//assert isTriangle(face) && locateFace(point).get().equals(face);
 
 		getMesh().insertVertex(p);
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 
 		F xyp = mesh.createFace();
 		F yzp = mesh.createFace();
@@ -1218,12 +1214,12 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 * <p>Mesh changing method.</p>
 	 *
-	 * @param p         the point which splits the triangle
 	 * @param face      the triangle face we split
 	 *
+	 * @param p         the point which splits the triangle
 	 * @return a list of all newly created face.
 	 */
-	default E splitTriangle(@NotNull final F face, @NotNull final P p) {
+	default E splitTriangle(@NotNull final F face, @NotNull final IPoint p) {
 		return splitTriangle(face, p, true);
 	}
 
@@ -1509,7 +1505,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 		// this should be the same afterwards
 		//E halfEdge = getMesh().getNext(edge);
 
-		IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 		E startEdge = mesh.getPrev(edge);
 		E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
 		E currentEdge = mesh.getPrev(edge);
@@ -1643,7 +1639,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param startFace the face at which the search starts
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(@NotNull final P point, F startFace) {
+	default Optional<F> locateFace(@NotNull final IPoint point, F startFace) {
 		return locateFace(point.getX(), point.getY(), startFace);
 	}
 
@@ -1667,7 +1663,7 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	}
 
 	// TODO: still required?
-	default E walkThroughHole(@NotNull VPoint q, @NotNull VPoint p, @NotNull E enteringEdge) {
+	default E walkThroughHole(@NotNull final VPoint q, @NotNull final VPoint p, @NotNull final E enteringEdge) {
 		assert GeometryUtils.intersectLine(q, p, getMesh().getPoint(enteringEdge), getMesh().getPoint(getMesh().getPrev(enteringEdge)));
 		E next = getMesh().getNext(enteringEdge);
 
@@ -2806,9 +2802,9 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	default boolean isValid() {
 		Predicate<F> orientationPredicate = f -> {
 			E edge = getMesh().getEdge(f);
-			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
-			P p2 = getMesh().getPoint(edge);
-			P p3 = getMesh().getPoint(getMesh().getNext(edge));
+			IPoint p1 = getMesh().getPoint(getMesh().getPrev(edge));
+			IPoint p2 = getMesh().getPoint(edge);
+			IPoint p3 = getMesh().getPoint(getMesh().getNext(edge));
 			boolean valid = GeometryUtils.isLeftOf(p1, p2, p3);
 			if (!valid) {
 				log.info(p1 + ", " + p2 + ", " + p3);
@@ -2832,25 +2828,42 @@ public interface ITriConnectivity<P extends IPoint, CE, CF, V extends IVertex<P>
 	default boolean isValid(@NotNull final F face) {
 		Predicate<F> orientationPredicate = f -> {
 			E edge = getMesh().getEdge(f);
-			P p1 = getMesh().getPoint(getMesh().getPrev(edge));
-			P p2 = getMesh().getPoint(edge);
-			P p3 = getMesh().getPoint(getMesh().getNext(edge));
+			IPoint p1 = getMesh().getPoint(getMesh().getPrev(edge));
+			IPoint p2 = getMesh().getPoint(edge);
+			IPoint p3 = getMesh().getPoint(getMesh().getNext(edge));
 			return GeometryUtils.isLeftOf(p1, p2, p3);
 		};
 
 		return !getMesh().isBoundary(face) && orientationPredicate.test(face);
 	}
 
-	default P[] getPoints(@NotNull final E edge, @NotNull final Class<P> clazz) {
-		final P[] points = (P[]) Array.newInstance(clazz, 3);
+	default IPoint[] getPoints(@NotNull final E edge) {
+		final IPoint[] points = new IPoint[3];
 		points[0] = getMesh().getPoint(edge);
 		points[1] = getMesh().getPoint(getMesh().getNext(edge));
 		points[2] = getMesh().getPoint(getMesh().getPrev(edge));
 		return points;
 	}
 
-	default P[] getPoints(F face, Class<P> clazz) {
-		return getPoints(getMesh().getEdge(face), clazz);
+	default IPoint[] getPoints(F face) {
+		return getPoints(getMesh().getEdge(face));
+	}
+
+	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, @NotNull final String name){
+		assert x.length == y.length && y.length == z.length && x.length == 3;
+
+		E edge = getMesh().getEdge(face);
+		x[0] = getMesh().getX(getMesh().getVertex(edge));
+		y[0] = getMesh().getY(getMesh().getVertex(edge));
+		z[0] = getMesh().getData(getMesh().getVertex(edge), name, Double.class).get();
+
+		x[1] = getMesh().getX(getMesh().getVertex(getMesh().getNext(edge)));
+		y[1] = getMesh().getY(getMesh().getVertex(getMesh().getNext(edge)));
+		z[1] = getMesh().getData(getMesh().getVertex(getMesh().getNext(edge)), name, Double.class).get();
+
+		x[2] = getMesh().getX(getMesh().getVertex(getMesh().getPrev(edge)));
+		y[2] = getMesh().getY(getMesh().getVertex(getMesh().getPrev(edge)));
+		z[2] = getMesh().getData(getMesh().getVertex(getMesh().getPrev(edge)), name, Double.class).get();
 	}
 
 	/**

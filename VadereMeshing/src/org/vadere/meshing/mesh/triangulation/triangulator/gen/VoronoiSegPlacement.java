@@ -18,26 +18,23 @@ import java.util.function.Function;
  * Computes insertion points based on a Frontal-Delaunay strategy, that is
  * the point lies on the Voronoi segment of the corresponding Voronoi-diagram.
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class VoronoiSegPlacement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPlacementStrategy<P, CE, CF, V, E ,F> {
-	private IMesh<P, CE, CF, V, E, F> mesh;
+public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPlacementStrategy<V, E ,F> {
+	private IMesh<V, E, F> mesh;
 	private Function<IPoint, Double> circumRadiusFunc;
 
 	public VoronoiSegPlacement(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc) {
 		this.mesh = mesh;
 		this.circumRadiusFunc = circumRadiusFunc;
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 

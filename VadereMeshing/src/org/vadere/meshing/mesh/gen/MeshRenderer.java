@@ -7,7 +7,6 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -25,21 +24,18 @@ import java.util.function.Predicate;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	private static final Logger log = Logger.getLogger(MeshRenderer.class);
 
 	/**
 	 * The mesh which will be rendered.
 	 */
-	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IMesh<V, E, F> mesh;
 
 	/**
 	 * A {@link Collection} of {@link F} from the mesh.
@@ -77,14 +73,14 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	 * @param colorFunction color function coloring faces
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			@Nullable final Function<F, Color> colorFunction) {
 		this(mesh, alertPred, colorFunction, null);
 	}
 
 	public MeshRenderer(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			@Nullable final Function<F, Color> faceColorFunction,
 			@Nullable final Function<E, Color> edgeColorFunction) {
@@ -103,7 +99,7 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred) {
 		this(mesh, alertPred, null);
 	}
@@ -114,11 +110,11 @@ public class MeshRenderer<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 	 * @param mesh          the mesh which will be rendered
 	 */
 	public MeshRenderer(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
+			@NotNull final IMesh<V, E, F> mesh) {
 		this(mesh, f -> false, null);
 	}
 
-	public void setMesh(@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
+	public void setMesh(@NotNull final IMesh<V, E, F> mesh) {
 		this.mesh = mesh;
 	}
 

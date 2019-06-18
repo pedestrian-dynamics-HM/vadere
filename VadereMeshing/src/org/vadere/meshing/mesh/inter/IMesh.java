@@ -48,8 +48,8 @@ import java.util.stream.StreamSupport;
 
 /**
  * <p>
- * A {@link IMesh} is a set of {@link IFace}, their half-edges {@link IHalfEdge}, vertices {@link IVertex} and points {@link P}
- * defining a geometry. It also is a factory for those geometric base elements: points, vertices, half-edges and faces. The user should use one mesh
+ * A {@link IMesh} is a set of {@link IFace}, their half-edges {@link IHalfEdge} and vertices {@link IVertex}
+ * defining a geometry. It also is a factory for those geometric base elements: vertices, half-edges and faces. The user should use one mesh
  * for exactly one geometric and the user should never create any base element without calling its mesh. Furthermore, the user is responsible for the
  * correctness of the mesh definition e.g. no overlapping edges. There are some classes for automatic mesh generation like
  * {@link ITriangulator} or other factory methods like {@link IMesh#createSimpleTriMesh}
@@ -70,18 +70,12 @@ import java.util.stream.StreamSupport;
  * iterate over the list {@link List} while changing elements in the mesh. The mesh offers a large set of different iterators and streams to iterate over all neighbouring
  * faces of a face, vertices of a vertex, edges of a vertex or over all edges / vertices / points of a face.
  * </p>
- *     We define as base elements: points {@link P}, vertices {@link V}, half-edges {@link E} and faces {@link F}.
+ *     We define as base elements: vertices {@link V}, half-edges {@link E} and faces {@link F}.
  *     <ul>
  *         <li>
- *             point {@link P}:
- *                 A point is a container object which can be identified by its 2-D coordinates (x,y) and is part of a vertex {@link V}. A point has no reference to
- *                 any other base element of the mesh data structure.
- *         </li>
- *         <li>
  *             vertex {@link V}:
- *                  A vertex is the end node / point of a half-edge. Each vertex has exactly one distinct point {@link P}. One can access the point
- *                  of a vertex in O(1). A vertex has also a 1 to 1 relation to a half-edge and the half-edge of a vertex can accessed in O(1) time. Furthermore, it has
- *                  a reference to one arbitrary of its half-edges (half-edges ending in it). If the vertex is at the boundary (hole or border) the half-edge should be
+ *                  A vertex is the end node / point of a half-edge. A vertex has also a 1 to 1 relation to a half-edge and the half-edge of a vertex can accessed in O(1) time.
+ *                  Furthermore, it has a reference to one arbitrary of its half-edges (half-edges ending in it). If the vertex is at the boundary (hole or border) the half-edge should be
  *                  a boundary half-edge but this is not guaranteed but the aim is to have this situation as often as possible to have quick access to boundary half-edges
  *                  to quickly check if the vertex is a boundary vertex! Note that an arbitrary neighbouring face of the vertex can also be accessed in O(1) by fist getting
  *                  its half-edge and extracting from the half-edge the face.
@@ -107,21 +101,11 @@ import java.util.stream.StreamSupport;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IMesh<
-		P extends IPoint,
-		CE,
-		CF,
-		V extends IVertex<P>,
-		E extends IHalfEdge<CE>,
-		F extends IFace<CF>>
-			extends Iterable<F>, Cloneable {
+public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<F>, Cloneable {
 
 	Logger logger = Logger.getLogger(IMesh.class);
 
@@ -130,7 +114,7 @@ public interface IMesh<
 	 *
 	 * @return a new fresh empty mesh
 	 */
-	IMesh<P, CE, CF, V, E, F> construct();
+	IMesh<V, E, F> construct();
 
 	/**
 	 * Removes deleted base elements from this data structure.
@@ -183,13 +167,6 @@ public interface IMesh<
 	F getFace(@NotNull E halfEdge);
 
 	/**
-	 * Returns the point constructor of the mesh.
-	 *
-	 * @return the point constructor of the mesh.
-	 */
-	IPointConstructor<P> getPointConstructor();
-
-	/**
 	 * Returns the face which is not a boundary, i.e. no hole and no border
 	 * of the faces of a full-edge which the half-edge is part of in O(1).
 	 *
@@ -238,9 +215,10 @@ public interface IMesh<
 		return toPoint(getVertex(edge));
 	}
 
-	default VPoint toPoint(@NotNull P p) {
+	default VPoint toPoint(@NotNull IPoint p) {
 		return new VPoint(p.getX(), p.getY());
 	}
+
 
 
 	/**
@@ -250,6 +228,14 @@ public interface IMesh<
 	 * @return the half-edge of the vertex.
 	 */
 	E getEdge(@NotNull V vertex);
+
+	double getX(@NotNull V vertex);
+
+	double getY(@NotNull V vertex);
+
+	default void setCoords(@NotNull V vertex, double x, double y) {
+		throw new UnsupportedOperationException("not jet implemented");
+	}
 
 	/**
 	 * Returns a half-edge of the face this can be any half-edge of this face in O(1).
@@ -265,7 +251,7 @@ public interface IMesh<
 	 * @param halfEdge the half-edge
 	 * @return the (end-)point of the half-edge
 	 */
-	P getPoint(@NotNull E halfEdge);
+	IPoint getPoint(@NotNull E halfEdge);
 
 	/**
 	 * Returns the (end-)vertex of the half-edge in O(1).
@@ -313,43 +299,101 @@ public interface IMesh<
 	 * @param vertex the vertex
 	 * @return the point of vertex
 	 */
-	P getPoint(@NotNull V vertex);
+	IPoint getPoint(@NotNull V vertex);
+
+	default <CV> Optional<CV> getData(@NotNull final V vertex, @NotNull final String name, @NotNull final Class<CV> clazz) {
+		return Optional.empty();
+	}
+
+	default boolean getBooleanData(@NotNull final V vertex, @NotNull final String name) {
+		return getData(vertex, name, Boolean.class).or(null).get();
+	}
+
+	default double getDoubleData(@NotNull final V vertex, @NotNull final String name) {
+		return getData(vertex, name, Double.class).or(null).get();
+	}
+
+	<CV> void setData(@NotNull final V vertex, @NotNull final String name, CV data);
+
+	default void setBooleanData(@NotNull final V vertex, @NotNull final String name, boolean data) {
+		setData(vertex, name, data);
+	}
+
+	default void setDoubleData(@NotNull final V vertex, @NotNull final String name, double data) {
+		setData(vertex, name, data);
+	}
 
 	/**
 	 * Returns the data saved on the half-edge in O(1) if there is any and otherwise <tt>Optional.empty()</tt>.
 	 *
-	 * @param edge the half-edge
+	 * @param edge  the half-edge
+	 * @param name  name of the property
+	 * @param clazz type of the property
 	 * @return the data saved on the half-edge or <tt>Optional.empty()</tt> if there is no data saved
 	 */
-	default Optional<CE> getData(@NotNull E edge) {
+	default <CE> Optional<CE> getData(@NotNull E edge, @NotNull final String name, @NotNull final Class<CE> clazz) {
 		return Optional.empty();
+	}
+
+	default boolean getBooleanData(@NotNull E edge, @NotNull final String name) {
+		return getData(edge, name, Boolean.class).or(null).get();
+	}
+
+	default double getDoubleData(@NotNull E edge, @NotNull final String name) {
+		return getData(edge, name, Double.class).or(null).get();
 	}
 
 	/**
 	 * Sets the data for a specific half-edge in O(1).
 	 *
 	 * @param edge the half-edge
+	 * @param name of the property
 	 * @param data the data
 	 */
-	void setData(@NotNull E edge, @Nullable CE data);
+	<CE> void setData(@NotNull E edge, @NotNull final String name, @Nullable CE data);
+
+	default void setBooleanData(@NotNull E edge, @NotNull final String name, boolean data) {
+		setData(edge, name, data);
+	}
+
+	default void setDoubleData(@NotNull E edge, @NotNull final String name, double data) {
+		setData(edge, name, data);
+	}
 
 	/**
 	 * Returns the data saved on the face in O(1) if there is any and otherwise <tt>Optional.empty()</tt>
 	 *
 	 * @param face the face
+	 * @param clazz
 	 * @return the data saved on the face or <tt>Optional.empty()</tt> if there is no data saved
 	 */
-	default Optional<CF> getData(@NotNull F face) {
+	default <CF> Optional<CF> getData(@NotNull F face, @NotNull final String name, @NotNull final Class<CF> clazz) {
 		return Optional.empty();
+	}
+
+	default boolean getBooleanData(@NotNull F face, @NotNull final String name) {
+		return getData(face, name, Boolean.class).or(null).get();
+	}
+
+	default double getDoubleData(@NotNull F face, @NotNull final String name) {
+		return getData(face, name, Double.class).or(null).get();
 	}
 
 	/**
 	 * Sets the data for a specific face in O(1).
 	 *
-	 * @param edge the half-edge
+	 * @param face the face
 	 * @param data the data
 	 */
-	void setData(@NotNull F edge, @Nullable CF data);
+	<CF> void setData(@NotNull F face, @NotNull final String name, @Nullable final CF data);
+
+	default void setBooleanData(@NotNull F face, @NotNull final String name, final boolean data) {
+		setData(face, name, data);
+	}
+
+	default void setDoubleData(@NotNull F face, @NotNull final String name, final double data) {
+		setData(face, name, data);
+	}
 
 	/**
 	 * Returns the face of the twin of the half-edge, i.e. its twin face in O(1).
@@ -796,7 +840,7 @@ public interface IMesh<
 	 * @param y y-coordinate
 	 * @return a point.
 	 */
-	P createPoint(final double x, final double y);
+	IPoint createPoint(final double x, final double y);
 
 	/**
 	 * A factory method which creates a new vertex. The vertex will not be inserted into the mesh data
@@ -815,7 +859,7 @@ public interface IMesh<
 	 * @param point a container supporting 2D-coordinates
 	 * @return a vertex.
 	 */
-	V createVertex(@NotNull final P point);
+	V createVertex(@NotNull final IPoint point);
 
 	/**
 	 * Returns the border of the mesh in O(1).
@@ -846,7 +890,7 @@ public interface IMesh<
 	 * @param point the point
 	 * @return the vertex of the point
 	 */
-	default V insertPoint(final P point) {
+	default V insertPoint(final IPoint point) {
 		V vertex = createVertex(point);
 		insertVertex(vertex);
 		return vertex;
@@ -952,7 +996,7 @@ public interface IMesh<
 	 * @param points an array of points representing a simple polygon (non-intersecting)
 	 * @return a face
 	 */
-	default F toFace(@NotNull final P... points) {
+	default F toFace(@NotNull final IPoint... points) {
 		return createFace(Arrays.stream(points).map(p -> insertPoint(p)).collect(Collectors.toList()));
 	}
 
@@ -968,7 +1012,7 @@ public interface IMesh<
 	 * @param points a list {@link List} of points representing a simple polygon (non-intersecting)
 	 * @return a face
 	 */
-	default F toFace(@NotNull final List<P> points) {
+	default F toFace(@NotNull final List<IPoint> points) {
 		return createFace(points.stream().map(p -> insertPoint(p)).collect(Collectors.toList()));
 	}
 
@@ -1045,7 +1089,7 @@ public interface IMesh<
 	 *
 	 * @return a list {@link List} of all boundary points
 	 */
-	default List<P> getBoundaryPoints() {
+	default List<IPoint> getBoundaryPoints() {
 		return streamBoundaryEdges().map(e -> getPoint(e)).collect(Collectors.toList());
 	}
 
@@ -1055,11 +1099,10 @@ public interface IMesh<
 	 * this will re-position the vertex and may destroy a valid connectivity! So in
 	 * general this can only be done if the new point is contained in the convex hull
 	 * of the neighbouring vertices of the vertex.
-	 *
-	 * @param vertex    the vertex
+	 *  @param vertex    the vertex
 	 * @param point     its new point
 	 */
-	void setPoint(@NotNull final V vertex, @NotNull final P point);
+	void setPoint(@NotNull final V vertex, @NotNull final IPoint point);
 
 	/**
 	 * Returns a list {@link List} of all adjacent points of the vertex in O(d)
@@ -1068,10 +1111,10 @@ public interface IMesh<
 	 * @param vertex the vertex
 	 * @return a list {@link List} of all adjacent points of the vertex
 	 */
-	default List<P> getPoints(@NotNull final V vertex) {
-		List<P> points = new ArrayList<>();
+	default List<IPoint> getPoints(@NotNull final V vertex) {
+		List<IPoint> points = new ArrayList<>();
 		for(V v : getAdjacentVertexIt(vertex)) {
-			points.add(getPoint(v));
+			points.add(toPoint(v));
 		}
 
 		return points;
@@ -1138,7 +1181,7 @@ public interface IMesh<
 	 * @param predicate the predicate
 	 * @return (optional) returns a point of the mesh fulfilling the predicate
 	 */
-	default Optional<P> findAny(@NotNull final Predicate<P> predicate) {
+	default Optional<IPoint> findAny(@NotNull final Predicate<IPoint> predicate) {
 		return streamPoints().filter(predicate).findAny();
 	}
 
@@ -1149,7 +1192,7 @@ public interface IMesh<
 	 * @param predicate the predicate
 	 * @return (optional) returns a point of the mesh fulfilling the predicate
 	 */
-	default Optional<E> findAnyEdge(@NotNull final Predicate<P> predicate) {
+	default Optional<E> findAnyEdge(@NotNull final Predicate<IPoint> predicate) {
 		return streamEdges().filter(edge -> predicate.test(getPoint(edge))).findAny();
 	}
 
@@ -1159,7 +1202,7 @@ public interface IMesh<
  	 * @param predicate the predicate
 	 * @return true if there is any point inside the mesh fulfilling the predicate, false otherwise
 	 */
-	default boolean findMatch(@NotNull final Predicate<P> predicate) {
+	default boolean findMatch(@NotNull final Predicate<IPoint> predicate) {
 		return streamPoints().anyMatch(predicate);
 	}
 
@@ -1214,7 +1257,7 @@ public interface IMesh<
 	 *
 	 * @return a stream {@link Stream} of all points.
 	 */
-	default Stream<P> streamPoints() {
+	default Stream<IPoint> streamPoints() {
 		return streamVertices().map(v -> getPoint(v));
 	}
 
@@ -1224,7 +1267,7 @@ public interface IMesh<
 	 * @param face the specific face
 	 * @return a stream {@link Stream} of all points of a specific face.
 	 */
-	default Stream<P> streamPoints(@NotNull final F face) {
+	default Stream<IPoint> streamPoints(@NotNull final F face) {
 		return streamVertices(face).map(v -> getPoint(v));
 	}
 
@@ -1234,7 +1277,7 @@ public interface IMesh<
 	 *
 	 * @return a parallel stream {@link Stream} of all points.
 	 */
-	default Stream<P> streamPointsParallel() {
+	default Stream<IPoint> streamPointsParallel() {
 		return streamEdgesParallel().map(e -> getPoint(e));
 	}
 
@@ -1288,7 +1331,7 @@ public interface IMesh<
 	 * @param face the face.
 	 * @return a triple {@link Triple} representing the face
 	 */
-	default Triple<P, P, P> toTriple(@NotNull final F face) {
+	default Triple<IPoint, IPoint, IPoint> toTriple(@NotNull final F face) {
 		List<V> vertices = getVertices(face);
 		assert vertices.size() == 3;
 		return Triple.of(getPoint(vertices.get(0)), getPoint(vertices.get(1)), getPoint(vertices.get(2)));
@@ -1321,7 +1364,7 @@ public interface IMesh<
 	 * @param point         the point
 	 * @return vertex of the triangulation of the face with the smallest distance to point
 	 */
-	default V getNearestPoint(final F face, final P point) {
+	default V getNearestPoint(@NotNull final F face, @NotNull final IPoint point) {
 		return getNearestPoint(face, point.getX(), point.getY());
 	}
 
@@ -1428,7 +1471,7 @@ public interface IMesh<
 	 * @param face the face the iterable iterates over
 	 * @return an Iterable {@link Iterable} which can be used to iterate over all vertices of a face
 	 */
-	default Iterable<P> getPointIt(@NotNull final F face) {
+	default Iterable<IPoint> getPointIt(@NotNull final F face) {
 		return () -> new PointIterator<>(this, face);
 	}
 
@@ -1638,7 +1681,7 @@ public interface IMesh<
 	 *
 	 * @return a list {@link Collection} of all (alive) points
 	 */
-	default Collection<P> getPoints() {
+	default Collection<IPoint> getPoints() {
 		return streamVertices().map(vertex -> getPoint(vertex)).collect(Collectors.toList());
 	}
 
@@ -1668,7 +1711,7 @@ public interface IMesh<
 	 * @return a list {@link List} of all vertices of a face.
 	 */
 	default List<V> getVertices(@NotNull final F face) {
-		EdgeIterator<P, CE, CF, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
+		EdgeIterator<V, E, F> edgeIterator = new EdgeIterator<>(this, face);
 
 		List<V> vertices = new ArrayList<>();
 		while (edgeIterator.hasNext()) {
@@ -1685,10 +1728,10 @@ public interface IMesh<
 	 * @param face the face
 	 * @return a list {@link List} of all points of a face.
 	 */
-	default List<P> getPoints(@NotNull final F face) {
-		EdgeIterator<P, CE, CF, V, E, F> edgeIterator = new EdgeIterator<>(this, face);
+	default List<IPoint> getPoints(@NotNull final F face) {
+		EdgeIterator<V, E, F> edgeIterator = new EdgeIterator<>(this, face);
 
-		List<P> points = new ArrayList<>();
+		List<IPoint> points = new ArrayList<>();
 		while (edgeIterator.hasNext()) {
 			points.add(getPoint(edgeIterator.next()));
 		}
@@ -1709,11 +1752,11 @@ public interface IMesh<
 			return true;
 		}
 
-		P p11 = getPoint(e1);
-		P p12 = getPoint(getPrev(e1));
+		IPoint p11 = getPoint(e1);
+		IPoint p12 = getPoint(getPrev(e1));
 
-		P p21 = getPoint(e2);
-		P p22 = getPoint(getPrev(e2));
+		IPoint p21 = getPoint(e2);
+		IPoint p22 = getPoint(getPrev(e2));
 
 		return p11.equals(p21) && p12.equals(p22) || p11.equals(p22) && p12.equals(p21);
 	}
@@ -1820,17 +1863,6 @@ public interface IMesh<
 	 */
 	int getNumberOfEdges();
 
-	/**
-	 * Factory method to create a new pointer based mesh.
-	 *
-	 * @param pointConstructor  the required point constructor which will be used by the mesh to create new points.
-	 * @param <P>               the type of the points (containers)
-	 * @return a new pointer based mesh
-	 */
-	static <P extends IPoint> PMesh<P, ?, ?> createPMesh(@NotNull final IPointConstructor<P> pointConstructor) {
-		return new PMesh<>(pointConstructor);
-	}
-
 	// TODO duplcated code see getNearestPoint.
 	/**
 	 * Returns the closest (Euklidean distance) vertex of the face with respect to (x ,y) in
@@ -1916,7 +1948,7 @@ public interface IMesh<
 	 *
 	 * @return a deep clone of this mesh
 	 */
-	IMesh<P, CE, CF, V, E, F> clone();
+	IMesh<V, E, F> clone();
 
 	/**
 	 * Returns a rectangular bound containing all vertices of the mesh.
@@ -1934,7 +1966,7 @@ public interface IMesh<
 		double minY = Double.MAX_VALUE;
 		double maxY = Double.MIN_VALUE;
 
-		for(P p : getPoints()) {
+		for(IPoint p : getPoints()) {
 			minX = Math.min(minX, p.getX());
 			minY = Math.min(minY, p.getY());
 			maxX = Math.max(maxX, p.getX());
@@ -1953,7 +1985,7 @@ public interface IMesh<
 	 * @param type  specifies the used {@link IPointLocator}
 	 * @return a triangulation {@link IIncrementalTriangulation} of this mesh
 	 */
-	IIncrementalTriangulation<P, CE, CF, V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
+	IIncrementalTriangulation<V, E, F> toTriangulation(@NotNull final IPointLocator.Type type);
 
 	/**
 	 * Rearranges the memory location of faces, vertices and halfEdges of the mesh according to
@@ -2146,8 +2178,8 @@ public interface IMesh<
 	 * @param <E>   the type of the edge
 	 * @param <F>   the type of the face
 	 */
-	static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> void createSimpleTriMesh(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh
+	static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> void createSimpleTriMesh(
+			@NotNull final IMesh<V, E, F> mesh
 	) {
 		F face1;
 		F face2;
@@ -2230,7 +2262,7 @@ public interface IMesh<
 	 *
 	 * @return a string representing the mesh
 	 */
-	default String toPythonTriangulation(@NotNull final Function<P, Double> evalPoint) {
+	default String toPythonTriangulation(@NotNull final Function<V, Double> evalPoint) {
 		garbageCollection();
 		StringBuilder builder = new StringBuilder();
 		List<V> vertices = getVertices();
@@ -2257,7 +2289,7 @@ public interface IMesh<
 		// [z1, z2, ...] z = value
 		builder.append("z = [");
 		for(V v : vertices) {
-			builder.append(evalPoint.apply(getPoint(v)) + ",");
+			builder.append(evalPoint.apply(v) + ",");
 		}
 		builder.delete(builder.length()-1, builder.length());
 		builder.append("]\n");

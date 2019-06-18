@@ -19,23 +19,20 @@ import java.util.Map;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
-	private SFCNode<P, CE, CF, V, E, F> head;
-	private Map<E, SFCNode<P, CE, CF, V, E, F>> edgeToNode;
+public class GenSpaceFillingCurve<V extends IVertex, E extends IHalfEdge, F extends IFace> {
+	private SFCNode<V, E, F> head;
+	private Map<E, SFCNode<V, E, F>> edgeToNode;
 
 	public GenSpaceFillingCurve(){
 		head = null;
 		edgeToNode = new HashMap<>();
 	}
 
-	public void insertFirst(final SFCNode<P, CE, CF, V, E, F> node) {
+	public void insertFirst(final SFCNode<V, E, F> node) {
 		assert head == null;
 
 		if(head != null) {
@@ -54,16 +51,16 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param anchor    the replaced element
 	 */
 	public void replace(
-			@NotNull final SFCNode<P, CE, CF, V, E, F> left,
-			@NotNull final SFCNode<P, CE, CF, V, E, F> right,
-			@NotNull SFCNode<P, CE, CF, V, E, F> anchor) {
+			@NotNull final SFCNode<V, E, F> left,
+			@NotNull final SFCNode<V, E, F> right,
+			@NotNull SFCNode<V, E, F> anchor) {
 		assert asList().contains(anchor);
 		insertNext(right, anchor);
 		insertNext(left, anchor);
 		remove(anchor);
 	}
 
-	public SFCNode<P, CE, CF, V, E, F> getNode(@NotNull final E edge) {
+	public SFCNode<V, E, F> getNode(@NotNull final E edge) {
 		return edgeToNode.get(edge);
 	}
 
@@ -72,7 +69,7 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 	 *
 	 * @param anchor the element which will be removed
 	 */
-	public void remove(@NotNull final SFCNode<P, CE, CF, V, E, F> anchor) {
+	public void remove(@NotNull final SFCNode<V, E, F> anchor) {
 		assert asList().contains(anchor);
 
 		if(anchor == head) {
@@ -94,10 +91,10 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * @param node      the node
 	 * @param anchor    the anchor element
 	 */
-	public void insertNext(@NotNull final SFCNode<P, CE, CF, V, E, F> node, @NotNull SFCNode<P, CE, CF, V, E, F> anchor) {
+	public void insertNext(@NotNull final SFCNode<V, E, F> node, @NotNull SFCNode<V, E, F> anchor) {
 		assert asList().contains(anchor);
 
-		SFCNode<P, CE, CF, V, E, F> anchorNext = anchor.next;
+		SFCNode<V, E, F> anchorNext = anchor.next;
 		anchor.next = node;
 		node.prev = anchor;
 		node.next = anchorNext;
@@ -114,14 +111,14 @@ public class GenSpaceFillingCurve<P extends IPoint, CE, CF, V extends IVertex<P>
 	 * Returns the SFC as ordered <tt>List</tt>.
 	 * @return the whole SFC as in an ordered list
 	 */
-	public List<SFCNode<P, CE, CF, V, E, F>> asList() {
-		List<SFCNode<P, CE, CF, V, E, F>> list;
+	public List<SFCNode<V, E, F>> asList() {
+		List<SFCNode<V, E, F>> list;
 		if(head == null) {
 			list = Collections.EMPTY_LIST;
 		}
 		else {
 			list = new ArrayList<>();
-			SFCNode<P, CE, CF, V, E, F> node = head;
+			SFCNode<V, E, F> node = head;
 			while (node != null) {
 				list.add(node);
 				node = node.next;

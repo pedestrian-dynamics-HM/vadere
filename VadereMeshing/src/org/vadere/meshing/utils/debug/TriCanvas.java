@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  * @param <F> the type of the faces
  */
 public abstract class TriCanvas
-		<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+		<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
 		extends Canvas {
 
 	static final Logger log = Logger.getLogger(TriCanvas.class);
@@ -42,7 +42,7 @@ public abstract class TriCanvas
 	static final int defaultWidth = 1000;
 	static final int defaultHeight = 1000;
 
-	protected final IMesh<P, CE, CF, V, E, F> mesh;
+	protected final IMesh<V, E, F> mesh;
 	public double width;
 	public double height;
 	protected VRectangle bound;
@@ -53,15 +53,15 @@ public abstract class TriCanvas
 	private Consumer<StringBuilder> stateLog;
 
 
-	public TriCanvas(final IMesh<P, CE, CF, V, E, F> mesh) {
+	public TriCanvas(final IMesh<V, E, F> mesh) {
 		this(mesh, defaultWidth, defaultHeight, defaultBound);
 	}
 
-	public TriCanvas(final IMesh<P, CE, CF, V, E, F> mesh, final double width, final double height) {
+	public TriCanvas(final IMesh<V, E, F> mesh, final double width, final double height) {
 		this(mesh, width, height, defaultBound);
 	}
 
-	public TriCanvas(final IMesh<P, CE, CF, V, E, F> mesh, final double width, final double height, final VRectangle bound) {
+	public TriCanvas(final IMesh<V, E, F> mesh, final double width, final double height, final VRectangle bound) {
 		this.width = width;
 		this.height = height;
 		this.bound = bound;
@@ -154,7 +154,7 @@ public abstract class TriCanvas
 		stateLog = c;
 	}
 
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 

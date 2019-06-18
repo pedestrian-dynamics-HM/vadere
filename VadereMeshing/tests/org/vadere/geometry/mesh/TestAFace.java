@@ -7,7 +7,6 @@ import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,23 +23,23 @@ public class TestAFace {
      * Building a geometry containing 2 triangles
      * xyz and wyx
      */
-    private IMesh<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> mesh;
+    private IMesh<AVertex, AHalfEdge, AFace> mesh;
     private AFace face1;
     private AFace face2;
     private AFace border;
-    private AVertex<VPoint> x, y, z, w;
-    private AHalfEdge<Object> zx ;
-    private AHalfEdge<Object> xy;
-    private AHalfEdge<Object> yz;
+    private AVertex x, y, z, w;
+    private AHalfEdge zx ;
+    private AHalfEdge xy;
+    private AHalfEdge yz;
 
-    private AHalfEdge<Object> wx;
-    private AHalfEdge<Object> xz;
-    private AHalfEdge<Object> yw;
-    private AHalfEdge<Object> zy;
+    private AHalfEdge wx;
+    private AHalfEdge xz;
+    private AHalfEdge yw;
+    private AHalfEdge zy;
 
     @Before
     public void setUp() throws Exception {
-        mesh = new AMesh<>((x, y) -> new VPoint(x, y));
+        mesh = new AMesh();
         border = mesh.createFace(true);
 
         // first triangle xyz
@@ -103,7 +102,7 @@ public class TestAFace {
     @Test
     public void testFaceIterator() {
         mesh.getAdjacentFacesIt(xy);
-        List<AFace<Object>> incidentFaces = mesh.getAdjacentFaces(xy);;
+        List<AFace> incidentFaces = mesh.getAdjacentFaces(xy);;
         assertEquals(incidentFaces.size(), 3);
     }
 
@@ -120,9 +119,9 @@ public class TestAFace {
 
     @Test
     public void testEdgeIterator() {
-        List<AVertex<VPoint>> adjacentVertices = mesh.getAdjacentVertices(zx);
-        Set<AVertex<VPoint>> neighbours = new HashSet<>(adjacentVertices);
-        Set<AVertex<VPoint>> expectedNeighbours = new HashSet<>();
+        List<AVertex> adjacentVertices = mesh.getAdjacentVertices(zx);
+        Set<AVertex> neighbours = new HashSet<>(adjacentVertices);
+        Set<AVertex> expectedNeighbours = new HashSet<>();
         expectedNeighbours.add(z);
         expectedNeighbours.add(y);
         expectedNeighbours.add(w);

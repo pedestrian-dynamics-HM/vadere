@@ -39,6 +39,14 @@ public class GeometryUtils {
 
 	public static final Logger log = Logger.getLogger(GeometryUtils.class);
 
+	public static double lengthSq(double x, double y) {
+		return x*x + y*y;
+	}
+
+	public static double length(double x, double y) {
+		return Math.sqrt(lengthSq(x, y));
+	}
+
 	/**
 	 * Interpolates between start and end with the given factor i.e. two values at once.
 	 *
@@ -922,6 +930,19 @@ public class GeometryUtils {
 		return result / 2.0;
 	}
 
+	public static double signedAreaOfPolygon(@NotNull final double x[], @NotNull final double y[]) {
+		assert x.length == y.length;
+		double result = 0;
+		if(x.length >= 3) {
+			for (int i = 0; i < x.length - 1; i++) {
+				result += x[i] * y[i + 1] - x[i + 1] * y[i];
+			}
+			int n = x.length - 1;
+			result += x[n] * y[0] - x[0] * y[n];
+		}
+		return result / 2.0;
+	}
+
 	public static double signedAreaOfPolygon(@NotNull final IPoint... vertices) {
 		double result = 0;
 		if(vertices.length >= 3) {
@@ -932,6 +953,10 @@ public class GeometryUtils {
 			result += vertices[n].getX() * vertices[0].getY() - vertices[0].getX() * vertices[n].getY();
 		}
 		return result / 2.0;
+	}
+
+	public static double areaOfPolygon(@NotNull final double x[], @NotNull final double y[]){
+		return Math.abs(signedAreaOfPolygon(x, y));
 	}
 
 	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices){

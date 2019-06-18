@@ -33,28 +33,23 @@ import java.util.stream.Stream;
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
 @Deprecated
-public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
+public class BowyerWatsonSlow implements ITriangulation {
 
 	/**
 	 * a {@link List} of triples {@link Triple} each defining a triangle.
 	 */
-    private List<Triple<P, P, P>> triangles;
+    private List<Triple<IPoint, IPoint, IPoint>> triangles;
 
 	/**
 	 * a {@link Collection} containing all points of the triangulation.
 	 */
-	private Collection<P> points;
+	private Collection<IPoint> points;
 
 	/**
 	 * the so called virtual points i.e. points that are not part of the actual triangulation but
 	 * help by constructing it.
 	 */
-    private List<P> virtualPoints;
-
-	/**
-	 * the point constructor which is required to construct additional helper points, i.e. the virtual points.
-	 */
-	private final IPointConstructor<P> pointConstructor;
+    private List<IPoint> virtualPoints;
 
 	/**
 	 * indicates if the computation has been executed.
@@ -63,14 +58,16 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 
 	/**
 	 * The default constructor.
+	 *  @param points            a {@link Collections} of points which will be part of the Delaunay triangulation
 	 *
-	 * @param points            a {@link Collections} of points which will be part of the Delaunay triangulation
-	 * @param pointConstructor  a point constructor to create additional helper points.
 	 */
-    public BowyerWatsonSlow(final Collection<P> points, final IPointConstructor<P> pointConstructor) {
+    public BowyerWatsonSlow(final Collection<IPoint> points) {
         this.points = points;
-	    this.pointConstructor = pointConstructor;
 	    this.finished = false;
+    }
+
+    private VPoint create(final double x, final double y) {
+    	return new VPoint(x, y);
     }
 
 	/**
@@ -78,10 +75,10 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 	 */
 	public void execute() {
 		// construct a new point which is upper right point of all points
-	    P max = points.parallelStream().reduce(pointConstructor.create(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> pointConstructor.create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
+	    IPoint max = points.parallelStream().reduce(create(Double.MIN_VALUE,Double.MIN_VALUE), (a, b) -> create(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY())));
 
 	    // construct a new point which is lower left of all points.
-	    P min = points.parallelStream().reduce(pointConstructor.create(Double.MAX_VALUE,Double.MAX_VALUE), (a, b) -> pointConstructor.create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
+	    IPoint min = points.parallelStream().reduce(create(Double.MAX_VALUE,Double.MAX_VALUE), (a, b) -> create(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY())));
 
 	    // construct a bound containing all points by using the upper right and lower left point.
 	    VRectangle bound = new VRectangle(min.getX(), min.getY(), max.getX()-min.getX(), max.getY()- min.getY());
@@ -115,29 +112,29 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 	private void init(final VRectangle bound) {
 		triangles = new ArrayList<>();
 		virtualPoints = new ArrayList<>();
-		Triple<P, P, P> superTriangle = getSuperTriangle(bound);
+		Triple<IPoint, IPoint, IPoint> superTriangle = getSuperTriangle(bound);
 		triangles.add(superTriangle);
 		virtualPoints.add(superTriangle.getLeft());
 		virtualPoints.add(superTriangle.getMiddle());
 		virtualPoints.add(superTriangle.getRight());
 	}
 
-    private Triple<P, P, P> getSuperTriangle(final VRectangle bound) {
+    private Triple<IPoint, IPoint, IPoint> getSuperTriangle(final VRectangle bound) {
         double gap = 1.0;
         double max = Math.max(bound.getWidth(), bound.getHeight());
-        P p1 = pointConstructor.create(bound.getX() - max - gap, bound.getY() - gap);
-        P p2 = pointConstructor.create(bound.getX() + 2 * max + gap, bound.getY() - gap);
-        P p3 = pointConstructor.create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max+ gap);
+        IPoint p1 = create(bound.getX() - max - gap, bound.getY() - gap);
+        IPoint p2 = create(bound.getX() + 2 * max + gap, bound.getY() - gap);
+        IPoint p3 = create(bound.getX() + (max+2*gap)/2, bound.getY() + 2 * max+ gap);
         return ImmutableTriple.of(p1, p2, p3);
     }
 
-    private void insert(final P point) {
+    private void insert(final IPoint point) {
         HashSet<Line> edges = new HashSet<>();
 
 	    // This is way to expensive O(n) instead of O(log(n))
-        Map<Boolean, List<Triple<P, P, P>>> partition = triangles.parallelStream().collect(Collectors.partitioningBy(t -> pointsToTriangle(t).isInCircumscribedCycle(point)));
+        Map<Boolean, List<Triple<IPoint, IPoint, IPoint>>> partition = triangles.parallelStream().collect(Collectors.partitioningBy(t -> pointsToTriangle(t).isInCircumscribedCycle(point)));
 
-	    List<Triple<P, P, P>> badTriangles = partition.get(true);
+	    List<Triple<IPoint, IPoint, IPoint>> badTriangles = partition.get(true);
         triangles = partition.get(false);
         IntStream s;
 
@@ -157,7 +154,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
     }
 
 
-    private List<Line> getEdges(Triple<P, P, P> triangle) {
+    private List<Line> getEdges(Triple<IPoint, IPoint, IPoint> triangle) {
 	    List<Line> list = new ArrayList<>();
 	    list.add(new Line(triangle.getLeft(), triangle.getMiddle()));
 	    list.add(new Line(triangle.getMiddle(), triangle.getRight()));
@@ -169,7 +166,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
         triangles = triangles.stream().filter(triangle -> !isTriangleConnectedToInitialPoints(triangle)).collect(Collectors.toList());
     }
 
-    private boolean isTriangleConnectedToInitialPoints(final Triple<P, P, P> trianglePoints) {
+    private boolean isTriangleConnectedToInitialPoints(final Triple<IPoint, IPoint, IPoint> trianglePoints) {
         return Stream.of(pointsToTriangle(trianglePoints).getLines()).anyMatch(edge -> {
             VPoint p1 = new VPoint(edge.getP1().getX(), edge.getP1().getY());
             VPoint p2 = new VPoint(edge.getP2().getX(), edge.getP2().getY());
@@ -177,7 +174,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
         });
     }
 
-    private VTriangle pointsToTriangle(Triple<P, P, P> points) {
+    private VTriangle pointsToTriangle(Triple<IPoint, IPoint, IPoint> points) {
 	    return new VTriangle(
 			    new VPoint(points.getLeft().getX(), points.getLeft().getY()),
 			    new VPoint(points.getMiddle().getX(), points.getMiddle().getY()),
@@ -185,7 +182,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
     }
 
 	@Override
-	public Stream<Triple<P, P, P>> streamTriples() {
+	public Stream<Triple<IPoint, IPoint, IPoint>> streamTriples() {
 		if(!finished) {
 			execute();
 		}
@@ -193,7 +190,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 	}
 
 	@Override
-	public Stream<P> streamPoints() {
+	public Stream<IPoint> streamPoints() {
 		if(!finished) {
 			execute();
 		}
@@ -201,10 +198,10 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 	}
 
 	private class Line {
-		final P p1;
-		final P p2;
+		final IPoint p1;
+		final IPoint p2;
 
-		private Line(P p1,  P p2) {
+		private Line(IPoint p1, IPoint p2) {
 			this.p1 = p1;
 			this.p2 = p2;
 		}
@@ -239,7 +236,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
         int width = 1000;
         int max = Math.max(height, width);
 
-        Set<VPoint> points = new HashSet<>();
+        Set<IPoint> points = new HashSet<>();
 		/*points.add(new VPoint(20,20));
 		points.add(new VPoint(20,40));
 		points.add(new VPoint(75,53));
@@ -251,7 +248,7 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
             points.add(point);
         }
 
-        BowyerWatsonSlow<VPoint> bw = new BowyerWatsonSlow<>(points, (x, y) -> new VPoint(x, y));
+        BowyerWatsonSlow bw = new BowyerWatsonSlow(points);
         bw.execute();
         Set<VLine> edges = bw.getEdges();
 
@@ -264,10 +261,10 @@ public class BowyerWatsonSlow<P extends IPoint> implements ITriangulation<P> {
 
     private static class Lines extends JComponent{
         private Set<VLine> edges;
-        private Set<VPoint> points;
+        private Set<IPoint> points;
         private final int max;
 
-        public Lines(final Set<VLine> edges, final Set<VPoint> points, final int max){
+        public Lines(final Set<VLine> edges, final Set<IPoint> points, final int max){
             this.edges = edges;
             this.points = points;
             this.max = max;

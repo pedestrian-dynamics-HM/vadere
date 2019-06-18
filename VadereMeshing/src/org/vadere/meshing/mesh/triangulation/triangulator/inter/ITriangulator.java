@@ -12,7 +12,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * <p>A triangulator i.e. a triangle generator creates a triangulation using a certain strategy.
@@ -21,25 +20,22 @@ import java.util.Set;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface ITriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public interface ITriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	/**
 	 * <p>Returns the generated triangulation.</p>
 	 *
 	 * @return the generated triangulation
 	 */
-	default IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+	default IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
 	}
 
-	IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation();
+	IIncrementalTriangulation<V, E, F> getTriangulation();
 
 	/**
 	 * <p>Returns the generated triangulation.</p>
@@ -48,9 +44,9 @@ public interface ITriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E
 	 *                 and triangles inside holes.
 	 * @return the generated triangulation
 	 */
-	IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize);
+	IIncrementalTriangulation<V, E, F> generate(boolean finalize);
 
-	IMesh<P, CE, CF, V, E, F> getMesh();
+	IMesh<V, E, F> getMesh();
 
 	//TODO this should be in an abstract class and it might be slow!
 	default void split(@NotNull final E segment, @NotNull final Collection<E> segments) {

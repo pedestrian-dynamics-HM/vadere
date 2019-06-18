@@ -11,7 +11,6 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -89,8 +88,8 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	}
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> getDiscretization() {
-		Map<Integer, IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?>> clone = new HashMap<>();
+	public Function<Agent, IMesh<?, ?, ?>> getDiscretization() {
+		Map<Integer, IMesh<?, ?, ?>> clone = new HashMap<>();
 
 		for(Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
 			Integer targetId = entry.getKey();

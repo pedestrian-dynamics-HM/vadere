@@ -31,7 +31,7 @@ import javax.swing.*;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class DebugGui<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public class DebugGui<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	private static DebugGui instance;
 	private final Object o;
@@ -91,7 +91,7 @@ public class DebugGui<P extends IPoint, CE, CF, V extends IVertex<P>, E extends 
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
 	void forceShowAndWait(TriCanvas<P, CE, CF, V, E, F> canvas) {
 		setDebugOn(true);
 		showAndWait(canvas);
@@ -109,7 +109,7 @@ public class DebugGui<P extends IPoint, CE, CF, V extends IVertex<P>, E extends 
 	 * @param <E> the type of the half-edges
 	 * @param <F> the type of the faces
 	 */
-	public static <P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
 	void showAndWait(TriCanvas<P, CE, CF, V, E, F> canvas) {
 		if (isDebugOn()) {
 			get().updateGui(canvas);

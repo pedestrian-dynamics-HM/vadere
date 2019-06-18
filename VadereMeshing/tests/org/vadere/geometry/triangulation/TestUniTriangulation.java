@@ -43,10 +43,10 @@ public class TestUniTriangulation extends JFrame {
 	    IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 
 	    // a mesh supplier for a default mesh
-	    IMeshSupplier<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 
 	    // the mesh refinement triangulator
-        GenUniformRefinementTriangulatorSFC<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> uniformRefinementTriangulation =
+        GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation =
                 new GenUniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.15, distanceFunc);
 
         // to measure the time consumption
@@ -55,9 +55,9 @@ public class TestUniTriangulation extends JFrame {
 	    /*
 	     * GUI-Code
 	     */
-	    IIncrementalTriangulation<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> triangulation = uniformRefinementTriangulation.init();
-	    Function<AFace<Object>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
-        MeshPanel<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> meshPanel =
+	    IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = uniformRefinementTriangulation.init();
+	    Function<AFace, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
+        MeshPanel<AVertex, AHalfEdge, AFace> meshPanel =
                 new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

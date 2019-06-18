@@ -8,13 +8,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * TODO: remove all object references!
+ *
  * An array-based implementation of {@link IVertex}.
  *
- * @param <P> the type of the points (containers)
  *
  * @author Benedikt Zoennchen
  */
-public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
+public class AVertex implements IVertex, Cloneable {
 
 	/**
 	 * A lock for flipping edges in parallel
@@ -24,7 +25,7 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	/**
 	 * The point of the vertex
 	 */
-    private P point;
+    private IPoint point;
 
 	/**
 	 * The array-index of the down vertex. This is only required by if one uses the {@link DelaunayHierarchy} as the
@@ -53,19 +54,19 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	 * @param id        the array-index of this vertex
 	 * @param point     the point / container of this vertex
 	 */
-	public AVertex(@NotNull final int id, @NotNull final P point) {
+	public AVertex(final int id, final IPoint point) {
 		this.point = point;
 		this.id = id;
 		this.lock = new ReentrantLock();
 		this.destroyed = false;
 	}
 
-	protected void setPoint(@NotNull final P point) {
+	protected void setPoint(@NotNull final IPoint point) {
 		this.point = point;
 	}
 
 	@Override
-	public P getPoint() {
+	public IPoint getPoint() {
 		return point;
 	}
 
@@ -96,7 +97,7 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	 *
 	 * @param id the new array-index of this face
 	 */
-	void setId(@NotNull final int id) {
+	void setId(final int id) {
 		this.id = id;
 	}
 
@@ -109,7 +110,7 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 		destroyed = true;
 	}
 
-	public Lock getLock() {
+	Lock getLock() {
 		return lock;
 	}
 
@@ -139,10 +140,10 @@ public class AVertex<P extends IPoint> implements IVertex<P>, Cloneable {
 	}
 
 	@Override
-    public AVertex<P> clone() {
+    public AVertex clone() {
         try {
-            AVertex<P> clone = (AVertex<P>)super.clone();
-            clone.point = (P)point.clone();
+            AVertex clone = (AVertex)super.clone();
+            clone.point = point.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());

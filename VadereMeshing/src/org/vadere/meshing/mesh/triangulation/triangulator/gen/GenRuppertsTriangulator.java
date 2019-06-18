@@ -38,21 +38,18 @@ import java.util.function.Supplier;
  *
  * @author Benedikt Zonnchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F>, ITriEventListener<P, CE, CF, V, E, F> {
+public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITriangulator<V, E, F>, ITriEventListener<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(GenRuppertsTriangulator.class);
 
 	/**
 	 * A triangulator for generating the constrained Delaunay triangulation
 	 */
-	private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
+	private final GenConstrainedDelaunayTriangulator<V, E, F> cdt;
 
 	/**
 	 * The (segment bounded) planar straight line graph which will be triangulated.
@@ -82,7 +79,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	/**
 	 * The triangulation which will be constructed.
  	 */
-	private IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+	private IIncrementalTriangulation<V, E, F> triangulation;
 
 	/**
 	 * The minimal angle (in degree) Ruppert's algorithm should achieve, i.e. after termination no
@@ -107,7 +104,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	/**
 	 * A placement strategy which determines the position insertion points.
 	 */
-	private IPlacementStrategy<P, CE, CF, V, E, F> placementStrategy;
+	private IPlacementStrategy<V, E, F> placementStrategy;
 
 
 	private LinkedList<E> encroachedSegements;
@@ -123,7 +120,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -132,7 +129,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -160,7 +157,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<P, CE, CF, V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg) {
 		this(meshSupplier, pslg, MIN_ANGLE_TO_TERMINATE, p -> Double.POSITIVE_INFINITY, true);
 	}
@@ -174,7 +171,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return cdt.getMesh();
 	}
 
@@ -207,7 +204,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 					else if(isLarge(face)) {
 						addLargeTriangle(face);
 					}
-				} else { // (4.2) else insert the point (and update data structure)
+				} else { // (4.2) else insertVertex the point (and update data structure)
 					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 					E e = triangulation.insert(circumCenter.getX(), circumCenter.getY());
 					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
@@ -427,12 +424,12 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
     @Override
-    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+    public IIncrementalTriangulation<V, E, F> generate() {
 	   return generate(true);
     }
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		while (!isFinished()) {
 			step();
 		}
@@ -440,7 +437,7 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
@@ -499,14 +496,14 @@ public class GenRuppertsTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	    VPoint midPoint = line.midPoint();
 	    VCircle diameterCircle = new VCircle(midPoint, midPoint.distance(line.getX1(), line.getY1()));
 
-	    P p1 = getMesh().getPoint(getMesh().getNext(seg));
+	    IPoint p1 = getMesh().getPoint(getMesh().getNext(seg));
 
 	    if(diameterCircle.getCenter().distance(p1) < diameterCircle.getRadius()) {
 		    return true;
 	    }
 
 	    if(!getMesh().isAtBoundary(seg)) {
-		    P p2 = getMesh().getPoint(getMesh().getNext(getMesh().getTwin(seg)));
+		    IPoint p2 = getMesh().getPoint(getMesh().getNext(getMesh().getTwin(seg)));
 		    if((diameterCircle.getCenter().distance(p2) < diameterCircle.getRadius())) {
 			    return true;
 		    }

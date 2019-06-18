@@ -1,14 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.APMesh;
-import org.vadere.meshing.mesh.impl.VPMesh;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -21,7 +13,7 @@ import java.util.Collection;
 /**
  * @author Benedikt Zoennchen
  */
-public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
+public class PEikMesh extends PEikMeshGen {
 
     public PEikMesh(
             @NotNull IDistanceFunction distanceFunc,
@@ -30,8 +22,8 @@ public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
             @NotNull VRectangle bound,
             @NotNull Collection<? extends VShape> obstacleShapes) {
 
-    	super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes,
-			    (x, y) -> new EikMeshPoint(x, y, false));
+    	super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes
+	    );
     }
 
 	public PEikMesh(
@@ -40,8 +32,8 @@ public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound,
-				(x, y) -> new EikMeshPoint(x, y, false));
+		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound
+		);
 	}
 
 	public PEikMesh(
@@ -49,15 +41,15 @@ public class PEikMesh extends PEikMeshGen<EikMeshPoint, Object, Object> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(distanceFunc, e -> initialEdgeLen, initialEdgeLen, bound,
-				(x, y) -> new EikMeshPoint(x, y, false));
+		super(distanceFunc, e -> initialEdgeLen, initialEdgeLen, bound
+		);
 	}
 
 	public PEikMesh(
 			@NotNull VPolygon polygon,
 			double initialEdgeLen,
 			@NotNull Collection<? extends VShape> obstacleShapes) {
-		super(polygon, initialEdgeLen, obstacleShapes,
-				(x, y) -> new EikMeshPoint(x, y, false));
+		super(polygon, initialEdgeLen, obstacleShapes
+		);
 	}
 }

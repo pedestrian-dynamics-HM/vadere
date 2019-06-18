@@ -1,22 +1,16 @@
 package org.vadere.meshing.mesh.triangulation;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PMeshSuppliert;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
-import org.vadere.util.geometry.Geometry;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.InterpolationUtil;
 
-import java.util.PriorityQueue;
 import java.util.function.Function;
 
 /**
@@ -32,12 +26,13 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 
+	static final String propName = "edgeLength";
+
 	static IEdgeLengthFunction createLFS(@NotNull final PSLG pslg) {
 		double g = 2.0;
 		IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
-		var ruppertsTriangulator = new PRuppertsTriangulator<>(
+		var ruppertsTriangulator = new PRuppertsTriangulator(
 				pslg,
-				pointConstructor,
 				10
 		);
 
@@ -50,11 +45,16 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 				return Double.POSITIVE_INFINITY;
 			}
 			else {
-				var edge = mesh.getEdge(face);
-				DataPoint<Double> p1 = mesh.getPoint(edge);
-				DataPoint<Double> p2 = mesh.getPoint(mesh.getNext(edge));
-				DataPoint<Double> p3 = mesh.getPoint(mesh.getPrev(edge));
-				return InterpolationUtil.barycentricInterpolation(p1, p2, p3, dataPoint -> dataPoint.getData(), p.getX(), p.getY());
+				//TODO dulicated code see EdgeLengthFunction
+				double x[] = new double[3];
+				double y[] = new double[3];
+				double z[] = new double[3];
+
+				triangulation.getTriPoints(face, x, y, z, propName);
+
+				double totalArea = GeometryUtils.areaOfPolygon(x, y);
+
+				return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
 			}
 		};
 		return edgeLengthFunction;

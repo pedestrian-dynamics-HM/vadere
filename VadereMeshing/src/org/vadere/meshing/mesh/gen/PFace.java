@@ -1,43 +1,35 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * A Face is a region of a planar separation of the 2-D space, e.g. the region of a Polygon/Triangle and so on.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the coordinates the face uses.
  */
-public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
+public class PFace implements IFace, Cloneable {
 
 	private static int MAX_FACE_PRINT_LEN = 100000;
 
 	/**
 	 * One of the half-edges bordering this face.
 	 */
-	private PHalfEdge<P, CE, CF> edge;
+	private PHalfEdge edge;
 
 	private boolean boundary;
 
 	private boolean destroyed = false;
 
-	private @Nullable CF data;
-
 	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
-	 *
-	 * @param edge one of the half-edges bordering this face.
+	 *  @param edge one of the half-edges bordering this face.
 	 * @param boundary indicates if this edge is a boundary (border or hole) edge
-	 * @param data the data associated and accessible via this face (possibly <tt>null</tt>)
 	 */
-	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge, final boolean boundary, @Nullable final CF data) {
+	protected PFace(@NotNull final PHalfEdge edge, final boolean boundary) {
 		this.boundary = boundary;
 		this.edge = edge;
-		this.data = data;
 	}
 
 	/**
@@ -46,12 +38,8 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 	 *
 	 * @param edge one of the half-edges bordering this face.
 	 */
-	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge) {
-		this(edge, false, null);
-	}
-
-	protected PFace(@NotNull final PHalfEdge<P, CE, CF> edge, boolean boundary) {
-		this(edge, boundary, null);
+	protected PFace(@NotNull final PHalfEdge edge) {
+		this(edge, false);
 	}
 
 	/**
@@ -84,11 +72,11 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 	 *
 	 * @param edge half-edge bordering this face
 	 */
-	void setEdge(final PHalfEdge<P, CE, CF> edge) {
+	void setEdge(final PHalfEdge edge) {
 		this.edge = edge;
 	}
 
-	PHalfEdge<P, CE, CF> getEdge() {
+	PHalfEdge getEdge() {
 		return edge;
 	}
 
@@ -96,22 +84,13 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 		return destroyed;
 	}
 
-	@Nullable
-	CF getData() {
-		return data;
-	}
-
-	void setData(@Nullable final CF data) {
-		this.data = data;
-	}
-
 	@Override
 	public String toString() {
 		if(destroyed) {
 			return "destroyed Face";
 		}
-		PHalfEdge<P, CE, CF> current = edge;
-		PHalfEdge<P, CE, CF> next = edge.getNext();
+		PHalfEdge current = edge;
+		PHalfEdge next = edge.getNext();
 		StringBuilder builder = new StringBuilder();
 		int count = 0;
 		while (count <= MAX_FACE_PRINT_LEN && !edge.equals(next)) {
@@ -133,9 +112,9 @@ public class PFace<P extends IPoint, CE, CF> implements IFace<CF>, Cloneable {
 	 * @throws CloneNotSupportedException if the method is not jet implemented.
 	 */
 	@Override
-	protected PFace<P, CE, CF> clone() throws CloneNotSupportedException {
+	protected PFace clone() throws CloneNotSupportedException {
 		try {
-			PFace<P, CE, CF> clone = (PFace<P, CE, CF>)super.clone();
+			PFace clone = (PFace)super.clone();
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e.getMessage());

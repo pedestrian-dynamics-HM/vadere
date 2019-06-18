@@ -13,15 +13,15 @@ import org.vadere.util.geometry.shapes.VLine;
 
 import java.util.LinkedList;
 
-public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
+public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
 
-	private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private final IEdgeLengthFunction edgeLengthFunction;
 	private boolean finished;
 	private boolean refined;
 
 	public GenRivaraRefinement(
-			@NotNull final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation,
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final IEdgeLengthFunction edgeLengthFunction
 			) {
 		this.triangulation = triangulation;
@@ -30,12 +30,12 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+	public IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!finished) {
 			do {
 				refined = false;
@@ -51,7 +51,7 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
@@ -75,7 +75,7 @@ public class GenRivaraRefinement<P extends IPoint, CE, CF, V extends IVertex<P>,
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 

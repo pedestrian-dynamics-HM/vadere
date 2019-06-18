@@ -13,7 +13,6 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -156,8 +155,8 @@ public interface IPotentialField {
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PEikMeshGen<PotentialPoint, Double, Object> meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes, (x, y) -> new PotentialPoint(x ,y));
-	        IIncrementalTriangulation<PotentialPoint, Double, Object, PVertex<PotentialPoint, Double, Object>, PHalfEdge<PotentialPoint, Double, Object>, PFace<PotentialPoint, Double, Object>> triangulation = meshGenerator.generate();
+	        PEikMeshGen meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
+	        IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 			        attributesPotential.getTimeCostAttributes(),
@@ -168,10 +167,10 @@ public interface IPotentialField {
 			        1.0 / attributesPotential.getPotentialFieldResolution());
 
 	        // TODO: here we assume the shapes are convex!
-	        List<PVertex<PotentialPoint, Double, Object>> targetVertices = new ArrayList<>();
+	        List<PVertex> targetVertices = new ArrayList<>();
 	        for(VShape shape : targetShapes) {
 	        	VPoint point = shape.getCentroid();
-	        	PFace<PotentialPoint, Double, Object> targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
+	        	PFace targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
 				targetVertices.addAll(triangulation.getMesh().getVertices(targetFace));
 	        }
 

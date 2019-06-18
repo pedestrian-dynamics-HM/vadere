@@ -19,16 +19,13 @@ import java.util.Random;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenRandomPointsSetTriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITriangulator<V, E, F> {
 
-    private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+    private final IIncrementalTriangulation<V, E, F> triangulation;
     private final int numberOfPoints;
     private Random random;
     private final VRectangle bound;
@@ -45,7 +42,7 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	 *                          no point should be inserted and negative elsewhere.
 	 * @param random            a pseudo random number generator
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
 	                                      @NotNull final int numberOfPoints,
 	                                      @NotNull final VRectangle bound,
 	                                      @NotNull final IDistanceFunction distFunc,
@@ -66,7 +63,7 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	 * @param distFunc          a distance function which has to be positive at positions where
 	 *                          no point should be inserted and negative elsewhere.
 	 */
-    public GenRandomPointsSetTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+    public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
                                           @NotNull final int numberOfPoints,
                                           @NotNull final VRectangle bound,
                                           @NotNull final IDistanceFunction distFunc
@@ -81,7 +78,7 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	 * @param bound             the bound containing all points
 	 * @param random            a pseudo random number generator
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
 	                                      @NotNull final int numberOfPoints,
 	                                      @NotNull final VRectangle bound,
 	                                      @NotNull final Random random
@@ -99,7 +96,7 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
 	                                      @NotNull final int numberOfPoints,
 	                                      @NotNull final VRectangle bound
 	) {
@@ -107,17 +104,17 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	}
 
     @Override
-    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+    public IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
     }
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		triangulation.init();
 		int numberOfInsertedPoints = 0;
 
 		while (numberOfInsertedPoints < numberOfPoints) {
-			P point = randomPoint();
+			IPoint point = randomPoint();
 
 			if(distFunc.apply(point) <= 0) {
 				triangulation.insert(point);
@@ -133,16 +130,16 @@ public class GenRandomPointsSetTriangulator<P extends IPoint, CE, CF, V extends 
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 
-	private P randomPoint() {
+	private IPoint randomPoint() {
         double x = bound.getMinX() + random.nextDouble() * bound.getWidth();
         double y = bound.getMinY() + random.nextDouble() * bound.getHeight();
         return triangulation.getMesh().createPoint(x, y);

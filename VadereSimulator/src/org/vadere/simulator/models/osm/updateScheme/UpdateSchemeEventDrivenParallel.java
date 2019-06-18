@@ -30,9 +30,9 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 	private LinkedCellsGrid<PedestrianOSM> linkedCellsGrid;
 	private boolean[][] locked;
 	private double pedestrianPotentialWidth;
-	private Map<PedestrianOSM, PVertex<PedestrianPoint, Object, Object>> map;
-	private PMesh<PedestrianPoint, Object, Object> mesh;
-	private MeshPanel<PedestrianPoint, Object, Object, PVertex<PedestrianPoint, Object, Object>, PHalfEdge<PedestrianPoint, Object, Object>, PFace<PedestrianPoint, Object, Object>> panel;
+	private Map<PedestrianOSM, PVertex> map;
+	private PMesh mesh;
+	private MeshPanel<PVertex, PHalfEdge, PFace> panel;
 
 
 	public UpdateSchemeEventDrivenParallel(@NotNull final Topography topography, @NotNull final double pedestrianPotentialWidth) {
@@ -75,13 +75,13 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		int counter = 1;
 		// event driven update ignores time credits
 		do{
-			mesh = new PMesh<>((x, y) -> new PedestrianPoint(new VPoint(x,y), null));
+			mesh = new PMesh<>();
 			Collection<PedestrianPoint> pedPoints = topography.getElements(PedestrianOSM.class)
 					.stream()
 					.map(ped -> new PedestrianPoint(ped.getPosition(), ped))
 					.collect(Collectors.toList());
 
-			GenPointSetTriangulator<PedestrianPoint, Object, Object, PVertex<PedestrianPoint, Object, Object>, PHalfEdge<PedestrianPoint, Object, Object>, PFace<PedestrianPoint, Object, Object>> triangulator
+			GenPointSetTriangulator<PVertex, PHalfEdge, PFace> triangulator
 					= new GenPointSetTriangulator<>(pedPoints, mesh);
 			triangulator.generate();
 
@@ -93,7 +93,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				panel.getMeshRenderer().setMesh(mesh);
 			}
 
-			for(PVertex<PedestrianPoint, Object, Object> pedestrianPoint : mesh.getVertices()) {
+			for(PVertex pedestrianPoint : mesh.getVertices()) {
 				map.put(mesh.getPoint(pedestrianPoint).pedestrianOSM, pedestrianPoint);
 			}
 
@@ -152,11 +152,11 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 	}
 
 	private boolean requireUpdate(PedestrianOSM pedestrianOSM) {
-		PVertex<PedestrianPoint, Object, Object> vertex = map.get(pedestrianOSM);
+		PVertex vertex = map.get(pedestrianOSM);
 		if(mesh.getPoint(vertex).hasChanged()) {
 			return true;
 		}
-		for(PVertex<PedestrianPoint, Object, Object> v : mesh.getAdjacentVertexIt(vertex)) {
+		for(PVertex v : mesh.getAdjacentVertexIt(vertex)) {
 			if(mesh.getPoint(v).hasChanged()) {
 				return true;
 			}

@@ -45,10 +45,10 @@ public class FMMTriangulationExamples {
 		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> p.getPotential()));
 	}
 
-	public static IIncrementalTriangulation<PotentialPoint, Double, Double,
-				PVertex<PotentialPoint, Double, Double>,
-				PHalfEdge<PotentialPoint, Double, Double>,
-				PFace<PotentialPoint, Double, Double>> bridge() throws IOException, InterruptedException {
+	public static IIncrementalTriangulation<
+			PVertex,
+				PHalfEdge,
+				PFace> bridge() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/bridge.poly");
 		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
@@ -60,20 +60,19 @@ public class FMMTriangulationExamples {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 1.0;
-		var meshImprover = new PEikMeshGen<PotentialPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				distanceFunction,
 				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
 				h0,
 				new VRectangle(segmentBound.getBounds2D()),
-				pslg.getHoles(),
-				pointConstructor
+				pslg.getHoles()
 		);
 
 		var mesh = meshImprover.getMesh();
 		Color green = new Color(85, 168, 104);
 		Color red = new Color(196,78,82);
 		Color blue = new Color(76,114,202);
-		Function<PFace<PotentialPoint, Double, Double>, Color> colorFunction = f -> {
+		Function<PFace, Color> colorFunction = f -> {
 			VPoint midpoint = mesh.toTriangle(f).midPoint();
 			if(midpoint.getY() < 46  && midpoint.getX() < 10) {
 				return blue;

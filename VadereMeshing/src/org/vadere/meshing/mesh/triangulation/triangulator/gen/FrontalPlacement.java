@@ -13,13 +13,13 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.function.Function;
 
-public class FrontalPlacement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPlacementStrategy<P, CE, CF, V, E ,F> {
-	private IMesh<P, CE, CF, V, E, F> mesh;
-	private DelaunayPlacement<P, CE, CF, V, E, F> delaunayPlacement;
-	private VoronoiSegPlacement<P, CE, CF, V, E, F> voronoiSegPlacement;
+public class FrontalPlacement<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPlacementStrategy<V, E ,F> {
+	private IMesh<V, E, F> mesh;
+	private DelaunayPlacement<V, E, F> delaunayPlacement;
+	private VoronoiSegPlacement<V, E, F> voronoiSegPlacement;
 	private VoronoiSegSizeOptimalPlacement<P, CE, CF, V, E, F> voronoiSegSizeOptimalPlacement;
 
-	public FrontalPlacement(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public FrontalPlacement(@NotNull final IMesh<V, E, F> mesh,
 	                        @NotNull final Function<IPoint, Double> circumRadiusFunc,
 	                        final double qmin) {
 		this.mesh = mesh;
@@ -29,7 +29,7 @@ public class FrontalPlacement<P extends IPoint, CE, CF, V extends IVertex<P>, E 
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 

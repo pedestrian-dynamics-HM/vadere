@@ -36,7 +36,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
     private static void overallUniformRing() {
 
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
@@ -78,7 +78,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 	}
 
 	private static void stepUniformRing(double startLen, double endLen, double stepLen) throws OpenCLException {
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -123,7 +123,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");

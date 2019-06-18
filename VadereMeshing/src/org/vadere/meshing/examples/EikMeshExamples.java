@@ -1,9 +1,7 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PMeshSuppliert;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -25,12 +23,9 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,24 +56,24 @@ public class EikMeshExamples {
 		int numberOfPoints = 200;
 		double linePoints = (int)Math.sqrt(numberOfPoints)+5;
 
-		List<EikMeshPoint> points = new ArrayList<>();
+		List<VPoint> points = new ArrayList<>();
 
 		for(double i = 0; i < linePoints; i++) {
-			points.add(new EikMeshPoint(0.1, 0.1 + i / linePoints * (height-0.2), true));
-			points.add(new EikMeshPoint(0.1 + i / linePoints * (width-0.2), 0.1, true));
-			points.add(new EikMeshPoint(width-0.2, 0.1 + i / linePoints * (height-0.2), true));
-			points.add(new EikMeshPoint(0.1 + i / linePoints * (width-0.2), height-0.2, true));
+			points.add(new VPoint(0.1, 0.1 + i / linePoints * (height-0.2)));
+			points.add(new VPoint(0.1 + i / linePoints * (width-0.2), 0.1));
+			points.add(new VPoint(width-0.2, 0.1 + i / linePoints * (height-0.2)));
+			points.add(new VPoint(0.1 + i / linePoints * (width-0.2), height-0.2));
 		}
 
 		for(int i = 0; i < numberOfPoints-15; i++) {
-			points.add(new EikMeshPoint(1.5 + random.nextDouble() * (width-3), 1.5 + random.nextDouble() * (height-3)));
+			points.add(new VPoint(1.5 + random.nextDouble() * (width-3), 1.5 + random.nextDouble() * (height-3)));
 		}
 
-		var delaunayTriangulator = new PDelaunayTriangulator<>(points, (x, y) -> new EikMeshPoint(x, y, false));
+		var delaunayTriangulator = new PDelaunayTriangulator(points);
 		var triangulation = delaunayTriangulator.generate();
 
-		var improver = new PEikMeshGen<>(p -> 1.0, triangulation);
-		var panel = new PMeshPanel<>(triangulation.getMesh(), 500, 500);
+		var improver = new PEikMeshGen(p -> 1.0, triangulation);
+		var panel = new PMeshPanel(triangulation.getMesh(), 500, 500);
 		panel.display("A square mesh");
 		panel.repaint();
 
@@ -121,13 +116,13 @@ public class EikMeshExamples {
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
 		double edgeLength = 0.03;
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				d,
 				p -> edgeLength + 0.5 * Math.abs(d.apply(p)),
 				edgeLength,
 				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect),
-				(x, y) -> new EikMeshPoint(x, y, false));
+				Arrays.asList(rect)
+		);
 
 		// generate the mesh
 		//meshImprover.generate();
@@ -135,7 +130,7 @@ public class EikMeshExamples {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 
 		meshPanel.display("Geometry defined by shapes");
 		meshImprover.initialize();
@@ -175,13 +170,13 @@ public class EikMeshExamples {
 		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
 		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
 		double edgeLength = 0.07;
-		var meshImprover = new PEikMeshGen<EikMeshPoint, Double, Double>(
+		var meshImprover = new PEikMeshGen(
 				d,
 				p -> edgeLength + 0.3 * Math.abs(d.apply(p)),
 				edgeLength,
 				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect),
-				(x, y) -> new EikMeshPoint(x, y, false));
+				Arrays.asList(rect)
+		);
 
 		// generate the mesh
 		//meshImprover.generate();
@@ -189,7 +184,7 @@ public class EikMeshExamples {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		PMeshPanel<EikMeshPoint, Double, Double> meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800);
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 
 		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
 		recorder.record();
@@ -271,13 +266,13 @@ public class EikMeshExamples {
 
 		// define the EikMesh-Improver
 		IEdgeLengthFunction h = p -> h0 + 0.3 * Math.abs(d.apply(p));
-		PEikMeshGen<EikMeshPoint, Double, Double> meshImprover = new PEikMeshGen<>(
+		PEikMeshGen meshImprover = new PEikMeshGen(
 				d,
 				h,
 				Arrays.asList(center),
 				h0,
-				bound,
-				(x, y) -> new EikMeshPoint(x, y, false));
+				bound
+		);
 
 		//meshImprover.setUseVirtualEdges(false);
 		//meshImprover.setAllowEdgeSplits(false);
@@ -294,7 +289,7 @@ public class EikMeshExamples {
 		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
 		var mesh = PolyGenerator.toMesh(inputStream, meshSuppliert);
 
-		var meshPanel = new PMeshPanel<>(mesh, 1000, 800);
+		var meshPanel = new PMeshPanel(mesh, 1000, 800);
 
 		// generate the mesh
 
@@ -372,7 +367,7 @@ public class EikMeshExamples {
 				bound);
 
 		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
@@ -407,7 +402,7 @@ public class EikMeshExamples {
 				bound);
 
 		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
@@ -447,7 +442,7 @@ public class EikMeshExamples {
 				bound);
 
 		// (optional) define the gui to display the mesh
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint, Object, Object>, PHalfEdge<EikMeshPoint, Object, Object>, PFace<EikMeshPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
@@ -497,15 +492,15 @@ public class EikMeshExamples {
 
 		// like before but we have to add the point-constructor to the constructor of EikMesh and we use
 		// the more generic type PEikMeshGen instead of PEikMes!
-		PEikMeshGen<MyPoint, Object, Object> meshImprover = new PEikMeshGen<>(
+		PEikMeshGen meshImprover = new PEikMeshGen(
 				ringDistance,
 				edgeLengthFunction,
 				edgeLength,
-				bound,
-				pointConstructor);
+				bound
+		);
 
 		// (optional) define the gui to display the mesh
-		MeshPanel<MyPoint, Object, Object, PVertex<MyPoint, Object, Object>, PHalfEdge<MyPoint, Object, Object>, PFace<MyPoint, Object, Object>> meshPanel = new MeshPanel<>(
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshImprover.getMesh(), 1000, 800);
 
 		meshPanel.display("User defined Points");

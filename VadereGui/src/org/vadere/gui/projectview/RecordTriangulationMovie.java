@@ -15,7 +15,6 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 
@@ -53,21 +52,21 @@ public class RecordTriangulationMovie {
 				bbound,
 				obstacleShapes);
 
-		Function<AFace<Object>, Color> colorFunction1 = f -> {
+		Function<AFace, Color> colorFunction1 = f -> {
 			float q = Math.max(0.0f, Math.min(1.0f, (float) meshImprover.faceToQuality(f)));
 			return new Color(q, q, q);
 		};
 
-		Function<AFace<EikMeshPoint>, Color> colorFunction2 = f -> {
+		Function<AFace, Color> colorFunction2 = f -> {
 			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		};
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
-		MeshRenderer<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshRenderer = new MeshRenderer<>(
+		MeshRenderer<AVertex, AHalfEdge, AFace> meshRenderer = new MeshRenderer<>(
 				meshImprover.getMesh(), f -> false, colorFunction1);
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel<>(
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(
 				meshRenderer, bbound.getWidth()*1000, bbound.getHeight()*1000);
 
 		JFrame frame = distmeshPanel.display();
@@ -119,7 +118,7 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               MeshRenderer<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> renderer,
+	                               MeshRenderer<AVertex, AHalfEdge, AFace> renderer,
 	                               int frames,
 	                               int width,
 	                               int height) throws IOException {

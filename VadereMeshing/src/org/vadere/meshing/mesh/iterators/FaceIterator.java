@@ -15,21 +15,18 @@ import java.util.function.Predicate;
 /**
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class FaceIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<F> {
+public class FaceIterator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Iterator<F> {
 
 	private LinkedList<F> facesToVisit;
 	private Set<F> visitedFaces;
 	private Predicate<F> facePredicate;
-	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IMesh<V, E, F> mesh;
 
-	public FaceIterator(final IMesh<P, CE, CF, V, E, F> mesh, final Predicate<F> facePredicate) {
+	public FaceIterator(final IMesh<V, E, F> mesh, final Predicate<F> facePredicate) {
 		this.mesh = mesh;
 		this.facesToVisit = new LinkedList<>();
 		F face = mesh.getFace();
@@ -44,7 +41,7 @@ public class FaceIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E exte
 		this.facePredicate = facePredicate;
 	}
 
-	public FaceIterator(final IMesh<P, CE, CF, V, E, F> mesh) {
+	public FaceIterator(final IMesh<V, E, F> mesh) {
 		this(mesh, f -> true);
 	}
 

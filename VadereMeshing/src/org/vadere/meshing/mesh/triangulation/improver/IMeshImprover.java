@@ -10,7 +10,6 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.IEikMeshImprover;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -21,21 +20,18 @@ import java.util.function.Predicate;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IMeshImprover<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	/**
 	 * Returns the mesh the improver is working on.
 	 *
 	 * @return the mesh the improver is working on.
 	 */
-	default IMesh<P,CE,CF,V,E,F> getMesh() {
+	default IMesh<V,E,F> getMesh() {
 		return getTriangulation().getMesh();
 	}
 
@@ -155,7 +151,7 @@ public interface IMeshImprover<P extends IPoint, CE, CF, V extends IVertex<P>, E
      *
      * @return the current triangulation / mesh
      */
-    IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation();
+    IIncrementalTriangulation<V, E, F> getTriangulation();
 
 	/**
 	 * Returns the current triangulation / mesh.

@@ -16,27 +16,24 @@ import java.util.Iterator;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class IncidentEdgeIterator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements Iterator<E> {
+public class IncidentEdgeIterator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Iterator<E> {
 
 	private static Logger log = Logger.getLogger(IncidentEdgeIterator.class);
-	private IMesh<P, CE, CF, V, E, F> mesh;
+	private IMesh<V, E, F> mesh;
 	private E current;
 	private E edge;
 	private boolean first;
 	int count = 0;
 
-	public IncidentEdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final V vertex) {
+	public IncidentEdgeIterator(final IMesh<V, E, F> mesh, final V vertex) {
 		this(mesh, mesh.getEdge(vertex));
 	}
 
-	public IncidentEdgeIterator(final IMesh<P, CE, CF, V, E, F> mesh, final E edge) {
+	public IncidentEdgeIterator(final IMesh<V, E, F> mesh, final E edge) {
 		this.mesh = mesh;
 		this.edge = edge;
 		this.current = mesh.getTwin(edge);

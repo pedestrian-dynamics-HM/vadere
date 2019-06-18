@@ -14,16 +14,13 @@ import org.vadere.util.geometry.shapes.VTriangle;
  * such as the Delaunay-refinement strategy i.e. the insertion point is the circumcenter of some
  * Delaunay triangle.
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IPlacementStrategy<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
+public interface IPlacementStrategy<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
-	IMesh<P, CE, CF, V, E, F> getMesh();
+	IMesh<V, E, F> getMesh();
 
 	default VPoint computePlacement(@NotNull final E edge) {
 		return computePlacement(edge, getMesh().toTriangle(getMesh().getFace(edge)));

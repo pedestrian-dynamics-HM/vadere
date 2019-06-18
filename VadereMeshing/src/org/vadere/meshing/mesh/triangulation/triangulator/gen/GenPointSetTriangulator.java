@@ -16,34 +16,30 @@ import java.util.Collection;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements ITriangulator<P, CE, CF, V, E, F> {
+public class GenPointSetTriangulator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITriangulator<V, E, F> {
 
 	/**
 	 * the triangulation which determines how points will be inserted.
 	 */
-    private final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation;
+    private final IIncrementalTriangulation<V, E, F> triangulation;
 
 	/**
 	 * the collection of points P.
 	 */
-	private final Collection<P> points;
+	private final Collection<IPoint> points;
 
 	private boolean generated;
 
 	/**
 	 * <p>The default constructor.</p>
-	 *
-	 * @param points        the collection of points P
+	 *  @param points        the collection of points P
 	 * @param triangulation a triangulation which determines how points will be inserted
 	 */
-    public GenPointSetTriangulator(final Collection<P> points, final IIncrementalTriangulation<P, CE, CF, V, E, F> triangulation) {
+    public GenPointSetTriangulator(final Collection<IPoint> points, final IIncrementalTriangulation<V, E, F> triangulation) {
         this.triangulation = triangulation;
         this.points = points;
         this.generated = false;
@@ -51,11 +47,10 @@ public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 	/**
 	 * <p>The default constructor.</p>
-	 *
-	 * @param points        the collection of points P
+	 *  @param points        the collection of points P
 	 * @param mesh          an empty mesh
 	 */
-	public GenPointSetTriangulator(final Collection<P> points, final IMesh<P, CE, CF, V, E, F> mesh) {
+	public GenPointSetTriangulator(final Collection<IPoint> points, final IMesh<V, E, F> mesh) {
 		this.triangulation = new IncrementalTriangulation<>(mesh);
 		this.points = points;
 		this.generated = false;
@@ -63,12 +58,12 @@ public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex
 
 
 	@Override
-    public IIncrementalTriangulation<P, CE, CF, V, E, F> generate() {
+    public IIncrementalTriangulation<V, E, F> generate() {
 		return generate(true);
     }
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> generate(boolean finalize) {
+	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!generated) {
 			triangulation.init();
 			triangulation.insert(points);
@@ -83,12 +78,12 @@ public class GenPointSetTriangulator<P extends IPoint, CE, CF, V extends IVertex
 	}
 
 	@Override
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return triangulation;
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
 	}
 }

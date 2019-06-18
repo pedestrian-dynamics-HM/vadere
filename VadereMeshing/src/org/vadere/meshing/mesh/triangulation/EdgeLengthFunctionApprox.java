@@ -9,6 +9,7 @@ import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.math.InterpolationUtil;
 
@@ -17,12 +18,14 @@ import java.util.PriorityQueue;
 
 public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
-	private IIncrementalTriangulation<DataPoint<Double>, Object, Object, PVertex<DataPoint<Double>, Object, Object>, PHalfEdge<DataPoint<Double>, Object, Object>, PFace<DataPoint<Double>, Object, Object>> triangulation;
+	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
+
+	private static final String propName = "edgeLength";
 
 	public EdgeLengthFunctionApprox(@NotNull final PSLG pslg) {
 
-		IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
-		var ruppertsTriangulator = new PRuppertsTriangulator<>(pslg, pointConstructor, 10);
+		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
+		var ruppertsTriangulator = new PRuppertsTriangulator(pslg, 10);
 		triangulation = ruppertsTriangulator.generate();
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
@@ -40,7 +43,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				}
 			}
 
-			triangulation.getMesh().getPoint(v).setData(minEdgeLen);
+			triangulation.getMesh().setData(v, propName, minEdgeLen);
 		}
 	}
 
@@ -48,22 +51,22 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 		assert g > 0;
 		// smooth the function based such that it is g-Lipschitz
 		var mesh = triangulation.getMesh();
-		PriorityQueue<PVertex<DataPoint<Double>, Object, Object>> heap = new PriorityQueue<>(
-				Comparator.comparingDouble(v1 -> mesh.getPoint(v1).getData())
+		PriorityQueue<PVertex> heap = new PriorityQueue<>(
+				Comparator.comparingDouble(v1 -> mesh.getData(v1, propName, Double.class).get())
 		);
 		heap.addAll(mesh.getVertices());
 
 		while (!heap.isEmpty()) {
 			var v = heap.poll();
-			double hv = mesh.getPoint(v).getData();
+			double hv = mesh.getData(v, propName, Double.class).get();
 			for (var u : mesh.getAdjacentVertexIt(v)) {
-				double hu = mesh.getPoint(u).getData();
+				double hu = mesh.getData(u, propName, Double.class).get();
 				double min = Math.min(hu, hv + g * v.distance(u));
 
 				// update heap
 				if (min < hu) {
 					heap.remove(u);
-					mesh.getPoint(u).setData(min);
+					mesh.setData(u, propName, min);
 					heap.add(u);
 				}
 			}
@@ -79,16 +82,20 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 			return Double.POSITIVE_INFINITY;
 		}
 		else {
-			var edge = mesh.getEdge(face);
-			DataPoint<Double> p1 = mesh.getPoint(edge);
-			DataPoint<Double> p2 = mesh.getPoint(mesh.getNext(edge));
-			DataPoint<Double> p3 = mesh.getPoint(mesh.getPrev(edge));
-			return InterpolationUtil.barycentricInterpolation(p1, p2, p3, dataPoint -> dataPoint.getData(), p.getX(), p.getY());
+			double x[] = new double[3];
+			double y[] = new double[3];
+			double z[] = new double[3];
+
+			triangulation.getTriPoints(face, x, y, z, propName);
+
+			double totalArea = GeometryUtils.areaOfPolygon(x, y);
+
+			return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
 		}
 	}
 
 	public void printPython() {
-		System.out.println(triangulation.getMesh().toPythonTriangulation(dataPoint -> dataPoint.getData()));
+		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getData(v, propName, Double.class).get()));
 		/*var points = triangulation.getMesh().getPoints();
 		System.out.print("[");
 		for(var dataPoint : points) {

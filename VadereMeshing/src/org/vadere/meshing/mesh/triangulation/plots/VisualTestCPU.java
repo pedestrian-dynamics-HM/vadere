@@ -41,7 +41,7 @@ public class VisualTestCPU {
 
 	private static void overallUniformRingA() {
 		VPolygon hex = VShape.generateHexagon(4.0);
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 
 		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
@@ -50,9 +50,9 @@ public class VisualTestCPU {
 		GenEikMesh meshGenerator = new GenEikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 		ColorHelper colorHelper = new ColorHelper(meshGenerator.getMesh().getNumberOfFaces());
-		Function<AFace<EikMeshPoint>, Color> colorFunction = f -> colorHelper.numberToColor(f.getId());
+		Function<AFace, Color> colorFunction = f -> colorHelper.numberToColor(f.getId());
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, colorFunction);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800, colorFunction);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -98,7 +98,7 @@ public class VisualTestCPU {
 
 	private static void overallUniformRingP() {
 		VPolygon hex = VShape.generateHexagon(4.0);
-		IMeshSupplier<EikMeshPoint, Object, Object, PVertex<EikMeshPoint,Object,Object>, PHalfEdge<EikMeshPoint,Object,Object>, PFace<EikMeshPoint,Object,Object>> supplier = () -> new PMesh<>(pointConstructor);
+		IMeshSupplier<PVertex, PHalfEdge, PFace> supplier = () -> new PMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 
 		//IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 10, IDistanceFunction.create(bbox, hex));
@@ -106,7 +106,7 @@ public class VisualTestCPU {
 
 		GenEikMesh meshGenerator = new GenEikMesh(distanceFunc, p -> 1.0 + (distanceFunc.apply(p) * distanceFunc.apply(p) / 6.0), initialEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
-		MeshPanel<EikMeshPoint, Object, Object, PVertex<EikMeshPoint,Object,Object>, PHalfEdge<EikMeshPoint,Object,Object>, PFace<EikMeshPoint,Object,Object>> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<PVertex, PHalfEdge, PFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

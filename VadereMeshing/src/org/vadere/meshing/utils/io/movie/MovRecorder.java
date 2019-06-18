@@ -13,13 +13,9 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 
 /**
  *
@@ -33,9 +29,9 @@ import javax.swing.*;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MovRecorder<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> {
-	private MeshRenderer<P, CE, CF, V, E, F> meshRenderer;
-	private GenEikMesh<P, CE, CF, V, E, F> eikMesh;
+public class MovRecorder<P extends EikMeshPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> {
+	private MeshRenderer<V, E, F> meshRenderer;
+	private GenEikMesh<V, E, F> eikMesh;
 	private int initImageCount = 10;
 	private int refineImageCount = 1;
 	private final int width;
@@ -45,8 +41,8 @@ public class MovRecorder<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E
 	private Date todaysDate;
 
 	public MovRecorder(
-			@NotNull final GenEikMesh<P, CE, CF, V, E, F> eikMesh,
-			@NotNull final MeshRenderer<P, CE, CF, V, E, F> meshRenderer,
+			@NotNull final GenEikMesh<V, E, F> eikMesh,
+			@NotNull final MeshRenderer<V, E, F> meshRenderer,
 			final int width,
 			final int height,
 			final VRectangle bound) throws IOException {

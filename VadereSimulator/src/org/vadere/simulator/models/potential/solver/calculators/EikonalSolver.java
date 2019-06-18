@@ -3,7 +3,6 @@ package org.vadere.simulator.models.potential.solver.calculators;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
@@ -66,5 +65,5 @@ public interface EikonalSolver {
 		return new UnitTimeCostFunction();
 	}
 
-	IMesh<? extends IPotentialPoint, ?, ?, ?, ?, ?> getDiscretization();
+	IMesh<?, ?, ?> getDiscretization();
 }

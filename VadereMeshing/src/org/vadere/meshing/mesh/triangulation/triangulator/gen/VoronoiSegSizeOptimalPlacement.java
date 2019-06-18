@@ -12,20 +12,19 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
-
-public class VoronoiSegSizeOptimalPlacement<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IPlacementStrategy<P, CE, CF, V, E ,F> {
-	private IMesh<P, CE, CF, V, E, F> mesh;
+public class VoronoiSegSizeOptimalPlacement<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPlacementStrategy<V, E ,F> {
+	private IMesh<V, E, F> mesh;
 	private double qmin;
 
 	public VoronoiSegSizeOptimalPlacement(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			final double qmin) {
 		this.mesh = mesh;
 		this.qmin = Math.toRadians(qmin);
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 

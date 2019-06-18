@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.gen;
 
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -16,47 +17,47 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PointLocation<P extends VPoint, CE, CF> {
+public class PointLocation {
 
-	private final Collection<PFace<P, CE, CF>> faces;
-	private final List<P> orderedPointList;
-	private final List<List<PHalfEdge<P, CE, CF>>> halfeEdgesSegments;
-	private final List<List<P>> intersectionPointsInSegment;
-	private final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh;
+	private final Collection<PFace> faces;
+	private final List<IPoint> orderedPointList;
+	private final List<List<PHalfEdge>> halfeEdgesSegments;
+	private final List<List<IPoint>> intersectionPointsInSegment;
+	private final IMesh<PVertex, PHalfEdge, PFace> mesh;
 
-	private Comparator<P> pointComparatorX = (p1, p2) -> {
+	private Comparator<IPoint> pointComparatorX = (p1, p2) -> {
 		double dx = p1.getX() - p2.getX();
 		if(dx < 0) return -1;
 		else if(dx > 0) return 1;
 		else return 0;
 	};
 
-	private Comparator<P> pointComparatorY = (p1, p2) -> {
+	private Comparator<IPoint> pointComparatorY = (p1, p2) -> {
 		double dy = p1.getY() - p2.getY();
 		if(dy < 0) return -1;
 		else if(dy > 0) return 1;
 		else return 0;
 	};
 
-	private class BetweenTwoPoints implements Predicate<PHalfEdge<P, CE, CF>> {
+	private class BetweenTwoPoints implements Predicate<PHalfEdge> {
 
-		private P p1;
-		private P p2;
+		private IPoint p1;
+		private IPoint p2;
 
-		private BetweenTwoPoints(final P p1, final P p2) {
+		private BetweenTwoPoints(final IPoint p1, final IPoint p2) {
 			this.p1 = p1;
 			this.p2 = p2;
 		}
 
 		@Override
-		public boolean test(final PHalfEdge<P, CE, CF> halfEdge) {
-			P v1 = mesh.getPoint(halfEdge);
-			P v2 = mesh.getPoint(mesh.getPrev(halfEdge));
+		public boolean test(final PHalfEdge halfEdge) {
+			IPoint v1 = mesh.getPoint(halfEdge);
+			IPoint v2 = mesh.getPoint(mesh.getPrev(halfEdge));
 			return (v1.getX() <= p1.getX() && v2.getX() >= p2.getX()) || (v2.getX() <= p1.getX() && v1.getX() >= p2.getX());
 		}
 	}
 
-	private class HalfEdgeComparator implements Comparator<PHalfEdge<P, CE, CF>> {
+	private class HalfEdgeComparator implements Comparator<PHalfEdge> {
 
 		private double x1;
 		private double x2;
@@ -67,7 +68,7 @@ public class PointLocation<P extends VPoint, CE, CF> {
 		}
 
 		@Override
-		public int compare(final PHalfEdge<P, CE, CF> edge1, final PHalfEdge<P, CE, CF> edge2) {
+		public int compare(final PHalfEdge edge1, final PHalfEdge edge2) {
 			VLine line1 = edge1.toLine();
 			VLine line2 = edge2.toLine();
 			double slope1 = line1.slope();
@@ -82,12 +83,12 @@ public class PointLocation<P extends VPoint, CE, CF> {
 		}
 	}
 
-	public PointLocation(final Collection<PFace<P, CE, CF>> faces, final IMesh<P, CE, CF, PVertex<P, CE, CF>, PHalfEdge<P, CE, CF>, PFace<P, CE, CF>> mesh) {
+	public PointLocation(final Collection<PFace> faces, final IMesh<PVertex, PHalfEdge, PFace> mesh) {
 		this.faces = faces;
 		this.mesh = mesh;
 
 		//TODO distinct is maybe slow here
-		Set<P> pointSet = faces.stream()
+		Set<IPoint> pointSet = faces.stream()
 				.flatMap(face -> mesh.streamEdges(face)).map(edge -> mesh.getPoint(edge))
 				.sorted(pointComparatorX).collect(Collectors.toSet());
 
@@ -96,13 +97,13 @@ public class PointLocation<P extends VPoint, CE, CF> {
 		intersectionPointsInSegment = new ArrayList<>(orderedPointList.size()-1);
 
 		for(int i = 0; i < orderedPointList.size() - 1; i++) {
-			P p1 = orderedPointList.get(i);
-			P p2 = orderedPointList.get(i+1);
-			List<PHalfEdge<P, CE, CF>> halfEdges = faces.stream()
+			IPoint p1 = orderedPointList.get(i);
+			IPoint p2 = orderedPointList.get(i+1);
+			List<PHalfEdge> halfEdges = faces.stream()
 					.flatMap(face -> mesh.streamEdges(face)).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
 
-			List<P> intersectionPoints = halfEdges.stream()
+			List<IPoint> intersectionPoints = halfEdges.stream()
 					.map(hf -> hf.toLine())
 					.map(line -> intersectionWithX(p1.getX(), line))
 					.distinct()
@@ -121,13 +122,13 @@ public class PointLocation<P extends VPoint, CE, CF> {
 
 	}
 
-	private P intersectionWithX(double x, VLine line) {
+	private IPoint intersectionWithX(double x, VLine line) {
 		Point2D p = line.getX1() < line.getX2() ? line.getP1() : line.getP2();
 
 		return mesh.getPoint(mesh.createVertex(x, (p.getY() + (p.getX()-x) * line.slope())));
 	}
 
-	public Optional<PFace<P, CE, CF>> getFace(final P point) {
+	public Optional<PFace> getFace(final VPoint point) {
 		int xSegmentIndex = Collections.binarySearch(orderedPointList, point, pointComparatorX);
 
 		xSegmentIndex = xSegmentIndex < 0 ? -xSegmentIndex - 2 : xSegmentIndex;
@@ -136,7 +137,7 @@ public class PointLocation<P extends VPoint, CE, CF> {
 			return Optional.empty();
 		}
 
-		List<P> intersectionPoints = intersectionPointsInSegment.get(xSegmentIndex);
+		List<IPoint> intersectionPoints = intersectionPointsInSegment.get(xSegmentIndex);
 		int ySegmentIndex = Collections.binarySearch(intersectionPoints, point, pointComparatorY);
 
 		ySegmentIndex = ySegmentIndex < 0 ? -ySegmentIndex - 2 : ySegmentIndex;
@@ -146,15 +147,15 @@ public class PointLocation<P extends VPoint, CE, CF> {
 			return Optional.empty();
 		}
 
-		PHalfEdge<P, CE, CF> edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
+		PHalfEdge edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
-		PFace<P, CE, CF> face = mesh.getFace(edge);
+		PFace face = mesh.getFace(edge);
 		VPolygon polygon = mesh.toPolygon(face);
 		if(polygon.contains(point)) {
 			return Optional.of(face);
 		}
 		else {
-			PFace<P, CE, CF> f = mesh.getTwinFace(edge);
+			PFace f = mesh.getTwinFace(edge);
 			if(mesh.isBoundary(f)) {
 				return Optional.empty();
 			}

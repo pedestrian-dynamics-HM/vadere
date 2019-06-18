@@ -11,13 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class GenEar<
-		P extends IPoint,
-		CE,
-		CF,
-		V extends IVertex<P>,
-		E extends IHalfEdge<CE>,
-		F extends IFace<CF>> implements Comparable<GenEar<P, CE, CF, V, E, F>>{
+public class GenEar<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Comparable<GenEar<V, E, F>>{
 
 	private final List<E> edges;
 	private double power;
@@ -63,20 +57,17 @@ public class GenEar<
 	}
 
 	@Override
-	public int compareTo(@NotNull final GenEar<P, CE, CF, V, E, F> o) {
+	public int compareTo(@NotNull final GenEar<V, E, F> o) {
 		return Double.compare(getPower(), o.getPower());
 	}
 
 	public static class EarNodeComparator<
-			P extends IPoint,
-			CE,
-			CF,
-			V extends IVertex<P>,
-			E extends IHalfEdge<CE>,
-			F extends IFace<CF>> implements Comparator<Node<GenEar<P, CE, CF, V, E, F>>> {
+			V extends IVertex,
+			E extends IHalfEdge,
+			F extends IFace> implements Comparator<Node<GenEar<V, E, F>>> {
 
 		@Override
-		public int compare(@NotNull final Node<GenEar<P, CE, CF, V, E, F>> o1, @NotNull final Node<GenEar<P, CE, CF, V, E, F>> o2) {
+		public int compare(@NotNull final Node<GenEar<V, E, F>> o1, @NotNull final Node<GenEar<V, E, F>> o2) {
 			return Double.compare(o1.getElement().getPower(), o2.getElement().getPower());
 		}
 	}

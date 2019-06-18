@@ -43,7 +43,7 @@ import javax.swing.*;
 /**
  * This class implements the Bowyer-Watson algorithm efficiently by using the mesh data structure {@link IMesh} and
  * sophisticated point locators {@link IPointLocator} where {@link JumpAndWalk} is the default. The incremental nature
- * of the implementation allows to insert points after the triangulation is finished, i.e. after the virtual points and
+ * of the implementation allows to insertVertex points after the triangulation is finished, i.e. after the virtual points and
  * their neighbouring faces are removed. However, points have to lie inside some interior face of the current triangulation.
  * Furthermore, this implementation allows for other criteria {@link Predicate} for flipping edges {@link E} than the
  * Delaunay criterion, e.g. a more relaxed version. However it is only guaranteed to generate a valid triangulation if
@@ -51,9 +51,6 @@ import javax.swing.*;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
- * @param <CE> the type of container of the half-edges
- * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
@@ -61,18 +58,18 @@ import javax.swing.*;
  * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
-public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IIncrementalTriangulation<P, CE, CF, V, E, F> {
+public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IIncrementalTriangulation<V, E, F> {
 
-	protected Collection<P> points;
+	protected Collection<IPoint> points;
 	private VRectangle bound;
 	private boolean finalized = false;
-	private IMesh<P, CE, CF, V, E, F> mesh;
-	private IPointLocator<P, CE, CF, V, E, F> pointLocator;
+	private IMesh<V, E, F> mesh;
+	private IPointLocator<V, E, F> pointLocator;
 	private boolean initialized;
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
 	private IPointLocator.Type type;
-	private final List<ITriEventListener<P, CE, CF, V, E, F>> triEventListeners;
+	private final List<ITriEventListener<V, E, F>> triEventListeners;
 
 
 	private static double BUFFER_PERCENTAGE = GeometryUtils.DOUBLE_EPS;
@@ -98,9 +95,9 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
-			@NotNull final Collection<P> points,
+			@NotNull final Collection<IPoint> points,
 			@NotNull final Predicate<E> illegalPredicate) {
 
 		assert mesh.getNumberOfVertices() == 0;
@@ -127,7 +124,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final VRectangle bound,
 			@NotNull final Predicate<E> illegalPredicate) {
@@ -152,7 +149,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 * @param type              the type of the point location algorithm
 	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
 	                                @NotNull final IPointLocator.Type type,
 	                                @NotNull final VRectangle bound) {
 		this(mesh, type, bound, halfEdge -> true);
@@ -165,12 +162,12 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
 	 *              bound to be inserted into the triangulation
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
 	                                @NotNull final VRectangle bound) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
 	}
 
-	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
 	                                @NotNull final VRectangle bound,
 	                                @NotNull final Predicate<E> illegalCondition) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, illegalCondition);
@@ -187,7 +184,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
 			@NotNull final Predicate<E> illegalPredicate) {
 
@@ -216,7 +213,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Predicate<E> illegalPredicate) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, illegalPredicate);
 	}
@@ -231,9 +228,9 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 * @param points    points to be inserted, which also specify the bounding box
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final IPointLocator.Type type,
-			@NotNull final Collection<P> points) {
+			@NotNull final Collection<IPoint> points) {
 		this(mesh, type, points, halfEdge -> true);
 	}
 
@@ -246,7 +243,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 * @param type      the type of the used point location algorithm
 	 */
 	public IncrementalTriangulation(
-			@NotNull final IMesh<P, CE, CF, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final IPointLocator.Type type) {
 		this(mesh, type, halfEdge -> true);
 	}
@@ -258,7 +255,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	 *
 	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<P, CE, CF, V, E, F> mesh) {
+	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh) {
 		this(mesh, IPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
 	}
 
@@ -285,7 +282,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 				pointLocator = new DelaunayTree<>(this);
 				break;
 			case DELAUNAY_HIERARCHY:
-				Supplier<IIncrementalTriangulation<P, CE, CF, V, E, F>> supplier;
+				Supplier<IIncrementalTriangulation<V, E, F>> supplier;
 				if(useMeshForBound) {
 					supplier = () -> new IncrementalTriangulation<>(mesh.clone(), IPointLocator.Type.BASE, illegalPredicate);
 				}
@@ -360,8 +357,8 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	public void compute() {
 		init();
 
-		// 1. insert points
-		for(P p : points) {
+		// 1. insertVertex points
+		for(IPoint p : points) {
 			insert(p);
 		}
 
@@ -382,19 +379,19 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
     }
 
     @Override
-	public E insert(@NotNull P point, @NotNull F face) {
-		return insert(getMesh().createVertex(point), face);
+	public E insert(@NotNull final IPoint point, @NotNull F face) {
+		return insertVertex(getMesh().createVertex(point), face);
 	}
 
 	@Override
-	public E insert(@NotNull V vertex, @NotNull F face) {
+	public E insertVertex(@NotNull V vertex, @NotNull F face) {
 		if(!initialized) {
 			init();
 		}
 
 		E edge = mesh.closestEdge(face, vertex.getX(), vertex.getY());
-		P p1 = mesh.getPoint(mesh.getPrev(edge));
-		P p2 = mesh.getPoint(edge);
+		IPoint p1 = mesh.getPoint(mesh.getPrev(edge));
+		IPoint p2 = mesh.getPoint(edge);
 
 		/*
 		 * 3 Cases:
@@ -425,7 +422,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		}
 	}
 
-	private boolean contains(@NotNull P point) {
+	private boolean contains(@NotNull final IPoint point) {
 		double x = point.getX();
 		double y = point.getY();
 		double x0 = bound.getMinX();
@@ -441,7 +438,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public E insert(P point) {
+	public E insert(@NotNull final IPoint point) {
 		if(!initialized) {
 			init();
 		}
@@ -456,18 +453,44 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public void insert(final Collection<P> points) {
+	public E insertVertex(V vertex) {
 		if(!initialized) {
 			init();
 		}
 
-		// 1. insert points
-		for(P p : points) {
+		if(contains(vertex)) {
+			F face = pointLocator.locatePoint(vertex);
+			return insertVertex(vertex, face);
+		}
+		else {
+			throw new IllegalArgumentException(vertex + " is not contained in " + bound);
+		}
+	}
+
+	@Override
+	public void insertVertices(Collection<? extends V> vertices) {
+		if(!initialized) {
+			init();
+		}
+
+		for(V v : vertices) {
+			insertVertex(v);
+		}
+	}
+
+	@Override
+	public void insert(final Collection<? extends IPoint> points) {
+		if(!initialized) {
+			init();
+		}
+
+		// 1. insertVertex points
+		for(IPoint p : points) {
 			insert(p);
 		}
 	}
 
-	protected IPointLocator<P, CE, CF, V, E, F> getPointLocator() {
+	protected IPointLocator<V, E, F> getPointLocator() {
 	    return pointLocator;
     }
 
@@ -552,12 +575,12 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public void addTriEventListener(@NotNull ITriEventListener<P, CE, CF, V, E, F> triEventListener) {
+	public void addTriEventListener(@NotNull ITriEventListener<V, E, F> triEventListener) {
 		triEventListeners.add(triEventListener);
 	}
 
 	@Override
-	public void removeTriEventListener(@NotNull ITriEventListener<P, CE, CF, V, E, F> triEventListener) {
+	public void removeTriEventListener(@NotNull ITriEventListener<V, E, F> triEventListener) {
 		triEventListeners.remove(triEventListener);
 	}
 
@@ -640,12 +663,12 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 
 	@Override
-	public Optional<F> locateFace(final P point) {
+	public Optional<F> locateFace(final IPoint point) {
 		return pointLocator.locate(point);
 	}
 
@@ -665,17 +688,17 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public Stream<Triple<P, P, P>> streamTriples() {
+	public Stream<Triple<IPoint, IPoint, IPoint>> streamTriples() {
 		return mesh.streamFaces().map(f -> faceToTriple(f));
 	}
 
 	@Override
-	public Stream<P> streamPoints() {
+	public Stream<IPoint> streamPoints() {
 		return mesh.streamPoints();
 	}
 
 	@Override
-	public void remove(P point) {
+	public void remove(IPoint point) {
 		Optional<F> optFace = locateFace(point);
 		if(optFace.isPresent()) {
 			F face = optFace.get();
@@ -692,12 +715,12 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		return stream().map(face -> faceToTriangle(face)).collect(Collectors.toSet());
 	}
 
-	private Triple<P, P, P> faceToTriple(final F face) {
-		List<P> points = mesh.getPoints(face);
+	private Triple<IPoint, IPoint, IPoint> faceToTriple(final F face) {
+		List<IPoint> points = mesh.getPoints(face);
 		assert points.size() == 3;
-		P p1 = points.get(0);
-		P p2 = points.get(1);
-		P p3 = points.get(2);
+		IPoint p1 = points.get(0);
+		IPoint p2 = points.get(1);
+		IPoint p3 = points.get(2);
 		return Triple.of(p1, p2, p3);
 	}
 
@@ -761,7 +784,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		return false;
 	}*/
 
-	public static <P extends IPoint, CE, CF, V extends  IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> boolean isIllegal(E edge, V p, IMesh<P, CE, CF, V, E, F> mesh) {
+	public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
 		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
@@ -808,7 +831,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 			// this should be the same afterwards
 			//E halfEdge = getMesh().getNext(edge);
 
-			IMesh<P, CE, CF, V, E, F> mesh = getMesh();
+			IMesh<V, E, F> mesh = getMesh();
 			E startEdge = mesh.getPrev(edge);
 			E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
 			E currentEdge = mesh.getPrev(edge);
@@ -835,7 +858,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
 		pointLocator.postFlipEdgeEvent(f1, f2);
-		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
 			triEventListener.postFlipEdgeEvent(f1, f2);
 		}
 	}
@@ -843,7 +866,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public void splitTriangleEvent(final F original, final F f1, F f2, F f3, V v) {
 		pointLocator.postSplitTriangleEvent(original, f1, f2, f3,v );
-		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
 			triEventListener.postSplitTriangleEvent(original, f1, f2, f3, v);
 		}
 	}
@@ -851,7 +874,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public void splitEdgeEvent(F original, F f1, F f2, V v) {
 		pointLocator.postSplitHalfEdgeEvent(original, f1, f2,v );
-		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
 			triEventListener.postSplitHalfEdgeEvent(original, f1, f2, v);
 		}
 	}
@@ -859,7 +882,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	@Override
 	public void insertEvent(@NotNull final E halfEdge) {
 		pointLocator.postInsertEvent(getMesh().getVertex(halfEdge));
-		for(ITriEventListener<P, CE, CF, V, E, F> triEventListener : triEventListeners) {
+		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
 			triEventListener.postInsertEvent(getMesh().getVertex(halfEdge));
 		}
 	}
@@ -874,9 +897,9 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 	}
 
 	@Override
-	public IncrementalTriangulation<P, CE, CF, V, E, F> clone() {
+	public IncrementalTriangulation<V, E, F> clone() {
 		try {
-			IncrementalTriangulation<P, CE, CF, V, E, F> clone = (IncrementalTriangulation<P, CE, CF, V, E, F>)super.clone();
+			IncrementalTriangulation<V, E, F> clone = (IncrementalTriangulation<V, E, F>)super.clone();
 			clone.mesh = mesh.clone();
 
 			List<V> cVirtualVertices = new ArrayList<>();
@@ -912,7 +935,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		int width = 1000;
 		int max = Math.max(height, width);
 
-		Set<VPoint> points = new HashSet<>();
+		Set<IPoint> points = new HashSet<>();
 		/*points.add(new VPoint(20,20));
 		points.add(new VPoint(20,40));
 		points.add(new VPoint(75,53));
@@ -927,11 +950,11 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 		IPointConstructor<VPoint> pointConstructor =  (x, y) -> new VPoint(x, y);
 		long ms = System.currentTimeMillis();
 
-		PMesh<VPoint, ?, ?> mesh = new PMesh<>(pointConstructor);
-		IIncrementalTriangulation<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> bw = IIncrementalTriangulation.createPTriangulation(
+		PMesh mesh = new PMesh();
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> bw = IIncrementalTriangulation.createPTriangulation(
 				IPointLocator.Type.DELAUNAY_HIERARCHY,
-				points,
-				pointConstructor);
+				points
+		);
 		bw.finish();
 		System.out.println(System.currentTimeMillis() - ms);
         Set<VLine> edges = bw.getEdges();
@@ -944,10 +967,10 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
 
         ms = System.currentTimeMillis();
-        IIncrementalTriangulation<VPoint, Object, Object, AVertex<VPoint>, AHalfEdge<Object>, AFace<Object>> bw2 = IIncrementalTriangulation.createATriangulation(
+        IIncrementalTriangulation<AVertex, AHalfEdge, AFace> bw2 = IIncrementalTriangulation.createATriangulation(
                 IPointLocator.Type.DELAUNAY_HIERARCHY,
-                points,
-                pointConstructor);
+                points
+        );
         bw2.finish();
         System.out.println(System.currentTimeMillis() - ms);
 
@@ -959,7 +982,7 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
         window2.setVisible(true);
 
 		ms = System.currentTimeMillis();
-		BowyerWatsonSlow<VPoint> bw3 = new BowyerWatsonSlow<>(points, (x, y) -> new VPoint(x, y));
+		BowyerWatsonSlow bw3 = new BowyerWatsonSlow(points);
 		bw3.execute();
 		Set<VLine> edges3 = bw3.getTriangles().stream()
 				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
@@ -992,10 +1015,10 @@ public class IncrementalTriangulation<P extends IPoint, CE, CF, V extends IVerte
 
 	private static class Lines extends JComponent{
 		private Set<VLine> edges;
-		private Set<VPoint> points;
+		private Set<IPoint> points;
 		private final int max;
 
-		public Lines(final Set<VLine> edges, final Set<VPoint> points, final int max){
+		public Lines(final Set<VLine> edges, final Set<IPoint> points, final int max){
 			this.edges = edges;
 			this.points = points;
 			this.max = max;

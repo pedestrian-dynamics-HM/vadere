@@ -12,19 +12,16 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-public interface IEikMeshImprover<P extends EikMeshPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>>
-		extends IMeshImprover<P,CE,CF,V,E,F>, ITriangulator<P, CE, CF, V, E, F> {
+public interface IEikMeshImprover<V extends IVertex, E extends IHalfEdge, F extends IFace> extends IMeshImprover<V, E, F>, ITriangulator<V, E, F> {
 
 	/**
 	 * Returns the mesh the improver is working on.
 	 *
 	 * @return the mesh the improver is working on.
 	 */
-	default IMesh<P,CE,CF,V,E,F> getMesh() {
+	default IMesh<V,E,F> getMesh() {
 		return getTriangulation().getMesh();
 	}
 

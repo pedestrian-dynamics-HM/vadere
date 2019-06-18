@@ -9,7 +9,6 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -18,8 +17,6 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,10 +28,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVertex<P>, E extends IHalfEdge<CE>, F extends IFace<CF>> implements IRefiner<P, CE, CF, V, E, F> {
+public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(GenVoronoiVertexInsertion.class);
-	private final GenConstrainedDelaunayTriangulator<P, CE, CF, V, E, F> cdt;
+	private final GenConstrainedDelaunayTriangulator<V, E, F> cdt;
 
 	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
 	private Set<E> segments;
@@ -54,10 +51,10 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 	private final static int MAX_POINTS = 20000;
 	private double delta = 1.5;
 
-	private VoronoiSegPlacement<P, CE, CF, V, E, F> placementStrategy;
+	private VoronoiSegPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiSegmentInsertion(@NotNull final PSLG pslg,
-	                                  @NotNull final IMeshSupplier<P, CE, CF, V, E, F> meshSupplier,
+	                                  @NotNull final IMeshSupplier<V, E, F> meshSupplier,
 	                                  final boolean createHoles,
 	                                  @NotNull Function<IPoint, Double> circumRadiusFunc) {
 		this.segments = new HashSet<>();
@@ -127,7 +124,7 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 
 		if(optionalF.isPresent() && !getMesh().isBoundary(optionalF.get())) {
 			V v = getMesh().createVertex(x.getX(), x.getY());
-			getTriangulation().insert(v, optionalF.get());
+			getTriangulation().insertVertex(v, optionalF.get());
 
 			// no point was inserted
 			if(getMesh().getEdge(v) == null) {
@@ -221,12 +218,12 @@ public class GenVoronoiSegmentInsertion<P extends IPoint, CE, CF, V extends IVer
 		}
 	}
 
-	public IIncrementalTriangulation<P, CE, CF, V, E, F> getTriangulation() {
+	public IIncrementalTriangulation<V, E, F> getTriangulation() {
 		return cdt.getTriangulation();
 	}
 
 	@Override
-	public IMesh<P, CE, CF, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return cdt.getMesh();
 	}
 

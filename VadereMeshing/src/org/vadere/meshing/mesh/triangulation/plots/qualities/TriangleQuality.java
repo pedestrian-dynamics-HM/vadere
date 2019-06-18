@@ -92,7 +92,7 @@ public class TriangleQuality {
 	}
 
 	private static void adaptiveDiscEikMesh(double startLen) {
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
 		List<VShape> obstacles = new ArrayList<>();
@@ -103,7 +103,7 @@ public class TriangleQuality {
 		List<Double> quality = new ArrayList<>();
 		List<Double> minQuality = new ArrayList<>();
 
-		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,
@@ -133,7 +133,7 @@ public class TriangleQuality {
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -203,7 +203,7 @@ public class TriangleQuality {
 
 
 	private static void adaptiveRingEikMesh(double startLen) {
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
 		List<VShape> obstacles = new ArrayList<>();
@@ -214,7 +214,7 @@ public class TriangleQuality {
 		List<Double> quality = new ArrayList<>();
 		List<Double> minQuality = new ArrayList<>();
 
-		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,
@@ -244,7 +244,7 @@ public class TriangleQuality {
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -321,7 +321,7 @@ public class TriangleQuality {
 
 	private static void adaptiveHexEikMesh(double startLen) {
 		VPolygon hex = VShape.generateHexagon(0.4);
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction quader = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0;
 		IDistanceFunction circ = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(quader, IDistanceFunction.create(bbox, hex));
@@ -338,7 +338,7 @@ public class TriangleQuality {
 		List<Double> quality = new ArrayList<>();
 		List<Double> minQuality = new ArrayList<>();
 
-		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,
@@ -368,7 +368,7 @@ public class TriangleQuality {
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

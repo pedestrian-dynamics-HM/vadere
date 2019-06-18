@@ -41,7 +41,7 @@ public class EikMeshTests {
 
 	private static void testVisual(){
 		VPolygon hex = VShape.generateHexagon(0.4);
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 
 		IDistanceFunction quader = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0;
 		IDistanceFunction circ = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
@@ -53,15 +53,15 @@ public class EikMeshTests {
 		obstacles.add(hex);
 		obstacles.add(new VRectangle(-1,-1,2,2));
 
-		GenEikMesh<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> meshGenerator = new GenEikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
 				supplier);
 
-		Predicate<AFace<Object>> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
+		Predicate<AFace> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
 				predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);

@@ -33,14 +33,14 @@ public class VisualTestGPUEdgeBased {
 
 	private static void overallUniformRing() throws OpenCLException {
 
-		IMeshSupplier<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
 		CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, bbox, new ArrayList<>(), supplier);
 		meshGenerator.initialize();
 
-		MeshPanel<EikMeshPoint, Object, Object, AVertex<EikMeshPoint>, AHalfEdge<Object>, AFace<Object>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

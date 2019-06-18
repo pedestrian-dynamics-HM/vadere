@@ -5,9 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
+import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -25,9 +26,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestTriangulationOperations {
 
-	private VPTriangulation triangulation;
+	private PTriangulation triangulation;
 	private VPoint collapsePoint = new VPoint(0.5, 0);
-	private List<VPoint> points = new ArrayList<>();
+	private List<IPoint> points = new ArrayList<>();
 	private VRectangle bound = new VRectangle(-0.5, -0.5, 2.0, 2.0);
 
 	@Before
@@ -44,8 +45,8 @@ public class TestTriangulationOperations {
 	@Test
 	public void testCollapse() {
 		var mesh = triangulation.getMesh();
-		PVertex<VPoint, Object, Object> vertex = mesh
-				.streamVertices().filter(v -> mesh.getPoint(v).equals(collapsePoint))
+		PVertex vertex = mesh
+				.streamVertices().filter(v -> mesh.toPoint(v).equals(collapsePoint))
 				.findAny().get();
 
 		assertTrue(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
@@ -58,7 +59,7 @@ public class TestTriangulationOperations {
 
 		assertFalse(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
 
-		PFace<VPoint, Object, Object> face = triangulation.getMesh().getFaces().get(0);
+		PFace face = triangulation.getMesh().getFaces().get(0);
 
 		assertTrue(mesh.streamEdges(face).allMatch(e -> mesh.getFace(e).equals(face)));
 
@@ -97,7 +98,7 @@ public class TestTriangulationOperations {
 				new VPoint(0.3, 0.3),
 				new VPoint(0.3, 0.6));
 
-		var delaunayTriangulation = new PDelaunayTriangulator<VPoint, Integer, Integer>(points, (x, y) -> new VPoint(x, y));
+		var delaunayTriangulation = new PDelaunayTriangulator(points);
 		var triangulation = delaunayTriangulation.generate();
 		var mesh = delaunayTriangulation.getMesh();
 

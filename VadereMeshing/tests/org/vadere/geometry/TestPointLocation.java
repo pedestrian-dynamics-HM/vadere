@@ -30,8 +30,8 @@ public class TestPointLocation {
 	private static PFace face2;
 	private static PFace border;
 	private static double EPSILON = 1.0e-6;
-	private IMesh<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> mesh;
-	private ITriConnectivity<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> triConnectivity;
+	private IMesh<PVertex, PHalfEdge, PFace> mesh;
+	private ITriConnectivity<PVertex, PHalfEdge, PFace> triConnectivity;
 
 	/**
 	 * Sets up a mesh consisting of 2 triangles and 1 border face.
@@ -40,15 +40,15 @@ public class TestPointLocation {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+		mesh = new PMesh();
 		face1 = mesh.createFace();
 		face2 = mesh.createFace();
 		border = mesh.getBorder();
 
-		PVertex<VPoint, Object, Object> x = mesh.insertVertex(0, 0);
-		PVertex<VPoint, Object, Object> y = mesh.insertVertex(1.5,3.0);
-		PVertex<VPoint, Object, Object> z = mesh.insertVertex(3.0,0);
-		PVertex<VPoint, Object, Object> w = mesh.insertVertex(4.5,3.0);
+		PVertex x = mesh.insertVertex(0, 0);
+		PVertex y = mesh.insertVertex(1.5,3.0);
+		PVertex z = mesh.insertVertex(3.0,0);
+		PVertex w = mesh.insertVertex(4.5,3.0);
 
 		PHalfEdge xy = mesh.createEdge(y, border);
 		mesh.setEdge(y, xy);
@@ -115,7 +115,7 @@ public class TestPointLocation {
 			}
 
 			@Override
-			public IMesh<VPoint, Object, Object, PVertex<VPoint, Object, Object>, PHalfEdge<VPoint, Object, Object>, PFace<VPoint, Object, Object>> getMesh() {
+			public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
 				return mesh;
 			}
 
