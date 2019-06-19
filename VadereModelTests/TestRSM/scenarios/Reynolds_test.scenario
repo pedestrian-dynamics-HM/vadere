@@ -1,7 +1,7 @@
 {
   "name" : "Reynolds_test",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
