@@ -1,7 +1,7 @@
 {
   "name" : "roVerTest001",
   "description" : "",
-  "release" : "0.10",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

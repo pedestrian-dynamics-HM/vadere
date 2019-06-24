@@ -118,7 +118,8 @@ public class ScenarioRun implements Runnable {
 					createAndSetOutputDirectory();
 					scenario.saveToOutputPath(outputPath);
 				}
-
+				// ensure all elements have unique id before attributes are sealed
+				scenario.getTopography().generateUniqueIdIfNotSet();
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds

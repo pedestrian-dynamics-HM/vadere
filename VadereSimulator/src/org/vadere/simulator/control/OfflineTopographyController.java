@@ -46,7 +46,6 @@ public class OfflineTopographyController {
 		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 		this.topography.setObstacleDistanceFunction(obstacleDistance);
 
-		this.topography.generateUniqueIdIfNotSet();
 	}
 
 	/**
