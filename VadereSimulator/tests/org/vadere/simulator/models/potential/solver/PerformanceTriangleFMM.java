@@ -4,7 +4,7 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
@@ -30,7 +30,7 @@ public class PerformanceTriangleFMM {
 
 	private static IIncrementalTriangulation<PVertex, PHalfEdge, PFace> createTriangulation() {
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-		PEikMeshGen meshGenerator = new PEikMeshGen<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox);
+		PEikMesh meshGenerator = new PEikMesh<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox);
 		return meshGenerator.generate();
 	}
 

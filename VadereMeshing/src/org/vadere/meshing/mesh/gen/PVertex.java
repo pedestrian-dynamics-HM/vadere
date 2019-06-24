@@ -3,6 +3,8 @@ package org.vadere.meshing.mesh.gen;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,6 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PVertex implements IVertex {
 
+	private Map<String, Object> propertyElements;
 	private Lock lock;
 	private IPoint point;
 	private PVertex down;
@@ -24,6 +27,7 @@ public class PVertex implements IVertex {
 		this.destroyed = false;
 		this.down = null;
 		this.lock = new ReentrantLock();
+		this.propertyElements = new HashMap<>();
 	}
 
 	public void setPoint(final IPoint point) {
@@ -105,4 +109,16 @@ public class PVertex implements IVertex {
 		    throw new InternalError(e.getMessage());
 	    }
     }
+
+	<T> void setData(final String name, T data) {
+		propertyElements.put(name, data);
+	}
+
+	<T> T getData(final String name, Class<T> clazz) {
+		if (propertyElements.containsKey(name)) {
+			return clazz.cast(propertyElements.get(name));
+		} else {
+			return null;
+		}
+	}
 }

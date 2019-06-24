@@ -5,7 +5,7 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.utils.io.movie.MovRecorder;
 import org.vadere.meshing.utils.io.poly.PolyGenerator;
@@ -16,7 +16,6 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -72,7 +71,7 @@ public class EikMeshExamples {
 		var delaunayTriangulator = new PDelaunayTriangulator(points);
 		var triangulation = delaunayTriangulator.generate();
 
-		var improver = new PEikMeshGen(p -> 1.0, triangulation);
+		var improver = new PEikMesh(p -> 1.0, triangulation);
 		var panel = new PMeshPanel(triangulation.getMesh(), 500, 500);
 		panel.display("A square mesh");
 		panel.repaint();
@@ -116,7 +115,7 @@ public class EikMeshExamples {
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
 		double edgeLength = 0.03;
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				d,
 				p -> edgeLength + 0.5 * Math.abs(d.apply(p)),
 				edgeLength,
@@ -170,7 +169,7 @@ public class EikMeshExamples {
 		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
 		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
 		double edgeLength = 0.07;
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				d,
 				p -> edgeLength + 0.3 * Math.abs(d.apply(p)),
 				edgeLength,
@@ -266,7 +265,7 @@ public class EikMeshExamples {
 
 		// define the EikMesh-Improver
 		IEdgeLengthFunction h = p -> h0 + 0.3 * Math.abs(d.apply(p));
-		PEikMeshGen meshImprover = new PEikMeshGen(
+		PEikMesh meshImprover = new PEikMesh(
 				d,
 				h,
 				Arrays.asList(center),
@@ -492,7 +491,7 @@ public class EikMeshExamples {
 
 		// like before but we have to add the point-constructor to the constructor of EikMesh and we use
 		// the more generic type PEikMeshGen instead of PEikMes!
-		PEikMeshGen meshImprover = new PEikMeshGen(
+		PEikMesh meshImprover = new PEikMesh(
 				ringDistance,
 				edgeLengthFunction,
 				edgeLength,

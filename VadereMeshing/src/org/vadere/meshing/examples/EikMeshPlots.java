@@ -6,7 +6,6 @@ import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
@@ -73,7 +72,7 @@ public class EikMeshPlots {
 		write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_random_before");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				p -> 1.0 + Math.abs(bound.distance(p)),
 				dt.getTriangulation()
 		);
@@ -100,7 +99,7 @@ public class EikMeshPlots {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 5.0;
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				distanceFunction,
 				p -> h0 + 0.3 * Math.abs(distanceFunction.apply(p)),
 				h0,
@@ -128,7 +127,7 @@ public class EikMeshPlots {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 1.0;
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				distanceFunction,
 				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
 				h0,
@@ -174,7 +173,7 @@ public class EikMeshPlots {
 		IDistanceFunction d_b = IDistanceFunction.create(boundary);
 		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
 		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
@@ -202,7 +201,7 @@ public class EikMeshPlots {
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
@@ -230,7 +229,7 @@ public class EikMeshPlots {
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
 				h0,
@@ -261,7 +260,7 @@ public class EikMeshPlots {
 
 		// define the EikMesh-Improver
 		IEdgeLengthFunction h = p -> h0;
-		PEikMeshGen meshImprover = new PEikMeshGen(
+		PEikMesh meshImprover = new PEikMesh(
 				d,
 				h,
 				Arrays.asList(center),
@@ -341,7 +340,7 @@ public class EikMeshPlots {
 			panel.repaint();
 		}
 
-		var eikMesh = new PEikMeshGen(h, ruppert.getTriangulation());
+		var eikMesh = new PEikMesh(h, ruppert.getTriangulation());
 
 		while (!eikMesh.isFinished()) {
 			try {

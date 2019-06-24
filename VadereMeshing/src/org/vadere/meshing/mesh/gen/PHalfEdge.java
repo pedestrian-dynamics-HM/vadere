@@ -5,7 +5,12 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PHalfEdge implements IHalfEdge, Cloneable {
+
+	private Map<String, Object> propertyElements;
 
 	/**
 	 * point at the end of the half edge.
@@ -39,12 +44,14 @@ public class PHalfEdge implements IHalfEdge, Cloneable {
 		this.end = end;
 		this.face = face;
 		this.destroyed = false;
+		this.propertyElements = new HashMap<>();
 	}
 
 	protected PHalfEdge(@NotNull final PVertex end) {
 		this.end = end;
 		this.face = null;
 		this.destroyed = false;
+		this.propertyElements = new HashMap<>();
 	}
 
 	PFace getFace() {
@@ -137,6 +144,18 @@ public class PHalfEdge implements IHalfEdge, Cloneable {
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new InternalError(e.getMessage());
+		}
+	}
+
+	<T> void setData(final String name, T data) {
+		propertyElements.put(name, data);
+	}
+
+	<T> T getData(final String name, Class<T> clazz) {
+		if (propertyElements.containsKey(name)) {
+			return clazz.cast(propertyElements.get(name));
+		} else {
+			return null;
 		}
 	}
 

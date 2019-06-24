@@ -10,7 +10,6 @@ import org.vadere.meshing.mesh.inter.IMeshDistanceFunction;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PVoronoiVertexInsertion;
@@ -63,7 +62,7 @@ public class MeshExamples {
 		//delaunayTriangulation();
 		//dirichletRefinment();
 //		delaunayRefinment();
-		constrainedDelaunayTriangulation();
+		//constrainedDelaunayTriangulation();
 		//eikMeshKaiserslautern();
 		//eikMeshKaiserslauternApprox();
 		//eikMeshA();
@@ -275,7 +274,7 @@ public class MeshExamples {
 		//panel.display(" Voronoi Vertex Insertion");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
-		var eikMesh = new PEikMeshGen(
+		var eikMesh = new PEikMesh(
 				p -> 1.0 + Math.abs(bound.distance(p)),
 				dt.getTriangulation()
 		);
@@ -638,7 +637,7 @@ public class MeshExamples {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 5.0;
-		PEikMeshGen meshImprover = new PEikMeshGen(
+		PEikMesh meshImprover = new PEikMesh(
 				distanceFunction,
 				p -> h0 + 0.3 * Math.abs(distanceFunction.apply(p)),
 				h0,
@@ -704,7 +703,7 @@ public class MeshExamples {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 5.0;
-		PEikMeshGen meshImprover = new PEikMeshGen(
+		PEikMesh meshImprover = new PEikMesh(
 				distanceFunction,
 				p -> h0 + 0.3 * Math.abs(distanceFunction.apply(p)),
 				h0,
@@ -767,7 +766,7 @@ public class MeshExamples {
 		}*/
 
 		// (3) use EikMesh to improve the mesh
-		var eikMesh = new PEikMeshGen(
+		var eikMesh = new PEikMesh(
 				p -> 1.0 + 0.2*Math.abs(pslg.getSegmentBound().distance(p)),
 				ruppertsTriangulator.getTriangulation()
 		);

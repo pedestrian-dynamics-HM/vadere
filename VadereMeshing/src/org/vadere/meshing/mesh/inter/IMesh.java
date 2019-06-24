@@ -233,9 +233,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 
 	double getY(@NotNull V vertex);
 
-	default void setCoords(@NotNull V vertex, double x, double y) {
-		throw new UnsupportedOperationException("not jet implemented");
-	}
+	void setCoords(@NotNull V vertex, double x, double y);
 
 	/**
 	 * Returns a half-edge of the face this can be any half-edge of this face in O(1).
@@ -301,16 +299,14 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 */
 	IPoint getPoint(@NotNull V vertex);
 
-	default <CV> Optional<CV> getData(@NotNull final V vertex, @NotNull final String name, @NotNull final Class<CV> clazz) {
-		return Optional.empty();
-	}
+	<CV> Optional<CV> getData(@NotNull final V vertex, @NotNull final String name, @NotNull final Class<CV> clazz);
 
 	default boolean getBooleanData(@NotNull final V vertex, @NotNull final String name) {
-		return getData(vertex, name, Boolean.class).or(null).get();
+		return getData(vertex, name, Boolean.class).orElse(false);
 	}
 
 	default double getDoubleData(@NotNull final V vertex, @NotNull final String name) {
-		return getData(vertex, name, Double.class).or(null).get();
+		return getData(vertex, name, Double.class).orElse(0.0);
 	}
 
 	<CV> void setData(@NotNull final V vertex, @NotNull final String name, CV data);
@@ -331,9 +327,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 * @param clazz type of the property
 	 * @return the data saved on the half-edge or <tt>Optional.empty()</tt> if there is no data saved
 	 */
-	default <CE> Optional<CE> getData(@NotNull E edge, @NotNull final String name, @NotNull final Class<CE> clazz) {
-		return Optional.empty();
-	}
+	<CE> Optional<CE> getData(@NotNull E edge, @NotNull final String name, @NotNull final Class<CE> clazz);
 
 	default boolean getBooleanData(@NotNull E edge, @NotNull final String name) {
 		return getData(edge, name, Boolean.class).or(null).get();
@@ -367,9 +361,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 * @param clazz
 	 * @return the data saved on the face or <tt>Optional.empty()</tt> if there is no data saved
 	 */
-	default <CF> Optional<CF> getData(@NotNull F face, @NotNull final String name, @NotNull final Class<CF> clazz) {
-		return Optional.empty();
-	}
+	<CF> Optional<CF> getData(@NotNull F face, @NotNull final String name, @NotNull final Class<CF> clazz);
 
 	default boolean getBooleanData(@NotNull F face, @NotNull final String name) {
 		return getData(face, name, Boolean.class).or(null).get();

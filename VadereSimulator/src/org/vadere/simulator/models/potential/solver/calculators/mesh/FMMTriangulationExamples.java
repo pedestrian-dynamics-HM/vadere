@@ -8,7 +8,7 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.io.poly.PolyGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -60,7 +60,7 @@ public class FMMTriangulationExamples {
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 1.0;
-		var meshImprover = new PEikMeshGen(
+		var meshImprover = new PEikMesh(
 				distanceFunction,
 				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
 				h0,

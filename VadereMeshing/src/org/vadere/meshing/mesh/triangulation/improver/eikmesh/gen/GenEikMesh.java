@@ -12,7 +12,6 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRivaraRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;

@@ -6,7 +6,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
@@ -155,7 +155,7 @@ public interface IPotentialField {
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PEikMeshGen meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
+	        PEikMesh meshGenerator = new PEikMesh<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
 	        IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(

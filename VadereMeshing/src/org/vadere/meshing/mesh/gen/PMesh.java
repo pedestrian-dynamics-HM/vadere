@@ -97,6 +97,11 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	}
 
 	@Override
+	public void setCoords(@NotNull final PVertex vertex, double x, double y) {
+		vertex.setPoint(new VPoint(x, y));
+	}
+
+	@Override
 	public PHalfEdge getEdge(@NotNull final PFace face) {
 		return face.getEdge();
 	}
@@ -117,18 +122,33 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	}
 
 	@Override
-	public <CV> void setData(@NotNull PVertex vertex, @NotNull String name, CV data) {
-		throw new UnsupportedOperationException("not jet implemented");
+	public <CV> Optional<CV> getData(@NotNull final PVertex vertex, @NotNull final String name, @NotNull final Class<CV> clazz) {
+		return Optional.ofNullable(vertex.getData(name, clazz));
 	}
 
 	@Override
-	public <CE> void setData(@NotNull PHalfEdge edge, @NotNull String name, @Nullable CE data) {
-		throw new UnsupportedOperationException("not jet implemented");
+	public <CV> void setData(@NotNull final PVertex vertex, @NotNull final String name, final CV data) {
+		vertex.setData(name, data);
+	}
+
+	@Override
+	public <CE> Optional<CE> getData(@NotNull final PHalfEdge edge, @NotNull final String name, @NotNull final Class<CE> clazz) {
+		return Optional.ofNullable(edge.getData(name, clazz));
+	}
+
+	@Override
+	public <CE> void setData(@NotNull final PHalfEdge edge, @NotNull final String name, @Nullable final CE data) {
+		edge.setData(name, data);
+	}
+
+	@Override
+	public <CF> Optional<CF> getData(@NotNull final PFace face, @NotNull final String name, @NotNull final Class<CF> clazz) {
+		return Optional.ofNullable(face.getData(name, clazz));
 	}
 
 	@Override
 	public <CF> void setData(@NotNull final PFace face, @NotNull final String name, @Nullable final CF data) {
-		throw new UnsupportedOperationException("not jet implemented");
+		face.setData(name, data);
 	}
 
 	@Override

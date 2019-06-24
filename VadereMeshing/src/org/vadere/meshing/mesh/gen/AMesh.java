@@ -102,6 +102,11 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	}
 
 	@Override
+	public void setCoords(@NotNull AVertex vertex, double x, double y) {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
+	@Override
 	public AHalfEdge getEdge(@NotNull final AFace face) {
 		return edges.get(face.getEdge());
 	}

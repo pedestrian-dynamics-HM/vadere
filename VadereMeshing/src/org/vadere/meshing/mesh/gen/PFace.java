@@ -3,6 +3,9 @@ package org.vadere.meshing.mesh.gen;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Face is a region of a planar separation of the 2-D space, e.g. the region of a Polygon/Triangle and so on.
  *
@@ -11,6 +14,8 @@ import org.vadere.meshing.mesh.inter.IFace;
 public class PFace implements IFace, Cloneable {
 
 	private static int MAX_FACE_PRINT_LEN = 100000;
+
+	private Map<String, Object> propertyElements;
 
 	/**
 	 * One of the half-edges bordering this face.
@@ -30,6 +35,7 @@ public class PFace implements IFace, Cloneable {
 	protected PFace(@NotNull final PHalfEdge edge, final boolean boundary) {
 		this.boundary = boundary;
 		this.edge = edge;
+		this.propertyElements = new HashMap<>();
 	}
 
 	/**
@@ -48,6 +54,7 @@ public class PFace implements IFace, Cloneable {
 	 */
 	PFace(boolean boundary) {
 		this.boundary = boundary;
+		this.propertyElements = new HashMap<>();
 	}
 
 	PFace() {
@@ -61,6 +68,7 @@ public class PFace implements IFace, Cloneable {
 	void destroy() {
 		setEdge(null);
 		destroyed = true;
+		propertyElements.clear();
 	}
 
 	public void setBoundary(boolean border) {
@@ -120,4 +128,17 @@ public class PFace implements IFace, Cloneable {
 			throw new InternalError(e.getMessage());
 		}
 	}
+
+	<T> void setData(final String name, T data) {
+		propertyElements.put(name, data);
+	}
+
+	<T> T getData(final String name, Class<T> clazz) {
+		if (propertyElements.containsKey(name)) {
+			return clazz.cast(propertyElements.get(name));
+		} else {
+			return null;
+		}
+	}
+
 }
