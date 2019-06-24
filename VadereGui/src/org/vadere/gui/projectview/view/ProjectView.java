@@ -5,7 +5,36 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.gui.projectview.control.*;
+import org.vadere.gui.projectview.control.ActionAddScenario;
+import org.vadere.gui.projectview.control.ActionCloneScenario;
+import org.vadere.gui.projectview.control.ActionCloseApplication;
+import org.vadere.gui.projectview.control.ActionCreateProject;
+import org.vadere.gui.projectview.control.ActionDeleteOutputDirectories;
+import org.vadere.gui.projectview.control.ActionDeleteScenarios;
+import org.vadere.gui.projectview.control.ActionEditScenarioDescription;
+import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
+import org.vadere.gui.projectview.control.ActionInterruptScenarios;
+import org.vadere.gui.projectview.control.ActionLoadProject;
+import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionNextTimeStep;
+import org.vadere.gui.projectview.control.ActionOpenInExplorer;
+import org.vadere.gui.projectview.control.ActionOutputToScenario;
+import org.vadere.gui.projectview.control.ActionPauseScenario;
+import org.vadere.gui.projectview.control.ActionRenameOutputFile;
+import org.vadere.gui.projectview.control.ActionRenameProject;
+import org.vadere.gui.projectview.control.ActionRenameScenario;
+import org.vadere.gui.projectview.control.ActionResumeNormalSpeed;
+import org.vadere.gui.projectview.control.ActionRunAllScenarios;
+import org.vadere.gui.projectview.control.ActionRunOutput;
+import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
+import org.vadere.gui.projectview.control.ActionSaveAsProject;
+import org.vadere.gui.projectview.control.ActionSaveProject;
+import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
+import org.vadere.gui.projectview.control.ActionShowAboutDialog;
+import org.vadere.gui.projectview.control.ActionToClipboard;
+import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
+import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.control.ShowResultDialogAction;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -20,9 +49,6 @@ import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLUtils;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -36,6 +62,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
 
 /**
  * Main view of the Vadere GUI.
@@ -72,6 +102,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
+	private JButton btnNextSimulationStep;
+	private JButton btnResumeNormalSpeed;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
@@ -288,6 +320,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunSelectedScenario.setVisible(!flag);
 		btnStopRunningScenarios.setVisible(flag);
 		btnPauseRunningScenarios.setVisible(flag);
+		btnNextSimulationStep.setVisible(flag);
+		btnResumeNormalSpeed.setVisible(flag);
 		scenarioTable.setEnabled(!flag);
 		scenarioTable.clearSelection();
 		outputTable.setEnabled(!flag);
@@ -698,6 +732,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnStopRunningScenarios = new JButton(interruptScenariosAction);
 		toolBar.add(btnStopRunningScenarios);
 
+		ActionResumeNormalSpeed resumeNormalSpeedAction =
+				new ActionResumeNormalSpeed(Messages.getString("ProjectView.btnResumeNormalSpeed.text"), model);
+		resumeNormalSpeedAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
+		btnResumeNormalSpeed = new JButton(resumeNormalSpeedAction);
+		toolBar.add(btnResumeNormalSpeed);
+
 		ActionPauseScenario pauseScenarioAction =
 				new ActionPauseScenario(Messages.getString("ProjectView.btnPauseRunningTests.text"), model);
 		pauseScenarioAction.putValue(Action.LONG_DESCRIPTION,
@@ -710,6 +751,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		toolBar.getInputMap().put(
 				KeyStroke.getKeyStroke(Messages.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
 		toolBar.getActionMap().put("pauseTests", pauseScenarioAction);
+
+		ActionNextTimeStep nextTimeStepAction =
+				new ActionNextTimeStep(Messages.getString("ProjectView.btnNextSimulationStep"), model);
+		nextTimeStepAction.putValue(Action.LONG_DESCRIPTION, "Next Step");
+		nextTimeStepAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_step.png")));
+		btnNextSimulationStep = new JButton(nextTimeStepAction);
+		toolBar.add(btnNextSimulationStep);
 
 		buildKeyboardShortcuts(pauseScenarioAction, interruptScenariosAction);
 	}
