@@ -59,6 +59,8 @@ import numpy as np
 import itertools as iter
 
 
+from typing import List
+
 vadere_obstacle_string = """{
     "shape" : {
         "type" : "POLYGON",
@@ -66,6 +68,7 @@ vadere_obstacle_string = """{
     },
     "id" : $id
 }"""
+
 
 class PathToPolygon:
 
@@ -78,9 +81,9 @@ class PathToPolygon:
         self.create_poly_points()
 
     @classmethod
-    def get_point_list(cls, list_of_tuples, dist):
+    def get_poly_object(cls, list_of_tuples, dist, id):
         ptp = cls(list_of_tuples, dist)
-        return ptp.create_poly_points()
+        return PolyObjectWidthId(id, ptp.create_poly_points())
 
     def create_poly_points(self):
         lines_o1 = []
@@ -165,6 +168,33 @@ class PathToPolygon:
         return [line_o1, line_o2]
 
 
+class PolyObjectWidthId:
+    """
+    Simple wrapper class around a list of points (order is important!) withn an identifier field (id)
+    """
+
+    def __init__(self, id, utm_points):
+        self.id = id
+        self.cartesian_points = utm_points
+        self.base = None
+
+    def shift_points(self, base: list):
+        shift_in_x = -base[0]
+        shift_in_y = -base[1]
+        self.cartesian_points = [(point[0] + shift_in_x, point[1] + shift_in_y) for point in self.cartesian_points]
+        self.base = base
+
+
+def str2bool(v):
+    # see https://stackoverflow.com/a/43357954
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
 
@@ -174,20 +204,22 @@ def parse_command_line_arguments():
                         help="An OSM map in XML format.",
                         default="maps/map_hochschule_klein.osm",
                         )
+    parser.add_argument("--use-osm-id", dest='use_osm_id', type=str2bool, const=True, nargs="?",
+                        default=True, help="Set to use osm ids for obstacles")
+    parser.add_argument("-o", "--output", type=str, nargs="?",
+                            help="Specify filename if you want the output in a file.")
+
     # parser.add_argument("-o", "--output", type=str, nargs="?",
     #               help="Specify filename if you want the output in a file.")
 
     subparser = parser.add_subparsers(help="sub-command help")
     parser_converter = subparser.add_parser('convert', help='convert given osm file to Vadere topography')
     parser_converter.set_defaults(main_func=main_convert)
-    parser_converter.add_argument("--use-osm-id", dest='use_osm_id', type=bool, default=False, help="Set to use osm ids for obstacles")
-    parser_converter.add_argument("-o", "--output", type=str, nargs="?",
-                            help="Specify filename if you want the output in a file.")
+
 
     parser_way_to_polygon = subparser.add_parser('wayToPoly', help='convert given way id to a Vadere polygon')
     parser_way_to_polygon.set_defaults(main_func=main_way_to_polygon)
     parser_way_to_polygon.add_argument("-d", "--path-width", dest="d", type=float, help="Specify filename if you want the output in a file.")
-    parser_way_to_polygon.add_argument("-o", "--output", type=str, nargs="?")
     parser_way_to_polygon.add_argument("-w", "--way", type=int, nargs="+")
 
     args = parser.parse_args()
@@ -280,16 +312,16 @@ def convert_nodes_to_cartesian_points(nodes, lookup_table_latitude_and_longitude
     return cartesian_points
 
 
-def create_vadere_obstacles_from_points(cartesian_points, id=-1):
+def create_vadere_obstacles_from_building(building: PolyObjectWidthId):
     vadere_point_string = '         { "x" : $x, "y" : $y }'
 
     obstacle_string_template = Template(vadere_obstacle_string)
     point_string_template = Template(vadere_point_string)
 
-    points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in cartesian_points]
+    points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in building.cartesian_points]
     points_as_string_concatenated = ",\n".join(points_as_string)
 
-    vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated, id=id)
+    vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated, id=building.id)
 
     return vadere_obstacle_as_string
 
@@ -319,21 +351,22 @@ def print_output(outputfile, output):
             print(output, file=text_file)
 
 
-def find_width_and_height(buildings_cartesian):
+def find_width_and_height(buildings: List[PolyObjectWidthId]):
     # search for the highest x- and y-coordinates within the points
     width = 0
     height = 0
-    for cartesian_points in buildings_cartesian:
-        for point in cartesian_points:
+    for cartesian_points in buildings:
+        for point in cartesian_points.cartesian_points:
             width = max(width, point[0])
             height = max(height, point[1])
     return math.ceil(width), math.ceil(height)
 
-def find_new_basepoint(buildings_cartesian):
+
+def find_new_basepoint(buildings: List[PolyObjectWidthId]):
     # "buildings_cartesian" is a list of lists!!!
     # The inner list contains the (x,y) tuples!
     # search for the lowest x- and y-coordinates within the points
-    all_points = [point for building in buildings_cartesian for point in building]
+    all_points = [point for building in buildings for point in building.cartesian_points]
 
     tuple_with_min_x = min(all_points, key=lambda point: point[0])
     tuple_with_min_y = min(all_points, key=lambda point: point[1])
@@ -348,18 +381,7 @@ def shift_way(way, base):
     return shift_cartesian_points
 
 
-def shift_points(buildings_utm, base:list):
-    shift_in_x_direction = -base[0]
-    shift_in_y_direction = -base[1]
-    new_buildings = []
-    for cartesian_points in buildings_utm:
-        shifted_cartesian_points = \
-            [(point[0] + shift_in_x_direction, point[1] + shift_in_y_direction) for point in cartesian_points]
-        new_buildings.append(shifted_cartesian_points)
-    return new_buildings
-
-
-def convert_buildings_to_cartesian(buildings_as_xml_nodes, nodes_dictionary_with_lat_and_lon):
+def convert_buildings_to_cartesian(buildings_as_xml_nodes, nodes_dictionary_with_lat_and_lon, use_osm_id: bool):
     buildings_in_cartesian = []
     for building in buildings_as_xml_nodes:
         # Collect nodes that belong to the current building.
@@ -369,14 +391,17 @@ def convert_buildings_to_cartesian(buildings_as_xml_nodes, nodes_dictionary_with
         cartesian_points = convert_nodes_to_cartesian_points(node_references, nodes_dictionary_with_lat_and_lon,
                                                              assume_closed_path=True)
 
-        buildings_in_cartesian.append(cartesian_points)
+        if use_osm_id:
+            buildings_in_cartesian.append(PolyObjectWidthId(building.get('id'), cartesian_points))
+        else:
+            buildings_in_cartesian.append(PolyObjectWidthId(-1, cartesian_points))
     return buildings_in_cartesian
 
 
-def convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings_as_cartesian):
+def convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings: List[PolyObjectWidthId]):
     list_of_vadere_obstacles_as_strings = []
-    for cartesian_points in buildings_as_cartesian:
-        vadere_obstacles_as_strings = create_vadere_obstacles_from_points(cartesian_points)
+    for building in buildings:
+        vadere_obstacles_as_strings = create_vadere_obstacles_from_building(building)
         list_of_vadere_obstacles_as_strings.append(vadere_obstacles_as_strings)
     return list_of_vadere_obstacles_as_strings
 
@@ -392,9 +417,12 @@ def init(args):
 
     print_xml_parsing_statistics(args.osm_file, nodes_dictionary_with_lat_and_lon, simple_buildings, complex_buildings, extracted_base_point)
 
-    buildings_as_cartesian = convert_buildings_to_cartesian(simple_buildings + complex_buildings, nodes_dictionary_with_lat_and_lon)
+    buildings_as_cartesian = convert_buildings_to_cartesian(simple_buildings + complex_buildings, nodes_dictionary_with_lat_and_lon, args.use_osm_id)
 
     new_base = find_new_basepoint(buildings_as_cartesian)
+
+    for b in buildings_as_cartesian:
+        b.shift_points(new_base)
 
     return xml_tree, nodes_dictionary_with_lat_and_lon, buildings_as_cartesian, new_base
 
@@ -406,10 +434,9 @@ def main_convert(args):
     osm2vadere.py mf.osm convert --output map.json
     """
     print(args)
-    xml_tree, _, buildings_as_cartesian, new_base = init(args)
+    xml_tree, _, buildings_as_cartesian, _ = init(args)
 
     # make sure everything lies within the topography
-    buildings_as_cartesian = shift_points(buildings_as_cartesian, new_base)
     width_topography, height_topography = find_width_and_height(buildings_as_cartesian)
 
     list_of_vadere_obstacles_as_strings = convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings_as_cartesian)
@@ -434,7 +461,7 @@ def main_way_to_polygon(args):
         assert len(way) == 1
         path_list = convert_way_to_cartesian(way[0], node_dict, assume_closed_path=False)
         path_list = shift_way(path_list, new_base)
-        vadere_obstacle = create_vadere_obstacles_from_points(PathToPolygon.get_point_list(path_list, args.d), id=w)
+        vadere_obstacle = create_vadere_obstacles_from_building(PathToPolygon.get_poly_object(path_list, args.d, w))
         obstacles.append(vadere_obstacle)
 
     print_output(args.output, '\n'.join(obstacles))

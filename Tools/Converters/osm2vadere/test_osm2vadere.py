@@ -68,8 +68,9 @@ class TestOsm2vadere(unittest.TestCase):
         building_normal = [(1, 1), (3, 1), (1, 3), (3, 3)]
         building_negative_coordinates = [(-1, 4), (-3, 2), (10, 2)]
         building_with_floating_points = [(2.3, 1.4), (-10.5, 7), (9.99, 3), (5, 7.1), (3, 4)]
-        buildings_cartesian = [building_normal, building_negative_coordinates, building_with_floating_points]
-        width, height = osm2vadere.find_width_and_height(buildings_cartesian)
+        building_points = [building_normal, building_negative_coordinates, building_with_floating_points]
+        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in building_points]
+        width, height = osm2vadere.find_width_and_height(buildings)
 
         self.assertTrue(width == 10)
         self.assertTrue(height == 8) # 7.1 is the maximum but the function returns math.ceil
@@ -78,18 +79,20 @@ class TestOsm2vadere(unittest.TestCase):
         building_normal = [(1, 1), (3, 1), (1, 3), (3, 3)]
         building_negative_coordinates = [(-1, 4), (-3, 2), (10, 2)]
         building_with_floating_points = [(2.3, 1.4), (-10.5, 7), (9.99, 3), (5, 7.1), (3, 4)]
-        buildings_cartesian = [building_normal, building_negative_coordinates, building_with_floating_points]
-        new_base_point = osm2vadere.find_new_basepoint(buildings_cartesian)
+        building_points = [building_normal, building_negative_coordinates, building_with_floating_points]
+        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in building_points]
+        new_base_point = osm2vadere.find_new_basepoint(buildings)
 
         self.assertTrue(new_base_point == (-10.5, 1))
 
         building_negative_coordinates.append((3, -5))
-        new_base_point = osm2vadere.find_new_basepoint(buildings_cartesian)
+        new_base_point = osm2vadere.find_new_basepoint(buildings)
 
         self.assertTrue(new_base_point == (-10.5, -5))
 
         buildings_cartesian_only_positive = [[(1, 3), (1, 2), (2, 2)], [(2, 4), (7, 7), (6, 6)]]
-        new_base_point = osm2vadere.find_new_basepoint(buildings_cartesian_only_positive)
+        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in buildings_cartesian_only_positive]
+        new_base_point = osm2vadere.find_new_basepoint(buildings)
 
         self.assertTrue(new_base_point == (1, 2))
 
@@ -100,6 +103,7 @@ class TestOsm2vadere(unittest.TestCase):
                 self.osm_file = osm_file
                 self.way = way
                 self.output = None
+                self.use_osm_id = True
 
         o = osm2vadere.main_way_to_polygon(Ns(0.25, TEST_DATA_2, [258139209]))
         self.assertEqual(len(o), 1)
@@ -107,12 +111,13 @@ class TestOsm2vadere(unittest.TestCase):
 
 
     def test_shift_points(self):
-        buildings_cartesian = [[(1, 3), (-1, 2), (2, 2)], [(2, 4), (7, 7), (6, 6)]]
-        buildings_cartesian_shifted_by_one_and_two = osm2vadere.shift_points(buildings_cartesian, [1, 2])
+        building_points = [[(1, 3), (-1, 2), (2, 2)], [(2, 4), (7, 7), (6, 6)]]
+        buildings = [osm2vadere.PolyObjectWidthId(-1, points) for points in building_points]
+        for b in buildings:
+            b.shift_points([1,2])
+        self.assertEqual(buildings[0].cartesian_points, [(0, 1), (-2, 0), (1, 0)])
+        self.assertEqual(buildings[1].cartesian_points, [(1, 2), (6, 5), (5, 4)])
 
-
-
-        self.assertTrue(buildings_cartesian_shifted_by_one_and_two == [[(0, 1), (-2, 0), (1, 0)], [(1, 2), (6, 5), (5, 4)]])
 
 if __name__ == "__main__":
     unittest.main()
