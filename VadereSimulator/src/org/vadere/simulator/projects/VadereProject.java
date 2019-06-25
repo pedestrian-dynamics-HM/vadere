@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects;
 
 import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.projects.migration.MigrationResult;
 import org.vadere.util.logging.Logger;
 
@@ -163,6 +164,22 @@ public class VadereProject {
 
 	public boolean isScenarioPaused() {
 		return !currentScenarioRun.isRunning();
+	}
+
+	public boolean isScenarioInSingleStepMode(){
+		return currentScenarioRun.isScenarioInSingleStepMode();
+	}
+
+	public void setSingleStepMode(boolean singleStepMode){
+		currentScenarioRun.setSingleStepMode(singleStepMode);
+	}
+
+	public boolean isWaitForSimCommand(){
+		return currentScenarioRun.isWaitForSimCommand();
+	}
+
+	public void nextSimCommand(double simulateUntilInSec){
+		currentScenarioRun.nextSimCommand(simulateUntilInSec);
 	}
 
 	public void resumePausedScenarios() {
