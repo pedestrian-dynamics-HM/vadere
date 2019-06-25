@@ -62,7 +62,8 @@ public class TraCIPacketBuffer extends TraCIByteBuffer {
 				// After the status command follows a single int encoding the number of
 				// subscription results which will follow. Thus in case of SIM_STEP
 				// give all remaining data to the factory.
-				return TraCIResponse.create(statusResponse, readByteBuffer(limit()));
+				int rest = limit() - position();
+				return TraCIResponse.create(statusResponse, readByteBuffer(rest));
 			} else {
 				int responseDataLen = getCommandDataLen();
 				ByteBuffer buffer = readByteBuffer(responseDataLen);

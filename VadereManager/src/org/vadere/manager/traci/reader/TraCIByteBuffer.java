@@ -259,5 +259,10 @@ public class TraCIByteBuffer implements TraCIReader {
 		return byteBuffer.limit();
 	}
 
+	@Override
+	public int position() {
+		return byteBuffer.position();
+	}
+
 
 }

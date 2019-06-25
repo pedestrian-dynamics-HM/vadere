@@ -63,4 +63,6 @@ public interface TraCIReader {
 	void ensureBytes(int num);
 
 	int limit();
+
+	int position();
 }

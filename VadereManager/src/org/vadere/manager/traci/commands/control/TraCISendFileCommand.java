@@ -12,11 +12,13 @@ public class TraCISendFileCommand extends TraCICommand {
 	private String fileName;
 	private String file;
 
-	public static TraCIPacket TraCISendFileCommand(String file){
+	public static TraCIPacket TraCISendFileCommand(String fileName, String file){
 		int strLen = file.getBytes(StandardCharsets.US_ASCII).length;
+		strLen += fileName.getBytes(StandardCharsets.US_ASCII).length;
 		TraCIPacket packet = TraCIPacket.create(); // 4 (add later)
-		packet.writeCommandLength(1 + 1 + 4 + strLen) // [1|5]
+		packet.writeCommandLength(1 + 1 + 4 + 4 + strLen) // [1|5]
 				.writeUnsignedByte(TraCICmd.SEND_FILE.id) // 1
+				.writeString(fileName)
 				.writeString(file); // 4+strLen
 		return packet;
 	}

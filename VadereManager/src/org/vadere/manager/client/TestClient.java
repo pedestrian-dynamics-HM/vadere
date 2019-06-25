@@ -185,7 +185,7 @@ public class TestClient implements Runnable{
 		if (args.length > 1)
 			filePath = args[1];
 
-		TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand(IOUtils.readTextFile(filePath));
+		TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand("Test", IOUtils.readTextFile(filePath));
 
 		traCISocket.sendExact(packet);
 

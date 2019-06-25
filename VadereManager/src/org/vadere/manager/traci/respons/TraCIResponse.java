@@ -36,15 +36,16 @@ public class TraCIResponse {
 
 		TraCICmd commandIdentifier = statusResponse.getCmdIdentifier();
 
-		TraCICmd responseIdentifier = TraCICmd.fromId(cmdResponseBuffer.readCmdIdentifier());
-
 		// build correct versions. based on actual command
+		TraCICmd responseIdentifier;
 		switch (commandIdentifier.type){
 			case CTRL:
-				return createControlResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
+				return createControlResponse(commandIdentifier, cmdResponseBuffer, statusResponse);
 			case VALUE_GET:
+				responseIdentifier = TraCICmd.fromId(cmdResponseBuffer.readCmdIdentifier());
 				return new TraCIGetResponse(statusResponse, responseIdentifier, cmdResponseBuffer);
 			case VALUE_SET:
+				responseIdentifier = TraCICmd.fromId(cmdResponseBuffer.readCmdIdentifier());
 				return createSetResponse(commandIdentifier, responseIdentifier, cmdResponseBuffer, statusResponse);
 			case VALUE_SUB:
 //				return createControlResponse(cmd, responseIdentifier, cmdResponseBuffer);
@@ -57,7 +58,7 @@ public class TraCIResponse {
 
 	// factory methods
 
-	private static TraCIResponse createControlResponse(TraCICmd commandIdentifier, TraCICmd responseIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse){
+	private static TraCIResponse createControlResponse(TraCICmd commandIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse){
 		switch (commandIdentifier){
 			case GET_VERSION:
 				return new TraCIGetVersionResponse(statusResponse, cmdResponseBuffer);

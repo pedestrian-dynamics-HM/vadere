@@ -21,20 +21,22 @@ public class VadereServer implements Runnable{
 
 	private final ServerSocket serverSocket;
 	private final ExecutorService handlerPool;
+	private final boolean guiSupport;
 
-	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool) {
+	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool, boolean guiSupport) {
 		this.serverSocket = serverSocket;
 		this.handlerPool = handlerPool;
+		this.guiSupport = guiSupport;
 	}
 
 	@Override
 	public void run() {
 		try {
-			logger.infof("listening on port %d...", serverSocket.getLocalPort());
+			logger.infof("listening on port %d... (gui-mode: %s)", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 
-				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket)));
+				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket), guiSupport));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

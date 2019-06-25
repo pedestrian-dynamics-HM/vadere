@@ -23,12 +23,11 @@ public class ClientHandler implements Runnable{
 	private RemoteManager remoteManager;
 
 
-	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket) {
+	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket, boolean guiSupport) {
 		this.serverSocket = serverSocket;
 		this.traCISocket = traCISocket;
-		this.remoteManager = new RemoteManager();
+		this.remoteManager = new RemoteManager(guiSupport);
 		this.cmdExecutor = new CommandExecutor(remoteManager);
-
 	}
 
 
@@ -38,9 +37,11 @@ public class ClientHandler implements Runnable{
 			handleClient();
 		} catch (EOFException eof){
 			logger.infof("EOF. Client closed socket");
-		} catch (IOException e) {
+		} catch (IOException io) {
 			logger.error("Exception caught when trying to listen on port "
-					+ 9999 + " or listening for a connection", e);
+					+ 9999 + " or listening for a connection", io);
+		} catch (Exception e){
+			logger.error("Error while handling TraCI Message", e);
 		}
 
 	}
@@ -48,12 +49,6 @@ public class ClientHandler implements Runnable{
 	private void handleClient() throws IOException{
 		try{
 			logger.info("client connected...");
-//			String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/roVerTest001.scenario";
-//
-//			String scenario = IOUtils.readTextFile(filePath);
-//			logger.infof("load File...");
-//			remoteManager.loadScenario(scenario);
-//			remoteManager.run();
 
 			while (true){
 
@@ -73,8 +68,6 @@ public class ClientHandler implements Runnable{
 				}
 
 			}
-		} catch (Exception e) {
-			logger.error("Error while handling TraCI Message", e);
 		} finally {
 			traCISocket.close();
 			remoteManager.stopSimulationIfRunning();

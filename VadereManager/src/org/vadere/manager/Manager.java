@@ -1,7 +1,7 @@
 package org.vadere.manager;
 
-
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
@@ -25,7 +25,7 @@ public class Manager {
 			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
 
-			VadereServer server = new VadereServer(serverSocket, pool);
+			VadereServer server = new VadereServer(serverSocket, pool, ns.getBoolean("guiMode"));
 			server.run();
 
 		} catch (HelpScreenException ignored) {
@@ -33,8 +33,6 @@ public class Manager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
 	}
 
 	private static ArgumentParser createArgumentParser() {
@@ -81,6 +79,13 @@ public class Manager {
 				.dest("clientNum")
 				.help("Set number of clients to manager. Important: Each client has a separate simulation. No communication between clients");
 
+		// boolean switch to tell server to start in gui mode.
+		parser.addArgument("--gui-mode")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.type(Boolean.class)
+				.dest("guiMode")
+				.help("Start server with GUI support. If a scenario is received show the current state of the scenario");
 
 	}
 }

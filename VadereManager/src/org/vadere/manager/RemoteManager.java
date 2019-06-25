@@ -1,6 +1,8 @@
 package org.vadere.manager;
 
+import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
+import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -11,7 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  //todo comment
+ *  This class acts as interface between the TraCI handling and the actual simulation.
+ *  All synchronization is handled by the {@link RemoteScenarioRun} class. All access to
+ *  the simulation state must be wrapped within a {@link StateAccessHandler} to decouple
+ *  the {@link org.vadere.simulator.control.SimulationState} from the command handing.
+ *
+ *  Within the {@link StateAccessHandler#execute(RemoteManager, SimulationState)} method
+ *  the {@link SimulationState} is save to access and change. Be really careful what you
+ *  change!
+ *
  */
 public class RemoteManager implements RunnableFinishedListener {
 
@@ -22,13 +32,15 @@ public class RemoteManager implements RunnableFinishedListener {
 	private Thread currentSimulationThread;
 	private boolean simulationFinished;
 	private boolean clientCloseCommandReceived;
+	private boolean guiSupport;
 
 	private List<Subscription> subscriptions;
 
 
-	public RemoteManager() {
-		subscriptions = new ArrayList<>();
-		clientCloseCommandReceived = false;
+	public RemoteManager(boolean guiSupport) {
+		this.guiSupport = guiSupport;
+		this.subscriptions = new ArrayList<>();
+		this.clientCloseCommandReceived = false;
 	}
 
 	public void loadScenario(String scenarioString) {
@@ -49,7 +61,6 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		return false;
 	}
-
 
 	public void addValueSubscription(Subscription sub){
 		subscriptions.add(sub);
@@ -88,6 +99,8 @@ public class RemoteManager implements RunnableFinishedListener {
 	public void finished(Runnable runnable) {
 		simulationFinished = true;
 		logger.infof("Simulation finished.");
+		if (guiSupport)
+			ServerView.close();
 	}
 
 	public void startSimulation(){
@@ -102,6 +115,12 @@ public class RemoteManager implements RunnableFinishedListener {
 		currentSimulationThread.setUncaughtExceptionHandler((t, ex) -> {
 			currentSimulationRun.simulationFailed(ex);
 		});
+
+		if (guiSupport){
+			OnlineVisualization onlineVisualization = new OnlineVisualization(true);
+			currentSimulationRun.addPassiveCallback(onlineVisualization);
+			ServerView.startServerGui(onlineVisualization);
+		}
 
 		logger.infof("Start Scenario %s with remote control...", currentSimulationRun.getScenario().getName());
 		currentSimulationThread.start();
