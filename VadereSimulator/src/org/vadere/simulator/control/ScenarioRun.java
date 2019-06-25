@@ -123,7 +123,7 @@ public class ScenarioRun implements Runnable {
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0,
+				simulation = new Simulation(mainModel, 0.0,
 						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
 						processorManager, simulationResult, remoteRunListeners, singleStepMode);
 			}
