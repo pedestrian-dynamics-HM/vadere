@@ -5,7 +5,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleReader implements Runnable{
@@ -30,12 +32,15 @@ public class ConsoleReader implements Runnable{
 			System.out.println("Unknown command: " + args[0]);
 
 		System.out.println("Help: ");
-		helpMap.entrySet().forEach(e -> {
-			System.out.printf("%s     %s\n", e.getKey(), e.getValue());
-		});
+		int cmdLen = helpMap.entrySet().stream().map(o->o.getKey().length()).max(Integer::compareTo).orElse(20);
+		helpMap.entrySet()
+				.stream()
+				.sorted(Comparator.comparing(Map.Entry::getKey))
+				.forEach(e -> {
+					System.out.printf("%-" + cmdLen + "s     %s\n", e.getKey(), e.getValue());
+				});
 		System.out.println("");
 	}
-
 
 	private void executeCmd(String cmdStr){
 		if(cmdStr.equals(""))
@@ -58,7 +63,6 @@ public class ConsoleReader implements Runnable{
 	}
 
 	private void commandLoop(){
-
 		while (running){
 
 			try {
@@ -76,7 +80,6 @@ public class ConsoleReader implements Runnable{
 	synchronized public void stop(){
 		running = false;
 	}
-
 
 	public static void main(String[] args){
 		ConsoleReader r = new ConsoleReader();

@@ -1,5 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
+import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
@@ -24,6 +25,13 @@ import java.util.stream.Collectors;
 /**
  * Handel GET/SET {@link org.vadere.manager.traci.commands.TraCICommand}s for the Person API
  */
+@TraCIApi(
+		name = "PersonAPI",
+		singleAnnotation = PersonHandler.class,
+		multipleAnnotation = PersonHandlers.class,
+		cmdEnum = TraCICmd.class,
+		varEnum = PersonVar.class
+)
 public class PersonCommandHandler extends CommandHandler<PersonVar>{
 
 	private static Logger logger = Logger.getLogger(PersonCommandHandler.class);
@@ -86,7 +94,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 
 	///////////////////////////// Handler /////////////////////////////
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ID_LIST, name = "getIDList")
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ID_LIST, name = "getIDList", ignoreElementId = true)
 	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager){
 		// elementIdentifier ignored.
 		remoteManager.accessState((manager, state) -> {
@@ -103,16 +111,14 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIDCount")
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIDCount", ignoreElementId = true)
 	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager){
-
 		remoteManager.accessState((manager, state) -> {
 			int numPeds = state.getTopography().getPedestrianDynamicElements().getElements().size();
 			cmd.setResponse(responseOK(PersonVar.COUNT.type, numPeds));
 		});
 
 		return cmd;
-
 	}
 
 	@PersonHandler( cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.SPEED, name = "getSpeed")
@@ -237,7 +243,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.TARGET_LIST, name = "setTargetList")
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.TARGET_LIST, name = "setTargetList", dataTypeStr = "ArrayList<String>")
 	public TraCICommand process_setTargetList(TraCISetCommand cmd, RemoteManager remoteManager) {
 		List<String> tmp = (List<String>) cmd.getVariableValue();
 		LinkedList<Integer> data = tmp.stream().map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
@@ -263,8 +269,6 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return super.process_NotImplemented(cmd, remoteManager);
 	}
 
-
-
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager){
 		return processValueSub(rawCmd, remoteManager, this::processGet,
 				TraCICmd.GET_PERSON_VALUE, TraCICmd.RESPONSE_SUB_PERSON_VARIABLE);
@@ -287,6 +291,5 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 
 		return invokeHandler(m, this, setCmd, remoteManager);
 	}
-
 
 }

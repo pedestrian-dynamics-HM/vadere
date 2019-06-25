@@ -1,10 +1,6 @@
 package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
-import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.commandHandler.variables.PersonVar;
-import org.vadere.manager.traci.commands.TraCIGetCommand;
-import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
@@ -24,7 +20,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TestClient implements Runnable{
+public class TestClient extends org.vadere.manager.client.AbstractTestClient implements Runnable{
 
 	private int port;
 	private TraCISocket traCISocket;
@@ -45,17 +41,11 @@ public class TestClient implements Runnable{
 
 
 	private void addCommands(ConsoleReader consoleReader){
-		consoleReader.addCommand("getVersion", "", this::getVersion);
-		consoleReader.addCommand("sendFile", "send file. default: scenario001", this::sendFile);
-		consoleReader.addCommand("nextStep", "default(-1) one loop.", this::nextSimTimeStep);
-		consoleReader.addCommand("close", "Close application and stop running simulations", this::close);
-		consoleReader.addCommand("pedIdList", "Get Pedestrian Ids as list", this::getIDs);
-		consoleReader.addCommand("getPos", "arg: idStr of pedestrian", this::getPos);
-		consoleReader.addCommand("getTargetList", "arg: idStr of pedestrian", this::getTargetList);
-		consoleReader.addCommand("setTargetList", "arg: pedId targetList...", this::setTargetList);
+		consoleReader.addCommand("ctr.getVersion", "", this::getVersion);
+		consoleReader.addCommand("ctr.sendFile", "send file. default: scenario001", this::sendFile);
+		consoleReader.addCommand("ctr.nextStep", "default(-1) one loop.", this::nextSimTimeStep);
+		consoleReader.addCommand("ctr.close", "Close application and stop running simulations", this::close);
 	}
-
-
 
 	private void establishConnection() throws IOException, InterruptedException {
 			Socket socket = new Socket();
@@ -88,6 +78,7 @@ public class TestClient implements Runnable{
 
 			consoleReader = new ConsoleReader();
 			addCommands(consoleReader);
+			init(traCISocket, consoleReader);
 			consoleThread = new Thread(consoleReader);
 			consoleThread.start();
 
@@ -129,64 +120,6 @@ public class TestClient implements Runnable{
 		TraCIResponse cmd = buf.nextResponse();
 
 		System.out.println(cmd.toString());
-
-	}
-
-	void getIDs(String[] args) throws IOException {
-		TraCIPacket p = TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.ID_LIST.id, "1");
-		traCISocket.sendExact(p);
-
-		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
-		System.out.println(res.getResponseData());
-	}
-
-
-	void getTargetList(String[] args) throws IOException {
-		if(args.length < 2){
-			System.out.println("command needs argument (id)");
-			return;
-		}
-
-		String elementIdentifier = args[1];
-		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.TARGET_LIST.id, elementIdentifier));
-
-		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
-		ArrayList<String> targets = (ArrayList<String>) res.getResponseData();
-		System.out.println(elementIdentifier + ": " + Arrays.toString(targets.toArray()));
-	}
-
-	void setTargetList(String[] args) throws IOException {
-		if(args.length < 3){
-			System.out.println("command needs argument element id and at least one target id");
-			return;
-		}
-
-		String elementIdentifier = args[1];
-		ArrayList<String> targets = new ArrayList<>();
-		for (int i = 2; i < args.length; i++){
-			targets.add(args[i]);
-		}
-		traCISocket.sendExact(TraCISetCommand.build(TraCICmd.SET_PERSON_STATE, elementIdentifier,
-				PersonVar.TARGET_LIST.id, PersonVar.TARGET_LIST.type, targets));
-
-		TraCIResponse res =  traCISocket.receiveResponse();
-		System.out.println(res.toString());
-	}
-
-
-	void getPos(String[] args) throws IOException {
-
-		if(args.length < 2){
-			System.out.println("command needs argument (id)");
-			return;
-		}
-
-		String elementIdentifier = args[1];
-		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.POS_2D.id, elementIdentifier));
-
-		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
-		VPoint p = (VPoint) res.getResponseData();
-		System.out.println(p.toString());
 
 	}
 
@@ -245,4 +178,91 @@ public class TestClient implements Runnable{
 		System.out.println(cmd.toString());
 	}
 
+	@Override
+	public void personapi_getIDList(String[] args) throws IOException {
+		TraCIGetResponse res = personapi.getIDList();
+		System.out.println(res.getResponseData());
+	}
+
+	@Override
+	public void personapi_getIDCount(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getSpeed(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getPosition2D(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+		String elementIdentifier = args[1];
+		TraCIGetResponse res = personapi.getPosition2D(elementIdentifier);
+		VPoint p = (VPoint) res.getResponseData();
+		System.out.println(p.toString());
+	}
+
+	@Override
+	public void personapi_getPosition3D(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getLength(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getWidth(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getRoadId(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getAngle(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getType(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void personapi_getTargetList(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		TraCIGetResponse res = personapi.getTargetList(elementIdentifier);
+		ArrayList<String> targets = (ArrayList<String>) res.getResponseData();
+		System.out.println(elementIdentifier + ": " + Arrays.toString(targets.toArray()));
+	}
+
+	@Override
+	public void personapi_setTargetList(String[] args) throws IOException {
+		if(args.length < 3){
+			System.out.println("command needs argument element id and at least one target id");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		ArrayList<String> targets = new ArrayList<>();
+		for (int i = 2; i < args.length; i++){
+			targets.add(args[i]);
+		}
+
+		TraCIResponse res =  personapi.setTargetList(elementIdentifier, targets);
+		System.out.println(res.toString());
+	}
 }

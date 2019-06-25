@@ -21,16 +21,23 @@ public class TraCISocket implements Closeable {
 	private final Socket socket;
 	private final DataOutputStream outStream;
 	private final DataInputStream inStream;
-
+	private String host;
+	private int port;
 
 	public TraCISocket(Socket socket) throws IOException {
 		this.socket = socket;
+		this.host = this.socket.getInetAddress().toString();
+		this.port = this.socket.getPort();
 		this.outStream = new DataOutputStream(socket.getOutputStream());
 		this.inStream = new DataInputStream(socket.getInputStream());
 	}
 
 	public int getPort(){
-		return socket.getPort();
+		return port;
+	}
+
+	public String getHost(){
+		return host;
 	}
 
 	public boolean hasClientConnection(){
@@ -82,7 +89,6 @@ public class TraCISocket implements Closeable {
 		TraCIPacketBuffer buf = receiveExact();
 		return buf.nextResponse();
 	}
-
 
 	@Override
 	public void close() throws IOException {
