@@ -6,7 +6,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesProcessor;
-import org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor;
+import org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentTrajectory;
 import org.vadere.state.attributes.processor.enums.SpeedCalculationStrategy;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
@@ -42,9 +42,11 @@ import java.util.function.BiFunction;
  * <pre>
  * | timeStep | pedId | ... | M1  | M2  |
  * |----------|-------|-----|-----|-----|
- * |1         | 1     |     | 0.5 | 0   |
- * |1         | 2     |     | 0   | 0.6 |
+ * |1         | 1     |     | 0.5 | -1  |
+ * |1         | 2     |     | -1  | 0.6 |
  * </pre>
+ *
+ * Note: If trajectory of pedestrian is empty, log -2.
  *
  * Use the {@link PedestrianTrajectoryProcessor} to access pedestrian's
  * trajectory.
@@ -53,11 +55,9 @@ import java.util.function.BiFunction;
  * - ByTrajectory: Use {@link VTrajectory#speed()}, i.e. trajectory.length() / trajectory.duration()
  * - ByMeasurementAreaHeight: Use measurementArea.height() / trajectory.duration()
  * - ByMeasurementAreaWidth: Use measurementArea.width() / trajectory.duration()
- *
- * Note: If "trajectory.isEmpty()", log -2.
  */
 @DataProcessorClass()
-public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedestrianIdKey, Double> {
+public class PedestrianSpeedInAreaProcessorUsingAgentTrajectory extends DataProcessor<TimestepPedestrianIdKey, Double> {
 
 	// Static variables
 	public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
@@ -69,8 +69,8 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 	private BiFunction<VTrajectory, VRectangle, Double> speedCalculationStrategy;
 
 	// Constructors
-	public PedestrianSpeedInAreaProcessor() {
-		super("speedInArea");
+	public PedestrianSpeedInAreaProcessorUsingAgentTrajectory() {
+		super("speedInAreaUsingAgentTrajectory");
 		// "init()" method is used by processor manager to initialize variables.
 	}
 
@@ -85,7 +85,7 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 
-		AttributesSpeedInAreaProcessor processorAttributes = (AttributesSpeedInAreaProcessor) this.getAttributes();
+		AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes = (AttributesSpeedInAreaProcessorUsingAgentTrajectory) this.getAttributes();
 
 		// manager.getMeasurementArea() throws an exception if area is "null" or not rectangular. Though, no checks required here.
 		boolean rectangularAreaRequired = true;
@@ -94,13 +94,13 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(processorAttributes.getPedestrianTrajectoryProcessorId());
 
 		if (pedestrianTrajectoryProcessor == null) {
-			throw new RuntimeException(String.format("PedestrianVelocityProcessor with index %d does not exist.", processorAttributes.getPedestrianTrajectoryProcessorId()));
+			throw new RuntimeException(String.format("PedestrianTrajectoryProcessor with index %d does not exist.", processorAttributes.getPedestrianTrajectoryProcessorId()));
 		}
 
 		initSpeedCalculationStrategy(processorAttributes);
 	}
 
-	private void initSpeedCalculationStrategy(AttributesSpeedInAreaProcessor processorAttributes) {
+	private void initSpeedCalculationStrategy(AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes) {
 		if (processorAttributes.getSpeedCalculationStrategy() == SpeedCalculationStrategy.BY_TRAJECTORY) {
 			speedCalculationStrategy = this::calculateSpeedByTrajectory;
 		} else if (processorAttributes.getSpeedCalculationStrategy() == SpeedCalculationStrategy.BY_MEASUREMENT_AREA_HEIGHT) {
@@ -115,7 +115,7 @@ public class PedestrianSpeedInAreaProcessor extends DataProcessor<TimestepPedest
 	@Override
 	public AttributesProcessor getAttributes() {
 		if (super.getAttributes() == null) {
-			setAttributes(new AttributesSpeedInAreaProcessor());
+			setAttributes(new AttributesSpeedInAreaProcessorUsingAgentTrajectory());
 		}
 
 		return super.getAttributes();

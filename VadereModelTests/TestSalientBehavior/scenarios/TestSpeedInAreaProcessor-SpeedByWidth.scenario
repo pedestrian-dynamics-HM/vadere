@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 6 ]
+      "processors" : [ 1, 2, 6, 8 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -36,13 +36,24 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentTrajectory",
       "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentTrajectory",
       "attributes" : {
         "measurementAreaId" : 1,
         "pedestrianTrajectoryProcessorId" : 5,
-        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_WIDTH"
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityDefaultProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentVelocity",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentVelocity",
+      "attributes" : {
+        "measurementAreaId" : 1,
+        "pedestrianVelocityDefaultProcessor" : 7
       }
     } ],
     "isTimestamped" : true,

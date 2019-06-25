@@ -42,18 +42,18 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSalientBehaviorProcessor",
       "id" : 7
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentTrajectory",
       "id" : 9,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentTrajectory",
       "attributes" : {
         "measurementAreaId" : 1,
         "pedestrianTrajectoryProcessorId" : 5,
         "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentTrajectory",
       "id" : 10,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentTrajectory",
       "attributes" : {
         "measurementAreaId" : 2,
         "pedestrianTrajectoryProcessorId" : 5,

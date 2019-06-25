@@ -2,7 +2,7 @@ package org.vadere.state.attributes.processor;
 
 import org.vadere.state.attributes.processor.enums.SpeedCalculationStrategy;
 
-public class AttributesSpeedInAreaProcessor extends AttributesProcessor {
+public class AttributesSpeedInAreaProcessorUsingAgentTrajectory extends AttributesProcessor {
 
     // Variables
 	private int measurementAreaId = -1;
