@@ -16,6 +16,7 @@ import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,14 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		if (ped == null) {
 			cmd.setResponse(responseERR(CommandHandler.ELEMENT_ID_NOT_FOUND));
 			logger.debugf("Pedestrian: %s not found.", cmd.getElementIdentifier());
+			return false;
+		}
+		return true;
+	}
+
+	public boolean checkIfPedestrianExists(Pedestrian ped, TraCISetCommand cmd){
+		if (ped == null) {
+			cmd.setErr(CommandHandler.ELEMENT_ID_NOT_FOUND + cmd.getElementId());
 			return false;
 		}
 		return true;
@@ -210,6 +219,38 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.TARGET_LIST, name = "getTargetList")
+	public TraCICommand process_getTargetList(TraCIGetCommand cmd, RemoteManager remoteManager) {
+		// return dummy value
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if(checkIfPedestrianExists(ped, cmd))
+				cmd.setResponse(responseOK(PersonVar.TARGET_LIST.type,
+						ped.getTargets()
+								.stream()
+								.map(i -> Integer.toString(i))
+								.collect(Collectors.toList())
+				));
+		});
+		return cmd;
+	}
+
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.TARGET_LIST, name = "setTargetList")
+	public TraCICommand process_setTargetList(TraCISetCommand cmd, RemoteManager remoteManager) {
+		List<String> tmp = (List<String>) cmd.getVariableValue();
+		LinkedList<Integer> data = tmp.stream().map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementId()));
+			if(checkIfPedestrianExists(ped, cmd)){
+				ped.setTargets(data);
+				cmd.setOK();
+			}
+		});
+		return cmd;
+	}
 
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.WAITING_TIME, name="getWaitingTime")
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.COLOR, name="getColor")

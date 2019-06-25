@@ -1,10 +1,10 @@
 package org.vadere.manager.client;
 
 import org.vadere.manager.TraCISocket;
-import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
+import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
@@ -13,6 +13,7 @@ import org.vadere.manager.traci.reader.TraCIPacketBuffer;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIResponse;
 import org.vadere.manager.traci.respons.TraCISimTimeResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TestClient implements Runnable{
 
@@ -48,6 +51,8 @@ public class TestClient implements Runnable{
 		consoleReader.addCommand("close", "Close application and stop running simulations", this::close);
 		consoleReader.addCommand("pedIdList", "Get Pedestrian Ids as list", this::getIDs);
 		consoleReader.addCommand("getPos", "arg: idStr of pedestrian", this::getPos);
+		consoleReader.addCommand("getTargetList", "arg: idStr of pedestrian", this::getTargetList);
+		consoleReader.addCommand("setTargetList", "arg: pedId targetList...", this::setTargetList);
 	}
 
 
@@ -136,6 +141,39 @@ public class TestClient implements Runnable{
 	}
 
 
+	void getTargetList(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		traCISocket.sendExact(TraCIGetCommand.build(TraCICmd.GET_PERSON_VALUE, PersonVar.TARGET_LIST.id, elementIdentifier));
+
+		TraCIGetResponse res = (TraCIGetResponse) traCISocket.receiveResponse();
+		ArrayList<String> targets = (ArrayList<String>) res.getResponseData();
+		System.out.println(elementIdentifier + ": " + Arrays.toString(targets.toArray()));
+	}
+
+	void setTargetList(String[] args) throws IOException {
+		if(args.length < 3){
+			System.out.println("command needs argument element id and at least one target id");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		ArrayList<String> targets = new ArrayList<>();
+		for (int i = 2; i < args.length; i++){
+			targets.add(args[i]);
+		}
+		traCISocket.sendExact(TraCISetCommand.build(TraCICmd.SET_PERSON_STATE, elementIdentifier,
+				PersonVar.TARGET_LIST.id, PersonVar.TARGET_LIST.type, targets));
+
+		TraCIResponse res =  traCISocket.receiveResponse();
+		System.out.println(res.toString());
+	}
+
+
 	void getPos(String[] args) throws IOException {
 
 		if(args.length < 2){
@@ -180,12 +218,24 @@ public class TestClient implements Runnable{
 
 	void sendFile(String[] args) throws IOException {
 
-		String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/scenario001.scenario";
+		String filePath = "/home/stsc/repos/vadere/VadereManager/testResources/testProject001/scenarios/";
 
-		if (args.length > 1)
-			filePath = args[1];
+		if (args.length > 1) {
+			filePath = filePath + args[1] + ".scenario";
+		} else {
+			System.out.println("use default scenario001.scenario");
+			filePath = filePath + "scenario001.scenario";
+		}
 
-		TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand("Test", IOUtils.readTextFile(filePath));
+		String data;
+		try{
+			data = IOUtils.readTextFile(filePath);
+		} catch (IOException e){
+			System.out.println("File not found: " + filePath);
+			return;
+		}
+
+		TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand("Test", data);
 
 		traCISocket.sendExact(packet);
 

@@ -34,7 +34,7 @@ public abstract class CommandHandler <VAR extends Enum> {
 
 	private static Logger logger = Logger.getLogger(CommandHandler.class);
 
-	public static final String ELEMENT_ID_NOT_FOUND = "No element found with given object id";
+	public static final String ELEMENT_ID_NOT_FOUND = "No element found with given object id ";
 	protected HashMap<Pair<TraCICmd, VAR>, Method> handler;
 	private final Method processNotImplemented;
 
@@ -77,7 +77,7 @@ public abstract class CommandHandler <VAR extends Enum> {
 
 	protected TraCICommand invokeHandler(Method m, Object obj, TraCICommand cmd, RemoteManager manager){
 		try {
-			return (TraCIGetCommand) m.invoke(obj, cmd, manager);
+			return (TraCICommand) m.invoke(obj, cmd, manager);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}

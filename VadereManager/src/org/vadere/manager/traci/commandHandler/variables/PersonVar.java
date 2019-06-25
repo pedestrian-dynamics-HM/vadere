@@ -31,6 +31,7 @@ public enum PersonVar {
 	APPEND_STAGE(0xc4, TraCIDataType.COMPOUND_OBJECT), // set
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
 	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set
+	TARGET_LIST(0xfe, TraCIDataType.STRING_LIST), // get, set
 	;
 
 

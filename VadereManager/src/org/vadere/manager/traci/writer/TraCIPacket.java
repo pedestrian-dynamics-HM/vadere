@@ -2,6 +2,7 @@ package org.vadere.manager.traci.writer;
 
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.respons.StatusResponse;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
@@ -101,6 +102,20 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return new ByteArrayOutputStreamTraCIWriter();
 	}
 
+	public TraCIPacket wrapSetCommand(TraCICmd commandIdentifier, String elementIdentifier,
+									  int variableIdentifier, TraCIDataType dataType, Object data){
+
+		TraCIWriter cmdBuilder = getCmdBuilder();
+		cmdBuilder.writeUnsignedByte(commandIdentifier.id)
+				.writeUnsignedByte(variableIdentifier)
+				.writeString(elementIdentifier)
+				.writeObjectWithId(dataType, data);
+
+		addCommandWithoutLen(cmdBuilder.asByteArray());
+
+		return this;
+	}
+
 	public TraCIPacket wrapGetResponse(TraCIGetResponse res){
 		addStatusResponse(res.getStatusResponse());
 
@@ -143,7 +158,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		addCommandWithExtendedLenField(cmdBuilder.asByteArray());
 	}
 
-	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
+		public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
 		TraCIGetVersionResponse res = cmd.getResponse();
 
 		if(res.isOKResponseStatus())

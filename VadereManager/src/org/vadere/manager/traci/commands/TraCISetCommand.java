@@ -4,6 +4,8 @@ import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
+import org.vadere.manager.traci.respons.StatusResponse;
+import org.vadere.manager.traci.respons.TraCIStatusResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
 
 /**
@@ -32,6 +34,13 @@ public class TraCISetCommand extends TraCICommand{
 	protected TraCIDataType returnDataType;
 	protected Object variableValue;
 
+	private StatusResponse statusResponse;
+
+	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data){
+		return TraCIPacket.create()
+				.wrapSetCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+						dataType, data);
+	}
 
 	public TraCISetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
@@ -58,8 +67,16 @@ public class TraCISetCommand extends TraCICommand{
 		return returnDataType;
 	}
 
+	public void setErr(String desc){
+		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.ERR, desc);
+	}
+
+	public void setOK(){
+		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.OK, "");
+	}
+
 	@Override
 	public TraCIPacket buildResponsePacket() {
-		return TraCIPacket.create().add_OK_StatusResponse(traCICmd);
+		return TraCIPacket.create().addStatusResponse(statusResponse);
 	}
 }
