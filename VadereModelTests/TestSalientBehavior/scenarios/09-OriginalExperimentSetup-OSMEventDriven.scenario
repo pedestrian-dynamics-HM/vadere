@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 6, 7, 9, 10 ]
+      "processors" : [ 1, 2, 6, 7, 9, 10, 11, 13, 14, 15 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -58,6 +58,42 @@
         "measurementAreaId" : 2,
         "pedestrianTrajectoryProcessorId" : 5,
         "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentTrajectory",
+      "id" : 11,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentTrajectory",
+      "attributes" : {
+        "measurementAreaId" : 3,
+        "pedestrianTrajectoryProcessorId" : 5,
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityDefaultProcessor",
+      "id" : 12
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentVelocity",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentVelocity",
+      "attributes" : {
+        "measurementAreaId" : 1,
+        "pedestrianVelocityDefaultProcessor" : 12
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentVelocity",
+      "id" : 14,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentVelocity",
+      "attributes" : {
+        "measurementAreaId" : 2,
+        "pedestrianVelocityDefaultProcessor" : 12
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentVelocity",
+      "id" : 15,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentVelocity",
+      "attributes" : {
+        "measurementAreaId" : 3,
+        "pedestrianVelocityDefaultProcessor" : 12
       }
     } ],
     "isTimestamped" : true,
@@ -172,9 +208,18 @@
       }, {
         "shape" : {
           "x" : 0.5,
-          "y" : 13.1,
+          "y" : 14.1,
           "width" : 4.0,
-          "height" : 9.0,
+          "height" : 8.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 3
+      }, {
+        "shape" : {
+          "x" : 0.5,
+          "y" : 1.9,
+          "width" : 4.0,
+          "height" : 8.0,
           "type" : "RECTANGLE"
         },
         "id" : 1
