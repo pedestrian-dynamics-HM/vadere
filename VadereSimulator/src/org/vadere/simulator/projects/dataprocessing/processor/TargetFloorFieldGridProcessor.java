@@ -52,11 +52,13 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 				System.out.println("Ped present: " + optPed.isPresent());
 				if (optPed.isPresent()) {
 					int row = 0;
-					for (double y = bound.y; y < bound.y + bound.height; y += att.getResolution()) {
+					int widthMax = (int)Math.floor(bound.height / att.getResolution());
+					for (int i = 0; i < widthMax; i++){
+						double y = bound.y + i*att.getResolution();
 						FloorFieldGridRow floorFieldGridRow = new FloorFieldGridRow((int) Math.floor(bound.width / att.getResolution()));
 						int col = 0;
-						for (int i=0; i< floorFieldGridRow.size(); i++){
-							double x = bound.x + i*att.getResolution();
+						for (int j=0; j< floorFieldGridRow.size(); j++){
+							double x = bound.x + j*att.getResolution();
 							floorFieldGridRow.setValue(col++, pft.getPotential(new VPoint(x, y), optPed.get()));
 						}
 						this.putValue(new TimestepRowKey(state.getStep(), row++), floorFieldGridRow);
