@@ -18,4 +18,8 @@ public class FloorFieldGridRow {
     public void setValue(int index, final Double value) {
 	    this.values.set(index, value);
     }
+
+    public int size(){
+        return values.size();
+    }
 }

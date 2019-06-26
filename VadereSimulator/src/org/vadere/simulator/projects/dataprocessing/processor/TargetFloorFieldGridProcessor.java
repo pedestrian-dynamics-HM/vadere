@@ -55,7 +55,8 @@ public class TargetFloorFieldGridProcessor extends DataProcessor<TimestepRowKey,
 					for (double y = bound.y; y < bound.y + bound.height; y += att.getResolution()) {
 						FloorFieldGridRow floorFieldGridRow = new FloorFieldGridRow((int) Math.floor(bound.width / att.getResolution()));
 						int col = 0;
-						for (double x = bound.x; x < bound.x + bound.width; x += att.getResolution()) {
+						for (int i=0; i< floorFieldGridRow.size(); i++){
+							double x = bound.x + i*att.getResolution();
 							floorFieldGridRow.setValue(col++, pft.getPotential(new VPoint(x, y), optPed.get()));
 						}
 						this.putValue(new TimestepRowKey(state.getStep(), row++), floorFieldGridRow);
