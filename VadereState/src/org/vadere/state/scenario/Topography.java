@@ -2,7 +2,6 @@ package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import org.apache.commons.math3.analysis.function.Abs;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;

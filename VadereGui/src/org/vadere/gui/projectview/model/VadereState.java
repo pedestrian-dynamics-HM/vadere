@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.model;
 import org.vadere.gui.components.utils.Messages;
 
 public enum VadereState {
-	RUNNING, PAUSED, INTERRUPTED, INITIALIZED;
+	RUNNING, PAUSED, INTERRUPTED, INITIALIZED, STEP;
 
 	@Override
 	public String toString() {
@@ -16,8 +16,10 @@ public enum VadereState {
 				return Messages.getString("Interrupted.text");
 			case INITIALIZED:
 				return Messages.getString("Initialized.text");
+			case STEP:
+				return Messages.getString("Step.text");
 			default:
-				return this.toString();
+				throw new IllegalStateException("VadereState. Should not be reached. All enums already tested.");
 		}
 	}
 }

@@ -6,6 +6,15 @@
 
 ### Added
 
+- single step mode in GUI: Allows the user to step through the simulation one 
+  step at a time to identify bugs.
+- simplify obstacles (with undo support): Merge multiple obstacles based on the 
+  convex hull their points create. The merge can be undon
+- add features to open street map (osm) importer: 
+  - import 'open' paths as polygons with a specified width. With this it is
+    possible to create walls or subway entrance
+  - add option to include osm ids into each obstacle created
+
 ### Changed
 
 ## v1.0 (2019-06-13)

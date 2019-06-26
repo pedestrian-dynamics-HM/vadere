@@ -1,10 +1,12 @@
-package org.vadere.simulator.projects;
+package org.vadere.simulator.control;
 
 import org.jetbrains.annotations.Nullable;
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.Simulation;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.projects.RunnableFinishedListener;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.util.io.IOUtils;
@@ -16,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,26 +32,35 @@ import java.util.Random;
  */
 public class ScenarioRun implements Runnable {
 
-	private static Logger logger = Logger.getLogger(ScenarioRun.class);
+	protected static Logger logger = Logger.getLogger(ScenarioRun.class);
 
-	private Path outputPath;
+	protected Path outputPath;
 
-	private final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
+	protected final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
-	private final DataProcessingJsonManager dataProcessingJsonManager;
+	protected final List<RemoteRunListener> remoteRunListeners = new ArrayList<>();
 
-	private Simulation simulation;
+	protected final DataProcessingJsonManager dataProcessingJsonManager;
+
+	protected Simulation simulation;
+
+	protected boolean singleStepMode = false;
 
 	// the processor is null if no output is written i.e. if scenarioStore.attributesSimulation.isWriteSimulationData() is false.
-	private @Nullable
+	protected @Nullable
 	ProcessorManager processorManager;
 
-	private final Scenario scenario;
-	private final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
+	protected final Scenario scenario;
+	protected final ScenarioStore scenarioStore; // contained in scenario, but here for convenience
 
-	private final RunnableFinishedListener finishedListener;
+	protected final RunnableFinishedListener finishedListener;
 
-	private SimulationResult simulationResult;
+	protected SimulationResult simulationResult;
+
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, boolean singleStepMode) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+		this.singleStepMode = singleStepMode;
+	}
 
 	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
 		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
@@ -106,13 +118,14 @@ public class ScenarioRun implements Runnable {
 					createAndSetOutputDirectory();
 					scenario.saveToOutputPath(outputPath);
 				}
-
+				// ensure all elements have unique id before attributes are sealed
+				scenario.getTopography().generateUniqueIdIfNotSet();
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0,
+				simulation = new Simulation(mainModel, 0.0,
 						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
-						processorManager, simulationResult);
+						processorManager, simulationResult, remoteRunListeners, singleStepMode);
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
@@ -143,8 +156,61 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isRunning();
 	}
 
+	public boolean isScenarioInSingleStepMode(){
+		return simulation != null && simulation.isSingleStepMode();
+	}
+
+	public void setSingleStepMode(boolean singleStepMode){
+
+		simulation.setSingleStepMode(singleStepMode);
+	}
+
+	public boolean isWaitForSimCommand(){
+		return simulation != null && simulation.isWaitForSimCommand();
+	}
+
+	public void nextSimCommand(double simulateUntilInSec){
+
+		if ( !simulation.isSingleStepMode())
+			throw new IllegalStateException("Simulation is not in 'remoteControl' state");
+
+		simulation.nextSimCommand(simulateUntilInSec);
+	}
+
+	public void pause() {
+
+		if(! simulation.isRunning())
+			throw new IllegalStateException("Received trigger to pause the simulation, but it is not running!");
+
+		if (simulation != null)
+			simulation.pause();
+	}
+
+	public void resume() {
+
+		if(simulation.isRunning())
+			throw new IllegalStateException("Received trigger to resume the simulation, but it is not paused!");
+
+		if (simulation != null)
+			simulation.resume();
+	}
+
+	// only allow subclasses access to the not final state.
+	// this is needed to allow vadere to receive SET-Commands.
+	protected SimulationState getSimulationState(){
+		return simulation.getSimulationState();
+	}
+
 	public void addPassiveCallback(final PassiveCallback pc) {
 		passiveCallbacks.add(pc);
+	}
+
+	public void addRemoteManagerListener(final RemoteRunListener listener){
+		remoteRunListeners.add(listener);
+	}
+
+	public boolean isSingleStepMode() {
+		return singleStepMode;
 	}
 
 	public void setOutputPaths(final Path outputPath, boolean overwriteTimestampSetting){
@@ -166,28 +232,6 @@ public class ScenarioRun implements Runnable {
 
 	public Path getOutputPath() {
 		return Paths.get(this.outputPath.toString());
-	}
-
-	public void pause() {
-
-		if(! simulation.isRunning()){
-			throw new IllegalStateException("Received trigger to pause the simulation, but it is not running!");
-		}
-
-		if (simulation != null) {
-			simulation.pause();
-		}
-	}
-
-	public void resume() {
-
-		if(simulation.isRunning()){
-			throw new IllegalStateException("Received trigger to resume the simulation, but it is not paused!");
-		}
-
-		if (simulation != null) {
-			simulation.resume();
-		}
 	}
 
 	private void createAndSetOutputDirectory() {

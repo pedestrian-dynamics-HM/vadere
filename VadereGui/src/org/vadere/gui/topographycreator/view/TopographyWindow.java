@@ -28,6 +28,7 @@ import org.vadere.gui.topographycreator.control.ActionResetTopography;
 import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
 import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
+import org.vadere.gui.topographycreator.control.ActionSimplifyObstacles;
 import org.vadere.gui.topographycreator.control.ActionSubtractMeasurementArea;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
@@ -37,11 +38,10 @@ import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
-import org.vadere.gui.topographycreator.control.DrawDotMode;
 import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
-import org.vadere.gui.topographycreator.control.DrawLineMode;
-import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
+import org.vadere.gui.topographycreator.control.DrawDotMode;
 import org.vadere.gui.topographycreator.control.DrawRectangleMode;
+import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
 import org.vadere.gui.topographycreator.control.EraserMode;
 import org.vadere.gui.topographycreator.control.SelectElementMode;
 import org.vadere.gui.topographycreator.control.TopographyAction;
@@ -345,9 +345,15 @@ public class TopographyWindow extends JPanel {
 		ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
+
+
 		/* resize Topography */
 		TopographyAction resizeTopographyBound = new ActionResizeTopographyBound(Messages.getString("TopographyBoundDialog.tooltip"),
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
+				panelModel, selectShape, undoSupport);
+
+		TopographyAction simplifyObstacle = new ActionSimplifyObstacles("Simplify",
+				new ImageIcon(Resources.class.getResource("/icons/merge_convex.png")),
 				panelModel, selectShape, undoSupport);
 
 		TopographyAction translateTopography =new ActionTranslateTopography("TranslateTopography",
@@ -403,6 +409,7 @@ public class TopographyWindow extends JPanel {
 		// "TopographyCreator.btnMinimizeTopography.tooltip");
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
 		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
+		addActionToToolbar(toolbar, simplifyObstacle, "TopographyCreator.btnTopographyBound.tooltip");
 		addActionToToolbar(toolbar, translateTopography, "TopographyCreator.btnTranslation.tooltip");
 		addActionToToolbar(toolbar, translateElements, "TopographyCreator.btnElementTranslation.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
