@@ -1,6 +1,6 @@
 {
-  "name" : "two_density",
-  "description" : "",
+  "name" : "bus_station",
+  "description" : "Scenario used for TGF19 contribution",
   "release" : "1.0",
   "processWriters" : {
     "files" : [ {
