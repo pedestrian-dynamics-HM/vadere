@@ -4,16 +4,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 import java.awt.*;
-import java.util.function.Function;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import tech.tablesaw.api.Table;
 
 /**
  * @author Benedikt Zoennchen
@@ -296,4 +299,37 @@ public interface GridEikonalSolver extends EikonalSolver {
 		return isValidPoint(getCellGrid(), point);
 	}
 
+	@Override
+	default boolean loadCachedFloorField(Path path) {
+		// load floor field from cache. If it succeeds return true to indicate that the floor field
+		// is initialized.
+		if (path.toFile().exists()){
+			try {
+				long ms = System.currentTimeMillis();
+				logger.infof("loaded floor field from cache %s", path.toAbsolutePath().toString());
+				Table table = Table.read().csv(path.toFile());
+				getCellGrid().loadFromTable(table);
+				logger.info("floor field initialization (cached) time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				return true;
+			} catch (IOException e) {
+				logger.errorf("cannot read cache %s", path.toAbsolutePath().toString());
+				// create floor field from scratch
+				return false;
+			}
+		}
+		// create floor field from scratch
+		return false;
+	}
+
+	@Override
+	default void saveFloorFieldToCache(Path path) {
+		Table gridTable = getCellGrid().asTable();
+		try {
+			path.getParent().toFile().mkdirs();
+			gridTable.write().csv(path.toFile());
+			logger.infof("saved floor field to cache %s", path.toAbsolutePath().toString());
+		} catch (IOException e) {
+			logger.errorf("cannot write floor field cache to %s", path.toAbsolutePath().toString());
+		}
+	}
 }
