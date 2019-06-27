@@ -3,10 +3,10 @@ package org.vadere.simulator.projects;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.projects.migration.MigrationResult;
+import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,14 +37,16 @@ public class VadereProject {
 			new LinkedBlockingQueue<>();
 	private LinkedBlockingDeque<Scenario> scenariosLeft;
 	private Path outputDirectory;
+	private Path projectDirectory;
 	private ProjectOutput projectOutput; //TODO initialize and wire up with rest ....
 
 	private MigrationResult migrationStats;
 
-	public VadereProject(final String name, final Iterable<Scenario> scenarios) {
+	public VadereProject(final String name, final Iterable<Scenario> scenarios, Path vadereProjectDirectory) {
 		this.name = name;
 		scenarios.forEach(scenario -> addScenario(scenario));
-		this.outputDirectory = Paths.get("output");
+		this.projectDirectory = vadereProjectDirectory;
+		this.outputDirectory = vadereProjectDirectory.resolve(IOUtils.OUTPUT_DIR);
 		this.projectOutput = new ProjectOutput(this);
 	}
 
@@ -137,7 +139,7 @@ public class VadereProject {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener);
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener, projectDirectory.resolve(IOUtils.SCENARIO_DIR));
 		scenarioRun.setOutputPaths(outputDirectory);
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);
@@ -319,5 +321,13 @@ public class VadereProject {
 
 	public void resetState() {
 		simulationResults = new LinkedList<>();
+	}
+
+	public Path getProjectDirectory() {
+		return projectDirectory;
+	}
+
+	public void setProjectDirectory(Path vadereProjectDirectory) {
+		this.projectDirectory = vadereProjectDirectory;
 	}
 }

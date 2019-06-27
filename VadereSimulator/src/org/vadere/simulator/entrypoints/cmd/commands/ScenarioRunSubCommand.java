@@ -64,7 +64,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
 			if (checkScenario(scenario, scenarioCheckerSwitch)){
-				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null).run();
+				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null, scenarioFile.getParent()).run();
 			} else {
 				System.exit(-1);
 			}

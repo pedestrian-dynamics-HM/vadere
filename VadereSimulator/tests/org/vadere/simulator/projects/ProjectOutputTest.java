@@ -119,7 +119,7 @@ public class ProjectOutputTest implements TestResourceHandler {
 
 	@Test
 	public void projectOutputSet(){
-		VadereProject proj = new VadereProject("test", new LinkedList<>());
+		VadereProject proj = new VadereProject("test", new LinkedList<>(), Paths.get("."));
 		assertNotNull(proj.getProjectOutput());
 	}
 

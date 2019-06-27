@@ -36,6 +36,8 @@ public class ScenarioRun implements Runnable {
 
 	protected Path outputPath;
 
+	protected Path scenarioLocation;
+
 	protected final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
 	protected final List<RemoteRunListener> remoteRunListeners = new ArrayList<>();
@@ -57,21 +59,21 @@ public class ScenarioRun implements Runnable {
 
 	protected SimulationResult simulationResult;
 
-	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, boolean singleStepMode) {
-		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, Path scenarioLocation, boolean singleStepMode) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, scenarioLocation);
 		this.singleStepMode = singleStepMode;
 	}
 
-	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, Path scenarioLocation) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, scenarioLocation);
 	}
 
-	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, outputDir, false, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener, Path scenarioLocation) {
+		this(scenario, outputDir, false, scenarioFinishedListener, scenarioLocation);
 	}
 
 	// if overwriteTimestampSetting is true do note use timestamp in output directory
-	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
+	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener, Path scenarioLocation) {
 		this.scenario = scenario;
 		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
@@ -79,6 +81,7 @@ public class ScenarioRun implements Runnable {
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 		this.simulationResult = new SimulationResult(scenario.getName());
+		this.scenarioLocation = scenarioLocation;
 	}
 
 

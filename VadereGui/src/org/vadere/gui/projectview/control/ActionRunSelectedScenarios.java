@@ -1,11 +1,11 @@
 package org.vadere.gui.projectview.control;
 
-import javax.swing.*;
-
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.VTable;
 
 import java.awt.event.ActionEvent;
+
+import javax.swing.*;
 
 public class ActionRunSelectedScenarios extends AbstractAction {
 

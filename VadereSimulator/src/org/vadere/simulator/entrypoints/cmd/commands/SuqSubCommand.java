@@ -38,7 +38,7 @@ public class SuqSubCommand implements SubCommandRunner {
 
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
-			new ScenarioRun(scenario, outputDir.toFile().toString(), true, null).run();
+			new ScenarioRun(scenario, outputDir.toFile().toString(), true, null, scenarioFile.getParent()).run();
 		} catch (Throwable e){
 			logger.error(e);
 			System.exit(-1);

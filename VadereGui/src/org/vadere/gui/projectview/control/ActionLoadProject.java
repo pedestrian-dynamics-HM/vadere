@@ -108,7 +108,6 @@ public class ActionLoadProject extends AbstractAction {
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath, MigrationOptions options) {
 		try {
 			VadereProject project = IOVadere.readProjectJson(projectFilePath, options);
-			projectViewModel.setCurrentProjectPath(projectFilePath);
 			projectViewModel.setProject(project);
 
 			projectViewModel.refreshOutputTable();

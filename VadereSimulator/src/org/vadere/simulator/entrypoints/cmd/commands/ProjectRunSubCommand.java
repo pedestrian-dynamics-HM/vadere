@@ -68,7 +68,7 @@ public class ProjectRunSubCommand implements SubCommandRunner {
 			try {
 				Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(
 						projectDirectory.toFile().toString(),scenarioFileName);
-				new ScenarioRun(scenario, projectDirectory.resolve(IOUtils.OUTPUT_DIR).toString(), null).run();
+				new ScenarioRun(scenario, projectDirectory.resolve(IOUtils.OUTPUT_DIR).toString(), null, projectDirectory.resolve(IOUtils.OUTPUT_DIR)).run();
 
 			} catch (Throwable e) {
 				logger.error(String.format("Error while executing scenario %d/%d %s. Resume with next scenario.", i, scenarioFileNames.size(), scenarioFileName));
