@@ -51,11 +51,11 @@ public class OfflineSimulation {
 		topography.reset();
 		// add pedestrians to the topography
 		trajectories.values().stream()
-				.filter(t -> t.isPedestrianAlive(step))
+				.filter(t -> t.isAlive(step))
 				.map(t -> t.getAgent(step))
 				.filter(opt -> opt.isPresent()).forEach(opt -> topography.addElement(opt.get()));
 		return new SimulationState(vadere.getName(), topography, vadere.getScenarioStore(),
-				step.getSimTimeInSec().orElse(Double.NaN), step.getStepNumber(), null);
+				(step.getStepNumber()-1) * vadere.getAttributesSimulation().getSimTimeStepLength(), step.getStepNumber(), null);
 	}
 
 	private void prepareOutput() {

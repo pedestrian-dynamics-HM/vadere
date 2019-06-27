@@ -4,18 +4,18 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.control.ActionSetTimeStep;
 import org.vadere.gui.postvisualization.control.EJSliderAction;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.state.simulation.Step;
 
 import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 public class AdjustPanel extends JPanel implements Observer {
 	private static Resources resources = Resources.getInstance("postvisualization");
@@ -23,10 +23,14 @@ public class AdjustPanel extends JPanel implements Observer {
 	private final JSlider slider;
 	private final JSpinner sStep;
 	private final JSpinner sVelocity;
+	private final JSpinner sVisTimeStepLength;
+
 	private final JSpinner sTime;
 	private final SpinnerModel sModelTime;
 	private final SpinnerModel sModelTimeStep;
 	private final SpinnerModel sModelVelocity;
+
+	private final SpinnerModel sModelVisTimeStepLength;
 	private final PostvisualizationModel model;
 
 	public AdjustPanel(final PostvisualizationModel model) {
@@ -42,11 +46,15 @@ public class AdjustPanel extends JPanel implements Observer {
 		// sStep.setEditable(false);
 		sModelVelocity = new SpinnerNumberModel(model.config.getFps(), 1, 200, 1);
 		sModelTimeStep = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
-		sModelTime = new SpinnerNumberModel(0.0, 0.0, 0.0, 0);
+		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.01);
+		sModelVisTimeStepLength = new SpinnerNumberModel(model.getVisTimeStepLength(), 0.01, Double.MAX_VALUE, 0.01);
+
 		sVelocity = new JSpinner(sModelVelocity);
 		sTime = new JSpinner(sModelTime);
 		sStep = new JSpinner(sModelTimeStep);
-		sTime.setEnabled(false);
+		sVisTimeStepLength = new JSpinner(sModelVisTimeStepLength);
+
+		//sTime.setEnabled(false);
 
 
 		// lTime.set
@@ -54,9 +62,10 @@ public class AdjustPanel extends JPanel implements Observer {
 		sStep.setPreferredSize(new Dimension(50, 30));
 		sVelocity.setPreferredSize(new Dimension(50, 30));
 		sTime.setPreferredSize(new Dimension(70, 30));
+		sVisTimeStepLength.setPreferredSize(new Dimension(70, 30));
 		// Layout definition!
 		FormLayout layout = new FormLayout(
-				"2dlu, default:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu", // col
+				"2dlu, default:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu", // col
 				"2dlu, default, 2dlu"); // rows
 		setLayout(layout);
 		CellConstraints cc = new CellConstraints();
@@ -67,21 +76,29 @@ public class AdjustPanel extends JPanel implements Observer {
 		add(sTime, cc.xy(10, 2));
 		add(new JLabel(Messages.getString("AdjustPanel.lblStep.text")), cc.xy(12, 2));
 		add(sStep, cc.xy(14, 2));
+		add(new JLabel(Messages.getString("AdjustPanel.lblVisTime.text")), cc.xy(16, 2));
+		add(sVisTimeStepLength, cc.xy(18, 2));
 
-		sVelocity.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				model.config.setFps((int) sVelocity.getValue());
+		sVelocity.addChangeListener(e -> {
+			model.config.setFps((int) sVelocity.getValue());
+			model.notifyObservers();
+		});
+
+		sTime.addChangeListener(e -> {
+			model.setVisTime((double)sModelTime.getValue());
+			model.notifyObservers();
+		});
+
+		sStep.addChangeListener(e -> {
+			if ((int) sStep.getValue() <= model.getStepCount()) {
+				model.setStep((int) sStep.getValue());
+				model.notifyObservers();
 			}
 		});
-		sStep.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				if ((int) sStep.getValue() <= model.getStepCount()) {
-					model.setStep((int) sStep.getValue());
-					model.notifyObservers();
-				}
-			}
+
+		sVisTimeStepLength.addChangeListener(e -> {
+			model.setVisTimeStepLength((double) sVisTimeStepLength.getValue());
+			model.notifyObservers();
 		});
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
@@ -94,10 +111,11 @@ public class AdjustPanel extends JPanel implements Observer {
 		slider.setMaximum(model.getLastStep().map(step -> step.getStepNumber()).orElse(1));
 		slider.setMinimum(model.getFirstStep().map(step -> step.getStepNumber()).orElse(1));
 
-		int currentStepNumber = model.getStep().map(step -> step.getStepNumber()).orElse(1);
+		int currentStepNumber = model.getStep().getStepNumber();
 
 		slider.setValue(currentStepNumber);
 		sStep.setValue(currentStepNumber);
 		sTime.setValue(model.getSimTimeInSec());
+		sModelVisTimeStepLength.setValue(model.getVisTimeStepLength());
 	}
 }

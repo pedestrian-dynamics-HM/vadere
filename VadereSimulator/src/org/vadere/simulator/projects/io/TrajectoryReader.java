@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
@@ -75,18 +76,19 @@ public class TrajectoryReader {
 	private int stridesIndex;
 	private int mostImportantEventIndex;
 	private int salientBehaviorIndex;
+	private double simTimeStepLength;
 
 	private static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
 
 	public TrajectoryReader(final Path trajectoryFilePath, final Scenario scenario) {
-		this(trajectoryFilePath, scenario.getAttributesPedestrian());
+		this(trajectoryFilePath, scenario.getAttributesPedestrian(), scenario.getAttributesSimulation().getSimTimeStepLength());
 	}
 
 	public TrajectoryReader(final Path trajectoryFilePath) {
-		this(trajectoryFilePath, new AttributesAgent());
+		this(trajectoryFilePath, new AttributesAgent(), new AttributesSimulation().getSimTimeStepLength());
 	}
 
-	private TrajectoryReader(final Path trajectoryFilePath, final AttributesAgent attributesAgent) {
+	private TrajectoryReader(final Path trajectoryFilePath, final AttributesAgent attributesAgent, final double simTimeStepLength) {
 		this.trajectoryFilePath = trajectoryFilePath;
 		this.attributesPedestrian = attributesAgent;
 		pedestrianIdKeys = new HashSet<>();
@@ -129,6 +131,7 @@ public class TrajectoryReader {
 		stridesIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		mostImportantEventIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
 		salientBehaviorIndex = NOT_SET_COLUMN_INDEX_IDENTIFIER;
+		this.simTimeStepLength = simTimeStepLength;
 	}
 
 	public Map<Step, List<Agent>> readFile() throws IOException {
@@ -299,6 +302,6 @@ public class TrajectoryReader {
 			ped.setSalientBehavior(salientBehavior);
 		}
 
-		return simTimeIndex == NOT_SET_COLUMN_INDEX_IDENTIFIER ? Pair.create(new Step(step), ped) : Pair.create(new Step(step, simTime), ped);
+		return Pair.create(new Step(step), ped);
 	}
 }

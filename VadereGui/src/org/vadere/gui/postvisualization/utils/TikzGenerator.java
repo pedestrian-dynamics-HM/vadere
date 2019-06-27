@@ -286,28 +286,27 @@ public class TikzGenerator {
         final StringBuffer generatedCode = new StringBuffer("");
 
 	    Stream<Trajectory> trajectoryStream = model.getAlivePedestrians();
-        Step currentTimeStep = model.getStep().orElseGet(null);
+        //Step currentTimeStep = model.getStep().orElseGet(null);
 
-        if (currentTimeStep != null) {
-            trajectoryStream.forEach(trajectory -> {
-                Stream<VPoint> trajectoryPoints = trajectory.getPositionsReverse(currentTimeStep);
 
-                // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
-                String trajectoryAsTikzString = trajectoryPoints
-                        .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
-                        .collect(Collectors.joining(" to\n"));
+        trajectoryStream.forEach(trajectory -> {
+            Stream<VPoint> trajectoryPoints = trajectory.getPositionsReverse(model.getSimTimeInSec());
 
-                String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(currentTimeStep));
+            // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
+            String trajectoryAsTikzString = trajectoryPoints
+                    .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
+                    .collect(Collectors.joining(" to\n"));
 
-                int pedestrianId = trajectory.getPedestrianId();
-                Optional<Step> trajectoryEndStep = trajectory.getEndStep();
-                String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
-                String currentTimeStepAsString = currentTimeStep.toString();
+            String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(model.getSimTimeInSec()));
 
-                generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ step %s of %s\n", pedestrianId, currentTimeStepAsString, trajectoryEndStepAsString));
-                generatedCode.append(coloredTrajectory);
-            });
-        }
+            int pedestrianId = trajectory.getPedestrianId();
+            Optional<Step> trajectoryEndStep = trajectory.getEndStep();
+            String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
+
+            generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ simTimeInSec %f of %s\n", pedestrianId, model.getSimTimeInSec(), trajectoryEndStepAsString));
+            generatedCode.append(coloredTrajectory);
+        });
+
 
 
 	    return generatedCode.toString();

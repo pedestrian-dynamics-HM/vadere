@@ -135,18 +135,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	@Override
 	public boolean setScale(final double scale) {
-		boolean hasChanged = true;
 		double oldScale = scaleFactor;
-
-		if (scale < MIN_SCALE_FACTOR) {
-			this.scaleFactor = MIN_SCALE_FACTOR;
-		} else if (scale > MAX_SCALE_FACTOR) {
-			this.scaleFactor = MAX_SCALE_FACTOR;
-		} else if (scale != this.scaleFactor) {
-			this.scaleFactor = scale;
-		} else {
-			hasChanged = false;
-		}
+		boolean hasChanged = setScaleWithoutChangingViewport(scale);
 
 		// update the viewport, since it depends on the scaleFactor
 		if (hasChanged) {
@@ -159,6 +149,27 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			setViewportBound(newViewPort);
 			setChanged();
 		}
+		return hasChanged;
+	}
+
+	@Override
+	public boolean setScaleWithoutChangingViewport(double scale) {
+		boolean hasChanged = true;
+
+		if (scale < MIN_SCALE_FACTOR) {
+			this.scaleFactor = MIN_SCALE_FACTOR;
+		} else if (scale > MAX_SCALE_FACTOR) {
+			this.scaleFactor = MAX_SCALE_FACTOR;
+		} else if (scale != this.scaleFactor) {
+			this.scaleFactor = scale;
+		} else {
+			hasChanged = false;
+		}
+
+		if(hasChanged) {
+			setChanged();
+		}
+
 		return hasChanged;
 	}
 
@@ -254,7 +265,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public void setViewportBound(final Rectangle2D.Double viewportBound) {
+	public synchronized void setViewportBound(final Rectangle2D.Double viewportBound) {
 		Rectangle2D.Double oldViewportBound = this.viewportBound;
 
 		if (!oldViewportBound.equals(viewportBound)) {
