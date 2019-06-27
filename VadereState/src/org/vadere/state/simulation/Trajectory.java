@@ -55,11 +55,13 @@ public class Trajectory {
 	 * since the complete {@link Map} <tt>pedestrianByStep</tt> has to be iterated for each
 	 * pedestrian. A better way is to construct all {@link Trajectory} objects at once.
 	 *
-	 * @param pedestrianByStep  container for a set of trajectories
-	 * @param pedestrianId      a specific and unique pedestrian id
+	 * @param pedestrianByStep      container for a set of trajectories
+	 * @param pedestrianId          a specific and unique pedestrian id
+	 * @param simStepLengthInSec    step length of one time step in seconds
 	 */
-	public Trajectory(final Map<Step, List<Agent>> pedestrianByStep, final int pedestrianId) {
+	public Trajectory(final Map<Step, List<Agent>> pedestrianByStep, final int pedestrianId, final double simStepLengthInSec) {
 		this.pedestrianId = pedestrianId;
+		this.simStepLengthInSec = simStepLengthInSec;
 
 		// create for each step that contains an pedestrian with the specific pedestrianId
 		this.trajectoryPoints = pedestrianByStep.entrySet().stream()

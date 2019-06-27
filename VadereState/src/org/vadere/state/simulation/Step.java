@@ -58,11 +58,7 @@ public class Step implements Comparable<Step> {
 	 * @return the decremented step or this step (if this step is the minimal step).
 	 */
 	public Step decrement() {
-		if(stepNumber > MINIMAL_STEP) {
-			return new Step(stepNumber - 1);
-		} else {
-			return this;
-		}
+		return new Step(stepNumber - 1);
 	}
 
 	public boolean isGreaterThan(final Step step) {

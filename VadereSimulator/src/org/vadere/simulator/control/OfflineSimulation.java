@@ -38,7 +38,7 @@ public class OfflineSimulation {
 				.flatMap(entry -> entry.getValue().stream())
 				.map(ped -> ped.getId())
 				.distinct()
-				.map(id -> new Trajectory(pedestriansByStep, id))
+				.map(id -> new Trajectory(pedestriansByStep, id, vadere.getAttributesSimulation().getSimTimeStepLength()))
 				.collect(Collectors.toMap(t -> t.getPedestrianId(), t -> t));
 
 		topographyController.prepareTopography();
