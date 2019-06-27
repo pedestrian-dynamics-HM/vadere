@@ -139,7 +139,7 @@ public class VadereProject {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener, projectDirectory.resolve(IOUtils.SCENARIO_DIR));
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener, projectDirectory.resolve(IOUtils.SCENARIO_DIR).resolve(nextScenario.getName() + IOUtils.SCENARIO_FILE_EXTENSION));
 		scenarioRun.setOutputPaths(outputDirectory);
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);

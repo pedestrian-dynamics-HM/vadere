@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.math.InterpolationUtil;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,8 +23,9 @@ public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IP
 
     public PotentialFieldTargetGrid(@NotNull final Topography topography,
                                     @NotNull final AttributesAgent attributesPedestrian,
-                                    @NotNull final AttributesFloorField attributesPotential) {
-    	super(topography, attributesPedestrian, attributesPotential);
+                                    @NotNull final AttributesFloorField attributesPotential,
+									@NotNull final Path cacheDir) {
+    	super(topography, attributesPedestrian, attributesPotential, cacheDir);
     }
 
     @Override

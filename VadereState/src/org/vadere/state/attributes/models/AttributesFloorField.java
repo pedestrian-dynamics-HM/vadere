@@ -47,7 +47,7 @@ public class AttributesFloorField extends Attributes {
 	 * invalidating existing caches.
 	 */
 	@JsonView(Views.CacheViewExclude.class)
-	private String cacheDir = ".cache/floorfield";
+	private String cacheDir = "";
 
 	private AttributesTimeCost timeCostAttributes;
 

@@ -14,6 +14,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +35,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-	                       AttributesAgent attributesPedestrian, Random random) {
+	                       AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		init(Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class), topography, random);
 	}
 

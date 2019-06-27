@@ -1,24 +1,25 @@
 package org.vadere.simulator.models.sfm;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
+import org.vadere.util.geometry.shapes.Vector2D;
+
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides gradients for obstacles using the formula of the classical SFM
@@ -37,7 +38,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 
 	@Override
 	public void initialize(final List<Attributes> attributesList, final Topography topography,
-	                       final AttributesAgent attributesPedestrian, final Random random) {
+	                       final AttributesAgent attributesPedestrian, final Random random, Path cacheDir) {
 		this.obstacles = topography.getObstacles();
 		this.topography = topography;
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialSFM.class);

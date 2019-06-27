@@ -27,6 +27,7 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.math.TruncatedNormalDistribution;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class SeatingModel implements Model {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();

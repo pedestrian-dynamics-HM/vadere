@@ -18,6 +18,7 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -159,7 +160,7 @@ public class TestCLOptimalStepsModel {
 		obstacleDistancePotential = new PotentialFieldDistanceEikonalEq(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				bound, attributesFloorField);
-		targetPotentialField = new PotentialFieldSingleTargetGrid(topography, attributesAgent, attributesFloorField, 1);
+		targetPotentialField = new PotentialFieldSingleTargetGrid(topography, attributesAgent, attributesFloorField, 1, Paths.get("."));
 		targetPotentialField.preLoop(0.4f);
 		pedestrians = new ArrayList<>();
 

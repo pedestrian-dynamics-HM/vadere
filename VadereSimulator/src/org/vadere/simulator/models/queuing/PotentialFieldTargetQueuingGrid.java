@@ -32,6 +32,7 @@ import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,8 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	public PotentialFieldTargetQueuingGrid(
 			final Topography topography,
 			final AttributesAgent attributesPedestrian,
-			final AttributesQueuingGame attributesQueuingGame) {
+			final AttributesQueuingGame attributesQueuingGame,
+			final Path cacheDir) {
 
 		if (!isValidArguments(topography, attributesQueuingGame)) {
 			throw new IllegalArgumentException("wrong TimeCostFunctionType.");
@@ -74,9 +76,9 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		this.topography.addElementRemovedListener(Pedestrian.class, this);
 		this.random = new Random();
 		this.competitiveField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getNavigationFloorField());
+				attributesQueuingGame.getNavigationFloorField(), cacheDir);
 		this.gentleField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getQueuingFloorField());
+				attributesQueuingGame.getQueuingFloorField(), cacheDir);
 		this.pedestrianAttitudeMap = new HashMap<>();
 		this.lifeTimeMap = new HashMap<>();
 		this.pedestrians = new ArrayList<>();
@@ -315,7 +317,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		// TODO should be used to initialize the Model
 	}
 

@@ -22,6 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -69,7 +70,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 
 		this.attributes = Model.findAttributes(modelAttributesList, AttributesSFM.class);
 
@@ -84,7 +85,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 						topography, targets, null);
 
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
+				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel(), cacheDir);
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);

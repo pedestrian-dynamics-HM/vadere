@@ -1,9 +1,5 @@
 package org.vadere.simulator.models.gnm;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
@@ -14,10 +10,15 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.math.MathUtil;
+
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 @ModelClass
 public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
@@ -28,7 +29,7 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-	                       AttributesAgent attributesPedestrian, Random random) {
+	                       AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialGNM.class);
 	}
 

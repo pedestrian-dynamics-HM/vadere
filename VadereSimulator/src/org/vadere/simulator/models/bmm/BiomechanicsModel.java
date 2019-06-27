@@ -16,6 +16,7 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class BiomechanicsModel implements MainModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		this.attributesBHM = Model.findAttributes(modelAttributesList, AttributesBHM.class);
 		this.attributesBMM = Model.findAttributes(modelAttributesList, AttributesBMM.class);
 		this.attributesPedestrian = attributesPedestrian;

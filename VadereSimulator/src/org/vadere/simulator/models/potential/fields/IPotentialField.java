@@ -40,7 +40,6 @@ import org.vadere.util.math.InterpolationUtil;
 import java.awt.geom.Rectangle2D;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -82,7 +81,8 @@ public interface IPotentialField {
             final int targetId,
             final List<VShape> targetShapes,
             final AttributesAgent attributesPedestrian,
-            final AttributesFloorField attributesPotential) {
+            final AttributesFloorField attributesPotential,
+			final Path cacheDir) {
 
         EikonalSolverType createMethod = attributesPotential.getCreateMethod();
 
@@ -197,7 +197,7 @@ public interface IPotentialField {
 		if (attributesPotential.isUseCachedFloorField()){
 			String cacheName = StateJsonConverter.getFloorFieldHash(topography, attributesPotential)
 					+ "_" + targetId + ".ffcache";
-			Path path = Paths.get(attributesPotential.getCacheDir(), cacheName);
+			Path path = cacheDir.resolve(attributesPotential.getCacheDir()).resolve(cacheName);
 			if (Files.exists(path)){
 				isInitialized = eikonalSolver.loadCachedFloorField(path);
 			} else {

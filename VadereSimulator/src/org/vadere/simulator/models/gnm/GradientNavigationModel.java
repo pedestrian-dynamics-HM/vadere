@@ -25,6 +25,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -71,7 +72,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 
 		this.attributes = Model.findAttributes(modelAttributesList, AttributesGNM.class);
 
@@ -81,7 +82,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 				new GNMEquations(), attributesPedestrian, topography, random);
 
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
+				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel(), cacheDir);
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);

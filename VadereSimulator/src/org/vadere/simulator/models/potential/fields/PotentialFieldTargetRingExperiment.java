@@ -8,12 +8,13 @@ import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.geometry.shapes.Vector2D;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -111,7 +112,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
 		// TODO should be used to initialize the Model
 	}
 
