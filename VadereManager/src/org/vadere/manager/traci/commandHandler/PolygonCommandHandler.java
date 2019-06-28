@@ -8,6 +8,7 @@ import org.vadere.manager.traci.commandHandler.annotation.PolygonHandlers;
 import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
+import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.state.scenario.Obstacle;
 
@@ -177,6 +178,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 
 	public TraCICommand processSet(TraCICommand cmd, RemoteManager remoteManager) {
 		// do nothing just say ok...
+		((TraCISetCommand) cmd).setOK();
 		return cmd;
 	}
 
