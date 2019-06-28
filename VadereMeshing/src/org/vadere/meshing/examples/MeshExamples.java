@@ -1,6 +1,8 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.AFace;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
@@ -11,6 +13,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.ADelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PVoronoiVertexInsertion;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
@@ -59,7 +62,7 @@ public class MeshExamples {
 		//ruppertsTriangulationKaiserslautern();
 		//ruppertsTriangulationPoly();
 		//ruppertsTriangulationPolyGreenland();
-		//delaunayTriangulation();
+		delaunayTriangulation();
 		//dirichletRefinment();
 //		delaunayRefinment();
 		//constrainedDelaunayTriangulation();
@@ -145,7 +148,7 @@ public class MeshExamples {
 		List<VPoint> points = randomPoints.limit(numberOfPoints).collect(Collectors.toList());
 
 		// (2) compute the Delaunay triangulation
-		var delaunayTriangulator = new PDelaunayTriangulator(points);
+		var delaunayTriangulator = new ADelaunayTriangulator(points);
 		var triangulation = delaunayTriangulator.generate();
 
 		// \definecolor{mygreen}{RGB}{85,168,104}
@@ -179,8 +182,8 @@ public class MeshExamples {
 
 
 		String propertyName = "area";
-		LinkedList<PHalfEdge> visitedEdges = delaunayTriangulator.generate().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().getFace());
-		for(PFace f : delaunayTriangulator.getMesh().getFaces()) {
+		LinkedList<AHalfEdge> visitedEdges = delaunayTriangulator.generate().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().getFace());
+		for(AFace f : delaunayTriangulator.getMesh().getFaces()) {
 			delaunayTriangulator.getMesh().setData(f, propertyName, delaunayTriangulator.getMesh().toTriangle(f).getArea());
 		}
 
@@ -192,7 +195,7 @@ public class MeshExamples {
 
 
 		VPoint q = delaunayTriangulator.getMesh().toTriangle(delaunayTriangulator.getMesh().getFace(visitedEdges.peekFirst())).midPoint();
-		Set<PFace> faceSet = visitedEdges.stream().map(e -> delaunayTriangulator.getMesh().getFace(e)).collect(Collectors.toSet());
+		Set<AFace> faceSet = visitedEdges.stream().map(e -> delaunayTriangulator.getMesh().getFace(e)).collect(Collectors.toSet());
 
 		//\definecolor{myred}{RGB}{196,78,82}
 

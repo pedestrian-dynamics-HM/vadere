@@ -1,5 +1,9 @@
 package org.vadere.meshing.mesh.gen;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -34,6 +38,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	private AFace boundary;
 	private List<AHalfEdge> edges;
 	private List<AVertex> vertices;
+	private Map<String, AObjectArrayList<?>> verticesData;
+	private Map<String, AObjectArrayList<?>> halfEdgesData;
+	private Map<String, AObjectArrayList<?>> facesData;
+	private Map<String, DoubleArrayList> verticesDoubleData;
+	private Map<String, DoubleArrayList> facesDoubleData;
+	private Map<String, DoubleArrayList> halfEdgesDoubleData;
 
 	public AMesh() {
 		clear();
@@ -51,6 +61,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		this.numberOfEdges = 0;
 		this.numberOfVertices = 0;
 		this.numberOfHoles = 0;
+		this.verticesData = new HashMap<>();
+		this.halfEdgesData = new HashMap<>();
+		this.facesData = new HashMap<>();
+		this.verticesDoubleData = new HashMap<>();
+		this.halfEdgesData = new HashMap<>();
+		this.facesDoubleData = new HashMap<>();
 	}
 
 	@Override
@@ -140,32 +156,77 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 
 	@Override
 	public <CV> Optional<CV> getData(@NotNull final AVertex vertex, @NotNull final String name, @NotNull Class<CV> clazz) {
-		throw new UnsupportedOperationException("not jet implemented");
+		if(!verticesData.containsKey(name)) {
+			throw new IllegalArgumentException(name + " is not a property of vertices.");
+		} else {
+			ObjectArrayList<CV> dataArray = (ObjectArrayList<CV>) verticesData.get(name);
+			assert dataArray.size() == vertices.size();
+			return Optional.ofNullable(dataArray.get(vertex.getId()));
+		}
 	}
 
 	@Override
 	public <CV> void setData(@NotNull final AVertex vertex, @NotNull final String name, @Nullable final CV data) {
-		throw new UnsupportedOperationException("not jet implemented");
+		if(!verticesData.containsKey(name)) {
+			AObjectArrayList<CV> dataArray = new AObjectArrayList<>();
+			fill(dataArray, vertices.size());
+			verticesData.put(name, dataArray);
+		}
+		AObjectArrayList<CV> dataArray = (AObjectArrayList<CV>) verticesData.get(name);
+		assert dataArray.size() == vertices.size();
+		dataArray.set(vertex.getId(), data);
 	}
 
 	@Override
 	public <CE> Optional<CE> getData(@NotNull final AHalfEdge edge, @NotNull final String name, @NotNull Class<CE> clazz) {
-		throw new UnsupportedOperationException("not jet implemented");
+		if(!halfEdgesData.containsKey(name)) {
+			throw new IllegalArgumentException(name + " is not a property of vertices.");
+		} else {
+			AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
+			assert dataArray.size() == vertices.size();
+			return Optional.ofNullable(dataArray.get(edge.getId()));
+		}
 	}
 
 	@Override
 	public <CE> void setData(@NotNull final AHalfEdge edge, @NotNull final String name, @Nullable final CE data) {
-		throw new UnsupportedOperationException("not jet implemented");
+		if(!halfEdgesData.containsKey(name)) {
+			AObjectArrayList<CE> dataArray = new AObjectArrayList<>();
+			fill(dataArray, edges.size());
+			halfEdgesData.put(name, dataArray);
+		}
+		AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
+		assert dataArray.size() == edges.size();
+		dataArray.set(edge.getId(), data);
 	}
 
 	@Override
 	public <CF> Optional<CF> getData(@NotNull final AFace face, @NotNull final String name, @NotNull Class<CF> clazz) {
-		throw new UnsupportedOperationException("not jet implemented");
+		if(!facesData.containsKey(name)) {
+			throw new IllegalArgumentException(name + " is not a property of vertices.");
+		} else {
+			AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
+			assert dataArray.size() == vertices.size();
+			return Optional.ofNullable(dataArray.get(face.getId()));
+		}
 	}
 
 	@Override
-	public <CF> void setData(@NotNull final AFace edge, @NotNull final String name, @Nullable final CF data) {
-		throw new UnsupportedOperationException("not jet implemented");
+	public <CF> void setData(@NotNull final AFace face, @NotNull final String name, @Nullable final CF data) {
+		if(!facesData.containsKey(name)) {
+			AObjectArrayList<CF> dataArray = new AObjectArrayList<>();
+			fill(dataArray, faces.size());
+			facesData.put(name, dataArray);
+		}
+		AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
+		assert dataArray.size() == faces.size();
+		dataArray.set(face.getId(), data);
+	}
+
+	private void fill(@NotNull final ObjectArrayList<?> data, final int n) {
+		for(int i = 0; i < n; i++) {
+			data.add(null);
+		}
 	}
 
 	@Override
@@ -250,6 +311,9 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		int id = edges.size();
 		AHalfEdge edge = new AHalfEdge(id, vertex.getId());
 		edges.add(edge);
+		for (ObjectArrayList edgeProperty : halfEdgesData.values()) {
+			edgeProperty.add(null);
+		}
 		numberOfEdges++;
 		return edge;
 	}
@@ -259,6 +323,9 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		int id = edges.size();
 		AHalfEdge edge = new AHalfEdge(id, vertex.getId(), face.getId());
 		edges.add(edge);
+		for (ObjectArrayList edgeProperty : halfEdgesData.values()) {
+			edgeProperty.add(null);
+		}
 		numberOfEdges++;
 		return edge;
 	}
@@ -273,6 +340,10 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		int id = faces.size();
 		AFace face = new AFace(id, -1, hole);
 		faces.add(face);
+		for (ObjectArrayList faceProperty : facesData.values()) {
+			faceProperty.add(null);
+		}
+
 		if(!hole) {
 			numberOfFaces++;
 		}
@@ -296,6 +367,9 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	@Override
 	public AVertex createVertex(@NotNull final IPoint point) {
 		int id = vertices.size();
+		for (ObjectArrayList vertexProperty : verticesData.values()) {
+			vertexProperty.add(null);
+		}
 		return new AVertex(id, point);
 	}
 
@@ -475,6 +549,31 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 
             // here we assume that the point-constructor is stateless!
             clone.boundary = boundary.clone();
+
+            // no deep copy of object properties
+	        clone.facesData = facesData;
+	        clone.verticesData = verticesData;
+	        clone.halfEdgesData = halfEdgesData;
+
+	        // deep copy of primitive properties
+	        Map<String, DoubleArrayList> clonedFacesDoubleData = new HashMap<>();
+	        for(var entry : facesDoubleData.entrySet()) {
+		        clonedFacesDoubleData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.facesDoubleData = clonedFacesDoubleData;
+
+	        Map<String, DoubleArrayList> clonedHalfEdgesDoubleData = new HashMap<>();
+	        for(var entry : halfEdgesDoubleData.entrySet()) {
+		        clonedHalfEdgesDoubleData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.halfEdgesDoubleData = clonedHalfEdgesDoubleData;
+
+	        Map<String, DoubleArrayList> clonedVerticessDoubleData = new HashMap<>();
+	        for(var entry : verticesDoubleData.entrySet()) {
+		        clonedVerticessDoubleData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.verticesDoubleData = clonedVerticessDoubleData;
+
             return clone;
 
         } catch (CloneNotSupportedException e) {
@@ -513,7 +612,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
      *
      * @param faceOrder the new order
      */
-    public void arrangeMemory(@NotNull Iterable<AFace> faceOrder) {
+    public void arrangeMemory(@NotNull final Iterable<AFace> faceOrder) {
         // clone the old one!
         AMesh cMesh = clone();
 
@@ -577,6 +676,53 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 
         // fix the boundary
         boundary.setEdge(edgeMap[boundary.getEdge()]);
+
+        // fix properties
+	    rearrangeFacesData(faceMap);
+	    rearrangeHalfEdgesData(edgeMap);
+	    rearrangeVerticesData(vertexMap);
+    }
+
+    private void rearrangeVerticesData(@NotNull int[] vertexMap) {
+	    for(int i = 0; i < vertexMap.length; i++) {
+		    for(var list : verticesData.values()) {
+			    list.swap(vertexMap[i], i);
+		    }
+
+		    for(var list : verticesDoubleData.values()) {
+			    double tmp = list.getDouble(vertexMap[i]);
+			    list.set(vertexMap[i], list.getDouble(i));
+			    list.set(i, tmp);
+		    }
+	    }
+    }
+
+	private void rearrangeHalfEdgesData(@NotNull int[] edgeMap) {
+		for(int i = 0; i < edgeMap.length; i++) {
+			for(var list : halfEdgesData.values()) {
+				list.swap(edgeMap[i], i);
+			}
+
+			for(var list : halfEdgesDoubleData.values()) {
+				double tmp = list.getDouble(edgeMap[i]);
+				list.set(edgeMap[i], list.getDouble(i));
+				list.set(i, tmp);
+			}
+		}
+	}
+
+    private void rearrangeFacesData(@NotNull int[] faceMap) {
+	    for(int i = 0; i < faceMap.length; i++) {
+		    for(var list : facesData.values()) {
+			    list.swap(faceMap[i], i);
+		    }
+
+		    for(var list : facesDoubleData.values()) {
+			    double tmp = list.getDouble(faceMap[i]);
+			    list.set(faceMap[i], list.getDouble(i));
+			    list.set(i, tmp);
+		    }
+	    }
     }
 
     private void copyFace(@NotNull final AFace face, @NotNull int[] vertexMap, @NotNull int[] edgeMap, @NotNull int[] faceMap, @NotNull final AMesh cMesh) {
@@ -636,7 +782,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
      *
      * <p>Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!</p>
      */
-    public void spatialSort() {
+    private void spatialSort() {
         // get the bound for the space filling curve!
         double maxX = Double.MIN_VALUE;
         double maxY = Double.MIN_VALUE;
@@ -677,9 +823,14 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
      * <p>Note: that any mapping id to vertex or id to halfEdge or id to face has to be recomputed!</p>
 	 */
 	public void garbageCollection() {
-		Map<Integer, Integer> faceIdMap = new HashMap<>();
-		Map<Integer, Integer> edgeIdMap = new HashMap<>();
-		Map<Integer, Integer> vertexIdMap = new HashMap<>();
+		int nullIdentifier = -2;
+		int[] faceIdMap = new int[faces.size()];
+		int[] edgeIdMap = new int[edges.size()];
+		int[] vertexIdMap = new int[vertices.size()];
+
+		Arrays.fill(faceIdMap, nullIdentifier);
+		Arrays.fill(edgeIdMap, nullIdentifier);
+		Arrays.fill(vertexIdMap, nullIdentifier);
 
 		int i = 0;
 		int j = 0;
@@ -687,7 +838,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			if (face.isDestroyed()) {
 				j--;
 			} else {
-				faceIdMap.put(i, j);
+				faceIdMap[i] = j;
 			}
 			i++;
 			j++;
@@ -699,7 +850,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			if (edge.isDestroyed()) {
 				j--;
 			} else {
-				edgeIdMap.put(i, j);
+				edgeIdMap[i] = j;
 			}
 			i++;
 			j++;
@@ -711,7 +862,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			if (vertex.isDestroyed()) {
 				j--;
 			} else {
-				vertexIdMap.put(i, j);
+				vertexIdMap[i] = j;
 			}
 			i++;
 			j++;
@@ -723,34 +874,39 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 
 		i = 0;
 		for (AFace face : faces) {
-			face.setId(faceIdMap.get(face.getId()));
-			face.setEdge(edgeIdMap.get(face.getEdge()));
+			face.setId(faceIdMap[face.getId()]);
+			face.setEdge(edgeIdMap[face.getEdge()]);
 			assert face.getId() == i;
 			i++;
 		}
 
 		i = 0;
 		for (AVertex vertex : vertices) {
-			vertex.setId(vertexIdMap.get(vertex.getId()));
-			vertex.setEdge(edgeIdMap.get(vertex.getEdge()));
+			vertex.setId(vertexIdMap[vertex.getId()]);
+			vertex.setEdge(edgeIdMap[vertex.getEdge()]);
 			assert vertex.getId() == i;
 			i++;
 		}
 
 		i = 0;
 		for (AHalfEdge edge : edges) {
-			edge.setId(edgeIdMap.get(edge.getId()));
-			edge.setEnd(vertexIdMap.get(edge.getEnd()));
-			edge.setNext(edgeIdMap.get(edge.getNext()));
-			edge.setPrevious(edgeIdMap.get(edge.getPrevious()));
-			edge.setTwin(edgeIdMap.get(edge.getTwin()));
+			edge.setId(edgeIdMap[edge.getId()]);
+			edge.setEnd(vertexIdMap[edge.getEnd()]);
+			edge.setNext(edgeIdMap[edge.getNext()]);
+			edge.setPrevious(edgeIdMap[edge.getPrevious()]);
+			edge.setTwin(edgeIdMap[edge.getTwin()]);
 			if (edge.getFace() != boundary.getId()) {
-				edge.setFace(faceIdMap.get(edge.getFace()));
+				edge.setFace(faceIdMap[edge.getFace()]);
 			}
 
 			assert edge.getId() == i;
 			i++;
 		}
+
+		// fix properties
+		rearrangeFacesData(faceIdMap);
+		rearrangeHalfEdgesData(edgeIdMap);
+		rearrangeVerticesData(vertexIdMap);
 
 		assert (getNumberOfVertices() == vertices.size()) && (getNumberOfEdges() == edges.size()) && (getNumberOfFaces() == faces.size()-holes.size());
 	}
