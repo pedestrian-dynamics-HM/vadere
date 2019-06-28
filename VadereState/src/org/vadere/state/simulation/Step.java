@@ -1,35 +1,21 @@
 package org.vadere.state.simulation;
 
-import java.util.Optional;
 
 /**
- * Java Bean that store the stepNumber and the simulation time in seconds of a specific time step.
+ * Immutable class. Java Bean that store the stepNumber and the simulation time in seconds of a specific time step.
+ *
+ * @author Benedikt Zoennchen
  *
  */
 public class Step implements Comparable<Step> {
-	private final Integer stepNumber;
-	private final Double simTimeInSec;
+	private final int stepNumber;
+	private final static int MINIMAL_STEP = 1;
+	private final static Step FIST_STEP = new Step(1);
+	private final static double MIN_TOLERANCE = 0.001;
+	private final static double MAX_TOLERANCE = 0.999;
 
 	public Step(final int stepNumber) {
 		this.stepNumber = stepNumber;
-		this.simTimeInSec = null;
-	}
-
-	public Step(final int stepNumber, final double simTimeInSec) {
-		this.stepNumber = stepNumber;
-		this.simTimeInSec = simTimeInSec;
-	}
-
-	/**
-	 * Returns an Optional<Double> since the simulation time in seconds may not stored.
-	 * 
-	 * @return an Optional<Double>
-	 */
-	public Optional<Double> getSimTimeInSec() {
-		if (simTimeInSec == null) {
-			return Optional.empty();
-		}
-		return Optional.of(simTimeInSec);
 	}
 
 	/**
@@ -41,6 +27,82 @@ public class Step implements Comparable<Step> {
 		return stepNumber;
 	}
 
+	/**
+	 * Securely increments the step.
+	 *
+	 * @return the incremented step
+	 */
+	public Step increment() {
+		return new Step(stepNumber + 1);
+	}
+
+	/**
+	 * Securely substracts the <tt>step</tt> from <tt>this</tt>.
+	 *
+	 * @param step a step
+	 * @return the subtraction result or the minimal step if the result would generate a step smaller than the minimal step.
+	 */
+	public Step subtract(final Step step) {
+		int diff = stepNumber - step.getStepNumber();
+
+		if (diff >= MINIMAL_STEP) {
+			return new Step(diff);
+		} else {
+			return FIST_STEP;
+		}
+	}
+
+	/**
+	 * Securely decrements the step by 1.
+	 *
+	 * @return the decremented step or this step (if this step is the minimal step).
+	 */
+	public Step decrement() {
+		return new Step(stepNumber - 1);
+	}
+
+	public boolean isGreaterThan(final Step step) {
+		return compareTo(step) > 0;
+	}
+
+	public boolean isGreaterEqThan(final Step step) {
+		return compareTo(step) >= 0;
+	}
+
+	public boolean isSmallerThan(final Step step) {
+		return compareTo(step) < 0;
+	}
+
+	public boolean isSmallerEqThan(final Step step) {
+		return compareTo(step) <= 0;
+	}
+
+	public static Step toFloorStep(final double simTimeInSec, final double simStepLengthInSec) {
+		Step base = new Step((int) (simTimeInSec / simStepLengthInSec));
+		double r = simTimeInSec - toSimTimeInSec(base, simStepLengthInSec);
+
+		if(r / simStepLengthInSec > MAX_TOLERANCE) {
+			return base.increment();
+		} else{
+			return base;
+		}
+	}
+
+	public static Step toCeilStep(final double simTimeInSec, final double simStepLengthInSec) {
+		Step base = new Step((int) (simTimeInSec / simStepLengthInSec));
+		double r = simTimeInSec - toSimTimeInSec(base, simStepLengthInSec);
+
+		if(r / simStepLengthInSec < MIN_TOLERANCE) {
+			return base;
+		} else {
+			return base.increment();
+		}
+	}
+
+	public static double toSimTimeInSec(final Step step, final double simStepLengthInSec) {
+		return step.getStepNumber() * simStepLengthInSec;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -50,12 +112,12 @@ public class Step implements Comparable<Step> {
 			return false;
 		}
 		Step other = (Step) obj;
-		return stepNumber.equals(other.stepNumber);
+		return stepNumber == other.stepNumber;
 	}
 
 	@Override
 	public String toString() {
-		return "(" + stepNumber + ", " + simTimeInSec + ")";
+		return "(" + stepNumber + ")";
 	}
 
 	@Override

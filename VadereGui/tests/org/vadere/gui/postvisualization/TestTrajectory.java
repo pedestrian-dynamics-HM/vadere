@@ -29,7 +29,7 @@ public class TestTrajectory extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		pedestriansByStep = new HashMap<>();
-		List<Step> steps = Arrays.asList(new Step(2), new Step(4), new Step(5), new Step(7));
+		List<Step> steps = Arrays.asList(new Step(1), new Step(4), new Step(5), new Step(7));
 		List<Pedestrian> pedestrians = Arrays.asList(
 				new Pedestrian(new AttributesAgent(1), new Random()),
 				new Pedestrian(new AttributesAgent(2), new Random()),
@@ -47,7 +47,7 @@ public class TestTrajectory extends TestCase {
 
 	@Test
 	public void testGetPedestrian() {
-		Trajectory trajectory = new Trajectory(pedestriansByStep, 1);
+		Trajectory trajectory = new Trajectory(pedestriansByStep, 1, 0.4);
 		assertEquals(trajectory.getAgent(new Step(3)), (trajectory.getAgent(new Step(2))));
 		assertTrue(trajectory.getAgent(new Step(3)).isPresent());
 		assertEquals(trajectory.getAgent(new Step(6)), (trajectory.getAgent(new Step(5))));
@@ -66,8 +66,9 @@ public class TestTrajectory extends TestCase {
 
 	@Test
 	public void testGetPositionReverse() {
-		Trajectory trajectory = new Trajectory(pedestriansByStep, 2);
-		IntStream.rangeClosed(1, 17).forEach(stepNumber -> assertTrue(
+		Trajectory trajectory = new Trajectory(pedestriansByStep, 2, 0.4);
+		trajectory.fill();
+		IntStream.rangeClosed(1, 7).forEach(stepNumber -> assertTrue(
 				trajectory.getPositionsReverse(new Step(stepNumber)).count() + "!=" + stepNumber,
 				trajectory.getPositionsReverse(new Step(stepNumber)).count() == stepNumber));
 		List<VPoint> reversePositions = trajectory.getPositionsReverse(new Step(12)).collect(Collectors.toList());

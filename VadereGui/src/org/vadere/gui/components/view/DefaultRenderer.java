@@ -59,37 +59,45 @@ public abstract class DefaultRenderer {
 	 * @param height
 	 */
 	public void render(final Graphics2D targetGraphics2D, final int width, final int height) {
-		render(targetGraphics2D, 0, 0, width, height);
+		synchronized (defaultModel) {
+			render(targetGraphics2D, 0, 0, width, height);
+		}
 	}
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
-		targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
-		targetGraphics2D.dispose();
+		synchronized (defaultModel) {
+			targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+			targetGraphics2D.dispose();
+		}
 	}
 
 	public void renderGraphics(final Graphics2D targetGraphics2D, final int width, final int height) {
-		targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		synchronized (defaultModel) {
+			targetGraphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// (1) clear background
-		targetGraphics2D.setColor(Color.GRAY);
-		//targetGraphics2D.fill();
-		targetGraphics2D.fillRect(0, 0, width, height);
+			// (1) clear background
+			targetGraphics2D.setColor(Color.GRAY);
+			//targetGraphics2D.fill();
+			targetGraphics2D.fillRect(0, 0, width, height);
 
-		// (2) render everything which can be rendered before the transformation
-		renderPreTransformation(targetGraphics2D, width, height);
+			// (2) render everything which can be rendered before the transformation
+			renderPreTransformation(targetGraphics2D, width, height);
 
-		// (3)
-		transformGraphics(targetGraphics2D);
+			// (3)
+			transformGraphics(targetGraphics2D);
 
-		// (4) render everything which can be rendered after the transformation
-		renderPostTransformation(targetGraphics2D, width, height);
+			// (4) render everything which can be rendered after the transformation
+			renderPostTransformation(targetGraphics2D, width, height);
+		}
 	}
 
 	public BufferedImage renderImage(final int width, final int height) {
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
-		renderGraphics(bufferGraphics2D, width, height);
-		return image;
+		synchronized (defaultModel) {
+			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
+			renderGraphics(bufferGraphics2D, width, height);
+			return image;
+		}
 	}
 
 	public void setLogo(final BufferedImage logo) {
@@ -99,33 +107,36 @@ public abstract class DefaultRenderer {
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
-		graphics2D.setColor(Color.WHITE);
-		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-		fill(new VRectangle(
-				topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
-				topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
-				(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
-				(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
+		synchronized (defaultModel) {
+			graphics2D.setColor(Color.WHITE);
+			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+			fill(new VRectangle(
+					topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
+					topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
+					(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
+					(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
 
+		}
 	}
 
 	protected void transformGraphics(final Graphics2D graphics2D) {
-		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-		mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
-		graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
+		synchronized (defaultModel) {
+			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+			mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
+			graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
 
 
-		//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
+			//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
 
-		/*
-		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
-		 */
-		Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
-		double dy = topographyBound.getHeight() - viewportBound.getHeight();
+			/*
+			 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
+			 */
+			Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
+			double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-		graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
-		// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
-
+			graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
+			// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
+		}
 	}
 
 	protected void renderScenarioElement(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
