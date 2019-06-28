@@ -695,6 +695,18 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			    list.set(i, tmp);
 		    }
 	    }
+
+	    for(var list : verticesDoubleData.values()) {
+		    if(vertexMap.length < facesDoubleData.size()) {
+			    list.trim(vertexMap.length);
+		    }
+	    }
+
+	    for(var list : verticesData.values()) {
+		    if(vertexMap.length < facesDoubleData.size()) {
+			    list.trim(vertexMap.length);
+		    }
+	    }
     }
 
 	private void rearrangeHalfEdgesData(@NotNull int[] edgeMap) {
@@ -709,6 +721,18 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 				list.set(i, tmp);
 			}
 		}
+
+		for(var list : halfEdgesDoubleData.values()) {
+			if(edgeMap.length < facesDoubleData.size()) {
+				list.trim(edgeMap.length);
+			}
+		}
+
+		for(var list : halfEdgesData.values()) {
+			if(edgeMap.length < facesDoubleData.size()) {
+				list.trim(edgeMap.length);
+			}
+		}
 	}
 
     private void rearrangeFacesData(@NotNull int[] faceMap) {
@@ -721,6 +745,18 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			    double tmp = list.getDouble(faceMap[i]);
 			    list.set(faceMap[i], list.getDouble(i));
 			    list.set(i, tmp);
+		    }
+	    }
+
+	    for(var list : facesDoubleData.values()) {
+		    if(faceMap.length < facesDoubleData.size()) {
+			    list.trim(faceMap.length);
+		    }
+	    }
+
+	    for(var list : facesData.values()) {
+		    if(faceMap.length < facesDoubleData.size()) {
+			    list.trim(faceMap.length);
 		    }
 	    }
     }
