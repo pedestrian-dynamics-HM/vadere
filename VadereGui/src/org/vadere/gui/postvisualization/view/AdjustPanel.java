@@ -46,7 +46,7 @@ public class AdjustPanel extends JPanel implements Observer {
 		// sStep.setEditable(false);
 		sModelVelocity = new SpinnerNumberModel(model.config.getFps(), 1, 200, 1);
 		sModelTimeStep = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
-		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.01);
+		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, model.getVisTimeStepLength());
 		sModelVisTimeStepLength = new SpinnerNumberModel(model.getVisTimeStepLength(), 0.01, Double.MAX_VALUE, 0.01);
 
 		sVelocity = new JSpinner(sModelVelocity);
@@ -117,5 +117,6 @@ public class AdjustPanel extends JPanel implements Observer {
 		sStep.setValue(currentStepNumber);
 		sTime.setValue(model.getSimTimeInSec());
 		sModelVisTimeStepLength.setValue(model.getVisTimeStepLength());
+		((SpinnerNumberModel)sModelTime).setStepSize(model.getVisTimeStepLength());
 	}
 }
