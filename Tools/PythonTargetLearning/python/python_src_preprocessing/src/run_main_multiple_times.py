@@ -35,8 +35,8 @@ for i in range(0,4):
     main_rf.run_main(observation_area= [20, 25, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
     main_rf.run_main(observation_area= [20, 30, 10, 10], resolution=0.5, framerate = 10, numberOfTrees=20)
 '''
-for i in range(0,10):
-    main_rf.run_main([-2.4, 3, 2.4, 1], 0.1, 8, 20)
+for i in range(0,5):
+    main_rf.run_main([-2.4, 3, 2.4, 1], 0.1, 8, 50)
 
 
 

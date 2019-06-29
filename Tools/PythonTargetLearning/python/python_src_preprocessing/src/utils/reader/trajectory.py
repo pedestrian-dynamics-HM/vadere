@@ -29,8 +29,10 @@ def get_all_trajectory_files(root_dir):
 def read_trajectory_file(path, fps=None):
     frame = pd.read_csv(path, sep=' ', header=0)
 
-    if fps is not None:
-        d = 2
+    frame.rename(lambda n: n.split('-')[0], axis='columns', inplace=True);
+
+    #if fps is not None:
+    #    d = 2
 
     return frame
 

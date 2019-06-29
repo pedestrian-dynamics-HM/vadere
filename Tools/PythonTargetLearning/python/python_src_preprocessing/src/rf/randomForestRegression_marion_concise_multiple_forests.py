@@ -20,12 +20,12 @@ from rf.error_calculation import calc_and_print_errors_rf
 
 
 
-def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDepth, nTargets, log_file, log_file_name, obs_area, resolution):
+def randomForest(test_size_percent, use_cores, directory, result_directory, numberOfTrees, treeDepth, nTargets, log_file, log_file_name, obs_area, resolution, _filter=lambda f: 'reduced' in f):
 
     print("*** MULTIPLE FORESTS ***")
 
     #  Some useful length measurements
-    imported_files = os.listdir(directory)
+    imported_files = list(filter(_filter, os.listdir(directory)))
     
     startTime = time.time()
 
@@ -132,7 +132,7 @@ def randomForest(test_size_percent, use_cores, directory, numberOfTrees, treeDep
     plt.title("Feature importance")
     plt.colorbar()
     # plt.show()
-    plt.savefig(log_file_name[0:len(log_file_name)-3] + 'pdf')
+    plt.savefig(os.path.join(result_directory, log_file_name[0:len(log_file_name)-3] + 'pdf'))
 
     # print("Out of bag error prediction")
     # print(rf_density_regressor.oob_prediction_)

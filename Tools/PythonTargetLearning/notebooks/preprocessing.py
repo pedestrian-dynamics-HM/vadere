@@ -154,7 +154,7 @@ def get_density_field(pedestrians, context):
     return density_approx
 
 
-def juelich_filter_percentiles(pedestrians, percentiles, density, context):
+def juelich_filter_percentiles(timestep, pedestrians, percentiles, density, context):
     flag = False
     if percentiles['A'] == 0.5 and percentiles['B'] == 0.5:
         flag = not(context.get('pFlag', False))
@@ -167,7 +167,7 @@ def juelich_assign_target(pedestrian):
     return 'B' if pedestrian['x'] < 0 else 'A'
 
 
-def process_percentiles(pedestrians, percentiles, density, context):
+def process_percentiles(timestep, pedestrians, percentiles, density, context):
     data = context.get('percentiles', None)
 
     # create dataframe if not yet available
@@ -179,7 +179,7 @@ def process_percentiles(pedestrians, percentiles, density, context):
     return context
 
 
-def process_pedestrians(pedestrians, percentiles, density, context):
+def process_pedestrians(timestep, pedestrians, percentiles, density, context):
     data = context.get('pedestrians', None)
 
     # create dataframe if not yet available
@@ -193,7 +193,7 @@ def process_pedestrians(pedestrians, percentiles, density, context):
     return context
 
 
-def process_peds_per_step(pedestrians, percentiles, density, context):
+def process_peds_per_step(timestep, pedestrians, percentiles, density, context):
     data = context.get('pedestrians', None)
 
     # create dataframe if not yet available
@@ -206,7 +206,7 @@ def process_peds_per_step(pedestrians, percentiles, density, context):
     return context
 
 
-def process_densities(pedestrians, percentiles, density, context):
+def process_densities(timestep, pedestrians, percentiles, density, context):
     data = context.get('densities', None)
 
     # create dataframe if not yet available
@@ -215,7 +215,7 @@ def process_densities(pedestrians, percentiles, density, context):
         context['densities'] = data
 
     distribution = [percentiles[key] for key in sorted(percentiles.keys())]
-    data.append(np.concatenate((density.flatten(), distribution), axis=None))
+    data.append(np.concatenate(([timestep], density.flatten(), distribution), axis=None))
 
     return context
 
@@ -262,7 +262,7 @@ def process_experiment(experiment, context):
     skip = context.get('skip', 1)
     all_timesteps = list(experiment.groupby('timeStep'))
     timesteps = all_timesteps[::skip]
-    print(len(all_timesteps), len(timesteps), skip)
+    print('using every ', skip, 'timestep, # of used timesteps', len(timesteps), ', # of total timesteps', len(all_timesteps))
     
     total = len(timesteps)
     timesteps = list(map(lambda a: (*a, context), timesteps))
@@ -276,24 +276,30 @@ def process_experiment(experiment, context):
             for _, result in enumerate(p.imap_unordered(process_timestep, timesteps)):
                 pbar.update()
 
-                pedestrians, percentiles, density = result
+                pedestrians, percentiles, density, timestep = result
 
                 if pedestrians is None:
                     continue
 
-                               # execute filters
+                 # execute filters
                 lock.acquire()
+                filtered = False
                 for _filter in filters:
-                    reject, context = filter(
-                        pedestrians, percentiles, density, context)
+                    reject, context = _filter(
+                        timestep, pedestrians, percentiles, density, context)
                     if reject:
-                        lock.release()
-                        continue
+                        #lock.release()
+                        filtered = True
+                        break
                 
+                if filtered:
+                    lock.release()
+                    continue
+
                 # execute processors
                 for processor in processors:
                     context = processor(
-                        pedestrians, percentiles, density, context)
+                        timestep, pedestrians, percentiles, density, context)
                 lock.release()
 
     return context
@@ -309,11 +315,11 @@ def process_timestep(args):
 
     # skip if empty area
     if len(pedestrians) == 0:
-        return None, None, None
+        return None, None, None, None
 
     percentiles = get_target_percentiles(
         pedestrians, pId2Target, context.get('targets', ['A', 'B']))
 
     density = get_density_field(pedestrians, context)
 
-    return pedestrians, percentiles, density
+    return pedestrians, percentiles, density, trajectories.timeStep.values[0]

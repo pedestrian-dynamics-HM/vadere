@@ -30,8 +30,13 @@ OUTPUT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_w
 # directory to write result files to
 RESULT_ROOT_DIRECTORY = os.path.join('C:/Users/Luca/Documents/PED_Can_we_learn_where_people_go/myresults/')
 
-OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich-vadere/output_01/')
-RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich-vadere/results_01/')
+
+OUTPUT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/output_01/')
+RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich/results_01/')
+
+INPUT_ROOT_DIRECTORY = os.path.join('I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/outputs/')
+OUTPUT_ROOT_DIRECTORY = os.path.join('I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/csvs/obstacle/')
+RESULT_ROOT_DIRECTORY = os.path.join('I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/results/obstacle/')
 
 # OBSERVATION_AREA select data from observed area, [offset_x, offset_y, width, height]
 # [7,23,5,5]
@@ -39,7 +44,8 @@ RESULT_ROOT_DIRECTORY = os.path.join('../../../notebooks/juelich-vadere/results_
 # [25, 5, 10, 10]
 # OBSERVATION_AREA = [20, 10, 10, 10]
 # OBSERVATION_AREA = [13.50, 7.25, 2.4, 1]
-OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
+OBSERVATION_AREA = [18.50, 6.7, 2.4, 1]
+# OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
 
 TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
 RESOLUTION = 0.1  # 0.5  # resolution for density calculations
@@ -52,7 +58,7 @@ SIM_TIME_STEP_LENGTH = 0.4  # unused right now
 test_size_percent = 0.2
 use_cores = 4
 # directory = '../../data/output_preprocessed/'
-NTREES = 20
+NTREES = 50
 number_of_targets = 3  # default
 tree_depth = None  # as long as possible
 
@@ -287,6 +293,7 @@ def run_main(observation_area, resolution, framerate, number_of_trees):
 			test_size_percent,
 			use_cores,
 			OUTPUT_ROOT_DIRECTORY,
+			RESULT_ROOT_DIRECTORY,
 			number_of_trees,
 			tree_depth,
 			number_of_targets,
