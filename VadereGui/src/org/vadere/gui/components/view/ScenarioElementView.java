@@ -81,7 +81,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			Theme syntaxTheme = Theme.load(in);
 			syntaxTheme.apply(textAreaLocal);
 		} catch (IOException e) {
-			logger.error("could not load theme" + e.getMessage());
+			logger.error("could not loadFromFilesystem theme" + e.getMessage());
 		}
 
 		txtrTextfiletextarea = textAreaLocal;

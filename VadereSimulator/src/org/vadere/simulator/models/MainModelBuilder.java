@@ -1,10 +1,10 @@
 package org.vadere.simulator.models;
 
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import java.nio.file.Path;
 import java.util.Random;
 
 /**
@@ -18,11 +18,11 @@ public class MainModelBuilder {
 	private ScenarioStore scenarioStore;
 	private MainModel model;
 	private Random random;
-	private Path scenarioLocation;
+	private ScenarioCache scenarioCache;
 
-	public MainModelBuilder(ScenarioStore scenarioStore, Path scenarioLocation) {
+	public MainModelBuilder(ScenarioStore scenarioStore, ScenarioCache scenarioCache) {
 		this.scenarioStore = scenarioStore;
-		this.scenarioLocation = scenarioLocation;
+		this.scenarioCache = scenarioCache;
 	}
 
 	public void createModelAndRandom()
@@ -57,9 +57,9 @@ public class MainModelBuilder {
 		MainModel mainModel = instantiator.createObject(mainModelName);
 		// use scenario location as base for cache location: ....../scenarios/.cache.d/[XXX]/aef333028.ffcache
 		// XXX is defined within the floor field attributes to allow human readable hierarchies within the cache directory
-		Path cacheDir = scenarioLocation.getParent().resolve("__cache__");
+//		Path cache = scenarioCache.getParent().resolve("__cache__");
 		mainModel.initialize(scenarioStore.getAttributesList(), scenarioStore.getTopography(),
-				scenarioStore.getTopography().getAttributesPedestrian(), random, cacheDir);
+				scenarioStore.getTopography().getAttributesPedestrian(), random, scenarioCache);
 		return mainModel;
 	}
 

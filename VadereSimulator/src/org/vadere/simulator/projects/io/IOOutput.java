@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
- * This IOUtility class provides all methods to load, delete, list, clean output directories.
+ * This IOUtility class provides all methods to loadFromFilesystem, delete, list, clean output directories.
  * Each output directory contains two files *.scenario and *.trajectories.
  *
  */

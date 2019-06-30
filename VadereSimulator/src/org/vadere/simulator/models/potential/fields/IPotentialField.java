@@ -16,13 +16,14 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolv
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.simulator.utils.cache.CacheLoader;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.EikonalSolverType;
-import org.vadere.state.util.StateJsonConverter;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -38,8 +39,6 @@ import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.awt.geom.Rectangle2D;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -74,7 +73,8 @@ public interface IPotentialField {
      * @param targetShapes          the area where T = 0
      * @param attributesPedestrian  pedestrian configuration
      * @param attributesPotential   potential field configuration (dynamic or static, parameters and so on...)
-     * @return an EikonalSolver for a specific target
+     * @param cache
+	 * @return an EikonalSolver for a specific target
      */
     static EikonalSolver create(
             final Topography topography,
@@ -82,8 +82,8 @@ public interface IPotentialField {
             final List<VShape> targetShapes,
             final AttributesAgent attributesPedestrian,
             final AttributesFloorField attributesPotential,
-			final Path cacheDir) {
-
+			final ScenarioCache cache) {
+		logger.debug("create EikonalSolver");
         EikonalSolverType createMethod = attributesPotential.getCreateMethod();
 
         Rectangle2D.Double bounds = topography.getBounds();
@@ -194,19 +194,24 @@ public interface IPotentialField {
 		   floor field initialization and log errors.
 		 */
 		boolean isInitialized = false;
-		if (attributesPotential.isUseCachedFloorField()){
-			String cacheName = StateJsonConverter.getFloorFieldHash(topography, attributesPotential)
-					+ "_" + targetId + ".ffcache";
-			Path path = cacheDir.resolve(attributesPotential.getCacheDir()).resolve(cacheName);
-			if (Files.exists(path)){
-				isInitialized = eikonalSolver.loadCachedFloorField(path);
+		logger.info("initialize floor field");
+		if (attributesPotential.isUseCachedFloorField() && cache.isNotEmpty()){
+			String targetIdentifier = cache.targetToIdentifier(targetId);
+			long ms = System.currentTimeMillis();
+			CacheLoader cacheLoader = cache.getCacheForTarget(targetId);
+			if (cacheLoader != null){
+				isInitialized = eikonalSolver.loadCachedFloorField(cacheLoader);
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
 			} else {
+				ms = System.currentTimeMillis();
 				logger.infof("No cache found for scenario initialize floor field");
-				long ms = System.currentTimeMillis();
 				eikonalSolver.initialize();
-				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
-				eikonalSolver.saveFloorFieldToCache(path);
 				isInitialized = true;
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				ms = System.currentTimeMillis();
+				logger.info("save floor field cache:");
+				eikonalSolver.saveFloorFieldToCache(cache, targetIdentifier);
+				logger.info("save floor field cache time:" + (System.currentTimeMillis() - ms + "[ms]"));
 			}
 		}
 

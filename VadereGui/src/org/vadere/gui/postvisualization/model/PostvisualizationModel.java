@@ -180,7 +180,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
                 f = potentialField.getInterpolationFunction();
             }
         } catch (IOException e) {
-            logger.warn("could not load potential field from file.");
+            logger.warn("could not loadFromFilesystem potential field from file.");
             e.printStackTrace();
         }
         return f;

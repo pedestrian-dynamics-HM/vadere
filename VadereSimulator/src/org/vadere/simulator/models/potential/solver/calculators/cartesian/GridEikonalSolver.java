@@ -6,6 +6,9 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.utils.cache.CacheException;
+import org.vadere.simulator.utils.cache.CacheLoader;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -13,10 +16,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Path;
-
-import tech.tablesaw.api.Table;
 
 /**
  * @author Benedikt Zoennchen
@@ -300,36 +299,26 @@ public interface GridEikonalSolver extends EikonalSolver {
 	}
 
 	@Override
-	default boolean loadCachedFloorField(Path path) {
-		// load floor field from cache. If it succeeds return true to indicate that the floor field
+	default boolean loadCachedFloorField(CacheLoader cacheLoader) {
+		// loadFromFilesystem floor field from cache. If it succeeds return true to indicate that the floor field
 		// is initialized.
-		if (path.toFile().exists()){
-			try {
-				long ms = System.currentTimeMillis();
-				logger.infof("loaded floor field from cache %s", path.toAbsolutePath().toString());
-				Table table = Table.read().csv(path.toFile());
-				getCellGrid().loadFromTable(table);
-				logger.info("floor field initialization (cached) time:" + (System.currentTimeMillis() - ms + "[ms]"));
-				return true;
-			} catch (IOException e) {
-				logger.errorf("cannot read cache %s", path.toAbsolutePath().toString());
-				// create floor field from scratch
-				return false;
-			}
+		boolean cacheLoaded = false;
+
+		try{
+			cacheLoader.loadCacheFor(getCellGrid());
+			cacheLoaded = true;
+		} catch (CacheException e){
+			logger.errorf("Error loading cache initialize manually. " + e);
 		}
-		// create floor field from scratch
-		return false;
+		return cacheLoaded;
 	}
 
 	@Override
-	default void saveFloorFieldToCache(Path path) {
-		Table gridTable = getCellGrid().asTable();
-		try {
-			path.getParent().toFile().mkdirs();
-			gridTable.write().csv(path.toFile());
-			logger.infof("saved floor field to cache %s", path.toAbsolutePath().toString());
-		} catch (IOException e) {
-			logger.errorf("cannot write floor field cache to %s", path.toAbsolutePath().toString());
+	default void saveFloorFieldToCache(ScenarioCache cache, String floorFieldIdentifier) {
+		try{
+			cache.saveToCache(floorFieldIdentifier, getCellGrid());
+		} catch (CacheException e){
+			logger.errorf("Error saving cache.", e);
 		}
 	}
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.types.CacheType;
 import org.vadere.state.types.EikonalSolverType;
 import org.vadere.state.util.Views;
 
@@ -39,7 +40,8 @@ public class AttributesFloorField extends Attributes {
 	 * Thus the created hash file can be moved to a different location without invalidating the
 	 * saved floor field.
 	 */
-	private boolean useCachedFloorField = false;
+	@JsonView(Views.CacheViewExclude.class)
+	private CacheType cacheType = CacheType.NO_CACHE;
 
 	/**
 	 * specifies path in which a cache of the target floor field is saved. This path is relative to
@@ -77,7 +79,7 @@ public class AttributesFloorField extends Attributes {
 	}
 
 	public boolean isUseCachedFloorField() {
-		return useCachedFloorField;
+		return cacheType != CacheType.NO_CACHE;
 	}
 
 	public String getCacheDir() {
@@ -104,10 +106,14 @@ public class AttributesFloorField extends Attributes {
 		this.targetAttractionStrength = targetAttractionStrength;
 	}
 
-	public void setUseCachedFloorField(boolean useCachedFloorField) {
-		checkSealed();
-		this.useCachedFloorField = useCachedFloorField;
+	public CacheType getCacheType() {
+		return cacheType;
 	}
+
+	public void setCacheType(CacheType cacheType) {
+		this.cacheType = cacheType;
+	}
+
 
 	public void setTimeCostAttributes(AttributesTimeCost timeCostAttributes) {
 		checkSealed();

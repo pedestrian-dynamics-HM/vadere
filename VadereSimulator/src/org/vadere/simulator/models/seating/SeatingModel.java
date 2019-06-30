@@ -22,12 +22,12 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.TruncatedNormalDistribution;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * Based on the master thesis of Jakob Schöttl.
  * 
  * To enable this model, add this model's class name to the main model's submodel list and
- * load a train topography.
+ * loadFromFilesystem a train topography.
  * 
  * https://github.com/schoettl/master-thesis
  * @author Jakob Schöttl
@@ -57,7 +57,7 @@ public class SeatingModel implements Model {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();

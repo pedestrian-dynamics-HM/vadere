@@ -15,6 +15,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
@@ -83,10 +84,12 @@ public class Simulation {
 	private final EventController eventController;
 	private final EventCognition eventCognition;
 	private final SalientBehaviorCognition salientBehaviorCognition;
+	private final ScenarioCache scenarioCache;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners, boolean singleStepMode) {
+					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners,
+					  boolean singleStepMode, ScenarioCache scenarioCache) {
 
 		this.name = name;
 		this.mainModel = mainModel;
@@ -101,6 +104,7 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
 		this.simulationResult = simulationResult;
+		this.scenarioCache = scenarioCache;
 
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
@@ -154,7 +158,7 @@ public class Simulation {
 	}
 
 	private void createControllers(Topography topography, MainModel mainModel, Random random) {
-		this.topographyController = new TopographyController(topography, mainModel);
+		this.topographyController = new TopographyController(topography, mainModel, scenarioCache);
 
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory

@@ -8,11 +8,11 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -44,8 +44,8 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential,
 			final int targetId,
-			final Path cacheDir) {
-		super(topography, attributesPedestrian, attributesPotential, cacheDir);
+			final ScenarioCache cache) {
+		super(topography, attributesPedestrian, attributesPotential, cache);
 		this.attributesFloorField = attributesPotential;
 		this.attributesPedestrian = attributesPedestrian;
 		this.targetId = targetId;
@@ -73,7 +73,7 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 	@Override
 	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
 		if (targetId == this.targetId) {
-			EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, this.attributesPedestrian, this.attributesFloorField, cacheDir);
+			EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, this.attributesPedestrian, this.attributesFloorField, cache);
 			eikonalSolvers.put(targetId, eikonalSolver);
 		}
 	}
@@ -83,7 +83,7 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		// TODO should be used to initialize the Model
 	}
 

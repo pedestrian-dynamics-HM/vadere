@@ -5,10 +5,9 @@ import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.FindByClass;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
@@ -27,11 +26,11 @@ public interface Model {
 	 */
 	default void initialize(List<Attributes> attributesList, Topography topography,
 			AttributesAgent attributesPedestrian, Random random){
-		initialize(attributesList, topography, attributesPedestrian, random, Paths.get("."));
+		initialize(attributesList, topography, attributesPedestrian, random, ScenarioCache.empty());
 	}
 
 	void initialize(List<Attributes> attributesList, Topography topography,
-					   AttributesAgent attributesPedestrian, Random random, Path cacheDir);
+					AttributesAgent attributesPedestrian, Random random, ScenarioCache cache);
 
 	void preLoop(final double simTimeInSec);
 

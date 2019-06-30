@@ -453,7 +453,10 @@ public abstract class StateJsonConverter {
 	 */
 	public static String getFloorFieldHash(final Topography topography, final AttributesFloorField attr)  {
 		try {
-			String topographyStr = serializeTopography(topography);
+			String topographyStr = mapper
+									.writerWithDefaultPrettyPrinter()
+									.withView(Views.CacheView.class)
+									.writeValueAsString(topography);
 			String attrString = mapper
 									.writerWithDefaultPrettyPrinter()
 									.withView(Views.CacheView.class)

@@ -18,6 +18,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -32,7 +33,6 @@ import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 			final Topography topography,
 			final AttributesAgent attributesPedestrian,
 			final AttributesQueuingGame attributesQueuingGame,
-			final Path cacheDir) {
+			final ScenarioCache cache) {
 
 		if (!isValidArguments(topography, attributesQueuingGame)) {
 			throw new IllegalArgumentException("wrong TimeCostFunctionType.");
@@ -76,9 +76,9 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		this.topography.addElementRemovedListener(Pedestrian.class, this);
 		this.random = new Random();
 		this.competitiveField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getNavigationFloorField(), cacheDir);
+				attributesQueuingGame.getNavigationFloorField(), cache);
 		this.gentleField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getQueuingFloorField(), cacheDir);
+				attributesQueuingGame.getQueuingFloorField(), cache);
 		this.pedestrianAttitudeMap = new HashMap<>();
 		this.lifeTimeMap = new HashMap<>();
 		this.pedestrians = new ArrayList<>();
@@ -317,7 +317,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		// TODO should be used to initialize the Model
 	}
 

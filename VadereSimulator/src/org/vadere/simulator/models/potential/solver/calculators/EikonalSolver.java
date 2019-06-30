@@ -3,11 +3,12 @@ package org.vadere.simulator.models.potential.solver.calculators;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.simulator.utils.cache.CacheLoader;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
-import java.nio.file.Path;
 import java.util.function.Function;
 
 /**
@@ -77,10 +78,10 @@ public interface EikonalSolver {
 	 * see {@link org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver}
 	 * for implementation.
 	 *
-	 * @param path path to cached floor field
+	 * @param cacheLoader path to cached floor field
 	 * @return true if floor field could be loaded and false if not.
 	 */
-	default boolean loadCachedFloorField(Path path){
+	default boolean loadCachedFloorField(CacheLoader cacheLoader){
 		// default not implemented. This will force a rebuild for each EikonalSolver at creation time.
 		logger.infof("caching not implemented for given EikonalSolver %s", this.getClass().getName());
 		return false;
@@ -93,10 +94,10 @@ public interface EikonalSolver {
 	 * implement the needed logic.
 	 * see {@link org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver}
 	 * for implementation.
-	 *
-	 * @param path path to cached floor field
+	 *  @param cache path to cached floor field
+	 * @param floorFieldIdentifier
 	 */
-	default void saveFloorFieldToCache(Path path){
+	default void saveFloorFieldToCache(ScenarioCache cache, String floorFieldIdentifier){
 		// default not implemented. This will force a rebuild for each EikonalSolver at creation time.
 		logger.infof("caching not implemented for given EikonalSolver %s", this.getClass().getName());
 	}

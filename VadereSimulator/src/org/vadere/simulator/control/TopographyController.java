@@ -1,19 +1,20 @@
 package org.vadere.simulator.control;
 
-import java.util.LinkedList;
-
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
+
+import java.util.LinkedList;
 
 public class TopographyController extends OfflineTopographyController {
 
 	private final Topography topography;
 	private final DynamicElementFactory dynamicElementFactory;
 
-	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory) {
-		super(topography);
+	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory, ScenarioCache scenarioCache) {
+		super(topography, scenarioCache);
 		this.topography = topography;
 		this.dynamicElementFactory = dynamicElementFactory;
 	}

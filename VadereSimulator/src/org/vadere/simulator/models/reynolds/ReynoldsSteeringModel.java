@@ -17,11 +17,11 @@ import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -55,7 +55,7 @@ public class ReynoldsSteeringModel implements MainModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
 		this.attributesReynolds = Model.findAttributes(modelAttributesList, AttributesReynolds.class);
 		this.attributesPedestrian = attributesPedestrian;

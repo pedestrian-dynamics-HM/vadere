@@ -29,6 +29,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -39,8 +40,8 @@ import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +52,8 @@ import java.util.concurrent.Executors;
 
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel {
+
+	private final static Logger logger = Logger.getLogger(OptimalStepsModel.class);
 
 	private UpdateSchemeOSM updateSchemeOSM;
 	private AttributesOSM attributesOSM;
@@ -74,8 +77,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
+		logger.debug("initialize OSM");
 		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
 		this.topography = topography;
 		this.random = random;
@@ -83,11 +87,13 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
+		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
 		subModelBuilder.addBuildedSubModelsToList(models);
 
+		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel(),cacheDir);
+				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel(), cache);
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);

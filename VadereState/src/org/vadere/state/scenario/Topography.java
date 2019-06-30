@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
@@ -9,6 +10,7 @@ import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.util.Views;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -66,11 +68,13 @@ public class Topography implements DynamicElementMover{
 	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
 	 * iteration between frames.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
 	 * MeasurementAreas.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<MeasurementArea> measurementAreas;
 
 	/**

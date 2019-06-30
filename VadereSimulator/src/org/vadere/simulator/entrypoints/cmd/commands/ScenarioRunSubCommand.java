@@ -10,6 +10,7 @@ import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.utils.scenariochecker.ConsoleScenarioCheckerMessageFormatter;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
@@ -64,11 +65,13 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
 			if (checkScenario(scenario, scenarioCheckerSwitch)){
-				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null, scenarioFile).run();
+				ScenarioCache cache = ScenarioCache.load(scenario, scenarioFile.toAbsolutePath().getParent());
+				new ScenarioRun(scenario, outputDir.toFile().toString() , overrideTimeStepSetting, null, scenarioFile, cache).run();
 			} else {
 				System.exit(-1);
 			}
 		} catch (Throwable e){
+			e.printStackTrace();
 			logger.error(e);
 			System.exit(-1);
 		}

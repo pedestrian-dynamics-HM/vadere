@@ -15,11 +15,11 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,11 +65,11 @@ public class BehaviouralHeuristicsModel implements MainModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random, Path cacheDir) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
 		try {
 			potentialFieldTarget = IPotentialFieldTargetGrid.createPotentialField(
-					modelAttributesList, topography, attributesPedestrian, PotentialFieldTargetGrid.class.getCanonicalName(), cacheDir);
+					modelAttributesList, topography, attributesPedestrian, PotentialFieldTargetGrid.class.getCanonicalName(), cache);
 			this.models.add(potentialFieldTarget);
 		} catch (AttributesNotFoundException e) {
 			potentialFieldTarget = null;

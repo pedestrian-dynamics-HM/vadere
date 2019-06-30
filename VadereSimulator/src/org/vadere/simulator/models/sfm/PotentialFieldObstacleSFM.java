@@ -10,12 +10,12 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 
 	@Override
 	public void initialize(final List<Attributes> attributesList, final Topography topography,
-	                       final AttributesAgent attributesPedestrian, final Random random, Path cacheDir) {
+						   final AttributesAgent attributesPedestrian, final Random random, ScenarioCache cache) {
 		this.obstacles = topography.getObstacles();
 		this.topography = topography;
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialSFM.class);

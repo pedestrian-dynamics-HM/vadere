@@ -8,11 +8,11 @@ import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereClassNotFoundException;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -40,12 +40,13 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
      * @param topography            the topography
      * @param attributesPedestrian  the attributes of pedestrians
      * @param className             the name of the class of the field which will be created
-     * @return target potential fields which use a Cartesian grid
+     * @param cache
+	 * @return target potential fields which use a Cartesian grid
      */
 	static IPotentialFieldTargetGrid createPotentialField(final List<Attributes> modelAttributesList,
                                                           final Topography topography,
                                                           final AttributesAgent attributesPedestrian, String className,
-														  final Path cacheDir) {
+														  final ScenarioCache cache) {
 
 		DynamicClassInstantiator<IPotentialFieldTarget> instantiator = new DynamicClassInstantiator<>();
 
@@ -56,11 +57,11 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
 		if (type == PotentialFieldTargetGrid.class) {
 			AttributesFloorField attributesFloorField =
 					Model.findAttributes(modelAttributesList, AttributesFloorField.class);
-			result = new PotentialFieldTargetGrid(topography, attributesPedestrian, attributesFloorField, cacheDir);
+			result = new PotentialFieldTargetGrid(topography, attributesPedestrian, attributesFloorField, cache);
 		} else if (type == PotentialFieldTargetQueuingGrid.class) {
 			AttributesQueuingGame attributesQueuingGame =
 					Model.findAttributes(modelAttributesList, AttributesQueuingGame.class);
-			result = new PotentialFieldTargetQueuingGrid(topography, attributesPedestrian, attributesQueuingGame, cacheDir);
+			result = new PotentialFieldTargetQueuingGrid(topography, attributesPedestrian, attributesQueuingGame, cache);
 		} else if (type == PotentialFieldTargetRingExperiment.class) {
 			AttributesPotentialRingExperiment attributesPotentialRingExperiment =
 					Model.findAttributes(modelAttributesList, AttributesPotentialRingExperiment.class);

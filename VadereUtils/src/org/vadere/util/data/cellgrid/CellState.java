@@ -1,5 +1,7 @@
 package org.vadere.util.data.cellgrid;
 
+import java.util.Objects;
+
 public class CellState implements Cloneable {
 	public Double potential;
 	public PathFindingTag tag;
@@ -12,6 +14,19 @@ public class CellState implements Cloneable {
 	public CellState() {
 		this.potential = Double.MAX_VALUE;
 		this.tag = PathFindingTag.Undefined;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CellState cellState = (CellState) o;
+		return potential.equals(cellState.potential) &&	tag == cellState.tag;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(potential, tag);
 	}
 
 	@Override

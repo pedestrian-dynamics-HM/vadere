@@ -7,12 +7,14 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.EventTimeframe;
 import org.vadere.state.events.types.WaitInAreaEvent;
 import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -115,6 +117,36 @@ public class StateJsonConverterTest {
         String hash2 = StateJsonConverter.getFloorFieldHash(topography, attr);
 
         assertNotEquals("Hashes must differ",hash1, hash2);
+    }
+
+    @Test
+    public void getFloorFieldHashTestAttTarget(){
+        Topography topography = new Topography();
+        topography.addObstacle(new Obstacle(new AttributesObstacle(3, new VRectangle(1,1,3,3))));
+        AttributesFloorField attr = new AttributesFloorField();
+        AttributesTarget attrTarget = new AttributesTarget(new VRectangle(1,1,1,1));
+        Target t = new Target(attrTarget);
+        topography.addTarget(t);
+        String hash1 = StateJsonConverter.getFloorFieldHash(topography, attr);
+
+        // changes must NOT change the floor field hash
+        attrTarget.setId(33);
+        attrTarget.setAbsorbing(false);
+        attrTarget.setWaitingTime(3);
+        attrTarget.setWaitingTimeYellowPhase(2);
+        attrTarget.setParallelWaiters(1);
+        attrTarget.setIndividualWaiting(false);
+        attrTarget.setDeletionDistance(0.4);
+        attrTarget.setStartingWithRedLight(true);
+        attrTarget.setNextSpeed(1);
+        String hash2 = StateJsonConverter.getFloorFieldHash(topography, attr);
+
+        assertEquals("Hashes must differ",hash1, hash2);
+
+        // changes must change the floor field hash
+        attrTarget.setShape(new VRectangle(2,2,2,2));
+        String hash3 = StateJsonConverter.getFloorFieldHash(topography, attr);
+        assertNotEquals("Hashes must differ",hash1, hash3);
     }
 
     @Test

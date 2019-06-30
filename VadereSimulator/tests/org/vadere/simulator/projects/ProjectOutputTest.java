@@ -101,7 +101,6 @@ public class ProjectOutputTest implements TestResourceHandler {
 		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 //		System.out.println(m.migrateScenarioFile());
 	}
-	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 
 	@Test
 	public void updateWithNew() throws IOException, URISyntaxException {

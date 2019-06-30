@@ -17,8 +17,6 @@ import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
 
-import java.util.Arrays;
-
 
 /**
  * Provides the possibility to start Vadere in console mode.

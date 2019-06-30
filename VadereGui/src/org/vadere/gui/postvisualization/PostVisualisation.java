@@ -17,7 +17,7 @@ public class PostVisualisation {
 	public static void main(String[] args) {
 		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting post visualization ...");
-		// load settings
+		// loadFromFilesystem settings
 		loadPreferences();
 		logger.info("preferences started");
 		// start main gui

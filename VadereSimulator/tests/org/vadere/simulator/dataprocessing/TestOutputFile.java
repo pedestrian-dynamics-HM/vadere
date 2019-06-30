@@ -9,10 +9,10 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class TestOutputFile {
 					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
 			testScenario = JsonConverter.deserializeScenarioRunManager(json);
 			topography = testScenario.getTopography();
-			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), Paths.get("."));
+			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), ScenarioCache.empty());
 			modelBuilder.createModelAndRandom();
 			mainModel = modelBuilder.getModel();
 		} catch (Exception e) {

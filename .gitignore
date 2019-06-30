@@ -53,3 +53,6 @@ VadereModelTests/*_private
 **/output/
 **/legacy/
 **/*_private/
+
+# Vadere Cache
+**/__cache__
