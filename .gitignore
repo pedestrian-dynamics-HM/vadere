@@ -44,6 +44,7 @@ VadereModelCalibration/**/output
 VadereModelTests/**/legacy
 VadereUtils/output/**
 VadereModelTests/*_private
+**/current_commit_hash.txt
 
 # Operating system files
 .DS_Store
