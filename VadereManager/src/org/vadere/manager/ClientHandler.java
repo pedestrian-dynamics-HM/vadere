@@ -9,6 +9,7 @@ import org.vadere.util.logging.Logger;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Path;
 
 /**
  *  //todo comment
@@ -23,10 +24,10 @@ public class ClientHandler implements Runnable{
 	private RemoteManager remoteManager;
 
 
-	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket, boolean guiSupport) {
+	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket, Path basedir, boolean guiSupport) {
 		this.serverSocket = serverSocket;
 		this.traCISocket = traCISocket;
-		this.remoteManager = new RemoteManager(guiSupport);
+		this.remoteManager = new RemoteManager(basedir, guiSupport);
 		this.cmdExecutor = new CommandExecutor(remoteManager);
 	}
 

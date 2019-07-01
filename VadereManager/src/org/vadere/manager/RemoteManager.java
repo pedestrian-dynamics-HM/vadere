@@ -6,11 +6,16 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  This class acts as interface between the TraCI handling and the actual simulation.
@@ -32,25 +37,51 @@ public class RemoteManager implements RunnableFinishedListener {
 	private Thread currentSimulationThread;
 	private boolean simulationFinished;
 	private boolean clientCloseCommandReceived;
+	private Path baseDir;
 	private boolean guiSupport;
 
 	private List<Subscription> subscriptions;
 
 
-	public RemoteManager(boolean guiSupport) {
+	public RemoteManager(Path baseDir, boolean guiSupport) {
+		this.baseDir = baseDir;
 		this.guiSupport = guiSupport;
 		this.subscriptions = new ArrayList<>();
 		this.clientCloseCommandReceived = false;
 	}
 
-	public void loadScenario(String scenarioString) {
+	public void loadScenario(String scenarioString, Map<String, ByteArrayInputStream> cacheData){
+
 		Scenario scenario;
+		ScenarioCache scenarioCache;
+		Path scenarioPath;
+		Path outputDir;
 		try {
 			scenario = ScenarioFactory.createScenarioWithScenarioJson(scenarioString);
+			scenarioPath = baseDir.resolve(IOUtils.SCENARIO_DIR).resolve(scenario.getName() + IOUtils.SCENARIO_FILE_EXTENSION);
+			scenarioCache = buildScenarioCache(scenario, cacheData);
 		} catch (IOException e) {
 			throw new TraCIException("Cannot create Scenario from given file.");
 		}
-		currentSimulationRun = new RemoteScenarioRun(scenario, this);
+		currentSimulationRun = new RemoteScenarioRun(scenario, baseDir,this, scenarioPath, scenarioCache);
+	}
+
+	public void loadScenario(String scenarioString) {
+
+		loadScenario(scenarioString, null);
+	}
+
+	private ScenarioCache buildScenarioCache(final Scenario scenario, Map<String, ByteArrayInputStream> cacheData){
+		ScenarioCache scenarioCache = ScenarioCache.load(scenario, baseDir);
+		if (scenarioCache.isEmpty())
+			return scenarioCache;
+
+		if (cacheData != null){
+			logger.info("received cache data");
+			cacheData.forEach(scenarioCache::addCache);
+		}
+
+		return scenarioCache;
 	}
 
 	public boolean stopSimulationIfRunning(){

@@ -1,5 +1,7 @@
 package org.vadere.simulator.utils.cache;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Topography;
@@ -9,6 +11,7 @@ import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellGridReadWriter;
 import org.vadere.util.logging.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -52,7 +55,7 @@ public class ScenarioCache {
 		this.scenario = null;
 	}
 
-	private ScenarioCache(Scenario scenario, Path scenarioPath){
+	private ScenarioCache(Scenario scenario, Path scenarioParentDir){
 		this.empty = scenario == null;
 		this.scenario = scenario;
 
@@ -66,7 +69,7 @@ public class ScenarioCache {
 			if(attFF != null){
 				this.attFF = attFF;
 				this.hash = StateJsonConverter.getFloorFieldHash(topography, attFF);
-				this.cachePath = scenarioPath.resolve(CACHE_DIR_NAME).resolve(attFF.getCacheDir());
+				this.cachePath = scenarioParentDir.resolve(CACHE_DIR_NAME).resolve(attFF.getCacheDir());
 				empty = !attFF.isUseCachedFloorField(); // deactivate cache object if caching is not active.
 				if (!empty)
 					findCacheOnFileSystem();
@@ -116,6 +119,8 @@ public class ScenarioCache {
 		}
 	}
 
+
+
 	private Path buildCsvCachePath(String floorFieldIdentifier){
 		return cachePath.resolve(hash +  floorFieldIdentifier + "_ffcache.csv");
 	}
@@ -133,6 +138,24 @@ public class ScenarioCache {
 		return Distance_FF + name;
 	}
 
+
+	public ScenarioCache addCache(String cacheIdentifier, ByteArrayInputStream stream){
+		if(empty)
+			throw new IllegalStateException("Empty cache object.");
+		switch (attFF.getCacheType()) {
+			case BIN_CACHE:
+				addBinaryCache(cacheIdentifier, new DataInputStream(new FastBufferedInputStream(stream)));
+				logger.infof("binary cache loaded for identifier: %s", cacheIdentifier);
+				break;
+			case CSV_CACHE:
+				addCsvCache(cacheIdentifier, stream);
+				logger.infof("csv cache loaded for identifier: %s", cacheIdentifier);
+				break;
+			default:
+				throw new IllegalStateException("Must be either CSV or BIN cache");
+		}
+		return this;
+	}
 
 	public ScenarioCache addCsvCache(String cacheIdentifier, InputStream stream){
 		if (empty)

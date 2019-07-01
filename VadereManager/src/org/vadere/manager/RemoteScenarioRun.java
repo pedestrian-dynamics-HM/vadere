@@ -2,10 +2,12 @@ package org.vadere.manager;
 
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.simulator.control.RemoteRunListener;
+import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,8 +19,8 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 	private boolean lastSimulationStep;
 
 
-	public RemoteScenarioRun(Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
-		super(scenario, scenarioFinishedListener);
+	public RemoteScenarioRun(Scenario scenario, Path outputDir, RunnableFinishedListener scenarioFinishedListener, Path scenarioPath, ScenarioCache scenarioCache) {
+		super(scenario, outputDir.toString(), scenarioFinishedListener, scenarioPath, scenarioCache);
 		this.singleStepMode = true;
 		this.waitForLoopEnd = new Object();
 		this.lock = new ReentrantLock();

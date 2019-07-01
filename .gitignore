@@ -57,3 +57,4 @@ VadereModelTests/*_private
 
 # Vadere Cache
 **/__cache__
+**/vadere-server-output

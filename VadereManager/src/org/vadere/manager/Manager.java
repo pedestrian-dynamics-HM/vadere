@@ -9,14 +9,17 @@ import net.sourceforge.argparse4j.internal.HelpScreenException;
 import org.vadere.util.logging.Logger;
 
 import java.net.ServerSocket;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Manager {
 
+	static Logger logger;
 
 	public static void main(String[] args) {
 		Logger.setMainArguments(args);
+		logger = Logger.getLogger(Manager.createArgumentParser());
 		ArgumentParser p = createArgumentParser();
 		Namespace ns;
 
@@ -24,8 +27,8 @@ public class Manager {
 			ns = p.parseArgs(args);
 			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
-
-			VadereServer server = new VadereServer(serverSocket, pool, ns.getBoolean("guiMode"));
+			logger.infof("Start Server with Loglevel: %s", logger.getLevel().toString());
+			VadereServer server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
 			server.run();
 
 		} catch (HelpScreenException ignored) {
@@ -87,5 +90,11 @@ public class Manager {
 				.dest("guiMode")
 				.help("Start server with GUI support. If a scenario is received show the current state of the scenario");
 
+		parser.addArgument("--output-dir", "-o")
+				.required(false)
+				.setDefault("./vadere-server-output")
+				.dest("output-dir") // set name in namespace
+				.type(String.class)
+				.help("Supply output directory as base directory for received scenarios.");
 	}
 }

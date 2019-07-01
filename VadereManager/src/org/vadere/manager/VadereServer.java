@@ -5,6 +5,7 @@ import org.vadere.util.logging.Logger;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -21,11 +22,13 @@ public class VadereServer implements Runnable{
 
 	private final ServerSocket serverSocket;
 	private final ExecutorService handlerPool;
+	private final Path baseDir;
 	private final boolean guiSupport;
 
-	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool, boolean guiSupport) {
+	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool, Path baseDir, boolean guiSupport) {
 		this.serverSocket = serverSocket;
 		this.handlerPool = handlerPool;
+		this.baseDir = baseDir;
 		this.guiSupport = guiSupport;
 	}
 
@@ -36,7 +39,7 @@ public class VadereServer implements Runnable{
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 
-				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket), guiSupport));
+				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
