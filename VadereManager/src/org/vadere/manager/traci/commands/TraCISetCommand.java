@@ -67,12 +67,14 @@ public class TraCISetCommand extends TraCICommand{
 		return returnDataType;
 	}
 
-	public void setErr(String desc){
+	public TraCISetCommand setErr(String desc){
 		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.ERR, desc);
+		return this;
 	}
 
-	public void setOK(){
+	public TraCISetCommand setOK(){
 		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.OK, "");
+		return this;
 	}
 
 	@Override

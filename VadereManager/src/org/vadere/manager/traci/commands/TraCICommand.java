@@ -1,15 +1,18 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.VadereServer;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.writer.TraCIPacket;
-import org.vadere.manager.traci.commands.control.TraCILoadCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
-import org.vadere.manager.traci.reader.TraCICommandBuffer;
+import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.traci.commands.control.TraCILoadCommand;
+import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
+import org.vadere.manager.traci.commands.control.TraCISendFileCommandV20_0_1;
 import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
+import org.vadere.manager.traci.reader.TraCICommandBuffer;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 import java.nio.ByteBuffer;
 
@@ -69,7 +72,10 @@ public abstract class TraCICommand {
 			case CLOSE:
 				return new TraCICloseCommand();
 			case SEND_FILE:
-				return new TraCISendFileCommand(cmdBuffer);
+				if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2))
+					return new TraCISendFileCommandV20_0_1(cmdBuffer);
+				else
+					return new TraCISendFileCommand(cmdBuffer);
 			case LOAD:
 				return new TraCILoadCommand(cmdBuffer);
 			default:

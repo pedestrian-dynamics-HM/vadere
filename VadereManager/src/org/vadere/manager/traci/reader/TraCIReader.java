@@ -31,6 +31,8 @@ public interface TraCIReader {
 		return ByteBuffer.wrap(readBytes(num));
 	}
 
+	void readBytes(byte[] data);
+
 	int readInt();
 	double readDouble();
 

@@ -18,8 +18,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import tech.tablesaw.api.Table;
-
 public class ScenarioCache {
 
 	Logger logger = Logger.getLogger(ScenarioCache.class);
@@ -27,20 +25,16 @@ public class ScenarioCache {
 	private static final String CACHE_DIR_NAME = "__cache__";
 	private static final String TARGET_FF = "_targetFF_";
 	private static final String Distance_FF = "_distanceFF_";
+	private static final String csv_sufix = ".csv";
+	private static final String bin_sufix = ".ffcache";
 
 	private boolean empty;
 	final private Scenario scenario;
 	private Path cachePath;
 	private AttributesFloorField attFF;
 
-
-	private HashMap<String, Table> floorFieldCache = new HashMap<>();
-	private HashMap<String, CacheLoader> xxx= new HashMap<>();
+	private HashMap<String, CacheLoader> cacheMap = new HashMap<>();
 	private String hash;
-
-
-
-
 
 	public static ScenarioCache empty(){
 		return new ScenarioCache();
@@ -80,7 +74,6 @@ public class ScenarioCache {
 		}
 	}
 
-
 	private void findCacheOnFileSystem(){
 		// add target cache
 		scenario.getTopography().getTargets().forEach(target -> {
@@ -119,16 +112,13 @@ public class ScenarioCache {
 		}
 	}
 
-
-
 	private Path buildCsvCachePath(String floorFieldIdentifier){
-		return cachePath.resolve(hash +  floorFieldIdentifier + "_ffcache.csv");
+		return cachePath.resolve(hash +  floorFieldIdentifier + csv_sufix);
 	}
 
 	private Path buildBinCachePath(String floorFieldIdentifier){
-		return cachePath.resolve(hash +  floorFieldIdentifier + ".ffcache");
+		return cachePath.resolve(hash +  floorFieldIdentifier + bin_sufix);
 	}
-
 
 	public String targetToIdentifier(int targetId){
 		return TARGET_FF + targetId;
@@ -160,7 +150,7 @@ public class ScenarioCache {
 	public ScenarioCache addCsvCache(String cacheIdentifier, InputStream stream){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		xxx.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromCsv(stream);
 			} catch (Exception e) {
@@ -173,7 +163,7 @@ public class ScenarioCache {
 	public ScenarioCache addCsvCache(String cacheIdentifier, File file){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		xxx.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromCsv(file);
 			} catch (Exception e) {
@@ -186,7 +176,7 @@ public class ScenarioCache {
 	public ScenarioCache addBinaryCache(String cacheIdentifier, DataInputStream stream){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		xxx.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromBinary(stream);
 			} catch (Exception e) {
@@ -199,7 +189,7 @@ public class ScenarioCache {
 	public ScenarioCache addBinaryCache(String cacheIdentifier, File file){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		xxx.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromBinary(file);
 			} catch (Exception e) {
@@ -254,7 +244,7 @@ public class ScenarioCache {
 	public CacheLoader getCache(String cacheIdentifier){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		return xxx.getOrDefault(cacheIdentifier, null);
+		return cacheMap.getOrDefault(cacheIdentifier, null);
 	}
 
 	public CacheLoader getCacheForTarget(int targetId){

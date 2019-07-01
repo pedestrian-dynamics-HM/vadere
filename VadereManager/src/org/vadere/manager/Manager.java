@@ -19,7 +19,7 @@ public class Manager {
 
 	public static void main(String[] args) {
 		Logger.setMainArguments(args);
-		logger = Logger.getLogger(Manager.createArgumentParser());
+		logger = Logger.getLogger(Manager.class);
 		ArgumentParser p = createArgumentParser();
 		Namespace ns;
 
@@ -27,7 +27,7 @@ public class Manager {
 			ns = p.parseArgs(args);
 			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
-			logger.infof("Start Server with Loglevel: %s", logger.getLevel().toString());
+			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
 			VadereServer server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
 			server.run();
 

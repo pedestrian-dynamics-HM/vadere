@@ -64,6 +64,11 @@ public class TraCIByteBuffer implements TraCIReader {
 	}
 
 	@Override
+	public void readBytes(byte[] data) {
+		byteBuffer.get(data, 0, data.length);
+	}
+
+	@Override
 	public int readInt() {
 		return byteBuffer.getInt();
 	}

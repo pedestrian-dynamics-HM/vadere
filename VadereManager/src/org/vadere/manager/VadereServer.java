@@ -1,5 +1,6 @@
 package org.vadere.manager;
 
+import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ public class VadereServer implements Runnable{
 	public static int SUPPORTED_TRACI_VERSION = 20;
 //	public static int SUPPORTED_TRACI_VERSION = 1;
 	public static String SUPPORTED_TRACI_VERSION_STRING = "Vadere Simulator. Supports subset of commands based von TraCI Version " + SUPPORTED_TRACI_VERSION;
+	public static TraCIVersion currentVersion = TraCIVersion.V20_0_2;
 
 	private final ServerSocket serverSocket;
 	private final ExecutorService handlerPool;

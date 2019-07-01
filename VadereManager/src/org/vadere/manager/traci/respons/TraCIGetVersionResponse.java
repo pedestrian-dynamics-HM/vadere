@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.respons;
 
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 
 import java.util.Objects;
@@ -29,10 +30,10 @@ public class TraCIGetVersionResponse extends TraCIResponse{
 				TraCICmd.GET_VERSION);
 	}
 
-	public TraCIGetVersionResponse(int versionId, String versionString) {
+	public TraCIGetVersionResponse(TraCIVersion version) {
 		this();
-		this.versionId = versionId;
-		this.versionString = versionString;
+		this.versionId = version.traciBaseVersion;
+		this.versionString = version.getVersionString();
 	}
 
 	public boolean isOKResponseStatus(){

@@ -4,6 +4,7 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
 import org.vadere.manager.VadereServer;
+import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;
 import org.vadere.manager.traci.commandHandler.variables.ControlVar;
@@ -11,6 +12,7 @@ import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
+import org.vadere.manager.traci.commands.control.TraCISendFileCommandV20_0_1;
 import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
 import org.vadere.manager.traci.respons.StatusResponse;
 import org.vadere.manager.traci.respons.TraCIGetVersionResponse;
@@ -102,19 +104,25 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 	public TraCICommand process_getVersion(TraCICommand rawCmd, RemoteManager remoteManager) {
 
 		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand)rawCmd;
-		cmd.setResponse(new TraCIGetVersionResponse(VadereServer.SUPPORTED_TRACI_VERSION,
-				VadereServer.SUPPORTED_TRACI_VERSION_STRING));
+		cmd.setResponse(new TraCIGetVersionResponse(VadereServer.currentVersion));
 
 		return cmd;
 	}
 
 	public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
+		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)){
+			TraCISendFileCommandV20_0_1 cmd = (TraCISendFileCommandV20_0_1) rawCmd;
 
-		remoteManager.loadScenario(cmd.getFile());
-		remoteManager.startSimulation();
+			remoteManager.loadScenario(cmd.getFile(), cmd.getCacheData());
+			remoteManager.startSimulation();
+			return cmd;
+		} else {
+			TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
 
-		return cmd;
+			remoteManager.loadScenario(cmd.getFile());
+			remoteManager.startSimulation();
+			return cmd;
+		}
 	}
 }

@@ -3,6 +3,7 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.commands.TraCICommand;
+import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.util.logging.Logger;
 
@@ -37,7 +38,7 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.GET_POLYGON.id, PolygonCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_POLYGON_STATE.id, PolygonCommandHandler.instance::processSet);
 		cmdMap.put(TraCICmd.SUB_POLYGON_VALUE.id, PolygonCommandHandler.instance::processValueSub);
-		cmdMap.put(TraCICmd.SET_VEHICLE_STATE.id, (cmd, manager) -> cmd );
+		cmdMap.put(TraCICmd.SET_VEHICLE_STATE.id, (cmd, manager) -> ((TraCISetCommand)cmd).setOK() ); //todo just say ok but do nothing
 	}
 
 	public TraCIPacket execute(TraCICommand cmd){
