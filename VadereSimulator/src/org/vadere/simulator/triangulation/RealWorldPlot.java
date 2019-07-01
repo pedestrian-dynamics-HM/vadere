@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
@@ -506,7 +507,8 @@ public class RealWorldPlot {
 		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
-				new AttributesFloorField());
+				new AttributesFloorField(),
+				ScenarioCache.empty());
 		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
 
@@ -585,7 +587,8 @@ public class RealWorldPlot {
 		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
-				new AttributesFloorField());
+				new AttributesFloorField(),
+				ScenarioCache.empty());
 		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 		//IDistanceFunction distanceFunc = p -> -obstacleDistance.apply(p);
 

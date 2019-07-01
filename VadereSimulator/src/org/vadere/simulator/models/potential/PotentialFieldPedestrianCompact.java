@@ -1,13 +1,8 @@
 package org.vadere.simulator.models.potential;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -15,10 +10,16 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
 // This potential is explained in seitz-2015 (The effect of stepping on pedestrians trajectories)
 // p. 596, eq. 1
@@ -57,7 +58,7 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-	                       AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		this.attributes  = Model.findAttributes(attributesList, AttributesPotentialCompact.class);
 		this.width = attributes.getPedPotentialWidth();
 		this.height = attributes.getPedPotentialHeight();

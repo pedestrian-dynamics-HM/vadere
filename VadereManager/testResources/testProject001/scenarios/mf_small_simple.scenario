@@ -1673,7 +1673,7 @@
             "y" : 240.6
           } ]
         },
-        "id" : -1
+        "id" : 28
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -1691,7 +1691,7 @@
             "y" : 219.2
           } ]
         },
-        "id" : -1
+        "id" : 30
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -1921,7 +1921,39 @@
         "nextSpeed" : -1.0
       } ],
       "absorbingAreas" : [ ],
-      "sources" : [ ],
+      "sources" : [ {
+        "id" : 23,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 147.9524496438901,
+            "y" : 158.453088570111
+          }, {
+            "x" : 143.8295708812843,
+            "y" : 158.46319241869656
+          }, {
+            "x" : 143.85764593174972,
+            "y" : 161.60000000000002
+          }, {
+            "x" : 147.97979386886047,
+            "y" : 161.60000000000002
+          }, {
+            "x" : 147.9524496438901,
+            "y" : 158.453088570111
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 53 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN"
+      } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,

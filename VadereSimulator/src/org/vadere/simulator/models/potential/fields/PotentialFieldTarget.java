@@ -11,13 +11,13 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
-import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
 import java.util.HashMap;
@@ -59,6 +59,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	 */
 	private AttributesAgent attributesPedestrian;
 
+	protected final ScenarioCache cache;
 
 	/**
 	 * Stores all potential fields which represent to a target (targetId).
@@ -69,11 +70,13 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 
 	public PotentialFieldTarget(@NotNull final Topography topography,
 	                            @NotNull final AttributesAgent attributesPedestrian,
-	                            @NotNull final AttributesFloorField attributesPotential) {
+	                            @NotNull final AttributesFloorField attributesPotential,
+								@NotNull final ScenarioCache cache) {
 		this.topography = topography;
 		this.attributesPedestrian = attributesPedestrian;
 		this.attributes = attributesPotential;
 		this.eikonalSolvers = new HashMap<>();
+		this.cache = cache;
 	}
 
 	@Override
@@ -196,13 +199,13 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	 * @param shapes    the target area
 	 */
 	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
-		EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, attributesPedestrian, attributes);
+		EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, attributesPedestrian, attributes, cache);
 		potentialFieldsNeedUpdate = potentialFieldsNeedUpdate || eikonalSolver.needsUpdate();
 		eikonalSolvers.put(targetId, eikonalSolver);
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography, AttributesAgent attributesPedestrian, Random random) {}
+	public void initialize(List<Attributes> attributesList, Topography topography, AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {}
 
 	private void addMissingEikonalSolvers() {
 		Map<Integer, List<VShape>> mergeMap = topography.getTargetShapes();

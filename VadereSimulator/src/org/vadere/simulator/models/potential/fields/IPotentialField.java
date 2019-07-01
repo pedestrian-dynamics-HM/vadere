@@ -16,12 +16,14 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolv
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.simulator.utils.cache.CacheLoader;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.EikonalSolverType;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -71,15 +73,17 @@ public interface IPotentialField {
      * @param targetShapes          the area where T = 0
      * @param attributesPedestrian  pedestrian configuration
      * @param attributesPotential   potential field configuration (dynamic or static, parameters and so on...)
-     * @return an EikonalSolver for a specific target
+     * @param cache
+	 * @return an EikonalSolver for a specific target
      */
     static EikonalSolver create(
             final Topography topography,
             final int targetId,
             final List<VShape> targetShapes,
             final AttributesAgent attributesPedestrian,
-            final AttributesFloorField attributesPotential) {
-
+            final AttributesFloorField attributesPotential,
+			final ScenarioCache cache) {
+		logger.debug("create EikonalSolver");
         EikonalSolverType createMethod = attributesPotential.getCreateMethod();
 
         Rectangle2D.Double bounds = topography.getBounds();
@@ -147,16 +151,16 @@ public interface IPotentialField {
 	        holes.addAll(topography.getTargets(targetId).stream().map(target -> target.getShape()).collect(Collectors.toList()));
 			VRectangle bbox = new VRectangle(bounds);
 
-	        /**
-	         * A default distance function which uses all shapes to compute the distance.
+	        /*
+	          A default distance function which uses all shapes to compute the distance.
 	         */
 			IDistanceFunction distanceFunc = new DistanceFunction(bbox, holes);
 	        IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(0, Math.min(-distanceFunc.apply(p), 22));
 
 	        //IEdgeLengthFunction edgeLengthFunction = p -> 1.0;
 
-	        /**
-	         * Generate the mesh, we use the pointer based implementation here.
+	        /*
+	          Generate the mesh, we use the pointer based implementation here.
 	         */
 	        PEikMeshGen<PotentialPoint> meshGenerator = new PEikMeshGen<>(distanceFunc,edgeLengthFunction, attributesPotential.getPotentialFieldResolution(), bbox, holes, (x, y) -> new PotentialPoint(x ,y));
 	        IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation = meshGenerator.generate();
@@ -184,9 +188,39 @@ public interface IPotentialField {
 			        distanceFunc);
         }
 
-        long ms = System.currentTimeMillis();
-        eikonalSolver.initialize();
-        logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+		/*
+		   Initialize floor field. If caching is activate try to read cached version. If no
+		   cache is present or the cache loading does not work fall back to standard
+		   floor field initialization and log errors.
+		 */
+		boolean isInitialized = false;
+		logger.info("initialize floor field");
+		if (attributesPotential.isUseCachedFloorField() && cache.isNotEmpty()){
+			String targetIdentifier = cache.targetToIdentifier(targetId);
+			long ms = System.currentTimeMillis();
+			CacheLoader cacheLoader = cache.getCacheForTarget(targetId);
+			if (cacheLoader != null){
+				isInitialized = eikonalSolver.loadCachedFloorField(cacheLoader);
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
+			} else {
+				ms = System.currentTimeMillis();
+				logger.infof("No cache found for scenario initialize floor field");
+				eikonalSolver.initialize();
+				isInitialized = true;
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				ms = System.currentTimeMillis();
+				logger.info("save floor field cache:");
+				eikonalSolver.saveFloorFieldToCache(cache, targetIdentifier);
+				logger.info("save floor field cache time:" + (System.currentTimeMillis() - ms + "[ms]"));
+			}
+		}
+
+		if (!isInitialized){
+			long ms = System.currentTimeMillis();
+			eikonalSolver.initialize();
+			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+		}
+
         return eikonalSolver;
     }
 

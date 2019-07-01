@@ -2,6 +2,9 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.utils.cache.CacheException;
+import org.vadere.simulator.utils.cache.CacheLoader;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.data.cellgrid.CellGrid;
@@ -33,13 +36,51 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 	private final Collection<VShape> obstacles;
 
 	public PotentialFieldDistancesBruteForce(@NotNull final Collection<VShape> obstacles,
-									 @NotNull final VRectangle bounds,
-									 @NotNull final AttributesFloorField attributesFloorField) {
-		double ms = System.currentTimeMillis();
+											 @NotNull final VRectangle bounds,
+											 @NotNull final AttributesFloorField attributesFloorField,
+											 @NotNull final ScenarioCache cache) {
+
 		this.obstacles = obstacles;
 		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
-		this.cellGrid.pointStream().forEach(p -> computeDistanceToGridPoint(p));
-		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+
+		boolean isInitialized = false;
+		logger.info("initialize floor field (PotentialFieldDistancesBruteForce)");
+		if (cache.isNotEmpty()){
+			double ms = System.currentTimeMillis();
+			String cacheIdentifier = cache.distToIdentifier("BruteForce");
+			CacheLoader cacheLoader = cache.getCache(cacheIdentifier); // todo allow user setting in scenario.
+			if(cacheLoader != null){
+				// cache found
+				try{
+					cacheLoader.loadCacheFor(cellGrid);
+					isInitialized = true;
+					logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
+				} catch (CacheException e){
+					logger.errorf("Error loading cache initialize manually. " + e);
+				}
+			} else {
+				// no cache found
+				ms = System.currentTimeMillis();
+				logger.infof("No cache found for scenario initialize floor field");
+				this.cellGrid.pointStream().forEach(p -> computeDistanceToGridPoint(p));
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				isInitialized = true;
+				try{
+					ms = System.currentTimeMillis();
+					logger.info("save floor field cache:");
+					cache.saveToCache(cacheIdentifier, cellGrid); // todo allow user setting in scenario.
+					logger.info("save floor field cache time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				} catch (CacheException e){
+					logger.errorf("Error saving cache.", e);
+				}
+			}
+		}
+
+		if (!isInitialized){
+			long ms = System.currentTimeMillis();
+			this.cellGrid.pointStream().forEach(p -> computeDistanceToGridPoint(p));
+			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+		}
 	}
 
 	private void computeDistanceToGridPoint(@NotNull final Point gridPoint) {

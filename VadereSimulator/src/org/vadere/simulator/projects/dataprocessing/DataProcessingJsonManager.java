@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 public class DataProcessingJsonManager {
 
-	//TODO Change to 'dataprocessing'
 	public static final String DATAPROCCESSING_KEY = "processWriters";
 
 	public static final String TRAJECTORIES_FILENAME = "postvis.trajectories";

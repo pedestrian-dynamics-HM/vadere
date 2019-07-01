@@ -101,7 +101,6 @@ public class ProjectOutputTest implements TestResourceHandler {
 		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 //		System.out.println(m.migrateScenarioFile());
 	}
-	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 
 	@Test
 	public void updateWithNew() throws IOException, URISyntaxException {
@@ -119,7 +118,7 @@ public class ProjectOutputTest implements TestResourceHandler {
 
 	@Test
 	public void projectOutputSet(){
-		VadereProject proj = new VadereProject("test", new LinkedList<>());
+		VadereProject proj = new VadereProject("test", new LinkedList<>(), Paths.get("."));
 		assertNotNull(proj.getProjectOutput());
 	}
 

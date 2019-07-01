@@ -1,11 +1,5 @@
 package org.vadere.simulator.models.reynolds;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
@@ -23,9 +17,16 @@ import org.vadere.state.events.exceptions.UnsupportedEventException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 @ModelClass(isMainModel = true)
 public class ReynoldsSteeringModel implements MainModel {
@@ -54,7 +55,7 @@ public class ReynoldsSteeringModel implements MainModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
 		this.attributesReynolds = Model.findAttributes(modelAttributesList, AttributesReynolds.class);
 		this.attributesPedestrian = attributesPedestrian;

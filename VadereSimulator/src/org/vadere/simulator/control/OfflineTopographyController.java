@@ -2,6 +2,7 @@ package org.vadere.simulator.control;
 
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
@@ -16,9 +17,15 @@ import java.util.stream.Collectors;
 public class OfflineTopographyController {
 
 	private final Topography topography;
+	protected final ScenarioCache scenarioCache;
 
 	public OfflineTopographyController(final Topography topography) {
+		this(topography, ScenarioCache.empty());
+	}
+
+	public OfflineTopographyController(final Topography topography, ScenarioCache scenarioCache) {
 		this.topography = topography;
+		this.scenarioCache = scenarioCache;
 	}
 
 	protected void update(double simTimeInSec) {
@@ -42,7 +49,7 @@ public class OfflineTopographyController {
 		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
-				new AttributesFloorField());
+				new AttributesFloorField(), scenarioCache);
 		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 		this.topography.setObstacleDistanceFunction(obstacleDistance);
 

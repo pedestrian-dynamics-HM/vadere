@@ -1,13 +1,6 @@
 package org.vadere.simulator.dataprocessing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -16,7 +9,15 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestOutputFile {
 
@@ -31,7 +32,7 @@ public class TestOutputFile {
 					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
 			testScenario = JsonConverter.deserializeScenarioRunManager(json);
 			topography = testScenario.getTopography();
-			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore());
+			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), ScenarioCache.empty());
 			modelBuilder.createModelAndRandom();
 			mainModel = modelBuilder.getModel();
 		} catch (Exception e) {

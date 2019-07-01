@@ -9,6 +9,7 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
@@ -34,7 +35,11 @@ public class ScenarioRun implements Runnable {
 
 	protected static Logger logger = Logger.getLogger(ScenarioRun.class);
 
+	protected final ScenarioCache scenarioCache;
+
 	protected Path outputPath;
+
+	protected final Path scenarioFilePath;
 
 	protected final List<PassiveCallback> passiveCallbacks = new LinkedList<>();
 
@@ -57,21 +62,21 @@ public class ScenarioRun implements Runnable {
 
 	protected SimulationResult simulationResult;
 
-	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, boolean singleStepMode) {
-		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, Path scenarioFilePath, boolean singleStepMode, ScenarioCache scenarioCache) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, scenarioFilePath, scenarioCache);
 		this.singleStepMode = singleStepMode;
 	}
 
-	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, RunnableFinishedListener scenarioFinishedListener, Path scenarioFilePath, ScenarioCache scenarioCache) {
+		this(scenario, IOUtils.OUTPUT_DIR, scenarioFinishedListener, scenarioFilePath, scenarioCache);
 	}
 
-	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener) {
-		this(scenario, outputDir, false, scenarioFinishedListener);
+	public ScenarioRun(final Scenario scenario, final String outputDir, final RunnableFinishedListener scenarioFinishedListener, Path scenarioFilePath, ScenarioCache scenarioCache) {
+		this(scenario, outputDir, false, scenarioFinishedListener, scenarioFilePath, scenarioCache);
 	}
 
 	// if overwriteTimestampSetting is true do note use timestamp in output directory
-	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener) {
+	public ScenarioRun(final Scenario scenario, final String outputDir, boolean overwriteTimestampSetting, final RunnableFinishedListener scenarioFinishedListener, Path scenarioFilePath, ScenarioCache scenarioCache) {
 		this.scenario = scenario;
 		this.scenario.setSimulationRunning(true); // create copy of ScenarioStore and redirect getScenarioStore to this copy for simulation.
 		this.scenarioStore = scenario.getScenarioStore();
@@ -79,6 +84,8 @@ public class ScenarioRun implements Runnable {
 		this.setOutputPaths(Paths.get(outputDir), overwriteTimestampSetting); // TODO [priority=high] [task=bugfix] [Error?] this is a relative path. If you start the application via eclipse this will be VadereParent/output
 		this.finishedListener = scenarioFinishedListener;
 		this.simulationResult = new SimulationResult(scenario.getName());
+		this.scenarioFilePath = scenarioFilePath;
+		this.scenarioCache = scenarioCache;
 	}
 
 
@@ -101,7 +108,7 @@ public class ScenarioRun implements Runnable {
 				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
 				scenarioStore.getTopography().reset();
 				logger.info("StartIt " + scenario.getName());
-				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, scenarioCache);
 				modelBuilder.createModelAndRandom();
 
 				final MainModel mainModel = modelBuilder.getModel();
@@ -125,7 +132,7 @@ public class ScenarioRun implements Runnable {
 				// Run simulation main loop from start time = 0 seconds
 				simulation = new Simulation(mainModel, 0.0,
 						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
-						processorManager, simulationResult, remoteRunListeners, singleStepMode);
+						processorManager, simulationResult, remoteRunListeners, singleStepMode, scenarioCache);
 			}
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
@@ -272,5 +279,7 @@ public class ScenarioRun implements Runnable {
 			processorManager.sealAllAttributes();
 		}
 	}
+
+
 
 }

@@ -6,14 +6,11 @@ import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
-import org.vadere.util.opencl.CLUtils;
 
 import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 /**
  * Entry point for the Vadere GUI.

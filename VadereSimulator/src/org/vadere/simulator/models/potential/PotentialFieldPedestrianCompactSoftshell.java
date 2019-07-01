@@ -1,11 +1,7 @@
 package org.vadere.simulator.models.potential;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
-import org.vadere.simulator.models.Model;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
@@ -13,10 +9,14 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 // Implementation of the soft shell repulsive potential of pedestrians according to sivers-2016b.
 // page 46, eq. 4.1
@@ -33,7 +33,7 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-	                       AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class);
 		this.intimateWidth = attributes.getPedPotentialIntimateSpaceWidth();
 		this.personalWidth = attributes.getPedPotentialPersonalSpaceWidth();

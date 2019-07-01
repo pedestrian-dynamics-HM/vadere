@@ -2,7 +2,6 @@ package org.vadere.simulator.models.osm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -11,10 +10,9 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.SubModelBuilder;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupSpeedAdjuster;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupStepSizeAdjuster;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupSpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
 import org.vadere.simulator.models.osm.optimization.PatternSearchOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -31,36 +29,31 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.WaitEvent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.util.data.cellgrid.CellState;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
-import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel {
+
+	private final static Logger logger = Logger.getLogger(OptimalStepsModel.class);
 
 	private UpdateSchemeOSM updateSchemeOSM;
 	private AttributesOSM attributesOSM;
@@ -84,8 +77,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
+		logger.debug("initialize OSM");
 		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
 		this.topography = topography;
 		this.random = random;
@@ -93,11 +87,13 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
 				attributesPedestrian, random);
+		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
 		subModelBuilder.addBuildedSubModelsToList(models);
 
+		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
+				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel(), cache);
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);

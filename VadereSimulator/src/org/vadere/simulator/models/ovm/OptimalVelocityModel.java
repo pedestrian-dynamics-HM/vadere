@@ -16,6 +16,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
@@ -63,7 +64,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 
 		this.attributesOVM = Model.findAttributes(modelAttributesList, AttributesOVM.class);
 		this.elementAttributes = topography.getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);

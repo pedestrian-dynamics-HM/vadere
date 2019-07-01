@@ -94,7 +94,7 @@ public class TextView extends JPanel implements IJsonView {
 				String content = IOUtils.readTextFile(path);
 				txtrTextfiletextarea.setText(content);
 			} catch (IOException e) {
-				logger.error("could not load from file: " + e.getMessage());
+				logger.error("could not loadFromFilesystem from file: " + e.getMessage());
 			}
 		}
 	};

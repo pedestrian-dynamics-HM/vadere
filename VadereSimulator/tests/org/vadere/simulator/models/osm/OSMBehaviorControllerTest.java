@@ -9,6 +9,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -18,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class OSMBehaviorControllerTest {
 
@@ -53,7 +54,8 @@ public class OSMBehaviorControllerTest {
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
                 topography,
                 new AttributesAgent(),
-                attributesOSM.getTargetPotentialModel());
+                attributesOSM.getTargetPotentialModel(),
+                ScenarioCache.empty());
 
         pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
                 potentialFieldTargetGrid, null, null, null, null);
@@ -167,7 +169,8 @@ public class OSMBehaviorControllerTest {
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
                 topography,
                 new AttributesAgent(),
-                attributesOSM.getTargetPotentialModel());
+                attributesOSM.getTargetPotentialModel(),
+                ScenarioCache.empty());
 
         pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
                 potentialFieldTargetGrid, null, null, null, null);
@@ -228,7 +231,8 @@ public class OSMBehaviorControllerTest {
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
                 topography,
                 new AttributesAgent(),
-                attributesOSM.getTargetPotentialModel());
+                attributesOSM.getTargetPotentialModel(),
+                ScenarioCache.empty());
 
         pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
                 potentialFieldTargetGrid, null, null, null, null);

@@ -5,6 +5,7 @@ import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
@@ -22,8 +23,9 @@ public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IP
 
     public PotentialFieldTargetGrid(@NotNull final Topography topography,
                                     @NotNull final AttributesAgent attributesPedestrian,
-                                    @NotNull final AttributesFloorField attributesPotential) {
-    	super(topography, attributesPedestrian, attributesPotential);
+                                    @NotNull final AttributesFloorField attributesPotential,
+									@NotNull final ScenarioCache cache) {
+    	super(topography, attributesPedestrian, attributesPotential, cache);
     }
 
     @Override

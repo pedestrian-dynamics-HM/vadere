@@ -14,21 +14,43 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.scenario.*;
+import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.scenario.AttributesAbsorbingArea;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.AttributesStairs;
+import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.attributes.scenario.AttributesTeleporter;
+import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.events.json.EventInfo;
 import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.AbsorbingArea;
+import org.vadere.state.scenario.Car;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Teleporter;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class StateJsonConverter {
 
@@ -238,6 +260,10 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(node);
 	}
 
+	public static ObjectNode serializeAttributesModelToNode(final Attributes... attributesList) {
+		return serializeAttributesModelToNode(Arrays.stream(attributesList).collect(Collectors.toList()));
+	}
+
 	public static ObjectNode serializeAttributesModelToNode(final List<Attributes> attributesList) {
 		List<Pair<String, Attributes>> attributePairList = attributesListToNameObjectPairList(attributesList);
 
@@ -248,6 +274,9 @@ public abstract class StateJsonConverter {
 		return attributesModelNode;
 	}
 
+	private static List<Pair<String, Attributes>> attributesListToNameObjectPairList(Attributes... attributesList) {
+		return attributesListToNameObjectPairList(Arrays.stream(attributesList).collect(Collectors.toList()));
+	}
 	private static List<Pair<String, Attributes>> attributesListToNameObjectPairList(List<Attributes> attributesList) {
 		List<Pair<String, Attributes>> list = new ArrayList<>(attributesList.size());
 		for (Attributes a : attributesList)
@@ -414,5 +443,32 @@ public abstract class StateJsonConverter {
 	
 	public static String writeValueAsString(Object value) throws JsonProcessingException {
 		return prettyWriter.writeValueAsString(value);
+	}
+
+	/**
+	 * Create a SHA-1 hash based on the given {@link AttributesFloorField} and {@link Topography}.
+	 * Use the Jackson view {@link Views.CacheView} to EXCLUDE the @link AttributesFloorField#cacheDir
+	 * field to allow reallocation of created floor field caches.
+	 *
+	 */
+	public static String getFloorFieldHash(final Topography topography, final AttributesFloorField attr)  {
+		try {
+			String topographyStr = mapper
+									.writerWithDefaultPrettyPrinter()
+									.withView(Views.CacheView.class)
+									.writeValueAsString(topography);
+			String attrString = mapper
+									.writerWithDefaultPrettyPrinter()
+									.withView(Views.CacheView.class)
+									.writeValueAsString(attr);
+			String hashIt = attrString + "\n" + topographyStr;
+			String hash = DigestUtils.sha1Hex(hashIt.getBytes());
+			logger.debugf("created Hash: %s", hash);
+			logger.tracef("used String for hash: \n%s", hashIt);
+			return hash;
+		} catch (JsonProcessingException e) {
+			logger.error("cannot create hash of topography and floor field attributes for cache access.");
+		}
+		return DigestUtils.sha1Hex("error");
 	}
 }

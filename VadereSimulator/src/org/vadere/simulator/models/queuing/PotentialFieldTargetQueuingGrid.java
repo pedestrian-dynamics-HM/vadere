@@ -18,6 +18,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -63,7 +64,8 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	public PotentialFieldTargetQueuingGrid(
 			final Topography topography,
 			final AttributesAgent attributesPedestrian,
-			final AttributesQueuingGame attributesQueuingGame) {
+			final AttributesQueuingGame attributesQueuingGame,
+			final ScenarioCache cache) {
 
 		if (!isValidArguments(topography, attributesQueuingGame)) {
 			throw new IllegalArgumentException("wrong TimeCostFunctionType.");
@@ -74,9 +76,9 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		this.topography.addElementRemovedListener(Pedestrian.class, this);
 		this.random = new Random();
 		this.competitiveField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getNavigationFloorField());
+				attributesQueuingGame.getNavigationFloorField(), cache);
 		this.gentleField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
-				attributesQueuingGame.getQueuingFloorField());
+				attributesQueuingGame.getQueuingFloorField(), cache);
 		this.pedestrianAttitudeMap = new HashMap<>();
 		this.lifeTimeMap = new HashMap<>();
 		this.pedestrians = new ArrayList<>();
@@ -315,7 +317,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random, ScenarioCache cache) {
 		// TODO should be used to initialize the Model
 	}
 

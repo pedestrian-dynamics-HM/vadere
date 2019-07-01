@@ -1,6 +1,7 @@
 package org.vadere.gui.projectview.model;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
@@ -19,6 +20,7 @@ import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +41,7 @@ public class ProjectViewModel implements IScenarioChecker {
 
 	private final OutputFileTableModel outputTableModel;
 	private final VadereScenarioTableModel scenarioTableModel;
-	private String currentProjectPath;
+//	private String currentProjectPath;
 	private ExecutorService refreshOutputExecutor;
 
 
@@ -200,19 +202,19 @@ public class ProjectViewModel implements IScenarioChecker {
 	 * been saved to disk yet.
 	 */
 	public String getCurrentProjectPath() {
-		return currentProjectPath;
+
+		return isProjectAvailable() ? project.getProjectDirectory().toAbsolutePath().toString() : null;
 	}
 
 	/**
 	 * Set path of the directory where the project is saved. It may be null if the model have not
 	 * been saved to disk yet.
 	 */
-	public void setCurrentProjectPath(final String currentProjectPath) {
-		if (currentProjectPath == null) {
-			this.currentProjectPath = null;
-		} else {
-			this.currentProjectPath = ProjectWriter.getProjectDir(currentProjectPath);
-		}
+	public void setCurrentProjectPath(@NotNull final String currentProjectPath) {
+		if (isProjectAvailable())
+			project.setProjectDirectory(Paths.get(currentProjectPath));
+		else
+			throw  new IllegalStateException();
 	}
 
 	public OutputBundle getSelectedOutputBundle() throws IOException {

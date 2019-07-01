@@ -69,17 +69,17 @@ public class ActionLoadProject extends AbstractAction {
 					else {
 						migrationOptions = MigrationOptions.reapplyFromVersion((Version)option);
 					}
-					// 3. load project
+					// 3. loadFromFilesystem project
 					loadProjectByPath(model, projectFilePath, migrationOptions);
 
 				} else {
-					// 3. load project
+					// 3. loadFromFilesystem project
 					loadProjectByPath(model, projectFilePath);
 				}
 
 
 			} else {
-				logger.info(String.format("user canceled load project."));
+				logger.info(String.format("user canceled loadFromFilesystem project."));
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -108,13 +108,12 @@ public class ActionLoadProject extends AbstractAction {
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath, MigrationOptions options) {
 		try {
 			VadereProject project = IOVadere.readProjectJson(projectFilePath, options);
-			projectViewModel.setCurrentProjectPath(projectFilePath);
 			projectViewModel.setProject(project);
 
 			projectViewModel.refreshOutputTable();
 			logger.info("refreshed output table - 2");
 
-			// select and load first scenario from list
+			// select and loadFromFilesystem first scenario from list
 			projectViewModel.setSelectedRowIndexInScenarioTable(0);
             logger.info("selected the first scenario");
 
@@ -169,7 +168,7 @@ public class ActionLoadProject extends AbstractAction {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "JoltMigrationAssistant assistant",
 					JOptionPane.ERROR_MESSAGE);
-			logger.error("could not load project: " + e.getMessage());
+			logger.error("could not loadFromFilesystem project: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

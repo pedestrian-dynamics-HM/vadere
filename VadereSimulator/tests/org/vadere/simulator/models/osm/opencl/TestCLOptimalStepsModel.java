@@ -12,6 +12,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.TextOutOfNodeException;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -159,7 +160,7 @@ public class TestCLOptimalStepsModel {
 		obstacleDistancePotential = new PotentialFieldDistanceEikonalEq(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				bound, attributesFloorField);
-		targetPotentialField = new PotentialFieldSingleTargetGrid(topography, attributesAgent, attributesFloorField, 1);
+		targetPotentialField = new PotentialFieldSingleTargetGrid(topography, attributesAgent, attributesFloorField, 1, ScenarioCache.empty());
 		targetPotentialField.preLoop(0.4f);
 		pedestrians = new ArrayList<>();
 

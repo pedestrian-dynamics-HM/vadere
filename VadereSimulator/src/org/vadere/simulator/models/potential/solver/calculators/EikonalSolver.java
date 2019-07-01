@@ -3,6 +3,8 @@ package org.vadere.simulator.models.potential.solver.calculators;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.simulator.utils.cache.CacheLoader;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
@@ -64,6 +66,40 @@ public interface EikonalSolver {
 
 	default ITimeCostFunction getTimeCostFunction() {
 		return new UnitTimeCostFunction();
+	}
+
+	/**
+	 * Load floor field from given file path. This method does not check if the cached floor field
+	 * is up to date with the current state of the scenario. This must be checked by the caller
+	 * beforehand.
+	 *
+	 * The default behavior does not support caching. To support caching override this method and
+	 * implement the needed logic.
+	 * see {@link org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver}
+	 * for implementation.
+	 *
+	 * @param cacheLoader path to cached floor field
+	 * @return true if floor field could be loaded and false if not.
+	 */
+	default boolean loadCachedFloorField(CacheLoader cacheLoader){
+		// default not implemented. This will force a rebuild for each EikonalSolver at creation time.
+		logger.infof("caching not implemented for given EikonalSolver %s", this.getClass().getName());
+		return false;
+	}
+
+	/**
+	 * Save floor field to given file path.
+	 *
+	 * The default behavior does not support caching. To support caching override this method and
+	 * implement the needed logic.
+	 * see {@link org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver}
+	 * for implementation.
+	 *  @param cache path to cached floor field
+	 * @param floorFieldIdentifier
+	 */
+	default void saveFloorFieldToCache(ScenarioCache cache, String floorFieldIdentifier){
+		// default not implemented. This will force a rebuild for each EikonalSolver at creation time.
+		logger.infof("caching not implemented for given EikonalSolver %s", this.getClass().getName());
 	}
 
 	IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization();
