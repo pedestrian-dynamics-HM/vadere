@@ -319,7 +319,9 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		setData(vertex, name, data);
 	}
 
-	//default void setDoubleDataNull
+	//default void setBooleanNull(@NotNull final V vertex, @NotNull final String name, boolean nil) {}
+
+	//default void setDoubleNull(@NotNull final V vertex, @NotNull final String name, double nil) {}
 
 	/**
 	 * Returns the data saved on the half-edge in O(1) if there is any and otherwise <tt>Optional.empty()</tt>.

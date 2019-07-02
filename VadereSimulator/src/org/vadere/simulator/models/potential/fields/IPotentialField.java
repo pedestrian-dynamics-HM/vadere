@@ -155,7 +155,7 @@ public interface IPotentialField {
 	        /**
 	         * Generate the mesh, we use the pointer based implementation here.
 	         */
-	        PEikMesh meshGenerator = new PEikMesh<>(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
+	        PEikMesh meshGenerator = new PEikMesh(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
 	        IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshGenerator.generate();
 
 	        ITimeCostFunction timeCost = TimeCostFunctionFactory.create(

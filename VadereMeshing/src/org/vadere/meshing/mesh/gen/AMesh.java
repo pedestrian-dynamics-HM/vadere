@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
+import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -38,12 +39,17 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	private AFace boundary;
 	private List<AHalfEdge> edges;
 	private List<AVertex> vertices;
+
+	//TODO: test the new property structure!
 	private Map<String, AObjectArrayList<?>> verticesData;
 	private Map<String, AObjectArrayList<?>> halfEdgesData;
 	private Map<String, AObjectArrayList<?>> facesData;
 	private Map<String, DoubleArrayList> verticesDoubleData;
 	private Map<String, DoubleArrayList> facesDoubleData;
 	private Map<String, DoubleArrayList> halfEdgesDoubleData;
+	private Map<String, BooleanArrayList> verticesBooleanData;
+	private Map<String, BooleanArrayList> facesBooleanData;
+	private Map<String, BooleanArrayList> halfEdgesBooleanData;
 
 	public AMesh() {
 		clear();
@@ -61,12 +67,18 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		this.numberOfEdges = 0;
 		this.numberOfVertices = 0;
 		this.numberOfHoles = 0;
+
 		this.verticesData = new HashMap<>();
 		this.halfEdgesData = new HashMap<>();
 		this.facesData = new HashMap<>();
+
 		this.verticesDoubleData = new HashMap<>();
 		this.halfEdgesData = new HashMap<>();
 		this.facesDoubleData = new HashMap<>();
+
+		this.verticesBooleanData = new HashMap<>();
+		this.halfEdgesBooleanData = new HashMap<>();
+		this.facesBooleanData = new HashMap<>();
 	}
 
 	@Override
@@ -221,6 +233,72 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
 		assert dataArray.size() == faces.size();
 		dataArray.set(face.getId(), data);
+	}
+
+	@Override
+	public void setDoubleData(@NotNull final AFace face, @NotNull final String name, final double data) {
+		if(!facesDoubleData.containsKey(name)) {
+			DoubleArrayList dataArray = new DoubleArrayList(faces.size());
+			facesDoubleData.put(name, dataArray);
+		}
+		DoubleArrayList dataArray = facesDoubleData.get(name);
+		assert dataArray.size() == faces.size();
+		dataArray.set(face.getId(), data);
+	}
+
+	@Override
+	public void setDoubleData(@NotNull final AVertex vertex, @NotNull final String name, final double data) {
+		if(!verticesDoubleData.containsKey(name)) {
+			DoubleArrayList dataArray = new DoubleArrayList(vertices.size());
+			verticesDoubleData.put(name, dataArray);
+		}
+		DoubleArrayList dataArray = verticesDoubleData.get(name);
+		assert dataArray.size() == vertices.size();
+		dataArray.set(vertex.getId(), data);
+	}
+
+	@Override
+	public void setDoubleData(@NotNull final AHalfEdge edge, @NotNull final String name, final double data) {
+		if(!halfEdgesDoubleData.containsKey(name)) {
+			DoubleArrayList dataArray = new DoubleArrayList(edges.size());
+			halfEdgesDoubleData.put(name, dataArray);
+		}
+		DoubleArrayList dataArray = halfEdgesDoubleData.get(name);
+		assert dataArray.size() == edges.size();
+		dataArray.set(edge.getId(), data);
+	}
+
+	@Override
+	public void setBooleanData(@NotNull final AFace face, @NotNull final String name, final boolean data) {
+		if(!facesBooleanData.containsKey(name)) {
+			BooleanArrayList dataArray = new BooleanArrayList(faces.size());
+			facesBooleanData.put(name, dataArray);
+		}
+		BooleanArrayList dataArray = facesBooleanData.get(name);
+		assert dataArray.size() == faces.size();
+		dataArray.set(face.getId(), data);
+	}
+
+	@Override
+	public void setBooleanData(@NotNull final AVertex vertex, @NotNull final String name, final boolean data) {
+		if(!verticesBooleanData.containsKey(name)) {
+			BooleanArrayList dataArray = new BooleanArrayList(vertices.size());
+			verticesBooleanData.put(name, dataArray);
+		}
+		BooleanArrayList dataArray = verticesBooleanData.get(name);
+		assert dataArray.size() == vertices.size();
+		dataArray.set(vertex.getId(), data);
+	}
+
+	@Override
+	public void setBooleanData(@NotNull final AHalfEdge edge, @NotNull final String name, final boolean data) {
+		if(!halfEdgesBooleanData.containsKey(name)) {
+			BooleanArrayList dataArray = new BooleanArrayList(edges.size());
+			halfEdgesBooleanData.put(name, dataArray);
+		}
+		BooleanArrayList dataArray = halfEdgesBooleanData.get(name);
+		assert dataArray.size() == edges.size();
+		dataArray.set(edge.getId(), data);
 	}
 
 	private void fill(@NotNull final ObjectArrayList<?> data, final int n) {
@@ -574,6 +652,24 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	        }
 	        clone.verticesDoubleData = clonedVerticessDoubleData;
 
+	        Map<String, BooleanArrayList> clonedFacesBooleanData = new HashMap<>();
+	        for(var entry : facesBooleanData.entrySet()) {
+		        clonedFacesBooleanData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.facesBooleanData = clonedFacesBooleanData;
+
+	        Map<String, BooleanArrayList> clonedHalfEdgesBooleanData = new HashMap<>();
+	        for(var entry : halfEdgesBooleanData.entrySet()) {
+		        clonedHalfEdgesBooleanData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.halfEdgesBooleanData = clonedHalfEdgesBooleanData;
+
+	        Map<String, BooleanArrayList> clonedVerticessBooleanData = new HashMap<>();
+	        for(var entry : verticesBooleanData.entrySet()) {
+		        clonedVerticessBooleanData.put(entry.getKey(), entry.getValue().clone());
+	        }
+	        clone.verticesBooleanData = clonedVerticessBooleanData;
+
             return clone;
 
         } catch (CloneNotSupportedException e) {
@@ -694,16 +790,28 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			    list.set(vertexMap[i], list.getDouble(i));
 			    list.set(i, tmp);
 		    }
+
+		    for(var list : verticesBooleanData.values()) {
+			    boolean tmp = list.getBoolean(vertexMap[i]);
+			    list.set(vertexMap[i], list.getBoolean(i));
+			    list.set(i, tmp);
+		    }
 	    }
 
 	    for(var list : verticesDoubleData.values()) {
-		    if(vertexMap.length < facesDoubleData.size()) {
+		    if(vertexMap.length < verticesDoubleData.size()) {
+			    list.trim(vertexMap.length);
+		    }
+	    }
+
+	    for(var list : verticesBooleanData.values()) {
+		    if(vertexMap.length < verticesBooleanData.size()) {
 			    list.trim(vertexMap.length);
 		    }
 	    }
 
 	    for(var list : verticesData.values()) {
-		    if(vertexMap.length < facesDoubleData.size()) {
+		    if(vertexMap.length < verticesData.size()) {
 			    list.trim(vertexMap.length);
 		    }
 	    }
@@ -720,16 +828,28 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 				list.set(edgeMap[i], list.getDouble(i));
 				list.set(i, tmp);
 			}
+
+			for(var list : halfEdgesBooleanData.values()) {
+				boolean tmp = list.getBoolean(edgeMap[i]);
+				list.set(edgeMap[i], list.getBoolean(i));
+				list.set(i, tmp);
+			}
 		}
 
 		for(var list : halfEdgesDoubleData.values()) {
-			if(edgeMap.length < facesDoubleData.size()) {
+			if(edgeMap.length < halfEdgesDoubleData.size()) {
+				list.trim(edgeMap.length);
+			}
+		}
+
+		for(var list : halfEdgesBooleanData.values()) {
+			if(edgeMap.length < halfEdgesBooleanData.size()) {
 				list.trim(edgeMap.length);
 			}
 		}
 
 		for(var list : halfEdgesData.values()) {
-			if(edgeMap.length < facesDoubleData.size()) {
+			if(edgeMap.length < halfEdgesData.size()) {
 				list.trim(edgeMap.length);
 			}
 		}
@@ -746,6 +866,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			    list.set(faceMap[i], list.getDouble(i));
 			    list.set(i, tmp);
 		    }
+
+		    for(var list : facesBooleanData.values()) {
+			    boolean tmp = list.getBoolean(faceMap[i]);
+			    list.set(faceMap[i], list.getBoolean(i));
+			    list.set(i, tmp);
+		    }
 	    }
 
 	    for(var list : facesDoubleData.values()) {
@@ -754,8 +880,14 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		    }
 	    }
 
+	    for(var list : facesBooleanData.values()) {
+		    if(faceMap.length < facesBooleanData.size()) {
+			    list.trim(faceMap.length);
+		    }
+	    }
+
 	    for(var list : facesData.values()) {
-		    if(faceMap.length < facesDoubleData.size()) {
+		    if(faceMap.length < facesData.size()) {
 			    list.trim(faceMap.length);
 		    }
 	    }

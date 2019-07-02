@@ -69,7 +69,7 @@ public class TestFFMNonUniformTriangulation {
     private GenEikMesh<PVertex, PHalfEdge, PFace> createEikMesh(
     		@NotNull final IEdgeLengthFunction edgeLengthFunc,
 		    final double initialEdgeLen) {
-	    IMeshSupplier<PVertex, PHalfEdge, PFace> meshSupplier = () -> new PMesh<>();
+	    IMeshSupplier<PVertex, PHalfEdge, PFace> meshSupplier = () -> new PMesh();
 	    GenEikMesh<PVertex, PHalfEdge, PFace> eikMesh = new GenEikMesh<>(
 			    distanceFunc,
 			    edgeLengthFunc,
@@ -165,11 +165,11 @@ public class TestFFMNonUniformTriangulation {
         log.info("max distance to boundary: " + triangulation.getMesh().getBoundaryVertices().stream().map(p -> Math.abs(distanceFunc.apply(p))).max(Comparator.comparingDouble(d -> d)));
         //log.info("L2-Error: " + computeL2Error(triangulation, distanceFunc));
         log.info("max error: " + maxError);
-        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(p.getPoint().getPotential() + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
+        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
 
         log.info("L2-error: " + Math.sqrt(sum / counter));
         log.info("L2-error-2: " + Math.sqrt(triangulation.getMesh().getVertices().stream()
-                .map(p -> Math.abs(Math.abs(p.getPoint().getPotential() + distanceFunc.apply(p))))
+                .map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(p))))
                 .map(val -> val * val)
                 .reduce(0.0, (d1, d2) -> d1 + d2) / triangulation.getMesh().getNumberOfVertices()));
         //assertTrue(0.0 == solver.getValue(5, 5));
@@ -326,8 +326,8 @@ public class TestFFMNonUniformTriangulation {
 
     private double computeL2Error(@NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation, final IDistanceFunction distanceFunc) {
         double sum = 0.0;
-        for(IVertex vertex : triangulation.getMesh().getVertices()) {
-            double diff = vertex.getPoint().getPotential() + distanceFunc.apply(vertex);
+        for(PVertex vertex : triangulation.getMesh().getVertices()) {
+            double diff = triangulation.getMesh().getDoubleData(vertex, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(vertex);
             sum += diff * diff;
         }
         return Math.sqrt(sum);

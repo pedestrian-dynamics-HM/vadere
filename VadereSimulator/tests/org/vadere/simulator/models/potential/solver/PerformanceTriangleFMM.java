@@ -30,11 +30,11 @@ public class PerformanceTriangleFMM {
 
 	private static IIncrementalTriangulation<PVertex, PHalfEdge, PFace> createTriangulation() {
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-		PEikMesh meshGenerator = new PEikMesh<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox);
+		PEikMesh meshGenerator = new PEikMesh(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox);
 		return meshGenerator.generate();
 	}
 
-	private static void solve(EikonalSolverFMMTriangulation<PotentialPoint, PVertex, PHalfEdge, PFace> solver) {
+	private static void solve(EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver) {
 		long ms = System.currentTimeMillis();
 		System.out.println("start FFM");
 		solver.initialize();
@@ -60,7 +60,7 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (3) solve the eikonal equation on the mesh
 		 */
-		EikonalSolverFMMTriangulation<PotentialPoint, PVertex, PHalfEdge, PFace> solver = new EikonalSolverFMMTriangulation(
+		EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver = new EikonalSolverFMMTriangulation(
 				new UnitTimeCostFunction(),
 				triangulation,
 				targetVertices,

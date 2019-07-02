@@ -42,7 +42,7 @@ public class FMMTriangulationExamples {
 		log.info("start FFM");
 		solver.initialize();
 		log.info("FFM finished");
-		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> p.getPotential()));
+		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential)));
 	}
 
 	public static IIncrementalTriangulation<
@@ -84,7 +84,7 @@ public class FMMTriangulationExamples {
 			}
 		};
 
-		var meshPanel = new PMeshPanel<>(meshImprover.getMesh(), 1000, 800, colorFunction);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800, colorFunction);
 		meshPanel.display("Combined distance functions " + h0);
 		while (!meshImprover.isFinished()) {
 			meshImprover.improve();

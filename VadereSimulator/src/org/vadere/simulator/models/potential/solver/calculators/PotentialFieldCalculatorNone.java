@@ -41,6 +41,6 @@ public class PotentialFieldCalculatorNone implements EikonalSolver {
 	 */
 	@Override
 	public IMesh<?, ?, ?> getDiscretization() {
-		return new PMesh<>();
+		return new PMesh();
 	}
 }
