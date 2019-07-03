@@ -150,7 +150,7 @@ public class ScenarioCache {
 	public ScenarioCache addCsvCache(String cacheIdentifier, InputStream stream){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		cacheMap.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, (CellGridCacheLoader)cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromCsv(stream);
 			} catch (Exception e) {
@@ -163,7 +163,7 @@ public class ScenarioCache {
 	public ScenarioCache addCsvCache(String cacheIdentifier, File file){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		cacheMap.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, (CellGridCacheLoader)cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromCsv(file);
 			} catch (Exception e) {
@@ -176,7 +176,7 @@ public class ScenarioCache {
 	public ScenarioCache addBinaryCache(String cacheIdentifier, DataInputStream stream){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		cacheMap.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, (CellGridCacheLoader)cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromBinary(stream);
 			} catch (Exception e) {
@@ -189,7 +189,7 @@ public class ScenarioCache {
 	public ScenarioCache addBinaryCache(String cacheIdentifier, File file){
 		if (empty)
 			throw new IllegalStateException("Empty cache object.");
-		cacheMap.put(cacheIdentifier, cellGrid -> {
+		cacheMap.put(cacheIdentifier, (CellGridCacheLoader)cellGrid -> {
 			try {
 				CellGridReadWriter.read(cellGrid).fromBinary(file);
 			} catch (Exception e) {
