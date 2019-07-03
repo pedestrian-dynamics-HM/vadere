@@ -8,7 +8,8 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.utils.io.movie.MovRecorder;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.MeshPolyReader;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -283,11 +284,18 @@ public class EikMeshExamples {
 		// (optional) define the gui to display the mesh
 		meshImprover.generate();
 
-		String polyString = PolyGenerator.to2DPoly(meshImprover.getMesh());
-		InputStream inputStream = new ByteArrayInputStream(polyString.getBytes(Charset.forName("UTF-8")));
-		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
-		var mesh = PolyGenerator.toMesh(inputStream, meshSuppliert);
 
+		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
+
+		var writer = new MeshPolyWriter<PVertex, PHalfEdge, PFace>();
+		var reader = new MeshPolyReader<>(meshSuppliert);
+
+		String polyString = writer.to2DPoly(meshImprover.getMesh());
+		InputStream inputStream = new ByteArrayInputStream(polyString.getBytes(Charset.forName("UTF-8")));
+
+		System.out.println(polyString);
+
+		var mesh = reader.readMesh(inputStream);
 		var meshPanel = new PMeshPanel(mesh, 1000, 800);
 
 		// generate the mesh

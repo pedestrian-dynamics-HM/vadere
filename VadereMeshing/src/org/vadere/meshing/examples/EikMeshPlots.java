@@ -9,7 +9,7 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
@@ -89,7 +89,7 @@ public class EikMeshPlots {
 
 	public static void kaiserslautern() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
@@ -117,7 +117,7 @@ public class EikMeshPlots {
 
 	public static void bridge() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/bridge.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
@@ -152,7 +152,7 @@ public class EikMeshPlots {
 
 	public static void eikMeshA(double h0) throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 
 		PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), h0, pslg.getHoles());
 		meshImprover.generate();
@@ -311,7 +311,7 @@ public class EikMeshPlots {
 
 	public static void ruppertsAndEikMeshKaiserslautern() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();

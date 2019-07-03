@@ -3,7 +3,7 @@ package org.vadere.geometry;
 import org.junit.Test;
 import org.vadere.meshing.examples.MeshExamples;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -33,7 +33,7 @@ public class TestPSLG {
 	@Test
 	public void testdProtection() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		pslg = pslg.toProtectedPSLG(Double.POSITIVE_INFINITY);
 		System.out.println(TexGraphGenerator.toTikz(pslg.getAllSegments()));
 	}

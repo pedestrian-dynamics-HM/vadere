@@ -1,6 +1,5 @@
 package org.vadere.meshing.utils.io.poly;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -26,13 +25,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PolyGenerator {
+public class PSLGGenerator {
 
 	private final static String SEPARATOR = " ";
 	private final static String SPLITTER = "\\s+";
@@ -88,129 +84,6 @@ public class PolyGenerator {
 	}
 
 	/**
-	 * Reads a PSLG (.poly) from an {@link InputStream} and converts the file into a {@link IMesh}.
-	 *
-	 * @param inputStream   the input stream
-	 * @param meshSupplier  mesh suppliert to construct an empty mesh
-	 *
-	 * @param <V> the type of the vertices
-	 * @param <E> the type of the half-edges
-	 * @param <F> the type of the faces
-	 *
-	 * @return a {@link Math} containing all segments and holes of the PSLG
-	 *
-	 * @throws IOException
-	 */
-	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> IMesh<V, E, F> toMesh(
-			@NotNull final InputStream inputStream,
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier) throws IOException {
-		var mesh = meshSupplier.get();
-
-		Map<Integer, V> vertices = new HashMap<>();
-		Map<Pair<Integer, Integer>, E> edges = new HashMap<>();
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-		String line = readLine(reader);
-		String[] split = line.split(SPLITTER);
-		int nVertex = Integer.parseInt(split[0].strip());
-		int dimension = Integer.parseInt(split[1].strip());
-		int boundaryMarker = Integer.parseInt(split[2].strip());
-		int targetMarker = Integer.parseInt(split[3].strip());
-		int nAttributes = Integer.parseInt(split[4].strip());
-
-		if(nAttributes > 1) {
-			throw new IOException("number of attributes > 1, is not jet supported.");
-		}
-
-		for(int i = 0; i < nVertex; i++) {
-			String vertexLine = readLine(reader);
-			split = vertexLine.split(SPLITTER);
-			int id = Integer.parseInt(split[0].strip());
-			int boundaryMark = Integer.parseInt(split[1].strip());
-			int targetMark = Integer.parseInt(split[2].strip());
-			double x = Double.parseDouble(split[3].strip());
-			double y = Double.parseDouble(split[4].strip());
-
-			V vertex = mesh.insertVertex(x, y);
-			vertices.put(id, vertex);
-			// TODO: attributes ? boundaryMark?
-			if(nAttributes == 1) {
-
-			}
-		}
-
-		// border
-		// this is always 1
-		String nBorderString = readLine(reader);
-		assert Integer.parseInt(nBorderString.strip()) == 1;
-		String borderVertices = readLine(reader);
-		toFace(borderVertices, vertices, edges, mesh, mesh.getBorder());
-
-		// triangles
-		Integer nTriangles = Integer.parseInt(readLine(reader).strip());
-		for(int i = 0; i < nTriangles; i++) {
-			F face = mesh.createFace();
-			toFace(readLine(reader), vertices, edges, mesh, face);
-		}
-
-		// holes
-		Integer nHoles = Integer.parseInt(readLine(reader).strip());
-		for(int i = 0; i < nHoles; i++) {
-			F face = mesh.createFace(true);
-			toFace(readLine(reader), vertices, edges, mesh, face);
-		}
-
-		assert mesh.isValid();
-		return mesh;
-	}
-
-	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> void toFace(
-			@NotNull final String line,
-			@NotNull final Map<Integer, V> vertices,
-			@NotNull final Map<Pair<Integer, Integer>, E> edges,
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final F face) {
-		String[] split = line.split(SPLITTER);
-		int nVertices = Integer.parseInt(split[0].strip());
-		assert nVertices == split.length-1;
-		List<Integer> vertexIds = new ArrayList<>(nVertices);
-		for(int i = 0; i < nVertices; i++) {
-			vertexIds.add(Integer.parseInt(split[i+1].strip()));
-		}
-
-		List<E> ccwEdges = new ArrayList<>(nVertices);
-		for(int i = 0; i < nVertices; i++) {
-			int i1 = vertexIds.get(i);
-			int i2 = vertexIds.get((i+1) % nVertices);
-			V v1 = vertices.get(i1);
-			V v2 = vertices.get(i2);
-			E edge = mesh.createEdge(v2);
-			mesh.setFace(edge, face);
-			mesh.setEdge(face, edge);
-
-			if(mesh.getEdge(v2) == null || !mesh.isBoundary(mesh.getEdge(v2))) {
-				mesh.setEdge(v2, edge);
-			}
-
-			edges.put(Pair.of(i1, i2), edge);
-
-			if(edges.containsKey(Pair.of(i2, i1))) {
-				E twin = edges.get(Pair.of(i2, i1));
-				mesh.setTwin(edge, twin);
-			}
-
-			ccwEdges.add(edge);
-		}
-
-		for(int i = 0; i < nVertices; i++) {
-			E edge = ccwEdges.get(i);
-			E next = ccwEdges.get((i+1)%nVertices);
-			mesh.setNext(edge, next);
-		}
-	}
-
-	/**
 	 * Transforms a boundary and a list of holes (together these two elements may define a topography) into a string representing a PSLG.
 	 *
 	 * Assumption: There is no hole intersecting or containing any other hole and the segment-bounding polygon containes all holes
@@ -220,7 +93,7 @@ public class PolyGenerator {
 	 * @return a {@link String} representation of the PSLG
 	 */
 	public static String toPSLG(@NotNull final VPolygon boundary, @NotNull final Collection<VPolygon> holes) {
-		return PolyGenerator.toPSLG(boundary, holes,true);
+		return PSLGGenerator.toPSLG(boundary, holes,true);
 	}
 
 	public static String toPSLG(@NotNull final VPolygon boundary, @NotNull final Collection<VPolygon> cHoles, final boolean addComments) {
@@ -314,7 +187,7 @@ public class PolyGenerator {
 		Map<Integer, LinkedList<Integer>> segments = new HashMap<>();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-			String st = PolyGenerator.readLine(br);
+			String st = PSLGGenerator.readLine(br);
 
 			String[] split = st.split(SPLITTER);
 			if(split.length < 1) {
@@ -340,7 +213,7 @@ public class PolyGenerator {
 			}
 
 			for(int i = 1; i <= numberOfVertices; i++) {
-				st = PolyGenerator.readLine(br);
+				st = PSLGGenerator.readLine(br);
 				if(st == null) {
 					throw new IOException("wrong file format: missing vertices");
 				}
@@ -359,7 +232,7 @@ public class PolyGenerator {
 				vertices.put(id, new VPoint(x, y));
 			}
 
-			st = PolyGenerator.readLine(br);
+			st = PSLGGenerator.readLine(br);
 			split = st.strip().split(SPLITTER);
 			int numberOfSegments = 0;
 			boundaryMarker = 0;
@@ -372,7 +245,7 @@ public class PolyGenerator {
 			}
 
 			for(int i = 1; i <= numberOfSegments; i++) {
-				st = PolyGenerator.readLine(br);
+				st = PSLGGenerator.readLine(br);
 				if(st == null) {
 					throw new IOException("wrong file format: missing vertices");
 				}
@@ -395,14 +268,14 @@ public class PolyGenerator {
 				segments.get(from).add(to);
 			}
 
-			st = PolyGenerator.readLine(br);
+			st = PSLGGenerator.readLine(br);
 			int numberOfHoles = 0;
 			if(st != null) {
 				st = st.strip();
 				numberOfHoles = Integer.parseInt(st);
 
 				for(int i = 1; i <= numberOfHoles; i++) {
-					st = PolyGenerator.readLine(br);
+					st = PSLGGenerator.readLine(br);
 					split = st.split(SPLITTER);
 					if(split.length < 2) {
 						throw new IOException("wrong file format: missing vertex coordinate");
@@ -485,153 +358,5 @@ public class PolyGenerator {
 		else {
 			throw new IOException("invalid .poly format.");
 		}
-	}
-
-	/**
-	 * Transforms a {@link IMesh} into a PSLG-{@link String}.
-	 *
-	 * @param mesh  the mesh
-	 *
-	 * @param <V> the type of the vertices
-	 * @param <E> the type of the half-edges
-	 * @param <F> the type of the faces
-	 *
-	 * @return a PSLG-{@link String}
-	 */
-	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPSLG(
-			@NotNull final IMesh<V, E, F> mesh) {
-		return toPSLG(mesh, v -> 0.0);
-	}
-
-	/**
-	 * Transforms a {@link IMesh} into a PSLG-{@link String}.
-	 *
-	 * @param mesh  the mesh
-	 * @param eval  gives the values which should be added to the vertices of the PSLG
-	 *
-	 * @param <V> the type of the vertices
-	 * @param <E> the type of the half-edges
-	 * @param <F> the type of the faces
-	 *
-	 * @return a PSLG-{@link String}
-	 */
-	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPSLG(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final Function<V, Double> eval) {
-		int dimension = 2;
-		int nAttributes = 0;
-		int boundaryMarker = 0; // no boundary marker
-		StringBuilder builder = new StringBuilder();
-		builder.append("#node\n");
-		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + nAttributes + SEPARATOR + boundaryMarker + "\n");
-		Map<V, Integer> map = new HashMap<>();
-		int id = 1;
-		for(V v : mesh.getVertices()) {
-			map.put(v, id);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, v.getX(), v.getY(), eval.apply(v)));
-			id++;
-		}
-
-		List<VLine> lines = mesh.getLines().stream().collect(Collectors.toList());
-		builder.append("\n" + lines.size() + SEPARATOR + boundaryMarker);
-		for(int index = 1; index <= lines.size(); index++) {
-			VLine line = lines.get(index-1);
-
-			Integer from = map.get(line.getVPoint1());
-			assert from != null;
-			if(from == null) {
-				throw new IllegalArgumentException("could not find index for point " + line.getVPoint1());
-			}
-
-			Integer to = map.get(line.getVPoint2());
-			assert to != null;
-			if(to == null) {
-				throw new IllegalArgumentException("could not find index for point " + line.getVPoint2());
-			}
-			builder.append("\n" + index + SEPARATOR + from + SEPARATOR + to);
-		}
-		builder.append("#holes\n");
-		List<F> holes = mesh.getHoles();
-		builder.append(holes.size()+"\n");
-
-		builder.append("#interior points for each hole\n");
-		id = 1;
-		for(F hole : holes) {
-			VPolygon polygon = mesh.toPolygon(hole);
-			VPoint p = GeometryUtils.getInteriorPoint(polygon);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
-		}
-		return builder.toString();
-	}
-
-	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String to2DPoly(
-			@NotNull final IMesh<V, E, F> mesh) {
-		return to2DPoly(mesh, v -> 0.0, v -> false);
-	}
-
-	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String to2DPoly(
-			@NotNull final IMesh<V, E, F> mesh, @NotNull Function<V, Double> vertexFunc, @NotNull Predicate<V> targetPred) {
-		int dimension = 2;
-		int nAttributes = 1;
-		int boundaryMarker = 1;
-		int targetMarker = 2;
-		StringBuilder builder = new StringBuilder();
-		builder.append("#nVertices dimension boundaryMarker targetMarker nAttributes\n");
-		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
-		Map<V, Integer> map = new HashMap<>();
-		int id = 1;
-		for(V v : mesh.getVertices()) {
-			int boundary = mesh.isAtBoundary(v) ? 1 : 0;
-			int target = targetPred.test(v) ? targetMarker : 0;
-			map.put(v, id);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR +"%f" + SEPARATOR + "%f" + SEPARATOR + "%f\n", id, boundary, target, v.getX(), v.getY(), vertexFunc.apply(v)));
-			id++;
-		}
-
-		// 1 boundary
-		builder.append("# nBorders\n");
-		builder.append(1+"\n");
-		builder.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
-		for(V v : mesh.getVertices(mesh.getBorder())) {
-			builder.append(map.get(v) + SEPARATOR);
-		}
-		builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-		builder.append("\n");
-
-		builder.append("# nTriangels\n");
-		builder.append(mesh.getNumberOfFaces()+"\n");
-
-		builder.append("# nVertices vertexIds\n");
-		for(F face : mesh.getFaces()) {
-			//builder.append("1 0\n");
-			builder.append(mesh.getPoints(face).size() + SEPARATOR);
-			for(V v : mesh.getVertices(face)) {
-				builder.append(map.get(v) + SEPARATOR);
-			}
-			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-			builder.append("\n");
-		}
-		builder.append("# nHoles\n");
-		List<F> holes = mesh.getHoles();
-		builder.append(holes.size()+"\n");
-
-		//
-		for(F hole : holes) {
-			int size = mesh.getPoints(hole).size();
-			builder.append(size + SEPARATOR);
-			for(V V : mesh.getVertices(hole)) {
-				builder.append(map.get(V) + SEPARATOR);
-			}
-			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-			builder.append("\n");
-		}
-		builder.append("# interior points for each hole\n");
-		id = 1;
-		for(F hole : holes) {
-			VPolygon polygon = mesh.toPolygon(hole);
-			VPoint p = GeometryUtils.getInteriorPoint(polygon);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
-		}
-		return builder.toString();
 	}
 }

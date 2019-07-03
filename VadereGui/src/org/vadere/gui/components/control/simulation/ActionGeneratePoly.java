@@ -6,7 +6,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.PostVisualisation;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -67,7 +67,7 @@ public class ActionGeneratePoly extends AbstractAction {
 
 			List<Obstacle> obstacles = new ArrayList<>(model.getTopography().getObstacles());
 			obstacles.removeAll(model.getTopography().getBoundaryObstacles());
-			String polyString = PolyGenerator.toPSLG(
+			String polyString = PSLGGenerator.toPSLG(
 					new VPolygon(bound),
 					obstacles.stream()
 							.map(obs -> obs.getShape())

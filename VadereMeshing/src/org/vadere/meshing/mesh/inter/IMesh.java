@@ -2169,12 +2169,11 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 * Creates a very simple mesh consisting of two triangles ((-100, 0), (100, 0), (0, 1)) and ((0, -1), (-100, 0), (100, 0))
 	 *
 	 * @param mesh  the mesh used to create the triangle. This mesh should be empty.
-	 * @param <P>   the type of the point
 	 * @param <V>   the type of the vertex
 	 * @param <E>   the type of the edge
 	 * @param <F>   the type of the face
 	 */
-	static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> void createSimpleTriMesh(
+	static <V extends IVertex, E extends IHalfEdge, F extends IFace> void createSimpleTriMesh(
 			@NotNull final IMesh<V, E, F> mesh
 	) {
 		F face1;

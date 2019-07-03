@@ -8,7 +8,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
@@ -2967,7 +2967,7 @@ public class RealWorldPlot {
 			return new Color(grayScale, grayScale, grayScale);
 		};*/
 		log.info(TexGraphGenerator.toTikz(meshGenerator.getMesh(), 1.0f));
-		log.info(PolyGenerator.to3DPoly(meshGenerator.getMesh()));
+		log.info(PSLGGenerator.to3DPoly(meshGenerator.getMesh()));
 		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
 	}
 

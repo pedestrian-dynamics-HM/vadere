@@ -9,7 +9,7 @@ import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
-import org.vadere.meshing.utils.io.poly.PolyGenerator;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
@@ -50,7 +50,7 @@ public class FMMTriangulationExamples {
 				PHalfEdge,
 				PFace> bridge() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/bridge.poly");
-		PSLG pslg = PolyGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
