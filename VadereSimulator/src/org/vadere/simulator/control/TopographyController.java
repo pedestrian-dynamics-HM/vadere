@@ -49,6 +49,7 @@ public class TopographyController extends OfflineTopographyController {
 			 * realPed.setTargets(new LinkedList<>(pedStore.getTargets()));
 			 * }
 			 */
+			realPed.setSource(null); // must be null to indicate this pedestrian is an initial ped.
 			realPed.setTargets(new LinkedList<>(initialValues.getTargets()));
 			realPed.setGroupIds(new LinkedList<>(initialValues.getGroupIds()));
 			realPed.setGroupSizes(new LinkedList<>(initialValues.getGroupSizes()));
@@ -64,6 +65,7 @@ public class TopographyController extends OfflineTopographyController {
 			}
 			topography.addElement(realPed);
 		}
+		topography.initializePedestrianCount();
 	}
 
 	public void update(double simTimeInSec) {

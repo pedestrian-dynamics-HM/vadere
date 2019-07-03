@@ -1,5 +1,21 @@
 package org.vadere.gui.topographycreator.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.control.IMode;
+import org.vadere.gui.components.model.DefaultConfig;
+import org.vadere.gui.components.model.DefaultModel;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Teleporter;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
@@ -9,21 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
 import java.util.function.Predicate;
-
-import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.IMode;
-import org.vadere.gui.components.model.DefaultConfig;
-import org.vadere.gui.components.model.DefaultModel;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 
 
 /**
@@ -303,6 +304,9 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 			case TELEPORTER:
 				topographyBuilder.setTeleporter((org.vadere.state.scenario.Teleporter) shape);
 				break;
+			case MEASUREMENT_AREA:
+				topographyBuilder.addMeasurementArea((org.vadere.state.scenario.MeasurementArea) shape);
+				break;
 			default:
 				throw new IllegalArgumentException("unsupported TopograpyhElementType.");
 		}
@@ -352,6 +356,13 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
+	public VShape resize(final Point start, final Point end) {
+		VPoint startVector = translateVectorCoordinates(start);
+		VPoint endVector = translateVectorCoordinates(end);
+		return getSelectedElement().getShape().resize(startVector, endVector);
+	}
+
+	@Override
 	public VShape translate(final Point vector) {
 		VPoint worldVector = new VPoint(vector.x / getScaleFactor(), -vector.y / getScaleFactor());
 		return translate(worldVector);
@@ -374,6 +385,11 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 	}
 
 	@Override
+	public List<MeasurementArea> getMeasurementAreas(){
+		return topographyBuilder.getMeasurementAreas();
+	}
+
+	@Override
 	public Double getBounds() {
 		return topographyBuilder.getAttributes().getBounds();
 	}
@@ -385,6 +401,15 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		}
 
 		topographyBuilder.removeObstacleIf(predicate);
+		setChanged();
+	}
+
+	@Override
+	public void removeMeasurementAreaIf(final @NotNull Predicate predicate){
+		if (selectedElement instanceof MeasurementArea){
+			selectedElement = null;
+		}
+		topographyBuilder.removeMeasurementAreaIf(predicate);
 		setChanged();
 	}
 

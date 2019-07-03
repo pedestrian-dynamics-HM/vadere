@@ -2,10 +2,13 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,41 +22,25 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 
 	private PedestrianListBuilder b = new PedestrianListBuilder();
 
-	@SuppressWarnings("unchecked")
 	AreaSpeedProcessorTestEnv() {
-		try {
-			testedProcessor = processorFactory.createDataProcessor(AreaSpeedProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId());
+		super(AreaSpeedProcessor.class, TimestepKey.class);
+	}
 
-		int pedPosProcId = nextProcessorId();
-		int pedVelProcId = nextProcessorId();
+	@Override
+	void initializeDependencies() {
 		AttributesAreaSpeedProcessor attr =
 				(AttributesAreaSpeedProcessor) testedProcessor.getAttributes();
+
+		int pedPosProcId = addDependentProcessor(PedestrianPositionProcessorTestEnv::new);
+		int pedVelProcId = addDependentProcessor(PedestrianVelocityProcessorTestEnv::new);
+
 		attr.setPedestrianPositionProcessorId(pedPosProcId);
 		attr.setPedestrianVelocityProcessorId(pedVelProcId);
 
-		PedestrianVelocityProcessorTestEnv pedVelProcEnv = new PedestrianVelocityProcessorTestEnv(pedVelProcId);
-		DataProcessor pedVelProc = pedVelProcEnv.getTestedProcessor();
-		addRequiredProcessors(pedVelProcEnv);
-		Mockito.when(manager.getProcessor(pedVelProcId)).thenReturn(pedVelProc);
-
-		PedestrianPositionProcessorTestEnv pedPosProcEnv = new PedestrianPositionProcessorTestEnv(pedPosProcId);
-		DataProcessor pedPosProc = pedPosProcEnv.getTestedProcessor();
-		addRequiredProcessors(pedPosProcEnv);
-		Mockito.when(manager.getProcessor(pedPosProcId)).thenReturn(pedPosProc);
-
-		try {
-			outputFile = outputFileFactory.createDefaultOutputfileByDataKey(
-					TimestepKey.class,
-					testedProcessor.getId()
-			);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(VadereWriterFactory.getStringWriterFactory());
+		attr.setMeasurementAreaId(99);
+		MeasurementArea measurementArea = new MeasurementArea(
+				new AttributesMeasurementArea(99, new VRectangle(0, 0, 4, 5)));
+		Mockito.when(manager.getMeasurementArea(99, false)).thenReturn(measurementArea);
 	}
 
 	@Override

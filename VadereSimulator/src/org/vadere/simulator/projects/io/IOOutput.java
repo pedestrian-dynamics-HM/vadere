@@ -70,6 +70,21 @@ public abstract class IOOutput {
 		return result;
 	}
 
+	/**
+	 * Check if the trajectory file of the project is valid by only reading the first line of the file.
+	 */
+	private static boolean testTrajectories (final VadereProject project, final File directory) {
+		try {
+			TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
+			reader.checkFile();
+			return true;
+
+		} catch (IOException | VadereClassNotFoundException e) {
+			logger.error("Error in output file " + directory.getName());
+			return false;
+		}
+	}
+
     private static Optional<Map<Step, List<Agent>>> readTrajectories(final VadereProject project, final File directory) {
         try {
             TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
@@ -205,8 +220,7 @@ public abstract class IOOutput {
 			return Optional.empty();
 
 		Optional<Scenario> scenario = readOutputFile(project, directory);
-		Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, directory);
-		if (scenario.isPresent() && trajectories.isPresent()){
+		if (scenario.isPresent() && testTrajectories(project, directory)){
 			return Optional.of(new SimulationOutput(directory.toPath(), scenario.get()));
 		} else {
 			//if directory is not a valid OutputDirectory
@@ -225,8 +239,7 @@ public abstract class IOOutput {
 		ConcurrentMap<String, SimulationOutput> simulationOutputs = new ConcurrentHashMap<>();
 		simOutDir.forEach( f -> {
 			Optional<Scenario> scenario = readOutputFile(project, f);
-			Optional<Map<Step, List<Agent>>>  trajectories =  readTrajectories(project, f);
-			if (scenario.isPresent() && trajectories.isPresent()){
+			if (scenario.isPresent() && testTrajectories(project, f)){
 				SimulationOutput out = new SimulationOutput(f.toPath(), scenario.get());
 				simulationOutputs.put(f.getName(), out);
 			} else {
@@ -248,7 +261,7 @@ public abstract class IOOutput {
 	}
 
 	private static boolean isValidOutputDirectory(final VadereProject project, final File directory) {
-		return readOutputFile(project, directory).isPresent() && readTrajectories(project, directory).isPresent();
+		return readOutputFile(project, directory).isPresent() && testTrajectories(project, directory);
 	}
 
 	private static boolean isMatchingOutputDirectory(final VadereProject project, final File directory,

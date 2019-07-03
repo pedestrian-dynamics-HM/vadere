@@ -1,6 +1,7 @@
 package org.vadere.gui.postvisualization;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.*;
 
 import javax.imageio.ImageIO;
@@ -8,7 +9,9 @@ import javax.imageio.ImageIO;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
 import org.vadere.gui.postvisualization.utils.SVGGenerator;
+import org.vadere.gui.postvisualization.utils.TikzGenerator;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.util.io.IOUtils;
@@ -28,6 +31,28 @@ import java.util.Optional;
  * 
  */
 public class PostVisualizationConsole {
+
+	private static String out = "/home/lphex/hm.d/presentations/groupmodel/bilder/";
+	private static String in =  "/home/lphex/hm.d/groupModelCalibration_run2/groupModelCalibration_run2/vadere_output/";
+
+
+//	public static void main(final String... args){
+//		for (int i = 0; i < 28; i++) {
+//			try{
+//				String nameIn = String.format("%010d_output", i);
+//				String nameOut = String.format("%010d", i);
+//				String[] arg = {"-out", out+ nameOut + "_300.png", "-in", in+nameIn, "-s", "300", "-r", "1", "--show-groups"};
+////				System.out.println(Arrays.toString(arg));
+//				main2(arg);
+////				String[] arg2 = {"-out", out+ nameOut+ "_740.png", "-in", in+nameIn, "-s", "740", "-r", "1"};
+////				System.out.println(Arrays.toString(arg2));
+////				main2(arg2);
+//
+//			}catch (Exception e){
+//
+//			}
+//		}
+//	}
 
 	public static void main(final String... args) {
 		StdOutErrLog.addStdOutErrToLog();
@@ -51,6 +76,8 @@ public class PostVisualizationConsole {
 				.help("Width in wolrd coordinates of the viewport of the snapshot.");
 		groupViewport.addArgument("-height", "--height").type(Double.class).setDefault(-1.0).required(false)
 				.help("Height in wolrd coordinates of the viewport of the snapshot.");
+		groupViewport.addArgument("--show-groups").type(Boolean.class).action(Arguments.storeTrue()).required(false)
+				.help("Show groups with distinct shapes and colors.");
 
 		MutuallyExclusiveGroup group = parser.addMutuallyExclusiveGroup("group").required(true);
 		group.addArgument("-s", "--step").type(Integer.class).setDefault(-1).help("Step number of the snapshot.");
@@ -74,6 +101,7 @@ public class PostVisualizationConsole {
 		Double width = ns.getDouble("width");
 		Double height = ns.getDouble("height");
 		Double resolution = ns.getDouble("resolution");
+		Boolean showGroups = ns.getBoolean("show_groups");
 
 		PostvisualizationModel model = new PostvisualizationModel();
 		PostvisualizationRenderer renderer = new PostvisualizationRenderer(model);
@@ -90,8 +118,9 @@ public class PostVisualizationConsole {
 			Optional<File> scenarioFile = IOUtils.getFirstFile(path.toFile(), IOUtils.SCENARIO_FILE_EXTENSION);
 
 			if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
-				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath());
-				model.init(reader.readFile(), IOOutput.readScenario(scenarioFile.get().toPath()), trajectoryFile.get().getParent());
+				Scenario scenario = IOOutput.readScenario(scenarioFile.get().toPath());
+				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath(), scenario);
+				model.init(reader.readFile(), scenario, trajectoryFile.get().getParent());
 			} else {
 				System.err.println("could not find trajectory or scenario file in: " + outputDirectoryPath);
 			}
@@ -114,9 +143,12 @@ public class PostVisualizationConsole {
 		if (step != -1) {
 			model.setStep(step);
 		} else {
-			model.setTime(time);
+			model.setVisTime(time);
 		}
 
+		if (showGroups){
+			model.config.setShowGroups(!model.config.isShowGroups());
+		}
 
 		/*
 		 * generate a picture (svg or png) based on the model state.
@@ -124,7 +156,11 @@ public class PostVisualizationConsole {
 		if (snapshotFile.endsWith("svg")) {
 			SVGGenerator svgGenerator = new SVGGenerator(renderer, renderer.getModel());
 			svgGenerator.generateSVG(new File(snapshotFile));
-		} else {
+		} else if (snapshotFile.endsWith("tex")){
+			TikzGenerator tikzGenerator = new TikzGenerator(renderer, renderer.getModel());
+			tikzGenerator.generateTikz(new File(snapshotFile));
+		}
+		else {
 			ImageGenerator pngGenerator = new ImageGenerator(renderer, renderer.getModel());
 			BufferedImage bi = pngGenerator.generateImage();
 

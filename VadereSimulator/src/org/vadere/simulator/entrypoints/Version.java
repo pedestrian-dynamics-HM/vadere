@@ -1,37 +1,58 @@
 package org.vadere.simulator.entrypoints;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.projects.migration.incidents.VersionBumpIncident;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Versions in strict order from oldest to newest.
  */
 public enum Version {
 
+
+
 	UNDEFINED("undefined"),
 	NOT_A_RELEASE("not a release"),
-	V0_1("0.1"),
-	V0_2("0.2"),
-	V0_3("0.3"),
-	V0_4("0.4"),
-	V0_5("0.5"),
-	V0_6("0.6"),
-	V0_7("0.7")
+	V0_1(0, 1),
+	V0_2(0, 2),
+	V0_3(0, 3),
+	V0_4(0, 4),
+	V0_5(0, 5),
+	V0_6(0, 6),
+	V0_7(0, 7),
+	V0_8(0, 8),
+	V0_9(0,9),
+	V0_10(0,10),
+	V1_0(1,0)
 	;
 
+
+
 	private String label;
+	private int major;
+	private int minor;
+
 
 	Version(String label) {
+		this.major = -1;
+		this.minor = -1;
 		this.label = label;
+	}
+
+	Version(int major, int minor){
+		this.major = major;
+		this.minor = minor;
+		this.label = major + "." + minor;
 	}
 
 	public String label() {
 		return label;
 	}
+
+	public int major() { return major;}
+
+	public int minor() { return  minor;}
 
 	public String label(char replaceSpaceWith) {
 		return label.replace(' ', replaceSpaceWith);
@@ -60,10 +81,24 @@ public enum Version {
 		return Arrays.stream(values()).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
 	}
 
-	public static String[] stringValues(Version startFrom) {
+	public static String[] stringValues(Version startFrom, boolean descending) {
 		int min = startFrom.ordinal();
-		return Arrays.stream(values()).filter(v -> v.ordinal() >= min).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
-	}
+		String[] values = Arrays.stream(values()).filter(v -> v.ordinal() >= min).map(v -> v.label().replace(' ', '_')).toArray(String[]::new);
+		if (descending){
+ 		    int length = values.length;
+		    for (int i = 0; i < length/2; i++){
+		        int j = length -1 - i;
+		        String tmp = values[i];
+		        values[i] = values[j];
+		        values[j] = tmp;
+
+
+            }
+        }
+		return values;
+    }
+
+
 
 	public Version nextVersion() {
 		int nextId = versionId(this) == (values().length - 1) ? versionId(this) : versionId(this) + 1;
@@ -93,8 +128,12 @@ public enum Version {
 
 	}
 
-	public boolean equalOrSamller(Version test) {
-		return versionId(this) <= versionId(test);
+	public boolean equalOrSmaller(Version test) {
+		return this.ordinal() <= test.ordinal();
+	}
+
+	public boolean equalOrBigger(Version test) {
+		return this.ordinal() >= test.ordinal();
 	}
 
 	public static Version latest() {

@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPolyConnectivity;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -34,49 +35,9 @@ public class WeilerAtherton {
 
 	private List<VPolygon> polygons;
 	private final static double  EPSILON = 1.0E-12;
-
-	/**
-	 * A WeilerPoint is used to connect the intersection points of two polygons each represented by
-	 * a face such that the path consistent of a subset of both half-edges of the two faces can be build.
-	 *
-	 */
-	public static class WeilerPoint extends VPoint {
-		private boolean isIntersectionPoint;
-		private boolean isInside;
-		@Nullable private PVertex twinPoint;
-
-		public WeilerPoint(@NotNull final VPoint point, final boolean isIntersectionPoint, final boolean inside) {
-			super(point.x, point.y);
-			this.isIntersectionPoint = isIntersectionPoint;
-			this.isInside = inside;
-			this.twinPoint = null;
-		}
-
-		public void setIntersectionPoint(final boolean intersectionPoint) {
-			isIntersectionPoint = intersectionPoint;
-		}
-
-		public void setInside(final boolean inside) {
-			isInside = inside;
-		}
-
-		public void setTwinPoint(@NotNull final PVertex twinPoint) {
-			this.twinPoint = twinPoint;
-		}
-
-		public boolean isIntersectionPoint() {
-			return isIntersectionPoint;
-		}
-
-		@Nullable
-		public PVertex getTwinPoint() {
-			return twinPoint;
-		}
-
-		public boolean isInside() {
-			return isInside;
-		}
-	}
+	private static final String propNameIntersection = "intersection";
+	private static final String propNameInside = "inside";
+	private static final String propNameTwin = "twin";
 
 	/**
 	 * The default constructor.
@@ -111,15 +72,17 @@ public class WeilerAtherton {
 		clipPointSet.addAll(clipping.getPath());
 		subPointSet.addAll(subject.getPath());
 
-		PFace subjectFace = subjectMesh.toFace(subject.getPath()
-				.stream()
-				.map(p -> new WeilerPoint(p, false, clipPointSet.contains(p) || clipping.contains(p)))
-				.collect(Collectors.toList()));
+		PFace subjectFace = subjectMesh.toFace(subject.getPath().stream().collect(Collectors.toList()));
+		subjectMesh.streamVertices().forEach(v -> {
+			subjectMesh.setData(v, propNameIntersection, false);
+			subjectMesh.setData(v, propNameInside, clipPointSet.contains(v) || clipping.contains(v));
+		});
 
-		PFace clippingFace = clippingMesh.toFace(clipping.getPath()
-				.stream()
-				.map(p -> new WeilerPoint(p, false, subPointSet.contains(p) || subject.contains(p)))
-				.collect(Collectors.toList()));
+		PFace clippingFace = clippingMesh.toFace(clipping.getPath().stream().collect(Collectors.toList()));
+		clippingMesh.streamVertices().forEach(v -> {
+			clippingMesh.setData(v, propNameIntersection, false);
+			clippingMesh.setData(v, propNameInside, subPointSet.contains(v) || subject.contains(v));
+		});
 
 		List<VPoint> intersectionPoints = new ArrayList<>();
 		PVertex ip = null;
@@ -134,6 +97,7 @@ public class WeilerAtherton {
 			List<PHalfEdge> subjectEdges = subjectMesh.getEdges(subjectFace);
 			intersectionFound = false;
 
+			// TODO: this can be simplified!
 			for(PHalfEdge clippingEdge : clippingEdges) {
 				for(PHalfEdge subjectEdge : subjectEdges) {
 					Optional<VPoint> optIntersectionPoint = equalIntersectionPoints(subjectEdge, subjectMesh, clippingEdge, clippingMesh);
@@ -165,16 +129,16 @@ public class WeilerAtherton {
 							PHalfEdge prev = clippingMesh.getPrev(subjectEdge);
 							PHalfEdge innerPrev = subjectMesh.getPrev(clippingEdge);
 
-							PVertex ip1 = IPolyConnectivity.splitEdge(subjectEdge, wp1, subjectMesh);
-							subjectMesh.setData(ip1, "intersection", true);
-							subjectMesh.setData(ip1, "inside", true);
+							PVertex ip1 = splitEdge(subjectEdge, wp1, subjectMesh);
+							subjectMesh.setData(ip1, propNameIntersection, true);
+							subjectMesh.setData(ip1, propNameInside, true);
 
-							PVertex ip2 = IPolyConnectivity.splitEdge(clippingEdge, wp2, clippingMesh);
-							clippingMesh.setData(ip2, "intersection", true);
-							clippingMesh.setData(ip2, "inside", true);
+							PVertex ip2 = splitEdge(clippingEdge, wp2, clippingMesh);
+							clippingMesh.setData(ip2, propNameIntersection, true);
+							clippingMesh.setData(ip2, propNameInside, true);
 
-							clippingMesh.setData(ip2, "twin", ip1);
-							subjectMesh.setData(ip1, "twin", ip2);
+							clippingMesh.setData(ip2, propNameTwin, ip1);
+							subjectMesh.setData(ip1, propNameTwin, ip2);
 
 							intersectionPoints.add(intersectionPoint);
 							intersectionFound = true;
@@ -199,8 +163,22 @@ public class WeilerAtherton {
 		return Pair.create(subjectFace, clippingFace);
 	}
 
+	private PVertex splitEdge(@NotNull final PHalfEdge edge, @NotNull final IPoint p, @NotNull final PMesh mesh) {
+		PVertex v1 = mesh.getVertex(edge);
+		PVertex v2 = mesh.getVertex(mesh.getPrev(edge));
+		if(mesh.toPoint(v1).equals(p)) {
+			return v1;
+		}
+
+		if(mesh.toPoint(v2).equals(p)) {
+			return v2;
+		}
+
+		return IPolyConnectivity.splitEdge(edge, p, mesh);
+	}
+
 	/**
-	 * Tests if the two edges from different faces have are geometrical equal points. If this is the case
+	 * Tests if the two edges from different faces have geometrical equal points. If this is the case
 	 * the points will be transformed into intersection points and they will be connected i.e. twins.
 	 *
 	 * @param subjectEdge   edge from the first face containing the first point
@@ -227,24 +205,32 @@ public class WeilerAtherton {
 		VPoint q1 = clippingMesh.toPoint(u1);
 		VPoint q2 = clippingMesh.toPoint(u2);
 
-		boolean intersection1 = subjectMesh.getData(v1, "intersection", Boolean.class).get();
-		boolean intersection2 = subjectMesh.getData(v2, "intersection", Boolean.class).get();
+		boolean intersection1 = subjectMesh.getData(v1, propNameIntersection, Boolean.class).get();
+		boolean intersection2 = subjectMesh.getData(v2, propNameIntersection, Boolean.class).get();
 
-		if(p1.equals(q1) && !intersection1) {
-			subjectMesh.setData(v1, "intersection", true);
-			clippingMesh.setData(u1, "intersection", true);
+		if(p1.equals(q1)) {
+			subjectMesh.setData(v1, propNameIntersection, true);
+			clippingMesh.setData(u1, propNameIntersection, true);
+			subjectMesh.setData(v1, propNameTwin, u1);
+			clippingMesh.setData(u1, propNameTwin, v1);
 			return Optional.of(p1);
-		} else if(p1.equals(q2) && !intersection1) {
-			subjectMesh.setData(v1, "intersection", true);
-			clippingMesh.setData(u2, "intersection", true);
+		} else if(p1.equals(q2)) {
+			subjectMesh.setData(v1, propNameIntersection, true);
+			clippingMesh.setData(u2, propNameIntersection, true);
+			subjectMesh.setData(v1, propNameTwin, u2);
+			clippingMesh.setData(u2, propNameTwin, v1);
 			return Optional.of(p1);
-		} else if(p2.equals(q1) && !intersection2) {
-			subjectMesh.setData(v2, "intersection", true);
-			clippingMesh.setData(u1, "intersection", true);
+		} else if(p2.equals(q1)) {
+			subjectMesh.setData(v2, propNameIntersection, true);
+			clippingMesh.setData(u1, propNameIntersection, true);
+			subjectMesh.setData(v2, propNameTwin, u1);
+			clippingMesh.setData(u1, propNameTwin, v2);
 			return Optional.of(p2);
-		} else if(p2.equals(q2) && !intersection2) {
-			subjectMesh.setData(v2, "intersection", true);
-			clippingMesh.setData(u2, "intersection", true);
+		} else if(p2.equals(q2)) {
+			subjectMesh.setData(v2, propNameIntersection, true);
+			clippingMesh.setData(u2, propNameIntersection, true);
+			subjectMesh.setData(v2, propNameTwin, u2);
+			clippingMesh.setData(u2, propNameTwin, v2);
 			return Optional.of(p2);
 		}
 		else {
@@ -366,7 +352,7 @@ public class WeilerAtherton {
 
 		Set<PHalfEdge> subjectExitingEdges = subjectMesh
 				.streamEdges(subjectFace)
-				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), "intersection", Boolean.class).get())
+				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), propNameIntersection, Boolean.class).get())
 				.filter(edge ->
 						contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge))) &&
 						!contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))))
@@ -374,7 +360,7 @@ public class WeilerAtherton {
 
 		Set<PHalfEdge> subjectEnteringEdges = subjectMesh
 				.streamEdges(subjectFace)
-				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), "intersection", Boolean.class).get())
+				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), propNameIntersection, Boolean.class).get())
 				.filter(edge ->
 						contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))) &&
 						!contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge)))
@@ -423,7 +409,7 @@ public class WeilerAtherton {
 
 		while (!intersectionSet.isEmpty()) {
 			PHalfEdge subjectEdge = intersectionSet.iterator().next();
-			PHalfEdge subjectTwin = clippingMesh.getEdge(subjectMesh.getData(subjectMesh.getVertex(subjectEdge), "twin", PVertex.class).get());
+			PHalfEdge subjectTwin = clippingMesh.getEdge(subjectMesh.getData(subjectMesh.getVertex(subjectEdge), propNameTwin, PVertex.class).get());
 			PHalfEdge next = subjectEdge;
 			intersectionSet.remove(subjectEdge);
 
@@ -431,11 +417,11 @@ public class WeilerAtherton {
 				next = mesh.getNext(next);
 				var v = mesh.getVertex(next);
 				// adaptPath
-				if(mesh.getData(v, "intersection", Boolean.class).get()) {
+				if(mesh.getData(v, propNameIntersection, Boolean.class).get()) {
 					/*
 					 * Special case!
 					 */
-					var twinPoint = mesh.getData(v, "twin", PVertex.class).get();
+					var twinPoint = mesh.getData(v, propNameTwin, PVertex.class).get();
 					PMesh twinMesh = mesh.equals(subjectMesh) ? clippingMesh : subjectMesh;
 					PHalfEdge twinPointEdge = twinMesh.getEdge(twinPoint);
 					VPoint prevTwinPoint = new VPoint(twinMesh.getPoint(twinMesh.getPrev(twinPointEdge)));
@@ -446,7 +432,7 @@ public class WeilerAtherton {
 
 					if(!prevTwinPoint.equals(prevPoint)) {
 						mesh = mesh.equals(subjectMesh) ? clippingMesh : subjectMesh;
-						next = mesh.getEdge(mesh.getData(mesh.getVertex(next), "twin", PVertex.class).get());
+						next = mesh.getEdge(mesh.getData(mesh.getVertex(next), propNameTwin, PVertex.class).get());
 					}
 
 				}

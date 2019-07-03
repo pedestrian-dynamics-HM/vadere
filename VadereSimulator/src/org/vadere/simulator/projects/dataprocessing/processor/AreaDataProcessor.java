@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesAreaProcessor;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.state.scenario.MeasurementArea;
 
 /**
  * @author Mario Teixeira Parente
@@ -11,7 +11,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
  */
 
 public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepKey, V> {
-    private VRectangle measurementArea;
+    private MeasurementArea measurementArea;
 
     protected AreaDataProcessor(final String... headers) {
         super(headers);
@@ -21,10 +21,10 @@ public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepKey, V>
     public void init(final ProcessorManager manager) {
         super.init(manager);
         AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
-        this.measurementArea = att.getMeasurementArea();
+        this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
     }
 
-    public VRectangle getMeasurementArea() {
+    public MeasurementArea getMeasurementArea() {
         return this.measurementArea;
     }
 }

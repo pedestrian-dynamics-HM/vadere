@@ -31,13 +31,13 @@ public class TestWeilerAtherton {
 	public void testRectangleIntersectionSpecialCase() {
 		VRectangle rec1 = new VRectangle(0, 0, 5, 5);
 		VRectangle rec2 = new VRectangle(2, 0, 5, 5);
-		VRectangle expectedResult = new VRectangle(2,0,3,5);
+		VPolygon expectedResult = new VPolygon(new VRectangle(2,0,3,5));
 		List<VPolygon> originalList = Arrays.asList(new VPolygon(rec1), new VPolygon(rec2));
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 
 		Optional<VPolygon> optPolygon = weilerAtherton.cap();
 		assertTrue(optPolygon.isPresent());
-		assertTrue(GeometryUtils.equalsPolygons(new VPolygon(expectedResult), optPolygon.get()));
+		assertTrue(GeometryUtils.equalsPolygons(expectedResult, optPolygon.get()));
 	}
 
 	@Test

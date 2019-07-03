@@ -159,7 +159,7 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 	static IIncrementalTriangulation<PVertex, PHalfEdge, PFace> createPTriangulation(
 			final IPointLocator.Type type,
 			final Collection<? extends IPoint> points) {
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = createPTriangulation(type, GeometryUtils.bound(points));
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = createPTriangulation(type, GeometryUtils.boundRelative(points));
 		triangulation.insert(points);
 		return triangulation;
 	}
@@ -167,7 +167,7 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
     static IIncrementalTriangulation<AVertex, AHalfEdge, AFace> createATriangulation(
 		    final IPointLocator.Type type,
 		    final Collection<? extends IPoint> points) {
-	    IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = createATriangulation(type, GeometryUtils.bound(points));
+	    IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = createATriangulation(type, GeometryUtils.boundRelative(points));
         triangulation.insert(points);
         return triangulation;
     }

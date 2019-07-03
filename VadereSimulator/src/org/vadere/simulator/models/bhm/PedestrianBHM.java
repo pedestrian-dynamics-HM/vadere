@@ -1,5 +1,14 @@
 package org.vadere.simulator.models.bhm;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.exceptions.UnsupportedEventException;
@@ -12,24 +21,19 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 public class PedestrianBHM extends Pedestrian {
 
 	private static Logger logger = Logger.getLogger(PedestrianBHM.class);
 
-	private final Random random;
+	private final transient Random random;
 	private final AttributesBHM attributesBHM;
-	private final Topography topography;
+	private final transient Topography topography;
 
 	private final double stepLength;
 
@@ -39,19 +43,26 @@ public class PedestrianBHM extends Pedestrian {
 	private VPoint lastPosition;
 	private VPoint targetDirection;
 
-	private final Navigation navigation;
-	private final List<DirectionAddend> directionAddends;
+	private final transient Navigation navigation;
+	private final transient List<DirectionAddend> directionAddends;
 
 	protected int action;
 
 	private boolean evadesTangentially;
 	private boolean evadesSideways;
 	private int remainCounter;
+	private transient @Nullable IPotentialFieldTarget potentialFieldTarget;
+	private transient TargetDirection targetDirectionStrategy;
 
 	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
-			AttributesBHM attributesBHM, Random random) {
-		super(attributesPedestrian, random);
+	                     AttributesBHM attributesBHM, Random random) {
+		this(topography, attributesPedestrian, attributesBHM, random, null);
+	}
 
+	public PedestrianBHM(Topography topography, AttributesAgent attributesPedestrian,
+			AttributesBHM attributesBHM, Random random, @Nullable IPotentialFieldTarget potentialFieldTarget) {
+		super(attributesPedestrian, random);
+		this.potentialFieldTarget = potentialFieldTarget;
 		this.random = random;
 		this.attributesBHM = attributesBHM;
 		this.topography = topography;
@@ -93,8 +104,21 @@ public class PedestrianBHM extends Pedestrian {
 		}
 
 		setNextTargetListIndex(0);
-
 		setEvasionStrategy();
+		setTargetDirectionStrategy();
+	}
+
+	private void setTargetDirectionStrategy() {
+		if(isPotentialFieldInUse()) {
+			TargetDirection base = new TargetDirectionGeoGradient(this, potentialFieldTarget);
+			targetDirectionStrategy = new TargetDirectionClose(this, potentialFieldTarget, base);
+		} else {
+			targetDirectionStrategy = new TargetDirectionEuclidean(this);
+		}
+	}
+
+	private boolean isPotentialFieldInUse() {
+		return potentialFieldTarget != null;
 	}
 
 	private void setEvasionStrategy() {
@@ -164,7 +188,7 @@ public class PedestrianBHM extends Pedestrian {
 		} else {
 			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
 		}
-		
+
 		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
 	}
 
@@ -222,7 +246,7 @@ public class PedestrianBHM extends Pedestrian {
 	// target direction methods...
 
 	VPoint computeTargetStep() {
-		return UtilsBHM.getTargetStep(this, this.getPosition(), this.getTargetDirection());
+		return UtilsBHM.getTargetStep(this, getPosition(), getTargetDirection());
 	}
 
 	/**
@@ -240,16 +264,20 @@ public class PedestrianBHM extends Pedestrian {
 		}
 
 		if (hasNextTarget()) {
-			VShape targetShape = topography.getTarget(getNextTargetId()).getShape();
-			if (!targetShape.contains(getPosition())) {
-				VPoint targetPoint = targetShape.closestPoint(getPosition());
-				targetDirection = targetPoint.subtract(getPosition()).norm();
+			Target target = topography.getTarget(getNextTargetId());
+			if (!target.getShape().contains(getPosition())) {
+
+				targetDirection = targetDirectionStrategy.getTargetDirection(target);
 
 				for (DirectionAddend da : directionAddends) {
-					targetDirection = targetDirection.add(da.getDirectionAddend());
+					targetDirection = targetDirection.add(da.getDirectionAddend(targetDirection));
 				}
 
-				if (!targetDirection.equals(VPoint.ZERO)) {
+				//TODO: if this happens it might cause problems dependent on the heuristics choose.
+				if(targetDirection.distanceToOrigin() < GeometryUtils.DOUBLE_EPS) {
+					targetDirection = VPoint.ZERO;
+				}
+				else {
 					targetDirection = targetDirection.norm();
 				}
 			}
@@ -326,8 +354,11 @@ public class PedestrianBHM extends Pedestrian {
 		double minDistance = Double.MAX_VALUE;
 
 		VLine stepLine = new VLine(getPosition(), position);
+		double len = stepLine.length();
+		VPoint midPoint = stepLine.midPoint();
 
-		for (Pedestrian other : topography.getElements(Pedestrian.class)) {
+		for (Pedestrian other : topography.getSpatialMap(Pedestrian.class)
+				.getObjects(midPoint, len *0.5 + 2 * getRadius() + attributesBHM.getSpaceToKeep())) {
 			if (other.getId() != getId()) {
 
 				double distance = stepLine.distance(other.getPosition()) -
@@ -363,7 +394,7 @@ public class PedestrianBHM extends Pedestrian {
 	 * This does not check collisions on the path, just collisions with position!
 	 */
 	public boolean collidesWithObstacle(VPoint position) {
-		if (detectObstacleProximity(position, this.getRadius()).size() == 0) {
+		if (detectObstacleProximity(position, getRadius()).isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -373,19 +404,36 @@ public class PedestrianBHM extends Pedestrian {
 	/**
 	 * This does not check collisions on the path, just collisions with position!
 	 */
-	List<Obstacle> detectObstacleProximity(VPoint position, double proximity) {
+	List<Obstacle> detectObstacleProximity(@NotNull VPoint position, double proximity) {
 
 		Collection<Obstacle> obstacles = topography.getObstacles();
 		List<Obstacle> result = new LinkedList<>();
 
 		for (Obstacle obstacle : obstacles) {
-			if (obstacle.getShape().distance(position) < proximity) {
+ 			if (obstacle.getShape().distance(position) < proximity) {
 				result.add(obstacle);
 			}
 		}
 
 		return result;
 	}
+
+	Optional<Obstacle> detectClosestObstacleProximity(@NotNull final VPoint position, double proximity) {
+
+		Collection<Obstacle> obstacles = topography.getObstacles();
+		Obstacle obs = null;
+		double minDistance = Double.MAX_VALUE;
+
+		for (Obstacle obstacle : obstacles) {
+			double distance = obstacle.getShape().distance(position);
+			if (distance < proximity && distance < minDistance) {
+				obs = obstacle;
+				minDistance = distance;
+			}
+		}
+		return Optional.ofNullable(obs);
+	}
+
 
 
 	// Java nuisance...
@@ -435,4 +483,65 @@ public class PedestrianBHM extends Pedestrian {
 			return 1;
 		}
 	}
+
+	/*
+	Benedikt Zoennchen: These methods are my attempt to use the (negative) gradient of the traveling time for computing the target direction which
+	does not work reliable at the moment. The (negative) gradient might point inside an obstacle!
+
+	private VPoint computeTargetDirectionByStepGradient() {
+		double distance = topography.getTarget(getNextTargetId()).getShape().distance(getPosition());
+		if(distance > 0 && distance < getStepLength()) {
+			return topography.getTarget(getNextTargetId()).getShape().closestPoint(getPosition()).setMagnitude(getStepLength());
+		}
+
+		VPoint bestArg = getPosition();
+		double bestVal = potentialFieldTarget.getPotential(bestArg, this);
+
+		double h = 0.01;
+		VPoint nextPosition = getPosition();
+		double stepLenSq = getStepLength() * getStepLength();
+
+		while (Math.abs(nextPosition.distanceSq(getPosition()) - stepLenSq) > h) {
+			VPoint gradient = potentialFieldTarget.getTargetPotentialGradient(nextPosition, this).multiply(-1.0);
+			nextPosition = nextPosition.add(gradient.scalarMultiply(h));
+			double val = potentialFieldTarget.getPotential(nextPosition, this);
+			if(val < bestVal) {
+				bestVal = val;
+			} else {
+				break;
+			}
+
+		}
+
+		return nextPosition.subtract(getPosition()).norm();
+	}
+
+	private VPoint computeTargetDirectionByLeap() {
+		double distance = topography.getTarget(getNextTargetId()).getShape().distance(getPosition());
+		if(distance > 0 && distance < getStepLength()) {
+			return topography.getTarget(getNextTargetId()).getShape().closestPoint(getPosition()).setMagnitude(getStepLength());
+		} else {
+			VPoint gradient1 = computeAdaptedGradient(computeTargetDirectionByGradient());
+			VPoint gradient2 = computeAdaptedGradient(potentialFieldTarget.getTargetPotentialGradient(getPosition().add(gradient1.setMagnitude(getStepLength())), this).multiply(-1.0));
+			return gradient1.add(gradient2).norm();
+		}
+	}
+
+	private VPoint computeAdaptedGradient(@NotNull final VPoint gradient) {
+		VPoint newGradient = gradient;
+
+		// agent may walked inside an obstacle
+		if(gradient.distanceSq(new VPoint(0,0)) < GeometryUtils.DOUBLE_EPS) {
+			Optional<Obstacle> obstacle = detectClosestObstacleProximity(getPosition(), getRadius());
+			if(obstacle.isPresent()) {
+				VPoint closestPoint = obstacle.get().getShape().closestPoint(getPosition());
+
+				VPoint direction = getPosition().subtract(closestPoint);
+				newGradient = direction.setMagnitude(direction.distanceToOrigin() + getRadius());
+			}
+		}
+
+		return newGradient;
+	}
+	*/
 }

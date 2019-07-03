@@ -1,20 +1,61 @@
 package org.vadere.simulator.models.groups;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.state.scenario.DynamicElementAddListener;
+import org.vadere.state.scenario.DynamicElementRemoveListener;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 
-import java.util.List;
+import java.beans.PropertyEditor;
+import java.util.Map;
 
-public interface GroupModel extends Model {
-	public Group getGroup(ScenarioElement ped);
 
-	public void registerMember(ScenarioElement ped, Group currentGroup);
+/**
+ * The {@link GroupModel} manges the behaviour from Groups. The generation of groups is manged
+ * internally for each source generating groups. Each source must register a groupSizeDistribution
+ * which will be used to generate the groups.
+ *
+ * At the time a pedestrian is placed in the topography the {@link GroupModel} is triggered over the
+ * {@link DynamicElementAddListener} and will assign the pedestrian to a group based on the source.
+ *
+ * @param <T> Group Type
+ */
+public interface GroupModel<T extends Group>
+		extends Model, DynamicElementAddListener<Pedestrian>, DynamicElementRemoveListener<Pedestrian> {
 
-	public CentroidGroup removeMember(ScenarioElement ped);
+	/**
+	 * @param pedestrian Pedestrian object
+	 * @return The group the pedestrian object is a part of.
+	 */
+	T getGroup(Pedestrian pedestrian);
 
-	public Group getNewGroup(int size);
+	/**
+	 * @return Map of Pedestrians and their group.
+	 */
+//	Map<Pedestrian, T> getPedestrianGroupMap();
 
-	public GroupFactory getGroupFactory(int sourceId);
+	Map<Integer, T> getGroupsById();
 
-	public void initializeGroupFactory(int sourceId, List<Double> groupSizeDistribution);
+
+	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
+
+	IPotentialFieldTarget getPotentialFieldTarget();
+
+	/**
+	 * Register groupSizeDistribution for a source.
+	 *
+	 * @param sourceId Source Id
+	 * @param gsD      Distribution for group size
+	 */
+	void registerGroupSizeDeterminator(int sourceId, GroupSizeDeterminator gsD);
+
+
+	/**
+	 * Generate groups for source based on initializedSizeDistribution.
+	 *
+	 * @param sourceId Source Id
+	 * @return Size of next group for given source
+	 */
+	int nextGroupForSource(int sourceId);
 }

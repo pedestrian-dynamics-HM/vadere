@@ -12,6 +12,10 @@ import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.voronoi.Face;
+import org.vadere.util.voronoi.HalfEdge;
+import org.vadere.util.voronoi.RectangleLimits;
+import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -127,8 +131,13 @@ public class TikzGenerator {
 		Color stairColor = model.getConfig().getStairColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
 
+		Color measurementAreaColor = model.getConfig().getMeasurementAreaColor();
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "MeasurementAreaColor", measurementAreaColor.getRed(), measurementAreaColor.getGreen(), measurementAreaColor.getBlue());
+
 		Color agentColor = model.getConfig().getPedestrianDefaultColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
+
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentIdColor", 255, 127, 0); // This orange color is hard-coded in "DefaultRenderer".
 
 		colorDefinitions += "\n";
 
@@ -142,16 +151,18 @@ public class TikzGenerator {
 		String drawSettings = "% Draw Settings\n";
 
 		double agentRadius = model.getConfig().getPedestrianTorso() / 2.0;
+		double opacityBetweenZeroAndOne = model.getConfig().getMeasurementAreaAlpha() / 255.0;
 
 		drawSettings += String.format(Locale.US,"\\newcommand{\\AgentRadius}{%f}\n", agentRadius);
 		drawSettings += String.format(Locale.US,"\\newcommand{\\LineWidth}{%d}\n", 1);
+		drawSettings += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
 
 		drawSettings += "\n";
 
 		return drawSettings;
 	}
 
-		private String convertScenarioElementsToTikz() {
+	private String convertScenarioElementsToTikz() {
 		String generatedCode = "";
 
 		DefaultSimulationConfig config = model.getConfig();
@@ -221,6 +232,22 @@ public class TikzGenerator {
 			generatedCode += "% Stairs (not enabled in config)\n";
 		}
 
+		if (config.isShowMeasurementArea()) {
+			generatedCode += "% Measurement Areas\n";
+			for (MeasurementArea measurementArea : topography.getMeasurementAreas()) {
+				generatedCode += String.format(Locale.US, "\\fill[MeasurementAreaColor,opacity=\\MeasurementAreaOpacity] %s;\n", generatePathForScenarioElement(measurementArea));
+			}
+		} else {
+			generatedCode += "% Measurement Areas (not enabled in config)\n";
+		}
+
+		if (model.isVoronoiDiagramVisible() && model.isVoronoiDiagramAvailable()) {
+			generatedCode += "% Voronoi Diagram\n";
+			generatedCode += drawVoronoiDiagram(model.getVoronoiDiagram());
+		} else {
+			generatedCode += "% Voronoi Diagram (not enabled in config)\n";
+		}
+
         if (config.isShowTrajectories()) {
             generatedCode += "% Trajectories\n";
 
@@ -237,8 +264,19 @@ public class TikzGenerator {
             generatedCode += "% Agents\n";
             generatedCode += drawAgents(config);
         } else {
-            generatedCode = "% Agents (not enabled in config)\n";
+            generatedCode += "% Agents (not enabled in config)\n";
         }
+
+        if (config.isShowPedestrianIds()) {
+			generatedCode += "% Agent Ids\n";
+
+			for (Agent agent : model.getAgents()) {
+				generatedCode += String.format(Locale.US, "\\node[text=AgentIdColor] (id%d) at (%f,%f) {\\textbf{%d}};\n",
+						agent.getId(), agent.getPosition().x, agent.getPosition().y, agent.getId());
+			}
+		} else {
+        	generatedCode += "% Agent Ids (not enabled in config)\n";
+		}
 
         return generatedCode;
 	}
@@ -248,28 +286,27 @@ public class TikzGenerator {
         final StringBuffer generatedCode = new StringBuffer("");
 
 	    Stream<Trajectory> trajectoryStream = model.getAlivePedestrians();
-        Step currentTimeStep = model.getStep().orElseGet(null);
+        //Step currentTimeStep = model.getStep().orElseGet(null);
 
-        if (currentTimeStep != null) {
-            trajectoryStream.forEach(trajectory -> {
-                Stream<VPoint> trajectoryPoints = trajectory.getPositionsReverse(currentTimeStep);
 
-                // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
-                String trajectoryAsTikzString = trajectoryPoints
-                        .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
-                        .collect(Collectors.joining(" to\n"));
+        trajectoryStream.forEach(trajectory -> {
+            Stream<VPoint> trajectoryPoints = trajectory.getPositionsReverse(model.getSimTimeInSec());
 
-                String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(currentTimeStep));
+            // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
+            String trajectoryAsTikzString = trajectoryPoints
+                    .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
+                    .collect(Collectors.joining(" to\n"));
 
-                int pedestrianId = trajectory.getPedestrianId();
-                Optional<Step> trajectoryEndStep = trajectory.getEndStep();
-                String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
-                String currentTimeStepAsString = currentTimeStep.toString();
+            String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(model.getSimTimeInSec()));
 
-                generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ step %s of %s\n", pedestrianId, currentTimeStepAsString, trajectoryEndStepAsString));
-                generatedCode.append(coloredTrajectory);
-            });
-        }
+            int pedestrianId = trajectory.getPedestrianId();
+            Optional<Step> trajectoryEndStep = trajectory.getEndStep();
+            String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
+
+            generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ simTimeInSec %f of %s\n", pedestrianId, model.getSimTimeInSec(), trajectoryEndStepAsString));
+            generatedCode.append(coloredTrajectory);
+        });
+
 
 
 	    return generatedCode.toString();
@@ -387,6 +424,76 @@ public class TikzGenerator {
 
         return generatedPath.trim();
     }
+
+	private String drawVoronoiDiagram(final VoronoiDiagram voronoiDiagram) {
+		String voronoiDiagramAsTikz = "";
+
+		synchronized (voronoiDiagram) {
+
+			if (voronoiDiagram != null) {
+				RectangleLimits limits = voronoiDiagram.getLimits();
+
+				voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) rectangle (%f,%f);\n",
+						limits.xLow, limits.yLow,
+						limits.xHigh, limits.yLow);
+			}
+
+			if (voronoiDiagram != null && voronoiDiagram.getFaces() != null) {
+
+				for (Face face : voronoiDiagram.getFaces()) {
+
+					boolean go = true;
+					boolean closed = false;
+					HalfEdge last = face.getOuterComponent();
+					HalfEdge next = last.getNext();
+					HalfEdge outerComponent = last;
+
+					while (go) {
+						if (next == null || last.getOrigin() == null) {
+							go = false;
+							closed = true;
+						} else {
+
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+									last.getOrigin().x, last.getOrigin().y,
+									next.getOrigin().x, next.getOrigin().y);
+
+							if (next == outerComponent) {
+								go = false;
+							} else {
+								last = next;
+								next = next.getNext();
+							}
+						}
+					}
+
+					last = outerComponent;
+					next = last.getPrevious();
+
+					go = true;
+
+					while (go && !closed) {
+						if (next == null || next.getOrigin() == null) {
+							go = false;
+						} else {
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+									last.getOrigin().x, last.getOrigin().y,
+									next.getOrigin().x, next.getOrigin().y);
+
+							if (next == outerComponent) {
+								go = false;
+							} else {
+								last = next;
+								next = next.getPrevious();
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return voronoiDiagramAsTikz;
+	}
 
 	private String convertJavaToTikzPath(int type, float[] coords) {
 		if (type < SEG_MOVETO || type > SEG_CLOSE) {

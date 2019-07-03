@@ -11,13 +11,15 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.SubModelBuilder;
-import org.vadere.simulator.models.groups.CentroidGroupModel;
-import org.vadere.simulator.models.groups.CentroidGroupPotential;
-import org.vadere.simulator.models.groups.CentroidGroupSpeedAdjuster;
-import org.vadere.simulator.models.groups.CentroidGroupStepSizeAdjuster;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupSpeedAdjuster;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupStepSizeAdjuster;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
 import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
+import org.vadere.simulator.models.osm.optimization.PatternSearchOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
+import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerCircleNelderMead;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerEvolStrat;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerGradient;
@@ -39,7 +41,6 @@ import org.vadere.state.events.types.ElapsedTimeEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.events.types.WaitEvent;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.OptimizationType;
@@ -59,7 +60,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ModelClass(isMainModel = true)
-public class OptimalStepsModel implements MainModel, PotentialFieldModel, DynamicElementRemoveListener<Pedestrian> {
+public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private UpdateSchemeOSM updateSchemeOSM;
 	private AttributesOSM attributesOSM;
@@ -73,12 +74,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	private List<StepSizeAdjuster> stepSizeAdjusters;
 	private Topography topography;
 	private double lastSimTimeInSec;
-	private int pedestrianIdCounter;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
 
 	public OptimalStepsModel() {
-		this.pedestrianIdCounter = 0;
 		this.speedAdjusters = new LinkedList<>();
 		this.stepSizeAdjusters = new LinkedList<>();
 	}
@@ -120,9 +119,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 					new CentroidGroupPotential(centroidGroupModel,
 							potentialFieldPedestrian, potentialFieldTarget, centroidGroupModel.getAttributesCGM());
 
-			SpeedAdjuster speedAdjusterCGM = new CentroidGroupSpeedAdjuster(centroidGroupModel);
-			this.speedAdjusters.add(speedAdjusterCGM);
-			this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
+			//this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
+			this.speedAdjusters.add(new CentroidGroupSpeedAdjuster(centroidGroupModel));
 		}
 
 		this.stepCircleOptimizer = createStepCircleOptimizer(
@@ -143,8 +141,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
 		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
 		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
-
-		topography.addElementRemovedListener(Pedestrian.class, this);
 
 		models.add(this);
 	}
@@ -256,11 +252,17 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 			case NELDER_MEAD:
 				result = new StepCircleOptimizerNelderMead(random);
 				break;
+			case NELDER_MEAD_CIRCLE:
+				result = new StepCircleOptimizerCircleNelderMead(random, attributesOSM);
+				break;
 			case POWELL:
 				result = new StepCircleOptimizerPowell(random);
 				break;
 			case PSO:
 				result = new ParticleSwarmOptimizer(movementThreshold, random);
+				break;
+			case PATTERN_SEARCH:
+				result = new PatternSearchOptimizer(movementThreshold, attributesOSM, random);
 				break;
 			case GRADIENT:
 				result = new StepCircleOptimizerGradient(topography,
@@ -300,9 +302,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
-		pedestrianIdCounter++;
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, id > 0 ? id : pedestrianIdCounter);
+				this.attributesPedestrian, registerDynamicElementId(topography, id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;
@@ -341,9 +342,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel, Dynami
 	public PotentialFieldAgent getPotentialFieldAgent() {
 		return potentialFieldPedestrian;
 	}
-
-	@Override
-	public void elementRemoved(Pedestrian ped) {}
 
 	@Override
 	public SourceControllerFactory getSourceControllerFactory() {

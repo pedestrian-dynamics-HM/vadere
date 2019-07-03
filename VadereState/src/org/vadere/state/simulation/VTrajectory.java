@@ -1,6 +1,5 @@
 package org.vadere.state.simulation;
 
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -15,10 +14,32 @@ import java.util.stream.Stream;
 
 public class VTrajectory implements Iterable<FootStep> {
 
+	// Variables
 	private LinkedList<FootStep> footSteps;
+	private transient LastFootSteps lastFootSteps;
 
+	// Constructors
 	public VTrajectory(){
+		this(10);
+	}
+
+	public VTrajectory(int lastFootStepCapacity){
 		footSteps = new LinkedList<>();
+		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
+	}
+
+	// Getters
+	public LinkedList<FootStep> getFootSteps() {
+		return new LinkedList<>(footSteps);
+	}
+
+	public LastFootSteps getLastFootSteps() {
+		return lastFootSteps;
+	}
+
+	// Methods
+	public int size() {
+		return footSteps.size();
 	}
 
 	public Optional<Double> speed(@NotNull final VRectangle rectangle) {
@@ -68,8 +89,14 @@ public class VTrajectory implements Iterable<FootStep> {
 		return clone().cut(startSimTime, endSimTime).length();
 	}
 
-	public double duration() {
-		return footSteps.peekLast().getEndTime() - footSteps.peekFirst().getStartTime();
+	public Optional<Double> duration() {
+		if(footSteps.isEmpty()) {
+			return Optional.empty();
+		}
+		else {
+			double duration = footSteps.peekLast().getEndTime() - footSteps.peekFirst().getStartTime();
+			return Optional.of(duration);
+		}
 	}
 
 	public Optional<Double> speed() {
@@ -77,13 +104,15 @@ public class VTrajectory implements Iterable<FootStep> {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of(length() / duration());
+			return Optional.of(length() / duration().get());
 		}
 	}
 
 	public void add(@NotNull final FootStep footStep) {
 		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
+
 		footSteps.add(footStep);
+		lastFootSteps.add(footStep);
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
@@ -155,14 +184,12 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public VTrajectory clone() {
-		LinkedList<FootStep> copy = new LinkedList<>(footSteps);
-		VTrajectory clone = new VTrajectory();
-		clone.footSteps = copy;
-		return clone;
-	}
+		VTrajectory newTrajectory = new VTrajectory();
 
-	public LinkedList<FootStep> getFootSteps() {
-		return new LinkedList<>(footSteps);
+		LinkedList<FootStep> footStepCopy = new LinkedList<>(footSteps);
+		newTrajectory.footSteps = footStepCopy;
+
+		return newTrajectory;
 	}
 
 	public VTrajectory cut(final double startTime, final double endTime) {

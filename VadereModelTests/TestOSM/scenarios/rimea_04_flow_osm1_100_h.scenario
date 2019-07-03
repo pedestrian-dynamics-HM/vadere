@@ -1,7 +1,8 @@
 {
   "name" : "rimea_04_flow_osm1_100_h",
   "description" : "",
-  "release" : "0.7",
+  "release" : "1.0",
+  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -88,13 +89,7 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramBProcessor",
       "attributes" : {
         "pedestrianTrajectoryProcessorId" : 10,
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        }
+        "measurementAreaId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
@@ -115,13 +110,7 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 7
       }
     }, {
@@ -129,21 +118,16 @@
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 22.0,
-          "y" : 10.1,
-          "width" : 2.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 17.0,
-          "y" : 10.1,
-          "width" : 12.0,
-          "height" : 1.8,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 2,
         "pedestrianVelocityProcessorId" : 7
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
       }
     } ],
     "isTimestamped" : true,
@@ -172,19 +156,19 @@
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
         "numberOfCircles" : 1,
+        "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : false,
+        "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
         "minStepLength" : 0.4625,
+        "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
-        "optimizationType" : "NELDER_MEAD",
-        "movementType" : "ARBITRARY",
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
-        "minimumStepLength" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -211,7 +195,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 1,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -225,6 +210,25 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 22.0,
+          "y" : 10.1,
+          "width" : 2.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 17.0,
+          "y" : 10.1,
+          "width" : 12.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -244,6 +248,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -273,7 +278,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

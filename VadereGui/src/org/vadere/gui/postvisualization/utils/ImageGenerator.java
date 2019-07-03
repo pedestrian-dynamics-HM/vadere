@@ -23,28 +23,31 @@ public class ImageGenerator<T extends DefaultSimulationConfig> {
 	}
 
 	public BufferedImage generateImage(final double scaleFactor) {
-		BufferedImage bi = null;
-		synchronized (renderer) {
+		synchronized (model) {
+			BufferedImage bi = null;
 			double oldScale = model.getScaleFactor();
 			try {
-				model.setScale(scaleFactor);
-				bi = renderer.renderImage(ImageGenerator.calculateOptimalWidth(model),
-						ImageGenerator.calculateOptimalHeight(model));
+				model.setScaleWithoutChangingViewport(scaleFactor);
+				bi = renderer.renderImage(ImageGenerator.calculateOptimalWidth(model), ImageGenerator.calculateOptimalHeight(model));
 			} catch (Exception e) {
 				logger.error("could not render image " + e.getMessage());
 			} finally {
-				model.setScale(oldScale);
+				model.setScaleWithoutChangingViewport(oldScale);
 			}
+			return bi;
 		}
-		return bi;
 	}
 
 	public BufferedImage generateImage(final Rectangle2D.Double imageSize) {
-		return generateImage(imageSize.getWidth() / model.getTopographyBound().getWidth());
+		synchronized (model) {
+			return generateImage(imageSize.getWidth() / model.getTopographyBound().getWidth());
+		}
 	}
 
 	public BufferedImage generateImage() {
-		return generateImage(model.getScaleFactor());
+		synchronized (model) {
+			return generateImage(model.getScaleFactor());
+		}
 	}
 
 	public static int calculateOptimalWidth(final DefaultModel model) {

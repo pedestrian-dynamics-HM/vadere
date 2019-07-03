@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -45,9 +46,15 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			pedestrian.clearStrides();
 			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 
-			while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-				pedestrian.updateNextPosition();
-				osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
+			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
+				while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+					pedestrian.updateNextPosition();
+					osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
+					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+
+				}
+			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
+				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
 			}
 
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {

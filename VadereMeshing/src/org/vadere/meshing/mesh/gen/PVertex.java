@@ -79,6 +79,11 @@ public class PVertex implements IVertex {
 	// TODO: make it protected since it is a non-deep copy. Therefore the IVertex should maybe not be a IPoint!?
 
 	@Override
+	public IPoint add(double x, double y) {
+		return point.add(x, y);
+	}
+
+	@Override
 	public IPoint norm(double len) {
 		return point.norm(len);
 	}

@@ -6,20 +6,26 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.flags.UsesMeasurementArea;
 import org.vadere.state.attributes.processor.AttributesCrossingTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.util.factory.processors.Flag;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.util.Collection;
+import java.util.List;
 
 //TODO
 @DataProcessorClass()
-public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>>{
+public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>> implements UsesMeasurementArea {
 
-	private VRectangle measurementArea;
+	private MeasurementArea measurementArea;
+	private VRectangle measurementAreaVRec;
+
 	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
@@ -35,9 +41,9 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
 
 			for(FootStep footStep : ped.getFootSteps()) {
-				if(footStep.intersects(measurementArea)) {
+				if(footStep.intersects(measurementAreaVRec)) {
 
-					double intersectionTime = footStep.computeIntersectionTime(measurementArea);
+					double intersectionTime = footStep.computeIntersectionTime(measurementAreaVRec);
 					if(!hasCrossStartTime(key)) {
 						setStartTime(key, intersectionTime);
 					}
@@ -75,7 +81,9 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
-		this.measurementArea = att.getMeasurementArea();
+		this.measurementArea  = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+		measurementAreaVRec = measurementArea.asVRectangle();
+
 	}
 
 	@Override
@@ -90,5 +98,12 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public String[] toStrings(@NotNull final  PedestrianIdKey key) {
 		Pair<Double, Double> times = getValue(key);
 		return new String[]{Double.toString(times.getLeft()), Double.toString(times.getRight())};
+	}
+
+
+	@Override
+	public int[] getReferencedMeasurementAreaId() {
+		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
+		return new int[]{att.getWaitingAreaId(), att.getMeasurementAreaId()};
 	}
 }

@@ -1,6 +1,5 @@
 package org.vadere.gui.projectview.control;
 
-
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
@@ -22,17 +21,11 @@ public class ActionPauseScenario extends AbstractAction {
 		this.model = model;
 	}
 
-
 	@Override
 	public void actionPerformed(final ActionEvent e) {
 		ProjectViewModel.ScenarioBundle optionalScenarioBundle = model.getRunningScenario();
 		Scenario scenario = optionalScenarioBundle.getScenario();
-		if (model.getProject().isScenarioPaused()) {
-			model.getProject().resumePausedScenarios();
-			model.getScenarioTableModel().replace(scenario,
-					new VadereScenarioTableModel.VadereDisplay(scenario, VadereState.RUNNING));
-			logger.info(String.format("all running scenarios resumed"));
-		} else {
+		if (! model.getProject().isScenarioPaused()) {
 			model.getProject().pauseRunnningScenario();
 			model.getScenarioTableModel().replace(scenario,
 					new VadereScenarioTableModel.VadereDisplay(scenario, VadereState.PAUSED));

@@ -16,12 +16,14 @@ import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
 import org.vadere.gui.projectview.control.ActionInterruptScenarios;
 import org.vadere.gui.projectview.control.ActionLoadProject;
 import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionNextTimeStep;
 import org.vadere.gui.projectview.control.ActionOpenInExplorer;
 import org.vadere.gui.projectview.control.ActionOutputToScenario;
 import org.vadere.gui.projectview.control.ActionPauseScenario;
 import org.vadere.gui.projectview.control.ActionRenameOutputFile;
 import org.vadere.gui.projectview.control.ActionRenameProject;
 import org.vadere.gui.projectview.control.ActionRenameScenario;
+import org.vadere.gui.projectview.control.ActionResumeNormalSpeed;
 import org.vadere.gui.projectview.control.ActionRunAllScenarios;
 import org.vadere.gui.projectview.control.ActionRunOutput;
 import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
@@ -100,6 +102,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
+	private JButton btnNextSimulationStep;
+	private JButton btnResumeNormalSpeed;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
@@ -316,6 +320,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunSelectedScenario.setVisible(!flag);
 		btnStopRunningScenarios.setVisible(flag);
 		btnPauseRunningScenarios.setVisible(flag);
+		btnNextSimulationStep.setVisible(flag);
+		btnResumeNormalSpeed.setVisible(flag);
 		scenarioTable.setEnabled(!flag);
 		scenarioTable.clearSelection();
 		outputTable.setEnabled(!flag);
@@ -361,11 +367,21 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				closeApplicationAction.actionPerformed(null);
 			}
 		});
-
+		Preferences pref = Preferences.userNodeForPackage(VadereApplication.class);
 		pack();
 	}
 
-	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
+	private void buildKeyboardShortcuts(ActionPauseScenario pauseScenarioAction, Action interruptScenariosAction) {
+	    addKeyboardShortcut("SPACE", "Typed Space", btnPauseRunningScenarios.getAction());
+	    addKeyboardShortcut("BACK_SPACE", "Typed Backspace", btnStopRunningScenarios.getAction());
+	}
+
+    private void addKeyboardShortcut(String key, String actionKey, Action action) {
+	    controlPanel.getInputMap().put(KeyStroke.getKeyStroke(key), actionKey);
+	    controlPanel.getActionMap().put(actionKey, action);
+    }
+
+    private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -383,7 +399,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenuItem mntmLoadProject = new JMenuItem(loadProjectAction);
 
 		mntmRecentProjects = new JMenu(Messages.getString("ProjectView.mntmRecentProjects.text"));
-		mntmRecentProjects.setEnabled(false);
+		mntmRecentProjects.setEnabled(true);
 		updateRecentProjectsMenu();
 
 		Action changeNameAction = new ActionRenameProject(Messages.getString("ProjectView.mntmChangeName.text"), model);
@@ -445,7 +461,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		menuBar.add(mnHelp);
 
 		Action showAboutAction = new ActionShowAboutDialog(Messages.getString("ProjectView.mntmAbout.text"));
-		setAcceleratorFromLocalizedShortcut(showAboutAction, "ProjectView.mntmAbout.shortcut");
 		JMenuItem mntmAbout = new JMenuItem(showAboutAction);
 
 		mnHelp.add(mntmAbout);
@@ -553,6 +568,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 				model.setCurrentScenario(bundle.getScenario());
                 logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
+
                 scenarioJPanel.setScenario(bundle.getScenario(), true);
 
 				outputTableRenderer.setMarkedOutputFiles(bundle.getOutputDirectories());
@@ -716,6 +732,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnStopRunningScenarios = new JButton(interruptScenariosAction);
 		toolBar.add(btnStopRunningScenarios);
 
+		ActionResumeNormalSpeed resumeNormalSpeedAction =
+				new ActionResumeNormalSpeed(Messages.getString("ProjectView.btnResumeNormalSpeed.text"), model);
+		resumeNormalSpeedAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
+		btnResumeNormalSpeed = new JButton(resumeNormalSpeedAction);
+		toolBar.add(btnResumeNormalSpeed);
+
 		ActionPauseScenario pauseScenarioAction =
 				new ActionPauseScenario(Messages.getString("ProjectView.btnPauseRunningTests.text"), model);
 		pauseScenarioAction.putValue(Action.LONG_DESCRIPTION,
@@ -728,6 +751,16 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		toolBar.getInputMap().put(
 				KeyStroke.getKeyStroke(Messages.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
 		toolBar.getActionMap().put("pauseTests", pauseScenarioAction);
+
+		ActionNextTimeStep nextTimeStepAction =
+				new ActionNextTimeStep(Messages.getString("ProjectView.btnNextSimulationStep"), model);
+		nextTimeStepAction.putValue(Action.LONG_DESCRIPTION, "Next Step");
+		nextTimeStepAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_step.png")));
+		btnNextSimulationStep = new JButton(nextTimeStepAction);
+		toolBar.add(btnNextSimulationStep);
+
+		buildKeyboardShortcuts(pauseScenarioAction, interruptScenariosAction);
 	}
 
 	private void buildRightSidePanel() {

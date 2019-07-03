@@ -1,14 +1,20 @@
 package org.vadere.simulator.models.bhm;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.GrahamScan;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UtilsBHM {
 
@@ -153,39 +159,32 @@ public class UtilsBHM {
 	}
 
 	/**
-	 * QuickHull algorithm to determine convex hull of pedestrian cluster.
-	 * 
+	 * Filters the list of pedestrians such that only pedestrians will remain which form
+	 * the convex hull of all the pedestrians in the list (with repect to their position).
+	 *
+	 * @param cluster list of pedestrians
+	 *
+	 * @return pedestrians forming the convex hull
 	 */
-	private static List<Pedestrian> convexHull(final List<Pedestrian> cluster) {
-		List<Pedestrian> result;
-
-		// any three points form a convex hull
-		if (cluster.size() < 4) {
-			result = cluster;
-		} else {
-			result = new LinkedList<>();
-
-			Pedestrian xmin = cluster.get(0);
-			Pedestrian xmax = cluster.get(0);
-
-			for (int i = 2; i < result.size(); i++) {
-				Pedestrian next = cluster.get(i);
-				if (next.getPosition().x < xmin.getPosition().x) {
-					xmin = next;
-				} else if (next.getPosition().x > xmin.getPosition().x) {
-					xmax = next;
-				}
-			}
-
-			VLine initialLine = new VLine(xmin.getPosition(), xmax.getPosition());
-
-			// TODO [priority=medium] [task=feature] complete algorithm
+	private static List<Pedestrian> convexHull(@NotNull final List<Pedestrian> cluster) {
+		if(cluster.size() > 2) {
+			return cluster;
 		}
-		throw new UnsupportedOperationException("this method is not fully implemented jet.");
-		// return result;
+
+		GrahamScan grahamScan = new GrahamScan(cluster.stream().map(ped -> ped.getPosition()).collect(Collectors.toList()));
+		Set<VPoint> convexHull = new HashSet<>(grahamScan.getConvexHull());
+		return cluster.stream().filter(ped -> convexHull.contains(ped.getPosition())).collect(Collectors.toList());
 	}
 
-	public static int randomChoice(List<Double> fractions, Random random) {
+	/**
+	 * Given the fractions f1, f2, ..., fn this method returns 1 or 2 ... or n with probability
+	 * f1 / sum, f2 / sum, ..., fn / sum for sum = f1 + f2 + ... + fn.
+	 *
+	 * @param fractions
+	 * @param random
+	 * @return a randomly chosen index in [0, fraction.size()) with probabilities depending on the fractions
+	 */
+	public static int randomChoice(@NotNull final List<Double> fractions, @NotNull final Random random) {
 
 		double[] probabilities = new double[fractions.size()];
 		double sum = 0;

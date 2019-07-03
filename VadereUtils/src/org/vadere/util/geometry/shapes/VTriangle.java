@@ -5,6 +5,10 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.Vector3D;
+
+import static java.lang.Double.isInfinite;
+import static java.lang.Double.isNaN;
 
 /**
  * A triangle. Points must be given in counter clockwise manner to get correct
@@ -127,23 +131,56 @@ public class VTriangle extends VPolygon {
     }
 
     public VPoint getOrthocenter() {
+
         if(orthocenter == null) {
-            double slope = -1 / ((p2.getY() - p1.getY()) / (p2.getX() - p1.getX()));
-            // y  = slope * (x - p3.x) + p3.y
 
-            double slope2 = -1 / ((p1.getY() - p3.getY()) / (p1.getX() - p3.getX()));// y = slope2 * (x - p2.x) + p2.y
+            VPoint p12, p13, p23, L1, L2;
 
-            // slope2 * (x - p2.x) + p2.y  = slope * (x - p3.x) + p3.y
-            // slope2 * (x - p2.x) - slope * (x - p3.x)  =  + p3.y - p2.y
-            // slope2 * x - slope2 * p2.x - slope * x + slope * p3.x =  + p3.y - p2.y
-            // slope2 * x  - slope * x  =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
-            // x * (slope2 - slope) =  + p3.y - p2.y + slope2 * p2.x - slope * p3.x
-            double x = (p3.getY() - p2.getY() + slope2 * p2.getX() - slope * p3.getX()) / (slope2 - slope);
-            double y = slope * (x - p3.getX()) + p3.getY();
-            orthocenter = new VPoint(x, y);
+            // create edge vectors
+            p12 = p2.subtract(p1); // Vector2D better??
+            p13 = p3.subtract(p1);
+            p23 = p3.subtract(p2);
+
+            // create system of equations
+            double cross = p13.crossProduct(p12);
+
+            L1 = new VPoint(-cross* p23.getY() , cross * p23.getX() );
+            L2 = new VPoint(-cross* p13.getY() , cross * p13.getX() );
+
+            // solve system of equation (determine first element of resulting vector lamda with cramers rule; second element not necessary)
+            double lamda1 = ( p12.getX() * L2.getY() - p12.getY() * L2.getX() ) / ( L1.getX()*L2.getY() - L2.getX()*L1.getY() ) ;
+
+            orthocenter = new VPoint ( p1.add( L1.scalarMultiply(lamda1) ) );
         }
 
+        //VPoint orthocenter2 = getOrthocenterSlowImplementation() ;
+        //assert Math.abs( orthocenter.distance(orthocenter2)) < GeometryUtils.DOUBLE_EPS ;
         return orthocenter;
+    }
+
+    public VPoint getOrthocenterSlowImplementation() {
+
+        // create edge vectors
+        VPoint p12 = p2.subtract(p1); // Vector2D better??
+        VPoint p13 = p3.subtract(p1);
+        VPoint p23 = p3.subtract(p2);
+
+        // edge vectors reverse
+        VPoint p21 = new VPoint(p12.scalarMultiply(-1.0));
+        VPoint p31 = new VPoint(p13.scalarMultiply(-1.0));
+        VPoint p32 = new VPoint(p23.scalarMultiply(-1.0));
+
+        // calculate angles a1, a2, a3
+        double a1 = Math.atan2(Math.abs( p13.crossProduct(p12)), p13.scalarProduct(p12)) ;
+        double a2 = Math.atan2(Math.abs( p23.crossProduct(p21)), p23.scalarProduct(p21)) ;
+        double a3 = Math.atan2(Math.abs( p31.crossProduct(p32)), p31.scalarProduct(p32)) ;
+
+        double div = Math.tan(a1)+ Math.tan(a2)+ Math.tan(a3) ;
+        double  x = ( Math.tan(a1)*p1.getX() + Math.tan(a2)*p2.getX() + Math.tan(a3)*p3.getX() ) / div;
+        double  y = ( Math.tan(a1)*p1.getY() + Math.tan(a2)*p2.getY() + Math.tan(a3)*p3.getY() ) / div;
+
+        return new VPoint(x,y);
+
     }
 
     public VPoint closestPoint(final IPoint point) {
@@ -210,6 +247,6 @@ public class VTriangle extends VPolygon {
 
     @Override
     public String toString() {
-        return p1 + "-" + p2 + "-" + p3;
+        return "["+p1 + "," + p2 + "," + p3 + "]";
     }
 }

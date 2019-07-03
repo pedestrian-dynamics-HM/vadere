@@ -148,7 +148,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			parallelUpdatablePeds.stream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
-				update(ped, currentTimeInSec);
+				update(ped, timeStepInSec, currentTimeInSec);
 			});
 
 
@@ -207,6 +207,11 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		@Override
 		public IPoint add(IPoint point) {
 			return this.point.add(point);
+		}
+
+		@Override
+		public IPoint add(double x, double y) {
+			return point.add(x, y);
 		}
 
 		@Override

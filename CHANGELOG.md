@@ -2,10 +2,35 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-## In Progress: v0.7
+## In Progress:
 
 ### Added
 
+- single step mode in GUI: Allows the user to step through the simulation one 
+  step at a time to identify bugs.
+- simplify obstacles (with undo support): Merge multiple obstacles based on the 
+  convex hull their points create. The merge can be undon
+- add features to open street map (osm) importer: 
+  - import 'open' paths as polygons with a specified width. With this it is
+    possible to create walls or subway entrance
+  - add option to include osm ids into each obstacle created
+ 
+`PostVis` added functionalities:
+- the PostVis works now on the basis of simulation time instead of time steps. Agents' position will be interpolated.
+    - the user can jump to a specific simulation time
+    - the user can step forward by steps as small as 0.01s
+    - the user can make videos using also this new feature which results in very smooth movement
+    - the frames per seconds (FPS) is now more accurate
+
+### Changed
+
+## v1.0 (2019-06-13)
+
+### Added
+
+- Open a trajectory file in the stand-alone application `vadere-postvis.jar` via drag and drop from file explorer.
+- Scenario elements like obstacles and targets can now be resized using the mouse in the topography creator tab (first, select element via left-click and then move mouse to one of its edges to get the resize handles).
+- Draw also Voronoi diagram in `TikzGenerator`.
 - Added new scenario element `AbsorbingArea` to absorb agents immediately.
   * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
   * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
@@ -40,9 +65,9 @@
   will check for overlapping `ScenarioElements` and check for inconsistence
   settings such as missing  TargetIDs for sources or inconsistenct speed ranges
   for pedestrians. See this
-  [table](Documentation/changelLogImages/TopographyCheckerMessages.md) for
+  [table](Documentation/changelog/TopographyCheckerMessages.md) for
   supported warnings and erros as well as this
-  [picture](Documentation/changelLogImages/TopographyChecker.png) to see which
+  [picture](Documentation/changelog/TopographyChecker.png) to see which
   kind of overlap produces erros or warnings.
 - `VadereConsole`: Add `--output-dir [on, off]` (default: `on`) switch to  `scenario-run`
   sub-command. This will will turn the ScenarioChecker on or off for the command
@@ -67,6 +92,7 @@
   * vadere.jar -> vadere-gui.jar
   * postvis.jar -> vadere-postvis.jar
   * vadere-console.jar -> remained unchanged
+- Header in output file have now the following form "[NAME]-PID[ID]". This avoids name conflicts and makes mapping to the relevant processor easy and fast.
 - Migration to Java 11 (OpenJDK).
 - Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
   **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build. 

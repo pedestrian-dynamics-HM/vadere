@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.Random;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -22,6 +23,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
+import java.awt.geom.Area;
 
 /**
  * This utility class contains only static methods which are used to solve
@@ -240,6 +242,31 @@ public class GeometryUtils {
 		return circumcenter.distance(q) < circumcenter.distance(p1);
 	}
 
+	public static List<VPoint> getDiscDiscretizationPoints(
+			@NotNull final VCircle circle,
+			final int numberOfCircles,
+			final int numberOfPointsOfLargestCircle,
+			final double anchorAngle,
+			final double angle) {
+		return getDiscDiscretizationPoints(null, false, circle, numberOfCircles, numberOfPointsOfLargestCircle, anchorAngle, angle);
+	}
+
+	public static List<VPoint> getDiscDiscretizationGridPoints(@Nullable final VCircle circle, double edgeLen) {
+		int n = (int)(circle.getRadius() * 2 / edgeLen) + 1;
+		List<VPoint> points = new ArrayList<>(n * n);
+		double x = circle.getCenter().x - circle.getRadius();
+		double y = circle.getCenter().y - circle.getRadius();
+		for (int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				VPoint point = new VPoint(x+i * edgeLen, y+j * edgeLen);
+				if(circle.contains(point)) {
+					points.add(point);
+				}
+			}
+		}
+		return points;
+	}
+
 	/**
 	 * Generates a set of points which are positioned inside a disc segment. The points are placed equidistant on one or multiple circles
 	 * with the center at the center of the disc and the radius smaller or equals the radius of the disc.
@@ -255,13 +282,15 @@ public class GeometryUtils {
 	 * @return a set of points which are positioned inside a disc segment
 	 */
 	public static List<VPoint> getDiscDiscretizationPoints(
-			@NotNull final Random random,
+			@Nullable final Random random,
 			final boolean varyDirection,
 			@NotNull final VCircle circle,
 			final int numberOfCircles,
 			final int numberOfPointsOfLargestCircle,
 			final double anchorAngle,
 			final double angle) {
+
+		assert random != null || !varyDirection;
 		double randOffset = varyDirection ? random.nextDouble() : 0;
 
 		List<VPoint> reachablePositions = new ArrayList<>();
@@ -293,6 +322,7 @@ public class GeometryUtils {
 
 		return reachablePositions;
 	}
+
 
 	/**
 	 * Computes the point on the line segment that is closest to the given point.
@@ -592,6 +622,12 @@ public class GeometryUtils {
 		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
 	}
 
+	public static boolean intersectLine(@NotNull final VLine line, @NotNull final IPoint p1, @NotNull final IPoint p2) {
+		double ccw1 = ccw(new VPoint(line.getP1()), new VPoint(line.getP2()), p1);
+		double ccw2 = ccw(new VPoint(line.getP1()), new VPoint(line.getP2()), p2);
+		return (ccw1 < 0 && ccw2 > 0) || (ccw1 > 0 && ccw2 < 0);
+	}
+
 	/**
 	 * Tests if the line-segment (p1, p2) intersects the line (p, q).
 	 *
@@ -725,6 +761,10 @@ public class GeometryUtils {
 	 */
 	public static boolean intersectLineSegment(@NotNull final IPoint p, @NotNull final IPoint q, @NotNull final IPoint p1, @NotNull final IPoint p2) {
 		return intersectLine(p, q, p1, p2) && intersectLine(p1, p2, p, q);
+	}
+
+	public static boolean intersectLineSegment(@NotNull VLine line, @NotNull final IPoint p1, @NotNull final IPoint p2) {
+		return intersectLine(new VPoint(line.getP1()), new VPoint(line.getP2()), p1, p2) && intersectLine(p1, p2, new VPoint(line.getP1()), new VPoint(line.getP2()));
 	}
 
 	/**
@@ -886,6 +926,11 @@ public class GeometryUtils {
 	 */
 	public static VPolygon polygonFromPoints2D(@NotNull final List<? extends IPoint> points) {
 		return polygonFromPoints2D(points.toArray(new VPoint[0]));
+	}
+
+	public static VPolygon polygonFromArea(@NotNull final Area area){
+		VPolygon tmpPolygon = new VPolygon(area);
+		return polygonFromPoints2D(tmpPolygon.getPoints());
 	}
 
 	/**
@@ -1400,12 +1445,13 @@ public class GeometryUtils {
 											   final double x4,
 											   final double y4) {
 		assert new VLine(new VPoint(x1, y1), new VPoint(x2, y2)).intersectsLine(x3, y3, x4, y4);
-		double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+		return intersectionPoint(x1, y1, x2, y2, x3, y3, x4, y4);
+		/*double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 		assert d != 0;
 
 		double x = ((x1 * y2 - y1 - x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
 		double y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (y3 * y4 - y3 * x4)) / d;
-		return new VPoint(x, y);
+		return new VPoint(x, y);*/
 	}
 
 	/**

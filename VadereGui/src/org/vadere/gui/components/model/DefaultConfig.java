@@ -10,6 +10,8 @@ public class DefaultConfig {
 	private Color densityColor = Color.RED;
 	private Color stairColor = new Color(0.5058823529411764f, 0.4470588235294118f, 0.6980392156862745f);
 	private Color pedestrianColor = new Color(0.2980392156862745f, 0.4470588235294118f, 0.7901960784313725f);
+	private Color measurementAreaColor = Color.RED;
+	private int measurementAreaAlpha = 140;
 	private boolean changed = false;
 
 	public DefaultConfig() {}
@@ -20,6 +22,8 @@ public class DefaultConfig {
 		this.absorbingAreaColor = config.absorbingAreaColor;
 		this.densityColor = config.densityColor;
 		this.obstacleColor = config.obstacleColor;
+		this.measurementAreaColor = config.measurementAreaColor;
+		this.measurementAreaAlpha = config.measurementAreaAlpha;
 		this.stairColor = config.stairColor;
 		this.changed = config.changed;
 	}
@@ -44,6 +48,22 @@ public class DefaultConfig {
 	public void setStairColor(final Color stairColor) {
 		this.stairColor = stairColor;
 		setChanged();
+	}
+
+	public Color getMeasurementAreaColor() {
+		return measurementAreaColor;
+	}
+
+	public void setMeasurementAreaColor(Color measurementAreaColor) {
+		this.measurementAreaColor = measurementAreaColor;
+	}
+
+	public int getMeasurementAreaAlpha() {
+		return measurementAreaAlpha;
+	}
+
+	public void setMeasurementAreaAlpha(int measurementAreaAlpha) {
+		this.measurementAreaAlpha = measurementAreaAlpha;
 	}
 
 	public Color getSourceColor() {

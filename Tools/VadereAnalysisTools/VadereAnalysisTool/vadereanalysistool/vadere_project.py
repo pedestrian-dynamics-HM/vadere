@@ -51,7 +51,7 @@ class VadereProject():
         again the named_files attribute. For the output `bridge_coordinates_kai_2018-10-11_17-50-48.43` the possible
         calls would be:
         ```
-        out = proj.named_output.bridge_coordinates_kai_2018_10_11_17_50_48_43()
+        out = proj.named_output.bridge_coordinates_kai_2018_10_11_17_50_48_43
         out.files['overlapCount.txt']()
         out.files['overlapCount.txt']()
         out.files['postvis.trajectories']()
@@ -64,7 +64,7 @@ class VadereProject():
         reduces the load time for big VadereProjects.
     """
 
-    def __init__(self, project_dir):
+    def __init__(self, project_dir, expect_all_outputs: bool = True):
 
         if os.path.exists(project_dir):
             self.project_path = project_dir
@@ -75,19 +75,17 @@ class VadereProject():
 
         self.output_path = os.path.join(self.project_path, 'output')
         if os.path.exists(os.path.join(self.project_path, 'output')):
-            self._load_output_directories()
+            self._load_output_directories(expect_all_outputs)
         else:
             print("Warn: project {} has no output folder, an empty folder will be created.".format(self.project_name))
             os.makedirs(self.output_path, mode=0o755)
-
 
         if os.path.exists(os.path.join(self.project_path, 'scenarios')):
             self._load_scenario_files()
         else:
             raise FileNotFoundError("Project does not have scenario folder.")
 
-
-    def _load_scenario_files(self, path='scenarios', scenario_search_pattern = "*.scenario", exclude_patterns = []):
+    def _load_scenario_files(self, path='scenarios', scenario_search_pattern = "*.scenario", exclude_patterns=[]):
 
         scenario_files = []
         for root, dirnames, filenames in os.walk(os.path.join(self.project_path, path)):
@@ -111,7 +109,7 @@ class VadereProject():
             shutil.rmtree(self.output_path)
             os.makedirs(self.output_path, mode=0o755)
 
-    def _load_output_directories(self):
+    def _load_output_directories(self, expect_all_outputs):
         ret_msg = "loaded {} out of {} output directories. {}"
         err_dir = list()
 
@@ -122,9 +120,10 @@ class VadereProject():
 
         for dir in out_dirs:
             try:
-                output = scenario_output.ScenarioOutput(os.path.join(self.output_path, dir))
+                output = scenario_output.ScenarioOutput.create_output_from_project_output(
+                    os.path.join(self.output_path, dir), expect_all_outputs=expect_all_outputs)
                 self.output_dirs[dir] = output
-                setattr(self.named_output, helper.clean_dir_name(dir), self._get_output_dir(dir))
+                setattr(self.named_output, helper.clean_dir_name(dir), output)
             except FileNotFoundError:
                 err_dir.append(dir)
 
@@ -135,9 +134,6 @@ class VadereProject():
         else:
             print(ret_msg.format(len(self.output_dirs), len(out_dirs), ''))
             self._err_dirs = list()
-
-    def _get_output_dir(self, dir_name):
-        return lambda: self.output_dirs[dir_name]
 
     def err_info(self):
         return (self._err_dirs)

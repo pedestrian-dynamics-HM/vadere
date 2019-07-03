@@ -2,7 +2,7 @@ package org.vadere.gui.postvisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -24,20 +24,23 @@ import org.vadere.gui.postvisualization.control.*;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.io.IOUtils;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Observer;
+import java.util.Optional;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import java.util.List;
 
 /**
  * Main Window of the new post visualization.
@@ -45,7 +48,7 @@ import javax.swing.*;
  * @Version 1.0
  * 
  */
-public class PostvisualizationWindow extends JPanel implements Observer {
+public class PostvisualizationWindow extends JPanel implements Observer, DropTargetListener {
 	private static final long serialVersionUID = -8177132133860336295L;
 	private JToolBar toolbar;
 	private ScenarioPanel scenarioPanel;
@@ -55,6 +58,9 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 	private JMenuBar menuBar;
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final ScenarioElementView textView;
+	private JButton playButton;
+	private JButton pauseButton;
+	private JButton stopButton;
 
 	public PostvisualizationWindow(final String projectPath) {
 		this(false, projectPath);
@@ -133,14 +139,14 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 		int iconHeight = Integer.valueOf(resources.getProperty("ProjectView.icon.height.value"));
 		int iconWidth = Integer.valueOf(resources.getProperty("ProjectView.icon.width.value"));
-		addActionToToolbar(toolbar,
+		playButton = addActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
-		addActionToToolbar(toolbar,
+		pauseButton = addActionToToolbar(toolbar,
 				new ActionPause("pause", resources.getIcon("pause.png", iconWidth, iconHeight), model),
 				"PostVis.btnPause.tooltip");
-		addActionToToolbar(toolbar,
-				new ActionStop("play", resources.getIcon("stop.png", iconWidth, iconHeight), model),
+		stopButton = addActionToToolbar(toolbar,
+				new ActionStop("stop", resources.getIcon("stop.png", iconWidth, iconHeight), model),
 				"PostVis.btnStop.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 
@@ -305,6 +311,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 			}
 		}
 
+		buildKeyboardShortcuts();
 
 		miGlobalSettings.addActionListener(e -> DialogFactory.createSettingsDialog(model).setVisible(true));
 
@@ -322,6 +329,27 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 		getActionMap().put("deselect", new ActionDeselect(model, this, null));
 		repaint();
 		revalidate();
+
+		// Make "this" window a drop target ("this" also handles the drops).
+		new DropTarget(this, DnDConstants.ACTION_MOVE, this, true);
+	}
+
+	private void buildKeyboardShortcuts() {
+		Action spaceKeyReaction = new ActionVisualization("Typed Space Key Reaction", model){
+			boolean isRunning = false;
+			@Override
+			public void actionPerformed(ActionEvent e){
+				(isRunning ? pauseButton : playButton).getAction().actionPerformed(null);
+				isRunning = !isRunning;
+			}
+		};
+		addKeyboardShortcut("SPACE","Typed Space", spaceKeyReaction);
+		addKeyboardShortcut("BACK_SPACE","Typed Backspace", stopButton.getAction());
+	}
+
+	private void addKeyboardShortcut(String key, String actionKey, Action action) {
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), actionKey);
+		getActionMap().put(actionKey, action);
 	}
 
 	private JMenuBar getMenu() {
@@ -330,8 +358,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 
 	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
-		model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
-		model.notifyObservers();
+
+		try {
+			model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
+			model.notifyObservers();
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public void loadOutputFile(final Scenario scenario) {
@@ -394,4 +427,99 @@ public class PostvisualizationWindow extends JPanel implements Observer {
 			frame.pack();
 		});
 	}
+
+	// Methods for drop support of this window.
+	@Override
+	public void dragEnter(DropTargetDragEvent dtde) {
+
+	}
+
+	@Override
+	public void dragOver(DropTargetDragEvent dtde) {
+
+	}
+
+	@Override
+	public void dropActionChanged(DropTargetDragEvent dtde) {
+
+	}
+
+	@Override
+	public void dragExit(DropTargetEvent dte) {
+
+	}
+
+	@Override
+	public void drop(DropTargetDropEvent dtde) {
+		try{
+			dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+			List<File> fileList = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+			// This is a robust solution, but user should be warned if multiple files are dropped.
+			for(File file : fileList){
+				openScenarioAndTrajectoryFile(file);
+			}
+		} catch (Exception ex){
+			JOptionPane.showMessageDialog(
+					this,
+					Messages.getString("Gui.DropAction.Error.text") + "\n"
+							+ ex.getMessage(),
+					Messages.getString("InformationDialogError.title"),
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public void openScenarioAndTrajectoryFile(@NotNull File scenarioOrTrajectoryFile) {
+		resources.setProperty("SettingsDialog.outputDirectory.path", scenarioOrTrajectoryFile.getParent());
+		Preferences.userNodeForPackage(PostVisualisation.class).put("SettingsDialog.outputDirectory.path", scenarioOrTrajectoryFile.getParent());
+
+		try {
+			IOUtils.saveUserPreferences(PostVisualisation.preferencesFilename,
+					Preferences.userNodeForPackage(PostVisualisation.class));
+		} catch (IOException | BackingStoreException e1) {
+			e1.printStackTrace();
+		}
+
+		Runnable runnable = () -> {
+			Player.getInstance(model).stop();
+
+			final JFrame dialog = DialogFactory.createLoadingDialog();
+			dialog.setVisible(true);
+
+			try {
+				Player.getInstance(model).stop();
+
+				File parentDirectory = scenarioOrTrajectoryFile.getParentFile();
+
+				Optional<File> trajectoryFile =
+						IOUtils.getFirstFile(parentDirectory, IOUtils.TRAJECTORY_FILE_EXTENSION);
+				Optional<File> scenarioFile =
+						IOUtils.getFirstFile(parentDirectory, IOUtils.SCENARIO_FILE_EXTENSION);
+
+				if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
+					Scenario vadereScenario = IOOutput.readScenario(scenarioFile.get().toPath());
+					model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadereScenario), vadereScenario, trajectoryFile.get().getParent());
+					model.notifyObservers();
+					dialog.dispose();
+				} else {
+					String errorMessage = String.format("%s\n%s\n%s", Messages.getString("Data.TrajectoryOrScenarioFile.NoData.text"),
+							trajectoryFile,
+							scenarioFile);
+					throw new IOException(errorMessage);
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(
+						null,
+						e.getMessage(),
+						Messages.getString("InformationDialogFileError"),
+						JOptionPane.ERROR_MESSAGE);
+			}
+
+			// when loading is finished, make frame disappear
+			SwingUtilities.invokeLater(() -> dialog.dispose());
+		};
+
+		new Thread(runnable).start();
+	}
+
 }

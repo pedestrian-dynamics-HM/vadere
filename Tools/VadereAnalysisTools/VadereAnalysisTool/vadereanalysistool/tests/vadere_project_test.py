@@ -21,7 +21,7 @@ class VadereProjectTests(unittest.TestCase):
 
     def test_load_output_dir(self):
         project = vadere_project.VadereProject("testData/s2ucre")
-        self.assertEqual(len(project.err_info()), 1)
+        self.assertEqual(len(project.err_info()), 0)
         self.assertEqual(len(project.output_dirs), 19)
 
     def test_scenaio_files(self):

@@ -28,6 +28,8 @@ import org.vadere.gui.topographycreator.control.ActionResetTopography;
 import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
 import org.vadere.gui.topographycreator.control.ActionSelectCut;
 import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
+import org.vadere.gui.topographycreator.control.ActionSimplifyObstacles;
+import org.vadere.gui.topographycreator.control.ActionSubtractMeasurementArea;
 import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
 import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
 import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
@@ -36,10 +38,10 @@ import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
 import org.vadere.gui.topographycreator.control.ActionUndo;
 import org.vadere.gui.topographycreator.control.ActionZoomIn;
 import org.vadere.gui.topographycreator.control.ActionZoomOut;
-import org.vadere.gui.topographycreator.control.DrawDotMode;
 import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
-import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
+import org.vadere.gui.topographycreator.control.DrawDotMode;
 import org.vadere.gui.topographycreator.control.DrawRectangleMode;
+import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
 import org.vadere.gui.topographycreator.control.EraserMode;
 import org.vadere.gui.topographycreator.control.SelectElementMode;
 import org.vadere.gui.topographycreator.control.TopographyAction;
@@ -237,6 +239,14 @@ public class TopographyWindow extends JPanel {
 		TopographyAction switchToStairsAction = new ActionSwitchCategory("switch to stairs", panelModel,
 				ScenarioElementType.STAIRS, selectRectangleAction);
 
+		/* switch category to measurement area action */
+		TopographyAction switchToMeasurementAreaAction = new ActionSwitchCategory(
+				"switch to measurement area", panelModel,
+				ScenarioElementType.MEASUREMENT_AREA, selectRectangleAction);
+
+		Action subtractMeasurementAreaAction = new ActionSubtractMeasurementArea(Messages.getString("TopographyCreator.btnSubtractMeasurementArea.label"), new ImageIcon(Resources.class
+				.getResource("/icons/subtract.png")), panelModel, undoSupport);
+
 
 		/* list of actions for the sub-dialog */
 		Action pen = new ActionSwitchSelectionMode(
@@ -257,9 +267,12 @@ public class TopographyWindow extends JPanel {
 				undoSupport),
 				basicAction);
 
+
 		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
 		List<Action> sourceDrawModes = new ArrayList<>();
 		List<Action> absorbingAreaDrawModes = new ArrayList<>();
+		List<Action> measurementAreaDrawModes = new ArrayList<>();
+		List<Action> measurementAreaMiscActions = new ArrayList<>();
 
 		obstacleAndTargetDrawModes.add(rectangle);
 		obstacleAndTargetDrawModes.add(pen);
@@ -269,6 +282,11 @@ public class TopographyWindow extends JPanel {
 		sourceDrawModes.add(pen);
 		sourceDrawModes.add(pen2);
 		sourceDrawModes.add(dot);
+
+		measurementAreaDrawModes.add(rectangle);
+		measurementAreaDrawModes.add(pen);
+		measurementAreaDrawModes.add(pen2);
+		measurementAreaMiscActions.add(subtractMeasurementAreaAction);
 
 		absorbingAreaDrawModes.add(rectangle);
 		absorbingAreaDrawModes.add(pen);
@@ -299,12 +317,20 @@ public class TopographyWindow extends JPanel {
 				.getResource("/icons/stairs_icon.png")), panelModel, switchToStairsAction, stairsButton,
 				obstacleAndTargetDrawModes);
 
+		/* open measurement area paint method dialog action*/
+		JButton measurementAreaButton = new JButton();
+		TopographyAction openMeasurementAreaDialog = new ActionOpenDrawOptionMenu( "MeasurementArea",
+				new ImageIcon(Resources.class.getResource("/icons/measurement_area_icon.png")),
+				panelModel, switchToMeasurementAreaAction, measurementAreaButton, measurementAreaDrawModes, measurementAreaMiscActions);
+
+
 		/* pedestrians */
 		TopographyAction switchToPedestrianAction = new ActionSwitchCategory("switch to pedestrian", panelModel,
 				ScenarioElementType.PEDESTRIAN, selectDotModeAction);
 		TopographyAction closeDialogAction = new ActionCloseDrawOptionPanel("Pedestrian", new ImageIcon(
 				Resources.class.getResource("/icons/pedestrians_icon.png")), panelModel,
 				switchToPedestrianAction);
+
 
 		/* switch category to source action */
 		TopographyAction switchToSourceAction = new ActionSwitchCategory("switch to source", panelModel,
@@ -319,9 +345,15 @@ public class TopographyWindow extends JPanel {
 		ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
+
+
 		/* resize Topography */
 		TopographyAction resizeTopographyBound = new ActionResizeTopographyBound(Messages.getString("TopographyBoundDialog.tooltip"),
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
+				panelModel, selectShape, undoSupport);
+
+		TopographyAction simplifyObstacle = new ActionSimplifyObstacles("Simplify",
+				new ImageIcon(Resources.class.getResource("/icons/merge_convex.png")),
 				panelModel, selectShape, undoSupport);
 
 		TopographyAction translateTopography =new ActionTranslateTopography("TranslateTopography",
@@ -365,6 +397,9 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, closeDialogAction, "TopographyCreator.btnInsertPedestrian.tooltip");
 		addActionToToolbar(toolbar, openStairsDialog, "TopographyCreator.btnInsertStairs.tooltip",
 				stairsButton);
+		addActionToToolbar(toolbar, openMeasurementAreaDialog,
+				"TopographyCreator.btnInsertMeasurementArea.tooltip",
+				measurementAreaButton);
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, mergeObstaclesAction, "TopographyCreator.btnMergeObstacles.tooltip");
 		// addActionToToolbar(toolbar, scrollAction, "TopographyCreator.btnScroll.tooltip");
@@ -374,6 +409,7 @@ public class TopographyWindow extends JPanel {
 		// "TopographyCreator.btnMinimizeTopography.tooltip");
 		addActionToToolbar(toolbar, maximizeAction, "TopographyCreator.btnMaximizeTopography.tooltip");
 		addActionToToolbar(toolbar, resizeTopographyBound, "TopographyCreator.btnTopographyBound.tooltip");
+		addActionToToolbar(toolbar, simplifyObstacle, "TopographyCreator.btnTopographyBound.tooltip");
 		addActionToToolbar(toolbar, translateTopography, "TopographyCreator.btnTranslation.tooltip");
 		addActionToToolbar(toolbar, translateElements, "TopographyCreator.btnElementTranslation.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));

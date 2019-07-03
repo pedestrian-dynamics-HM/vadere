@@ -2,8 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.writer.VadereStringWriterFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -29,24 +27,7 @@ public class PedestrianStartTimeProcessorTestEnv extends ProcessorTestEnv<Pedest
 	}
 
 	PedestrianStartTimeProcessorTestEnv(int nextProcessorId) {
-		super();
-
-		try {
-			testedProcessor = processorFactory.createDataProcessor(PedestrianStartTimeProcessor.class);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		testedProcessor.setId(nextProcessorId);
-		this.nextProcessorId = nextProcessorId++;
-
-		try {
-			outputFile = outputFileFactory.createOutputfile(
-					PedestrianIdOutputFile.class,
-					testedProcessor.getId());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		outputFile.setVadereWriterFactory(new VadereStringWriterFactory());
+		super(PedestrianStartTimeProcessor.class, PedestrianIdKey.class, nextProcessorId);
 	}
 
 	@Override

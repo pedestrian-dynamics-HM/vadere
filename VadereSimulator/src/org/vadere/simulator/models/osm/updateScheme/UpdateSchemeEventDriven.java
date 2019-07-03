@@ -5,6 +5,8 @@ import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.state.behavior.SalientBehavior;
+import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -40,29 +42,34 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
-				update(ped, currentTimeInSec);
+				update(ped, timeStepInSec, currentTimeInSec);
 				//System.out.println(ped.getId());
 				pedestrianEventsQueue.add(ped);
 			}
 		}
 	}
 
-	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec) {
+	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			VPoint oldPosition = pedestrian.getPosition();
 
+			double stepDuration = pedestrian.getDurationNextStep();
+
 			// for the first step after creation, timeOfNextStep has to be initialized
 			if (pedestrian.getTimeOfNextStep() == 0) {
-				pedestrian.setTimeOfNextStep(currentTimeInSec);
+				pedestrian.setTimeOfNextStep(currentTimeInSec - timeStepInSec);
 			}
-			
-			// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-			pedestrian.updateNextPosition();
-			double stepDuration = pedestrian.getDurationNextStep();
-			osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
+				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+				pedestrian.updateNextPosition();
+				osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
+				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
+			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
+				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
+			}
+
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			osmBehaviorController.wait(pedestrian);
 		} else if (mostImportantEvent instanceof BangEvent) {

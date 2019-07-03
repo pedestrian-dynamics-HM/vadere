@@ -21,7 +21,7 @@ public interface ITimeCostFunction {
 	/**
 	 * Prepares the dynamic timeCostFunction for the next step.
 	 */
-	void update();
+	default void update(){}
 
 	/**
 	 * Indicates that this ITimeCostFunction is for generating a dynamic
@@ -30,5 +30,5 @@ public interface ITimeCostFunction {
 	 * @return true => this ITimeCostFunction is for generating a dynaic
 	 *         potential field, otherwise false
 	 */
-	boolean needsUpdate();
+	default boolean needsUpdate(){return false;}
 }

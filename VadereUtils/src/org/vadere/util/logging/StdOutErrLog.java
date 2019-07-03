@@ -10,9 +10,9 @@ public class StdOutErrLog {
 	 * redirect StdOut and StdErr to logfile with custom log level STDOUT and STDERR.
 	 */
 	public static void addStdOutErrToLog(){
-		System.setOut(redirectOut(System.out));
-		System.setErr(redirectErr(System.err));
-		logger.info("Redirect StdOut and StdErr");
+			System.setOut(redirectOut(System.out));
+			System.setErr(redirectErr(System.err));
+			logger.info("Redirect StdOut and StdErr");
 	}
 
 	private static PrintStream redirectOut(PrintStream baseStream) {

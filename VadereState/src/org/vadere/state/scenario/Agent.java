@@ -115,6 +115,13 @@ public abstract class Agent extends DynamicElement {
 		return source;
 	}
 
+	/**
+	 *  Initially set pedestrians will not have source id set.
+	 */
+	public boolean hasSource(){
+		return source != null;
+	}
+
 	@Override
 	public int getId() {
 		return attributes.getId();
@@ -240,4 +247,5 @@ public abstract class Agent extends DynamicElement {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
 
+	public abstract Agent clone();
 }

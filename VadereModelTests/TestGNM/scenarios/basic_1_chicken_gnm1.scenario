@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_gnm1",
   "description" : "",
-  "release" : "0.7",
+  "release" : "1.0",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -25,7 +25,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesGNM" : {
@@ -58,7 +60,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 1,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -73,35 +76,33 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 25.0,
-            "y" : 21.0
-          }, {
-            "x" : 26.0,
-            "y" : 21.0
-          }, {
-            "x" : 26.0,
-            "y" : 41.0
-          }, {
-            "x" : 9.0,
-            "y" : 41.0
-          }, {
-            "x" : 9.0,
-            "y" : 21.0
-          }, {
-            "x" : 10.0,
-            "y" : 21.0
-          }, {
-            "x" : 10.0,
-            "y" : 40.0
-          }, {
-            "x" : 25.0,
-            "y" : 40.0
-          } ]
+          "x" : 10.0,
+          "y" : 40.0,
+          "width" : 15.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 9.0,
+          "y" : 21.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : -1
+      }, {
+        "shape" : {
+          "x" : 25.0,
+          "y" : 21.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
         },
         "id" : -1
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -151,7 +152,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null
