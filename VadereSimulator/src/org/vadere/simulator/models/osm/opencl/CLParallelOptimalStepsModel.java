@@ -167,7 +167,7 @@ public class CLParallelOptimalStepsModel {
 	private boolean debug = false;
 	private boolean profiling = false;
 
-    private int numberOfSortElements;
+    private long numberOfSortElements;
 
     public enum KernelType {
         Separate,
@@ -330,7 +330,7 @@ public class CLParallelOptimalStepsModel {
 		this.iCellSize = (float)cellSize;
 
 		// support also not multiple of 2 !
-		numberOfSortElements = expOf(pedestrians.size(), 2);
+		numberOfSortElements = CLUtils.power(pedestrians.size(), 2);
 		int toRemove = 0;
 		int originalSize = pedestrians.size();
 
@@ -663,7 +663,7 @@ public class CLParallelOptimalStepsModel {
 		    }
 		    else {
 			    localWorkSize = maxWorkGroupSize;
-			    globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+			    globalWorkSize = CLUtils.multiple(numberOfElements, localWorkSize);
 		    }
 
 		    clGlobalWorkSize.put(0, globalWorkSize);
@@ -706,7 +706,7 @@ public class CLParallelOptimalStepsModel {
 			}
 			else {
 				localWorkSize = maxWorkGroupSize;
-				globalWorkSize = multipleOf(numberOfElements, localWorkSize);
+				globalWorkSize = CLUtils.multiple(numberOfElements, localWorkSize);
 			}
 
 		    clGlobalWorkSize.put(0, globalWorkSize);
@@ -759,22 +759,6 @@ public class CLParallelOptimalStepsModel {
 			//return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
 			return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
 		}
-	}
-
-    private int expOf(int value, int multiple) {
-	    int result = 2;
-	    while (result < value) {
-		    result *= multiple;
-	    }
-	    return result;
-    }
-
-	private long multipleOf(long value, long multiple) {
-		long result = multiple;
-		while (result < value) {
-			result += multiple;
-		}
-		return result;
 	}
 
 	// TODO: global and local work size computation

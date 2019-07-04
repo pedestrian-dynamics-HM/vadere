@@ -201,11 +201,11 @@ public class CLConvolution extends CLOperation {
     private void convolveSeparate() throws OpenCLException {
         //init();
         try (MemoryStack stack = stackPush()) {
-            PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(2);
+            PointerBuffer clGlobalWorkSizeEdges = stack.mallocPointer(2);
             clGlobalWorkSizeEdges.put(0, matrixWidth);
 	        clGlobalWorkSizeEdges.put(1, matrixHeight);
 
-            PointerBuffer ev = stack.callocPointer(1);
+            PointerBuffer ev = stack.mallocPointer(1);
             // run the kernel and read the result
 	        CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveCol, 2, null, clGlobalWorkSizeEdges, null, null, null));
 	        CLInfo.checkCLError(clEnqueueNDRangeKernel(clQueue, clKernelConvolveRow, 2, null, clGlobalWorkSizeEdges, null, null, null));
@@ -215,7 +215,7 @@ public class CLConvolution extends CLOperation {
 
     private void convolve(final long clKernel) throws OpenCLException {
 	    try (MemoryStack stack = stackPush()) {
-		    PointerBuffer clGlobalWorkSizeEdges = stack.callocPointer(2);
+		    PointerBuffer clGlobalWorkSizeEdges = stack.mallocPointer(2);
 		    clGlobalWorkSizeEdges.put(0, matrixWidth);
 		    clGlobalWorkSizeEdges.put(1, matrixHeight);
 
@@ -227,7 +227,7 @@ public class CLConvolution extends CLOperation {
 
     private void setArguments(final long clKernel) throws OpenCLException {
 	    try (MemoryStack stack = stackPush()) {
-		    IntBuffer errcode_ret = stack.callocInt(1);
+		    IntBuffer errcode_ret = stack.mallocInt(+1);
 
 		    // host memory to gpu memory
 		    clInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
@@ -245,7 +245,7 @@ public class CLConvolution extends CLOperation {
 
     private void setArguments(final long clKernelConvolveCol, final long clKernelConvolveRow) throws OpenCLException {
 	    try (MemoryStack stack = stackPush()) {
-		    IntBuffer errcode_ret = stack.callocInt(1);
+		    IntBuffer errcode_ret = stack.mallocInt(1);
 
 		    clTmp = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
 		    clInput = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * matrixWidth * matrixHeight, errcode_ret);
@@ -310,7 +310,7 @@ public class CLConvolution extends CLOperation {
 
     private void buildProgram() throws OpenCLException {
 	    try (MemoryStack stack = stackPush()) {
-		    IntBuffer errcode_ret = stack.callocInt(1);
+		    IntBuffer errcode_ret = stack.mallocInt(1);
 
 		    PointerBuffer strings = stack.mallocPointer(1);
 		    PointerBuffer lengths = stack.mallocPointer(1);

@@ -223,4 +223,55 @@ public class CLUtils {
 	    MemoryUtil.memFree(buffer);
         return newBuffer;
     }
+
+	/**
+	 * Returns an integer n such that n = <tt>base</tt>^k, where k > 0 is the smallest integer such that
+	 * n >= <tt>value</tt>.
+	 *
+	 * @param value the value
+	 * @param base  the base
+	 *
+	 * @return an integer n such that n = 2 * <tt>multiple</tt>^k
+	 */
+	public static long power(long value, long base) {
+		assert value > 0 && base > 0;
+
+		long result = base;
+		while (result < value) {
+			result *= base;
+		}
+		return result;
+	}
+
+	/**
+	 * Returns an long n such that n = <tt>base</tt> * k, where k > 0 is the smallest long such that
+	 * n >= <tt>value</tt>.
+	 *
+	 * @param value the value
+	 * @param base  the multiple
+	 *
+	 * @return an integer n such that n = 2 * <tt>multiple</tt>^k
+	 */
+	public static long multiple(long value, long base) {
+		long result = base;
+		while (result < value) {
+			result += base;
+		}
+		return result;
+	}
+
+	/**
+	 * Computes the the factor radix which is 1 for all long of the form 2^k.
+	 *
+	 * @param L
+	 * @return
+	 */
+	public static long factorRadix2(long L){
+		if(L==0){
+			return 0;
+		}else{
+			for(int log2L = 0; (L & 1) == 0; L >>= 1, log2L++);
+			return L;
+		}
+	}
 }
