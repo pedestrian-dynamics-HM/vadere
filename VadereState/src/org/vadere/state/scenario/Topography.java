@@ -450,6 +450,12 @@ public class Topography implements DynamicElementMover{
 	 * writing the topography to file.
 	 */
 	public void addBoundary(Obstacle obstacle) {
+
+		if (obstacle.getId() == Attributes.ID_NOT_SET){
+			int nextId = obstacles.stream().map(Obstacle::getId).max(Integer::compareTo).orElse(1) + 1;
+			obstacle.setId(nextId);
+		}
+
 		this.addObstacle(obstacle);
 		this.boundaryObstacles.add(obstacle);
 	}
