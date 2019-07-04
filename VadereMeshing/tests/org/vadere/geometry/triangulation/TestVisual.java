@@ -1,9 +1,10 @@
 package org.vadere.geometry.triangulation;
 
-import org.vadere.meshing.mesh.impl.VPTriangulation;
-import org.vadere.meshing.mesh.impl.VPUniformRefinement;
+import org.vadere.meshing.mesh.impl.PTriangulation;
+import org.vadere.meshing.mesh.impl.PUniformRefinement;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -36,7 +37,7 @@ public class TestVisual {
 
 	public static void testUniformRefinement() {
 
-		VPUniformRefinement uniformRefinement = new VPUniformRefinement(
+		PUniformRefinement uniformRefinement = new PUniformRefinement(
                 () -> IIncrementalTriangulation.createVPTriangulation(bound),
 				bound,
 				Arrays.asList(new VRectangle(200, 200, 100, 200)),
@@ -54,7 +55,7 @@ public class TestVisual {
 
 	public static void testTriangulation() {
 
-		Set<VPoint> points = new HashSet<>();
+		Set<IPoint> points = new HashSet<>();
 
 		Random r = new Random(1);
 		for(int i=0; i< 20; i++) {
@@ -65,7 +66,7 @@ public class TestVisual {
 		IPointConstructor<VPoint> pointConstructor =  (x, y) -> new VPoint(x, y);
 		long ms = System.currentTimeMillis();
 
-		VPTriangulation triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
+		PTriangulation triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
 		triangulation.insert(points);
 		//triangulation.finish();
 		Set<VLine> edges = triangulation.getEdges();
@@ -79,10 +80,10 @@ public class TestVisual {
 
 	private static class Lines extends JComponent{
 		private Set<VLine> edges;
-		private Set<VPoint> points;
+		private Set<IPoint> points;
 		private final int max;
 
-		public Lines(final Set<VLine> edges, final Set<VPoint> points, final int max){
+		public Lines(final Set<VLine> edges, final Set<IPoint> points, final int max){
 			this.edges = edges;
 			this.points = points;
 			this.max = max;

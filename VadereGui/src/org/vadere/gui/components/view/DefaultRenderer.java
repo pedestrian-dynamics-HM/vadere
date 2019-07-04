@@ -8,7 +8,6 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -634,10 +633,10 @@ public abstract class DefaultRenderer {
 
 	protected void renderMesh(
 			@NotNull final Graphics2D g,
-			@NotNull final IMesh<? extends IPotentialPoint, ?, ?, ?> mesh,
+			@NotNull final IMesh<?, ?, ?> mesh,
 			@NotNull final VRectangle bound) {
-		MeshRenderer<? extends IPotentialPoint, ?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
-		meshRenderer.renderGraphics(g, bound);
+		MeshRenderer<?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+		//meshRenderer.renderGraphics(g, bound);
 	}
 
 	protected void renderVoronoiDiagram(final Graphics2D g, final VoronoiDiagram voronoiDiagram) {

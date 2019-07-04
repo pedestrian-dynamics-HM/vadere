@@ -24,5 +24,5 @@ public interface IPointConstructor<P extends IPoint> {
 	/**
 	 * A point constructor vor {@link VPoint}
 	 */
-	IPointConstructor<VPoint> pointConstructorVPoint = (x, y) -> new VPoint(x, y);
+	IPointConstructor<IPoint> pointConstructorVPoint = (x, y) -> new VPoint(x, y);
 }

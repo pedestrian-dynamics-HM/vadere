@@ -1,9 +1,8 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.triangulator.RandomPointsSetTriangulator;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSetTriangulator;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 public class DelaunayTriangulationExamples {
@@ -19,18 +18,15 @@ public class DelaunayTriangulationExamples {
 		// define a bound of the mesh / triangulation
 		VRectangle bound = new VRectangle(0, 0, 100, 100);
 
-		// define your triangulation which is based on VPoint
-		VPTriangulation triangulation = IIncrementalTriangulation.createVPTriangulation(bound);
-
 		// define a random point set triangulator
 		int numberOfPoint = 5000;
-		RandomPointsSetTriangulator randomTriangulator = new RandomPointsSetTriangulator(triangulation, numberOfPoint, bound);
+		GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(new PMesh(), numberOfPoint, bound);
 
 		// fill in the points into the empty triangulation
 		randomTriangulator.generate();
 
 		// display the result
-		MeshPanel meshPanel = new MeshPanel(triangulation.getMesh(), 500, 500);
+		MeshPanel meshPanel = new MeshPanel(randomTriangulator.getMesh(), 500, 500);
 		meshPanel.display();
 	}
 

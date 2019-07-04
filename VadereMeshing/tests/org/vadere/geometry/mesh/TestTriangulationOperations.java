@@ -1,32 +1,34 @@
 package org.vadere.geometry.mesh;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.VPTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Benedikt Zoennchen
  */
 public class TestTriangulationOperations {
 
-	private VPTriangulation triangulation;
-	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
+	private PTriangulation triangulation;
 	private VPoint collapsePoint = new VPoint(0.5, 0);
-	private List<VPoint> points = new ArrayList<>();
+	private List<IPoint> points = new ArrayList<>();
 	private VRectangle bound = new VRectangle(-0.5, -0.5, 2.0, 2.0);
 
 	@Before
@@ -38,13 +40,13 @@ public class TestTriangulationOperations {
 		points.add(new VPoint(0.5, 1));
 		triangulation.insert(points);
 		triangulation.finish();
-		mesh = triangulation.getMesh();
 	}
 
 	@Test
 	public void testCollapse() {
-		PVertex<VPoint> vertex = mesh
-				.streamVertices().filter(v -> mesh.getPoint(v).equals(collapsePoint))
+		var mesh = triangulation.getMesh();
+		PVertex vertex = mesh
+				.streamVertices().filter(v -> mesh.toPoint(v).equals(collapsePoint))
 				.findAny().get();
 
 		assertTrue(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
@@ -57,7 +59,7 @@ public class TestTriangulationOperations {
 
 		assertFalse(new HashSet<>(points).equals(new HashSet<>(mesh.getPoints())));
 
-		PFace<VPoint> face = triangulation.getMesh().getFaces().get(0);
+		PFace face = triangulation.getMesh().getFaces().get(0);
 
 		assertTrue(mesh.streamEdges(face).allMatch(e -> mesh.getFace(e).equals(face)));
 
@@ -75,11 +77,51 @@ public class TestTriangulationOperations {
 
 	@Test
 	public void testIsValid() {
+		assertTrue(triangulation.getMesh().isValid());
 		assertTrue(triangulation.isValid());
 	}
 
 	@Test
 	public void testRecompute() {
 		triangulation.recompute();
+	}
+
+	@Test
+	public void testRemovePoint() {
+		List<VPoint> points = Arrays.asList(new VPoint(0,0),
+				new VPoint(1, 0),
+				new VPoint(1, 1),
+				new VPoint(0, 1),
+				new VPoint(0.5, 0.5),
+				new VPoint(0.3, 0.8),
+				new VPoint(0.12, 0.23),
+				new VPoint(0.3, 0.3),
+				new VPoint(0.3, 0.6));
+
+		var delaunayTriangulation = new PDelaunayTriangulator(points);
+		var triangulation = delaunayTriangulation.generate();
+		var mesh = delaunayTriangulation.getMesh();
+
+		assertEquals(points.size(), mesh.getNumberOfVertices());
+
+		triangulation.remove(new VPoint(0.5, 0.5));
+		assertEquals(points.size()-1, mesh.getNumberOfVertices());
+		Assert.assertTrue(mesh.isValid());
+
+		triangulation.remove(new VPoint(0.3, 0.3));
+		assertEquals(points.size()-2, mesh.getNumberOfVertices());
+		Assert.assertTrue(mesh.isValid());
+
+		triangulation.remove(new VPoint(0.3, 0.6));
+		assertEquals(points.size()-3, mesh.getNumberOfVertices());
+		Assert.assertTrue(mesh.isValid());
+
+		triangulation.insert(new VPoint(0.15, 0.5));
+		assertEquals(points.size()-2, mesh.getNumberOfVertices());
+		Assert.assertTrue(mesh.isValid());
+
+		triangulation.remove(new VPoint(0.15, 0.5));
+		assertEquals(points.size()-3, mesh.getNumberOfVertices());
+		Assert.assertTrue(mesh.isValid());
 	}
 }

@@ -122,7 +122,7 @@ public class TrainModel {
 		for (Pedestrian p : pedestrians) {
 			// TODO not implemented
 //			for (Seat s : seats) {
-//				if (p.getPosition().equals(s.getAssociatedTarget().getShape().getCentroid())) {
+//				if (p.getPosition().equals(s.getAssociatedTarget().getShape().getPolygonCentroid())) {
 //					p.getTargets().add(s.getAssociatedTarget().getId());
 //					s.setSittingPerson(p);
 //				}

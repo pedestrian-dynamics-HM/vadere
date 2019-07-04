@@ -434,11 +434,11 @@ public class TopographyWindow extends JPanel {
 		getActionMap().put("copy-element", copyElementAction);
 
 		TopographyAction insertCopiedElementAction =
-				new ActionInsertCopiedElement("insert copied element", panelModel, undoSupport);
+				new ActionInsertCopiedElement("insertVertex copied element", panelModel, undoSupport);
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				"insert-copied-element");
-		getActionMap().put("insert-copied-element", insertCopiedElementAction);
+				"insertVertex-copied-element");
+		getActionMap().put("insertVertex-copied-element", insertCopiedElementAction);
 
 		// delete element
 		TopographyAction deleteElement =

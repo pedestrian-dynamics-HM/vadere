@@ -1,20 +1,20 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.logging.Logger;
-import org.vadere.util.math.IDistanceFunction;
+import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class RunTimeCPU extends JFrame {
 
 
     private static void overallUniformRing() {
-	    IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 	    IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 	    List<VShape> obstacles = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class RunTimeCPU extends JFrame {
 	    double minInitialEdgeLength = 0.03;
 
 	    while (initialEdgeLength >= minInitialEdgeLength) {
-		    EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshGenerator = new EikMesh<>(
+		    GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				    distanceFunc,
 				    uniformEdgeLength,
 				    initialEdgeLength,
@@ -64,7 +64,7 @@ public class RunTimeCPU extends JFrame {
 		    log.info("quality" + meshGenerator.getQuality());
 		    log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-		    MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		    MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 		    JFrame frame = distmeshPanel.display();
 		    frame.setVisible(true);
 		    frame.setTitle("uniformRing()");
@@ -76,7 +76,7 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepUniformRing(double startLen, double endLen, double stepLen) {
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -89,7 +89,7 @@ public class RunTimeCPU extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
-			EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshGenerator = new EikMesh<>(
+			GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 					distanceFunc,
 					uniformEdgeLength,
 					initialEdgeLength,
@@ -119,7 +119,7 @@ public class RunTimeCPU extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");

@@ -1,10 +1,10 @@
 package org.vadere.meshing.mesh.inter;
 
-
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
+import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
@@ -20,20 +20,19 @@ import java.util.stream.Collectors;
  * <p>
  * A poly-connectivity {@link IPolyConnectivity} is the connectivity of a mesh of non-intersecting connected polygons including holes.
  * So it is more abstract than a tri-connectivity {@link ITriConnectivity}. The mesh {@link IMesh} stores all the
- * date of the base elements (points {@link P}, vertices {@link V}, half-edges {@link E} and faces {@link F}) and offers factory method
+ * date of the base elements, vertices {@link V}, half-edges {@link E} and faces {@link F}) and offers factory method
  * to create new base elements. The connectivities, i.e. {@link IPolyConnectivity} and {@link ITriConnectivity}
  * offers all the operations manipulating the connectivity of the mesh. The connectivity is the relation between vertices and edges which
  * define faces which therefore define the mesh structure.
  * </p>
  *
- * @param <P> the type of the points (containers)
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  *
  * @author Benedikt Zoennchen
  */
-public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Iterable<F>{
+public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<F> {
 
 	/**
 	 * A logger to debug some code.
@@ -47,10 +46,10 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 *
 	 * @return the mesh of this IPolyConnectivity
 	 */
-	IMesh<P, V, E, F> getMesh();
+	IMesh<V, E, F> getMesh();
 
 	default boolean isAtBoundary(@NotNull final E halfEdge) {
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 		return mesh.isBoundary(halfEdge) || mesh.isBoundary(mesh.getTwin(halfEdge));
 	}
 
@@ -70,6 +69,18 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return getMesh().locate(x, y);
 	}
 
+	default Optional<V> locatePoint(final double x, final double y) {
+		Optional<F> optFace = locateFace(x, y);
+		if(optFace.isPresent()) {
+			for(V v : getMesh().getVertexIt(optFace.get())) {
+				if(v.getX() == x && v.getY() == y) {
+					return Optional.of(v);
+				}
+			}
+		}
+		return Optional.empty();
+	}
+
 	/**
 	 * <p>Searches and returns the face containing the point (x,y) in O(n),
 	 * where n is the number of faces of the mesh.</p>
@@ -79,7 +90,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param point the location point
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(@NotNull final P point) {
+	default Optional<F> locateFace(@NotNull final IPoint point) {
 		return locateFace(point.getX(), point.getY());
 	}
 
@@ -110,7 +121,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @return a half-edge (begin, end) if there is any, otherwise empty()
 	 */
 	default Optional<E> findEdge(@NotNull final V begin, @NotNull final V end) {
-		IMesh<P, V, E, F> mesh = getMesh();
+		IMesh<V, E, F> mesh = getMesh();
 		return mesh.getIncidentEdges(mesh.getEdge(begin)).stream()
 				.filter(edge -> mesh.getPrev(edge).equals(end))
 				.map(edge -> mesh.getTwin(edge)).findAny();
@@ -148,33 +159,21 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 *
 	 * <p>Changes the connectivity.</p>
 	 *
-	 * @param edge  the edge
-	 * @param p     the split point.
-	 * @param mesh  the mesh containing the edge and which will contain p afterwards
-	 * @param <P>   the type of the points (containers)
 	 * @param <V>   the type of the vertices
 	 * @param <E>   the type of the half-edges
 	 * @param <F>   the type of the faces
 	 *
+	 * @param edge  the edge
+	 * @param p     the split point.
+	 * @param mesh  the mesh containing the edge and which will contain p afterwards
 	 * @return returns the new vertex
 	 */
-	static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> V splitEdge(
-			@NotNull final E edge, @NotNull P p, @NotNull IMesh<P, V, E, F> mesh) {
-
+	static <V extends IVertex, E extends IHalfEdge, F extends IFace> V splitEdge(
+			@NotNull final E edge, @NotNull IPoint p, @NotNull IMesh<V, E, F> mesh) {
+		V u = mesh.createVertex(p);
 		E twin = mesh.getTwin(edge);
-
-		if(mesh.getPoint(edge).equals(p)) {
-			return mesh.getVertex(edge);
-		}
-
-		if(mesh.getPoint(twin).equals(p)) {
-			return mesh.getVertex(mesh.getPrev(edge));
-		}
-
 		E prev = mesh.getPrev(edge);
 		E tNext = mesh.getNext(twin);
-
-		V u = mesh.createVertex(p);
 
 		E e = mesh.createEdge(u);
 		mesh.setFace(e, mesh.getFace(edge));
@@ -422,13 +421,67 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * <p>Changes the connectivity.</p>
 	 *
 	 * @param face                      the face
-	 * @param mergeCondition            the cup condition
+	 * @param mergeCondition            the merge condition
 	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 *
-	 * @return the cup result i.e. the resulting face.
+	 * @return the merge result i.e. the resulting face.
 	 */
 	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices) {
 		return mergeFaces(face, mergeCondition, deleteIsolatedVertices, -1);
+	}
+
+	/**
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * the mergeCondition does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
+	 * @param errorCondition            a predicate which indicates that the merge process did merge faces which should not be merged,
+	 *                                  and therefore leading to an illegal mesh. If this condition is ever satisfied an exception will be thrown.
+	 * @throws IllegalMeshException     if during the merging <tt>errorCondition</tt> is true.
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			@NotNull final Predicate<F> errorCondition,
+			final boolean deleteIsolatedVertices) throws IllegalMeshException {
+		return mergeFaces(face, mergeCondition, errorCondition, deleteIsolatedVertices, -1);
+	}
+
+	/**
+	 * <p>A virus like working algorithm which merges neighbouring faces by starting at the face until
+	 * the mergeCondition does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param mergeCondition            the merge condition
+	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
+	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be removed
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			final boolean deleteIsolatedVertices,
+			final int maxDept) {
+		try {
+			return mergeFaces(face, mergeCondition, f -> false, deleteIsolatedVertices, maxDept);
+		} catch (IllegalMeshException e) {
+			e.printStackTrace();
+		}
+		// this will never happen.
+		return Optional.empty();
 	}
 
 	// TODO: improve performance by remembering faces
@@ -441,13 +494,21 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * <p>Changes the connectivity.</p>
 	 *
 	 * @param face                      the face
-	 * @param mergeCondition            the cup condition
+	 * @param mergeCondition            the merge condition
 	 * @param deleteIsolatedVertices    if true, vertices with degree zero will be removed from the mesh data structure otherwise they will not.
 	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be removed
+	 * @param errorCondition            a predicate which indicates that the merge process did merge faces which should not be merged,
+	 *                                  and therefore leading to an illegal mesh. If this condition is ever satisfied an exception will be thrown.
+	 * @throws IllegalMeshException     if during the merging <tt>errorCondition</tt> is true.
 	 *
-	 * @return the cup result i.e. the resulting face.
+	 * @return the merge result i.e. the resulting face.
 	 */
-	default Optional<F> mergeFaces(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsolatedVertices, final int maxDept) {
+	default Optional<F> mergeFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> mergeCondition,
+			@NotNull final Predicate<F> errorCondition,
+			final boolean deleteIsolatedVertices,
+			final int maxDept) throws IllegalMeshException {
 		boolean modified = true;
 		F currentFace = face;
 		int dept = 0;
@@ -460,6 +521,9 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 			assert neighbouringFaces.isEmpty() || neighbouringFaces.stream().anyMatch(f -> !f.equals(neighbouringFaces.get(0))) : "each edge of both faces is a link to the other face";
 
 			for(F neighbouringFace : neighbouringFaces) {
+				if(errorCondition.test(neighbouringFace)) {
+					throw new IllegalMeshException("the errorCondition is satisfied.");
+				}
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && mergeCondition.test(neighbouringFace)) {
 					Optional<F> optionalMergeResult = removeEdges(currentFace, neighbouringFace, deleteIsolatedVertices);
@@ -490,15 +554,15 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	}
 
 	/**
-	 * Creates a new hole or extends an existing hole by removing neighbouring faces as
-	 * long as the cup condition holds.
+	 * Creates a new hole or extends an existing hole by removing neighbouring faces by a virus algorithm
+	 * which consumes faces as long as the merge condition holds.
 	 *
 	 * Changes the connectivity.
 	 *
 	 * @param face                      they face which will be transformed into a hole
-	 * @param mergeCondition            the cup condition
+	 * @param mergeCondition            the merge condition
 	 * @param deleteIsoletedVertices    if true isolated vertices, i.e. vertices without any edges, will be removed from the mesh
-	 * @return  (optional) the hole or face itself it the face does not fulfill the cup condition
+	 * @return  (optional) the hole or face itself it the face does not fulfill the merge condition
 	 *          or empty if due to the creation of the hole all faces will be removed!
 	 */
 	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
@@ -540,6 +604,13 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 					modified = true;
 				}
 			}
+		}
+	}
+
+	default void removeFacesAtBoundary(@NotNull final Predicate<F> mergePredicate, @NotNull final Predicate<F> errorPredicate) throws IllegalMeshException {
+		mergeFaces(getMesh().getBorder(), mergePredicate, errorPredicate, true, 1);
+		for(F face : getMesh().getHoles()) {
+			mergeFaces(face, mergePredicate, errorPredicate, true, 1);
 		}
 	}
 
@@ -721,6 +792,18 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x, y, edge));
 	}
 
+	/**
+	 * Returns true if (x,y) is contained in the ccw triangle defined by (v1, v2, v3).
+	 *
+	 * Assumption: v1 -> v2 -> v3 is ccw oriented.
+	 *
+	 * @param x
+	 * @param y
+	 * @param v1
+	 * @param v2
+	 * @param v3
+	 * @return
+	 */
 	default boolean contains(final double x, final double y, @NotNull final V v1, @NotNull final V v2, @NotNull final V v3) {
 		return !GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x, y)
 				&& !GeometryUtils.isRightOf(v2.getX(), v2.getY(), v3.getX(), v3.getY(), x, y)
@@ -738,7 +821,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param y1    the y-coordinate of the point
 	 * @return true if the (x1, y1) is part of the face, false otherwise
 	 */
-	default boolean isMember(final double x1, final double y1, final F face) {
+	default boolean isMember(final double x1, final double y1, @NotNull final F face) {
 		return getMemberEdge(face, x1, y1).isPresent();
 	}
 
@@ -754,7 +837,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param distance  the maximal distance
 	 * @return true if the (x1, y1) close to a point of the face, false otherwise
 	 */
-	default boolean isClose(final double x1, final double y1, final F face, double distance) {
+	default boolean isClose(final double x1, final double y1, @NotNull final F face, double distance) {
 		return getCloseEdge(face, x1, y1, distance).isPresent();
 	}
 
@@ -772,7 +855,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default Optional<E> getMemberEdge(@NotNull final F face, final double x1, final double y1) {
 
 		for(E e : getMesh().getEdgeIt(face)) {
-			P p = getMesh().getPoint(e);
+			IPoint p = getMesh().getPoint(e);
 			if(p.getX() == x1 && p.getY() == y1) {
 				return Optional.of(e);
 			}
@@ -795,7 +878,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	default Optional<E> getCloseEdge(@NotNull final F face, double x1, double y1, double distance) {
 		assert distance > 0;
 		for(E e : getMesh().getEdgeIt(face)) {
-			P p = getMesh().getPoint(e);
+			IPoint p = getMesh().getPoint(e);
 			if(p.distance(x1, y1) <= distance) {
 				return Optional.of(e);
 			}
@@ -814,7 +897,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param edge  the half-edge
 	 * @return true if the point (x1, y1) is right of the half-edge, false otherwise
 	 */
-	default boolean isRightOf(final double x1, final double y1, final E edge) {
+	default boolean isRightOf(final double x1, final double y1, @NotNull final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
 		return GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
@@ -831,7 +914,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param edge  the half-edge
 	 * @return true if the point (x1, y1) is left of the half-edge, false otherwise
 	 */
-	default boolean isLeftOf(final double x1, final double y1, final E edge) {
+	default boolean isLeftOf(final double x1, final double y1, @NotNull final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
 		return GeometryUtils.isLeftOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
@@ -847,7 +930,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
      * @param edge  the half-edge defining the line-segment
      * @return true if the line-segment defined by the half-edge intersects the line (p1, p2)
      */
-	default boolean intersects(final IPoint p1, final IPoint p2, E edge) {
+	default boolean intersects(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
 		return intersects(p1, p2, v1, v2);
@@ -864,7 +947,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param v2 the second point of the line-segment
 	 * @return true if the line-segment defined by (v1,v2) intersects the line (p1, p2)
 	 */
-	default boolean intersects(final IPoint p1, final IPoint p2, V v1, V v2) {
+	default boolean intersects(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final V v1, @NotNull final V v2) {
 		return GeometryUtils.intersectLine(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 	}
 
@@ -878,7 +961,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param edge  the half-edge defining the line-segment
 	 * @return true if the half-line-segment starting at p1 in the direction (p2-p1) intersects the line-segment defined by the half-edge, false otherwise
 	 */
-	default boolean intersectsDirectional(final IPoint p1, final IPoint p2, E edge) {
+	default boolean intersectsDirectional(@NotNull final IPoint p1, @NotNull final IPoint p2, E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
 		return GeometryUtils.intersectHalfLineSegment(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
@@ -931,7 +1014,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 							//create face
 							Face_handle  newf = create_face(ff,ii,fn,in);
 							typename Hole::iterator tempo=hit;
-							hit = hole.insert(hit,Edge(newf,1)); //push newf
+							hit = hole.insertVertex(hit,Edge(newf,1)); //push newf
 							hole.erase(tempo); //erase ff
 							hole.erase(next); //erase fn
 							if (hit != hole.begin() ) --hit;
@@ -992,7 +1075,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param boundary                  the boundary which has to be a neighbouring boundary of the face
 	 * @param deleteIsolatedVertices    true means that all vertices with degree smaller equals 1 will be removed as well
 	 */
-	default void removeFaceAtBoundary(@NotNull final F face, final F boundary, final boolean deleteIsolatedVertices) {
+	default void removeFaceAtBoundary(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
 		if(!getMesh().isDestroyed(face)) {
 
 			assert getMesh().streamFaces(face).filter(neighbour -> neighbour.equals(boundary)).count() > 0;
@@ -1038,7 +1121,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 				assert survivingEdge == null;
 
 				// all edges are border edges!
-				EdgeIterator<P, V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), boundaryEdge);
+				EdgeIterator<V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), boundaryEdge);
 
 				F twinFace = getMesh().getTwinFace(boundaryEdge);
 
@@ -1192,7 +1275,7 @@ public interface IPolyConnectivity<P extends IPoint, V extends IVertex<P>, E ext
 	 * @param face2 the second face that might be a neighbour of face1
 	 * @return  the half-edge of face1 such that its twin is part of face2
 	 */
-	default Optional<E> findTwins(final F face1, final F face2) {
+	default Optional<E> findTwins(@NotNull final F face1, @NotNull final F face2) {
 		for(E halfEdge1 : getMesh().getEdgeIt(face1)) {
 			for(E halfEdge2 : getMesh().getEdgeIt(face2)) {
 				if(getMesh().getTwin(halfEdge1).equals(halfEdge2)) {

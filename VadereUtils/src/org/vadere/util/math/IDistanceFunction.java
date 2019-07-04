@@ -2,6 +2,7 @@ package org.vadere.util.math;
 
 
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -40,11 +41,51 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 		};
 	}
 
+	static IDistanceFunction createToTargets(final Collection<? extends VShape> targets) {
+		assert !targets.isEmpty();
+		return p -> {
+			double min = Double.POSITIVE_INFINITY;
+			for (VShape shape : targets) {
+				double dist = shape.distance(p);
+				if(dist < min) {
+					min = dist;
+				}
+			}
+			return min;
+		};
+	}
+
+	static IDistanceFunction createToTargetPoints(final Collection<? extends IPoint> targetPoints) {
+		assert !targetPoints.isEmpty();
+		return p -> {
+			double min = Double.POSITIVE_INFINITY;
+			for (IPoint targetPoint : targetPoints) {
+				double dist = targetPoint.distance(p);
+				if(dist < min) {
+					min = dist;
+				}
+			}
+			return min;
+		};
+	}
+
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final Collection<? extends VShape> obstacles) {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}
 
+	static IDistanceFunction create(final VPolygon regionBoundingBox, final Collection<? extends VShape> obstacles) {
+		return new DistanceFunction(regionBoundingBox, obstacles);
+	}
+
 	static IDistanceFunction create(final VRectangle regionBoundingBox, final VShape ... shapes) {
+		List<VShape> shapeList = new ArrayList<>();
+		for(VShape shape : shapes) {
+			shapeList.add(shape);
+		}
+		return new DistanceFunction(regionBoundingBox, shapeList);
+	}
+
+	static IDistanceFunction create(final VPolygon regionBoundingBox, final VShape ... shapes) {
 		List<VShape> shapeList = new ArrayList<>();
 		for(VShape shape : shapes) {
 			shapeList.add(shape);

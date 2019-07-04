@@ -39,7 +39,7 @@ public class DistMeshPlotsSmall {
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
-	private static void uniformCircle(final double initialEdgeLength) {
+	private static void uniformCircle(final double initialEdgeLength) throws InterruptedException {
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
@@ -49,7 +49,7 @@ public class DistMeshPlotsSmall {
 				initialEdgeLength,
 				bbox, obstacles);
 
-		StopWatch overAllTime = new StopWatch();
+		/*StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.execute();
 		overAllTime.stop();
@@ -57,17 +57,23 @@ public class DistMeshPlotsSmall {
 		log.info("#vertices:" + meshGenerator.getPoints().size());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("quality:" + meshGenerator.getQuality());
-		log.info("min-quality: " + meshGenerator.getMinQuality());
+		log.info("min-quality: " + meshGenerator.getMinQuality());*/
 
 		DistmeshPanel distmeshPanel = new DistmeshPanel(meshGenerator, 1000, 800, bbox);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformCircle("+ initialEdgeLength +")");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		distmeshPanel.repaint();
 
-		System.out.println();
-		System.out.println();
+		while (true) {
+			meshGenerator.improve();
+			Thread.sleep(100);
+			distmeshPanel.repaint();
+			Thread.sleep(100);
+		}
+
+		//System.out.println();
+		//System.out.println();
 		//System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
 	}
 
@@ -216,7 +222,7 @@ public class DistMeshPlotsSmall {
 	private static void uniformHex() {
 		VPolygon hex = VShape.generateHexagon(0.4);
 
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -249,11 +255,11 @@ public class DistMeshPlotsSmall {
 		System.out.println();
 	}
 
-	public static void main(String[] args) {
-		//uniformCircle(initialEdgeLength);
+	public static void main(String[] args) throws InterruptedException {
+		uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength);
 		//uniformCircle(initialEdgeLength / 2.0);
-		adaptiveRing(0.04);
+		//adaptiveRing(0.04);
 		// /uniformRing();
 		//uniformRect();
 		//uniformHex();
