@@ -7,7 +7,12 @@ import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
-import org.vadere.gui.components.control.simulation.*;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGeneratePoly;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
@@ -244,11 +249,16 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				renderer, model);
 		AbstractAction tikzImg = new ActionGenerateTikz(Messages.getString("ProjectView.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
 				renderer, model);
+		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), resources.getIcon("camera_poly.png", iconWidth, iconHeight),
+				renderer, model);
+
+
 		// add new ImageGenerator Action ...
 
 		imgOptions.add(pngImg);
 		imgOptions.add(svgImg);
 		imgOptions.add(tikzImg);
+		imgOptions.add(polyImg);
 		// add Action to List ....
 
 		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(

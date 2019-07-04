@@ -1,18 +1,17 @@
 package org.vadere.simulator.models.potential.solver;
 
-
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.PEikMeshGen;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
-import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,13 +28,13 @@ public class PerformanceTriangleFMM {
 		//LogManager.shutdown();
 	}
 
-	private static IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> createTriangulation() {
+	private static IIncrementalTriangulation<PVertex, PHalfEdge, PFace> createTriangulation() {
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0;
-		PEikMeshGen<PotentialPoint> meshGenerator = new PEikMeshGen<>(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox, (x, y) -> new PotentialPoint(x, y));
+		PEikMesh meshGenerator = new PEikMesh(distanceFunc, edgeLengthFunc, initialEdgeLen, bbox);
 		return meshGenerator.generate();
 	}
 
-	private static void solve(EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> solver) {
+	private static void solve(EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver) {
 		long ms = System.currentTimeMillis();
 		System.out.println("start FFM");
 		solver.initialize();
@@ -48,7 +47,7 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (1) create mesh
 		 */
-		IIncrementalTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> triangulation = createTriangulation();
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = createTriangulation();
 
 		/**
 		 * (2) define target points
@@ -56,12 +55,12 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (2) define target points
 		 */
-		List<PVertex<PotentialPoint>> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+		List<PVertex> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 
 		/**
 		 * (3) solve the eikonal equation on the mesh
 		 */
-		EikonalSolverFMMTriangulation<PotentialPoint, PVertex<PotentialPoint>, PHalfEdge<PotentialPoint>, PFace<PotentialPoint>> solver = new EikonalSolverFMMTriangulation(
+		EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver = new EikonalSolverFMMTriangulation(
 				new UnitTimeCostFunction(),
 				triangulation,
 				targetVertices,

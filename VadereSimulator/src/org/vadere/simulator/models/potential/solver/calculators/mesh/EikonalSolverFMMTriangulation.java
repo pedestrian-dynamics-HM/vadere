@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -9,13 +8,11 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.logging.LogLevel;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
@@ -23,11 +20,9 @@ import org.vadere.util.math.MathUtil;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -40,18 +35,17 @@ import java.util.function.Predicate;
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
- * @param <P>   the type of the points of the triangulation extending {@link IPotentialPoint}
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
-public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements EikonalSolver {
+public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> implements EikonalSolver {
 
     private static Logger logger = Logger.getLogger(EikonalSolverFMMTriangulation.class);
     private Set<F> nonAccuteTris = new HashSet<>();
-    private Map<Triple<P, P, P>, Double> angles = new HashMap();
-	private Map<Triple<P, P, P>, Double> sinPhis = new HashMap();
-	private Map<Triple<P, P, P>, Double> cosPhis = new HashMap();
+
+    public static final String namePotential = "potential";
+    public static final String namePathFindingTag = "pathFindingTag";
 
     static {
     	logger.setInfo();
@@ -62,6 +56,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 */
 	private ITimeCostFunction timeCostFunction;
 
+	/**
+	 * Gives the distance to the boundary i.e. the targets
+	 */
 	private IDistanceFunction distFunc;
 
 	private Collection<V> targetVertices;
@@ -69,7 +66,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	/**
 	 * The triangulation the solver uses.
 	 */
-    private IIncrementalTriangulation<P, V, E, F> triangulation;
+    private IIncrementalTriangulation<V, E, F> triangulation;
 
 	/**
 	 * Indicates that the computation of T has been completed.
@@ -85,11 +82,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * Comparator for the heap. Vertices of points with small potentials are at the top of the heap.
      */
     private Comparator<V> pointComparator = (v1, v2) -> {
-        P p1 = getMesh().getPoint(v1);
-        P p2 = getMesh().getPoint(v2);
-        if (p1.getPotential() < p2.getPotential()) {
+        if (getPotential(v1) < getPotential(v2)) {
             return -1;
-        } else if(p1.getPotential() > p2.getPotential()) {
+        } else if(getPotential(v1) > getPotential(v2)) {
             return 1;
         }
         else {
@@ -108,16 +103,21 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
                                          @NotNull final Collection<IPoint> targetPoints,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
+	    this.targetVertices = new HashSet<>();
+	    this.distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
 
         for(IPoint point : targetPoints) {
             F face = triangulation.locateFace(point.getX(), point.getY()).get();
-            initialFace(face, p -> point.distance(p));
+            if(!getMesh().isBoundary(face)) {
+	            targetVertices.addAll(getMesh().getVertices(face));
+            }
+            //initialFace(face, p -> point.distance(p));
         }
     }
 
@@ -130,18 +130,20 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     public EikonalSolverFMMTriangulation(@NotNull final Collection<VShape> targetShapes,
                                          @NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation
+                                         @NotNull final IIncrementalTriangulation<V, E, F> triangulation
     ) {
         this.triangulation = triangulation;
         this.calculationFinished = false;
         this.timeCostFunction = timeCostFunction;
         this.narrowBand = new PriorityQueue<>(pointComparator);
+	    this.targetVertices = new HashSet<>();
+	    this.distFunc = IDistanceFunction.createToTargets(targetShapes);
 
         for(VShape shape : targetShapes) {
             getMesh().streamFaces()
                     .filter(f -> !getMesh().isBoundary(f))
                     .filter(f -> shape.intersects(getMesh().toTriangle(f)))
-                    .forEach(f -> initialFace(f, p -> Math.max(shape.distance(p), 0)));
+                    .forEach(f -> targetVertices.addAll(getMesh().getVertices(f)));
         }
     }
 
@@ -154,7 +156,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * @param distFunc          the distance function (distance to the target) which is negative inside and positive outside the area of interest
      */
     public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
-                                         @NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
+                                         @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
                                          @NotNull final Collection<V> targetVertices,
                                          @NotNull final IDistanceFunction distFunc
     ) {
@@ -164,6 +166,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         this.narrowBand = new PriorityQueue<>(pointComparator);
         this.distFunc = distFunc;
         this.targetVertices = targetVertices;
+
         for(F face : triangulation.getMesh().getFaces()) {
         	if(isNonAcute(face)) {
         		nonAccuteTris.add(face);
@@ -179,15 +182,12 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     private void initialFace(@NotNull final F face, @NotNull final IDistanceFunction distanceFunction) {
         for(V vertex : getMesh().getVertexIt(face)) {
-            P potentialPoint = getMesh().getPoint(vertex);
-            double distance = distanceFunction.apply(potentialPoint);
-
-            if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
+            double distance = distanceFunction.apply(vertex);
+            if(getPathFindingTag(vertex) != PathFindingTag.Undefined) {
                 narrowBand.remove(vertex);
             }
-
-            potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance * timeCostFunction.costAt(potentialPoint)));
-            potentialPoint.setPathFindingTag(PathFindingTag.Reached);
+            updatePotential(vertex, distance / getTimeCost(vertex));
+            setPathFindingTag(vertex, PathFindingTag.Reached);
             narrowBand.add(vertex);
         }
     }
@@ -202,7 +202,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	    if (!calculationFinished) {
 		    while (narrowBand.size() > 0) {
 			    V vertex = narrowBand.poll();
-			    getMesh().getPoint(vertex).setPathFindingTag(PathFindingTag.Reached);
+			    setPathFindingTag(vertex, PathFindingTag.Reached);
 			    updatePotentialOfNeighbours(vertex);
 		    }
 		    calculationFinished = true;
@@ -210,34 +210,38 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
     private void reset() {
-	    triangulation.getMesh().streamPoints().forEach(p -> p.setPathFindingTag(PathFindingTag.Undefined));
-	    triangulation.getMesh().streamPoints().forEach(p -> p.setPotential(Double.MAX_VALUE));
+	    triangulation.getMesh().streamVertices().forEach(v -> setPathFindingTag(v, PathFindingTag.Undefined));
+	    triangulation.getMesh().streamVertices().forEach(v -> setPotential(v, Double.MAX_VALUE));
 	    calculationFinished = false;
 
 	    for(V vertex : targetVertices) {
-		    P potentialPoint = getMesh().getPoint(vertex);
-		    double distance = -distFunc.apply(potentialPoint);
+		    double distance = Math.max(distFunc.apply(vertex), 0);
 
-		    if(potentialPoint.getPathFindingTag() != PathFindingTag.Undefined) {
+		    if(getPathFindingTag(vertex) != PathFindingTag.Undefined) {
 			    narrowBand.remove(vertex);
 		    }
-
-		    potentialPoint.setPotential(Math.min(potentialPoint.getPotential(), distance / timeCostFunction.costAt(potentialPoint)));
-		    potentialPoint.setPathFindingTag(PathFindingTag.Reached);
+		    updatePotential(vertex, distance / getTimeCost(vertex));
+			setPathFindingTag(vertex, PathFindingTag.Reached);
 		    narrowBand.add(vertex);
 
 		    for(V v : triangulation.getMesh().getAdjacentVertexIt(vertex)) {
-			    P potentialP = getMesh().getPoint(v);
-
-			    if(potentialP.getPathFindingTag() == PathFindingTag.Undefined) {
-				    double dist = Math.max(-distFunc.apply(potentialP), 0);
-				    logger.debug("T at " + potentialP + " = " + dist);
-				    potentialP.setPotential(Math.min(potentialP.getPotential(), dist / timeCostFunction.costAt(potentialP)));
-				    potentialP.setPathFindingTag(PathFindingTag.Reachable);
+			    if(getPathFindingTag(v)  == PathFindingTag.Undefined) {
+				    double dist = Math.max(distFunc.apply(v), 0);
+				    logger.debug("T at " + v + " = " + dist);
+				    updatePotential(v, dist / getTimeCost(v));
+				    setPathFindingTag(v, PathFindingTag.Reachable);
 				    narrowBand.add(v);
 			    }
 		    }
 	    }
+    }
+
+    private double getTimeCost(@NotNull final V vertex) {
+    	return timeCostFunction.costAt(vertex);
+    }
+
+    private void updatePotential(@NotNull final V vertex, final double potential) {
+	    setPotential(vertex, Math.min(getPotential(vertex), potential));
     }
 
     // unknownPenalty is ignored.
@@ -248,7 +252,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 
 	@Override
     public Function<IPoint, Double> getPotentialField() {
-	    IIncrementalTriangulation<P, V, E, F> clone = triangulation.clone();
+	    IIncrementalTriangulation<V, E, F> clone = triangulation.clone();
 	    return p -> getPotential(clone, p.getX(), p.getY());
     }
 
@@ -258,7 +262,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
     }
 
 	@Override
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	public IMesh<?, ?, ?> getDiscretization() {
 		return triangulation.getMesh().clone();
 	}
 
@@ -270,15 +274,14 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 * @param x             the x-coordinate of the point
 	 * @param y             the y-coordinate of the point
 	 *
-	 * @param <P>   the type of the points of the triangulation extending {@link IPotentialPoint}
 	 * @param <V>   the type of the vertices of the triangulation
 	 * @param <E>   the type of the half-edges of the triangulation
 	 * @param <F>   the type of the faces of the triangulation
 	 *
 	 * @return the interpolated value of the traveling time T at (x, y)
 	 */
-    private static <P extends IPotentialPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double getPotential(
-    		@NotNull final IIncrementalTriangulation<P, V, E, F> triangulation,
+    private static <V extends IVertex, E extends IHalfEdge, F extends IFace> double getPotential(
+    		@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 		    final double x,
 		    final double y) {
 
@@ -292,12 +295,16 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 		    //	logger.warn("no triangle found for coordinates (" + x + "," + y + ")");
 	    }
 	    else {
-		    result = InterpolationUtil.barycentricInterpolation(triangulation.getMesh().getPoints(optFace.get()), x, y);
+	    	E edge = triangulation.getMesh().getEdge(optFace.get());
+	    	V v1 = triangulation.getMesh().getVertex(edge);
+	    	V v2 = triangulation.getMesh().getVertex(triangulation.getMesh().getNext(edge));
+		    V v3 = triangulation.getMesh().getVertex(triangulation.getMesh().getPrev(edge));
+		    result = InterpolationUtil.barycentricInterpolation(v1, v2, v3, v -> triangulation.getMesh().getDoubleData(v, namePotential), x, y);
 	    }
 	    return result;
     }
 
-    private IMesh<P, V, E, F> getMesh() {
+    private IMesh<V, E, F> getMesh() {
     	return triangulation.getMesh();
     }
 
@@ -321,18 +328,16 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      */
     private void updatePotential(@NotNull final V vertex) {
         double potential = recomputePotential(vertex);
-        P potentialPoint = getMesh().getPoint(vertex);
-        if(potential < potentialPoint.getPotential()) {
-            if(potentialPoint.getPathFindingTag() == PathFindingTag.Reachable) {
+        if(potential < getPotential(vertex)) {
+            if(getPathFindingTag(vertex) == PathFindingTag.Reachable) {
                 narrowBand.remove(vertex);
             }
-
-            potentialPoint.setPotential(potential);
-            potentialPoint.setPathFindingTag(PathFindingTag.Reachable);
+            setPotential(vertex, potential);
+            setPathFindingTag(vertex, PathFindingTag.Reachable);
             narrowBand.add(vertex);
         }
 
-        if(potentialPoint.getPathFindingTag() == PathFindingTag.Undefined) {
+        if(getPathFindingTag(vertex) == PathFindingTag.Undefined) {
             logger.debug("could not set neighbour vertex" + vertex);
         }
     }
@@ -351,9 +356,9 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         // value accordingly
         double potential = Double.MAX_VALUE;
 
-        for(F face : getMesh().getAdjacentFacesIt(vertex)) {
-            if(!getMesh().isBoundary(face)) {
-                potential = Math.min(computePotential(getMesh().getPoint(vertex), face), potential);
+        for(E edge : getMesh().getEdgeIt(vertex)) {
+            if(!getMesh().isBoundary(edge)) {
+                potential = Math.min(computePotential(edge), potential);
             }
         }
         return potential;
@@ -391,23 +396,23 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
      * @param point a point for which the potential should be re-computed
      * @param face  a face neighbouring the point
      */
-    private double computePotential(@NotNull final P point, @NotNull final F face) {
-        // check whether the triangle does contain useful data
-        List<E> edges = getMesh().getEdges(face);
-        E halfEdge = edges.stream().filter(e -> getMesh().getPoint(e).equals(point)).findAny().get();
-        edges.removeIf(edge -> getMesh().getPoint(edge).equals(point));
 
-        assert edges.size() == 2;
+	/**
+	 * Updates a point (the point where the edge ends) given a triangle (which is the face of the edge).
+	 * The point can only be updated if the triangle triangleContains it and the other two points are in the frozen band.
+	 *
+	 * @param edge the edge defining the point and the triangle
+	 * @return the recomputed potential
+	 */
+	private double computePotential(@NotNull final E edge) {
+	    E e1 = getMesh().getNext(edge);
+	    E e2 = getMesh().getPrev(edge);
 
-        P p1 = getMesh().getPoint(edges.get(0));
-        P p2 = getMesh().getPoint(edges.get(1));
-
-        if(isFeasibleForComputation(p1) && isFeasibleForComputation(p2)) {
-
+        if(isFeasibleForComputation(getMesh().getVertex(e1)) && isFeasibleForComputation(getMesh().getVertex(e2))) {
         	//if(!nonAccuteTris.contains(face)) {
         		//double potential = computePotential(point, p1, p2);
         		//logger.info("compute potential " + potential);
-		        return computePotential(point, p1, p2);
+		        return computePotential(edge, e1, e2);
             //} // we only try to find a virtual vertex if both points are already frozen
             /*else {
                 logger.debug("special case for non-acute triangle");
@@ -428,20 +433,19 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
                 }
             }*/
         }
-
         return Double.MAX_VALUE;
     }
 
 	/**
 	 * Defines the porperties for which a point is used to compute the traveling time of neighbouring points.
 	 *
-	 * @param p the point which is tested
+	 * @param v the point which is tested
 	 *
 	 * @return true if the point can be used for computation, false otherwise
 	 */
-	private boolean isFeasibleForComputation(final P p){
+	private boolean isFeasibleForComputation(final V v){
         //return p.getPathFindingTag().frozen;
-        return p.getPathFindingTag() == PathFindingTag.Reachable || p.getPathFindingTag() == PathFindingTag.Reached;
+        return getPathFindingTag(v) == PathFindingTag.Reachable || getPathFindingTag(v) == PathFindingTag.Reached;
     }
 
 	/**
@@ -455,7 +459,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	 *
 	 * @return (optional) a numerical support such that a acute triangle can be formed or empty if no support can be found
 	 */
-	private Optional<P> walkToNumericalSupport(@NotNull final E halfEdge, @NotNull final F face) {
+	private Optional<V> walkToNumericalSupport(@NotNull final E halfEdge, @NotNull final F face) {
         assert getMesh().toTriangle(face).isNonAcute();
 
         E next = getMesh().getNext(halfEdge);
@@ -507,7 +511,7 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 	        /**
 	         * find the support inside the face in O(3).
 	         */
-            return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getPoint(v)).findAny();
+            return getMesh().streamEdges(destination).filter(e -> isPointInCone.test(e)).map(v -> getMesh().getVertex(v)).findAny();
         }
         else {
             logger.warn("walked to boundary");
@@ -535,33 +539,60 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         }
     }
 
+	private PathFindingTag getPathFindingTag(@NotNull final V vertex) {
+		return triangulation.getMesh().getData(vertex, namePathFindingTag, PathFindingTag.class).get();
+	}
+
+	private void setPathFindingTag(@NotNull final V vertex, final PathFindingTag tag) {
+		triangulation.getMesh().setData(vertex, namePathFindingTag, tag);
+	}
+
+    private double getPotential(@NotNull final V vertex) {
+		return triangulation.getMesh().getDoubleData(vertex, namePotential);
+    }
+
+    private void setPotential(@NotNull final V vertex, final double potential) {
+		triangulation.getMesh().setDoubleData(vertex, namePotential, potential);
+    }
 
 	/**
 	 * Computes the traveling time T at <tt>point</tt> by using the neighbouring points <tt>point1</tt> and <tt>point2</tt>.
 	 *
-	 * @param point     the point for which the traveling time is computed
-	 * @param point1    one neighbouring point
-	 * @param point2    another neighbouring point
+	 * @param edge     the edge / point for which the traveling time is computed
+	 * @param edge1    one neighbouring edge
+	 * @param edge2    another neighbouring edge
 	 *
-	 * @return the traveling time T at <tt>point</tt> by using the triangle (point, point1, point2) for the computation
+	 * @return the traveling time T at <tt>edge</tt> by using the triangle (edge, edge1, edge2) for the computation
 	 */
-	private double computePotential(final P point, final P point1, final P point2) {
-        // see: Sethian, Level Set Methods and Fast Marching Methods, page 124.
-        P p1;   // A
-        P p2;   // B
+	private double computePotential(final E edge, final E edge1, final E edge2) {
+
+		V point = getMesh().getVertex(edge);
+		V point1 = getMesh().getVertex(edge1);
+		V point2 = getMesh().getVertex(edge2);
+
+		// see: Sethian, Level Set Methods and Fast Marching Methods, page 124.
+
+		E e1; // A
+		E e2; // B
+		IPoint p1;   // A
+		IPoint p2;   // B
 
         // assuming T(B) > T(A)
-        if(point1.getPotential() > point2.getPotential()) {
+        if(getPotential(point1) > getPotential(point2)) {
             p2 = point1;
+            e2 = edge1;
             p1 = point2;
+            e1 = edge2;
         }
         else {
             p2 = point2;
+            e2 = edge2;
             p1 = point1;
+            e1 = edge1;
         }
 
-        double TA = p1.getPotential();
-        double TB = p2.getPotential();
+        double TA = getPotential(p1);
+        double TB = getPotential(p2);
 
         double u = TB - TA;
         double a = p2.distance(point);
@@ -569,8 +600,8 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         double c = p1.distance(p2);
 
         //double phi = angle(p1, point, p2);
-        double cosphi = cosPhi(p1, point, p2);
-        double sinPhi = sinPhi(p1, point, p2);
+        double cosphi = cosPhi(e1, edge, e2);
+        double sinPhi = sinPhi(e1, edge, e2);
 
 
         double F = 1.0 / timeCostFunction.costAt(point);
@@ -589,11 +620,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
         }
     }
 
-	private double sinPhi(P p1, P p, P p2) {
-		Double sinPhi = sinPhis.get(Triple.of(p, p1, p2));
-		if(sinPhi == null) {
+	private double sinPhi(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
+		double sinPhi = getMesh().getDoubleData(p, "sinPhis");
+		if(sinPhi == 0) {
 			sinPhi = Math.sin(angle(p1, p, p2));
-			sinPhis.put(Triple.of(p, p1, p2), sinPhi);
+			getMesh().setDoubleData(p, "sinPhis", sinPhi);
 			return sinPhi;
 		}
 		else {
@@ -601,11 +632,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 		}
 	}
 
-	private double cosPhi(P p1, P p, P p2) {
-		Double cosPhi = cosPhis.get(Triple.of(p, p1, p2));
-		if(cosPhi == null) {
+	private double cosPhi(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
+		double cosPhi = getMesh().getDoubleData(p, "cosPhis");
+		if(cosPhi == 0) {
 			cosPhi = Math.cos(angle(p1, p, p2));
-			cosPhis.put(Triple.of(p, p1, p2), cosPhi);
+			getMesh().setDoubleData(p, "cosPhis", cosPhi);
 			return cosPhi;
 		}
 		else {
@@ -613,11 +644,11 @@ public class EikonalSolverFMMTriangulation<P extends IPotentialPoint, V extends 
 		}
 	}
 
-    private double angle(P p1, P p, P p2) {
-	    Double angle = angles.get(Triple.of(p, p1, p2));
-	    if(angle == null) {
-	    	angle = GeometryUtils.angle(p1, p, p2);
-	    	angles.put(Triple.of(p, p1, p2), angle);
+    private double angle(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
+	    double angle =  getMesh().getDoubleData(p, "angle");
+	    if(angle == 0) {
+	    	angle = GeometryUtils.angle(getMesh().getVertex(p1), getMesh().getVertex(p), getMesh().getVertex(p2));
+		    getMesh().setDoubleData(p, "angle", angle);
 	    	return angle;
 	    }
 	    else {

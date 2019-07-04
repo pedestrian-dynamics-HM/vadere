@@ -7,7 +7,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.util.geometry.shapes.VPoint;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,23 +22,23 @@ public class TestPFace {
 	 * Building a geometry containing 2 triangles
 	 * xyz and wyx
 	 */
-	private IMesh<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> mesh;
+	private IMesh<PVertex, PHalfEdge, PFace> mesh;
 	private PFace face1;
 	private PFace face2;
 	private PFace border;
-	private PVertex<VPoint> x, y, z, w;
-	private PHalfEdge<VPoint> zx ;
-	private PHalfEdge<VPoint> xy;
-	private PHalfEdge<VPoint> yz;
+	private PVertex x, y, z, w;
+	private PHalfEdge zx ;
+	private PHalfEdge xy;
+	private PHalfEdge yz;
 
-	private PHalfEdge<VPoint> wx;
-	private PHalfEdge<VPoint> xz;
-	private PHalfEdge<VPoint> yw;
-	private PHalfEdge<VPoint> zy;
+	private PHalfEdge wx;
+	private PHalfEdge xz;
+	private PHalfEdge yw;
+	private PHalfEdge zy;
 
 	@Before
 	public void setUp() throws Exception {
-		mesh = new PMesh<>((x, y) -> new VPoint(x, y));
+		mesh = new PMesh();
 		border = mesh.createFace(true);
 
 		// first triangle xyz
@@ -103,7 +103,7 @@ public class TestPFace {
 	@Test
 	public void testFaceIterator() {
 		mesh.getAdjacentFacesIt(xy);
-		List<PFace<VPoint>> incidentFaces = mesh.getAdjacentFaces(xy);;
+		List<PFace> incidentFaces = mesh.getAdjacentFaces(xy);;
 		assertEquals(incidentFaces.size(), 3);
 	}
 
@@ -119,9 +119,9 @@ public class TestPFace {
 
 	@Test
 	public void testEdgeIterator() {
-		List<PVertex<VPoint>> adjacentVertices = mesh.getAdjacentVertices(zx);
-		Set<PVertex<VPoint>> neighbours = new HashSet<>(adjacentVertices);
-		Set<PVertex<VPoint>> expectedNeighbours = new HashSet<>();
+		List<PVertex> adjacentVertices = mesh.getAdjacentVertices(zx);
+		Set<PVertex> neighbours = new HashSet<>(adjacentVertices);
+		Set<PVertex> expectedNeighbours = new HashSet<>();
 		expectedNeighbours.add(z);
 		expectedNeighbours.add(y);
 		expectedNeighbours.add(w);

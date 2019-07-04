@@ -39,7 +39,7 @@ public class PedestrianStateProcessor extends DataProcessor<TimestepPedestrianId
 			.map(Agent::getId)
 			.collect(Collectors.toList());
 		
-		//insert ped states c = created or m = moved 
+		//insertVertex ped states c = created or m = moved
 		pedsInThisState.stream()
 			.forEach(id -> {
 				boolean pedEntryExists = getKeys().stream()

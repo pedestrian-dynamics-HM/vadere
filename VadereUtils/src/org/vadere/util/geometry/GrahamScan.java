@@ -12,7 +12,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
  */
 public class GrahamScan {
 
-	private Stack<VPoint> convexHull = new Stack<VPoint>();
+	private Stack<VPoint> convexHull = new Stack<>();
 	private VPoint[] points;
 	private final int numberOfPoints;
 	private boolean calculated;
@@ -42,7 +42,7 @@ public class GrahamScan {
 		Arrays.sort(points, new VPointCoordinateComparator());
 
 		// now sort by ccw relative to first extreme point
-		Arrays.sort(points, 1, numberOfPoints, new VPointPoloarComparator(points[0]));
+		Arrays.sort(points, 1, numberOfPoints, new VPointPolarComparator(points[0]));
 
 		// first extreme point will be in the hull
 		convexHull.push(points[0]);
@@ -100,6 +100,11 @@ public class GrahamScan {
 		return convexHull.size() >= 3;
 	}
 
+	/**
+	 * Returns a clockwise oriented convex simple polygon.
+	 *
+	 * @return a clockwise oriented convex simple polygon
+	 */
 	public VPolygon getPolytope() {
 		if (!calculated) {
 			execute();
@@ -144,11 +149,11 @@ public class GrahamScan {
 		}
 	}
 
-	public static class VPointPoloarComparator implements Comparator<VPoint> {
+	public static class VPointPolarComparator implements Comparator<VPoint> {
 
 		private final VPoint point;
 
-		public VPointPoloarComparator(final VPoint point) {
+		public VPointPolarComparator(final VPoint point) {
 			this.point = point;
 		}
 

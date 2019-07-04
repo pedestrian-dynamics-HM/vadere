@@ -8,14 +8,18 @@ public class EikMeshPoint extends MPoint implements Cloneable {
 	private boolean fixPoint;
 	private IPoint velocity;
 	private double absoluteForce;
-	private double maxTraveldistance;
+	private double movement;
 	private IPoint lastPosition;
+
+	public EikMeshPoint(final double x, final double y){
+		this(x, y, false);
+	}
 
 	public EikMeshPoint(final double x, final double y, boolean fixPoint){
 		super(x, y);
 		this.fixPoint = fixPoint;
 		this.velocity = new VPoint(0,0);
-		this.maxTraveldistance = 0;
+		this.movement = 0;
 		this.lastPosition = new VPoint(x, y);
 	}
 
@@ -75,17 +79,18 @@ public class EikMeshPoint extends MPoint implements Cloneable {
 		return lastPosition;
 	}
 
-	public void setMaxTraveldistance(double maxTraveldistance) {
-		this.maxTraveldistance = maxTraveldistance;
+	public void setMovement(double movement) {
+		this.movement = movement;
 	}
 
-	public double getMaxTraveldistance() {
-		return maxTraveldistance;
+	public double getMovement() {
+		return movement;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + "/" + fixPoint + "/" + velocity;
+		return super.toString();
+		//return super.toString() + "/" + fixPoint + "/" + velocity;
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.*;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -18,14 +17,13 @@ import javax.swing.*;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends Canvas {
+public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Canvas {
 
-	private  MeshRenderer<P, V, E, F> meshRenderer;
+	private  MeshRenderer<V, E, F> meshRenderer;
 
 	/**
 	 * The width of the canvas.
@@ -46,7 +44,7 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        the height of the canvas
 	 */
 	public MeshPanel(
-			@NotNull final MeshRenderer<P, V, E, F> meshRenderer,
+			@NotNull final MeshRenderer<V, E, F> meshRenderer,
 			final double width,
 			final double height) {
 		this.meshRenderer = meshRenderer;
@@ -57,19 +55,41 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	/**
 	 * Construct a mesh panel filling faces with the color defined by the color function.
 	 *
-	 * @param mesh          the mesh which will be rendered
-	 * @param alertPred     a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
-	 * @param width         width of the canvas
-	 * @param height        height of the canvas
-	 * @param colorFunction color function coloring faces
+	 * @param mesh              the mesh which will be rendered
+	 * @param alertPred         a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width             width of the canvas
+	 * @param height            height of the canvas
+	 * @param colorFunction     color function coloring faces
+	 * @param edgeColorFunction color function coloring edges
 	 */
 	public MeshPanel(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			final double width,
+			final double height,
+			@NotNull final Function<F, Color> colorFunction,
+			@NotNull final Function<E, Color> edgeColorFunction) {
+		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction, edgeColorFunction);
+		this.height = height;
+		this.width = width;
+	}
+
+	/**
+	 * Construct a mesh panel filling faces with the color defined by the color function.
+	 *
+	 * @param mesh              the mesh which will be rendered
+	 * @param alertPred         a {@link Predicate} of {@link F} which marks a face to be drawn in a special way.
+	 * @param width             width of the canvas
+	 * @param height            height of the canvas
+	 * @param colorFunction     color function coloring faces
+	 */
+	public MeshPanel(
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Predicate<F> alertPred,
 			final double width,
 			final double height,
 			@NotNull final Function<F, Color> colorFunction) {
-		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction);
+		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction, e -> Color.GRAY);
 		this.height = height;
 		this.width = width;
 	}
@@ -83,11 +103,11 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        height of the canvas
 	 */
     public MeshPanel(
-    		@NotNull final IMesh<P, V, E, F> mesh,
+    		@NotNull final IMesh<V, E, F> mesh,
 		    @NotNull final Predicate<F> alertPred,
 		    final double width,
 		    final double height) {
-    	this(mesh, alertPred, width, height, f -> Color.WHITE);
+    	this(mesh, alertPred, width, height, f -> Color.WHITE, e -> Color.GRAY);
     }
 
 	/**
@@ -98,20 +118,24 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 	 * @param height        height of the canvas
 	 */
 	public MeshPanel(
-			@NotNull final IMesh<P, V, E, F> mesh,
+			@NotNull final IMesh<V, E, F> mesh,
 			final double width,
 			final double height) {
-		this(mesh, f -> false, width, height, f -> Color.WHITE);
+		this(mesh, f -> false, width, height, f -> new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f), e -> Color.GRAY);
 	}
 
-	public MeshRenderer<P, V, E, F> getMeshRenderer() {
-		return meshRenderer;
+	@Override
+	public void update(Graphics g) {
+		paint(g);
 	}
 
 	@Override
 	public void paint(Graphics g) {
-    	// double buffering => draw into an image
 		meshRenderer.render((Graphics2D) g, (int)Math.ceil(width), (int)Math.ceil(height));
+	}
+
+	public MeshRenderer<V, E, F> getMeshRenderer() {
+		return meshRenderer;
 	}
 
 	public JFrame display() {
@@ -123,10 +147,10 @@ public class MeshPanel<P extends IPoint, V extends IVertex<P>, E extends IHalfEd
 		jFrame.setSize((int)width+10, (int)height+10);
 		jFrame.add(this);
 		jFrame.setTitle(title);
-		jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setVisible(true);
 		jFrame.setVisible(true);
-		repaint();
+		//jFrame.setIgnoreRepaint(true);
 		jFrame.repaint();
 		return jFrame;
 	}

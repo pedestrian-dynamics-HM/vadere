@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -9,9 +10,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -271,7 +270,7 @@ public class RealWorldPlot {
 				0.1,
 				obstacleShapes);
 
-		MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> meshPanel = new MeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800);
+		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(meshImprover.getMesh(), f -> false, 1000, 800);
 		JFrame frame = meshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");

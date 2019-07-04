@@ -2,20 +2,20 @@ package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.EikMesh;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
+import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.logging.Logger;
-import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class EikMeshTests {
 
 	private static void testVisual(){
 		VPolygon hex = VShape.generateHexagon(0.4);
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 
 		IDistanceFunction quader = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0;
 		IDistanceFunction circ = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
@@ -53,15 +53,15 @@ public class EikMeshTests {
 		obstacles.add(hex);
 		obstacles.add(new VRectangle(-1,-1,2,2));
 
-		EikMesh<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshGenerator = new EikMesh<>(
+		GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 				distanceFunc,
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
 				supplier);
 
-		Predicate<AFace<EikMeshPoint>> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
+		Predicate<AFace> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
 				predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
