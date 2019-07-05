@@ -252,13 +252,14 @@ public class CLParallelOptimalStepsModel {
 	    int power = (int)CLUtils.power(pedestrians.size(), 2);
 	    try (MemoryStack stack = stackPush()) {
 		    IntBuffer errcode_ret = stack.callocInt(1);
-		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memPedestrians, errcode_ret);
+		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
 		    clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 		    clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 		    clReorderedPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
-		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 6 * 4 * pedestrians.size(), errcode_ret);
+		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
 		    clPedestrianNextPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
 
+		    clEnqueueWriteBuffer(clQueue, clPedestrians, true, 0, memPedestrians, null, null);
 		    memNextPositions = MemoryUtil.memAllocFloat(numberOfElements * COORDOFFSET);
 		    memIndices = MemoryUtil.memAllocInt(numberOfElements);
 		    pedestrianSet = true;
@@ -269,8 +270,6 @@ public class CLParallelOptimalStepsModel {
 	//TODO: dont sort if the size is <= 1!
 	public List<VPoint> update() throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
-			List<VPoint> newPositions = new ArrayList<>();
-			Collections.fill(newPositions, VPoint.ZERO);
 			allocGlobalHostMemory();
 			allocGlobalDeviceMemory();
 			clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
@@ -291,16 +290,27 @@ public class CLParallelOptimalStepsModel {
 					clPotentialFieldSize,
 					numberOfElements);
 
-			clMove(clReorderedPedestrians, clCellStarts, clCellEnds, clCellSize, clGridSize, clWorldOrigin, numberOfElements);
+			clMove(
+					clPedestrianNextPositions,
+					clReorderedPedestrians,
+					clCellStarts,
+					clCellEnds,
+					clCellSize,
+					clGridSize,
+					clWorldOrigin,
+					numberOfElements);
 
 			clEnqueueReadBuffer(clQueue, clPedestrianNextPositions, true, 0, memNextPositions, null, null);
 			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
+			clFinish(clQueue);
 
+			List<VPoint> newPositions = new ArrayList<>();
+			fill(newPositions, VPoint.ZERO, numberOfElements);
 			int[] aIndices = CLUtils.toIntArray(memIndices, numberOfElements);
 			float[] positionsAndRadi = CLUtils.toFloatArray(memNextPositions, numberOfElements * COORDOFFSET);
 			for(int i = 0; i < numberOfElements; i++) {
-				float x = positionsAndRadi[i * 2];
-				float y = positionsAndRadi[i * 2 + 1];
+				float x = positionsAndRadi[i * COORDOFFSET + X];
+				float y = positionsAndRadi[i * COORDOFFSET + Y];
 				VPoint newPosition = new VPoint(x,y);
 				newPositions.set(aIndices[i], newPosition);
 			}
@@ -318,13 +328,13 @@ public class CLParallelOptimalStepsModel {
 	private FloatBuffer allocHostMemory(@NotNull final List<PedestrianOpenCL> pedestrians) {
 	    float[] pedestrianStruct = new float[pedestrians.size() * OFFSET];
 	    for(int i = 0; i < pedestrians.size(); i++) {
-		    pedestrianStruct[i * X] = (float) pedestrians.get(i).position.getX();
-		    pedestrianStruct[i * Y] = (float) pedestrians.get(i).position.getY();
-		    pedestrianStruct[i * STEPSIZE] = pedestrians.get(i).stepRadius;
-		    pedestrianStruct[i * DESIREDSPEED] = 0;
-		    pedestrianStruct[i * TIMECREDIT] = 0;
-		    pedestrianStruct[i * NEWX] = 0;
-		    pedestrianStruct[i * NEWY] = 0;
+		    pedestrianStruct[i * OFFSET + X] = (float) pedestrians.get(i).position.getX();
+		    pedestrianStruct[i * OFFSET + Y] = (float) pedestrians.get(i).position.getY();
+		    pedestrianStruct[i * OFFSET + STEPSIZE] = pedestrians.get(i).stepRadius;
+		    pedestrianStruct[i * OFFSET + DESIREDSPEED] = 2.0f;
+		    pedestrianStruct[i * OFFSET + TIMECREDIT] = 3.0f;
+		    pedestrianStruct[i * OFFSET + NEWX] = 4.0f;
+		    pedestrianStruct[i * OFFSET + NEWY] = 5.0f;
 	    }
 	    return CLUtils.toFloatBuffer(pedestrianStruct);
     }
@@ -473,6 +483,7 @@ public class CLParallelOptimalStepsModel {
     }
 
 	private void clMove(
+			final long clPedestrianNextPositions,
 			final long clReorderedPedestrians,
 			final long clCellStarts,
 			final long clCellEnds,
@@ -504,14 +515,14 @@ public class CLParallelOptimalStepsModel {
 			}
 			else {
 				localWorkSize = maxWorkGroupSize;
-				globalWorkSize = CLUtils.power(numberOfElements, 2);
-				//globalWorkSize = CLUtils.multiple(numberOfElements, localWorkSize);
+				//globalWorkSize = CLUtils.power(numberOfElements, 2);
+				globalWorkSize = CLUtils.multiple(numberOfElements, localWorkSize);
 			}
 
 			clGlobalWorkSize.put(0, globalWorkSize);
 			clLocalWorkSize.put(0, localWorkSize);
 			//TODO: local work size? + check 2^n constrain!
-			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSeek", clQueue, clSeek, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMove", clQueue, clMove, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 		}
 	}
 
@@ -947,5 +958,12 @@ public class CLParallelOptimalStepsModel {
 		public String toString() {
 			return position + " -> " + newPosition;
 		}
+	}
+
+	private static <T> void fill(@NotNull final List<T> list, @NotNull T element, final int n) {
+    	assert list.isEmpty() && n >= 0;
+    	for(int i = 0; i < n; i++) {
+    		list.add(element);
+	    }
 	}
 }

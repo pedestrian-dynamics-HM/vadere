@@ -147,9 +147,9 @@ public class TestCLOptimalStepsModel {
 	//@Ignore
 	@Before
 	public void setUp() throws IOException, TextOutOfNodeException {
-		random = new Random();
+		random = new Random(0);
 		maxStepSize = 0.2f;
-		numberOfElements = 16384-1;
+		numberOfElements = 8192;
 		attributesOSM = new AttributesOSM();
 		attributesFloorField = new AttributesFloorField();
 		attributesAgent = new AttributesAgent();
@@ -192,15 +192,15 @@ public class TestCLOptimalStepsModel {
 		List<VPoint> result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
+			//logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
 		}
 		// max step length + function width);
 		result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
+			//logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
 		}
 
-		//clOptimalStepsModel.clear();
+		clOptimalStepsModel.clear();
 	}
 }
