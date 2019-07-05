@@ -120,7 +120,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 *
 	 * @param pedestrian the pedestrian
 	 */
-	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
+	private void  updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			pedestrian.setLastPosition(pedestrian.getPosition());
 			synchronized (topography) {

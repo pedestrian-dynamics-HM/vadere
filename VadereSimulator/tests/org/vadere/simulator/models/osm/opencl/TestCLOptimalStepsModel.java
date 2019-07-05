@@ -144,12 +144,12 @@ public class TestCLOptimalStepsModel {
 				  List<SpeedAdjuster> speedAdjusters,
 				  StepCircleOptimizer stepCircleOptimizer
 	 */
-	@Ignore
+	//@Ignore
 	@Before
 	public void setUp() throws IOException, TextOutOfNodeException {
 		random = new Random();
 		maxStepSize = 0.2f;
-		numberOfElements = 256;
+		numberOfElements = 16384-1;
 		attributesOSM = new AttributesOSM();
 		attributesFloorField = new AttributesFloorField();
 		attributesAgent = new AttributesAgent();
@@ -177,7 +177,7 @@ public class TestCLOptimalStepsModel {
 		pedestrians.add(pedestrian);
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void testIdentity() throws OpenCLException {
 		CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
@@ -185,18 +185,20 @@ public class TestCLOptimalStepsModel {
 				attributesFloorField,
 				new VRectangle(topography.getBounds()),
 				targetPotentialField.getEikonalSolver(),
-				obstacleDistancePotential.getEikonalSolver());
+				obstacleDistancePotential.getEikonalSolver(),
+				attributesPotentialCompact.getPedPotentialWidth());
 		// max step length + function width);
-		List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, attributesPotentialCompact.getPedPotentialWidth());
+		clOptimalStepsModel.setPedestrians(pedestrians);
+		List<VPoint> result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
 		}
 		// max step length + function width);
-		result = clOptimalStepsModel.getNextSteps(pedestrians, 				attributesPotentialCompact.getPedPotentialWidth());
+		result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
 		}
 
 		//clOptimalStepsModel.clear();

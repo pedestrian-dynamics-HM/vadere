@@ -7,6 +7,7 @@ import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
@@ -62,9 +63,10 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 				maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed());
 			}
 
-			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
 			long ms = System.currentTimeMillis();
-			List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, cellSize);
+
+			clOptimalStepsModel.setPedestrians(pedestrians);
+			List<VPoint> result = clOptimalStepsModel.update();
 			ms = System.currentTimeMillis() - ms;
 			logger.debug("runtime for next step computation = " + ms + " [ms]");
 
@@ -76,7 +78,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 				pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 
 				if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-					pedestrian.setNextPosition(result.get(i).newPosition);
+					pedestrian.setNextPosition(result.get(i));
 					movedPedestrians.add(pedestrian);
 				}
 			}

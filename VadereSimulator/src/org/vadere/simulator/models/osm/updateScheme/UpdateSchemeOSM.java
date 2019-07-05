@@ -7,6 +7,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.DynamicElementAddListener;
 import org.vadere.state.scenario.DynamicElementRemoveListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -59,12 +60,15 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			@NotNull final EikonalSolver distanceEikonalSolver) {
 
 		try {
+			double maxStepSize = 1.2; // from seitz-2014c
+			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
 			CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
 					attributesOSM,
 					attributesFloorField,
 					new VRectangle(topography.getBounds()),
 					targetEikonalSolver,
-					distanceEikonalSolver);
+					distanceEikonalSolver,
+					cellSize);
 
 			return new UpdateSchemeCLParallel(topography, clOptimalStepsModel);
 

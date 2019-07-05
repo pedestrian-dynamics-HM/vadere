@@ -150,10 +150,10 @@ public class CLBitonicSort {
 	    /**
 	     * We use non-stack memory because the stack might be too small.
 	     */
-	    inKeys = CLUtils.toIntBuffer(padKeys, CLUtils.toIntBuffer(padKeys));
-	    outKeys = CLUtils.toIntBuffer(padKeys);
-	    inValues = CLUtils.toIntBuffer(padValues, CLUtils.toIntBuffer(padValues));
-	    outValues = CLUtils.toIntBuffer(padValues);
+	    inKeys = CLUtils.toIntBuffer(padKeys);
+	    outKeys = MemoryUtil.memAllocInt(padKeys.length);
+	    inValues = CLUtils.toIntBuffer(padValues);
+	    outValues = MemoryUtil.memAllocInt(padValues.length);
 
 	    try (MemoryStack stack = stackPush()) {
 	    	int dir = 1;

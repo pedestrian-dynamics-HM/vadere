@@ -177,7 +177,7 @@ public class CLUtils {
 
     public static IntBuffer toIntBuffer(@NotNull final int[] array) {
     	IntBuffer intBuffer = MemoryUtil.memAllocInt(array.length);
-    	return intBuffer;
+    	return toIntBuffer(array, intBuffer);
     }
 
 	public static IntBuffer toIntBuffer(@NotNull final int[] array, @NotNull final IntBuffer intBuffer) {
