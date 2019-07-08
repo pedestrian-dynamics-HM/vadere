@@ -26,6 +26,10 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
 
+	static {
+		logger.setDebug();
+	}
+
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.executorService = Executors.newFixedThreadPool(8);

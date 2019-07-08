@@ -168,7 +168,8 @@ inline bool hasConflict(
                 float2 dist = otherPedestrian - pedPosition;
 
                 // for itself dist < RADIUS but otherTimeCredit == timeCredit and otherPedestrian.x == pedPosition.x
-                if((dist.x * dist.x + dist.y * dist.y) < RADIUS * RADIUS &&
+                float twiceRadius = 2 * RADIUS;
+                if((dist.x * dist.x + dist.y * dist.y) < twiceRadius * twiceRadius &&
                         (otherTimeCredit < timeCredit || (otherTimeCredit == timeCredit && otherPedestrian.x < pedPosition.x))) {
                     collisions = collisions + 1;
                 }
@@ -265,35 +266,36 @@ __kernel void seek(
     if(index < numberOfPedestrians) {
         float2 pedPosition = (float2)(orderedPedestrians[index * OFFSET + X], orderedPedestrians[index * OFFSET + Y]);
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
-        //float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
+        float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT] + timeStepInSec;
 
-        // update time credit
-        orderedPedestrians[index * OFFSET + TIMECREDIT] = timeCredit;
-
+        float duration = stepSize / desiredSpeed;
         float2 minArg = pedPosition;
-        float value = 1000000;
-        float minValue = value;
+        if(timeCredit > duration) {
 
-        // loop over all points of the disc and find the minimum value and argument
-        for(uint i = 0; i < numberOfPoints; i++) {
-            float2 circlePosition = circlePositions[i];
-            float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
-            float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-            float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-            float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-            float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
-            float value = targetPotential + obstaclePotential + pedestrianPotential;
+            float value = 1000000;
+            float minValue = value;
 
-            if(minValue > value) {
-                minValue = value;
-                minArg = evalPoint;
+            // loop over all points of the disc and find the minimum value and argument
+            for(uint i = 0; i < numberOfPoints; i++) {
+                float2 circlePosition = circlePositions[i];
+                float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
+                float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+                float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+                float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+                float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+                float value = targetPotential + obstaclePotential + pedestrianPotential;
+
+                if(minValue > value) {
+                    minValue = value;
+                    minArg = evalPoint;
+                }
+                //minArg = circlePosition;
             }
-            //minArg = circlePosition;
         }
-
         //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
         //minArg = pedPosition;
+        //orderedPedestrians[index * OFFSET + TIMECREDIT] = timeCredit;
         orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
         orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
     }
@@ -307,9 +309,9 @@ __kernel void move(
     __constant const float        *cellSize,              //input
     __constant const uint2        *gridSize,              //input
     __constant const float2       *worldOrigin,           //input
-    const uint                    numberOfPedestrians     //input
+    const float                   timeStepInSec,
+    const uint                    numberOfPedestrians    //input
 ){
-
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
         float2 newPedPosition = (float2)(orderedPedestrians[index * OFFSET + NEWX], orderedPedestrians[index * OFFSET + NEWY]);
@@ -324,7 +326,25 @@ __kernel void move(
             orderedPedestrians[index * OFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
             orderedPedestrians[index * OFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
             newPositions[index] = newPedPosition;
+            //orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
         }
+    }
+}
+
+__kernel void swap(
+    __global const float  *d_ReorderedPos,  //output: reordered by cell hash positions
+    __global float  *d_Pos,     //input: positions array sorted by hash
+    uint    numParticles
+){
+    const uint index = get_global_id(0);
+    if(index < numParticles){
+        d_Pos[index * OFFSET + X] = d_ReorderedPos[index * OFFSET + X];
+        d_Pos[index * OFFSET + Y] = d_ReorderedPos[index * OFFSET + Y];
+        d_Pos[index * OFFSET + STEPSIZE] = d_ReorderedPos[index * OFFSET + STEPSIZE];
+        d_Pos[index * OFFSET + DESIREDSPEED] = d_ReorderedPos[index * OFFSET + DESIREDSPEED];
+        d_Pos[index * OFFSET + TIMECREDIT] = d_ReorderedPos[index * OFFSET + TIMECREDIT];
+        d_Pos[index * OFFSET + NEWX] = d_ReorderedPos[index * OFFSET + NEWX];
+        d_Pos[index * OFFSET + NEWY] = d_ReorderedPos[index * OFFSET + NEWY];
     }
 }
 
