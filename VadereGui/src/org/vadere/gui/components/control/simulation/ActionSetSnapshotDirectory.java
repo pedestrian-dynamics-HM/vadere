@@ -1,19 +1,16 @@
 package org.vadere.gui.components.control.simulation;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.prefs.Preferences;
-
-import javax.swing.JFileChooser;
-import javax.swing.JTextField;
-
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.postvisualization.PostVisualisation;
+import org.vadere.util.config.VadereConfig;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 public class ActionSetSnapshotDirectory extends ActionVisualization {
-	private static Resources resources = Resources.getInstance("postvisualization");
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private final JTextField textField;
 
@@ -25,14 +22,14 @@ public class ActionSetSnapshotDirectory extends ActionVisualization {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		final JFileChooser fc = new JFileChooser(resources.getProperty("SettingsDialog.snapshotDirectory.path"));
+		final JFileChooser fc = new JFileChooser(CONFIG.getString("SettingsDialog.snapshotDirectory.path"));
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = fc.showOpenDialog(null);
+
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
-			resources.setProperty("SettingsDialog.snapshotDirectory.path", file.getAbsolutePath());
-			Preferences.userNodeForPackage(PostVisualisation.class).put("SettingsDialog.snapshotDirectory.path",
-					file.getAbsolutePath());
+
+			CONFIG.setProperty("SettingsDialog.snapshotDirectory.path", file.getAbsolutePath());
 			textField.setText(file.getAbsolutePath());
 		}
 	}

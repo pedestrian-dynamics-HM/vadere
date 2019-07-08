@@ -6,12 +6,11 @@ import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
-import java.awt.*;
-import java.util.prefs.Preferences;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.util.prefs.Preferences;
 
 public class VDialogManager {
 
@@ -40,7 +39,7 @@ public class VDialogManager {
 	}
 
 	private static String getDefaultDirectory() {
-		return Preferences.userNodeForPackage(VadereApplication.class).get("default_directory", "/projects");
+		return Preferences.userNodeForPackage(VadereApplication.class).get("ProjectView.defaultDirectory", "/projects");
 	}
 
 	public static int showConfirmDialogWithBodyAndTextArea(String title, String body, String textAreaContent,

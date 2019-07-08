@@ -3,6 +3,7 @@ package org.vadere.gui.postvisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import org.openide.NotifyDescriptor;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
@@ -36,7 +37,7 @@ public class ImageSizeDialog extends JDialog {
 		this.model = model;
 		this.imageSize = new Rectangle2D.Double(0, 0, ImageGenerator.calculateOptimalWidth(model),
 				ImageGenerator.calculateOptimalHeight(model));
-		this.setTitle(resources.getProperty("ImageSizeDialog.title"));
+		this.setTitle(Messages.getString("ImageSizeDialog.title"));
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.addWindowListener(
 				new WindowAdapter() {
@@ -54,7 +55,7 @@ public class ImageSizeDialog extends JDialog {
 
 		getContentPane().setLayout(mainLayout);
 
-		JLabel lblWidth = new JLabel(resources.getProperty("ImageSizeDialog.lblWidth.text") + ":");
+		JLabel lblWidth = new JLabel(Messages.getString("ImageSizeDialog.lblWidth.text") + ":");
 		final JSpinner spinnerWidth = new JSpinner();
 		sModelImageWidth = new SpinnerNumberModel(ImageGenerator.calculateOptimalWidth(model), 1, 5000, 1);
 		spinnerWidth.setModel(sModelImageWidth);
@@ -65,7 +66,7 @@ public class ImageSizeDialog extends JDialog {
 		getContentPane().add(new JLabel("px"), cc.xy(6, 2));
 
 
-		JLabel lblHeight = new JLabel(resources.getProperty("ImageSizeDialog.lblHeight.text") + ":");
+		JLabel lblHeight = new JLabel(Messages.getString("ImageSizeDialog.lblHeight.text") + ":");
 		final JSpinner spinnerHeight = new JSpinner();
 		sModelImageHeight = new SpinnerNumberModel(ImageGenerator.calculateOptimalHeight(model), 1, 5000, 1);
 		spinnerHeight.setModel(sModelImageHeight);

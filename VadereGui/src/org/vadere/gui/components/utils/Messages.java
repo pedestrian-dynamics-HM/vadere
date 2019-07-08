@@ -1,13 +1,11 @@
 package org.vadere.gui.components.utils;
 
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.view.ProjectView;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.lang.BundleManager;
 
-import java.util.Locale;
-import java.util.prefs.Preferences;
-
 import javax.swing.*;
+import java.util.Locale;
 
 /**
  * Messages class used in localization.
@@ -34,7 +32,7 @@ public class Messages {
 	}
 
 	public static void changeLanguage(Locale lang) {
-		Preferences.userNodeForPackage(VadereApplication.class).put("language", lang.getLanguage());
+		VadereConfig.getConfig().setProperty("Messages.language", lang.getLanguage());
 		BundleManager.instance().setLanguage(lang);
 		JOptionPane.showMessageDialog(ProjectView.getMainWindow(), getString("Messages.changeLanguagePopup.text"),
 				getString("Messages.changeLanguagePopup.title"), JOptionPane.INFORMATION_MESSAGE);
