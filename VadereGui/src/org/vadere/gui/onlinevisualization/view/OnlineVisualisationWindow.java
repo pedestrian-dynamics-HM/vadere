@@ -7,6 +7,7 @@ import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.simulation.ActionGeneratePoly;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
@@ -174,7 +175,6 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				renderer,
 				model);
 
-
 		ActionGenerateSVG generateSVG = new ActionGenerateSVG(
 				Messages.getString("ProjectView.btnSVGSnapshot.tooltip"),
 				resources.getIcon("camera_svg.png", iconWidth, iconHeight),
@@ -184,6 +184,12 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		ActionGenerateTikz generateTikz = new ActionGenerateTikz(
 				Messages.getString("ProjectView.btnTikZSnapshot.tooltip"),
 				resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer,
+				model);
+
+		ActionGeneratePoly generatePoly = new ActionGeneratePoly(
+				Messages.getString("ProjectView.btnPolySnapshot.tooltip"),
+				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
 				renderer,
 				model);
 
@@ -222,6 +228,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		imgOptions.add(generatePNG);
 		imgOptions.add(generateSVG);
 		imgOptions.add(generateTikz);
+		imgOptions.add(generatePoly);
 
 		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(
 				"camera_menu",

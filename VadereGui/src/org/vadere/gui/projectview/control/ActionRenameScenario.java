@@ -46,7 +46,7 @@ public class ActionRenameScenario extends AbstractAction {
 				ProjectWriter.renameScenario(scenario, model.getCurrentProjectPath(), newName);
 				model.saveScenarioToDisk(scenario);
 
-				// remove and insert the element such that the table is still sorted by name
+				// remove and insertVertex the element such that the table is still sorted by name
 				model.getScenarioTableModel().replace(scenario, new VadereScenarioTableModel.VadereDisplay(scenario, VadereState.INITIALIZED));
 				model.refreshScenarioNames();
 				/*

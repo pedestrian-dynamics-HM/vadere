@@ -1,5 +1,9 @@
 package org.vadere.util.geometry.shapes;
 
+import org.vadere.util.geometry.GeometryUtils;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * A {@link IPoint} represents a point in the 2D Euclidean space. Note that an {@link IPoint} might
  * be immutable (see {@link VPoint}) or mutable (see {@link MPoint}). In the mutable case operations like
@@ -25,6 +29,10 @@ public interface IPoint extends Cloneable {
 	IPoint scalarMultiply(final double factor);
 
 	IPoint rotate(final double radAngle);
+
+	default IPoint projectOnto(final IPoint b) {
+		return GeometryUtils.projectOnto(getX(), getY(), b.getX(), b.getY());
+	}
 
 	/**
 	 * Computes the scalar product of this and the point.

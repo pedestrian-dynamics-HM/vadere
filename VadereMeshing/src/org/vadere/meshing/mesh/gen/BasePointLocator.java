@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.gen;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IPointLocator;
@@ -17,24 +18,23 @@ import java.util.Optional;
  * mesh and end up at the face that contains the point, if there is one. In worst case this is not faster than
  * checking each face of the mesh but it is more clever and faste in most cases.
  *
- * @param <P> the type of the points (containers)
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPointLocator<P, V, E, F> {
+public class BasePointLocator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPointLocator<V, E, F> {
 
-	private ITriConnectivity<P, V, E, F> triConnectivity;
+	private ITriConnectivity<V, E, F> triConnectivity;
 
-	public BasePointLocator(final ITriConnectivity<P, V, E, F> triConnectivity) {
+	public BasePointLocator(final ITriConnectivity<V, E, F> triConnectivity) {
 		this.triConnectivity = triConnectivity;
 	}
 
 	@Override
-	public void postSplitTriangleEvent(F original, F f1, F f2, F f3) {}
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2) {}
+	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
 
 	@Override
 	public void postFlipEdgeEvent(final F f1, final F f2) {}
@@ -43,7 +43,7 @@ public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends 
 	public void postInsertEvent(V vertex) {}
 
 	@Override
-	public F locatePoint(final P point) {
+	public F locatePoint(@NotNull final IPoint point) {
 		//return triConnectivity.getMesh().getFace(triConnectivity.locateNearestNeighbour(point));
 		return triConnectivity.locateFace(point.getX(), point.getY()).get();
 		/*if(insertion) {
@@ -66,7 +66,7 @@ public class BasePointLocator<P extends IPoint, V extends IVertex<P>, E extends 
 	}
 
 	@Override
-	public Optional<F> locate(final IPoint point) {
+	public Optional<F> locate(@NotNull final IPoint point) {
 		return triConnectivity.locateFace(point.getX(), point.getY());
 	}
 }

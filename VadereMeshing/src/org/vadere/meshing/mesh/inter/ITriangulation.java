@@ -9,10 +9,8 @@ import java.util.stream.Stream;
 
 /**
  * A {@link ITriangulation} is a set of connected triangles.
- *
- * @param <P> the type of the points of the triangles
  */
-public interface ITriangulation<P extends IPoint> {
+public interface ITriangulation {
 
 	/**
 	 * Returns a {@link Stream} of {@link VTriangle} which represent the triangles of this triangulation.
@@ -27,16 +25,16 @@ public interface ITriangulation<P extends IPoint> {
 	}
 
 	/**
-	 * Returns a {@link Stream} of {@link Triple} of {@link P} which represent the triangles of this triangulation.
+	 * Returns a {@link Stream} of {@link Triple} of {@link IPoint} which represent the triangles of this triangulation.
 	 *
-	 * @return a {@link Stream} of {@link Triple} of {@link P}
+	 * @return a {@link Stream} of {@link Triple} of {@link IPoint}
 	 */
-	Stream<Triple<P, P, P>> streamTriples();
+	Stream<Triple<IPoint, IPoint, IPoint>> streamTriples();
 
 	/**
-	 * Returns a {@link Stream} of {@link P} which are the points of the triangulation.
+	 * Returns a {@link Stream} of {@link IPoint} which are the points of the triangulation.
 	 *
-	 * @return a {@link Stream} of {@link P} which are the points of the triangulation.
+	 * @return a {@link Stream} of {@link IPoint} which are the points of the triangulation.
 	 */
-	Stream<P> streamPoints();
+	Stream<IPoint> streamPoints();
 }

@@ -14,6 +14,13 @@
   - import 'open' paths as polygons with a specified width. With this it is
     possible to create walls or subway entrance
   - add option to include osm ids into each obstacle created
+ 
+`PostVis` added functionalities:
+- the PostVis works now on the basis of simulation time instead of time steps. Agents' position will be interpolated.
+    - the user can jump to a specific simulation time
+    - the user can step forward by steps as small as 0.01s
+    - the user can make videos using also this new feature which results in very smooth movement
+    - the frames per seconds (FPS) is now more accurate
 
 ### Changed
 

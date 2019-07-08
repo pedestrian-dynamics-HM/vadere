@@ -2,13 +2,15 @@ package org.vadere.gui.postvisualization.control;
 
 
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.state.simulation.Step;
 import org.vadere.util.logging.Logger;
+
+import java.util.Optional;
 
 public class Player implements Runnable {
 	private static Logger logger = Logger.getLogger(Player.class);
 	private static volatile Player instance;
 	private Thread currentThread;
-	private int currentStep;
 
 	enum State {
 		STOPPED, PAUSED, RUNNING
@@ -29,7 +31,6 @@ public class Player implements Runnable {
 
 	private Player(final PostvisualizationModel model) {
 		this.model = model;
-		this.currentStep = 1;
 		this.currentThread = null;
 		state = State.STOPPED;
 	}
@@ -41,7 +42,6 @@ public class Player implements Runnable {
 	public void stop() {
 		state = State.STOPPED;
 		running = false;
-		currentStep = 1;
 
 		if (currentThread != null) {
 			currentThread.interrupt();
@@ -63,8 +63,6 @@ public class Player implements Runnable {
 				currentThread.start();
 			}
 			state = State.RUNNING;
-
-			model.getStep().ifPresent(s -> currentStep = s.getStepNumber());
 			synchronized (model) {
 				model.notifyAll();
 			}
@@ -79,8 +77,8 @@ public class Player implements Runnable {
 		}
 	}
 
-	private boolean isRunable() {
-		return model.getStep().isPresent() && model.getFirstStep().isPresent() && model.getLastStep().isPresent();
+	private boolean isRunnable() {
+		return !model.isEmpty();
 	}
 
 	@Override
@@ -91,17 +89,16 @@ public class Player implements Runnable {
 			// synchronized (model) {
 			switch (state) {
 				case RUNNING: {
-					if (isRunable()) {
-						if (model.getLastStep().get().getStepNumber() > model.getStep().get().getStepNumber()) {
-							currentStep = model.getStep().get().getStepNumber() + 1;
-							model.setStep(currentStep);
-						} else {
-							pause();
+					if (isRunnable()) {
+						double newSimeTimeInSec = model.getSimTimeInSec() + model.getVisTimeStepLength();
+						if(model.getSimTimeInSec() >= model.getMaxSimTimeInSec()) {
+							newSimeTimeInSec = 0;
 						}
+						model.setVisTime(newSimeTimeInSec);
 					}
 				}
-					model.notifyObservers();
-					break;
+				model.notifyObservers();
+				break;
 
 				case PAUSED: {
 					synchronized (model) {
@@ -112,17 +109,18 @@ public class Player implements Runnable {
 						}
 					}
 				}
-					break;
-				default:
-					break;
+				break;
+				default: break;
 			}
 			// }
 			diffMs = System.currentTimeMillis() - ms;
-			sleepTimeMS = (int) Math.round((1000.0 - diffMs) / model.config.getFps());
-			try {
-				Thread.sleep(Math.max(0, sleepTimeMS));
-			} catch (InterruptedException e) {
-				logger.info("Player interrupted while sleeping");
+			sleepTimeMS = (int) Math.round((1000.0 / model.config.getFps() - diffMs));
+			if(sleepTimeMS > 0) {
+				try {
+					Thread.sleep(Math.max(0, sleepTimeMS));
+				} catch (InterruptedException e) {
+					logger.info("Player interrupted while sleeping");
+				}
 			}
 		}
 	}

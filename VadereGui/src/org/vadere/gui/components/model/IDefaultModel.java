@@ -28,6 +28,8 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 
 	boolean setScale(final double scale);
 
+	boolean setScaleWithoutChangingViewport(final double scale);
+
 	void notifyScaleListeners();
 
 	Color getScenarioElementColor(final ScenarioElementType elementType);

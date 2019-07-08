@@ -36,7 +36,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
     private static void overallUniformRing() {
 
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -46,7 +46,8 @@ public class RunTimeGPUEdgeBased extends JFrame {
 		List<Long> runTimes = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
-			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			final double finitialEdgeLength = initialEdgeLength;
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, p -> uniformEdgeLength.apply(p) * finitialEdgeLength, bbox, new ArrayList<>(), supplier);
 
 			StopWatch overAllTime = new StopWatch();
 			overAllTime.start();
@@ -62,7 +63,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
@@ -77,7 +78,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 	}
 
 	private static void stepUniformRing(double startLen, double endLen, double stepLen) throws OpenCLException {
-		IMeshSupplier<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> supplier = () -> new AMesh<>(pointConstructor);
+		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -91,8 +92,9 @@ public class RunTimeGPUEdgeBased extends JFrame {
 		List<Double> initlialEdgeLengths = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
+			double finitialEdgeLength = initialEdgeLength;
 			initlialEdgeLengths.add(initialEdgeLength);
-			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+			CLEikMesh meshGenerator = new CLEikMesh(distanceFunc, p->uniformEdgeLength.apply(p) * finitialEdgeLength, bbox, new ArrayList<>(), supplier);
 			meshGenerator.initialize();
 
 			StopWatch overAllTime = new StopWatch();
@@ -121,7 +123,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");

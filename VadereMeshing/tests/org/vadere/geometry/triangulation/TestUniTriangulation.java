@@ -5,24 +5,24 @@ import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+
+import javax.swing.*;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import javax.swing.*;
-
 /**
- * This class is for testing and to give an example of how to use {@link UniformRefinementTriangulatorSFC}.
+ * This class is for testing and to give an example of how to use {@link GenUniformRefinementTriangulatorSFC}.
  *
  * @author Benedikt Zoennchen
  */
@@ -43,11 +43,11 @@ public class TestUniTriangulation extends JFrame {
 	    IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 
 	    // a mesh supplier for a default mesh
-	    IMeshSupplier<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> supplier = () -> new AMesh<>(pointConstructor);
+	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 
 	    // the mesh refinement triangulator
-        UniformRefinementTriangulatorSFC<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> uniformRefinementTriangulation =
-                new UniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.1, 1.5, distanceFunc, new ArrayList<>());
+        GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation =
+                new GenUniformRefinementTriangulatorSFC<>(supplier, bbox, new ArrayList<>(), p -> 0.15, distanceFunc);
 
         // to measure the time consumption
 	    StopWatch overAllTime = new StopWatch();
@@ -55,9 +55,9 @@ public class TestUniTriangulation extends JFrame {
 	    /*
 	     * GUI-Code
 	     */
-	    IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> triangulation = uniformRefinementTriangulation.init();
-	    Function<AFace<VPoint>, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
-        MeshPanel<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> meshPanel =
+	    IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = uniformRefinementTriangulation.init();
+	    Function<AFace, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
+        MeshPanel<AVertex, AHalfEdge, AFace> meshPanel =
                 new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -77,7 +77,7 @@ public class TestUniTriangulation extends JFrame {
                 e.printStackTrace();
             }
 	        overAllTime.resume();
-	        uniformRefinementTriangulation.step();
+	        uniformRefinementTriangulation.refine();
 	        overAllTime.suspend();
 
 	        log.info("computation time = " + (overAllTime.getTime()) + "[ms]");

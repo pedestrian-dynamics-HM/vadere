@@ -11,6 +11,7 @@ import org.vadere.gui.postvisualization.utils.ImageGenerator;
 import org.vadere.gui.postvisualization.utils.SVGGenerator;
 import org.vadere.gui.postvisualization.utils.TikzGenerator;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.TrajectoryReader;
 import org.vadere.util.io.IOUtils;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -118,8 +118,9 @@ public class PostVisualizationConsole {
 			Optional<File> scenarioFile = IOUtils.getFirstFile(path.toFile(), IOUtils.SCENARIO_FILE_EXTENSION);
 
 			if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
-				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath());
-				model.init(reader.readFile(), IOOutput.readScenario(scenarioFile.get().toPath()), trajectoryFile.get().getParent());
+				Scenario scenario = IOOutput.readScenario(scenarioFile.get().toPath());
+				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath(), scenario);
+				model.init(reader.readFile(), scenario, trajectoryFile.get().getParent());
 			} else {
 				System.err.println("could not find trajectory or scenario file in: " + outputDirectoryPath);
 			}
@@ -142,7 +143,7 @@ public class PostVisualizationConsole {
 		if (step != -1) {
 			model.setStep(step);
 		} else {
-			model.setTime(time);
+			model.setVisTime(time);
 		}
 
 		if (showGroups){

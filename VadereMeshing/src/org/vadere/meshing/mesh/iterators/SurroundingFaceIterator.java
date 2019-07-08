@@ -13,17 +13,17 @@ import java.util.Iterator;
  * This Iterator iterates over all twin faces of its half-edges.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the point
- * @param <V> the type of the vertex
- * @param <E> the type of the half-edge
- * @param <F> the type of the face
+ *
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class SurroundingFaceIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<F> {
+public class SurroundingFaceIterator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Iterator<F> {
 
-	private EdgeIterator<P, V, E, F> edgeIterator;
-	private IMesh<P, V, E, F> mesh;
+	private EdgeIterator<V, E, F> edgeIterator;
+	private IMesh<V, E, F> mesh;
 
-	public SurroundingFaceIterator(@NotNull final IMesh<P, V, E, F> mesh, @NotNull final F face) {
+	public SurroundingFaceIterator(@NotNull final IMesh<V, E, F> mesh, @NotNull final F face) {
 		assert mesh.isAlive(face);
 		this.mesh = mesh;
 		this.edgeIterator = new EdgeIterator<>(mesh, face);
