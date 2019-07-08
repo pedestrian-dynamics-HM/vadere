@@ -1,14 +1,9 @@
 package org.vadere.util.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -19,13 +14,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Contains utilities for input and output.
@@ -118,31 +106,6 @@ public class IOUtils {
 	 */
 	public static String getUserDataDirectory() {
 		return System.getProperty("user.home") + File.separator;
-	}
-
-	/**
-	 * Loads user preferences from the given file.
-	 * 
-	 * @param filename
-	 *        filename of the file storing the preferences
-	 * @param cls
-	 *        class type for which the preferences should be loaded
-	 * @return the preferences object, or null.
-	 */
-	public static Preferences loadUserPreferences(String filename, Class<?> cls)
-			throws IOException, InvalidPreferencesFormatException {
-		FileInputStream fis = new FileInputStream(filename);
-		Preferences.importPreferences(fis);
-
-		return Preferences.userNodeForPackage(cls);
-	}
-
-	/** Saves a given preference to file. */
-	public static void saveUserPreferences(String preferencesfilename,
-			Preferences prefs) throws IOException, BackingStoreException {
-		try (FileOutputStream fos = new FileOutputStream(preferencesfilename)) {
-			prefs.exportNode(fos);
-		}
 	}
 
 	/** Writes a given string to a given file. */

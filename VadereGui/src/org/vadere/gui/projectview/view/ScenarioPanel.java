@@ -106,13 +106,13 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		//Tab
 		attributesSimulationView =
-				new TextView("/attributes", "default_directory_attributes", AttributeType.SIMULATION);
+				new TextView("/attributes", "ProjectView.defaultDirectoryAttributes", AttributeType.SIMULATION);
 		attributesSimulationView.setScenarioChecker(model);
 
 		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
 
 		//Tab
-		attributesModelView = new TextView("/attributes", "default_directory_attributes", AttributeType.MODEL);
+		attributesModelView = new TextView("/attributes", "ProjectView.defaultDirectoryAttributes", AttributeType.MODEL);
 		attributesModelView.setScenarioChecker(model);
 
 		JMenuBar presetMenuBar = new JMenuBar();
@@ -192,11 +192,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
 
-		topographyFileView = new TextView("/scenarios", "default_directory_scenarios", AttributeType.TOPOGRAPHY);
+		topographyFileView = new TextView("/scenarios", "ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
-		eventFileView = new TextView("/attributes", "default_directory_attributes", AttributeType.EVENT);
+		eventFileView = new TextView("/attributes", "ProjectView.defaultDirectoryAttributes", AttributeType.EVENT);
 		eventFileView.isEditable(true);
 		tabbedPane.addTab(Messages.getString("Tab.Event.title"), eventFileView);
 

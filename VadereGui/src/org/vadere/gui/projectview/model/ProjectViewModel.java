@@ -2,34 +2,24 @@ package org.vadere.gui.projectview.model;
 
 
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
-import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.gui.projectview.view.ScenarioNamePanel;
-import org.vadere.gui.projectview.view.ScenarioPanel;
-import org.vadere.gui.projectview.view.VDialogManager;
-import org.vadere.gui.projectview.view.VTable;
+import org.vadere.gui.projectview.view.*;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOOutput;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
 
 public class ProjectViewModel implements IScenarioChecker {
 	private static Logger logger = Logger.getLogger(ProjectViewModel.class);
@@ -60,7 +50,7 @@ public class ProjectViewModel implements IScenarioChecker {
 		this.projectChangeListeners = new LinkedList<>();
 		this.project = null;
 		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
-		this.showSimulationResultDialog = Preferences.userNodeForPackage(VadereApplication.class)
+		this.showSimulationResultDialog = VadereConfig.getConfig()
 				.getBoolean("Project.simulationResult.show", true);
 		this.scenarioCheckerListeners = new ArrayList<>();
 	}

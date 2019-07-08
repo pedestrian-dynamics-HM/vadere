@@ -6,16 +6,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.vadere.gui.components.utils.Resources;
+import org.apache.commons.configuration2.Configuration;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.visualization.ColorHelper;
 
 public class DefaultSimulationConfig extends DefaultConfig {
-	private static Resources resources = Resources.getInstance("global");
-	private boolean showLogo = Boolean.valueOf(resources.getProperty("Logo.show"));
-	private double densityScale = Double.valueOf(resources.getProperty("Density.measurementscale"));
-	private double densityMeasurementRadius = Double.valueOf(resources.getProperty("Density.measurementradius"));
-	private double densityStandardDerivation = Double.valueOf(resources.getProperty("Density.standardderivation"));
-	private double pedestrianTorso = Double.valueOf(resources.getProperty("Pedestrian.Radius")) * 2;
+
+	private static final Configuration CONFIG = VadereConfig.getConfig();
+
+	private boolean showLogo = CONFIG.getBoolean("SettingsDialog.showLogo");
+	private double densityScale = CONFIG.getDouble("Density.measurementScale");
+	private double densityMeasurementRadius = CONFIG.getDouble("Density.measurementRadius");
+	private double densityStandardDerivation = CONFIG.getDouble("Density.standardDeviation");
+	private double pedestrianTorso = CONFIG.getDouble("Pedestrian.radius") * 2;
 
 	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
@@ -37,9 +40,9 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	protected final Color pedestrianDefaultColor = Color.BLUE;
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
-	private double gridWidth = Double.valueOf(resources.getProperty("ProjectView.cellWidth"));
-	private final double MIN_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.minCellWidth"));
-	private final double MAX_CELL_WIDTH = Double.valueOf(resources.getProperty("ProjectView.maxCellWidth"));
+	private double gridWidth = CONFIG.getDouble("ProjectView.cellWidth");
+	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
+	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
 
 	public DefaultSimulationConfig() {
 		super();

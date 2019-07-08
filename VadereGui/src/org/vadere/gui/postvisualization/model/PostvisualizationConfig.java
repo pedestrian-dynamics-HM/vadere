@@ -1,13 +1,14 @@
 package org.vadere.gui.postvisualization.model;
 
-import java.util.*;
-
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
-import org.vadere.gui.components.utils.Resources;
+import org.vadere.util.config.VadereConfig;
+
+import java.util.Observable;
 
 public class PostvisualizationConfig extends DefaultSimulationConfig {
 
-	private static Resources resources = Resources.getInstance("postvisualization");
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private boolean recording = false;
 	private boolean showAllTrajectories = true;
@@ -15,10 +16,9 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 	private boolean showFaydedPedestrians = false;
 	private boolean loadTopographyInformationsOnly = false;
 	private boolean useEvacuationTimeColor = false;
-	//private double gridWidth = Double.valueOf(resources.getProperty("PostVis.cellWidth"));
-	private int fps = Integer.valueOf(resources.getProperty("PostVis.framesPerSecond"));
 
-	private final int MAX_VELOCITY = Integer.valueOf(resources.getProperty("PostVis.maxFramePerSecond"));
+	private int fps = CONFIG.getInt("PostVis.framesPerSecond");
+	private final int MAX_VELOCITY = CONFIG.getInt("PostVis.maxFramePerSecond");
 
 	private Observable observable;
 
