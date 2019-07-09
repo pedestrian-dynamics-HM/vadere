@@ -149,7 +149,8 @@ public class TestCLOptimalStepsModel {
 	public void setUp() throws IOException, TextOutOfNodeException {
 		random = new Random(0);
 		maxStepSize = 0.2f;
-		numberOfElements = 8192;
+		//numberOfElements = 8192;
+		numberOfElements = 1024;
 		attributesOSM = new AttributesOSM();
 		attributesFloorField = new AttributesFloorField();
 		attributesAgent = new AttributesAgent();

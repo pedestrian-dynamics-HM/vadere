@@ -26,7 +26,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -87,14 +86,15 @@ public class CLParallelOptimalStepsModel {
 
     //
 	private static final int COORDOFFSET = 2;
-	private static final int OFFSET = 7;
 	private static final int X = 0;
 	private static final int Y = 1;
-	private static final int STEPSIZE = 2;
-	private static final int DESIREDSPEED = 3;
-	private static final int TIMECREDIT = 4;
-	private static final int NEWX = 5;
-	private static final int NEWY = 6;
+
+	private static final int OFFSET = 5;
+	private static final int STEPSIZE = 0;
+	private static final int DESIREDSPEED = 1;
+	private static final int TIMECREDIT = 2;
+	private static final int NEWX = 3;
+	private static final int NEWY = 4;
 
     // CL ids
     private long clPlatform;
@@ -108,14 +108,15 @@ public class CLParallelOptimalStepsModel {
     private long clIndices;
     private long clCellStarts;
     private long clCellEnds;
+    private long clReorderedPositions;
     private long clReorderedPedestrians;
     private long clPedestrians;
+	private long clPositions;
     private long clCellSize;
     private long clWorldOrigin;
     private long clGridSize;
     private long clTargetPotential;
     private long clObstaclePotential;
-    private long clPedestrianNextPositions;
     private long clCirclePositions;
     private long clPotentialFieldSize;
     private long clPotentialFieldGridSize;
@@ -240,30 +241,35 @@ public class CLParallelOptimalStepsModel {
     	// clear the old memory before re-initialization
     	if(pedestrianSet) {
 		    freeCLMemory(clPedestrians);
+		    freeCLMemory(clPositions);
 		    freeCLMemory(clHashes);
 		    freeCLMemory(clIndices);
 		    freeCLMemory(clReorderedPedestrians);
-		    freeCLMemory(clPedestrianNextPositions);
+		    freeCLMemory(clReorderedPositions);
 		    MemoryUtil.memFree(memNextPositions);
 		    MemoryUtil.memFree(memIndices);
 	    }
 
-	    FloatBuffer memPedestrians = allocHostMemory(pedestrians);
+	    FloatBuffer memPedestrians = allocPedestrianHostMemory(pedestrians);
+		FloatBuffer memPositions = allocPositionHostMemory(pedestrians);
 	    int power = (int)CLUtils.power(pedestrians.size(), 2);
 	    try (MemoryStack stack = stackPush()) {
 		    IntBuffer errcode_ret = stack.callocInt(1);
 		    clPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
+		    clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
 		    clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 		    clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 		    clReorderedPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
-		    clPedestrianNextPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
+		    clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
 
 		    clEnqueueWriteBuffer(clQueue, clPedestrians, true, 0, memPedestrians, null, null);
+		    clEnqueueWriteBuffer(clQueue, clPositions, true, 0, memPositions, null, null);
 		    memNextPositions = MemoryUtil.memAllocFloat(numberOfElements * COORDOFFSET);
 		    memIndices = MemoryUtil.memAllocInt(numberOfElements);
 		    pedestrianSet = true;
 	    }
 	    MemoryUtil.memFree(memPedestrians);
+		MemoryUtil.memFree(memPositions);
     }
 
 	//TODO: dont sort if the size is <= 1!
@@ -271,12 +277,13 @@ public class CLParallelOptimalStepsModel {
 		try (MemoryStack stack = stackPush()) {
 			allocGlobalHostMemory();
 			allocGlobalDeviceMemory();
-			clCalcHash(clHashes, clIndices, clPedestrians, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
+			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
 			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
-			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clHashes, clIndices, clPedestrians, numberOfElements);
+			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clReorderedPositions, clHashes, clIndices, clPedestrians, clPositions, numberOfElements);
 
 			clSeek(
 					clReorderedPedestrians,
+					clReorderedPositions,
 					clCirclePositions,
 					clCellStarts,
 					clCellEnds,
@@ -290,8 +297,8 @@ public class CLParallelOptimalStepsModel {
 					numberOfElements);
 
 			clMove(
-					clPedestrianNextPositions,
 					clReorderedPedestrians,
+					clReorderedPositions,
 					clCellStarts,
 					clCellEnds,
 					clCellSize,
@@ -301,10 +308,12 @@ public class CLParallelOptimalStepsModel {
 
 			clSwap(
 					clReorderedPedestrians,
+					clReorderedPositions,
 					clPedestrians,
+					clPositions,
 					numberOfElements);
 
-			clEnqueueReadBuffer(clQueue, clPedestrianNextPositions, true, 0, memNextPositions, null, null);
+			clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
 			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
 			clFinish(clQueue);
 
@@ -329,11 +338,9 @@ public class CLParallelOptimalStepsModel {
 	 * @param pedestrians
 	 * @return
 	 */
-	private FloatBuffer allocHostMemory(@NotNull final List<PedestrianOpenCL> pedestrians) {
+	private FloatBuffer allocPedestrianHostMemory(@NotNull final List<PedestrianOpenCL> pedestrians) {
 	    float[] pedestrianStruct = new float[pedestrians.size() * OFFSET];
 	    for(int i = 0; i < pedestrians.size(); i++) {
-		    pedestrianStruct[i * OFFSET + X] = (float) pedestrians.get(i).position.getX();
-		    pedestrianStruct[i * OFFSET + Y] = (float) pedestrians.get(i).position.getY();
 		    pedestrianStruct[i * OFFSET + STEPSIZE] = pedestrians.get(i).stepRadius;
 		    pedestrianStruct[i * OFFSET + DESIREDSPEED] = pedestrians.get(i).freeFlowSpeed;
 		    pedestrianStruct[i * OFFSET + TIMECREDIT] = 5.0f;
@@ -342,6 +349,15 @@ public class CLParallelOptimalStepsModel {
 	    }
 	    return CLUtils.toFloatBuffer(pedestrianStruct);
     }
+
+	private FloatBuffer allocPositionHostMemory(@NotNull final List<PedestrianOpenCL> pedestrians) {
+		float[] pedestrianStruct = new float[pedestrians.size() * COORDOFFSET];
+		for(int i = 0; i < pedestrians.size(); i++) {
+			pedestrianStruct[i * COORDOFFSET + X] = (float) pedestrians.get(i).position.getX();
+			pedestrianStruct[i * COORDOFFSET + Y] = (float) pedestrians.get(i).position.getY();
+		}
+		return CLUtils.toFloatBuffer(pedestrianStruct);
+	}
 
 	/**
 	 * Allocates the host memory for objects which do not change during the simulation e.g. the static potential field.
@@ -412,7 +428,7 @@ public class CLParallelOptimalStepsModel {
 		    final long clIndices,
 		    final long clPositions,
 		    final long clCellSize,
-		    final long clWorldOrign,
+		    final long clWorldOrigin,
 		    final long clGridSize,
 		    final int numberOfElements,
 		    final int numberOfElementsPower) throws OpenCLException {
@@ -422,7 +438,7 @@ public class CLParallelOptimalStepsModel {
 		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 1, clIndices));
 		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 2, clPositions));
 		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 3, clCellSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 4, clWorldOrign));
+		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 4, clWorldOrigin));
 		    CLInfo.checkCLError(clSetKernelArg1p(clCalcHash, 5, clGridSize));
 		    CLInfo.checkCLError(clSetKernelArg1i(clCalcHash, 6, numberOfElements));
 		    clGlobalWorkSize.put(0, numberOfElementsPower);
@@ -433,6 +449,7 @@ public class CLParallelOptimalStepsModel {
 
     private void clSeek(
 		    final long clReorderedPedestrians,
+		    final long clReorderedPositions,
 		    final long clCirclePositions,
 		    final long clCellStarts,
 		    final long clCellEnds,
@@ -449,23 +466,24 @@ public class CLParallelOptimalStepsModel {
 
 		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
-			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0); // local 4 byte (integer)
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 0, clReorderedPedestrians));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 1, clCirclePositions));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 2, clCellStarts));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 3, clCellEnds));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 4, clCellSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 5, clGridSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 6, clObstaclePotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 7, clTargetPotential));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 8, clWorldOrigin));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 9, clPotentialFieldGridSize));
-		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 10, clPotentialFieldSize));
-		    CLInfo.checkCLError(clSetKernelArg1f(clSeek, 11, (float)attributesFloorField.getPotentialFieldResolution()));
-		    CLInfo.checkCLError(clSetKernelArg1f(clSeek, 12, timeStepInSec));
-		    CLInfo.checkCLError(clSetKernelArg1i(clSeek, 13, circlePositionList.size()));
-		    CLInfo.checkCLError(clSetKernelArg1i(clSeek, 14, numberOfElements));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 1, clReorderedPositions));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 2, clCirclePositions));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 3, clCellStarts));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 4, clCellEnds));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 5, clCellSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 6, clGridSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 7, clObstaclePotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 8, clTargetPotential));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 9, clWorldOrigin));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 10, clPotentialFieldGridSize));
+		    CLInfo.checkCLError(clSetKernelArg1p(clSeek, 11, clPotentialFieldSize));
+		    CLInfo.checkCLError(clSetKernelArg1f(clSeek, 12, (float)attributesFloorField.getPotentialFieldResolution()));
+		    CLInfo.checkCLError(clSetKernelArg1f(clSeek, 13, timeStepInSec));
+		    CLInfo.checkCLError(clSetKernelArg1i(clSeek, 14, circlePositionList.size()));
+		    CLInfo.checkCLError(clSetKernelArg1i(clSeek, 15, numberOfElements));
 
 		    long globalWorkSize;
 		    long localWorkSize;
@@ -487,8 +505,8 @@ public class CLParallelOptimalStepsModel {
     }
 
 	private void clMove(
-			final long clPedestrianNextPositions,
 			final long clReorderedPedestrians,
+			final long clReorderedPositions,
 			final long clCellStarts,
 			final long clCellEnds,
 			final long clCellSize,
@@ -500,10 +518,10 @@ public class CLParallelOptimalStepsModel {
 
 			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
-			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0); // local 4 byte (integer)
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
 
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 0, clPedestrianNextPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 1, clReorderedPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 0, clReorderedPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 1, clReorderedPositions));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 2, clCellStarts));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 3, clCellEnds));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 4, clCellSize));
@@ -532,7 +550,9 @@ public class CLParallelOptimalStepsModel {
 	}
 
 	private void clSwap(
+			final long clReorderedPedestrians,
 			final long clReorderedPositions,
+			final long clPedestrians,
 			final long clPositions,
 			final int numberOfElements) throws OpenCLException {
 
@@ -540,10 +560,12 @@ public class CLParallelOptimalStepsModel {
 			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 			clGlobalWorkSize.put(0, numberOfElements);
 
-			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 0, clReorderedPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 1, clPositions));
-			CLInfo.checkCLError(clSetKernelArg1i(clSwap, 2, numberOfElements));
-			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMove", clQueue, clSwap, 1, null, clGlobalWorkSize, null, null, null));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 0, clReorderedPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 1, clReorderedPositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 2, clPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 3, clPositions));
+			CLInfo.checkCLError(clSetKernelArg1i(clSwap, 4, numberOfElements));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSwap", clQueue, clSwap, 1, null, clGlobalWorkSize, null, null, null));
 		}
 	}
 
@@ -551,9 +573,11 @@ public class CLParallelOptimalStepsModel {
     private void clFindCellBoundsAndReorder(
     		final long clCellStarts,
 		    final long clCellEnds,
+		    final long clReorderedPedestrians,
 		    final long clReorderedPositions,
 		    final long clHashes,
 		    final long clIndices,
+		    final long clPedestrians,
 		    final long clPositions,
 		    final int numberOfElements) throws OpenCLException {
 
@@ -562,16 +586,18 @@ public class CLParallelOptimalStepsModel {
 		    PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
-			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0); // local 4 byte (integer)
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 2, clReorderedPositions));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clHashes));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clIndices));
-		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clPositions));
-		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 6, (Math.min(numberOfElements+1, maxWorkGroupSize)) * 4)); // local memory
-		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 7, numberOfElements));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 2, clReorderedPedestrians));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 3, clReorderedPositions));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 4, clHashes));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 5, clIndices));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 6, clPedestrians));
+		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 7, clPositions));
+		    CLInfo.checkCLError(clSetKernelArg(clFindCellBoundsAndReorder, 8, (Math.min(numberOfElements+1, maxWorkGroupSize)) * 4)); // local memory
+		    CLInfo.checkCLError(clSetKernelArg1i(clFindCellBoundsAndReorder, 9, numberOfElements));
 
 		    long globalWorkSize;
 		    long localWorkSize;
@@ -615,27 +641,6 @@ public class CLParallelOptimalStepsModel {
 		}
 	}
 
-	private long getMaxWorkGroupSizeForKernel(long clDevice, long clKernel, long workItemMem) throws OpenCLException {
-		try (MemoryStack stack = stackPush()) {
-			LongBuffer pp = stack.mallocLong(1);
-			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clKernel, clDevice, CL_KERNEL_LOCAL_MEM_SIZE , pp, null));
-
-			/*long kernelLocalMemory = pp.get(0);
-			logger.debug("CL_KERNEL_LOCAL_MEM_SIZE = (" + clKernel + ") = " + kernelLocalMemory);
-			logger.debug("memory for each  = " + (workItemMem + kernelLocalMemory));
-
-			long maxWorkGroupSizeForLocalMemory = (workItemMem + kernelLocalMemory) == 0 ? 0 : (max_local_memory_size / (workItemMem + kernelLocalMemory));*/
-			long maxWorkGroupSizeForLocalMemory = workItemMem == 0 ? max_work_group_size : (max_local_memory_size / (workItemMem));
-			PointerBuffer ppp = stack.mallocPointer(1);
-			CLInfo.checkCLError(clGetKernelWorkGroupInfo(clKernel, clDevice, CL_KERNEL_WORK_GROUP_SIZE , ppp, null));
-
-			long maxWorkGroupSizeForPrivateMemory = ppp.get(0);
-			logger.debug("CL_KERNEL_WORK_GROUP_SIZE (" + clKernel + ") = " + maxWorkGroupSizeForPrivateMemory);
-			//return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
-			return Math.min(max_work_group_size, Math.min(maxWorkGroupSizeForLocalMemory, maxWorkGroupSizeForPrivateMemory));
-		}
-	}
-
 	// TODO: global and local work size computation
     private void clBitonicSort(
     		final long clKeysIn,
@@ -650,7 +655,7 @@ public class CLParallelOptimalStepsModel {
 	    	PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
-			long maxWorkGroupSize = getMaxWorkGroupSizeForKernel(clDevice, clBitonicMergeLocal, 8); // local memory for key and values (integer)
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 8, max_work_group_size, max_local_memory_size); // local memory for key and values (integer)
 
 		    // small sorts
 		    if (numberOfElements <= maxWorkGroupSize) {
@@ -763,10 +768,11 @@ public class CLParallelOptimalStepsModel {
 	    try {
 	    	if(pedestrianSet) {
 			    CLInfo.checkCLError(clReleaseMemObject(clPedestrians));
+			    CLInfo.checkCLError(clReleaseMemObject(clPositions));
 			    CLInfo.checkCLError(clReleaseMemObject(clHashes));
 			    CLInfo.checkCLError(clReleaseMemObject(clIndices));
 			    CLInfo.checkCLError(clReleaseMemObject(clReorderedPedestrians));
-			    CLInfo.checkCLError(clReleaseMemObject(clPedestrianNextPositions));
+			    CLInfo.checkCLError(clReleaseMemObject(clReorderedPositions));
 		    }
 
 	    	if(counter > 0) {

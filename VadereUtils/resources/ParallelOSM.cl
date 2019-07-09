@@ -17,17 +17,20 @@
 #define UMAD(a, b, c)  ( (a) * (b) + (c) )
 
 #define RADIUS 0.2
+#define DIAMETER 0.4
+
+#define POTENTIAL_WIDTH 0.5f
 
 #define COORDOFFSET 2
-
-#define OFFSET 7
 #define X 0
 #define Y 1
-#define STEPSIZE 2
-#define DESIREDSPEED 3
-#define TIMECREDIT 4
-#define NEWX 5
-#define NEWY 6
+
+#define OFFSET 5
+#define STEPSIZE 0
+#define DESIREDSPEED 1
+#define TIMECREDIT 2
+#define NEWX 3
+#define NEWY 4
 
 inline void ComparatorPrivate(
     uint *keyA,
@@ -60,16 +63,16 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-inline int2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
-    int2 gridPos;
+inline uint2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
+    uint2 gridPos;
     float2 wordOr = (*worldOrigin);
-    gridPos.x = (int)floor((p.x - wordOr.x) / (*cellSize));
-    gridPos.y = (int)floor((p.y - wordOr.y) / (*cellSize));
+    gridPos.x = (uint)max(0, (int)floor((p.x - wordOr.x) / (*cellSize)));
+    gridPos.y = (uint)max(0, (int)floor((p.y - wordOr.y) / (*cellSize)));
     return gridPos;
 }
 
 //Calculate address in grid from position (clamping to edges)
-inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
+inline uint getGridHash(const uint2 gridPos, __constant const uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     //gridPos.x = gridPos.x & ((*gridSize).x - 1);
     //gridPos.y = gridPos.y & ((*gridSize).y - 1);
@@ -81,20 +84,28 @@ inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
 ////////////////////////////////////////////////////////////////////////////////
 
 // see PotentialFieldPedestrianCompact with useHardBodyShell = false:
-inline float getPedestrianPotential(float2 pos, float2 otherPedPosition) {
+/*inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
+    float d = distance(pos, otherPedPosition);
+    if (d < POTENTIAL_WIDTH) {
+        return 12.6f * native_exp(1 / (pown(d / POTENTIAL_WIDTH, 2) - 1));
+    } else {
+        return 0.0f;
+    }
+}*/
 
-    float potential = 0.0f;
+// see PotentialFieldPedestrianCompact with useHardBodyShell = false:
+inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
     float d = distance(pos, otherPedPosition);
     float width = 0.5f;
     float height = 12.6f;
     if (d < width) {
-        potential = height * exp(1 / (pown(d / width, 2) - 1));
+        return 12.6f * native_exp(1 / (pown(d / 0.5f, 2) - 1));
+    } else {
+        return 0.0f;
     }
-
-    return potential;
 }
 
-inline float getFullPedestrianPotential(
+/*inline float getFullPedestrianPotential(
         __global const float        *orderedPedestrians,  //input
         __global const uint         *d_CellStart,
         __global const uint         *d_CellEnd,
@@ -105,13 +116,51 @@ inline float getFullPedestrianPotential(
         const float2                pedPosition)
 {
     float potential = 0;
-    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     //Accumulate surrounding cells
     // TODO: index check!
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
             int2 uGridPos = (int2)(gridPos.x + x , gridPos.y + y);
             if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
+                continue;
+            }
+            uint   hash = getGridHash((uint2)uGridPos, gridSize);
+            uint startI = d_CellStart[hash];
+
+            //Skip empty cell
+            //if(startI == 0xFFFFFFFFU)
+            //    continue;
+            //Iterate over particles in this cell
+            uint endI = d_CellEnd[hash];
+            for(uint j = startI; j < endI; j++){
+                float2 otherPedestrian = (float2) (orderedPedestrians[j * OFFSET + X], orderedPedestrians[j * OFFSET + Y]);
+                potential += getPedestrianPotential(pos, otherPedestrian);
+            }
+        }
+    }
+    potential -= getPedestrianPotential(pos, pedPosition);
+    return potential;
+}*/
+
+inline float getFullPedestrianPotential(
+        __global const float        *orderedPositions,  //input
+        __global const uint         *d_CellStart,
+        __global const uint         *d_CellEnd,
+        __constant const float      *cellSize,
+        __constant const uint2      *gridSize,
+        __constant const float2     *worldOrigin,
+        const float2                pos,
+        const float2                pedPosition)
+{
+    float potential = 0;
+    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    for(int y = -1; y <= 1; y++) {
+        for(int x = -1; x <= 1; x++){
+            uint2 uGridPos = gridPos - (int2)(x, y);
+
+            // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
+            if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
             uint   hash = getGridHash(uGridPos, gridSize);
@@ -123,8 +172,9 @@ inline float getFullPedestrianPotential(
             //Iterate over particles in this cell
             uint endI = d_CellEnd[hash];
             for(uint j = startI; j < endI; j++){
-                float2 otherPedestrian = (float2) (orderedPedestrians[j * OFFSET + X], orderedPedestrians[j * OFFSET + Y]);
-                potential += getPedestrianPotential(pos, otherPedestrian);
+                // TODO: seperate position from rest , remove global memory access
+                float2 otherPos = (float2) (orderedPositions[j * COORDOFFSET + X], orderedPositions[j * COORDOFFSET + Y]);
+                potential += getPedestrianPotential(pos, otherPos);
             }
         }
     }
@@ -142,16 +192,14 @@ inline bool hasConflict(
         const float timeCredit,
         const float2 pedPosition)
 {
-    float potential = 0;
-    uint index = get_global_id(0);
-    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     uint collisions = 0;
-    //Accumulate surrounding cells
-    // TODO: index check!
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-            int2 uGridPos = (int2)(gridPos.x + x , gridPos.y + y);
-            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
+           uint2 uGridPos = gridPos - (int2)(x, y);
+
+            // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
+            if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
             uint   hash = getGridHash(uGridPos, gridSize);
@@ -165,11 +213,9 @@ inline bool hasConflict(
             for(uint j = startI; j < endI; j++){
                 float2 otherPedestrian = (float2) (orderedPedestrians[j * OFFSET + NEWX], orderedPedestrians[j * OFFSET + NEWY]);
                 float otherTimeCredit = orderedPedestrians[j * OFFSET + TIMECREDIT];
-                float2 dist = otherPedestrian - pedPosition;
 
                 // for itself dist < RADIUS but otherTimeCredit == timeCredit and otherPedestrian.x == pedPosition.x
-                float twiceRadius = 2 * RADIUS;
-                if((dist.x * dist.x + dist.y * dist.y) < twiceRadius * twiceRadius &&
+                if(distance(otherPedestrian, pedPosition) < DIAMETER &&
                         (otherTimeCredit < timeCredit || (otherTimeCredit == timeCredit && otherPedestrian.x < pedPosition.x))) {
                     collisions = collisions + 1;
                 }
@@ -247,6 +293,7 @@ inline float getObstaclePotential(float minDistanceToObstacle){
 
 __kernel void seek(
     __global float          *orderedPedestrians,    //input
+    __global float          *orderedPositions,      //input
     __global const float2   *circlePositions,       //input
     __global const uint     *d_CellStart,           //input: cell boundaries
     __global const uint     *d_CellEnd,             //input
@@ -264,7 +311,7 @@ __kernel void seek(
 
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
-        float2 pedPosition = (float2)(orderedPedestrians[index * OFFSET + X], orderedPedestrians[index * OFFSET + Y]);
+        float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT] + timeStepInSec;
@@ -283,7 +330,8 @@ __kernel void seek(
                 float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
                 float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
                 float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-                float pedestrianPotential = getFullPedestrianPotential(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+                float pedestrianPotential = getFullPedestrianPotential(orderedPositions, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+                //float pedestrianPotential = 0.0f;
                 float value = targetPotential + obstaclePotential + pedestrianPotential;
 
                 if(minValue > value) {
@@ -296,14 +344,15 @@ __kernel void seek(
         //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
         //minArg = pedPosition;
         //orderedPedestrians[index * OFFSET + TIMECREDIT] = timeCredit;
-        orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
+
+         orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
         orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
     }
 }
 
 __kernel void move(
-    __global float2               *newPositions,          //output
     __global float                *orderedPedestrians,    //input, update this
+    __global float                *orderedPositions,    //input, update this
     __global const uint           *d_CellStart,           //input: cell boundaries
     __global const uint           *d_CellEnd,             //input
     __constant const float        *cellSize,              //input
@@ -315,36 +364,36 @@ __kernel void move(
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
         float2 newPedPosition = (float2)(orderedPedestrians[index * OFFSET + NEWX], orderedPedestrians[index * OFFSET + NEWY]);
-        float2 oldPosition = (float2)(orderedPedestrians[index * OFFSET + X], orderedPedestrians[index * OFFSET + Y]);
-        float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
-        float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
+        //float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
+        //float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT];
 
-        if(hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
-            newPositions[index] = oldPosition;
-        } else {
-            orderedPedestrians[index * OFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
-            orderedPedestrians[index * OFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
-            newPositions[index] = newPedPosition;
-            //orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
+        if(!hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+            orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
+            orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
+
+            orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
         }
     }
 }
 
 __kernel void swap(
-    __global const float  *d_ReorderedPos,  //output: reordered by cell hash positions
-    __global float  *d_Pos,     //input: positions array sorted by hash
+    __global const float  *d_ReorderedPedestrians,
+    __global const float  *d_ReorderedPos,
+    __global float  *d_Pedestrians,
+    __global float  *d_Pos,
     uint    numParticles
 ){
     const uint index = get_global_id(0);
     if(index < numParticles){
-        d_Pos[index * OFFSET + X] = d_ReorderedPos[index * OFFSET + X];
-        d_Pos[index * OFFSET + Y] = d_ReorderedPos[index * OFFSET + Y];
-        d_Pos[index * OFFSET + STEPSIZE] = d_ReorderedPos[index * OFFSET + STEPSIZE];
-        d_Pos[index * OFFSET + DESIREDSPEED] = d_ReorderedPos[index * OFFSET + DESIREDSPEED];
-        d_Pos[index * OFFSET + TIMECREDIT] = d_ReorderedPos[index * OFFSET + TIMECREDIT];
-        d_Pos[index * OFFSET + NEWX] = d_ReorderedPos[index * OFFSET + NEWX];
-        d_Pos[index * OFFSET + NEWY] = d_ReorderedPos[index * OFFSET + NEWY];
+        d_Pos[index * COORDOFFSET + X] = d_ReorderedPos[index * COORDOFFSET + X];
+        d_Pos[index * COORDOFFSET + Y] = d_ReorderedPos[index * COORDOFFSET + Y];
+
+        d_Pedestrians[index * OFFSET + STEPSIZE] = d_ReorderedPedestrians[index * OFFSET + STEPSIZE];
+        d_Pedestrians[index * OFFSET + DESIREDSPEED] = d_ReorderedPedestrians[index * OFFSET + DESIREDSPEED];
+        d_Pedestrians[index * OFFSET + TIMECREDIT] = d_ReorderedPedestrians[index * OFFSET + TIMECREDIT];
+        d_Pedestrians[index * OFFSET + NEWX] = d_ReorderedPedestrians[index * OFFSET + NEWX];
+        d_Pedestrians[index * OFFSET + NEWY] = d_ReorderedPedestrians[index * OFFSET + NEWY];
     }
 }
 
@@ -363,9 +412,9 @@ __kernel void calcHash(
     if(index >= numParticles) {
         gridHash = (*gridSize).x * (*gridSize).y + 1;
     } else {
-        const float2 p = (float2) (d_Pos[index * OFFSET + X], d_Pos[index * OFFSET + Y]);
+        const float2 p = (float2) (d_Pos[index * COORDOFFSET + X], d_Pos[index * COORDOFFSET + Y]);
         //Get address in grid
-        int2 gridPos = getGridPos(p, cellSize, worldOrigin);
+        uint2 gridPos = getGridPos(p, cellSize, worldOrigin);
         gridHash = getGridHash(gridPos, gridSize);
     }
     //Store grid hash and particle index
@@ -412,9 +461,11 @@ __kernel void Memset(
 __kernel void findCellBoundsAndReorder(
     __global uint   *d_CellStart,     //output: cell start index
     __global uint   *d_CellEnd,       //output: cell end index
+    __global float  *d_ReorderedPedestrians,  //output: reordered by cell hash positions
     __global float  *d_ReorderedPos,  //output: reordered by cell hash positions
     __global const uint   *d_Hash,    //input: sorted grid hashes
     __global const uint   *d_Index,   //input: particle indices sorted by hash
+    __global float  *d_Pedestrians,  //output: reordered by cell hash positions
     __global const float  *d_Pos,     //input: positions array sorted by hash
     __local uint *localHash,          //get_group_size(0) + 1 elements
     uint    numParticles
@@ -456,13 +507,15 @@ __kernel void findCellBoundsAndReorder(
 
         //Now use the sorted index to reorder the pos and vel arrays
         uint sortedIndex = d_Index[index];
-        d_ReorderedPos[index * OFFSET + X] = d_Pos[sortedIndex * OFFSET + X];
-        d_ReorderedPos[index * OFFSET + Y] = d_Pos[sortedIndex * OFFSET + Y];
-        d_ReorderedPos[index * OFFSET + STEPSIZE] = d_Pos[sortedIndex * OFFSET + STEPSIZE];
-        d_ReorderedPos[index * OFFSET + DESIREDSPEED] = d_Pos[sortedIndex * OFFSET + DESIREDSPEED];
-        d_ReorderedPos[index * OFFSET + TIMECREDIT] = d_Pos[sortedIndex * OFFSET + TIMECREDIT];
-        d_ReorderedPos[index * OFFSET + NEWX] = d_Pos[sortedIndex * OFFSET + NEWX];
-        d_ReorderedPos[index * OFFSET + NEWY] = d_Pos[sortedIndex * OFFSET + NEWY];
+
+        d_ReorderedPos[index * COORDOFFSET + X] = d_Pos[sortedIndex * COORDOFFSET + X];
+        d_ReorderedPos[index * COORDOFFSET + Y] = d_Pos[sortedIndex * COORDOFFSET + Y];
+
+        d_ReorderedPedestrians[index * OFFSET + STEPSIZE] = d_Pedestrians[sortedIndex * OFFSET + STEPSIZE];
+        d_ReorderedPedestrians[index * OFFSET + DESIREDSPEED] = d_Pedestrians[sortedIndex * OFFSET + DESIREDSPEED];
+        d_ReorderedPedestrians[index * OFFSET + TIMECREDIT] = d_Pedestrians[sortedIndex * OFFSET + TIMECREDIT];
+        d_ReorderedPedestrians[index * OFFSET + NEWX] = d_Pedestrians[sortedIndex * OFFSET + NEWX];
+        d_ReorderedPedestrians[index * OFFSET + NEWY] = d_Pedestrians[sortedIndex * OFFSET + NEWY];
     }
 }
 
