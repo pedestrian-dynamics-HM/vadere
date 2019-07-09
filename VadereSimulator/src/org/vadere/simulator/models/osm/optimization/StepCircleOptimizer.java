@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VPoint;
 
 /**
@@ -24,8 +25,8 @@ public abstract class StepCircleOptimizer {
     private ArrayList<OptimizationMetric> currentMetricValues;
 
 	protected StepCircleOptimizer(){
-		// TODO: read if the metric should be computed from a config file, see issue #243
-		this.computeMetric = false;
+
+		this.computeMetric = VadereConfig.getConfig().getBoolean("Testing.compareBruteForceSolution");
 
 		if(this.computeMetric){
 			this.currentMetricValues = new ArrayList<>();
