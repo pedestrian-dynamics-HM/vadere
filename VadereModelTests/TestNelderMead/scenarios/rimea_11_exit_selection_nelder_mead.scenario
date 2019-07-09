@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.10320735815457976,
-        "maxMeanDifferenceFuncValue" : 0.06573000624569796,
-        "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.4137730000637334,
-        "infoMinFuncDifference" : -0.0061021424381255684,
-        "infoMaxFuncDifference" : 3.1035982147173797,
-        "infoStddevPointDistance" : 0.1390008307897397,
-        "infoStddevDifferenceFuncValue" : 0.1659699405499854
+        "maxMeanPointDistance" : 0.10117727754291686,
+        "maxMeanDifferenceFuncValue" : 0.06578728725037036,
+        "infoMinPointDistanceL2" : 1.9860273225978185E-15,
+        "infoMaxPointDistanceL2" : 1.381287718714383,
+        "infoMinFuncDifference" : -0.004389072407133376,
+        "infoMaxFuncDifference" : 2.685622269103443,
+        "infoStddevPointDistance" : 0.14060838183188207,
+        "infoStddevDifferenceFuncValue" : 0.1714766405903272
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -61,7 +61,7 @@
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
-        "optimizationType" : "NELDER_MEAD_CIRCLE",
+        "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : true,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
@@ -118,7 +118,7 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 3213925745664992646,
+      "fixedSeed" : 1,
       "simulationSeed" : 1,
       "useSalientBehavior" : false
     },
@@ -150,7 +150,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -168,7 +168,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -198,7 +198,7 @@
             "y" : 15.600000000000001
           } ]
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -222,7 +222,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.5,
           "y" : 8.0,

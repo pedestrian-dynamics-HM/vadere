@@ -152,7 +152,7 @@ public class VadereConfig {
         defaultConfig.put("SettingsDialog.outputDirectory.path", ".");
         defaultConfig.put("SettingsDialog.snapshotDirectory.path", ".");
         defaultConfig.put("SettingsDialog.showLogo", "false");
-        defaultConfig.put("Testing.compareBruteForceSolution", "false");
+        defaultConfig.put("Testing.stepCircleOptimization.compareBruteForceSolution", "false");
         defaultConfig.put("TopographyCreator.dotRadius", "0.5");
 
         return defaultConfig;

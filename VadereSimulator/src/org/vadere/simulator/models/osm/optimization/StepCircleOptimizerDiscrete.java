@@ -27,7 +27,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 	private final Random random;
 	private final static Logger log = Logger.getLogger(StepCircleOptimizerDiscrete.class);
 
-	public StepCircleOptimizerDiscrete(final double movementThreshold, @NotNull final Random random) {
+	public StepCircleOptimizerDiscrete(final double movementThreshold, final Random random) {
 		this.movementThreshold = movementThreshold;
 		this.random = random;
 	}
@@ -62,9 +62,14 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 			try {
 				currentPotential = potentialEvaluationFunction.getPotential(currentPosition);
 
-				// DL: it is not exactly clear how this condition works (where is the value 0.0001 coming from?, Why
-				// is there a random boolean?
-				boolean fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
+				boolean fineTuneCondition;
+				if(bruteForce){
+					fineTuneCondition = false;
+				}else{
+					// DL: it is not exactly clear how this condition works (where is the value 0.0001 coming from?, Why
+					// is there a random boolean?
+					fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
+				}
 
 				if(bruteForce && currentPotential < potential) {
 					potential = currentPotential;

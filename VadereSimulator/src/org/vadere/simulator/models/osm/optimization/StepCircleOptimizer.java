@@ -2,7 +2,6 @@ package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.util.config.VadereConfig;
@@ -26,7 +25,7 @@ public abstract class StepCircleOptimizer {
 
 	protected StepCircleOptimizer(){
 
-		this.computeMetric = VadereConfig.getConfig().getBoolean("Testing.compareBruteForceSolution");
+		this.computeMetric = VadereConfig.getConfig().getBoolean("Testing.stepCircleOptimization.compareBruteForceSolution");
 
 		if(this.computeMetric){
 			this.currentMetricValues = new ArrayList<>();
@@ -62,9 +61,8 @@ public abstract class StepCircleOptimizer {
 														 final SolutionPair foundSolution){
 
         var bruteForceSolution = new
-				StepCircleOptimizerDiscrete(0.0, new Random()).computeBruteForceSolution(pedestrian);
+				StepCircleOptimizerDiscrete(0.0, null).computeBruteForceSolution(pedestrian);
 
-        // TODO: maybe time of nextStep is not the actual correct one, possibly adapt , see #242 and !66
         var optimizationMetric = new OptimizationMetric(pedestrian.getId(), pedestrian.getTimeOfNextStep(),
                 bruteForceSolution.point, bruteForceSolution.funcValue, foundSolution.point, foundSolution.funcValue);
 

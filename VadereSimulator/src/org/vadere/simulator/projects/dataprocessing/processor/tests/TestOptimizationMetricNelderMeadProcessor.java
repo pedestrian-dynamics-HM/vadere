@@ -6,28 +6,15 @@ import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor;
-import org.vadere.simulator.projects.migration.MigrationLogger;
-import org.vadere.state.attributes.processor.AttributesTestNumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesTestOptimizationMetricProcessor;
-import org.vadere.state.attributes.processor.AttributesTestPedestrianEvacuationTimeProcessor;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.logging.Logger;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Map.entry;
 
-/**
- *
- *
- */
 @DataProcessorClass()
 public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 
@@ -148,6 +135,12 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		System.out.println("INFORMATION FROM TestOptimizationMetricNelderMeadProcessor");
 		System.out.println();
 
+		System.out.println("Main metric:");
+		System.out.println(getCompareValuesString("mean function difference", statistics.get("meanDifferenceFuncValue"), attr.getMaxMeanDifferenceFuncValue()));
+		System.out.println(getCompareValuesString("mean point distance", statistics.get("meanPointDistance"), attr.getMaxMeanPointDistance()));
+
+		System.out.println();
+		System.out.println("Further information:");
 		System.out.println(getCompareValuesString("minimum point distance", statistics.get("minPointDistanceL2"), attr.getInfoMinPointDistanceL2()));
 		System.out.println(getCompareValuesString("maximum point distance", statistics.get("maxPointDistanceL2"), attr.getInfoMaxPointDistanceL2()));
 		System.out.println(getCompareValuesString("standard deviation point distance", statistics.get("stddevPointDistance"), attr.getInfoStddevPointDistance()));
@@ -155,6 +148,17 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		System.out.println(getCompareValuesString("minimum function difference", statistics.get("minDifferenceFuncValue"), attr.getInfoMinFuncDifference()));
 		System.out.println(getCompareValuesString("maximum function difference", statistics.get("maxDifferenceFuncValue"), attr.getInfoMaxFuncDifference()));
 		System.out.println(getCompareValuesString("standard deviation function difference", statistics.get("stddevDifferenceFuncValue"), attr.getInfoStddevDifferenceFuncValue()));
+
+		System.out.println("\n In JSON format (for copying into TestProcessor");
+
+		System.out.println("\"maxMeanPointDistance\" : " + statistics.get("meanPointDistance") + ",");
+		System.out.println("\"maxMeanDifferenceFuncValue\" : " + statistics.get("meanDifferenceFuncValue") + ",");
+		System.out.println("\"infoMinPointDistanceL2\" : " + statistics.get("minPointDistanceL2") + ",");
+		System.out.println("\"infoMaxPointDistanceL2\" : " + statistics.get("maxPointDistanceL2") + ",");
+		System.out.println("\"infoMinFuncDifference\" : " + statistics.get("minDifferenceFuncValue") + ",");
+		System.out.println("\"infoMaxFuncDifference\" : " + statistics.get("maxDifferenceFuncValue") + ",");
+		System.out.println("\"infoStddevPointDistance\" : " + statistics.get("stddevPointDistance") + ",");
+		System.out.println("\"infoStddevDifferenceFuncValue\" : " + statistics.get("stddevDifferenceFuncValue"));
 
 		System.out.println("######################################################################################");
 		System.out.println("######################################################################################");
