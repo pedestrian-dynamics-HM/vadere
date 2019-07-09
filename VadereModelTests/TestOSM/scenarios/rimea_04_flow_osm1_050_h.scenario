@@ -2,12 +2,11 @@
   "name" : "rimea_04_flow_osm1_050_h",
   "description" : "",
   "release" : "1.0",
-  "commithash" : "warning: no commit hash",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 5, 7 ]
+      "processors" : [ 1, 2, 7 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -150,7 +149,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
