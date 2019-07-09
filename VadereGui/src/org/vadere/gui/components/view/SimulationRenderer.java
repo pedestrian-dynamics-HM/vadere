@@ -3,7 +3,6 @@ package org.vadere.gui.components.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -22,7 +21,6 @@ import java.util.stream.Stream;
 public abstract class SimulationRenderer extends DefaultRenderer {
 
     private static Logger logger = Logger.getLogger(SimulationRenderer.class);
-    private static Resources resources = Resources.getInstance("postvisualization");
 
     private static double MAX_POTENTIAL = 1000.0;
     private static double CONTOUR_STEP = 2.0;
