@@ -52,7 +52,9 @@ public class PedestrianFootStepProcessor extends DataProcessor<EventtimePedestri
 	@Override
 	public String[] toStrings(EventtimePedestrianIdKey key) {
 		String[] footStepLine = this.getValue(key).getValueString();
+
+		// Note: remove the "startTime" from the footStepLine because it is already included in the "simTime" of the
+		// EventtimePedestrianIdKey
 		return Arrays.copyOfRange(footStepLine, 1, footStepLine.length);
 	}
-
 }
