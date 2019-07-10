@@ -225,16 +225,17 @@ if __name__ == "__main__":
             passed_and_failed_scenarios_optimization = list()
 
         # Make a summery of all scenario files
-        passed_and_failed_scenarios = passed_and_failed_scenarios_model
-        passed_and_failed_scenarios["failed"] += passed_and_failed_scenarios_optimization["failed"]
-        passed_and_failed_scenarios["passed"] += passed_and_failed_scenarios_optimization["passed"]
+        all_passed_and_failed_scenarios = passed_and_failed_scenarios_model
+        all_passed_and_failed_scenarios["failed"].extend(passed_and_failed_scenarios_optimization["failed"])
+        all_passed_and_failed_scenarios["passed"].extend(passed_and_failed_scenarios_optimization["passed"])
+        all_passed_and_failed_scenarios["failed_summary"].extend(passed_and_failed_scenarios_optimization["failed_summary"])
 
     else:
-        passed_and_failed_scenarios = run_scenario_files_with_vadere_console([args.scenario])
+        all_passed_and_failed_scenarios = run_scenario_files_with_vadere_console([args.scenario])
 
-    print_summary(passed_and_failed_scenarios)
+    print_summary(all_passed_and_failed_scenarios)
 
-    if has_failed_scenarios(passed_and_failed_scenarios):
+    if has_failed_scenarios(all_passed_and_failed_scenarios):
         exit(1)
     else:
         exit(0)

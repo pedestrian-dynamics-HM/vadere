@@ -10,13 +10,11 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +40,7 @@ public class VadereConfig {
     // Static Variables
     private static final Logger LOGGER = Logger.getLogger(VadereConfig.class);
 
+    // If changing any of the following values, remember to also change it in the CI configuration
     private static final String CONFIG_FILENAME = "vadere.conf";
     private static final String HOME_DIR = System.getProperty("user.home");
     private static final String CONFIG_DIR = ".config";
@@ -103,7 +102,7 @@ public class VadereConfig {
         }
     }
 
-    // Static Getters
+    // Static getters
     /**
      * Use Apache Common Configuration API on the returned object to retrieve Vadere's config options.
      *
@@ -118,6 +117,8 @@ public class VadereConfig {
     // Methods
 
     private static Map<String, String> getDefaultConfig(){
+        //NOTE: Remember to also add the new configuration in existing vadere.conf file.
+
         final Map<String, String> defaultConfig = new HashMap<>();
 
         String defaultSearchDirectory = System.getProperty("user.home");
