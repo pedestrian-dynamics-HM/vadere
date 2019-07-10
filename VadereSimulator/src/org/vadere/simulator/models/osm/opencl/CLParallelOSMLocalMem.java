@@ -247,7 +247,7 @@ public class CLParallelOSMLocalMem {
 		for(int i = 0; i < indices.length; i++) {
 			indices[i] = i;
 		}
-		
+
 		// clear the old memory before re-initialization
 		if(pedestrianSet) {
 			freeCLMemory(clPedestrians);

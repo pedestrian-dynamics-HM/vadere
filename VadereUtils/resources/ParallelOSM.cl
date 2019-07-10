@@ -282,7 +282,7 @@ inline float getObstaclePotential(float minDistanceToObstacle){
     if (minDistanceToObstacle <= 0.0f) {
         currentPotential = 1000000.0f;
     } else if (minDistanceToObstacle < width) {
-        currentPotential = height * exp(1.0f / (pow(minDistanceToObstacle / width, 2) - 1.0f));
+        currentPotential = height * native_exp(1.0f / (pown(minDistanceToObstacle / width, 2) - 1.0f));
     }
 
     currentPotential = max(0.0f, currentPotential);
