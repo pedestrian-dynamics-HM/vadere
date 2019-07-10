@@ -222,7 +222,8 @@ if __name__ == "__main__":
         if not has_failed_scenarios(passed_and_failed_scenarios_model):
             passed_and_failed_scenarios_optimization = run_all_optimization_tests()
         else:
-            passed_and_failed_scenarios_optimization = list()
+            print("Skipping optimization tests...")
+            passed_and_failed_scenarios_optimization = {"failed": [], "passed": [], "failed_summary": []}  # empty
 
         # Make a summery of all scenario files
         all_passed_and_failed_scenarios = passed_and_failed_scenarios_model
