@@ -19,6 +19,7 @@ import time
 long_timeout_in_seconds = 12 * 60
 short_timeout_in_seconds = 2 * 60
 
+
 def parse_command_line_arguments():
     parser = argparse.ArgumentParser(description="Run all scenario files.")
     parser.add_argument("scenario", type=str, nargs="?", help="Run only the given scenario file and not all. E.g., \"VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
@@ -27,7 +28,8 @@ def parse_command_line_arguments():
 
     return args
 
-def run_all():
+
+def run_all_model_tests():
     long_running_scenarios = [
         "basic_4_1_wall_gnm1",
         "queueing",
@@ -45,12 +47,12 @@ def run_all():
     excluded_scenarios = ["TestOVM", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 
-    scenario_files_regular_length = find_scenario_files(exclude_patterns=excluded_scenarios)
+    scenario_files_regular_length = find_scenario_files(path="VadereModelTests", exclude_patterns=excluded_scenarios)
     passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_regular_length, scenario_timeout_in_sec=short_timeout_in_seconds)
 
     for scenario in long_running_scenarios:
         search_pattern = "*" + scenario + "*.scenario"
-        scenario_files_long = find_scenario_files(scenario_search_pattern=search_pattern)
+        scenario_files_long = find_scenario_files(path="VadereModelTests", scenario_search_pattern=search_pattern)
         tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files_long,
                                                                                  scenario_timeout_in_sec=long_timeout_in_seconds)
         passed_and_failed_scenarios["passed"].extend(tmp_passed_and_failed_scenarios["passed"])
@@ -59,7 +61,24 @@ def run_all():
 
     return passed_and_failed_scenarios
 
-def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.scenario", exclude_patterns = ["TestOVM", "output","legacy"]):
+
+def run_all_optimization_tests():
+    scenario_files = find_scenario_files(path="VadereOptimizationTests")
+    passed_and_failed_scenarios = run_scenario_files_with_vadere_console(scenario_files, scenario_timeout_in_sec=short_timeout_in_seconds)
+
+    return passed_and_failed_scenarios
+
+
+def find_scenario_files(path, scenario_search_pattern="*.scenario", exclude_patterns=None):
+
+    if exclude_patterns is None:
+        exclude_patterns = ["output", "legacy"]  # default values
+    else:  # always insert output and legacy
+        if "output" not in exclude_patterns:
+            exclude_patterns.append("output")
+        if "legacy" not in exclude_patterns:
+            exclude_patterns.append("legacy")
+
     scenario_files = []
 
     for root, dirnames, filenames in os.walk(path):
@@ -78,7 +97,9 @@ def find_scenario_files(path="VadereModelTests", scenario_search_pattern = "*.sc
 
     return sorted(scenario_files)
 
-def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar", scenario_timeout_in_sec=short_timeout_in_seconds):
+
+def run_scenario_files_with_vadere_console(scenario_files, vadere_console="VadereSimulator/target/vadere-console.jar",
+                                           scenario_timeout_in_sec=short_timeout_in_seconds, vadere_config_filepath=None):
     output_dir = "output"
     log_base_dir = "vadere_logs"
 
@@ -111,14 +132,16 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             # Measure wall time and not CPU time.
             wall_time_start = time.time()
 
+            # TODO: tread vadere_config_file_path
+
             # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout to get it).
             completed_process = subprocess.run(args=["java", "-enableassertions", "-jar", vadere_console,
                                                      "--logname", log_file, "scenario-run", "-f",
                                                      scenario_file, "-o", output_dir],
-                                           timeout=scenario_timeout_in_sec,
-                                           check=True,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
+                                               timeout=scenario_timeout_in_sec,
+                                               check=True,
+                                               stdout=subprocess.PIPE,
+                                               stderr=subprocess.PIPE)
 
             wall_time_end = time.time()
             wall_time_delta = wall_time_end - wall_time_start
@@ -149,9 +172,11 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
 
     return {"passed": passed_scenarios, "failed": failed_scenarios_with_exception, "failed_summary": failed_summary}
 
+
 def makedirs_if_non_existing(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
 
 def read_first_error_linies(error_byte_string):
     err_string_lines = error_byte_string.decode('utf-8').split('\n')
@@ -159,6 +184,7 @@ def read_first_error_linies(error_byte_string):
         return re.sub('\s+', ' ', ' '.join(err_string_lines[:2]))
     else:
         return 'unknown error see vadere log file.'
+
 
 def print_summary(passed_and_failed_scenarios):
     total_passed_scenarios = len(passed_and_failed_scenarios["passed"])
@@ -173,7 +199,6 @@ def print_summary(passed_and_failed_scenarios):
         for line in faild_summary:
             print(line)
 
-
     print("###########")
     print("# Summary #")
     print("###########")
@@ -182,17 +207,34 @@ def print_summary(passed_and_failed_scenarios):
     print("Passed: {}".format(total_passed_scenarios))
     print("Failed: {}".format(total_failed_scenarios))
 
+
+def has_failed_scenarios(passed_and_failed_scenarios):
+    return len(passed_and_failed_scenarios["failed"]) > 0
+
+
 if __name__ == "__main__":
     args = parse_command_line_arguments()
 
-    if args.scenario == None:
-        passed_and_failed_scenarios = run_all()
+    if args.scenario is None:
+
+        passed_and_failed_scenarios_model = run_all_model_tests()
+
+        if not has_failed_scenarios(passed_and_failed_scenarios_model):
+            passed_and_failed_scenarios_optimization = run_all_optimization_tests()
+        else:
+            passed_and_failed_scenarios_optimization = list()
+
+        # Make a summery of all scenario files
+        passed_and_failed_scenarios = passed_and_failed_scenarios_model
+        passed_and_failed_scenarios["failed"] += passed_and_failed_scenarios_optimization["failed"]
+        passed_and_failed_scenarios["passed"] += passed_and_failed_scenarios_optimization["passed"]
+
     else:
         passed_and_failed_scenarios = run_scenario_files_with_vadere_console([args.scenario])
 
     print_summary(passed_and_failed_scenarios)
 
-    if len(passed_and_failed_scenarios["failed"]) > 0:
+    if has_failed_scenarios(passed_and_failed_scenarios):
         exit(1)
     else:
         exit(0)
