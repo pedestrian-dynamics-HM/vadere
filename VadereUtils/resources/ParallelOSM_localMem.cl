@@ -105,43 +105,13 @@ inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosit
     }
 }
 
-/*inline float getFullPedestrianPotential(
-        __global const float        *orderedPedestrians,  //input
-        __global const uint         *d_CellStart,
-        __global const uint         *d_CellEnd,
-        __constant const float      *cellSize,
-        __constant const uint2      *gridSize,
-        __constant const float2     *worldOrigin,
-        const float2                pos,
-        const float2                pedPosition)
-{
-    float potential = 0;
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
-    //Accumulate surrounding cells
-    // TODO: index check!
-    for(int y = -1; y <= 1; y++) {
-        for(int x = -1; x <= 1; x++){
-            int2 uGridPos = (int2)(gridPos.x + x , gridPos.y + y);
-            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
-                continue;
-            }
-            uint   hash = getGridHash((uint2)uGridPos, gridSize);
-            uint startI = d_CellStart[hash];
-
-            //Skip empty cell
-            //if(startI == 0xFFFFFFFFU)
-            //    continue;
-            //Iterate over particles in this cell
-            uint endI = d_CellEnd[hash];
-            for(uint j = startI; j < endI; j++){
-                float2 otherPedestrian = (float2) (orderedPedestrians[j * OFFSET + X], orderedPedestrians[j * OFFSET + Y]);
-                potential += getPedestrianPotential(pos, otherPedestrian);
-            }
-        }
+inline float getLocalFullPedestrianPotential(__local float *localPositions, const uint size, const float2 pos){
+    float potential = 0.0f;
+    for(uint j = 0; j < size; j++){
+        float2 otherPos = (float2) (localPositions[j * COORDOFFSET + X], localPositions[j * COORDOFFSET + Y]);
+        potential += getPedestrianPotential(pos, otherPos);
     }
-    potential -= getPedestrianPotential(pos, pedPosition);
-    return potential;
-}*/
+}
 
 inline float getFullPedestrianPotential(
         __global const float        *orderedPositions,  //input
@@ -307,58 +277,100 @@ __kernel void seek(
     const float             potentialCellSize,      //input
     const float             timeStepInSec,
     const uint              numberOfPoints,         //input
-    const uint              numberOfPedestrians) {
+    const uint              numberOfPedestrians,
+    __local float           *localPositions,
+    __local float           *results){
 
-    const uint index = get_global_id(0);
-    if(index < numberOfPedestrians) {
-        float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
-        float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
-        float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
-        float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT] + timeStepInSec;
+    const uint numberOfPedsPerCell = 8;
+    const uint cellX = get_group_id(0);
+    const uint cellY = get_group_id(1);
+    const uint cell_size_x = get_local_size(0);
+    const uint cell_size_y = get_local_size(1);
+    const uint lid = get_local_id(1) * cell_size_x + get_local_id(1);
+    const uint numberOfPeds =  cell_size_x * cell_size_y * numberOfPedsPerCell;
 
-        float duration = stepSize / desiredSpeed;
-        float2 minArg = pedPosition;
-        if(timeCredit > duration) {
+    const uint hash = getGridHash((uint2)(cellX, cellX), gridSize);
+    const uint startI = d_CellStart[hash];
+    const uint endI = d_CellEnd[hash];
 
-            float value = 1000000;
-            float minValue = value;
+    if(startI < endI) {
+        // load positions around the cell into local memory
+        if(lid < 9 * numberOfPedsPerCell) {
+            // load local memory
+            uint x = ((lid / numberOfPedsPerCell) % 3) - 1;
+            uint y = ((lid / numberOfPedsPerCell) / 3) - 1;
+            uint2 uGridPos = (cellX + x, cellY + y);
 
-            // loop over all points of the disc and find the minimum value and argument
-            for(uint i = 0; i < numberOfPoints; i++) {
-                float2 circlePosition = circlePositions[i];
-                float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
-                float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-                float pedestrianPotential = getFullPedestrianPotential(orderedPositions, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
-                //float pedestrianPotential = 0.0f;
-                float value = targetPotential + obstaclePotential + pedestrianPotential;
+            // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
+            if(uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y){
+                uint hash = getGridHash(uGridPos, gridSize);
+                uint startIO = d_CellStart[hash];
+                uint endIO = d_CellEnd[hash];
+                uint j = startIO + lid % numberOfPedsPerCell;
 
-                if(minValue > value) {
-                    minValue = value;
-                    minArg = evalPoint;
+                if(startIO + j < endIO) {
+                    localPositions[lid + X] = orderedPositions[j * COORDOFFSET + X];
+                    localPositions[lid + Y] = orderedPositions[j * COORDOFFSET + Y];
+                } else {
+                    localPositions[lid + X] = -1.0f;
+                    localPositions[lid + Y] = -1.0f;
                 }
-                //minArg = circlePosition;
             }
         }
-        //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
-        //minArg = pedPosition;
-        orderedPedestrians[index * OFFSET + TIMECREDIT] = timeCredit;
-        orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
-        orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        // compute for each ped (in this cell) for each posi the potential
+        uint pointId = lid / numberOfPoints;
+        uint pedId = startI + (lid % numberOfPoints);
+        results[lid] = 100000;
+        if(endI < pedId) {
+            float2 pedPosition = (float2)(localPositions[pedId + X], localPositions[pedId + Y]);
+            float2 circlePosition = circlePositions[pointId];
+
+            // TODO: use local memory
+            float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
+            float desiredSpeed = orderedPedestrians[pedId * OFFSET + DESIREDSPEED];
+            float timeCredit = orderedPedestrians[pedId * OFFSET + TIMECREDIT] + timeStepInSec;
+
+            float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
+            float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+            float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+            float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+            float pedestrianPotential = getLocalFullPedestrianPotential(localPositions, 9 * numberOfPedsPerCell, pedPosition);
+            //float pedestrianPotential = 0.0f;
+            float value = targetPotential + obstaclePotential + pedestrianPotential;
+            results[lid] = value;
+            barrier(CLK_LOCAL_MEM_FENCE);
+            // for each ped find the min
+            if(lid % numberOfPoints == 0) {
+                float minVal = 100000;
+                float2 minArg = (0.0f, 0.0f);
+                for(uint i = 0; i < numberOfPoints; i++) {
+                    if(results[lid + i] < minVal){
+                        minVal = results[lid + i];
+                        minArg = pedPosition + (float2)(circlePositions[lid + i] * stepSize);
+                    }
+                }
+                orderedPedestrians[pedId * OFFSET + NEWX] = minArg.x;
+                orderedPedestrians[pedId * OFFSET + NEWY] = minArg.x;
+            }
+
+        } else {
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
     }
 }
 
 __kernel void move(
     __global float                *orderedPedestrians,    //input, update this
-    __global float                *orderedPositions,      //input, update this
+    __global float                *orderedPositions,    //input, update this
     __global const uint           *d_CellStart,           //input: cell boundaries
     __global const uint           *d_CellEnd,             //input
     __constant const float        *cellSize,              //input
     __constant const uint2        *gridSize,              //input
     __constant const float2       *worldOrigin,           //input
     const float                   timeStepInSec,
-    const uint                    numberOfPedestrians     //input
+    const uint                    numberOfPedestrians    //input
 ){
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
@@ -370,6 +382,7 @@ __kernel void move(
         if(!hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
             orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
             orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
+
             orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
         }
     }

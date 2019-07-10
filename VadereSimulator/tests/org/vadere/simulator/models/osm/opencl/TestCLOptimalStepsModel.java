@@ -187,7 +187,7 @@ public class TestCLOptimalStepsModel {
 				new VRectangle(topography.getBounds()),
 				targetPotentialField.getEikonalSolver(),
 				obstacleDistancePotential.getEikonalSolver(),
-				attributesPotentialCompact.getPedPotentialWidth());
+				0.8);
 		// max step length + function width);
 		clOptimalStepsModel.setPedestrians(pedestrians);
 		List<VPoint> result = clOptimalStepsModel.update();

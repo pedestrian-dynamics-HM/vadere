@@ -34,8 +34,6 @@ import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
-import static org.lwjgl.opencl.CL10.CL_KERNEL_LOCAL_MEM_SIZE;
-import static org.lwjgl.opencl.CL10.CL_KERNEL_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
@@ -181,6 +179,7 @@ public class CLParallelOptimalStepsModel {
     private int numberOfElements = 0;
     private final EikonalSolver targetPotential;
     private final EikonalSolver obstaclePotential;
+    private int[] indices;
 
 	public CLParallelOptimalStepsModel(
 			@NotNull final AttributesOSM attributesOSM,
@@ -237,6 +236,11 @@ public class CLParallelOptimalStepsModel {
 	public void setPedestrians(@NotNull final List<PedestrianOpenCL> pedestrians) throws OpenCLException {
     	this.numberOfElements = pedestrians.size();
     	this.numberOfSortElements = (int)CLUtils.power(numberOfElements, 2);
+		this.indices = new int[pedestrians.size()];
+
+		for(int i = 0; i < indices.length; i++) {
+			indices[i] = i;
+		}
 
     	// clear the old memory before re-initialization
     	if(pedestrianSet) {
@@ -314,18 +318,24 @@ public class CLParallelOptimalStepsModel {
 					numberOfElements);
 
 			clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
+			//clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, memNextPositions, null, null);
 			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
 			clFinish(clQueue);
 
 			List<VPoint> newPositions = new ArrayList<>();
 			fill(newPositions, VPoint.ZERO, numberOfElements);
 			int[] aIndices = CLUtils.toIntArray(memIndices, numberOfElements);
+			int[] tmpInices = new int[indices.length];
+			for(int i = 0; i < indices.length; i++) {
+				tmpInices[i] = indices[aIndices[i]];
+			}
+			System.arraycopy(tmpInices, 0, indices,0, indices.length);
 			float[] positionsAndRadi = CLUtils.toFloatArray(memNextPositions, numberOfElements * COORDOFFSET);
 			for(int i = 0; i < numberOfElements; i++) {
 				float x = positionsAndRadi[i * COORDOFFSET + X];
 				float y = positionsAndRadi[i * COORDOFFSET + Y];
 				VPoint newPosition = new VPoint(x,y);
-				newPositions.set(aIndices[i], newPosition);
+				newPositions.set(indices[i], newPosition);
 			}
 
 			counter++;
@@ -343,7 +353,7 @@ public class CLParallelOptimalStepsModel {
 	    for(int i = 0; i < pedestrians.size(); i++) {
 		    pedestrianStruct[i * OFFSET + STEPSIZE] = pedestrians.get(i).stepRadius;
 		    pedestrianStruct[i * OFFSET + DESIREDSPEED] = pedestrians.get(i).freeFlowSpeed;
-		    pedestrianStruct[i * OFFSET + TIMECREDIT] = 5.0f;
+		    pedestrianStruct[i * OFFSET + TIMECREDIT] = 500.0f;
 		    pedestrianStruct[i * OFFSET + NEWX] = 0.0f;
 		    pedestrianStruct[i * OFFSET + NEWY] = 0.0f;
 	    }
