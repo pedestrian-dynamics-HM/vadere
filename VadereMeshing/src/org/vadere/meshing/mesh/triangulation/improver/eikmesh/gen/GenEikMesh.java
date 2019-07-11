@@ -512,6 +512,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		double desiredLen = getDesiredEdgeLength(p1, p2);
 		double ratio = len / desiredLen;
 		double absForce = f.apply(ratio);
+		//System.out.println(len);
+		//System.out.println(desiredLen);
 		VPoint force = p1p2.setMagnitude(absForce * desiredLen);
 		return force;
 	}

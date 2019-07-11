@@ -11,10 +11,12 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.function.Function;
 
 public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
@@ -22,10 +24,18 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	private static final String propName = "edgeLength";
 
-	public EdgeLengthFunctionApprox(@NotNull final PSLG pslg) {
+	public EdgeLengthFunctionApprox(
+			@NotNull final PSLG pslg,
+			@NotNull final Function<IPoint, Double> circumRadiusFunc) {
 
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
-		var ruppertsTriangulator = new PRuppertsTriangulator(pslg, 10);
+		/**
+		 * Add a bound around so the edge function is also defined outside.
+		 */
+		VRectangle bound = GeometryUtils.boundRelative(pslg.getSegmentBound().getPoints(), 0.3);
+		PSLG boundedPSLG = pslg.conclose(bound);
+
+		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
 		triangulation = ruppertsTriangulator.generate();
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
@@ -37,7 +47,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 		for(var v : vertices) {
 			double minEdgeLen = Double.MAX_VALUE;
 			for(var u : triangulation.getMesh().getAdjacentVertexIt(v)) {
-				double len = v.distance(u);
+				double len = v.distance(u) * 0.9;
 				if(len < minEdgeLen) {
 					minEdgeLen = len;
 				}
@@ -45,6 +55,11 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 			triangulation.getMesh().setData(v, propName, minEdgeLen);
 		}
+	}
+
+	public EdgeLengthFunctionApprox(@NotNull final PSLG pslg) {
+		this(pslg, p -> Double.POSITIVE_INFINITY);
+		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 	}
 
 	public void smooth(double g) {

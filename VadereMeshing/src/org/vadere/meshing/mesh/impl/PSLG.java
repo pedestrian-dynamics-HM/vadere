@@ -101,6 +101,18 @@ public class PSLG {
 		this(segmentBound, holes, segments, points, new HashSet<>());
 	}
 
+	public PSLG conclose(@NotNull final VRectangle rectangle) {
+		if(!rectangle.contains(segmentBound.getBounds2D())) {
+			throw new IllegalArgumentException();
+		}
+		ArrayList<VLine> newLines = new ArrayList<>(segments.size() + segmentBound.getLinePath().size());
+		newLines.addAll(segments);
+		newLines.addAll(segmentBound.getLinePath());
+		PSLG pslg = new PSLG(new VPolygon(rectangle), holes, newLines, points);
+		pslg.protectionDiscs.addAll(this.protectionDiscs);
+		return pslg;
+	}
+
 	public PSLG addLines(@NotNull final Collection<VLine> lines) {
 		ArrayList<VLine> newLines = new ArrayList<>(segments.size() + lines.size());
 		newLines.addAll(segments);

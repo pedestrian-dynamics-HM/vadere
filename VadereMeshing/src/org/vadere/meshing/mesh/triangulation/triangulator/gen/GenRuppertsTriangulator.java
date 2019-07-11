@@ -356,6 +356,9 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 				split(segment);
 			}
 		}
+
+		// we require this because split may other edges which are not direct neighbours encroached!
+		refineSimplex1D();
 	}
 
 	private void deEncrocheSgements() {
@@ -490,7 +493,20 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		return p.distance(line.getVPoint1()) > GeometryUtils.DOUBLE_EPS && p.distance(line.getVPoint2()) > GeometryUtils.DOUBLE_EPS && diameterCircle.contains(p);
 	}
 
-    private boolean isEncroached(@NotNull final E segment) {
+	private boolean isEncroached(@NotNull final E segment) {
+		E seg = getMesh().isBoundary(segment) ? getMesh().getTwin(segment) : segment;
+		VPoint p1 = getMesh().toPoint(getMesh().getNext(seg));
+		if(isEncroached(seg, p1)) {
+			return true;
+		} else if(getMesh().isAtBoundary(seg)) {
+			return false;
+		} else {
+			VPoint p2 = getMesh().toPoint(getMesh().getNext(getMesh().getTwin(seg)));
+			return isEncroached(seg, p2);
+		}
+	}
+
+    /*private boolean isEncroached(@NotNull final E segment) {
 		E seg = getMesh().isBoundary(segment) ? getMesh().getTwin(segment) : segment;
 	    VLine line = getMesh().toLine(seg);
 	    VPoint midPoint = line.midPoint();
@@ -510,7 +526,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	    }
 
 	    return false;
-    }
+    }*/
 
     // TODO replace this!
 	private boolean isEncroachedExpensive(@NotNull final E segment) {
