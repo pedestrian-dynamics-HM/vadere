@@ -42,9 +42,6 @@ import java.util.Optional;
 
 /**
  * Main Window of the new post visualization.
- * 
- * @Version 1.0
- * 
  */
 public class PostvisualizationWindow extends JPanel implements Observer, DropTargetListener {
 	private static final long serialVersionUID = -8177132133860336295L;
