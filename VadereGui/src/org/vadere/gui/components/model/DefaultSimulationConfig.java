@@ -34,7 +34,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showGrid = false;
 	private boolean showDensity = false;
 	private boolean showGroups = false;
-	protected final Color pedestrianDefaultColor = Color.BLUE;
+	protected final Color pedestrianDefaultColor = new Color(76, 114, 202);
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
 	private double gridWidth = Double.valueOf(resources.getProperty("ProjectView.cellWidth"));

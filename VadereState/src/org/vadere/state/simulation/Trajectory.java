@@ -134,6 +134,17 @@ public class Trajectory {
 	}
 
 	/**
+	 * Returns true if the pedestrian is alive or died some time before the specific time step.
+	 * In other words only pedestrian not yet born will return false.
+	 *
+	 * @param step the time step
+	 * @return true if the pedestrian was alive at any time step smaller or equal to current one. (so all alive and dead, but no pedestrian not born yet).
+	 */
+	public boolean wasPedestrianAliveBefore(final Step step){
+		return trajectoryPoints.entrySet().stream().map(Map.Entry::getKey).anyMatch(s -> s.getStepNumber() <= step.getStepNumber());
+	}
+
+	/**
 	 * Returns true if the pedestrian appeared, otherwise false.
 	 * 
 	 * @param step the time step

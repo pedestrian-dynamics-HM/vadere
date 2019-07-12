@@ -336,6 +336,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.values().stream().filter(t -> t.isPedestrianAlive(this.step));
 	}
 
+	public synchronized Trajectory getTrajectory(int pedestrianId){
+		return trajectories.get(pedestrianId);
+	}
+
 	public boolean isEmpty() {
 		return agentsByStep.size() == 0;
 	}
