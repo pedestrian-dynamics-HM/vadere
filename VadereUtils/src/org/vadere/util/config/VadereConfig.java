@@ -106,7 +106,7 @@ public class VadereConfig {
         }
     }
 
-    // Static Setters
+    // Static setters
     /**
      * With this setter one can inject a different config file instead of using "~/.config/vadere.conf".
      *
@@ -117,7 +117,7 @@ public class VadereConfig {
         CONFIG_FILENAME = CONFIG_PATH.getFileName().toString();
     }
 
-    // Static Setters
+    // Static setters
     /**
      * Use Apache Common Configuration API on the returned object to retrieve Vadere's config options.
      *
