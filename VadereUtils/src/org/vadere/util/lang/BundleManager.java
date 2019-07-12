@@ -52,8 +52,8 @@ public class BundleManager {
 	}
 
 	public void setLanguage(Class<?> clazz){
-		String language = VadereConfig.getConfig().getString("language", null);
-		Locale locale =defaultLocale;
+		String language = VadereConfig.getConfig().getString("Messages.language", null);
+		Locale locale = defaultLocale;
 		if (language != null) {
 			switch (language) {
 				case "de":

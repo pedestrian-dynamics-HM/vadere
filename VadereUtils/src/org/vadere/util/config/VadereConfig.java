@@ -41,14 +41,15 @@ public class VadereConfig {
     private static final Logger LOGGER = Logger.getLogger(VadereConfig.class);
 
     // If changing any of the following values, remember to also change it in the CI configuration
-    private static final String CONFIG_FILENAME = "vadere.conf";
-    private static final String HOME_DIR = System.getProperty("user.home");
-    private static final String CONFIG_DIR = ".config";
+    private static final String DEFAULT_HOME_DIR = System.getProperty("user.home");
+    private static final String DEFAULT_CONFIG_DIR = ".config";
 
-    private static final Path PATH_TO_CONFIG_DIR = Path.of(HOME_DIR, CONFIG_DIR);
-    private static final Path PATH_TO_CONFIG = Path.of(HOME_DIR, CONFIG_DIR, CONFIG_FILENAME);
+    // Both variables must not be "final" so that we are able
+    // to inject another config file from CLI argument "--config-file myconfig.conf".
+    private static String CONFIG_FILENAME = "vadere.conf";
+    private static Path CONFIG_PATH = Path.of(DEFAULT_HOME_DIR, DEFAULT_CONFIG_DIR, CONFIG_FILENAME);
 
-    private static VadereConfig SINGLETON_INSTANCE = new VadereConfig();
+    private static VadereConfig SINGLETON_INSTANCE;
 
     // Variables
     private FileBasedConfiguration vadereConfig;
@@ -57,10 +58,13 @@ public class VadereConfig {
     private VadereConfig() {
         createDefaultConfigIfNonExisting();
 
+        // If Vadere was started like "vadere-console.jar --config-file here.txt", search in current working directory.
+        String basePath = (CONFIG_PATH.getParent() == null) ? System.getProperty("user.dir") : CONFIG_PATH.getParent().toString() ;
+
         PropertiesBuilderParameters propertiesParams = new Parameters()
                 .properties()
                 .setFileName(CONFIG_FILENAME)
-                .setBasePath(PATH_TO_CONFIG.getParent().toString());
+                .setBasePath(basePath);
 
         FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
                 new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
@@ -70,26 +74,26 @@ public class VadereConfig {
         try {
             vadereConfig = builder.getConfiguration();
         } catch (ConfigurationException ex) {
-            LOGGER.error(String.format("Error while reading config file \"%s\": %s", PATH_TO_CONFIG.toString(), ex.getMessage()));
+            LOGGER.error(String.format("Error while reading config file \"%s\": %s", CONFIG_PATH.toString(), ex.getMessage()));
             LOGGER.info("Create and use default config");
         }
     }
 
     private void createDefaultConfigIfNonExisting() {
         try { // Ensure that config directory exists.
-            Files.createDirectories(PATH_TO_CONFIG_DIR);
+            Files.createDirectories(Path.of(DEFAULT_HOME_DIR, DEFAULT_CONFIG_DIR));
         } catch (IOException ex) {
-            LOGGER.error(String.format("Cannot create directory: %s", PATH_TO_CONFIG));
+            LOGGER.error(String.format("Cannot create directory: %s", Path.of(DEFAULT_HOME_DIR, DEFAULT_CONFIG_DIR)));
         }
 
-        if (Files.exists(PATH_TO_CONFIG) == false) {
+        if (Files.exists(CONFIG_PATH) == false) {
             Map<String, String> defaultConfig = getDefaultConfig();
 
             try {
-                LOGGER.info(String.format("Writing default config file: %s", PATH_TO_CONFIG));
+                LOGGER.info(String.format("Writing default config file: %s", CONFIG_PATH));
 
                 Files.write(
-                        PATH_TO_CONFIG,
+                        CONFIG_PATH,
                         defaultConfig
                                 .entrySet()
                                 .stream()
@@ -97,12 +101,23 @@ public class VadereConfig {
                                 .sorted(String::compareTo)
                                 .collect(Collectors.toList()));
             } catch (IOException e) {
-                LOGGER.error(String.format("Error while writing default config file \"%s\": %s", PATH_TO_CONFIG.toString(), e.getMessage()));
+                LOGGER.error(String.format("Error while writing default config file \"%s\": %s", CONFIG_PATH, e.getMessage()));
             }
         }
     }
 
-    // Static getters
+    // Static Setters
+    /**
+     * With this setter one can inject a different config file instead of using "~/.config/vadere.conf".
+     *
+     * @param configPath Path to config file.
+     */
+    public static void setConfigPath(String configPath) {
+        CONFIG_PATH = Path.of(configPath);
+        CONFIG_FILENAME = CONFIG_PATH.getFileName().toString();
+    }
+
+    // Static Setters
     /**
      * Use Apache Common Configuration API on the returned object to retrieve Vadere's config options.
      *
@@ -111,6 +126,10 @@ public class VadereConfig {
      * @return A Configuration object from Apache Common Configuration library.
      */
     public static Configuration getConfig() {
+        if (SINGLETON_INSTANCE == null) {
+            SINGLETON_INSTANCE = new VadereConfig();
+        }
+
         return SINGLETON_INSTANCE.vadereConfig;
     }
 
