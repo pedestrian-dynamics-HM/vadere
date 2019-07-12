@@ -6,11 +6,8 @@ import java.util.function.Function;
 
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.state.scenario.Agent;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 public abstract class SimulationModel<T extends DefaultSimulationConfig> extends DefaultModel {
@@ -42,8 +39,8 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		return config;
 	}
 
-	public IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
-		return new PMesh<IPotentialPoint>((x,y) -> new PotentialPoint(x,y));
+	public IMesh<?, ?, ?> getDiscretization() {
+		return new PMesh();
 	}
 
     /*public double getPotential(final int x, final int y) {
@@ -87,7 +84,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
     }*/
 
 	@Override
-	public void notifyObservers() {
+	public synchronized void notifyObservers() {
 		// synchronized (config) {
 		if (config.hasChanged()) {
 			setChanged();

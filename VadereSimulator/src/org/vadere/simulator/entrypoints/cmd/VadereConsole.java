@@ -1,22 +1,16 @@
 package org.vadere.simulator.entrypoints.cmd;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparser;
-import net.sourceforge.argparse4j.inf.Subparsers;
-
+import net.sourceforge.argparse4j.inf.*;
 import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.SuqSubCommand;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
+import org.vadere.util.io.VadereArgumentParser;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
-
 
 /**
  * Provides the possibility to start Vadere in console mode.
@@ -27,62 +21,32 @@ public class VadereConsole {
 
 	public static void main(String[] args) {
 		Logger.setMainArguments(args);
-//		rimea_01_pathway_gnm1.scenario rimea_04_flow_gnm1_050_h.scenario
-//			String[] tmp = {"project-run", "-p", "/home/lphex/hm.d/vadere/VadereModelTests/TestOSM_Group_calibration"};
-//			args = tmp;
-		ArgumentParser parser = createArgumentParser();
+
+		VadereArgumentParser vadereArgumentParser = new VadereArgumentParser();
+		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
+
+		addSubCommandsToParser(argumentParser);
 
 		try {
-			//if (!CLUtils.isOpenCLSupported()) {
-			//	System.out.println("Warning: OpenCL acceleration disabled, since no OpenCL support could be found!");
-			//}
-			Namespace ns = parser.parseArgs(args);
+			Namespace ns = vadereArgumentParser.parseArgsAndProcessOptions(args);
 			SubCommandRunner sRunner = ns.get("func");
 			StdOutErrLog.addStdOutErrToLog();
-			sRunner.run(ns, parser);
+			sRunner.run(ns, argumentParser);
 
 		} catch (UnsatisfiedLinkError linkError) {
 			System.err.println("[LWJGL]: " + linkError.getMessage());
 		} catch (ArgumentParserException e) {
-			parser.handleError(e);
+			argumentParser.handleError(e);
 			System.exit(1);
 		} catch (Exception e) {
-			System.err.println("topographyError in command:" + e.getMessage());
+			System.err.println("Cannot start vadere-console: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}
 
 	}
 
-	private static ArgumentParser createArgumentParser() {
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("Vadere")
-				.defaultHelp(true)
-				.description("Runs the VADERE pedestrian simulator.");
-
-		addOptionsToParser(parser);
-		addSubCommandsToParser(parser);
-
-		return parser;
-	}
-
-    private static void addOptionsToParser(ArgumentParser parser) {
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-        parser.addArgument("--loglevel")
-                .required(false)
-                .type(String.class)
-                .dest("loglevel")
-                .choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
-                .setDefault("INFO")
-                .help("Set Log Level.");
-
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-		parser.addArgument("--logname")
-				.required(false)
-				.type(String.class)
-				.dest("logname")
-				.help("Write log to given file.");
-    }
-
+	// TODO: Move this method to "VadereArgumentParser".
 	private static void addSubCommandsToParser(ArgumentParser parser) {
 		Subparsers subparsers = parser.addSubparsers()
 										.title("subcommands")
@@ -92,7 +56,7 @@ public class VadereConsole {
 		// Run Project
 		Subparser projectRun = subparsers
 				.addParser(SubCommand.PROJECT_RUN.getCmdName())
-				.help("This command uses a VADERE project and runs selected scenario.")
+				.help("This command uses a Vadere project and runs selected scenario.")
 				.setDefault("func", new ProjectRunSubCommand());
 		projectRun.addArgument("--project-dir", "-p")
 				.required(true)

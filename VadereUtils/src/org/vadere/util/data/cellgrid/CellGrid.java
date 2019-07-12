@@ -377,7 +377,7 @@ public class CellGrid {
 			double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
 
 			double t = (pos.getX() - gridPointCoord.x) / getResolution();
-			double u = (pos.getX() - gridPointCoord.y) / getResolution();
+			double u = (pos.getY() - gridPointCoord.y) / getResolution();
 
 			return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
 		};

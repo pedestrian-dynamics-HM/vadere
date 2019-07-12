@@ -6,9 +6,11 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.utils.TopographyJsonWriter;
+import org.vadere.util.config.VadereConfig;
 
 /**
  * Action: save the topography to the current file (last_save_point).
@@ -16,8 +18,9 @@ import org.vadere.gui.topographycreator.utils.TopographyJsonWriter;
  *
  */
 public class ActionQuickSaveTopography extends TopographyAction {
-	private static Resources resources = Resources.getInstance("topographycreator");
+
 	private static final long serialVersionUID = -6802761549259354252L;
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	public ActionQuickSaveTopography(String name, ImageIcon icon, IDrawPanelModel panelModel) {
 		super(name, icon, panelModel);
@@ -33,18 +36,18 @@ public class ActionQuickSaveTopography extends TopographyAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String lastSavePoint = resources.getProperty("last_save_point");
+		String lastSavePoint = CONFIG.getString("Gui.lastSavePoint");
 
 		if (lastSavePoint == null) {
 			final JFileChooser fc = new JFileChooser();
-
 			int returnVal = fc.showDialog(null, "Save");
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile().toString().endsWith(".json") ? fc.getSelectedFile()
 						: new File(fc.getSelectedFile().toString() + ".json");
 				TopographyJsonWriter.writeTopography(getScenarioPanelModel().build(), file);
-				resources.putProperty("last_save_point", file.getAbsolutePath());
+
+				CONFIG.setProperty("Gui.lastSavePoint", file.getAbsolutePath());
 			}
 		} else {
 			TopographyJsonWriter.writeTopography(getScenarioPanelModel().build(), new File(lastSavePoint));

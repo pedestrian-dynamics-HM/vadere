@@ -4,7 +4,6 @@ package org.vadere.gui.projectview.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.control.ActionAddScenario;
 import org.vadere.gui.projectview.control.ActionCloneScenario;
 import org.vadere.gui.projectview.control.ActionCloseApplication;
@@ -45,6 +44,7 @@ import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLUtils;
@@ -61,7 +61,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -291,7 +290,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
-				Preferences.userNodeForPackage(VadereApplication.class).get("last_used_project", null);
+				VadereConfig.getConfig().getString("History.lastUsedProject", null);
 		if (lastUsedProjectPath != null) {
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
@@ -367,7 +366,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				closeApplicationAction.actionPerformed(null);
 			}
 		});
-		Preferences pref = Preferences.userNodeForPackage(VadereApplication.class);
 		pack();
 	}
 
@@ -431,7 +429,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		// Checkbox menu item to turn off result dialog of project run.
 		mnFile.addSeparator();
-		boolean showDialogDefault = Preferences.userNodeForPackage(VadereApplication.class)
+		boolean showDialogDefault = VadereConfig.getConfig()
 				.getBoolean("Project.simulationResult.show", false);
 		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, showDialogDefault);
 		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
@@ -789,7 +787,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	public void updateRecentProjectsMenu() {
 		mntmRecentProjects.removeAll();
-		String str = Preferences.userNodeForPackage(VadereApplication.class).get("recent_projects", "");
+		String str = VadereConfig.getConfig().getString("History.recentProjects", "");
 		boolean hasEntry = false;
 		if (str.length() > 0) {
 			for (String path : str.split(",")) {

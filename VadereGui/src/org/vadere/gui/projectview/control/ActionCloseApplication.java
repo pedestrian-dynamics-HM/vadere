@@ -32,9 +32,7 @@ public class ActionCloseApplication extends AbstractAction {
 			if (!ActionAbstractSaveProject.askSaveUnlessUserCancels(model))
 				return;
 
-			ActionAbstractSaveProject.savePreferences(); // automatically save preferences on close
-
-		} catch (IOException | BackingStoreException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		finally {

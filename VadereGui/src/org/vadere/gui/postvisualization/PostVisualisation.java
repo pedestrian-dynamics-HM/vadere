@@ -1,58 +1,39 @@
 package org.vadere.gui.postvisualization;
 
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
-import org.vadere.util.io.IOUtils;
+import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.util.io.VadereArgumentParser;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
 
-import java.io.IOException;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-
 public class PostVisualisation {
-	public static final String preferencesFilename = "PostVisualisation.preferences.xml";
 	private static Logger logger = Logger.getLogger(PostVisualisation.class);
 
 	public static void main(String[] args) {
 		StdOutErrLog.addStdOutErrToLog();
-		logger.info("starting post visualization ...");
-		// loadFromFilesystem settings
-		loadPreferences();
-		logger.info("preferences started");
-		// start main gui
-		PostvisualizationWindow.start();
-		logger.info("post visualization started");
-	}
+		logger.info("starting Vadere PostVisualization...");
 
-	/**
-	 * Load the preferences from file.
-	 */
-	private static void loadPreferences() {
-		Preferences prefs = null;
+		VadereArgumentParser vadereArgumentParser = new VadereArgumentParser();
+		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
+
 		try {
-			IOUtils.loadUserPreferences(preferencesFilename, PostVisualisation.class);
-		} catch (IOException | InvalidPreferencesFormatException e) {
-			logger.error("preferences file not found or corrupted. creating a new file...");
-			prefs = Preferences.userNodeForPackage(PostVisualisation.class);
-
-			defaultPreferences(prefs);
-			try {
-				IOUtils.saveUserPreferences(preferencesFilename, prefs);
-			} catch (IOException | BackingStoreException e1) {
-				logger.error("preferences file could not be written.");
-			}
+			vadereArgumentParser.parseArgsAndProcessOptions(args);
+		} catch (UnsatisfiedLinkError linkError) {
+			System.err.println("[LWJGL]: " + linkError.getMessage());
+		} catch (ArgumentParserException e) {
+			argumentParser.handleError(e);
+			System.exit(1);
+		} catch (Exception e) {
+			System.err.println("Cannot start vadere: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
 		}
-	}
 
-	/**
-	 * Set default preferences.
-	 * 
-	 * @param prefs
-	 */
-	private static void defaultPreferences(final Preferences prefs) {
-		prefs.put("SettingsDialog.outputDirectory.path", ".");
-		prefs.put("SettingsDialog.snapshotDirectory.path", ".");
-		prefs.put("recentlyOpenedFiles", "");
+		Messages.loadLanguageFromPreferences(VadereApplication.class);
+
+		PostvisualizationWindow.start();
 	}
 }

@@ -43,8 +43,8 @@ public class PerformanceTest {
 	private static void setUp() {
 		points = new ArrayList<>();
 
-		Random r = new Random();
-		int numberOfPoints = 300000;
+		Random r = new Random(0);
+		int numberOfPoints = 1_000_000;
 
 		for(int i=0; i< numberOfPoints; i++) {
 			VPoint point = new VPoint(width*r.nextDouble(), height*r.nextDouble());
@@ -54,28 +54,35 @@ public class PerformanceTest {
 
 	private static void testPointerWalk() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points, (x, y) -> new VPoint(x, y));
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points);
 		delaunay.finish();
 		log.info("runtime of the Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
+	private static void testArrayJumpAndWalk() {
+		long ms = System.currentTimeMillis();
+		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.JUMP_AND_WALK, points);
+		delaunay.finish();
+		log.info("runtime of the Jump & Walk method (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+	}
+
 	private static void testPointerJumpAndWalk() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.JUMP_AND_WALK, points, (x, y) -> new VPoint(x, y));
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.JUMP_AND_WALK, points);
 		delaunay.finish();
-		log.info("runtime of the Jump & Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
+		log.info("runtime of the Jump & Walk method (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testPointerDelaunayHierarchy() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<VPoint, PVertex<VPoint>, PHalfEdge<VPoint>, PFace<VPoint>> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points);
 		delaunay.finish();
 		log.info("runtime of the Delaunay-Hierarchy (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testArrayDelaunayHierarchy() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<VPoint, AVertex<VPoint>, AHalfEdge<VPoint>, AFace<VPoint>> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points, (x, y) -> new VPoint(x, y));
+		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points);
 		delaunay.finish();
 		log.info("runtime of the Delaunay-Hierarchy (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
@@ -101,9 +108,11 @@ public class PerformanceTest {
 		setUp();
 		testSweepline();
 		testJTSDelaunayBuilder();
-		testPointerDelaunayHierarchy();
+		//testPointerDelaunayHierarchy();
+		//testArrayDelaunayHierarchy();
+		testArrayJumpAndWalk();
 		testPointerJumpAndWalk();
-		testPointerWalk();
+		//testPointerWalk();
 	}
 
 }

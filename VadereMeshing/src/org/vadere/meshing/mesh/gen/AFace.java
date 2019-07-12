@@ -1,15 +1,13 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * An array-based implementation of {@link IFace}.
  *
  * @author Benedikt Zoennchen
  */
-public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
+public class AFace implements IFace, Cloneable {
 
 	/**
 	 * One of the array index of the half-edges bordering this face.
@@ -34,12 +32,11 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 	/**
 	 * Default constructor. To construct a face where you have already some half-edges
 	 * bordering this face.
-	 *
-	 * @param id     the array-index of this face
+	 *  @param id     the array-index of this face
 	 * @param edge   the array-index of one edge of this face
 	 * @param border indicator if this face is a border face or not
 	 */
-	AFace(@NotNull final int id,@NotNull final int edge, boolean border) {
+	AFace(final int id, final int edge, boolean border) {
 		this.border = border;
 		this.edge = edge;
 		this.id = id;
@@ -49,7 +46,7 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 * This constructor can be used for constructing a new face without having
 	 * constructed the bordering half-edges jet.
 	 */
-	AFace(@NotNull final int id, @NotNull boolean border) {
+	AFace(final int id, boolean border) {
 		this.border = border;
 		this.edge = -1;
 		this.id = id;
@@ -77,7 +74,7 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 *
 	 * @param edge the array-index of a half-edge bordering this face
 	 */
-	void setEdge(@NotNull final int edge) {
+	void setEdge(final int edge) {
 		this.edge = edge;
 	}
 
@@ -88,7 +85,7 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 	 *
 	 * @param id the new array-index of this face
 	 */
-	void setId(@NotNull final int id) {
+	void setId(final int id) {
 		this.id = id;
 	}
 
@@ -131,9 +128,9 @@ public class AFace<P extends IPoint> implements IFace<P>, Cloneable {
 	}
 
 	@Override
-    protected AFace<P> clone()  {
+    protected AFace clone()  {
         try {
-            return (AFace<P>) super.clone();
+            return (AFace) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }

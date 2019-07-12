@@ -5,7 +5,6 @@ import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -62,13 +61,13 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			} else {
 				trajectoriesStream = model.getAlivePedestrians();
 			}
-			model.getStep().ifPresent(step -> trajectoriesStream.forEach(t -> renderTrajectory(g, color, t, step)));
+			trajectoriesStream.forEach(t -> renderTrajectory(g, color, t, model.getSimTimeInSec()));
 		}
 	}
 
-	private void renderTrajectory(final Graphics2D g, final Color color, final Trajectory trajectory, final Step step) {
+	private void renderTrajectory(final Graphics2D g, final Color color, final Trajectory trajectory, final double simTimeInSec) {
 
-		Optional<Agent> optionalPedestrian = trajectory.getAgent(step);
+		Optional<Agent> optionalPedestrian = trajectory.getAgent(simTimeInSec);
 		AgentRender agentRender = getAgentRender();
 
 		if (optionalPedestrian.isPresent()) {
@@ -87,7 +86,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 			// renderImage the pedestrian
 			if (model.config.isShowPedestrians()) {
-				if (model.config.isShowFaydedPedestrians() || !trajectory.isPedestrianDisappeared(step)) {
+				if (model.config.isShowFaydedPedestrians() || !trajectory.hasDisappeared(simTimeInSec)) {
 					agentRender.render(pedestrian, nonGroupColor, g);
 					if (model.config.isShowPedestrianIds()) {
 						DefaultRenderer.paintAgentId(g, pedestrian);
@@ -96,13 +95,13 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			}
 
 			// renderImage the trajectory
-			if (model.config.isShowTrajectories() && step.getStepNumber() > 0) {
-				renderTrajectory(g, trajectory.getPositionsReverse(step), pedestrian);
+			if (model.config.isShowTrajectories()) {
+				renderTrajectory(g, trajectory.getPositionsReverse(simTimeInSec), pedestrian);
 			}
 
 			// renderImage the arrows indicating the walking direction
 			if (model.config.isShowWalkdirection() &&
-					(model.config.isShowFaydedPedestrians() || !trajectory.isPedestrianDisappeared(step))) {
+					(model.config.isShowFaydedPedestrians() || !trajectory.hasDisappeared(simTimeInSec))) {
 				int pedestrianId = pedestrian.getId();
 				VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
 
@@ -133,10 +132,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				}
 			}
 		} else {
-			logger.error("Optional<Pedestrian> should not be empty at this point! Step: " + step + ", Ped: "
-					+ trajectory.getPedestrianId());
+			logger.error("Optional<Pedestrian> should not be empty at this point! Step: " + simTimeInSec + ", Ped: " + trajectory.getPedestrianId());
 		}
 	}
-
-
 }

@@ -102,5 +102,5 @@ public interface EikonalSolver {
 		logger.infof("caching not implemented for given EikonalSolver %s", this.getClass().getName());
 	}
 
-	IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization();
+	IMesh<?, ?, ?> getDiscretization();
 }

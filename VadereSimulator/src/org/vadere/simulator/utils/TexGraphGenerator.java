@@ -22,7 +22,7 @@ import java.util.function.Function;
 /**
  * @author Benedikt Zoennchen
  */
-public class TexGraphGenerator extends org.vadere.meshing.utils.tex.TexGraphGenerator {
+public class TexGraphGenerator extends org.vadere.meshing.utils.io.tex.TexGraphGenerator {
 
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
@@ -33,8 +33,8 @@ public class TexGraphGenerator extends org.vadere.meshing.utils.tex.TexGraphGene
 	 * @param scaling   the scaling of the tikz graphics
 	 * @return a string representing a tikz graphics
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> String toTikz(
-			@NotNull final IMesh<P, V, E, F> mesh,
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toTikz(
+			@NotNull final IMesh<V, E, F> mesh,
 			@NotNull final Function<F, Color> coloring,
 			final float scaling,
 			@NotNull final Topography topography) {

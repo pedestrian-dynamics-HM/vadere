@@ -17,26 +17,33 @@ import java.util.List;
 
 /**
  * Draw selected {@link IMesh} with default coloring based on the quality of the triangulation.
+ *
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 public class SimpleTriCanvas
-		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-		extends TriCanvas<P, V, E, F> {
+		<P extends IPoint, CE, CF,V extends IVertex, E extends IHalfEdge, F extends IFace>
+		extends TriCanvas<P, CE, CF, V, E, F> {
 
 	protected List<F> faces;
 
-	private SimpleTriCanvas(final IMesh<P, V, E, F> mesh, VRectangle bound) {
+	private SimpleTriCanvas(final IMesh<V, E, F> mesh, VRectangle bound) {
 		this(mesh, defaultWidth, defaultHeight, bound);
 	}
 
-	public SimpleTriCanvas(final IMesh<P, V, E, F> mesh) {
+	public SimpleTriCanvas(final IMesh<V, E, F> mesh) {
 		this(mesh, defaultWidth, defaultHeight);
 	}
 
-	private SimpleTriCanvas(final IMesh<P, V, E, F> mesh, double width, double height) {
+	private SimpleTriCanvas(final IMesh<V, E, F> mesh, double width, double height) {
 		this(mesh, defaultWidth, defaultHeight, defaultBound);
 	}
 
-	private SimpleTriCanvas(final IMesh<P, V, E, F> mesh, double width, double height, VRectangle bound) {
+	private SimpleTriCanvas(final IMesh<V, E, F> mesh, double width, double height, VRectangle bound) {
 		super(mesh, width, height, bound);
 		this.faces = new ArrayList<>();
 		this.faces = mesh.getFacesWithHoles();
@@ -57,14 +64,14 @@ public class SimpleTriCanvas
 	//statics - Factory Methods.
 
 	@NotNull
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-	SimpleTriCanvas<P, V, E, F> simpleCanvas(final IMesh<P, V, E, F> mesh, VRectangle bound) {
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
+	SimpleTriCanvas<P, CE, CF, V, E, F> simpleCanvas(final IMesh<V, E, F> mesh, VRectangle bound) {
 		return new SimpleTriCanvas<>(mesh, bound);
 	}
 
 	@NotNull
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-	SimpleTriCanvas<P, V, E, F> simpleCanvas(final IMesh<P, V, E, F> mesh) {
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
+	SimpleTriCanvas<P, CE, CF, V, E, F> simpleCanvas(final IMesh<V, E, F> mesh) {
 
 		return new SimpleTriCanvas<>(mesh);
 	}

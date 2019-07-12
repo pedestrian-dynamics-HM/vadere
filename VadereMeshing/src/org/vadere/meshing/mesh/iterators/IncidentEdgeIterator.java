@@ -1,6 +1,5 @@
 package org.vadere.meshing.mesh.iterators;
 
-
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -16,39 +15,40 @@ import java.util.Iterator;
  * iterator.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the vertex
- * @param <E> the type of the half-edge
- * @param <F> the type of the face
+ *
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class IncidentEdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
+public class IncidentEdgeIterator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Iterator<E> {
 
 	private static Logger log = Logger.getLogger(IncidentEdgeIterator.class);
-	private IMesh<P, V, E, F> mesh;
+	private IMesh<V, E, F> mesh;
 	private E current;
 	private E edge;
 	private boolean first;
 	int count = 0;
 
-	public IncidentEdgeIterator(final IMesh<P, V, E, F> mesh, final V vertex) {
+	public IncidentEdgeIterator(final IMesh<V, E, F> mesh, final V vertex) {
 		this(mesh, mesh.getEdge(vertex));
 	}
 
-	public IncidentEdgeIterator(final IMesh<P, V, E, F> mesh, final E edge) {
+	public IncidentEdgeIterator(final IMesh<V, E, F> mesh, final E edge) {
 		this.mesh = mesh;
 		this.edge = edge;
-		this.current = mesh.getNext(edge);
+		this.current = mesh.getTwin(edge);
 		this.first = true;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return (first || current != mesh.getNext(edge));
+		return (first || current != mesh.getTwin(edge));
 	}
 
 	@Override
 	public E next() {
 		E result = current;
-		current = mesh.getNext(mesh.getTwin(result));
+		current = mesh.getTwin(mesh.getPrev(result));
 		first = false;
 		count++;
 		//log.info(count);

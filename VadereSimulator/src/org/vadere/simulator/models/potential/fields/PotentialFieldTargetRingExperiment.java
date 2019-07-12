@@ -11,6 +11,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -89,7 +90,7 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
     }
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
+	public Function<Agent, IMesh<?, ?, ?>> getDiscretization() {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 

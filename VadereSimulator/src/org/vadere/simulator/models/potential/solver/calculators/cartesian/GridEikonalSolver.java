@@ -25,12 +25,12 @@ public interface GridEikonalSolver extends EikonalSolver {
 	CellGrid getCellGrid();
 
 	// TODO: implement this!
-	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization(final CellGrid potentialField) {
-		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
+	default IMesh<?, ?, ?> getDiscretization(final CellGrid potentialField) {
+		return new PMesh();
 	}
 
 	@Override
-	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	default IMesh<?, ?, ?> getDiscretization() {
 		return getDiscretization(getCellGrid());
 	}
 

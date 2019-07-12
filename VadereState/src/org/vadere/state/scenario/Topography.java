@@ -460,6 +460,10 @@ public class Topography implements DynamicElementMover{
 		this.boundaryObstacles.add(obstacle);
 	}
 
+	public List<Obstacle> getBoundaryObstacles() {
+		return new ArrayList<>(boundaryObstacles);
+	}
+
 	public void removeBoundary() {
 		for (Obstacle boundaryObstacle : this.boundaryObstacles) {
 			this.obstacles.remove(boundaryObstacle);

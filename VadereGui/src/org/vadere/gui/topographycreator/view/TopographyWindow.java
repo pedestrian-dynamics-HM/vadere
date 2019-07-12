@@ -50,6 +50,7 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.config.VadereConfig;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -75,7 +76,7 @@ public class TopographyWindow extends JPanel {
 	public TopographyWindow(final Scenario currentScenario) {
 
 		toolbar = new ScenarioToolBar("Toolbar");
-		int toolbarSize = Integer.parseInt(resources.getProperty("Toolbar.size"));
+		int toolbarSize = VadereConfig.getConfig().getInt("Gui.toolbar.size");
 		toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
 		toolbar.setBorderPainted(false);
 		toolbar.setFloatable(false);
@@ -434,11 +435,11 @@ public class TopographyWindow extends JPanel {
 		getActionMap().put("copy-element", copyElementAction);
 
 		TopographyAction insertCopiedElementAction =
-				new ActionInsertCopiedElement("insert copied element", panelModel, undoSupport);
+				new ActionInsertCopiedElement("insertVertex copied element", panelModel, undoSupport);
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-				"insert-copied-element");
-		getActionMap().put("insert-copied-element", insertCopiedElementAction);
+				"insertVertex-copied-element");
+		getActionMap().put("insertVertex-copied-element", insertCopiedElementAction);
 
 		// delete element
 		TopographyAction deleteElement =

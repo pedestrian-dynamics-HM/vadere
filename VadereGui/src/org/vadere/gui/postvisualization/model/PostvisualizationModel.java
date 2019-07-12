@@ -7,6 +7,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.control.TableListenerLogicExpression;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -39,7 +40,15 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private static Logger logger = Logger.getLogger(PostvisualizationModel.class);
 
-	private Step step;
+	//private Step step;
+
+	//private double ratio;
+
+	private double visTime;
+
+	private double visTimeStepLength;
+
+	private double simTimeStepLength;
 
 	private int topographyId;
 
@@ -55,7 +64,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private Map<Step, List<Agent>> agentsByStep;
 
-	private Comparator<Step> stepComparator = (s1, s2) -> s1.getStepNumber() - s2.getStepNumber();
+	private Comparator<Step> stepComparator = Comparator.comparingInt(Step::getStepNumber);
 
 	private List<Step> steps;
 
@@ -73,7 +82,9 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.potentialContainer = null;
 		this.pedestrianColorTableModel = new PedestrianColorTableModel();
 		this.steps = new ArrayList<>();
-
+		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
+		this.visTimeStepLength = this.simTimeStepLength;
+		this.visTime = 0;
 		/*for (int i = 0; i < 5; i++) {
 			try {
 				colorEvalFunctions.put(i, new JsonLogicParser("false").parse());
@@ -93,7 +104,6 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		colorEvalFunctions.remove(row);
 	}
 
-
 	/**
 	 * Initialize the {@link PostvisualizationModel}.
 	 *
@@ -102,6 +112,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	 * @param projectPath   the path to the project.
 	 */
 	public void init(final Map<Step, List<Agent>> agentsByStep, final Scenario scenario, final String projectPath) {
+		simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		logger.info("start the initialization of the PostvisualizationModel.");
 		init(scenario, projectPath);
 		this.agentsByStep = agentsByStep;
@@ -124,7 +135,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 					for(Agent agent : agentsByStep.get(map.get(stepNumber))) {
 						if(!trajectories.containsKey(agent.getId())) {
-							trajectories.put(agent.getId(), new Trajectory(agent.getId()));
+							trajectories.put(agent.getId(), new Trajectory(agent.getId(), simTimeStepLength));
 						}
 						trajectories.get(agent.getId()).addStep(map.get(stepNumber), agent);
 					}
@@ -138,8 +149,12 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			trajectory.fill();
 		}
 
-		this.step = !steps.isEmpty() ? steps.get(0) : null;
+		this.visTime = 0;
 		logger.info("finished init postvis model");
+	}
+
+	private double stepToTime(final int step) {
+		return visTimeStepLength * (step - 1);
 	}
 
 	public void init(final Scenario vadere, final String projectPath) {
@@ -149,6 +164,18 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.trajectories = new HashMap<>();
 		this.selectedElement = null;
 		this.outputPath = projectPath;
+	}
+
+	public double getVisTimeStepLength() {
+		return visTimeStepLength;
+	}
+
+	public synchronized void setVisTimeStepLength(final double visTimeStepLength) {
+		this.visTimeStepLength = visTimeStepLength;
+	}
+
+	public double getSimTimeStepLength() {
+		return simTimeStepLength;
 	}
 
 	public Optional<Step> getLastStep() {
@@ -167,6 +194,14 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 	}
 
+	public Step fist() {
+		return getFirstStep().get();
+	}
+
+	public Step last() {
+		return getLastStep().get();
+	}
+
 	public Scenario getScenarioRunManager() {
 		return vadere;
 	}
@@ -175,8 +210,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public Function<IPoint, Double> getPotentialField() {
         Function<IPoint, Double> f = p -> 0.0;
         try {
-            if (potentialContainer != null && step != null) {
-                final CellGrid potentialField = potentialContainer.getPotentialField(step.getStepNumber());
+            if (potentialContainer != null) {
+                final CellGrid potentialField = potentialContainer.getPotentialField(Step.toFloorStep(getSimTimeInSec(), getSimTimeStepLength()).getStepNumber());
                 f = potentialField.getInterpolationFunction();
             }
         } catch (IOException e) {
@@ -188,12 +223,12 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	@Override
 	public boolean isFloorFieldAvailable() {
-		return potentialContainer != null && step != null;
+		return potentialContainer != null;
 	}
 
 	@Override
 	public Collection<Agent> getAgents() {
-		return getAlivePedestrians().map(t -> t.getAgent(step)).filter(ped -> ped.isPresent()).map(ped -> ped.get())
+		return getAlivePedestrians().map(t -> t.getAgent(getSimTimeInSec())).filter(ped -> ped.isPresent()).map(ped -> ped.get())
 				.collect(Collectors.toList());
 	}
 
@@ -212,22 +247,49 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return config.getGridWidth();
 	}
 
-	public synchronized Optional<Step> getStep() {
+	/*public synchronized Optional<Step> getStep() {
 		return Optional.ofNullable(step);
 	}
+
+	public synchronized Optional<Double> getRatio() {
+		return Optional.ofNullable(ratio);
+	}*/
 
 	public int getStepCount() {
 		return steps.size();
 	}
 
-	public synchronized void setTime(final double time) {
-		if (steps.size() >= 2 && steps.get(1).getSimTimeInSec().isPresent()
-				&& steps.get(0).getSimTimeInSec().isPresent()) {
-			double dt = steps.get(1).getSimTimeInSec().get() - steps.get(0).getSimTimeInSec().get();
-			int step = (int) Math.round(time / dt) + 1;
-			setStep(step);
-		} else if (1.0e-10 < Math.abs(time)) {
-			setStep(1);
+	public synchronized void setVisTime(final double visTimeInSec) {
+		if(!isEmpty()) {
+			double validVisTime = Math.min(Step.toSimTimeInSec(last(), simTimeStepLength), Math.max(Step.toSimTimeInSec(fist(), simTimeStepLength), visTimeInSec));
+			if(this.visTime != validVisTime) {
+				this.visTime = validVisTime;
+
+				if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
+					synchronized(getVoronoiDiagram()) {
+						getVoronoiDiagram().computeVoronoiDiagram(
+								trajectories.values().stream()
+										.filter(t -> t.isAlive(visTime))
+										.map(t -> t.getAgent(visTime).get().getPosition())
+										.collect(Collectors.toList()));
+					}
+				}
+
+				if (isElementSelected() && getSelectedElement() instanceof Pedestrian) {
+					Trajectory trajectory = trajectories.get(getSelectedElement().getId());
+					if (trajectory != null) {
+						Optional<Agent> ped = trajectory.getAgent(visTime);
+						setSelectedElement(ped.orElse(null));
+					}
+				}
+
+				// so the new pedestrian position is displayed!
+				if (isElementSelected()) {
+					notifySelectSecenarioElementListener(getSelectedElement());
+				}
+
+				setChanged();
+			}
 		}
 	}
 
@@ -258,9 +320,34 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return pedestrianColorTableModel;
 	}
 
-	public synchronized void setStep(final int step) {
-		// speed up the computation if every step is available, which is the default case!
-		Optional<Step> optionalStep = steps.size() >= step && steps.get(step - 1).getStepNumber() == step
+	/*public synchronized void setStep(final double visTimeInSec) {
+		this.visTime = visTimeInSec;
+		if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
+			synchronized(getVoronoiDiagram()) {
+				getVoronoiDiagram().computeVoronoiDiagram(
+						trajectories.values().stream()
+								.filter(t -> t.isAlive(visTimeInSec))
+								.map(t -> t.getAgent(visTimeInSec).get().getPosition())
+								.collect(Collectors.toList()));
+			}
+		}
+
+		if (isElementSelected() && getSelectedElement() instanceof Pedestrian) {
+			Trajectory trajectory = trajectories.get(getSelectedElement().getId());
+			if (trajectory != null) {
+				Optional<Agent> ped = trajectory.getAgent(visTimeInSec);
+				setSelectedElement(ped.orElse(null));
+			}
+		}
+
+		// so the new pedestrian position is displayed!
+		if (isElementSelected()) {
+			notifySelectSecenarioElementListener(getSelectedElement());
+		}
+
+		setChanged();
+
+		/*Optional<Step> optionalStep = steps.size() >= step && steps.get(step - 1).getStepNumber() == step
 				? Optional.of(steps.get(step - 1)) : Optional.<Step>empty();
 
 		if (!optionalStep.isPresent()) {
@@ -269,51 +356,64 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 		if (!optionalStep.isPresent()) {
 			logger.error("could not found step with the number: " + step);
-		} else if (!this.step.equals(optionalStep.get())) {
-			this.step = optionalStep.get();
-			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
-				getVoronoiDiagram().computeVoronoiDiagram(
-						trajectories.values().stream()
-								.filter(t -> t.isPedestrianAlive(this.step))
-								.map(t -> t.getAgent(this.step).get().getPosition())
-								.collect(Collectors.toList()));
+		} else if (this.step == null || (!this.step.equals(optionalStep.get()) || ratio != this.ratio)) {
 
+			// cache step and ratio
+			this.step = optionalStep.get();
+			this.ratio = ratio;
+			this.visTime = this.step.getSimTimeInSec() + ratio * getSimTimeStepLength();
+
+			logger.info("calculated time = " + visTime + "," + System.currentTimeMillis());
+			int istep = ratio == 0 ? this.step.getStepNumber() : this.step.getStepNumber() + 1;
+
+			Step nextStep = new Step(istep, stepToTime(istep));
+			this.ratio = ratio;
+			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
+				synchronized(getVoronoiDiagram()) {
+					getVoronoiDiagram().computeVoronoiDiagram(
+							trajectories.values().stream()
+									.filter(t -> t.isAlive(nextStep))
+									.map(t -> t.getAgent(this.step, ratio).get().getPosition())
+									.collect(Collectors.toList()));
+				}
 			}
 
 			if (isElementSelected() && getSelectedElement() instanceof Pedestrian) {
 				Trajectory trajectory = trajectories.get(getSelectedElement().getId());
 				if (trajectory != null) {
-					Optional<Agent> ped = trajectory.getAgent(this.step);
+					Optional<Agent> ped = trajectory.getAgent(this.step, ratio);
 					setSelectedElement(ped.orElseGet(() -> null));
 				}
 			}
 
-			// so the new pedestrian position is displayed!
+
 			if (isElementSelected()) {
 				notifySelectSecenarioElementListener(getSelectedElement());
 			}
 
-			/*
-			 * if(isFloorFieldAvailable()) {
-			 * getPotentialField();
-			 * }
-			 */
 			setChanged();
 		}
+	}*/
+
+	public synchronized void setStep(final int step) {
+		setVisTime(Step.toSimTimeInSec(new Step(step), simTimeStepLength));
+	}
+
+	public synchronized Step getStep() {
+		return Step.toFloorStep(getSimTimeInSec(), simTimeStepLength);
 	}
 
 	@Override
 	public double getSimTimeInSec() {
-		return getStep().map(this::getSimTimeInSec).orElse(0.0);
-	}
-
-	private double getSimTimeInSec(final Step step) {
-		return step.getSimTimeInSec()
-				.orElse(step.getStepNumber() * vadere.getScenarioStore().getAttributesSimulation().getSimTimeStepLength());
+		return visTime;
 	}
 
 	public synchronized void setPotentialFieldContainer(final PotentialFieldContainer container) {
 		this.potentialContainer = container;
+	}
+
+	public double getMaxSimTimeInSec() {
+		return Step.toSimTimeInSec(last(), simTimeStepLength);
 	}
 
 	/**
@@ -323,7 +423,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	 * @return all trajectories
 	 */
 	public synchronized Stream<Trajectory> getAppearedPedestrians() {
-		return trajectories.values().stream().filter(t -> t.isPedestrianAppeared(this.step));
+		return trajectories.values().stream().filter(t -> t.hasAppeared(getSimTimeInSec()));
 	}
 
 	/**
@@ -333,7 +433,11 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	 * @return all trajectories of pedestrians that are visible at the current time step
 	 */
 	public synchronized Stream<Trajectory> getAlivePedestrians() {
-		return trajectories.values().stream().filter(t -> t.isPedestrianAlive(this.step));
+		return trajectories.values().stream().filter(t -> t.isAlive(getSimTimeInSec()));
+	}
+
+	public synchronized Trajectory getTrajectory(int pedestrianId){
+		return trajectories.get(pedestrianId);
 	}
 
 	public synchronized Trajectory getTrajectory(int pedestrianId){
@@ -341,7 +445,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public boolean isEmpty() {
-		return agentsByStep.size() == 0;
+		return agentsByStep.isEmpty();
 	}
 
 	@Override

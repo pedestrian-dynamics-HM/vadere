@@ -1,6 +1,7 @@
 package org.vadere.util.geometry;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -109,4 +110,19 @@ public class TestPolygon {
 		assertEquals("equals() does not work properly.", testPolygon, copyTestPolygon);
 	}
 
+	@Test
+	public void testOrientation() {
+		VPoint p1 = new VPoint(0.0, 0.0);
+		VPoint p2 = new VPoint(1.0, 0.0);
+		VPoint p3 = new VPoint(1.0, 1.0);
+		VPoint p4 = new VPoint(0.5, 2.0);
+		VPoint p5 = new VPoint(0.9, 1.0);
+
+
+		VPolygon ccwPoly = GeometryUtils.polygonFromPoints2D(p1, p2, p3, p4, p5);
+		VPolygon cwPoly = GeometryUtils.polygonFromPoints2D(p5, p4, p3, p2, p1);
+
+		assertTrue(ccwPoly.isCCW());
+		assertTrue(!cwPoly.isCCW());
+	}
 }
