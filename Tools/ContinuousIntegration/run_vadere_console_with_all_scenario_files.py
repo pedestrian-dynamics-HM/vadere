@@ -74,8 +74,9 @@ def run_all_optimization_tests():
     config_filepath = os.path.join("VadereOptimizationTests", "TestNelderMead", "vadere.conf")
 
     # NOTE: it is likely that the set config file is not required by new optimization tests
+    # long_timeout, because the brute force is expensive.
     passed_and_failed_scenarios = run_scenario_files_with_vadere_console(
-        scenario_files, scenario_timeout_in_sec=short_timeout_in_seconds, config_filepath=config_filepath)
+        scenario_files, scenario_timeout_in_sec=long_timeout_in_seconds, config_filepath=config_filepath)
 
     return passed_and_failed_scenarios
 
@@ -215,13 +216,13 @@ def result_dict_print_summary(passed_and_failed_scenarios):
     total_passed_scenarios = len(passed_and_failed_scenarios["passed"])
     total_failed_scenarios = len(passed_and_failed_scenarios["failed"])
     total_scenarios = total_passed_scenarios + total_failed_scenarios
-    faild_summary = passed_and_failed_scenarios["failed_summary"]
+    failed_summary = passed_and_failed_scenarios["failed_summary"]
 
-    if len(faild_summary) > 0:
+    if result_dict_has_failed_tests(passed_and_failed_scenarios):
         print("##################")
         print("# Failed Summary #")
         print("##################")
-        for line in faild_summary:
+        for line in failed_summary:
             print(line)
 
     print("###########")
