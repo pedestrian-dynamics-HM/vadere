@@ -1,40 +1,38 @@
 package org.vadere.util.data.cellgrid;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 public class CellGridReadWriterTest {
 
-	private String loadTestResource(String path){
-		URL url = CellGridTest.class.getResource(path);
-		try {
-			return url.toURI().getPath();
-		} catch (URISyntaxException e) {
-			fail("TestResource not found " + path);
+	private File loadTestResource(String path){
+		URL resource1 = CellGridTest.class.getResource(path);
+		if (resource1 == null){
+			Assert.fail("Resource not found: " + path);
 		}
-		return "";
+		return new File(resource1.getFile());
 	}
 
 	@Test
 	public void testCSV() throws Exception {
-		String pathCSV = loadTestResource("/org/vadere/util/data/cellgrid/test001.ffcache");
+		File pathCSV = loadTestResource("/org/vadere/util/data/cellgrid/test001.ffcache");
 		CellGrid cellGrid = new CellGrid(3.0, 3.0, 1.0, new CellState(), 0.0, 0.0);
 
 		// read in csv
-		CellGridReadWriter.read(cellGrid).fromCsv(Paths.get(pathCSV).toFile());
+		CellGridReadWriter.read(cellGrid).fromCsv(pathCSV);
 
 		// write back
-		CellGridReadWriter.write(cellGrid).toCsv(Paths.get(pathCSV+"back").toFile());
+		CellGridReadWriter.write(cellGrid).toCsv(Paths.get(pathCSV.toString()+"back").toFile());
 
 		// read again
 		CellGrid cellGrid2 = new CellGrid(3.0, 3.0, 1.0, new CellState(), 0.0, 0.0);
-		CellGridReadWriter.read(cellGrid2).fromCsv(Paths.get(pathCSV+"back").toFile());
+		CellGridReadWriter.read(cellGrid2).fromCsv(Paths.get(pathCSV.toString()+"back").toFile());
 
 
 		// compare
@@ -49,18 +47,18 @@ public class CellGridReadWriterTest {
 
 	@Test
 	public void testBIN() throws Exception {
-		String pathBIN = loadTestResource("/org/vadere/util/data/cellgrid/test001.bincache");
+		File pathBIN = loadTestResource("/org/vadere/util/data/cellgrid/test001.bincache");
 		CellGrid cellGrid = new CellGrid(3.0, 3.0, 1.0, new CellState(), 0.0, 0.0);
 
 		// read in csv
-		CellGridReadWriter.read(cellGrid).fromBinary(Paths.get(pathBIN).toFile());
+		CellGridReadWriter.read(cellGrid).fromBinary(pathBIN);
 
 		// write back
-		CellGridReadWriter.write(cellGrid).toBinary(Paths.get(pathBIN+"back").toFile());
+		CellGridReadWriter.write(cellGrid).toBinary(Paths.get(pathBIN.toString()+"back").toFile());
 
 		// read again
 		CellGrid cellGrid2 = new CellGrid(3.0, 3.0, 1.0, new CellState(), 0.0, 0.0);
-		CellGridReadWriter.read(cellGrid2).fromBinary(Paths.get(pathBIN+"back").toFile());
+		CellGridReadWriter.read(cellGrid2).fromBinary(Paths.get(pathBIN.toString()+"back").toFile());
 
 
 		// compare

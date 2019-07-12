@@ -440,10 +440,6 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.get(pedestrianId);
 	}
 
-	public synchronized Trajectory getTrajectory(int pedestrianId){
-		return trajectories.get(pedestrianId);
-	}
-
 	public boolean isEmpty() {
 		return agentsByStep.isEmpty();
 	}
