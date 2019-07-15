@@ -1,8 +1,7 @@
 {
   "name" : "04_bang_event_one_agent_one_obstacle",
   "description" : "",
-  "release" : "1.0",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -85,7 +84,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       }
     },
@@ -166,12 +167,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -194,22 +200,7 @@
         "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.2,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
-        "acceleration" : 2.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
+      "attributesCar" : null
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
