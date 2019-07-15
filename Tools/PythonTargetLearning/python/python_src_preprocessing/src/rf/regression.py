@@ -1,7 +1,10 @@
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
+import matplotlib.pyplot as plt
 import numpy as np
+import joblib
 import time
+import os.path as path
 
 def calculate_errors(prediction, target):
 
@@ -19,12 +22,58 @@ def calculate_errors(prediction, target):
     
     rmse = np.sqrt(np.mean(np.square(prediction - target), axis=0))
 
-    return  euklid_error_mean, euklid_error_std, mean_abs_error, mean_error, rmse
+    return  (euklid_error_mean, euklid_error_std, mean_abs_error, mean_error, rmse)
     
 
+def features_importance(regressor, area):
+    return np.reshape(regressor.feature_importances_, area)
 
 
-def single(samples, targets, **kwargs):
+def plot_features_importance(regressor, area, title, path):
+    fi = features_importance(regressor, area)
+
+    fig, ax = plt.subplots()
+    fig.sup_title(title)
+    img = ax.imshow(fi)
+    fig.colorbar(img)
+    fig.savefig(path)
+
+
+def train(sampels, targets, **kwargs):
+    number_of_trees = kwargs.get('number_of_trees',   20)
+    number_of_cores = kwargs.get('number_of_cores',    1)
+    max_tree_depth  = kwargs.get('max_tree_depth',  None)
+    oob_score       = kwargs.get('oob_score',       True)
+
+    # initialise random forest regressor
+    regressor = RandomForestRegressor(
+        n_estimators = number_of_trees, 
+        n_jobs       = number_of_cores, 
+        max_depth    = max_tree_depth,
+        oob_score    = oob_score)
+
+
+    # train model
+    regressor.fit(sampels, targets)
+
+    save = kwargs.get('save', False)
+    if save:
+        folder = kwargs.get('folder', None)
+        if folder is not None:
+            prefix = kwargs.get('prefix', '')
+            joblib.dump(regressor, path.join(folder, '{0}-rf-regressor.joblib'.format(prefix)))
+
+    return regressor
+
+
+def test(regressor, sampels, targets):
+    prediction = regressor.predict(sampels)
+    errors = calculate_errors(prediction, targets)
+
+    return errors, prediction
+
+
+def single_forest(samples, targets, **kwargs):
     """Train using single forest 
 
 
@@ -51,42 +100,35 @@ def single(samples, targets, **kwargs):
     oob_score : boolean
         record out of bag score (default: True)
 
+    save : boolean
+        save regression model to file (default: False)
+
+    folder : string
+        folder to save model to if save == True (default: None)
+
+    prefix : string
+        prefix used for filename of model (default: '')
+
     Returns
     -------
+    RandomForestRegressor
+        random forest regressor
     array
-        predictions 
-    double
-    
-    double
-    
-    double
+        predictions on test set
+    tuple
+        tuple containing model scores (training score, test score, out of bag score)
+    tuple
+        tuple containing errors on test set (euklid_error_mean, euklid_error_std, mean_abs_error, mean_error, rmse)
     """
 
     # init options
-    number_of_trees = kwargs.get('number_of_trees',   20)
-    number_of_cores = kwargs.get('number_of_cores',    1)
-    test_size       = kwargs.get('test_size',        0.2)
-    max_tree_depth  = kwargs.get('max_tree_depth',  None)
-    oob_score       = kwargs.get('oob_score',       True)
+    test_size = kwargs.get('test_size', 0.2)
 
     # split samples into training and test
     train_samples, test_samples, train_targets, test_targets = \
         train_test_split(samples, targets, shuffle = True, test_size = test_size)
-
-    # initialise random forest regressor
-    regressor = RandomForestRegressor(
-        n_estimators = number_of_trees, 
-        n_jobs       = number_of_cores, 
-        max_depth    = max_tree_depth,
-        oob_score    = oob_score)
-
-
-    # train model
-    regressor.fit(train_samples, train_targets)
-        
     
-    # evaluate model
-    prediction = regressor.predict(test_samples)
+    regressor = train(train_samples, train_targets, **kwargs)
     
     # evaluate performance
     score_training = regressor.score(train_samples, train_targets)
@@ -95,14 +137,14 @@ def single(samples, targets, **kwargs):
 
 
     # calculate errors
-    calculate_errors(prediction, test_targets)
+    errors, prediction = test(regressor, test_samples, test_targets)
 
 
-    return prediction, score_training, score_test, score_oob
+    return regressor, prediction, (score_training, score_test, score_oob), errors
 
 
 
-def multiple(samples, targets, **kwargs):
+def multiple_forests(samples, targets, **kwargs):
     """Train using one forest per target
 
     Parameters
@@ -128,33 +170,51 @@ def multiple(samples, targets, **kwargs):
     oob_score : boolean
         record out of bag score (default: True)
 
+    save : boolean
+        save regression model to file (default: False)
+
+    folder : string
+        folder to save model to if save == True (default: None)
 
     Returns
     -------
 
     """
 
+    # init options
+    test_size       = kwargs.get('test_size',        0.2)
+    
+    # split samples into training and test
+    train_samples, test_samples, train_targets, test_targets = \
+        train_test_split(samples, targets, shuffle = True, test_size = test_size)
+
     # number of targets
     n_targets = len(targets[0])
 
+    regressors = []
+    predictions = np.zeros([len(test_targets), n_targets]) 
+    score_test = np.zeros(n_targets)
+    score_training = np.zeros(n_targets)
+    score_oob = np.zeros(n_targets)
+
     # train single forest for each target
     for i in range(0, n_targets):
-        single(samples, targets[:, i])
+        regressor = train(train_samples, train_targets, prefix='target-{0}'.format(i), **kwargs)
+        regressors.append(regressor)
 
+        # evaluate performance
+        score_training[i] = regressor.score(train_samples, train_targets)
+        score_test[i] = regressor.score(test_samples, test_samples)
+        score_oob[i] = regressor.oob_score_
 
-"""
-def train():
+        _, prediction = test(regressor, test_samples, test_targets[:, i])
 
-    # standardization
-    row_sums = y_predicted.sum(axis=1)
-    y_predicted_normiert = y_predicted / row_sums[:, np.newaxis]
+        predictions[:, i] = prediction
 
-    combined = np.zeros((len(y_predicted_normiert), 6))
-    combined[:, :3] = y_predicted_normiert
-    combined[:, 3:] = y_test_density_np
+    # calculate errors
+    row_sums = predictions.sum(axis=1)
+    normed_prediction = predictions / row_sums[:, np.newaxis]
 
-    calc_and_print_errors_rf(y_test_density_np, y_predicted_normiert, log_file, score_training, score_test, score_oob)
+    errors = calculate_errors(normed_prediction, test_targets)
 
-    n = int(np.sqrt(len(rf_density_regressor.feature_importances_)))
-    features_importance = np.reshape(rf_density_regressor.feature_importances_, [int(obs_area[3]/resolution),int(obs_area[2]/resolution)])
-"""
+    return regressors, normed_prediction, (score_training, score_test, score_oob), errors
