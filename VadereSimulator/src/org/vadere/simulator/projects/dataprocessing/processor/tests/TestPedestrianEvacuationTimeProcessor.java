@@ -42,14 +42,23 @@ public class TestPedestrianEvacuationTimeProcessor extends TestProcessor {
 
 	@Override
 	public void postLoop(SimulationState state) {
+
+		Double maximalEvacTime = getAttributes().getMaximalEvacuationTime();
+		Double minimalEvacTime = getAttributes().getMinimalEvacuationTime();
+
+		Double finishTime = state.getScenarioStore().getAttributesSimulation().getFinishTime();
+
+		// See issue #249, this is only for security such that the tests work correctly
+		if(finishTime <= maximalEvacTime){
+			handleAssertion(false,
+					"finishTime in Simulation options has to be larger than maximalEvacTime");
+		}
+
 		pedestrianEvacuationTimeProcessor.postLoop(state);
 
 		int invalidEvacuationTimes = 0;
 		for(PedestrianIdKey key : pedestrianEvacuationTimeProcessor.getKeys()) {
 			Double evacTime = pedestrianEvacuationTimeProcessor.getValue(key);
-
-			Double maximalEvacTime = getAttributes().getMaximalEvacuationTime();
-			Double minimalEvacTime = getAttributes().getMinimalEvacuationTime();
 
 			if((evacTime == Double.POSITIVE_INFINITY && maximalEvacTime != Double.POSITIVE_INFINITY) ||
 					(evacTime < minimalEvacTime || evacTime > maximalEvacTime)) {

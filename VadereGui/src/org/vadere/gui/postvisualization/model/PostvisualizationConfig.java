@@ -14,6 +14,7 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 	private boolean showAllTrajectories = true;
 	private boolean showTrajecoriesOnSnapshot = false;
 	private boolean showFaydedPedestrians = false;
+	private boolean showAllTrajOnSnapshot = false;
 	private boolean loadTopographyInformationsOnly = false;
 	private boolean useEvacuationTimeColor = false;
 
@@ -96,6 +97,15 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 
 	public void setShowFaydedPedestrians(boolean showFaydedPedestrians) {
 		this.showFaydedPedestrians = showFaydedPedestrians;
+		setChanged();
+	}
+
+	public boolean isShowAllTrajOnSnapshot() {
+		return showAllTrajOnSnapshot;
+	}
+
+	public void setShowAllTrajOnSnapshot(boolean showAllTrajOnSnapshot) {
+		this.showAllTrajOnSnapshot = showAllTrajOnSnapshot;
 		setChanged();
 	}
 }

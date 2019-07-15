@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.simulator.entrypoints.Version;
+import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -161,5 +164,23 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography");
 
         return  StateJsonConverter.deserializeToNode(sortedRoot);
+    }
+
+    /**
+     * This hook will ensure that new attributes will be added with their default values.
+     * Important: must be used as PostHook only. The JsonNode representation of the scenario
+     * must already have the new Version Number!
+     * @param node
+     * @return
+     * @throws MigrationException
+     */
+    public static JsonNode addNewMembersWithDefaultValues(JsonNode node) throws MigrationException{
+        try {
+            Scenario scenario = JsonConverter.deserializeScenarioRunManagerFromNode(node);
+            node = JsonConverter.serializeScenarioRunManagerToNode(scenario, false);
+        } catch (IOException e) {
+            throw new MigrationException("Error while serializing and deserializing scenario",e);
+        }
+        return node;
     }
 }
