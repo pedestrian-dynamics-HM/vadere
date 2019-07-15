@@ -1,7 +1,7 @@
 {
   "name" : "rimea_06_corner",
   "description" : "",
-  "release" : "1.0",
+  "release" : "1.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -240,18 +240,24 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "type" : "PEDESTRIAN",
-        "groupSizes" : [ ]
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : { },
+        "type" : "PEDESTRIAN"
       }, {
         "source" : null,
         "targetIds" : [ ],
@@ -273,18 +279,24 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
-        "modelPedestrianMap" : { },
         "isChild" : false,
         "isLikelyInjured" : false,
+        "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "type" : "PEDESTRIAN",
-        "groupSizes" : [ ]
+        "groupSizes" : [ ],
+        "modelPedestrianMap" : { },
+        "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
         "radius" : 0.195,
