@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.11637874817308734,
-        "maxMeanDifferenceFuncValue" : 0.04086533272032428,
+        "maxMeanPointDistance" : 0.07522399192836575,
+        "maxMeanDifferenceFuncValue" : 0.023848826871958207,
         "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.4027595875238072,
-        "infoMinFuncDifference" : -6.450105858060162E-4,
-        "infoMaxFuncDifference" : 0.8011193645851016,
-        "infoStddevPointDistance" : 0.14227951170241054,
-        "infoStddevDifferenceFuncValue" : 0.054445311463520295
+        "infoMaxPointDistanceL2" : 1.564386140233547,
+        "infoMinFuncDifference" : -7.357495880544462E-6,
+        "infoMaxFuncDifference" : 0.33222591981368765,
+        "infoStddevPointDistance" : 0.09544596760319345,
+        "infoStddevDifferenceFuncValue" : 0.0336543527990736
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -59,8 +59,8 @@
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 4,
-        "numberOfCircles" : 1,
+        "stepCircleResolution" : 5,
+        "numberOfCircles" : 4,
         "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : true,
         "movementType" : "ARBITRARY",

@@ -87,8 +87,10 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 
 		if(pointDistanceL2Values.isEmpty() || differenceFuncValues.isEmpty()){
 			throw new NullPointerException("No values to compare. Reasons can be that i) there are no agents in the " +
-					"scenario, ii) the option to compare with the brute force is turned off or iii) or the optimizer " +
-					"does not support setting the OptimizationMetric. ");
+					"scenario, ii) the option to compare with the brute force is turned off (see " +
+					"`Testing.stepCircleOptimization.compareBruteForceSolution` in Vadere.conf) or iii) the " +
+					"optimizer does not support setting the OptimizationMetric of iv) the simulation failed " +
+					"unexpected.");
 		}
 
 		var metricStatistics = computeStatistics(pointDistanceL2Values, differenceFuncValues);
@@ -204,7 +206,6 @@ public class TestOptimizationMetricNelderMeadProcessor extends TestProcessor {
 		statistics.put("stddevDifferenceFuncValue", stddevDifferenceFuncValue);
 
 		return statistics;
-
 	}
 
 	@Override

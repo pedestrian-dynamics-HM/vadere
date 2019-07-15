@@ -133,7 +133,7 @@ public class PedestrianOSM extends Pedestrian {
 		} else {
 			VCircle reachableArea = new VCircle(getPosition(), getDesiredStepSize());
 
-			// get stairs pedestrian is on - remains null if on area
+			// get stairs object an agent may be on - remains null if agent is on area
 			Stairs stairs = null;
 			for (Stairs singleStairs : topography.getStairs()) {
 				if (singleStairs.getShape().contains(getPosition())) {
@@ -142,7 +142,7 @@ public class PedestrianOSM extends Pedestrian {
 				}
 			}
 
-			if (stairs == null) { // meaning pedestrian is on area
+			if (stairs == null) { // --> agent is on area
 
 				refreshRelevantPedestrians();
 				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
