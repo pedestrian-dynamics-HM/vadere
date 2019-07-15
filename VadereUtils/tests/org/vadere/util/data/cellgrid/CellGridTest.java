@@ -1,37 +1,35 @@
 package org.vadere.util.data.cellgrid;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Random;
 
 import tech.tablesaw.api.Table;
 
 import static junit.framework.TestCase.fail;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class CellGridTest {
 
-	private String loadTestResource(String path){
-		URL url = CellGridTest.class.getResource(path);
-		try {
-			return url.toURI().getPath();
-		} catch (URISyntaxException e) {
-			fail("TestResource not found " + path);
+	private File loadTestResource(String path){
+		URL resource1 = CellGridTest.class.getResource(path);
+		if (resource1 == null){
+			Assert.fail("Resource not found: " + path);
 		}
-		return "";
+		return new File(resource1.getFile());
 	}
 
 	@Test
 	public void loadCache(){
-		String path = loadTestResource("/org/vadere/util/data/cellgrid/test001.ffcache");
+		File path = loadTestResource("/org/vadere/util/data/cellgrid/test001.ffcache");
 		Table t = null;
 		try {
-			t = Table.read().csv(Paths.get(path).toFile());
+			t = Table.read().csv(path);
 		} catch (IOException e) {
 			fail("Test file not found");
 			return;
