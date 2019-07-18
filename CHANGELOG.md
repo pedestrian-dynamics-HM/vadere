@@ -12,6 +12,23 @@
 
 ### Added
 
+- VadereServer:
+  - Introducing TraCI server implementation for Vadere to allow remote control
+    of Vaderes simulation loop.
+  - VadereManager/target/vadere-server.jar will open a TCP socket and waits
+    for connection request.
+- FloorField Caching:
+  - CellGrid based floorfields can be loaded from a persisted cache file.
+  - Added attributes:
+    - `cacheType: [NO_CACHE|TXT_CACHE|BIN_CACHE]`
+    - `cacheDir: ""` relative path
+  - Cache files will be saved in a `__cache__` directory beside (sibling) the
+    scenario file. With `cacheDir` it is possible to create some structure within
+    the cache directory. Important: If `cacheDir` is an absolute path the cache
+    file will not be placed in `__cache__`.
+  - A TXT_CACHE type will save the CellGrid in a human readable form (CSV) and
+    BIN_CACHE will use a simple binary format for better performance and space
+    reasons.
 - TikzGenerator:
   - add configuration to show all traces of pedestrians, even if they
     left the simulation. Config: PostVis -> `Show all Trajectories on Snapshot`
