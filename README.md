@@ -55,7 +55,7 @@ With the following steps, you can run a simulation with one of the built-in exam
 - Start Vadere 
 - Click *Project* > *Open* 
 - Choose `vadere.project` of one of the test projects, e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
-- Select tahe scenario on the left and press *run selected scenario*
+- Select the scenario on the left and press *run selected scenario*
 
 ## Build from Source
 
