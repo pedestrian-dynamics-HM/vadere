@@ -34,8 +34,8 @@ variables:
 #   (i.e.,the virtual machines). We have to track that!
 stages:
     - unit_test
-#- integration_test
-#- seed_test
+    - integration_test
+    - seed_test
     - deploy
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
@@ -82,7 +82,8 @@ stages:
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
-        
+        - python3 -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
+        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${EIKMESH_PACKAGE_NAME_BRANCHES}
     only:
         refs:
             - master
