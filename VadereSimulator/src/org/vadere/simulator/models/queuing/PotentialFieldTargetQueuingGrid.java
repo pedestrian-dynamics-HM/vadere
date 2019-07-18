@@ -18,6 +18,7 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -314,7 +315,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
 

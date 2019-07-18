@@ -7,7 +7,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.StringContains;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonNodeExplorer;
 
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 				try {
 					Iterator<JsonNode> iter = iteratorMeasurementArea(n,id);
 					return iter.hasNext();
-				} catch (MigrationException e) {
+				} catch (Exception e) {
 					fail(e.getMessage());
 				}
 				return false;
@@ -176,7 +175,7 @@ public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 	default ArrayList<JsonNode> getProcessorsByType(JsonNode node, String processorType)  {
 		try {
 			return JsonNodeExplorer.super.getProcessorsByType(node, processorType);
-		} catch (MigrationException e) {
+		} catch (Exception e) {
 			fail("default nodes not present.");
 			return null;
 		}
@@ -185,7 +184,7 @@ public interface TestJsonNodeExplorer extends JsonNodeExplorer {
 	default ArrayList<JsonNode> getFilesForProcessorId(JsonNode node, String processorType){
 		try {
 			return JsonNodeExplorer.super.getFilesForProcessorId(node, processorType);
-		} catch (MigrationException e) {
+		} catch (Exception e) {
 			fail("default nodes not present.");
 			return null;
 		}

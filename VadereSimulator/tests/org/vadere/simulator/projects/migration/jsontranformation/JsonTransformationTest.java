@@ -4,12 +4,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
 import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
-import org.vadere.simulator.utils.reflection.TestResourceHandler;
-import org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 
-public abstract class JsonTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
+public abstract class JsonTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandlerScenario {
 
-	protected JsonTransformationFactory factory = JsonTransformationFactory.instance();
+	protected org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory factory = org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory.instance();
 
 
 	@Before

@@ -1,7 +1,7 @@
 {
   "name" : "basic_5_2_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "1.1",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

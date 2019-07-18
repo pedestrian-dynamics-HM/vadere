@@ -19,7 +19,6 @@ import org.vadere.util.logging.Logger;
 import java.util.Collection;
 import java.util.List;
 
-//TODO
 @DataProcessorClass()
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, Pair<Double, Double>> implements UsesMeasurementArea {
 

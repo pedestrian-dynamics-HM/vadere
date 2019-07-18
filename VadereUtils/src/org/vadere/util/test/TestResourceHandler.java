@@ -1,8 +1,5 @@
-package org.vadere.simulator.utils.reflection;
+package org.vadere.util.test;
 
-import org.vadere.simulator.entrypoints.ScenarioFactory;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.util.io.IOUtils;
 
 import java.io.File;
@@ -67,16 +64,6 @@ public interface TestResourceHandler {
 			fail("File not Found: " + e.getMessage());
 		}
 		return ret;
-	}
-
-	default Scenario getScenarioFromRelativeResource(String name){
-		Scenario scenario = null;
-		try {
-			scenario = ScenarioFactory.createScenarioWithScenarioFilePath(getRelativeTestPath(name));
-		} catch (IOException e) {
-			fail("Resource not found: " + getTestDir().resolve(name).toString());
-		}
-		return scenario;
 	}
 
 	default Path getTestFileBackup(String fileName) {

@@ -3,15 +3,14 @@ package org.vadere.simulator.projects;
 import org.vadere.simulator.control.PassiveCallback;
 import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.projects.migration.MigrationResult;
+import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,14 +36,16 @@ public class VadereProject {
 			new LinkedBlockingQueue<>();
 	private LinkedBlockingDeque<Scenario> scenariosLeft;
 	private Path outputDirectory;
-	private ProjectOutput projectOutput; //TODO initialize and wire up with rest ....
+	private Path projectDirectory;
+	private ProjectOutput projectOutput;
 
 	private MigrationResult migrationStats;
 
-	public VadereProject(final String name, final Iterable<Scenario> scenarios) {
+	public VadereProject(final String name, final Iterable<Scenario> scenarios, Path vadereProjectDirectory) {
 		this.name = name;
-		scenarios.forEach(scenario -> addScenario(scenario));
-		this.outputDirectory = Paths.get("output");
+		scenarios.forEach(this::addScenario);
+		this.projectDirectory = vadereProjectDirectory;
+		this.outputDirectory = vadereProjectDirectory.resolve(IOUtils.OUTPUT_DIR);
 		this.projectOutput = new ProjectOutput(this);
 	}
 
@@ -55,9 +56,7 @@ public class VadereProject {
 	}
 
 	public boolean hasUnsavedChanges() {
-		Set<String> currentScenarioIds = new HashSet<>();
 		for (Scenario srm : getScenarios()) {
-			currentScenarioIds.add(srm.getName());
 			if (srm.hasUnsavedChanges())
 				return true;
 		}
@@ -66,13 +65,11 @@ public class VadereProject {
 
 	public String getDiffs() {
 		String eol = "\n---------------\n";
-		Set<String> currentScenarioIds = new HashSet<>();
 		StringBuilder collectDiffs = new StringBuilder();
 		for (Scenario srm : getScenarios()) {
-			currentScenarioIds.add(srm.getName());
 			String diff = srm.getDiff();
 			if (diff != null)
-				collectDiffs.append("scenario <" + srm.getName() + "> :\n" + diff + eol);
+				collectDiffs.append("scenario <").append(srm.getName()).append("> :\n").append(diff).append(eol);
 		}
 		return collectDiffs.toString();
 	}
@@ -137,12 +134,16 @@ public class VadereProject {
 
 		notifySingleScenarioFinishListener(nextScenario);
 
-		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener);
+		final ScenarioRun scenarioRun = new ScenarioRun(nextScenario, scenarioFinishedListener, projectDirectory.resolve(IOUtils.SCENARIO_DIR).resolve(nextScenario.getName() + IOUtils.SCENARIO_FILE_EXTENSION), loadCache(nextScenario));
 		scenarioRun.setOutputPaths(outputDirectory);
 		if (visualization != null) {
 			scenarioRun.addPassiveCallback(visualization);
 		}
 		return scenarioRun;
+	}
+
+	private ScenarioCache loadCache(final Scenario scenario){
+		return ScenarioCache.load(scenario, projectDirectory.resolve(IOUtils.SCENARIO_DIR));
 	}
 
 	private void notifySingleScenarioFinishListener(final Scenario scenario) {
@@ -319,5 +320,13 @@ public class VadereProject {
 
 	public void resetState() {
 		simulationResults = new LinkedList<>();
+	}
+
+	public Path getProjectDirectory() {
+		return projectDirectory;
+	}
+
+	public void setProjectDirectory(Path vadereProjectDirectory) {
+		this.projectDirectory = vadereProjectDirectory;
 	}
 }
