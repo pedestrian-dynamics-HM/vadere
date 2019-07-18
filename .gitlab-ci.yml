@@ -67,7 +67,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        #- python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
     artifacts:
         when: on_failure
         paths:
@@ -83,7 +83,7 @@ stages:
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
         - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
         - python3 -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
-        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${EIKMESH_PACKAGE_NAME_BRANCHES}
+        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
     only:
         refs:
             - master
@@ -118,7 +118,7 @@ stages:
         - mvn -Dmaven.test.skip=true package
         # setup.py install should from the directoty at which the setup.py file is located (working directory). The brackets return the working direcory back to previous position. 
         - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && python3 setup.py install --user)
-        #- python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
+        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
     artifacts:
         when: on_failure
         paths: 
