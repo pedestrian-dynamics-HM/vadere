@@ -2,32 +2,29 @@ package org.vadere.gui.components.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
-import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Optional;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 /**
  * @author Benedikt Zoennchen
  */
 public class SettingsDialog extends JDialog {
 	private static Logger logger = Logger.getLogger(SettingsDialog.class);
-	private static Resources resources = Resources.getInstance("global");
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private DefaultSimulationConfig config;
 	private List<JButton> targetColorButtons;
@@ -93,7 +90,8 @@ public class SettingsDialog extends JDialog {
 		colorLayeredPane.setLayout(colorLayout);
 		additionalLayeredPane.setLayout(additionalLayout);
 
-		Integer[] colorIds = new Integer[Integer.parseInt(resources.getProperty("SettingsDialog.maxNumberOfTargets"))];
+//		Integer[] colorIds = new Integer[CONFIG.("SettingsDialog.maxNumberOfTargets")];
+		Integer[] colorIds = (Integer[])CONFIG.getArray(Integer.class, "SettingsDialog.maxNumberOfTargets");
 		for (int index = 1; index <= colorIds.length; index++) {
 			colorIds[index - 1] = index;
 		}
@@ -284,8 +282,9 @@ public class SettingsDialog extends JDialog {
 		additionalLayeredPane.add(new JLabel(Messages.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
 				cc.xy(2, 20));
 
-		JTextField tSnapshotDir = new JTextField(
-				Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
+/*		JTextField tSnapshotDir = new JTextField(
+				Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));*/
+		JTextField tSnapshotDir = new JTextField(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
 		tSnapshotDir.setEditable(false);
 		tSnapshotDir.setPreferredSize(new Dimension(130, 20));
 		additionalLayeredPane.add(tSnapshotDir, cc.xy(4, 20));

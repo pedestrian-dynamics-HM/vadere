@@ -50,6 +50,7 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.config.VadereConfig;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -75,7 +76,7 @@ public class TopographyWindow extends JPanel {
 	public TopographyWindow(final Scenario currentScenario) {
 
 		toolbar = new ScenarioToolBar("Toolbar");
-		int toolbarSize = Integer.parseInt(resources.getProperty("Toolbar.size"));
+		int toolbarSize = VadereConfig.getConfig().getInt("Gui.toolbar.size");
 		toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
 		toolbar.setBorderPainted(false);
 		toolbar.setFloatable(false);

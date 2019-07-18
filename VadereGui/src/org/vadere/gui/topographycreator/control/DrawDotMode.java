@@ -8,6 +8,7 @@ import org.vadere.gui.components.control.DefaultSelectionMode;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VCircle;
 
 /**
@@ -26,7 +27,7 @@ public class DrawDotMode extends DefaultSelectionMode {
 		super(panelModel);
 		this.panelModel = panelModel;
 		this.undoSupport = undoSupport;
-		this.dotRadius = Double.valueOf(resources.getProperty("TopographyCreator.dotRadius"));
+		this.dotRadius = VadereConfig.getConfig().getDouble( "TopographyCreator.dotRadius");
 	}
 
 	@Override

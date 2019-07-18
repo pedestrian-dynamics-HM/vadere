@@ -2,6 +2,7 @@ package org.vadere.gui.projectview.control;
 
 import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.ProjectViewModel;
+import org.vadere.util.config.VadereConfig;
 
 import java.awt.event.ActionEvent;
 import java.util.prefs.Preferences;
@@ -22,6 +23,6 @@ public class ShowResultDialogAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		model.setShowSimulationResultDialog(item.getState());
-		Preferences.userNodeForPackage(VadereApplication.class).putBoolean("Project.simulationResult.show", item.getState());
+		VadereConfig.getConfig().setProperty("Project.simulationResult.show", item.getState());
 	}
 }
