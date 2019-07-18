@@ -1,7 +1,7 @@
 {
   "name" : "g2_osm_calibration_minStepSize_0_11",
   "description" : "",
-  "release" : "0.7",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -83,13 +83,7 @@
       "id" : 11,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 50.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 16
       }
     }, {
@@ -97,20 +91,8 @@
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramDProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 50.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 50.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 16
       }
     }, {
@@ -118,20 +100,8 @@
       "id" : 13,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramEProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 50.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
-        "voronoiArea" : {
-          "x" : 50.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 1,
+        "voronoiMeasurementAreaId" : 1,
         "pedestrianVelocityProcessorId" : 16
       }
     }, {
@@ -153,13 +123,7 @@
       "id" : 19,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 75.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 2,
         "pedestrianVelocityProcessorId" : 16
       }
     }, {
@@ -167,13 +131,7 @@
       "id" : 23,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementArea" : {
-          "x" : 35.0,
-          "y" : 0.5,
-          "width" : 2.0,
-          "height" : 4.0,
-          "type" : "RECTANGLE"
-        },
+        "measurementAreaId" : 3,
         "pedestrianVelocityProcessorId" : 16
       }
     }, {
@@ -197,6 +155,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 2.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -206,7 +166,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -255,7 +217,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 1,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -269,6 +232,34 @@
         "bounded" : true
       },
       "obstacles" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 50.0,
+          "y" : 0.5,
+          "width" : 2.0,
+          "height" : 4.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 75.0,
+          "y" : 0.5,
+          "width" : 2.0,
+          "height" : 4.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      }, {
+        "shape" : {
+          "x" : 35.0,
+          "y" : 0.5,
+          "width" : 2.0,
+          "height" : 4.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 3
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -288,6 +279,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -317,7 +309,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

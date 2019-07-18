@@ -7,6 +7,7 @@ import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
@@ -38,8 +39,10 @@ public class SuqSubCommand implements SubCommandRunner {
 
 		try {
 			Scenario scenario = ScenarioFactory.createScenarioWithScenarioFilePath(scenarioFile);
-			new ScenarioRun(scenario, outputDir.toFile().toString(), true, null).run();
+			ScenarioCache cache = ScenarioCache.load(scenario, scenarioFile.toAbsolutePath().getParent());
+			new ScenarioRun(scenario, outputDir.toFile().toString(), true, null, scenarioFile, cache).run();
 		} catch (Throwable e){
+			e.printStackTrace();
 			logger.error(e);
 			System.exit(-1);
 		}

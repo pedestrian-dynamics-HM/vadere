@@ -1,15 +1,14 @@
 package org.vadere.simulator.models;
 
-import java.util.List;
-import java.util.Random;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * Interface for a simulation model.
@@ -25,7 +24,7 @@ public interface Model {
 	 * list and creating sub models. It also sets attributes recursively for its sub models.
 	 */
 	void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random);
+					AttributesAgent attributesPedestrian, Random random);
 
 	void preLoop(final double simTimeInSec);
 

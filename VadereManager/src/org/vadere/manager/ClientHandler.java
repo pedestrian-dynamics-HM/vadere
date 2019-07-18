@@ -1,0 +1,79 @@
+package org.vadere.manager;
+
+import org.vadere.manager.traci.commandHandler.CommandExecutor;
+import org.vadere.manager.traci.commands.TraCICommand;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
+import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.util.logging.Logger;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.nio.file.Path;
+
+/**
+ *  //todo comment
+ */
+public class ClientHandler implements Runnable{
+
+	private static Logger logger = Logger.getLogger(ClientHandler.class);
+
+	private final ServerSocket serverSocket;
+	private final TraCISocket traCISocket;
+	private final CommandExecutor cmdExecutor;
+	private RemoteManager remoteManager;
+
+
+	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket, Path basedir, boolean guiSupport) {
+		this.serverSocket = serverSocket;
+		this.traCISocket = traCISocket;
+		this.remoteManager = new RemoteManager(basedir, guiSupport);
+		this.cmdExecutor = new CommandExecutor(remoteManager);
+	}
+
+
+	@Override
+	public void run() {
+		try {
+			handleClient();
+		} catch (EOFException eof){
+			logger.infof("EOF. Client closed socket");
+		} catch (IOException io) {
+			logger.error("Exception caught when trying to listen on port "
+					+ 9999 + " or listening for a connection", io);
+		} catch (Exception e){
+			logger.error("Error while handling TraCI Message", e);
+		}
+
+	}
+
+	private void handleClient() throws IOException{
+		try{
+			logger.info("client connected...");
+
+			while (true){
+
+				TraCIPacketBuffer traCIPacketBuffer = traCISocket.receiveExact();
+
+				if (traCIPacketBuffer.hasRemaining()){
+					TraCICommand cmd = traCIPacketBuffer.nextCommand();
+					while (cmd != null ){
+
+
+						TraCIPacket response = cmdExecutor.execute(cmd);
+						logger.debugf("send packet with %d byte", response.size());
+						traCISocket.sendExact(response);
+
+						cmd = traCIPacketBuffer.nextCommand();
+					}
+				}
+
+			}
+		} finally {
+			traCISocket.close();
+			remoteManager.stopSimulationIfRunning();
+		}
+
+	}
+
+}

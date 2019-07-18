@@ -8,7 +8,7 @@ public class PedestrianTargetIdProcessorTest extends ProcessorTest {
 	@Before
 	public void setup(){
 		processorTestEnv = new PedestrianTargetIdProcessorTestEnv();
-		//int and load ProcessorTestEnv
+		//int and loadFromFilesystem ProcessorTestEnv
 		super.setup();
 	}
 
