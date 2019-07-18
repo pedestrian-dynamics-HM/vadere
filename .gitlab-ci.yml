@@ -34,8 +34,6 @@ variables:
 #   (i.e.,the virtual machines). We have to track that!
 stages:
     - unit_test
-    #- integration_test
-    #- seed_test
     - deploy
 
 # PLEASE, OMIT FOLLOWING GITLAB PITFALLS:
