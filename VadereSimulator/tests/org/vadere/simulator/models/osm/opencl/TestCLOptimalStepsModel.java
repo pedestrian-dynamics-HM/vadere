@@ -124,7 +124,7 @@ public class TestCLOptimalStepsModel {
 
 	private AttributesFloorField attributesFloorField;
 	private AttributesOSM attributesOSM;
-	private List<CLParallelOptimalStepsModel.PedestrianOpenCL> pedestrians;
+	private List<CLParallelOSMLocalMem.PedestrianOpenCL> pedestrians;
 	private Topography topography;
 	private PotentialFieldDistanceEikonalEq obstacleDistancePotential;
 	private PotentialFieldSingleTargetGrid targetPotentialField;
@@ -168,20 +168,20 @@ public class TestCLOptimalStepsModel {
 			VPoint randomPosition = new VPoint(
 					(float)(bound.getMinX() + random.nextDouble() * bound.getWidth()),
 					(float)(bound.getMinY() + random.nextDouble() * bound.getHeight()));
-			CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(randomPosition, maxStepSize);
+			CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(randomPosition, maxStepSize);
 			pedestrians.add(pedestrian);
 		}
 
-		CLParallelOptimalStepsModel.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
+		CLParallelOSMLocalMem.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
 
-		CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
+		CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
 		pedestrians.add(pedestrian);
 	}
 
 	//@Ignore
 	@Test
 	public void testIdentity() throws OpenCLException {
-		CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
+		CLParallelOSMLocalMem clOptimalStepsModel = new CLParallelOSMLocalMem(
 				attributesOSM,
 				attributesFloorField,
 				new VRectangle(topography.getBounds()),

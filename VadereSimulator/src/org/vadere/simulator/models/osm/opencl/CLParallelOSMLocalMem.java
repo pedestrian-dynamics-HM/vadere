@@ -120,6 +120,7 @@ public class CLParallelOSMLocalMem {
 	private long clCirclePositions;
 	private long clPotentialFieldSize;
 	private long clPotentialFieldGridSize;
+	private long clMaxPedCountInCell;
 
 	// Host Memory
 	private FloatBuffer memWorldOrigin;
@@ -149,6 +150,7 @@ public class CLParallelOSMLocalMem {
 	private long clSeek;
 	private long clMove;
 	private long clSwap;
+	private long clCount;
 
 	private int numberOfGridCells;
 	private VRectangle bound;
@@ -301,6 +303,7 @@ public class CLParallelOSMLocalMem {
 					clGridSize,
 					clObstaclePotential,
 					clTargetPotential,
+					clMaxPedCountInCell,
 					clWorldOrigin,
 					clPotentialFieldGridSize,
 					clPotentialFieldSize,
@@ -421,7 +424,10 @@ public class CLParallelOSMLocalMem {
 				clCellSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memCellSize, errcode_ret);
 				clGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memGridSize, errcode_ret);
 				clPotentialFieldSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memPotentialFieldSize, errcode_ret);
+
 				clPotentialFieldGridSize = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memPotentialFieldGridSize, errcode_ret);
+				clMaxPedCountInCell = clCreateBuffer(clContext,  CL_MEM_READ_WRITE, 4, errcode_ret);
+
 				clWorldOrigin = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memWorldOrigin, errcode_ret);
 				clTargetPotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memTargetPotentialField, errcode_ret);
 				clObstaclePotential = clCreateBuffer(clContext,  CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR, memObstaclePotentialField, errcode_ret);
@@ -472,6 +478,7 @@ public class CLParallelOSMLocalMem {
 			final long clGridSize,
 			final long clObstaclePotential,
 			final long clTargetPotential,
+			final long clMaxPedCountInCell,
 			final long clWorldOrigin,
 			final long clPotentialFieldGridSize,
 			final long clPotentialFieldSize,
@@ -485,7 +492,6 @@ public class CLParallelOSMLocalMem {
 
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 0, clReorderedPedestrians));
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 1, clReorderedPositions));
-			// local memory
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 2, clCirclePositions));
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 3, clCellStarts));
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 4, clCellEnds));
@@ -493,13 +499,13 @@ public class CLParallelOSMLocalMem {
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 6, clGridSize));
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 7, clObstaclePotential));
 			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 8, clTargetPotential));
-			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 9, clWorldOrigin));
-			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 10, clPotentialFieldGridSize));
-			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 11, clPotentialFieldSize));
-			CLInfo.checkCLError(clSetKernelArg1f(clSeek, 12, (float)attributesFloorField.getPotentialFieldResolution()));
-			CLInfo.checkCLError(clSetKernelArg1f(clSeek, 13, timeStepInSec));
-			CLInfo.checkCLError(clSetKernelArg1i(clSeek, 14, circlePositionList.size()));
-			CLInfo.checkCLError(clSetKernelArg1i(clSeek, 15, numberOfElements));
+			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 9, clMaxPedCountInCell));
+			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 10, clWorldOrigin));
+			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 11, clPotentialFieldGridSize));
+			CLInfo.checkCLError(clSetKernelArg1p(clSeek, 12, clPotentialFieldSize));
+			CLInfo.checkCLError(clSetKernelArg1f(clSeek, 13, (float)attributesFloorField.getPotentialFieldResolution()));
+			CLInfo.checkCLError(clSetKernelArg1f(clSeek, 14, timeStepInSec));
+			CLInfo.checkCLError(clSetKernelArg1i(clSeek, 15, circlePositionList.size()));
 			CLInfo.checkCLError(clSetKernelArg(clSeek, 16, maxNumberOfElementsPerCell * circlePositionList.size() * 2 * 4));
 			CLInfo.checkCLError(clSetKernelArg(clSeek, 17, maxNumberOfElementsPerCell * circlePositionList.size() * 4));
 
@@ -591,6 +597,24 @@ public class CLParallelOSMLocalMem {
 		}
 	}
 
+	private void clMaxPedCountInCell(
+			final long clReorderedPedestrians,
+			final long clReorderedPositions,
+			final long clPedestrians,
+			final long clPositions,
+			final int numberOfElements) throws OpenCLException {
+
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			clGlobalWorkSize.put(0, numberOfElements);
+
+			CLInfo.checkCLError(clSetKernelArg1p(clCount, 0, clMaxPedCountInCell));
+			CLInfo.checkCLError(clSetKernelArg1p(clCount, 1, clCellStarts));
+			CLInfo.checkCLError(clSetKernelArg1p(clCount, 2, clCellEnds));
+			CLInfo.checkCLError(clSetKernelArg1p(clCount, 3, clGridSize));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clCount", clQueue, clCount, 1, null, clGlobalWorkSize, null, null, null));
+		}
+	}
 
 	private void clFindCellBoundsAndReorder(
 			final long clCellStarts,
@@ -807,6 +831,7 @@ public class CLParallelOSMLocalMem {
 				CLInfo.checkCLError(clReleaseMemObject(clObstaclePotential));
 				CLInfo.checkCLError(clReleaseMemObject(clCirclePositions));
 				CLInfo.checkCLError(clReleaseMemObject(clPotentialFieldGridSize));
+				CLInfo.checkCLError(clReleaseMemObject(clMaxPedCountInCell));
 				CLInfo.checkCLError(clReleaseMemObject(clPotentialFieldSize));
 			}
 
@@ -842,6 +867,7 @@ public class CLParallelOSMLocalMem {
 		CLInfo.checkCLError(clReleaseKernel(clSeek));
 		CLInfo.checkCLError(clReleaseKernel(clMove));
 		CLInfo.checkCLError(clReleaseKernel(clSwap));
+		CLInfo.checkCLError(clReleaseMemObject(clCount));
 
 		CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
 		CLInfo.checkCLError(clReleaseProgram(clProgram));
@@ -944,8 +970,11 @@ public class CLParallelOSMLocalMem {
 			CLInfo.checkCLError(errcode_ret);
 			clMove = clCreateKernel(clProgram, "move", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
+			clCount = clCreateKernel(clProgram, "count", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
 			clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
+
 
 			max_work_group_size = InfoUtils.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
 			logger.debug("CL_DEVICE_MAX_WORK_GROUP_SIZE = " + max_work_group_size);
