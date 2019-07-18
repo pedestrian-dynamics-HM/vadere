@@ -1,14 +1,14 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
-import java.awt.Point;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-
-import org.vadere.util.math.MathUtil;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.math.MathUtil;
+
+import java.awt.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
 
 public class PotentialFieldCalculatorDijkstra extends AGridEikonalSolver {
 

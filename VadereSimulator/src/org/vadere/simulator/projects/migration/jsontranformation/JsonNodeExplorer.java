@@ -43,6 +43,21 @@ public interface JsonNodeExplorer {
 		return scenarioFile;
 	}
 
+	default void changeStringValue(JsonNode parent, String keyName, String value){
+		ObjectNode p = (ObjectNode) parent;
+		p.put(keyName, value);
+	}
+
+	default void changeIntegerValue(JsonNode parent, String keyName, Integer value){
+		ObjectNode p = (ObjectNode) parent;
+		p.put(keyName, value);
+	}
+
+	default void changeDoubleValue(JsonNode parent, String keyName, double value){
+		ObjectNode p = (ObjectNode) parent;
+		p.put(keyName, value);
+	}
+
 	default  void addIntegerField(JsonNode root, String keyName, int value){
 		ObjectNode parent = (ObjectNode) root;
 		parent.put(keyName, value);

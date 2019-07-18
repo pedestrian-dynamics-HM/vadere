@@ -5,13 +5,13 @@ import org.junit.Test;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
-import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.simulator.projects.io.TrajectoryReader;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.simulation.Step;
-import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
+import org.vadere.util.test.TestUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class TestTrajectoryReader implements TestResourceHandler {
+public class TestTrajectoryReader implements TestResourceHandlerScenario {
 
 	private Scenario test;
 	private VadereProject project;
