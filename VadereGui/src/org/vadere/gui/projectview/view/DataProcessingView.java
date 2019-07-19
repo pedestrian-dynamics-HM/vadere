@@ -120,7 +120,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private JMenu processorsMenu = new JMenu();
 
 	private TextView buildExpertView() {
-		TextView panel = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		TextView panel = new TextView("ProjectView.defaultDirectoryOutputProcessors", AttributeType.OUTPUTPROCESSOR);
 		JMenuBar processorsMenuBar = new JMenuBar();
 		processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		processorsMenu.setEnabled(isEditable);

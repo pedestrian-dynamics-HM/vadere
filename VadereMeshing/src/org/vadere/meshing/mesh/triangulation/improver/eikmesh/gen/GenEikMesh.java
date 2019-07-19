@@ -170,7 +170,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.bound = null;
 		this.distanceFunc = distanceFunc;
 		this.edgeLengthFunc = edgeLengthFunc;
-		this.initialEdgeLen =initialEdgeLen;
+		this.initialEdgeLen = initialEdgeLen;
 		this.deps = 0.0001 * initialEdgeLen;
 		this.nSteps = 0;
 		this.fixPointRelation = new HashMap<>();
@@ -716,6 +716,10 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		}
 	}
 
+	/**
+	 * unused
+	 * @param face
+	 */
 	private void updateFace(@NotNull F face) {
 		if(canBreak(face) && isBreaking(face)) {
 			VPoint circumcenter = getMesh().toTriangle(face).getCircumcenter();

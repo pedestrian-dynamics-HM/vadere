@@ -31,6 +31,7 @@ public class MovRecorder implements IRecorder {
 	private Rectangle2D.Double imageSize;
 	private Rectangle2D.Double viewport;
 	private boolean finished;
+	private File outputFile;
 
 	public MovRecorder(final PostvisualizationRenderer renderer) {
 		this.model = renderer.getModel();
@@ -76,6 +77,7 @@ public class MovRecorder implements IRecorder {
 			try {
 				this.finished = true;
 				enc.finish();
+				VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 			} catch (IndexOutOfBoundsException error) {
 				logger.debug("Nothing recorded! " + error.getMessage());
 				throw error;
@@ -108,7 +110,7 @@ public class MovRecorder implements IRecorder {
 		SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
 		JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
-			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
+			outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
 			fileChooser.setSelectedFile(outputFile);
 
 			int returnVal = fileChooser.showDialog(null, "Save");

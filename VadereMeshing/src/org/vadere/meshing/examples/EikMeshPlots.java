@@ -57,9 +57,9 @@ public class EikMeshPlots {
 
 		kaiserslautern();
 		ruppertsAndEikMeshKaiserslautern();*/
-		//bridge();
+		bridge();
 		//roomLFS();
-		cornerLFS();
+		//cornerLFS();
 	}
 
 	public static void randomDelaunay() throws IOException {

@@ -148,8 +148,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			@NotNull final AttributesOSM attributesOSM) {
 		switch (attributesOSM.getUpdateType()) {
 			case PARALLEL_OPEN_CL: {
-				//throw new UnsupportedOperationException("not jet implemented.");
-				return UpdateSchemeOSM.createOpenCLUpdateScheme(
+				throw new UnsupportedOperationException("not jet implemented.");
+				/*return UpdateSchemeOSM.createOpenCLUpdateScheme(
 						topography,
 						attributesOSM,
 						Model.findAttributes(attributesList, AttributesFloorField.class),
@@ -221,7 +221,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 							}
 						}
 						);
-			}
+			*/}
 			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
 		}
 	}
