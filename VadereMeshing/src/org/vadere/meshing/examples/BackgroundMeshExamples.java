@@ -23,7 +23,8 @@ public class BackgroundMeshExamples {
 		//localFeatureSize("/poly/room.poly");
 		//localFeatureSize("/poly/corner.poly");
 		//localFeatureSize("/poly/narrowCorridor.poly");
-		localFeatureSize("/poly/bridge.poly");
+		//localFeatureSize("/poly/bridge.poly");
+		localFeatureSize("/poly/mf_small_very_simple.poly");
 	}
 
 	public static void localFeatureSize(@NotNull final String fileName) throws IOException {

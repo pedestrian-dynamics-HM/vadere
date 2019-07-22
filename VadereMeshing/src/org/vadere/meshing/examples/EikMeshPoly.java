@@ -23,7 +23,8 @@ public class EikMeshPoly {
 
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		meshPoly("/poly/bridge.poly");
+		meshPoly("/poly/mf_small_very_simple.poly");
+		//meshPoly("/poly/bridge.poly");
 		//meshPoly("/poly/room.poly");
 		//meshPoly("/poly/corner.poly");
 	}
@@ -31,7 +32,8 @@ public class EikMeshPoly {
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
 		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
-		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> 2.0);
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
+		edgeLengthFunctionApprox.smooth(0.3);
 		edgeLengthFunctionApprox.printPython();
 
 
@@ -58,14 +60,15 @@ public class EikMeshPoly {
 		}
 		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), fileName+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "mesh.tex");
+		System.out.println(meshImprover.getMesh().getNumberOfVertices());
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
 	}
 
 	private static void write(final String string, final String filename) throws IOException {
-		File outputFile = new File("./eikmesh/"+filename+".tex");
+		File outputFile = new File("./"+filename+".tex");
 		try(FileWriter fileWriter = new FileWriter(outputFile)) {
 			fileWriter.write(string);
 		}
