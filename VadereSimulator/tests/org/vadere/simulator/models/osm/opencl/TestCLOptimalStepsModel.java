@@ -150,7 +150,7 @@ public class TestCLOptimalStepsModel {
 		random = new Random(0);
 		maxStepSize = 0.2f;
 		//numberOfElements = 8192;
-		numberOfElements = 1024;
+		numberOfElements = 4;
 		attributesOSM = new AttributesOSM();
 		attributesFloorField = new AttributesFloorField();
 		attributesAgent = new AttributesAgent();
@@ -174,7 +174,7 @@ public class TestCLOptimalStepsModel {
 
 		CLParallelOSMLocalMem.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
 
-		CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
+		CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(-0.001, -0.001)), maxStepSize);
 		pedestrians.add(pedestrian);
 	}
 
@@ -187,19 +187,19 @@ public class TestCLOptimalStepsModel {
 				new VRectangle(topography.getBounds()),
 				targetPotentialField.getEikonalSolver(),
 				obstacleDistancePotential.getEikonalSolver(),
-				0.8);
+				5.0);
 		// max step length + function width);
 		clOptimalStepsModel.setPedestrians(pedestrians);
 		List<VPoint> result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			//logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
 		}
 		// max step length + function width);
 		result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			//logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
 		}
 
 		clOptimalStepsModel.clear();

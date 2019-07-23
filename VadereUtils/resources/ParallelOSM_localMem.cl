@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define UMAD(a, b, c)  ( (a) * (b) + (c) )
 
+#define LOCAL_PED_COUNT_ID 5
 #define RADIUS 0.2
 #define DIAMETER 0.4
 
@@ -76,7 +77,14 @@ inline uint getGridHash(const uint2 gridPos, __constant const uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     //gridPos.x = gridPos.x & ((*gridSize).x - 1);
     //gridPos.y = gridPos.y & ((*gridSize).y - 1);
+    // a * b + c = hash => b + c = hash / a, b = hash / a - c
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
+}
+
+inline uint2 getGridPosFromIndex(const uint hash, __constant const uint2* gridSize){
+    uint y = hash / (*gridSize).x;
+    uint x = hash - ((*gridSize).x * y);
+    return (uint2) (x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +136,7 @@ inline float getFullPedestrianPotential(
     uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-            uint2 uGridPos = gridPos - (int2)(x, y);
+            uint2 uGridPos = (uint2)(gridPos - (int2)(x, y));
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
             if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
@@ -268,11 +276,11 @@ __kernel void seek(
     __global const float2   *circlePositions,       //input
     __global const uint     *d_CellStart,           //input: cell boundaries
     __global const uint     *d_CellEnd,             //input
-    __constant const float        *cellSize,
-    __constant const uint2        *gridSize,
+    __constant const float  *cellSize,
+    __constant const uint2  *gridSize,
     __global const float    *distanceField,         //input
     __global const float    *targetPotentialField,  //input
-    __global uint           *maxPedsInCell,
+    __global const uint     *maxPedsInCell,
     __constant const float2 *worldOrigin,           //input
     __constant const uint2  *potentialGridSize,
     __constant const float2 *potentialFieldSize,    //input
@@ -283,62 +291,59 @@ __kernel void seek(
     __local float           *results){
 
     __local int             pedCount[10];
-    const uint numberOfPedsPerCell = 8;
-    const uint cellX = get_group_id(0);
-    const uint cellY = get_group_id(1);
-    const uint cell_size_x = get_local_size(0);
-    const uint cell_size_y = get_local_size(1);
-    const uint localSize = cell_size_x * cell_size_y;
-    const uint lid = get_local_id(1) * cell_size_x + get_local_id(1);
-    const uint numberOfPeds =  cell_size_x * cell_size_y * numberOfPedsPerCell;
+    //const uint numberOfPedsPerCell = 8;
+    const uint lid = get_local_id(0);
+    const uint gid = get_global_id(0);
+    const uint hash = get_group_id(0);
 
-    const uint hash = getGridHash((uint2)(cellX, cellX), gridSize);
     const uint startI = d_CellStart[hash];
     const uint endI = d_CellEnd[hash];
     const uint numberOfPedsInCell = endI - startI;
     const uint numberOfEvals = numberOfPedsInCell * numberOfPoints;
+    const uint2 cell = getGridPosFromIndex(hash, gridSize);
 
-    /*if(cell_size_x < 3 && cell_size_y < 3) {
-        int x = cell_size_x-3;
-        int y = cellY + cell_size_y-3;
-        uint2 uGridPos = (cellX + x, cellY + y);
-        if(uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y){
-            uint hash = getGridHash(uGridPos, gridSize);
-            uint startIO = d_CellStart[hash];
-            uint endIO = d_CellEnd[hash];
-            int c = 4 + x + 3 * y;
-            pedCount[lid+1] = endIO - startIO;
+    // empty cell
+    if(lid < 9) {
+        int y = lid / 3 - 1;
+        int x = lid - ((y + 1) * 3) - 1;
+        uint2 uGridPos = (uint2)(cell.x + x, cell.y + y);
+        if(uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y) {
+            uint hashIO = getGridHash(uGridPos, gridSize);
+            pedCount[lid+1] = d_CellEnd[hashIO] - d_CellStart[hashIO];
         }
         else {
             pedCount[lid+1] = 0;
         }
     }
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     if(lid == 0) {
         pedCount[0] = 0;
-        for(int i = 2; i < 9; i++) {
+        for(int i = 1; i < 10; i++) {
             pedCount[i] = pedCount[i-1] + pedCount[i];
         }
     }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // cell is not empty
     if(startI < endI) {
         // load positions around the cell into local memory (aligned!)
         for(int y = -1; y <= 1; y++) {
             for(int x = -1; x <= 1; x++){
-                uint2 uGridPos = (cellX + x, cellY + y);
+                uint2 uGridPos = (uint2)(cell.x + x, cell.y + y);
                 // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
                 if(uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y){
-                    uint hash = getGridHash(uGridPos, gridSize);
-                    uint startIO = d_CellStart[hash];
-                    uint endIO = d_CellEnd[hash];
+                    uint hashIOO = getGridHash(uGridPos, gridSize);
+                    uint startIO = d_CellStart[hashIOO];
+                    uint endIO = d_CellEnd[hashIOO];
 
                     // other cell is not empty
                     if(startIO + lid < endIO){
                         int c = 4 + x + 3 * y;
                         // here we look how many agents are before
-                        localPositions[(pedCount[c-1] + lid) * COORDOFFSET + X] = orderedPositions[(startIO + lid) * COORDOFFSET + X];
-                        localPositions[(pedCount[c-1] + lid) * COORDOFFSET + Y] = orderedPositions[(startIO + lid) * COORDOFFSET + Y];
+                        localPositions[(pedCount[c] + lid) * COORDOFFSET + X] = orderedPositions[(startIO + lid) * COORDOFFSET + X];
+                        localPositions[(pedCount[c] + lid) * COORDOFFSET + Y] = orderedPositions[(startIO + lid) * COORDOFFSET + Y];
                     }
                 }
             }
@@ -346,12 +351,15 @@ __kernel void seek(
         barrier(CLK_LOCAL_MEM_FENCE);
 
         // from here on we only use shared memory!
-        for(int j = lid; j < numberOfEvals; j+=localSize) {
-            uint pedNr = j / numberOfPoints;
-            uint pointNr = j / numberOfPedsInCell;
-            if(pedNr < pedCount[5]) {
-                float2 pedPosition = (float2)(localPositions[(pedCount[4] + pedNr) * COORDOFFSET + X], localPositions[(pedCount[4] + pedNr) * COORDOFFSET + Y]);
-                float2 circlePosition = circlePositions[pointNr];
+        for(int j = 0; j < numberOfEvals; j += get_local_size(0)) {
+            uint pointNr = j + lid;
+            uint pedNr = pointNr / numberOfPoints;
+            uint pointId = pointNr - numberOfPoints * pedNr;
+
+            if(pedNr < pedCount[LOCAL_PED_COUNT_ID]) {
+                float2 pedPosition = (float2)(  localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + pedNr) * COORDOFFSET + X],
+                                                localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + pedNr) * COORDOFFSET + Y]);
+                float2 circlePosition = circlePositions[pointId];
                 uint pedId = startI + pedNr;
 
                 // TODO: use local memory
@@ -363,33 +371,33 @@ __kernel void seek(
                 float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
                 float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
                 float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-                float pedestrianPotential = getLocalFullPedestrianPotential(localPositions, 9 * numberOfPedsPerCell, pedPosition);
+                float pedestrianPotential = getLocalFullPedestrianPotential(localPositions, numberOfPoints, pedPosition);
                 //float pedestrianPotential = 0.0f;
                 float value = targetPotential + obstaclePotential + pedestrianPotential;
                 results[j] = value;
             }
         }
         barrier(CLK_LOCAL_MEM_FENCE);
+
+        // finally find the best solution
         if(lid < numberOfPedsInCell) {
-            uint pedNr = lid;
-            uint pedId = startI + pedNr;
+            uint pedId = startI + lid;
             float minVal = 100000;
             float2 minArg = (0.0f, 0.0f);
-            float2 pedPosition = (float2)(localPositions[(pedCount[4] + pedNr) * COORDOFFSET + X], localPositions[(pedCount[4] + pedNr) * COORDOFFSET + Y]);
+            float2 pedPosition = (float2)(  localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + lid) * COORDOFFSET + X],
+                                            localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + lid) * COORDOFFSET + Y]);
             float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
             for(uint i = 0; i < numberOfPoints; i++) {
-                if(results[pedNr * numberOfPoints + i] < minVal){
-                    minVal = results[i];
-                    minArg = pedPosition + (float2)(circlePositions[i] * stepSize);
+                if(results[lid * numberOfPoints + i] < minVal){
+                    minVal = results[lid * numberOfPoints + i];
+                    minArg = pedPosition /*+ (float2)(circlePositions[i] * stepSize)*/;
                 }
             }
+
             orderedPedestrians[pedId * OFFSET + NEWX] = minArg.x;
-            orderedPedestrians[pedId * OFFSET + NEWY] = minArg.x;
+            orderedPedestrians[pedId * OFFSET + NEWY] = minArg.y;
         }
-    } else {
-        barrier(CLK_LOCAL_MEM_FENCE);
-        barrier(CLK_LOCAL_MEM_FENCE);
-    }*/
+    }
 }
 
 __kernel void move(
