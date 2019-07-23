@@ -3,6 +3,7 @@ package org.vadere.gui.topographycreator.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -375,6 +376,12 @@ public class TopographyWindow extends JPanel {
 //		ActionScenarioChecker actionScenarioChecker =
 //				new ActionScenarioChecker("ScenarioChecker", panelModel, jsonValidIndicator);
 
+		int iconHeight = VadereConfig.getConfig().getInt("ProjectView.icon.height.value");
+		int iconWidth = VadereConfig.getConfig().getInt("ProjectView.icon.width.value");
+		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"),
+				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
+				panelModel);
+
 
 		/* create toolbar*/
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
@@ -417,6 +424,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, selectCutAction, "TopographyCreator.btnCutTopography.tooltip");
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
 		addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
+		addActionToToolbar(toolbar, polyImg, "TopographyCreator.btnGeneratePoly.tooltip");
 
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");

@@ -1,12 +1,10 @@
-package org.vadere.gui.components.control.simulation;
+package org.vadere.gui.components.control;
 
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
-import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.state.scenario.Obstacle;
@@ -27,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -35,10 +32,9 @@ import javax.swing.*;
 public class ActionGeneratePoly extends AbstractAction {
 	private static Logger logger = Logger.getLogger(ActionGeneratePNG.class);
 	private static final Configuration CONFIG = VadereConfig.getConfig();
-	private final SimulationModel<? extends DefaultSimulationConfig> model;
+	private final DefaultModel<? extends DefaultSimulationConfig> model;
 
-	public ActionGeneratePoly(final String name, Icon icon, final SimulationRenderer renderer,
-	                         final SimulationModel<? extends DefaultSimulationConfig> model) {
+	public ActionGeneratePoly(final String name, Icon icon, final DefaultModel<? extends DefaultSimulationConfig> model) {
 		super(name, icon);
 		this.model = model;
 	}
