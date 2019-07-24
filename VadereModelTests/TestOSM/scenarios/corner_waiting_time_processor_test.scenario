@@ -1,8 +1,7 @@
 {
   "name" : "corner_waiting_time_processor_test",
   "description" : "",
-  "release" : "0.10",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -79,7 +78,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -229,12 +230,17 @@
           "speedDistributionStandardDeviation" : 0.0,
           "minimumSpeed" : 0.3,
           "maximumSpeed" : 3.0,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ ],
         "trajectory" : {
           "footSteps" : [ ]

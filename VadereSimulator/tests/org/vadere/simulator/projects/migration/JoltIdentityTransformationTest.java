@@ -44,7 +44,6 @@ public class JoltIdentityTransformationTest {
 		testIdentity(scenarioFiles, "/identity_v0.1.json");
 	}
 
-	// todo use testResources
 	@Test
 	@Ignore
 	public void testTransformationV01_to_V02() throws IOException {
@@ -96,7 +95,6 @@ public class JoltIdentityTransformationTest {
 	}
 
 
-	// todo use testResources
 	@Test
 	@Ignore
 	public void transformv1t0v2() throws IOException {
@@ -112,7 +110,6 @@ public class JoltIdentityTransformationTest {
 		System.out.println(diffy.diff(jsonOut1, jsonOut2).toString());
 	}
 
-	// todo use testResources
 	@Test
 	@Ignore
 	public void attr01() throws IOException {

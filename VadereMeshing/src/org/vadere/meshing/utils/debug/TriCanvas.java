@@ -6,7 +6,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.utils.color.ColorFunctions;
-import org.vadere.meshing.utils.tex.TexGraphBuilder;
+import org.vadere.meshing.utils.io.tex.TexGraphBuilder;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -27,12 +27,14 @@ import java.util.function.Consumer;
  * from the {@link DebugGui}.
  *
  * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
 public abstract class TriCanvas
-		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
+		<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
 		extends Canvas {
 
 	static final Logger log = Logger.getLogger(TriCanvas.class);
@@ -40,26 +42,26 @@ public abstract class TriCanvas
 	static final int defaultWidth = 1000;
 	static final int defaultHeight = 1000;
 
-	protected final IMesh<P, V, E, F> mesh;
+	protected final IMesh<V, E, F> mesh;
 	public double width;
 	public double height;
 	protected VRectangle bound;
 	protected double scale;
-	ColorFunctions<P, V, E, F> colorFunctions;
+	ColorFunctions<P, CE, CF, V, E, F> colorFunctions;
 	LinkedList<Consumer<Graphics2D>> paintDecorator;
-	private TexGraphBuilder<P, V, E, F> texGraphBuilder;
+	private TexGraphBuilder<P, CE, CF, V, E, F> texGraphBuilder;
 	private Consumer<StringBuilder> stateLog;
 
 
-	public TriCanvas(final IMesh<P, V, E, F> mesh) {
+	public TriCanvas(final IMesh<V, E, F> mesh) {
 		this(mesh, defaultWidth, defaultHeight, defaultBound);
 	}
 
-	public TriCanvas(final IMesh<P, V, E, F> mesh, final double width, final double height) {
+	public TriCanvas(final IMesh<V, E, F> mesh, final double width, final double height) {
 		this(mesh, width, height, defaultBound);
 	}
 
-	public TriCanvas(final IMesh<P, V, E, F> mesh, final double width, final double height, final VRectangle bound) {
+	public TriCanvas(final IMesh<V, E, F> mesh, final double width, final double height, final VRectangle bound) {
 		this.width = width;
 		this.height = height;
 		this.bound = bound;
@@ -113,7 +115,7 @@ public abstract class TriCanvas
 	 * @param c a Consumer {@link Consumer} of {@link Graphics2D}
 	 * @return this canvas
 	 */
-	public TriCanvas<P, V, E, F> addGuiDecorator(Consumer<Graphics2D> c) {
+	public TriCanvas<P, CE, CF, V, E, F> addGuiDecorator(Consumer<Graphics2D> c) {
 		paintDecorator.add(c);
 		return this;
 	}
@@ -123,7 +125,7 @@ public abstract class TriCanvas
 	 * @param c a Consumer {@link Consumer} of {@link StringBuilder}
 	 * @return this canvas
 	 */
-	public TriCanvas<P, V, E, F> addTexDecorator(Consumer<StringBuilder> c) {
+	public TriCanvas<P, CE, CF, V, E, F> addTexDecorator(Consumer<StringBuilder> c) {
 		texGraphBuilder.addElement(c);
 		return this;
 	}
@@ -140,7 +142,7 @@ public abstract class TriCanvas
 	 * Add new {@link ColorFunctions} object to the {@link TriCanvas} implementation.
 	 * @param colorFunctions the new color function
 	 */
-	public void setColorFunctions(ColorFunctions<P, V, E, F> colorFunctions) {
+	public void setColorFunctions(ColorFunctions<P, CE, CF, V, E, F> colorFunctions) {
 		this.colorFunctions = colorFunctions;
 	}
 
@@ -152,11 +154,11 @@ public abstract class TriCanvas
 		stateLog = c;
 	}
 
-	public IMesh<P, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 
-	public TexGraphBuilder<P, V, E, F> getTexGraphBuilder() {
+	public TexGraphBuilder<P, CE, CF, V, E, F> getTexGraphBuilder() {
 		return texGraphBuilder;
 	}
 }

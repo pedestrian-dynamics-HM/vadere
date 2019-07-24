@@ -1,30 +1,30 @@
 package org.vadere.gui.components.control.simulation;
 
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
-import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
 import org.vadere.gui.postvisualization.view.ImageSizeDialog;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.prefs.Preferences;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
 
 public class ActionGeneratePNG extends AbstractAction implements IRendererChangeListener {
+
 	private static Logger logger = Logger.getLogger(ActionGeneratePNG.class);
-	private static Resources resources = Resources.getInstance("global");
+	private static final Configuration CONFIG = VadereConfig.getConfig();
+
 	private ImageGenerator generator;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
 
@@ -41,12 +41,11 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 		ImageSizeDialog imageSizeDialog = new ImageSizeDialog(model);
 
 		if (imageSizeDialog.getState() == ImageSizeDialog.State.Ok) {
-			JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
+			JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
 
 			Date todaysDate = new java.util.Date();
-			SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
+			SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
-
 
 			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".png");
 			fileChooser.setSelectedFile(outputFile);
@@ -62,6 +61,7 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 
 				try {
 					ImageIO.write(bi, "png", outputFile);
+					VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 					logger.info("generate new png: " + outputFile.getAbsolutePath());
 				} catch (IOException e1) {
 					logger.error(e1.getMessage());

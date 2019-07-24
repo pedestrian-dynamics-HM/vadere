@@ -11,6 +11,7 @@ import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.MigrationResult;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
@@ -69,17 +70,17 @@ public class ActionLoadProject extends AbstractAction {
 					else {
 						migrationOptions = MigrationOptions.reapplyFromVersion((Version)option);
 					}
-					// 3. load project
+					// 3. loadFromFilesystem project
 					loadProjectByPath(model, projectFilePath, migrationOptions);
 
 				} else {
-					// 3. load project
+					// 3. loadFromFilesystem project
 					loadProjectByPath(model, projectFilePath);
 				}
 
 
 			} else {
-				logger.info(String.format("user canceled load project."));
+				logger.info(String.format("user canceled loadFromFilesystem project."));
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -87,7 +88,7 @@ public class ActionLoadProject extends AbstractAction {
 	}
 
 	public static void addToRecentProjects(String path) {
-		String listStr = Preferences.userNodeForPackage(VadereApplication.class).get("recent_projects", "");
+		String listStr = VadereConfig.getConfig().getString("History.recentProjects", "");
 		String str = path; // make sure the new one is at top position
 		if (listStr.length() > 0) {
 			String[] list = listStr.split(",");
@@ -97,8 +98,8 @@ public class ActionLoadProject extends AbstractAction {
 					str += "," + entry;
 			}
 		}
-		Preferences.userNodeForPackage(VadereApplication.class).put("last_used_project", path);
-		Preferences.userNodeForPackage(VadereApplication.class).put("recent_projects", str);
+		VadereConfig.getConfig().setProperty("History.lastUsedProject", path);
+		VadereConfig.getConfig().setProperty("History.recentProjects", str);
 		ProjectView.getMainWindow().updateRecentProjectsMenu();
 	}
 
@@ -108,18 +109,17 @@ public class ActionLoadProject extends AbstractAction {
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath, MigrationOptions options) {
 		try {
 			VadereProject project = IOVadere.readProjectJson(projectFilePath, options);
-			projectViewModel.setCurrentProjectPath(projectFilePath);
 			projectViewModel.setProject(project);
 
 			projectViewModel.refreshOutputTable();
 			logger.info("refreshed output table - 2");
 
-			// select and load first scenario from list
+			// select and loadFromFilesystem first scenario from list
 			projectViewModel.setSelectedRowIndexInScenarioTable(0);
             logger.info("selected the first scenario");
 
 			// change the default directory for searching files
-			Preferences.userNodeForPackage(VadereApplication.class).put("default_directory",
+			VadereConfig.getConfig().setProperty("ProjectView.defaultDirectory",
 					projectViewModel.getCurrentProjectPath());
 			addToRecentProjects(projectFilePath);
 			ProjectView.getMainWindow().setProjectSpecificActionsEnabled(true);
@@ -169,7 +169,7 @@ public class ActionLoadProject extends AbstractAction {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "JoltMigrationAssistant assistant",
 					JOptionPane.ERROR_MESSAGE);
-			logger.error("could not load project: " + e.getMessage());
+			logger.error("could not loadFromFilesystem project: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

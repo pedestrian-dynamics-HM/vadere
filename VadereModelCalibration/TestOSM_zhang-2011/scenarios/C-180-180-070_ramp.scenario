@@ -1,8 +1,7 @@
 {
   "name" : "C-180-180-070_ramp",
   "description" : "",
-  "release" : "0.10",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -155,6 +154,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -412,22 +413,7 @@
         "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.3,
-        "maximumSpeed" : 1.0,
-        "acceleration" : 2.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
+      "attributesCar" : null
     },
     "eventInfos" : [ ]
   }

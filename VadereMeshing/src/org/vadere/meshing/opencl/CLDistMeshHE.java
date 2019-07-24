@@ -12,7 +12,6 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.CLGatherer;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
@@ -35,7 +34,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMeshHE<P extends IPoint> {
+public class CLDistMeshHE {
 
     private static Logger log = Logger.getLogger(CLDistMeshHE.class);
 
@@ -123,14 +122,14 @@ public class CLDistMeshHE<P extends IPoint> {
     private PointerBuffer retSize;
     private ByteBuffer source;
 
-    private AMesh<P> mesh;
+    private AMesh mesh;
 
     private boolean doublePrecision = true;
     private boolean profiling = false;
 
     private boolean hasToRead = false;
 
-    public CLDistMeshHE(@NotNull AMesh<P> mesh) {
+    public CLDistMeshHE(@NotNull AMesh mesh) {
         this.mesh = mesh;
         this.mesh.garbageCollection();
         if(doublePrecision) {
@@ -572,7 +571,7 @@ public class CLDistMeshHE<P extends IPoint> {
     private void readResultFromHost() {
         //AMesh<P> mesh = new AMesh<>(mesh.getPointConstructor());
 
-        List<P> pointSet = new ArrayList<>(numberOfVertices);
+        List<IPoint> pointSet = new ArrayList<>(numberOfVertices);
         if(doublePrecision) {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
                 pointSet.add(mesh.createPoint(vD.get(i), vD.get(i+1)));
@@ -704,9 +703,9 @@ public class CLDistMeshHE<P extends IPoint> {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh<MPoint> mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
+        AMesh mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
         log.info("before");
-        Collection<AVertex<MPoint>> vertices = mesh.getVertices();
+        Collection<AVertex> vertices = mesh.getVertices();
         log.info(vertices);
 
         CLDistMeshHE clDistMesh = new CLDistMeshHE(mesh);

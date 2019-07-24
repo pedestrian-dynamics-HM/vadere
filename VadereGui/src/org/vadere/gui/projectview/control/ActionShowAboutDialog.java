@@ -18,20 +18,15 @@ public class ActionShowAboutDialog extends AbstractAction {
 		super(name);
 	}
 
-	/*
-
-
-				JOptionPane.showMessageDialog(null, text,
-						Messages.getString("PostVis.about.title"),
-						JOptionPane.INFORMATION_MESSAGE);
-
-	 */
-
 	@Override
 	public void actionPerformed(final ActionEvent event) {
-		String text = "<html>" +
-				"<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("ProjectView.version"), HashGenerator.releaseNumber()) + "</em></font><br>" +
-				"<font size =\"3\">" + MessageFormat.format(Messages.getString("ProjectView.license.text"), "GNU Lesser General Public License (<em>LGPL</em>)")+".</font></html>";
+		String text = "";
+		text += "<html>";
+		text += "<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("ProjectView.version"), HashGenerator.releaseNumber()) + "</em></font><br>";
+		text += "<br>";
+		text += "<font size =\"3\">www.vadere.org</font><br>";
+		text += "<font size =\"3\">" + MessageFormat.format(Messages.getString("ProjectView.license.text"), "GNU Lesser General Public License (<em>LGPL</em>).") + "</font>";
+		text += "</html>";
 
 		JOptionPane.showMessageDialog(null,
 				text, Messages.getString("ProjectView.aboutDialog.label"),

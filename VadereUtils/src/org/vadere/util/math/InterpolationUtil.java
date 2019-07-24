@@ -1,12 +1,19 @@
 package org.vadere.util.math;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 /**
  * Interpolation utilities not covered by java.lang.Math
@@ -14,54 +21,111 @@ import java.util.List;
  */
 public class InterpolationUtil {
 
-	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
-		assert points.size() == 3;
+	public static <P extends IPoint> double barycentricInterpolation(
+			@NotNull final P p1, @NotNull final P p2, @NotNull final P p3,
+			@NotNull final Function<P, Double> eval,
+			final double totalArea,
+			final double x, final double y){
+		return barycentricInterpolation(p1, eval.apply(p1), p2, eval.apply(p2), p3, eval.apply(p3), totalArea, x, y);
+	}
 
-		IPotentialPoint p1 = points.get(0);
-		IPotentialPoint p2 = points.get(1);
-		IPotentialPoint p3 = points.get(2);
+	public static double barycentricInterpolation(
+			@NotNull final IPoint p1, final double val1,
+			@NotNull final IPoint p2, final double val2,
+			@NotNull final IPoint p3, final double val3,
+			final double totalArea,
+			final double x, final double y){
+		return barycentricInterpolation(
+				p1.getX(), p1.getY(), val1,
+				p2.getX(), p2.getY(), val2,
+				p3.getX(), p3.getY(), val3,
+				totalArea, x, y
+				);
+	}
 
-		VTriangle vtriangle = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
+	public static double barycentricInterpolation(
+			@NotNull final double[] xcoords,
+			@NotNull final double[] ycoords,
+			@NotNull double[] values,
+			final double totalArea,
+			final double x, final double y){
+		return barycentricInterpolation(
+				xcoords[0], ycoords[0], values[0],
+				xcoords[1], ycoords[1], values[1],
+				xcoords[2], ycoords[2], values[2],
+				totalArea, x, y);
+	}
 
-		double totalArea = vtriangle.getArea();
+	public static double barycentricInterpolation(
+			@NotNull final double x1, final double y1, final double val1,
+			@NotNull final double x2, final double y2, final double val2,
+			@NotNull final double x3, final double y3, final double val3,
+			final double totalArea,
+			final double x, final double y){
 
-		assert totalArea > 0;
+		assert Math.abs(totalArea-GeometryUtils.areaOfPolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3})) < GeometryUtils.DOUBLE_EPS;
 
 		VPoint point = new VPoint(x, y);
 
 		double value = 0.0;
 
-		if(point.equals(p1)) {
-			value = p1.getPotential();
+		if(point.distanceSq(x1, y1) < GeometryUtils.DOUBLE_EPS) {
+			value = val1;
 		}
-		else if(point.equals(p2)) {
-			value = p2.getPotential();
+		else if(point.distanceSq(x2, y2) < GeometryUtils.DOUBLE_EPS) {
+			value = val2;
 		}
-		else if(point.equals(p3)) {
-			value = p3.getPotential();
+		else if(point.distanceSq(x3, y3) < GeometryUtils.DOUBLE_EPS) {
+			value = val3;
 		}
 		else {
-			double area1 = new VTriangle(new VPoint(p2), new VPoint(p3), point).getArea();
-			double area2 = new VTriangle(new VPoint(p1), new VPoint(p3), point).getArea();
-			double area3 = new VTriangle(new VPoint(p1), new VPoint(p2), point).getArea();
+			double area1 = GeometryUtils.areaOfPolygon(new double[]{x,x2,x3}, new double[]{y,y2,y3});
+			double area2 = GeometryUtils.areaOfPolygon(new double[]{x1,x,x3}, new double[]{y1,y,y3});
+			double area3 = GeometryUtils.areaOfPolygon(new double[]{x1,x2,x}, new double[]{y1,y2,y});
 
 			if(area1 > 0.0) {
 				double percentP1 = area1 / totalArea;
-				value += percentP1 * p1.getPotential();
+				value += percentP1 * val1;
 			}
 
 			if(area2 > 0.0) {
 				double percentP2 = area2 / totalArea;
-				value += percentP2 * p2.getPotential();
+				value += percentP2 * val2;
 			}
-
 
 			if(area3 > 0.0) {
 				double percentP3 = area3 / totalArea;
-				value += percentP3 * p3.getPotential();
+				value += percentP3 * val3;
 			}
 		}
 		return value;
+
+	}
+
+	public static <P extends IPoint> double barycentricInterpolation(
+			@NotNull final P p1, @NotNull final P p2, @NotNull final P p3,
+			@NotNull final Function<P, Double> eval, final double x, final double y){
+
+		double totalArea = GeometryUtils.areaOfPolygon(Arrays.asList(p1, p2, p3));
+
+		assert totalArea > 0;
+		return barycentricInterpolation(p1, p2, p3, eval, totalArea, x, y);
+	}
+
+	public static double barycentricInterpolation(final IPotentialPoint[] points, final double x, final double y){
+		assert points.length == 3;
+		IPotentialPoint p1 = points[0];
+		IPotentialPoint p2 = points[1];
+		IPotentialPoint p3 = points[2];
+		return barycentricInterpolation(p1, p2, p3, p->p.getPotential(), x, y);
+	}
+
+	public static double barycentricInterpolation(final List<? extends IPotentialPoint> points, final double x, final double y){
+		assert points.size() == 3;
+		IPotentialPoint p1 = points.get(0);
+		IPotentialPoint p2 = points.get(1);
+		IPotentialPoint p3 = points.get(2);
+		return barycentricInterpolation(p1, p2, p3, p->p.getPotential(), x, y);
 	}
 
 	/**
@@ -205,9 +269,7 @@ public class InterpolationUtil {
 	/**
 	 * Gauss quadrature x values for the interval [-1,1] and N=11 steps.
 	 * 
-	 * @see http
-	 *      ://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values
-	 *      .php
+	 * see http://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values.php
 	 */
 	private static double[] GaussQuadraturePoints = new double[] {
 			-0.993752171, -0.967226839, -0.920099334, -0.853363365,
@@ -232,9 +294,7 @@ public class InterpolationUtil {
 	/**
 	 * Gauss quadrature weights for the interval [-1,1] and N=11 steps.
 	 * 
-	 * @see http
-	 *      ://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values
-	 *      .php
+	 * see http://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values.php
 	 */
 	private static double[] GaussQuadratureWeights = new double[] {
 			0.016017228, 0.03695379, 0.057134425, 0.076100114, 0.093444423,
@@ -261,9 +321,7 @@ public class InterpolationUtil {
 	/**
 	 * Gauss quadrature length for the interval [-1,1] and N=11 steps.
 	 * 
-	 * @see http
-	 *      ://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values
-	 *      .php
+	 * see http://processingjs.nihongoresources.com/bezierinfo/legendre-gauss-values.php
 	 */
 	private static int GaussQuadratureN = 21;
 	private static int NormalQuadratureN = 31;

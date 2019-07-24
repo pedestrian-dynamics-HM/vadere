@@ -3,6 +3,7 @@ package org.vadere.gui.projectview;
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.gui.components.utils.Recorder;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 import org.vadere.util.logging.StdOutErrLog;
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.util.geometry.GeometryUtils;
@@ -15,9 +16,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 
 import java.awt.*;
 import java.io.IOException;
@@ -53,21 +52,21 @@ public class RecordTriangulationMovie {
 				bbound,
 				obstacleShapes);
 
-		Function<AFace<EikMeshPoint>, Color> colorFunction1 = f -> {
+		Function<AFace, Color> colorFunction1 = f -> {
 			float q = Math.max(0.0f, Math.min(1.0f, (float) meshImprover.faceToQuality(f)));
 			return new Color(q, q, q);
 		};
 
-		Function<AFace<EikMeshPoint>, Color> colorFunction2 = f -> {
+		Function<AFace, Color> colorFunction2 = f -> {
 			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		};
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());
 
-		MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> meshRenderer = new MeshRenderer<>(
+		MeshRenderer<AVertex, AHalfEdge, AFace> meshRenderer = new MeshRenderer<>(
 				meshImprover.getMesh(), f -> false, colorFunction1);
 
-		MeshPanel<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> distmeshPanel = new MeshPanel<>(
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(
 				meshRenderer, bbound.getWidth()*1000, bbound.getHeight()*1000);
 
 		JFrame frame = distmeshPanel.display();
@@ -119,7 +118,7 @@ public class RecordTriangulationMovie {
 	}
 
 	public static void addPictures(Recorder recorder,
-	                               MeshRenderer<EikMeshPoint, AVertex<EikMeshPoint>, AHalfEdge<EikMeshPoint>, AFace<EikMeshPoint>> renderer,
+	                               MeshRenderer<AVertex, AHalfEdge, AFace> renderer,
 	                               int frames,
 	                               int width,
 	                               int height) throws IOException {

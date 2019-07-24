@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.inter;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Optional;
 
@@ -16,12 +17,11 @@ import java.util.Optional;
  *
  * @author Benedikt Zoennchen
  *
- * @param <P> the type of the points (containers)
  * @param <V> the type of the vertices
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> extends ITriEventListener<P, V, E, F> {
+public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends IFace> extends ITriEventListener<V, E, F> {
 
 	/**
 	 * Starts the point location of the point and returns the face which is found.
@@ -31,7 +31,7 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	 * @param point     the point
 	 * @return the face containing the point
 	 */
-	F locatePoint(final P point);
+	F locatePoint(@NotNull final IPoint point);
 
 	/**
 	 * Starts the point location of the point and returns the face which is found.
@@ -39,7 +39,7 @@ public interface IPointLocator<P extends IPoint, V extends IVertex<P>, E extends
 	 * @param point     the point
 	 * @return the face containing the point
 	 */
-	Optional<F> locate(final P point);
+	Optional<F> locate(@NotNull final IPoint point);
 
 	/**
 	 * Starts the point (x,y) location of the point and returns the face which is found.

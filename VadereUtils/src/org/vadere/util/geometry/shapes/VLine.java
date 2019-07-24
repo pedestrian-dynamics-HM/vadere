@@ -10,6 +10,8 @@ import org.vadere.util.geometry.shapes.Vector2D;
 public class VLine extends Line2D.Double {
     private VPoint p1;
     private VPoint p2;
+    private double length;
+    private double lengthSq;
 
     public VLine(final VPoint p1, final VPoint p2) {
         super(p1.getX(), p1.getY(), p2.getX(), p2.getY());
@@ -18,6 +20,8 @@ public class VLine extends Line2D.Double {
 		}*/
         this.p1 = p1;
         this.p2 = p2;
+        this.length = -1;
+        this.lengthSq = -1;
     }
 
     public VLine(double x1, double y1, double x2, double y2) {
@@ -40,6 +44,20 @@ public class VLine extends Line2D.Double {
         return p1.add(p2).scalarMultiply(0.5);
     }
 
+	public VPoint midPoint(double eps) {
+    	assert eps > -0.5 && eps < 0.5;
+    	VPoint p3 = p2.subtract(p1);
+		return p1.add(p3.scalarMultiply(0.5 + eps));
+	}
+
+	public VPoint getVPoint1() {
+    	return new VPoint(getX1(), getY1());
+	}
+
+	public VPoint getVPoint2() {
+    	return new VPoint(getX2(), getY2());
+	}
+
     @Override
     public int hashCode() {
         // this has to be symmetric
@@ -60,13 +78,34 @@ public class VLine extends Line2D.Double {
     }
 
     public double length() {
-        return getP1().distance(getP2());
+        if(length == -1) {
+        	length = getP1().distance(getP2());
+        }
+    	return length;
     }
+
+    public double lengthSq() {
+    	if(lengthSq == -1) {
+		    lengthSq = getP1().distanceSq(getP2());
+	    }
+    	return lengthSq;
+    }
+
 	public double distance(VPoint point) {
 		return GeometryUtils.closestToSegment(this, point).distance(point);
 	}
 
 	public Vector2D asVector(){
 		return new Vector2D(x2 - x1, y2 - y1);
+	}
+
+	public VPoint asVPoint(){
+		return new VPoint(x2 - x1, y2 - y1);
+	}
+
+
+	@Override
+	public String toString() {
+		return p1 + " - " + p2;
 	}
 }

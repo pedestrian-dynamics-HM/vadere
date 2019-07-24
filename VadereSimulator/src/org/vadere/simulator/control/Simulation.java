@@ -15,10 +15,15 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.AbsorbingArea;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -43,10 +48,15 @@ public class Simulation {
 	private DynamicElementFactory dynamicElementFactory;
 
 	private final List<PassiveCallback> passiveCallbacks;
+	private final List<RemoteRunListener> remoteRunListeners;
 	private List<Model> models;
 
 	private boolean isRunSimulation = false;
 	private boolean isPaused = false;
+	private boolean singleStepMode; // constructor
+	private boolean waitForSimCommand = false;
+	private double simulateUntilInSec = -1;
+
 	/**
 	 * current simulation time (seconds)
 	 */
@@ -74,10 +84,12 @@ public class Simulation {
 	private final EventController eventController;
 	private final EventCognition eventCognition;
 	private final SalientBehaviorCognition salientBehaviorCognition;
+	private final ScenarioCache scenarioCache;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult) {
+					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners,
+					  boolean singleStepMode, ScenarioCache scenarioCache) {
 
 		this.name = name;
 		this.mainModel = mainModel;
@@ -92,6 +104,7 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 		this.simTimeInSec = startTimeInSec;
 		this.simulationResult = simulationResult;
+		this.scenarioCache = scenarioCache;
 
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
@@ -101,6 +114,8 @@ public class Simulation {
 
 		this.processorManager = processorManager;
 		this.passiveCallbacks = passiveCallbacks;
+		this.remoteRunListeners = remoteRunListeners;
+		this.singleStepMode = singleStepMode;
 
 		// "eventController" is final. Therefore, create object here and not in helper method.
 		this.eventController = new EventController(scenarioStore);
@@ -205,6 +220,10 @@ public class Simulation {
 			processorManager.postLoop(this.simulationState);
 		}
 
+		// notify remoteManger that simulation ended. If a command waited for the next
+		// simulation step notify it and execute command with current SimulationState.
+		setWaitForSimCommand(true); // its save to read the state now.
+		remoteRunListeners.forEach(RemoteRunListener::lastSimulationStepFinishedListener);
 	}
 
 	/**
@@ -220,6 +239,7 @@ public class Simulation {
 			preLoop();
 
 			while (isRunSimulation) {
+
 				synchronized (this) {
 					while (isPaused) {
 						try {
@@ -242,7 +262,7 @@ public class Simulation {
 
 				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
-				updateWriters(simTimeInSec);
+				updateWriters(simTimeInSec); // set SimulationState with Time!!!
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -251,6 +271,35 @@ public class Simulation {
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
 				}
+
+
+				// Single step hook
+				// Remote Control Hook
+				synchronized (this){
+					if (singleStepMode){
+						// check reached next simTime (-1 simulate one step)
+						// round to long to ensure correct trap.
+						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
+						if (timeReached || simulateUntilInSec == -1){
+							logger.debugf("Simulated until: %.4f", simTimeInSec);
+
+							setWaitForSimCommand(true);
+							remoteRunListeners.forEach(RemoteRunListener::simulationStepFinishedListener);
+							while (waitForSimCommand){
+								logger.debugf("wait for next SimCommand...");
+								try {
+									wait();
+								} catch (InterruptedException e) {
+									waitForSimCommand = false;
+									Thread.currentThread().interrupt();
+									logger.warn("interrupt while waitForSimCommand");
+								}
+							}
+						}
+					}
+				}
+
+
 
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
@@ -353,21 +402,48 @@ public class Simulation {
 		}
 	}
 
-	public synchronized void pause() {
+	synchronized void pause() {
 		isPaused = true;
 	}
 
-	public synchronized boolean isPaused() {
+	private synchronized boolean isPaused() {
 		return isPaused;
 	}
 
 	public synchronized boolean isRunning() {
-		return isRunSimulation && !isPaused();
+		return isRunSimulation && !isPaused() && !isWaitForSimCommand();
 	}
 
-	public synchronized void resume() {
+	synchronized boolean isSingleStepMode(){ return singleStepMode;}
+
+	void setSingleStepMode(boolean singleStepMode) {
+		this.singleStepMode = singleStepMode;
+	}
+
+	boolean isWaitForSimCommand() {
+		return waitForSimCommand;
+	}
+
+	private void setWaitForSimCommand(boolean waitForSimCommand) {
+		this.waitForSimCommand = waitForSimCommand;
+	}
+
+	synchronized void nextSimCommand(double simulateUntilInSec){
+		this.simulateUntilInSec = simulateUntilInSec;
+		waitForSimCommand = false;
 		isPaused = false;
 		notify();
+	}
+
+	synchronized void resume() {
+		isPaused = false;
+		waitForSimCommand = false;
+		singleStepMode = false;
+		notify();
+	}
+
+	synchronized SimulationState getSimulationState(){
+		return simulationState;
 	}
 
 	/**
@@ -404,4 +480,5 @@ public class Simulation {
 	public void setStartTimeInSec(double startTimeInSec) {
 		this.startTimeInSec = startTimeInSec;
 	}
+
 }

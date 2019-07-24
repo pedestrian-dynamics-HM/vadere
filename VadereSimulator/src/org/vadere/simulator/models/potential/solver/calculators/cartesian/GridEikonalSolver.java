@@ -4,16 +4,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
+import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.utils.cache.CacheException;
+import org.vadere.simulator.utils.cache.ICacheObject;
+import org.vadere.simulator.utils.cache.ICellGridCacheObject;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.data.cellgrid.CellGrid;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
 import java.awt.*;
-import java.util.function.Function;
 
 /**
  * @author Benedikt Zoennchen
@@ -23,12 +23,12 @@ public interface GridEikonalSolver extends EikonalSolver {
 	CellGrid getCellGrid();
 
 	// TODO: implement this!
-	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization(final CellGrid potentialField) {
-		return new PMesh<IPotentialPoint>((x, y) -> new PotentialPoint(x, y));
+	default IMesh<?, ?, ?> getDiscretization(final CellGrid potentialField) {
+		return new PMesh();
 	}
 
 	@Override
-	default IMesh<? extends IPotentialPoint, ?, ?, ?> getDiscretization() {
+	default IMesh<?, ?, ?> getDiscretization() {
 		return getDiscretization(getCellGrid());
 	}
 
@@ -296,4 +296,29 @@ public interface GridEikonalSolver extends EikonalSolver {
 		return isValidPoint(getCellGrid(), point);
 	}
 
+	@Override
+	default boolean loadCachedFloorField(ICacheObject cacheObject) {
+		// loadFromFilesystem floor field from cache. If it succeeds return true to indicate that the floor field
+		// is initialized.
+		boolean cacheLoaded = false;
+
+		try{
+			ICellGridCacheObject cellGridCache = (ICellGridCacheObject) cacheObject;
+			cellGridCache.initializeObjectFromCache(getCellGrid());
+			cacheLoaded = true;
+		} catch (CacheException e){
+			logger.errorf("Error loading cache. Initialize manually. " + e);
+		}
+		return cacheLoaded;
+	}
+
+	@Override
+	default void saveFloorFieldToCache(ICacheObject cacheObject) {
+		try{
+			ICellGridCacheObject cellGridCache = (ICellGridCacheObject) cacheObject;
+			cellGridCache.persistObject(getCellGrid());
+		} catch (CacheException e){
+			logger.errorf("Error saving cache.", e);
+		}
+	}
 }

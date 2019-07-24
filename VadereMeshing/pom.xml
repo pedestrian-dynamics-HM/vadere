@@ -43,5 +43,19 @@
             <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- fast collections especially for primitive data tyes -->
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>8.2.3</version>
+        </dependency>
+
+        <!-- this is only to record some movies -->
+        <dependency>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec-javase</artifactId>
+            <version>0.1.9</version>
+        </dependency>
     </dependencies>
 </project>

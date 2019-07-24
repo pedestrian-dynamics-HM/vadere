@@ -1,10 +1,10 @@
 package org.vadere.simulator.models;
 
-import java.util.Random;
-
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.util.Random;
 
 /**
  * This class encapsulates the creation of MainModel.

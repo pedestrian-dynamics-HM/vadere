@@ -2,10 +2,69 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-## In Progress: v0.7
+## In Progress:
 
 ### Added
 
+### Changed
+
+## v1.2 (2019-07-13)
+
+### Added
+
+- VadereServer:
+  - Introducing TraCI server implementation for Vadere to allow remote control
+    of Vaderes simulation loop.
+  - VadereManager/target/vadere-server.jar will open a TCP socket and waits
+    for connection request.
+- FloorField Caching:
+  - CellGrid based floorfields can be loaded from a persisted cache file.
+  - Added attributes:
+    - `cacheType: [NO_CACHE|TXT_CACHE|BIN_CACHE]`
+    - `cacheDir: ""` relative path
+  - Cache files will be saved in a `__cache__` directory beside (sibling) the
+    scenario file. With `cacheDir` it is possible to create some structure within
+    the cache directory. Important: If `cacheDir` is an absolute path the cache
+    file will not be placed in `__cache__`.
+  - A TXT_CACHE type will save the CellGrid in a human readable form (CSV) and
+    BIN_CACHE will use a simple binary format for better performance and space
+    reasons.
+- TikzGenerator:
+  - add configuration to show all traces of pedestrians, even if they
+    left the simulation. Config: PostVis -> `Show all Trajectories on Snapshot`
+  - add named coordinate for each scenario element. The coordinate represents the
+    centroid point of the polygon and can be used as a point for relative placement
+    of labels.
+  - introduced id for reference: Source `src_XXX`, Target `trg_XXX`, AbsorbingArea `absorb_XXX`
+    Obstacels `obs_XXX`, Stairs `str_XXX`, MeasurementArea `mrmtA_XXX`
+- single step mode in GUI: Allows the user to step through the simulation one
+  step at a time to identify bugs.
+- simplify obstacles (with undo support): Merge multiple obstacles based on the
+  convex hull their points create. The merge can be undon
+- add features to open street map (osm) importer:
+  - import 'open' paths as polygons with a specified width. With this it is
+    possible to create walls or subway entrance
+  - add option to include osm ids into each obstacle created
+
+`PostVis` added functionalities:
+- the PostVis works now on the basis of simulation time instead of time steps. Agents' position will be interpolated.
+    - the user can jump to a specific simulation time
+    - the user can step forward by steps as small as 0.01s
+    - the user can make videos using also this new feature which results in very smooth movement
+    - the frames per seconds (FPS) is now more accurate
+
+### Changed
+
+- version migration ensures that new attributes in the scenario file will be added
+  with default values if no specific actions are defined in a Transformation class.
+- TikzGenerator: style information for pedestrians are moved to dedicated style
+  classes to simplify changes in generated tikz files.  
+
+## v1.0 (2019-06-13)
+
+### Added
+
+- Open a trajectory file in the stand-alone application `vadere-postvis.jar` via drag and drop from file explorer.
 - Scenario elements like obstacles and targets can now be resized using the mouse in the topography creator tab (first, select element via left-click and then move mouse to one of its edges to get the resize handles).
 - Draw also Voronoi diagram in `TikzGenerator`.
 - Added new scenario element `AbsorbingArea` to absorb agents immediately.
@@ -33,7 +92,7 @@
 - `VadereConsole`: Add option `--logname <filename>` to specify the name for the log file.
   Please note that the log file `log.out` is always written (because this file is configured
   in the `log4j.properties` of each Vadere module (i.e., "gui", "meshing", ...). (c61a3946: Simulator)
-- New outputprocessors 
+- New outputprocessors
   * mainly for the BHM: QueueWidthProcessor (to evaluate queueWidth) and PedestrianBehaviorProcessor (evaluate behavior: step / tangential step / sideways step / wait)
   * solely for the OSM: PedestrianFootStepProcessor (logs every step instead of the positions at each time step )
 
@@ -61,7 +120,7 @@
 - `GUI`:
     - improved coloring
 
-- `OutputFile`: Distinguish between indices (rows) and headers (columns), in code and with a new checkbox that when enables allow to write meta-data into output files. Furthermore, resolve naming conflicts (if they occur) in headers of output files (see #201). 
+- `OutputFile`: Distinguish between indices (rows) and headers (columns), in code and with a new checkbox that when enables allow to write meta-data into output files. Furthermore, resolve naming conflicts (if they occur) in headers of output files (see #201).
 
 ### Changed
 
@@ -72,7 +131,7 @@
 - Header in output file have now the following form "[NAME]-PID[ID]". This avoids name conflicts and makes mapping to the relevant processor easy and fast.
 - Migration to Java 11 (OpenJDK).
 - Removed directory `Documentation/version-control` which contained the Git hooks. The Git hooks are not required anymore. Instead, added `git rev-parse HEAD` to file `VadereSimulator/pom.xml` to create `VadereSimulator/resources/current_commit_hash.txt` during each build via `mvn compile`.
-  **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build. 
+  **Note:** The file `current_commit_hash.txt` is created during Maven's validation phase, i.e., before the actual build.
 
 ## v0.6 (2018-09-07)
 

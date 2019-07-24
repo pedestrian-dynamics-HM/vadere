@@ -47,7 +47,7 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 					return;
 				addScenario(vadere);
 			} catch (IOException e) {
-				logger.error(String.format("topographyError during output load: '%s'", e.getLocalizedMessage()));
+				logger.error(String.format("topographyError during output loadFromFilesystem: '%s'", e.getLocalizedMessage()));
 			}
 		} else {
 			IOUtils.errorBox(Messages.getString("renameErrorDialog.text"),

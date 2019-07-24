@@ -2,9 +2,11 @@ package org.vadere.gui.projectview.view;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.apache.commons.configuration2.Configuration;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.VadereApplication;
@@ -17,12 +19,14 @@ import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.presettings.EventPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
@@ -41,10 +45,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class TextView extends JPanel implements IJsonView {
 
 	private static Logger logger = Logger.getLogger(TextView.class);
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private AttributeType attributeType;
-	private String default_folder;
 	private String default_resource;
+
 
 	private JPanel panelTop = new JPanel();
 
@@ -64,14 +69,15 @@ public class TextView extends JPanel implements IJsonView {
 	private ActionListener saveToFileActionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String path = IOUtils.chooseJSONFileSave(Messages.getString("TextFileView.btnSaveToFile.text"),
-					Preferences.userNodeForPackage(VadereApplication.class).get(default_resource, default_folder));
+			String path = IOUtils.chooseJSONFileSave(Messages.getString("TextFileView.btnSaveToFile.text"), CONFIG.getString(default_resource));
 
 			if (path == null)
 				return;
 
 			try {
 				IOUtils.writeTextFile(path.endsWith(".json") ? path : path + ".json", txtrTextfiletextarea.getText());
+				File file = new File(path);
+				VadereConfig.getConfig().setProperty(default_resource, file.getParentFile().getAbsolutePath());
 			} catch (IOException e1) {
 				IOUtils.errorBox(e1.getLocalizedMessage(), Messages.getString("SaveFileErrorMessage.title"));
 				logger.error(e1);
@@ -83,15 +89,15 @@ public class TextView extends JPanel implements IJsonView {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			FileFilter filter = new FileNameExtensionFilter("JSON file", "json");
-			String path = IOUtils.chooseFile("Choose file...",
-					Preferences.userNodeForPackage(VadereApplication.class).get(default_resource, default_folder),
-					filter);
+			String path = IOUtils.chooseFile(Messages.getString("ChooseFile.text"), CONFIG.getString(default_resource), filter);
 
 			if (path == null)
 				return;
 
 			try {
 				String content = IOUtils.readTextFile(path);
+				File file = new File(path);
+				VadereConfig.getConfig().setProperty(default_resource, file.getParentFile().getAbsolutePath());
 				txtrTextfiletextarea.setText(content);
 			} catch (IOException e) {
 				logger.error("could not load from file: " + e.getMessage());
@@ -102,8 +108,7 @@ public class TextView extends JPanel implements IJsonView {
 	/**
 	 * Create the panel.
 	 */
-	public TextView(String default_folder, String default_resource, final AttributeType attributeType) {
-	    this.default_folder = default_folder;
+	public TextView(@NotNull final String default_resource, final AttributeType attributeType) {
 		this.default_resource = default_resource;
 		this.attributeType = attributeType;
 		setLayout(new BorderLayout(0, 0));
