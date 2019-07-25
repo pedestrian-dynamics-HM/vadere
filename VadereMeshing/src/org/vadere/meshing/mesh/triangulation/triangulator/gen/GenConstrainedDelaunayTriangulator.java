@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -54,9 +55,23 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
 			@NotNull final PSLG pslg,
 			final boolean confirming) {
+		this(new IncrementalTriangulation<>(meshSupply.get(), pslg.getBoundingBox()), pslg, confirming);
+	}
+
+	public GenConstrainedDelaunayTriangulator(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final PSLG pslg,
+			final boolean confirming) {
+		this(triangulation, pslg.getAllSegments(), confirming);
+	}
+
+	public GenConstrainedDelaunayTriangulator(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final Collection<VLine> constrains,
+			final boolean confirming) {
 
 		this.conforming = confirming;
-		this.constrains = pslg.getAllSegments();
+		this.constrains = constrains;
 		this.points = Collections.EMPTY_LIST;
 		this.vConstrains = new ArrayList<>(constrains.size());
 		this.eConstrains = new ArrayList<>(constrains.size());
@@ -65,7 +80,8 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		 * This prevent the flipping of constrained edges
 		 */
 		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
-		this.triangulation = new IncrementalTriangulation<>(meshSupply.get(), pslg.getBoundingBox(), canIllegal);
+		this.triangulation = triangulation;
+		this.triangulation.setCanIllegalPredicate(canIllegal);
 	}
 
 	@Override

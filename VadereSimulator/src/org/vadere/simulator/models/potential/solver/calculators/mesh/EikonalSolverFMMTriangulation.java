@@ -141,7 +141,6 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 
         for(VShape shape : targetShapes) {
             getMesh().streamFaces()
-                    .filter(f -> !getMesh().isBoundary(f))
                     .filter(f -> shape.intersects(getMesh().toTriangle(f)))
                     .forEach(f -> targetVertices.addAll(getMesh().getVertices(f)));
         }

@@ -91,6 +91,8 @@ public interface VShape extends Shape, Cloneable {
 	 */
 	List<VPoint> getPath();
 
+	List<VLine> lines();
+
 	static VPolygon generateHexagon(final double radius) {
 		List<VPoint> points = new ArrayList<>();
 

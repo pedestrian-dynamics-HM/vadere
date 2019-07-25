@@ -10,9 +10,11 @@ import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
+import org.vadere.meshing.mesh.iterators.EdgeIteratorReverse;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRivaraRefinement;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenVoronoiSegmentInsertion;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
@@ -53,7 +55,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private IDistanceFunction distanceFunc;
 	private IEdgeLengthFunction edgeLengthFunc;
 	private VRectangle bound;
-	private VPolygon segmentBound = null;
 	private Collection<? extends IPoint> fixPoints;
 	private double scalingFactor;
 	private double deps;
@@ -89,8 +90,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	// different options
 	private boolean allowEdgeSplits = true;
 	private boolean allowVertexCollapse = true;
-	private boolean removeLowBoundaryTriangles = true;
+	private boolean removeLowBoundaryTriangles = false;
 	private boolean useVirtualEdges = true;
+	private boolean smoothBorder = false;
 	//private boolean splitFaces = true;
 	//private boolean useFixPoints = false;
 
@@ -174,7 +176,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.deps = 0.0001 * initialEdgeLen;
 		this.nSteps = 0;
 		this.fixPointRelation = new HashMap<>();
-		this.refiner = new GenRivaraRefinement<>(triangulation, p -> initialEdgeLen * edgeLengthFunc.apply(p));
+		this.refiner = new GenVoronoiSegmentInsertion<>(triangulation, p -> edgeLengthFunc.apply(p));
 		this.nonEmptyBaseMode = true;
 		this.fixPoints = Collections.EMPTY_LIST;
 		this.boundaryPointToLine = new HashMap<>();
@@ -199,7 +201,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
             @NotNull final Collection<? extends IPoint> fixPoints,
             final double initialEdgeLen,
             @NotNull final VRectangle bound,
-            @Nullable final VPolygon segmentBound,
             @NotNull final Collection<? extends VShape> shapes,
             @NotNull final IMeshSupplier<V, E, F> meshSupplier) {
 		this.shapes = shapes;
@@ -213,7 +214,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.nonEmptyBaseMode = false;
 		this.fixPoints = fixPoints;
 		this.boundaryPointToLine = new HashMap<>();
-		this.segmentBound = segmentBound;
 		this.refiner = new GenUniformRefinementTriangulatorSFC(
 				meshSupplier,
 				bound,
@@ -228,20 +228,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			@NotNull final IEdgeLengthFunction edgeLengthFunc,
 			final double initialEdgeLen,
 			@NotNull final VRectangle bound,
-			@Nullable final VPolygon segmentBound,
 			@NotNull final Collection<? extends VShape> shapes,
 			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
-		this(distanceFunc, edgeLengthFunc, Collections.EMPTY_LIST, initialEdgeLen, bound, segmentBound, shapes, meshSupplier);
-	}
-
-	public GenEikMesh(
-			@NotNull final IDistanceFunction distanceFunc,
-			@NotNull final IEdgeLengthFunction edgeLengthFunc,
-			final double initialEdgeLen,
-			@NotNull final VRectangle bound,
-			@NotNull final Collection<? extends VShape> shapes,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
-		this(distanceFunc, edgeLengthFunc, Collections.EMPTY_LIST, initialEdgeLen, bound, null, shapes, meshSupplier);
+		this(distanceFunc, edgeLengthFunc, Collections.EMPTY_LIST, initialEdgeLen, bound, shapes, meshSupplier);
 	}
 
 	public GenEikMesh(
@@ -250,14 +239,14 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			final double initialEdgeLen,
 			@NotNull final VRectangle bound,
 			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
-		this(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, null, Collections.EMPTY_LIST, meshSupplier);
+		this(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, Collections.EMPTY_LIST, meshSupplier);
 	}
 
 	public GenEikMesh(@NotNull final VPolygon segmentBound,
 	                  final double initialEdgeLen,
 	                  @NotNull final Collection<? extends VShape> shapes,
 	                  @NotNull final IMeshSupplier<V, E, F> meshSupplier){
-		this(new DistanceFunction(segmentBound, shapes), p -> initialEdgeLen, initialEdgeLen, GeometryUtils.boundRelative(segmentBound.getPoints()), segmentBound, shapes, meshSupplier);
+		this(new DistanceFunction(segmentBound, shapes), p -> initialEdgeLen, initialEdgeLen, GeometryUtils.boundRelative(segmentBound.getPoints()), shapes, meshSupplier);
 	}
 
 	public void step() {
@@ -295,9 +284,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		if(refiner != null && !refiner.isFinished()) {
 			refiner.refine();
 		} else {
-			if(distanceFunc == null) {
+			//if(distanceFunc == null) {
 				computeProjectionLines();
-			}
+			//}
 			if(refiner != null) {
 				refiner.getFixPoints().stream().forEach(v -> setFixPoint(v, true));
 			}
@@ -362,7 +351,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	@Override
     public void improve() {
 		synchronized (getMesh()) {
-
+			//System.out.println(getMesh().streamVertices().filter(v -> isSlidePoint(v)).count());
 			if(!initializationFinished()) {
 				initialize();
 			}
@@ -374,7 +363,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 						removeFacesAtBoundary();
 					}
 
-					if(distanceFunc != null) {
+					if(distanceFunc != null && smoothBorder) {
 						getTriangulation().smoothBoundary(distanceFunc, v -> fixPointRelation.containsKey(v));
 					}
 					//splitTriangles();
@@ -409,7 +398,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					dQuality = Math.abs(tmpQuality-quality);
 					quality = tmpQuality;
 				}
-
+				assert getMesh().isValid();
 				log.info("quality (" + nSteps + "):" + tmpQuality);
 			}
 		}
@@ -635,42 +624,49 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 */
 	private void updateVertex(final V vertex) {
 	    // modify point placement only if it is not a fix point
-    	if(!isFixedVertex(vertex)) {
-		    /*
-		     * (1) break / remove the vertex if the forces are to large / there is to much pressure
-		     */
-		    if(canBreak(vertex) && isBreaking(vertex)) {
-			    // TODO: if the algorithm runs in parallel this might lead to unexpected results! synchronized required!
-			    getTriangulation().collapse3DVertex(vertex, true);
-		    }
+		/*
+		 * (1) break / remove the vertex if the forces are to large / there is to much pressure
+		 */
+		if(canBreak(vertex) && isBreaking(vertex)) {
+			// TODO: if the algorithm runs in parallel this might lead to unexpected results! synchronized required!
+			getTriangulation().collapse3DVertex(vertex, true);
+		}
+		else if(!isFixPoint(vertex)) {
 		    /*
 		     * (2) otherwise displace the vertex
 		     */
-		    else {
-			    VPoint oldPosition = new VPoint(vertex.getX(), vertex.getY());
+		    VPoint oldPosition = new VPoint(vertex.getX(), vertex.getY());
 
+		    if(isSlidePoint(vertex)) {
+
+		    	// point is already at the boundary so we just slide them on the boundary
+		    	if(Math.abs(distanceFunc.apply(vertex)) < 10) {
+		    		VLine lineEdge = getMesh().toLine(getMesh().getBoundaryEdge(vertex).get());
+				    IPoint velocity = getForce(vertex);
+				    IPoint movement = velocity.scalarMultiply(delta);
+		    		IPoint projection = GeometryUtils.projectOnto(movement.getX(), movement.getY(), lineEdge.getX2() - lineEdge.getX1(), lineEdge.getY2() - lineEdge.getY1());
+				    move(vertex, vertex.getX() + projection.getX(), vertex.getY() + projection.getY());
+			    } else {
+				    applyForce(vertex);
+				    // if there is no distance function project the point back onto the line formed by neighboring fix points i.e. onto its projection line
+				    VLine line = boundaryPointToLine.get(vertex);
+				    assert line != null;
+				    //if(line != null) {
+				    //double distance = GeometryUtils.distanceToLine(line.getX1(), line.getY1(), line.getX2(), line.getY2(), vertex.getX(), vertex.getY());
+				    IPoint projection = GeometryUtils.projectOntoLine(vertex.getX(), vertex.getY(), line.getX1(), line.getY1(), line.getX2(), line.getY2());
+
+				    if(projection.distance(line.getX1(), line.getY1()) < line.length() && projection.distance(line.getX2(), line.getY2()) < line.length()) {
+					    move(vertex, projection.getX(), projection.getY());
+				    }
+				    //}
+			    }
+		    }
+		    // (2.2) back projection
+		    else if(distanceFunc != null) {
 			    // (2.1) p_{k+1} = p_k + dt * F(p_k)
 			    applyForce(vertex);
-
-			    // (2.2) back projection
-			    if(distanceFunc != null) {
-				    VPoint projection = computeProjection(vertex);
-				    move(vertex, projection.getX(), projection.getY());
-			    } else if(getMesh().isAtBoundary(vertex)) {
-			    	// if there is no distance function project the point back onto the line formed by neighboring fix points i.e. onto its projection line
-					VLine line = boundaryPointToLine.get(vertex);
-
-					//if(line != null) {
-						//double distance = GeometryUtils.distanceToLine(line.getX1(), line.getY1(), line.getX2(), line.getY2(), vertex.getX(), vertex.getY());
-						IPoint projection = GeometryUtils.projectOntoLine(vertex.getX(), vertex.getY(), line.getX1(), line.getY1(), line.getX2(), line.getY2());
-
-						if(projection.distance(line.getX1(), line.getY1()) < line.length() && projection.distance(line.getX2(), line.getY2()) < line.length()) {
-							move(vertex, projection.getX(), projection.getY());
-						}
-
-
-					//}
-			    }
+			    VPoint projection = computeProjection(vertex);
+			    move(vertex, projection.getX(), projection.getY());
 		    }
 		}
     	setVelocityX(vertex, 0);
@@ -688,6 +684,10 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		}
 	}
 
+	private boolean isSlidePoint(@NotNull V vertex) {
+		return getMesh().isAtBoundary(vertex) && !isFixPoint(vertex);
+	}
+
 	/**
 	 * Tests if the new position is inside the 1-ring polygon.
 	 *
@@ -699,6 +699,27 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 */
 	private boolean isLegalMove(@NotNull final V vertex, double newX, double newY) {
 		if(vertex.distance(newX, newY) > GeometryUtils.DOUBLE_EPS) {
+
+			// TODO: at the boundary vertices can still overtake each other.
+			if(getMesh().isAtBorder(vertex)) {
+				E boundaryEdge = getMesh().getBoundaryEdge(vertex).get();
+				V next = getMesh().getVertex(getMesh().getNext(boundaryEdge));
+				V prev = getMesh().getVertex(getMesh().getPrev(boundaryEdge));
+
+				IPoint dirN = next.subtract(vertex);
+				IPoint dirP = vertex.subtract(prev);
+
+				IPoint newDirN = next.subtract(new VPoint(newX, newY));
+				IPoint newDirP = new VPoint(newX, newY).subtract(prev);
+
+				double angleDifN = Math.abs(GeometryUtils.angleTo(dirN) - GeometryUtils.angleTo(newDirN));
+				double angleDifP = Math.abs(GeometryUtils.angleTo(dirP) - GeometryUtils.angleTo(newDirP));
+
+				if(angleDifN > Math.PI || angleDifP > Math.PI) {
+					return false;
+				}
+			}
+
 			return getMesh().streamEdges(vertex)
 					.filter(e -> !getMesh().isBoundary(e))
 					.map(e -> getMesh().getPrev(e))
@@ -741,7 +762,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 */
 	private void updateEdge(@NotNull final E edge) {
 		if(canBreak(edge) && isBreaking(edge)) {
-			if(distanceFunc == null) {
+			//if(distanceFunc == null) {
 				V v1 = getMesh().getVertex(edge);
 				V v2 = getMesh().getVertex(getMesh().getPrev(edge));
 				VLine line;
@@ -758,9 +779,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					setFixPoint(v, false);
 					boundaryPointToLine.put(v, line);
 				});
-			} else {
+			/*} else {
 				getTriangulation().splitEdge(edge, true, v -> setFixPoint(v, false));
-			}
+			}*/
 		}
 	}
 
@@ -798,7 +819,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if the edge can be collapsed / break.
 	 */
 	private boolean canBreak(@NotNull final E edge) {
-		return allowEdgeSplits;
+		return allowEdgeSplits /*&& getMesh().isAtBoundary(edge) */&& !getMesh().isBoundary(edge);
 	}
 
 	/**
@@ -811,7 +832,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if the edge breaks under the pressure of the forces, otherwise false.
 	 */
 	private boolean isBreaking(@NotNull final E edge) {
-		return getMesh().isLongestEdge(edge) && faceToQuality(getMesh().getTwinFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY;
+		return getMesh().isLongestEdge(edge) && faceToQuality(getMesh().getFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY;
 	}
 
 	/**
@@ -824,8 +845,17 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if the vertex can be collapsed / break.
 	 */
 	private boolean canBreak(@NotNull final V vertex) {
-		if(allowVertexCollapse) {
-			return !isFixPoint(vertex) && getMesh().isAtBoundary(vertex) && getMesh().degree(vertex) == 3;
+		if(allowVertexCollapse && isSlidePoint(vertex) && getMesh().degree(vertex) == 3) {
+			/*Optional<E> toDeleteEdge = getMesh().streamEdges(vertex).filter(e -> !getMesh().isAtBoundary(e)).findAny();
+			if(toDeleteEdge.isPresent()) {
+				E edge = toDeleteEdge.get();
+				E twin = getMesh().getTwin(edge);
+				// 2 triangles!
+				return edge.equals(getMesh().getNext(getMesh().getNext(getMesh().getNext(edge)))) && twin.equals(getMesh().getNext(getMesh().getNext(getMesh().getNext(twin))));
+			} else {
+				return false;
+			}*/
+			return true;
 		}
     	return false;
 	}
@@ -876,7 +906,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		    double newY = y - projY;
 
 	    	// back projection towards the inside if the point is outside
-	    	if(isOutside(distance)) {
+		    if(isOutside(distance)) {
 			    return new VPoint(newX, newY);
 		    }
 		    // back projection towards the inside if the point is inside (to improve the convergence rate of the algorithm)
@@ -896,13 +926,59 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * this method constructs a map : boundary vertex -> line which gives quick access to the projection line.
 	 */
 	private void computeProjectionLines() {
+		for(V v : refiner.getFixPoints()) {
+			setFixPoint(v, true);
+		}
+
+		for (F boundaryFace : getMesh().getBoundaryAndHoles()) {
+
+			List<V> slicePoints = new ArrayList<>();
+			Optional<V> optionalV = getMesh().streamVertices(boundaryFace).filter(v -> isFixPoint(v)).findFirst();
+
+			if(optionalV.isPresent()) {
+				V startFixPoint = optionalV.get();
+				V sf = startFixPoint;
+
+				E edge = getMesh().getBoundaryEdge(startFixPoint).get();
+				var iterator = new EdgeIterator<>(getMesh(), edge);
+
+				do {
+					edge = iterator.next();
+					V vertex = getMesh().getVertex(edge);
+
+					if(isFixPoint(vertex) && !startFixPoint.equals(vertex)) {
+						VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(vertex));
+						for(V slicePoint : slicePoints) {
+							boundaryPointToLine.put(slicePoint, line);
+						}
+						startFixPoint = vertex;
+						slicePoints.clear();
+					} else {
+						slicePoints.add(vertex);
+					}
+				} while (iterator.hasNext());
+
+				if(!startFixPoint.equals(sf)) {
+					VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(sf));
+					for(V slicePoint : slicePoints) {
+						boundaryPointToLine.put(slicePoint, line);
+					}
+				}
+			}
+
+
+		}
+		assert getMesh().getBoundaryVertices().stream().filter(v -> isSlidePoint(v)).allMatch(v -> boundaryPointToLine.containsKey(v));
+	}
+
+	/*private void computeProjectionLines() {
 	    for (F boundaryFace : getMesh().getBoundaryAndHoles()) {
 
 		    List<V> nonFixPoints = new ArrayList<>();
 		    E be = getMesh().streamEdges(boundaryFace).filter(e -> isNotColinear(e)).findFirst().get();
 		    V lastFixPoint = getMesh().getVertex(be);
 		    V firstFixPoint = getMesh().getVertex(be);
-		    setFixPoint(lastFixPoint, true);
+		    //setFixPoint(lastFixPoint, true);
 		    VLine segment;
 		    var iterator = new EdgeIterator<>(getMesh(), be);
 
@@ -915,7 +991,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 			    // not co-linear?
 			    if (Math.abs(GeometryUtils.ccw(v1, v2, v3)) > GeometryUtils.DOUBLE_EPS) {
-			    	setFixPoint(v2, true);
+			    	//setFixPoint(v2, true);
 				    segment = new VLine(getMesh().toPoint(lastFixPoint), getMesh().toPoint(v2));
 				    for (V v : nonFixPoints) {
 					    boundaryPointToLine.put(v, segment);
@@ -937,9 +1013,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 		    assert nonFixPoints.isEmpty();
 	    }
-
-		assert getMesh().getBoundaryVertices().stream().filter(v -> isFixPoint(v)).allMatch(v -> boundaryPointToLine.containsKey(v));
-    }
+		assert getMesh().getBoundaryVertices().stream().filter(v -> isSlidePoint(v)).allMatch(v -> boundaryPointToLine.containsKey(v));
+    }*/
 
 	/**
 	 * Tests if a point is outside which is determined by the <tt>distance</tt> value.
@@ -1006,9 +1081,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private Set<IPoint> generateFixPoints() {
 		List<VShape> shapes = new ArrayList<>(this.shapes.size()+1);
 		shapes.addAll(this.shapes);
-		if(segmentBound != null) {
-			shapes.add(segmentBound);
-		}
 
 		Set<IPoint> ancherPoints = generateAnchorPoints(shapes);
 		ancherPoints.addAll(fixPoints);
@@ -1066,7 +1138,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if and only if the vertex {@link V} is a fix point.
 	 */
 	private boolean isFixedVertex(final V vertex) {
-		return isFixPoint(vertex) /*|| nonEmptyBaseMode && getMesh().isAtBoundary(vertex)*/;
+		return isFixPoint(vertex) /*|| nonEmptyBaseMode &&getMesh().isAtBoundary(vertex)*/;
 	}
 
 	/**
@@ -1126,7 +1198,51 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		} catch (IllegalMeshException e) {
 			log.error("error!");
 		}
+
+		updateProjectionLines();
 	}
+
+	private void updateProjectionLines() {
+		// this is a bad code which just updates the boundaryPointToLine requiring to run on the border possibly in both directions
+		getMesh().streamVertices().filter(v -> isSlidePoint(v)).filter(v -> !boundaryPointToLine.containsKey(v)).forEach(v -> {
+			E edge = getMesh().getBoundaryEdge(v).get();
+			V v1 = getMesh().getVertex(getMesh().getNext(edge));
+			V v2 =  getMesh().getVertex(getMesh().getPrev(edge));
+
+			if(isFixPoint(v1) && isFixPoint(v2)) {
+				boundaryPointToLine.put(v, new VLine(getMesh().toPoint(v1), getMesh().toPoint(v2)));
+			} else {
+				EdgeIterator<V, E, F> edgeIterator = new EdgeIterator<>(getMesh(), edge);
+				while (edgeIterator.hasNext()) {
+					E next = edgeIterator.next();
+					V vertex = getMesh().getVertex(next);
+					if(boundaryPointToLine.containsKey(vertex)) {
+						boundaryPointToLine.put(v, boundaryPointToLine.get(vertex));
+					}
+
+					if(isFixPoint(vertex)) {
+						break;
+					}
+				}
+
+				if(!boundaryPointToLine.containsKey(v)) {
+					EdgeIteratorReverse<V, E, F> reverseEdgeIterator = new EdgeIteratorReverse<>(getMesh(), edge);
+					while (reverseEdgeIterator.hasNext()) {
+						E next = reverseEdgeIterator.next();
+						V vertex = getMesh().getVertex(next);
+						if(boundaryPointToLine.containsKey(vertex)) {
+							boundaryPointToLine.put(v, boundaryPointToLine.get(vertex));
+						}
+
+						if(isFixPoint(vertex)) {
+							break;
+						}
+					}
+				}
+			}
+		});
+	}
+
 
 	/**
 	 * <p>Shrinks the border such that there are no more triangles outside the boundary i.e. where the distance is positive.

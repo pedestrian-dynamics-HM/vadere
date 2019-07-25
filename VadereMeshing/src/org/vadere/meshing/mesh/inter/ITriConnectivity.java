@@ -2813,7 +2813,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		};
 
 		//log.debug(getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).filter(e -> !orientationPredicate.test(e)).count() + " invalid triangles");
-		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
+		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).allMatch(orientationPredicate);
 	}
 
 	/**
