@@ -47,16 +47,6 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianWaitingTimeProcessor",
-      "id" : 6,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianWaitingTimeProcessor",
-      "attributes" : {
-        "expectedResult" : "SUCCESS",
-        "pedestrianWaitingTimeProcessorId" : 2,
-        "maximalWaitingTime" : 0.0,
-        "minimalWaitingTime" : 0.0
-      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -128,7 +118,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 1,
       "simulationSeed" : 1,
-      "useSalientBehavior" : false
+      "useSalientBehavior" : true
     },
     "topography" : {
       "attributes" : {
@@ -269,7 +259,7 @@
         "footStepsToStore" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
-        "targetOrientationAngleThreshold" : 45.0
+        "targetOrientationAngleThreshold" : 25.0
       },
       "teleporter" : null,
       "attributesCar" : null
