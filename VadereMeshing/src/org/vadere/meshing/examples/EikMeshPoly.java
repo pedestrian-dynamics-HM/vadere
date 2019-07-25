@@ -61,14 +61,14 @@ public class EikMeshPoly {
 				pslg.getAllPolygons()
 		);
 
-		var meshPanel = new PMeshPanel(meshImprover.getMesh()/*, f -> distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0*/, 1000, 800);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), f -> meshImprover.getMesh().getBooleanData(f, "frozen"), 1000, 800);
 		meshPanel.display("Combined distance functions " + h0);
 		meshImprover.improve();
 		while (!meshImprover.isFinished()) {
 			synchronized (meshImprover.getMesh()) {
 				meshImprover.improve();
 			}
-			//Thread.sleep(200);
+			//Thread.sleep(2000);
 			meshPanel.repaint();
 		}
 		//meshImprover.generate();
