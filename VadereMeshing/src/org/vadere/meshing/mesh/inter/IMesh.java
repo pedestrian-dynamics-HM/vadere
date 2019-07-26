@@ -368,11 +368,11 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	<CF> Optional<CF> getData(@NotNull F face, @NotNull final String name, @NotNull final Class<CF> clazz);
 
 	default boolean getBooleanData(@NotNull F face, @NotNull final String name) {
-		return getData(face, name, Boolean.class).or(null).get();
+		return getData(face, name, Boolean.class).orElse(false);
 	}
 
 	default double getDoubleData(@NotNull F face, @NotNull final String name) {
-		return getData(face, name, Double.class).or(null).get();
+		return getData(face, name, Double.class).orElse(0.0);
 	}
 
 	/**
@@ -1162,7 +1162,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 * @return a parallel stream {@link Stream} of (all alive) interior faces
 	 */
 	default Stream<F> streamFaces() {
-		return streamFaces(f -> true);
+		return streamFaces(f -> !isBoundary(f));
 	}
 
 	/**
@@ -1316,7 +1316,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 */
 	default VTriangle toTriangle(@NotNull final F face) {
 		List<V> vertices = getVertices(face);
-		assert vertices.size() == 3;
+		assert vertices.size() == 3 : "number of vertices of " + face + " is " + vertices.size();
 		return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
 	}
 
@@ -1938,6 +1938,8 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		}
 		return Optional.empty();
 	}
+
+	//default Optional<E> getBoundaryEdge()
 
 	/**
 	 * Returns a deep clone of this mesh.

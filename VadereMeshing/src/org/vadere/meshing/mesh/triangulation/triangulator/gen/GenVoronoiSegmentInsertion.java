@@ -9,6 +9,8 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
+import org.vadere.util.geometry.Geometry;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,10 +34,11 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 
 	private static Logger logger = Logger.getLogger(GenVoronoiVertexInsertion.class);
 	private final GenConstrainedDelaunayTriangulator<V, E, F> cdt;
+	private IIncrementalTriangulation<V, E, F> triangulation;
 
 	// Improvements: maybe mark edges which should not be flipped instead of using a Set is slower.
-	private Set<E> segments;
 	private final PSLG pslg;
+	private final VPolygon segmentBound;
 
 	private boolean initialized;
 	private boolean generated;
@@ -57,7 +60,6 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	                                  @NotNull final IMeshSupplier<V, E, F> meshSupplier,
 	                                  final boolean createHoles,
 	                                  @NotNull Function<IPoint, Double> circumRadiusFunc) {
-		this.segments = new HashSet<>();
 		this.initialized = false;
 		this.generated = false;
 		this.active = new PriorityQueue<>(new GenVoronoiSegmentInsertion.FaceQualityComparator());
@@ -67,6 +69,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		this.createHoles = createHoles;
 		this.circumRadiusFunc = circumRadiusFunc;
 		this.pslg = pslg.addLines(generateLines(pslg));
+		this.segmentBound = pslg.getSegmentBound();
 
 		/**
 		 * This prevent the flipping of constrained edges
@@ -75,8 +78,37 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), circumRadiusFunc);
 	}
 
+	public GenVoronoiSegmentInsertion(@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                                  @NotNull final Function<IPoint, Double> circumRadiusFunc) {
+		this.triangulation = triangulation;
+		this.initialized = true;
+		this.generated = false;
+		this.active = new PriorityQueue<>(new GenVoronoiSegmentInsertion.FaceQualityComparator());
+		this.accepted = new HashSet<>();
+		this.activeSet = new HashSet<>();
+		this.triangles = new HashMap<>();
+		this.createHoles = false;
+		this.circumRadiusFunc = circumRadiusFunc;
+		this.pslg = null;
+		this.cdt = null;
+		this.segmentBound = GeometryUtils.polygonFromPoints2D(
+				getTriangulation().getMesh().getVertices(triangulation.getMesh().getBorder()));
+		this.placementStrategy = new VoronoiSegPlacement<>(triangulation.getMesh(), circumRadiusFunc);
+		scan();
+	}
+
 	private boolean isAccepted(@NotNull final E edge) {
 		return circumRadiusFunc.apply(getMesh().toLine(edge).midPoint()) / getMesh().toTriangle(getMesh().getFace(edge)).getCircumscribedRadius() < 1.5;
+	}
+
+	private void scan() {
+		for(F face : getTriangulation().getMesh().getFaces()) {
+			if(!isAccepted(face) && isActive(face)) {
+				triangles.put(face, getMesh().toTriangle(face));
+				active.add(face);
+				activeSet.add(face);
+			}
+		}
 	}
 
 	@Override
@@ -84,15 +116,9 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		if(!refinementFinished()) {
 			if(!initialized) {
 				cdt.generate(true);
-				segments = new HashSet<>(cdt.getConstrains());
-				for(F face : getTriangulation().getMesh().getFaces()) {
-					if(!isAccepted(face) && isActive(face)) {
-						triangles.put(face, getMesh().toTriangle(face));
-						active.add(face);
-						activeSet.add(face);
-					}
-				}
+				scan();
 				initialized = true;
+				triangulation = cdt.getTriangulation();
 			}
 
 			if(!active.isEmpty()) {
@@ -219,12 +245,12 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	}
 
 	public IIncrementalTriangulation<V, E, F> getTriangulation() {
-		return cdt.getTriangulation();
+		return triangulation;
 	}
 
 	@Override
 	public IMesh<V, E, F> getMesh() {
-		return cdt.getMesh();
+		return getTriangulation().getMesh();
 	}
 
 	private boolean isAccepted(@NotNull final F face) {
@@ -247,7 +273,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		}
 
 		// This might be expensive!
-		if(!pslg.getSegmentBound().contains(getMesh().toTriangle(face).midPoint())) {
+		if(!segmentBound.contains(getMesh().toTriangle(face).midPoint())) {
 			return false;
 		}
 

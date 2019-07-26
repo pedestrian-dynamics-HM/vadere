@@ -15,7 +15,6 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * <p>A tri-connectivity {@link ITriConnectivity} is the connectivity of a mesh of non-intersecting connected triangles including holes.
  * A hole can be an arbitrary simple polygon. So it is more concrete than a poly-connectivity {@link IPolyConnectivity}.
- * The mesh {@link IMesh} stores all the date of the base elements (points {@link P}, vertices {@link V}, half-edges {@link E}
+ * The mesh {@link IMesh} stores all the date of the base elements (vertices {@link V}, half-edges {@link E}
  * and faces {@link F}) and offers factory method to create new base elements.
  * The connectivities, i.e. {@link IPolyConnectivity} and {@link ITriConnectivity} offers all the operations manipulating
  * the connectivity of the mesh. The connectivity is the relation between vertices and edges which define faces which therefore define the mesh structure.</p>
@@ -203,6 +202,20 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		double lenSq = line.lengthSq();
 
 		return getMesh().toLine(next).lengthSq() <= lenSq && getMesh().toLine(prev).lengthSq() <= lenSq;
+	}
+
+	default boolean isShortestHalfEdge(@NotNull final E edge) {
+		E e = edge;
+		if(getMesh().isBoundary(e)) {
+			e = getMesh().getTwin(e);
+		}
+
+		E next = getMesh().getNext(e);
+		E prev = getMesh().getPrev(e);
+		VLine line = getMesh().toLine(e);
+		double lenSq = line.lengthSq();
+
+		return getMesh().toLine(next).lengthSq() >= lenSq && getMesh().toLine(prev).lengthSq() >= lenSq;
 	}
 
 	/**
@@ -1221,6 +1234,104 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	default E splitTriangle(@NotNull final F face, @NotNull final IPoint p) {
 		return splitTriangle(face, p, true);
+	}
+
+	default V collapseEdge(@NotNull final E edge, final boolean deleteIsolatededVertex) {
+		IMesh<V, E, F> mesh = getMesh();
+		E twin = mesh.getTwin(edge);
+
+		// before changing connectivity change vertices.
+		V replacedVertex = getMesh().getVertex(twin);
+		V survivedVertex = getMesh().getVertex(edge);
+
+		for(E e : getMesh().getEdgeIt(replacedVertex)) {
+			getMesh().setVertex(e, survivedVertex);
+		}
+
+		if(getMesh().getEdge(survivedVertex).equals(edge)) {
+			getMesh().setEdge(survivedVertex, getMesh().getTwin(getMesh().getNext(edge)));
+		}
+
+		F fa = mesh.getFace(edge);
+		F fb = mesh.getFace(twin);
+
+		F f4 = getMesh().getTwinFace(getMesh().getPrev(edge));
+		F f5 = getMesh().getTwinFace(getMesh().getNext(twin));
+
+		boolean isF4Boundary = getMesh().isBoundary(f4);
+		boolean isF5Boundary = getMesh().isBoundary(f5);
+
+		// survives
+		E aNext = mesh.getNext(edge);
+		E bNext = mesh.getNext(twin);
+		E aPrev = mesh.getPrev(edge);
+		// survives
+		E bPrev = mesh.getPrev(twin);
+
+		if(!getMesh().isBoundary(edge)) {
+			E aPrevTwin = mesh.getTwin(aPrev);
+			E aPrevTwinPrev = mesh.getPrev(aPrevTwin);
+			E aPrevTwinNext = mesh.getNext(aPrevTwin);
+			E next = getMesh().getNext(edge);
+			V nextVertex = getMesh().getVertex(next);
+
+			if(getMesh().getEdge(nextVertex).equals(aPrevTwin)) {
+				getMesh().setEdge(nextVertex, next);
+			}
+
+			// adjust pointers
+			getMesh().setNext(aNext, aPrevTwinNext);
+			getMesh().setPrev(aNext, aPrevTwinPrev);
+			getMesh().setFace(aNext, f4);
+			getMesh().setEdge(f4, aNext);
+
+			// destroy the rest
+			getMesh().destroyFace(fa);
+			getMesh().destroyEdge(aPrev);
+			getMesh().destroyEdge(aPrevTwin);
+		} else {
+			getMesh().setNext(getMesh().getPrev(edge), getMesh().getNext(edge));
+		}
+
+		if(!getMesh().isBoundary(twin)) {
+			E bNextTwin = mesh.getTwin(bNext);
+			E bNextTwinNext = mesh.getNext(bNextTwin);
+			E bNextTwinPrev = mesh.getPrev(bNextTwin);
+			E prevTwin = getMesh().getTwin(mesh.getPrev(twin));
+			V nextVertex = getMesh().getVertex(prevTwin);
+
+			if(getMesh().getEdge(nextVertex).equals(bNext)) {
+				getMesh().setEdge(nextVertex, prevTwin);
+			}
+
+			// adjust pointers
+			getMesh().setNext(bPrev, bNextTwinNext);
+			getMesh().setPrev(bPrev, bNextTwinPrev);
+			getMesh().setFace(bPrev, f5);
+			getMesh().setEdge(f5, bPrev);
+
+			// destroy the rest
+			getMesh().destroyFace(fb);
+			getMesh().destroyEdge(bNext);
+			getMesh().destroyEdge(bNextTwin);
+		} else {
+			getMesh().setNext(getMesh().getPrev(twin), getMesh().getNext(twin));
+		}
+
+		// destroy the rest
+		getMesh().destroyEdge(edge);
+		getMesh().destroyEdge(twin);
+
+		if(deleteIsolatededVertex) {
+			getMesh().destroyVertex(replacedVertex);
+		} else {
+			getMesh().setEdge(replacedVertex, null);
+		}
+
+		adjustVertex(survivedVertex);
+		assert getMesh().isValid();
+
+		return survivedVertex;
 	}
 
 	/**
@@ -2813,7 +2924,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		};
 
 		//log.debug(getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).filter(e -> !orientationPredicate.test(e)).count() + " invalid triangles");
-		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).filter(f -> !getMesh().isBoundary(f)).allMatch(orientationPredicate);
+		return getMesh().streamFaces().filter(f -> !getMesh().isDestroyed(f)).allMatch(orientationPredicate);
 	}
 
 	/**

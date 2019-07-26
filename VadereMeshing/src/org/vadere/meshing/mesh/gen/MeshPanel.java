@@ -23,7 +23,8 @@ import javax.swing.*;
  */
 public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Canvas {
 
-	private  MeshRenderer<V, E, F> meshRenderer;
+	private MeshRenderer<V, E, F> meshRenderer;
+	public static Function defaultFaceColors = f -> new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
 
 	/**
 	 * The width of the canvas.
@@ -121,7 +122,7 @@ public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 			@NotNull final IMesh<V, E, F> mesh,
 			final double width,
 			final double height) {
-		this(mesh, f -> false, width, height, f -> new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f), e -> Color.GRAY);
+		this(mesh, f -> false, width, height, defaultFaceColors, e -> Color.GRAY);
 	}
 
 	@Override

@@ -57,9 +57,11 @@ public class EikMeshPlots {
 
 		kaiserslautern();
 		ruppertsAndEikMeshKaiserslautern();*/
-		bridge();
+		//bridge();
 		//roomLFS();
 		//cornerLFS();
+
+		uniformRing(0.3);
 	}
 
 	public static void randomDelaunay() throws IOException {
@@ -432,9 +434,9 @@ public class EikMeshPlots {
 
 	private static void write(final String string, final String filename) throws IOException {
 		File outputFile = new File("./eikmesh/"+filename+".tex");
-		try(FileWriter fileWriter = new FileWriter(outputFile)) {
-			fileWriter.write(string);
-		}
+//		try(FileWriter fileWriter = new FileWriter(outputFile)) {
+			//fileWriter.write(string);
+//		}
 	}
 
 	private static String toTexDocument(final String tikz) {

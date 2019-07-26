@@ -59,7 +59,7 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound
 	) {
-		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, null, Collections.EMPTY_LIST,() -> new PMesh());
+		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, Collections.EMPTY_LIST,() -> new PMesh());
 	}
 
 
