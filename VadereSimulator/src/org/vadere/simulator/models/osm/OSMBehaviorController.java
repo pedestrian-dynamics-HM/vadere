@@ -140,8 +140,8 @@ public class OSMBehaviorController {
                 boolean targetOrientationDiffers = false;
 
                 // TODO: Compare both approaches.
-                // double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
-                double angleInRadian = angleInRadian = calculateAngleBetweenTargetGradients(pedestrian, (PedestrianOSM)closestPedestrian);
+                double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+                // double angleInRadian = angleInRadian = calculateAngleBetweenTargetGradients(pedestrian, (PedestrianOSM)closestPedestrian);
 
                 if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
                     targetOrientationDiffers = true;
