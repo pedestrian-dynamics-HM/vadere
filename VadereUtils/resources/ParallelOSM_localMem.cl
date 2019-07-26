@@ -116,7 +116,7 @@ inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosit
 inline float getLocalFullPedestrianPotential(__local float *localPositions, const uint size, const float2 pos){
     float potential = 0.0f;
     for(uint j = 0; j < size; j++){
-        float2 otherPos = (float2) (localPositions[j * COORDOFFSET + X], localPositions[j * COORDOFFSET + Y]);
+        float2 otherPos = (float2) (localPositions[j * OFFSET + NEWX], localPositions[j * OFFSET + NEWY]);
         potential += getPedestrianPotential(pos, otherPos);
     }
     return potential;
@@ -342,8 +342,12 @@ __kernel void seek(
                     if(startIO + lid < endIO){
                         int c = 4 + x + 3 * y;
                         // here we look how many agents are before
-                        localPositions[(pedCount[c] + lid) * COORDOFFSET + X] = orderedPositions[(startIO + lid) * COORDOFFSET + X];
-                        localPositions[(pedCount[c] + lid) * COORDOFFSET + Y] = orderedPositions[(startIO + lid) * COORDOFFSET + Y];
+                        //TODO here we access global memory which might be highly distributed.
+                        localPositions[(pedCount[c] + lid) * OFFSET + STEPSIZE] = orderedPedestrians[(startIO + lid) * OFFSET + STEPSIZE];
+                        localPositions[(pedCount[c] + lid) * OFFSET + DESIREDSPEED] = orderedPedestrians[(startIO + lid) * OFFSET + DESIREDSPEED];
+                        localPositions[(pedCount[c] + lid) * OFFSET + TIMECREDIT] = orderedPedestrians[(startIO + lid) * OFFSET + TIMECREDIT] + timeStepInSec;
+                        localPositions[(pedCount[c] + lid) * OFFSET + NEWX] = orderedPositions[(startIO + lid) * COORDOFFSET + X];
+                        localPositions[(pedCount[c] + lid) * OFFSET + NEWY] = orderedPositions[(startIO + lid) * COORDOFFSET + Y];
                     }
                 }
             }
@@ -357,24 +361,27 @@ __kernel void seek(
             uint pointId = pointNr - numberOfPoints * pedNr;
 
             if(pedNr < pedCount[LOCAL_PED_COUNT_ID]) {
-                float2 pedPosition = (float2)(  localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + pedNr) * COORDOFFSET + X],
-                                                localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + pedNr) * COORDOFFSET + Y]);
-                float2 circlePosition = circlePositions[pointId];
-                uint pedId = startI + pedNr;
+                uint offset = (pedCount[LOCAL_PED_COUNT_ID-1] + pedNr) * OFFSET;
+                float stepSize = localPositions[offset + STEPSIZE];
+                float desiredSpeed = localPositions[offset + DESIREDSPEED];
+                float timeCredit = localPositions[offset + TIMECREDIT];
+                float duration = stepSize / desiredSpeed;
+                if(duration <= timeCredit) {
+                    float2 pedPosition = (float2)(localPositions[offset + NEWX],
+                                                  localPositions[offset + NEWY]);
+                    float2 circlePosition = circlePositions[pointId];
+                    uint pedId = startI + pedNr;
 
-                // TODO: use local memory
-                float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
-                float desiredSpeed = orderedPedestrians[pedId * OFFSET + DESIREDSPEED];
-                float timeCredit = orderedPedestrians[pedId * OFFSET + TIMECREDIT] + timeStepInSec;
-
-                float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
-                float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-                float pedestrianPotential = getLocalFullPedestrianPotential(localPositions, numberOfPoints, pedPosition);
-                //float pedestrianPotential = 0.0f;
-                float value = targetPotential + obstaclePotential + pedestrianPotential;
-                results[j] = value;
+                    // TODO: use local memory
+                    float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
+                    float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+                    float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+                    float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+                    float pedestrianPotential = getLocalFullPedestrianPotential(localPositions, numberOfPoints, pedPosition);
+                    //float pedestrianPotential = 0.0f;
+                    float value = targetPotential + obstaclePotential + pedestrianPotential;
+                    results[j] = value;
+                }
             }
         }
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -382,20 +389,30 @@ __kernel void seek(
         // finally find the best solution
         if(lid < numberOfPedsInCell) {
             uint pedId = startI + lid;
-            float minVal = 100000;
-            float2 minArg = (0.0f, 0.0f);
-            float2 pedPosition = (float2)(  localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + lid) * COORDOFFSET + X],
-                                            localPositions[(pedCount[LOCAL_PED_COUNT_ID-1] + lid) * COORDOFFSET + Y]);
-            float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
-            for(uint i = 0; i < numberOfPoints; i++) {
-                if(results[lid * numberOfPoints + i] < minVal){
-                    minVal = results[lid * numberOfPoints + i];
-                    minArg = pedPosition /*+ (float2)(circlePositions[i] * stepSize)*/;
-                }
-            }
+            uint offset = (pedCount[LOCAL_PED_COUNT_ID-1] + lid) * OFFSET;
+            float2 pedPosition = (float2)(  localPositions[offset + NEWX],
+                                            localPositions[offset + NEWY]);
 
-            orderedPedestrians[pedId * OFFSET + NEWX] = minArg.x;
-            orderedPedestrians[pedId * OFFSET + NEWY] = minArg.y;
+            float stepSize = localPositions[offset + STEPSIZE];
+            float desiredSpeed = localPositions[offset + DESIREDSPEED];
+            float timeCredit = localPositions[offset + TIMECREDIT];
+            float duration = stepSize / desiredSpeed;
+
+            if(duration <= timeCredit) {
+                float minVal = 100000;
+                float2 minArg = (0.0f, 0.0f);
+                for(uint i = 0; i < numberOfPoints; i++) {
+                    if(results[lid * numberOfPoints + i] < minVal){
+                        minVal = results[lid * numberOfPoints + i];
+                        minArg = pedPosition + (float2)(circlePositions[i] * stepSize);
+                    }
+                }
+
+                // write back to global memory
+                orderedPedestrians[pedId * OFFSET + NEWX] = minArg.x;
+                orderedPedestrians[pedId * OFFSET + NEWY] = minArg.y;
+            }
+            orderedPedestrians[pedId * OFFSET + TIMECREDIT] = timeCredit;
         }
     }
 }
@@ -414,14 +431,14 @@ __kernel void move(
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
         float2 newPedPosition = (float2)(orderedPedestrians[index * OFFSET + NEWX], orderedPedestrians[index * OFFSET + NEWY]);
-        //float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
-        //float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
+        float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
+        float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT];
+        float duration = stepSize / desiredSpeed;
 
-        if(!hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+        if(duration <= timeCredit && !hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
             orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
             orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
-
             orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
         }
     }

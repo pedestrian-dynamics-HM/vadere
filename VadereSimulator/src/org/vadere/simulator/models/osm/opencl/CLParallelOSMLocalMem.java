@@ -542,7 +542,7 @@ public class CLParallelOSMLocalMem {
 			CLInfo.checkCLError(clSetKernelArg1f(clSeek, 14, timeStepInSec));
 			CLInfo.checkCLError(clSetKernelArg1i(clSeek, 15, circlePositionList.size()));
 			// local memory for the arg and value of the optimization problem.
-			CLInfo.checkCLError(clSetKernelArg(clSeek, 16, maxNumberOfElementsPerCell * circlePositionList.size() * 2 * 4));
+			CLInfo.checkCLError(clSetKernelArg(clSeek, 16, maxNumberOfElementsPerCell * circlePositionList.size() * 5 * 4));
 			CLInfo.checkCLError(clSetKernelArg(clSeek, 17, maxNumberOfElementsPerCell * circlePositionList.size() * 4));
 
 			int localSzie = maxNumberOfElementsPerCell;
