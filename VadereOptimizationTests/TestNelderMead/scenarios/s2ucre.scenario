@@ -4,7 +4,54 @@
   "release" : "1.2",
   "processWriters" : {
     "files" : [ ],
-    "processors" : [ ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestOptimizationMetricNelderMeadProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestOptimizationMetricProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "optimizationMetricProcessorId" : 2,
+        "testEvacuationProcessorId" : 3,
+        "maxMeanPointDistance" : 0.11145469470145097,
+        "maxMeanDifferenceFuncValue" : 0.023782107248396297,
+        "infoMinPointDistanceL2" : 0.005467775994727584,
+        "infoMaxPointDistanceL2" : 0.6825148285371956,
+        "infoMinFuncDifference" : 1.0532856536293878E-4,
+        "infoMaxFuncDifference" : 0.10498155287141664,
+        "infoStddevPointDistance" : 0.07134475478590001,
+        "infoStddevDifferenceFuncValue" : 0.0122377396313633
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestEvacuationTimeProcessor",
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "evacuationTimeProcessorId" : 4,
+        "maximalEvacuationTime" : 200.0,
+        "minimalEvacuationTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 6
+    } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
   },
@@ -33,8 +80,8 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 4,
-        "numberOfCircles" : 1,
+        "stepCircleResolution" : 5,
+        "numberOfCircles" : 4,
         "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
@@ -73,8 +120,8 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : -3213925745664992646,
-      "simulationSeed" : 0,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1,
       "useSalientBehavior" : false
     },
     "topography" : {
@@ -159,7 +206,7 @@
             "y" : 49.5
           } ]
         },
-        "id" : -1
+        "id" : 4
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -192,7 +239,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 24.300000000046566,
           "y" : 44.5,

@@ -303,8 +303,8 @@ public class GeometryUtils {
 			int numberOfGridPoints = (int) Math.ceil(circleOfGrid / circle.getRadius() * numberOfPointsOfLargestCircle);
 
 			// reduce number of grid points proportional to the constraint of direction
-			if (angle < 2 * Math.PI) {
-				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2 * Math.PI));
+			if (angle < 2.0 * Math.PI) {
+				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2.0 * Math.PI));
 			}
 
 			double angleDelta = angle / numberOfGridPoints;
@@ -314,9 +314,7 @@ public class GeometryUtils {
 
 				double x = circleOfGrid * Math.cos(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getX();
 				double y = circleOfGrid * Math.sin(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getY();
-				VPoint tmpPos = new VPoint(x, y);
-
-				reachablePositions.add(tmpPos);
+				reachablePositions.add(new VPoint(x, y));
 			}
 		}
 

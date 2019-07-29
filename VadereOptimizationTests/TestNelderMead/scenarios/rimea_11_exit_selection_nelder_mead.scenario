@@ -1,10 +1,57 @@
 {
-  "name" : "counterflow",
+  "name" : "rimea_11_exit_selection_nelder_mead",
   "description" : "",
   "release" : "1.2",
   "processWriters" : {
     "files" : [ ],
-    "processors" : [ ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestOptimizationMetricNelderMeadProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestOptimizationMetricProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "optimizationMetricProcessorId" : 2,
+        "testEvacuationProcessorId" : 3,
+        "maxMeanPointDistance" : 0.06743253584052734,
+        "maxMeanDifferenceFuncValue" : 0.03762845011019873,
+        "infoMinPointDistanceL2" : 0.0,
+        "infoMaxPointDistanceL2" : 1.1908766074958799,
+        "infoMinFuncDifference" : -0.007825774248588324,
+        "infoMaxFuncDifference" : 3.1836042315887085,
+        "infoStddevPointDistance" : 0.11888918094737598,
+        "infoStddevDifferenceFuncValue" : 0.14690668533173323
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestEvacuationTimeProcessor",
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "evacuationTimeProcessorId" : 4,
+        "maximalEvacuationTime" : 200.0,
+        "minimalEvacuationTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 6
+    } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
   },
@@ -12,8 +59,8 @@
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 4,
-        "numberOfCircles" : 1,
+        "stepCircleResolution" : 5,
+        "numberOfCircles" : 4,
         "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : true,
         "movementType" : "ARBITRARY",
@@ -46,7 +93,7 @@
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
+        "targetAttractionStrength" : 2.0,
         "cacheType" : "NO_CACHE",
         "cacheDir" : "",
         "timeCostAttributes" : {
@@ -65,7 +112,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 80.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -73,8 +120,8 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 6138355022448163583,
-      "simulationSeed" : 6138355022448163583,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1,
       "useSalientBehavior" : false
     },
     "topography" : {
@@ -82,39 +129,88 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 20.0,
-          "height" : 3.0
+          "width" : 14.0,
+          "height" : 18.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 7.2,
+            "y" : 5.0
+          }, {
+            "x" : 7.2,
+            "y" : 6.0
+          }, {
+            "x" : 0.5,
+            "y" : 6.0
+          }, {
+            "x" : 0.5,
+            "y" : 5.0
+          } ]
+        },
+        "id" : 3
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 10.1,
+            "y" : 5.0
+          }, {
+            "x" : 10.1,
+            "y" : 6.0
+          }, {
+            "x" : 7.8,
+            "y" : 6.0
+          }, {
+            "x" : 7.8,
+            "y" : 5.0
+          } ]
+        },
+        "id" : 4
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 0.5,
+            "y" : 14.5
+          }, {
+            "x" : 11.6,
+            "y" : 14.5
+          }, {
+            "x" : 11.6,
+            "y" : 6.000000000000007
+          }, {
+            "x" : 10.7,
+            "y" : 6.0
+          }, {
+            "x" : 10.7,
+            "y" : 5.0
+          }, {
+            "x" : 12.6,
+            "y" : 5.0
+          }, {
+            "x" : 12.6,
+            "y" : 15.600000000000001
+          }, {
+            "x" : 0.5,
+            "y" : 15.600000000000001
+          } ]
+        },
+        "id" : 5
+      } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 18.5,
-          "y" : 0.5,
-          "width" : 1.0,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 0.5,
-          "y" : 0.5,
-          "width" : 1.0,
+          "x" : 6.4,
+          "y" : 2.4000000000000004,
+          "width" : 6.0,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -128,49 +224,29 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 1,
+        "id" : 2,
         "shape" : {
-          "x" : 1.6,
-          "y" : 0.5,
-          "width" : 1.0,
-          "height" : 2.0,
+          "x" : 2.5,
+          "y" : 8.0,
+          "width" : 3.95,
+          "height" : 4.74,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 2.0 ],
-        "spawnNumber" : 1,
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 100,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 80.0,
+        "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
-      }, {
-        "id" : 2,
-        "shape" : {
-          "x" : 17.4,
-          "y" : 0.5,
-          "width" : 1.0,
-          "height" : 2.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 2.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 80.0,
-        "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "radius" : 0.2,
+        "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,

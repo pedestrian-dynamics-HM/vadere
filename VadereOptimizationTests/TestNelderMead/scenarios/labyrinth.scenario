@@ -4,7 +4,54 @@
   "release" : "1.2",
   "processWriters" : {
     "files" : [ ],
-    "processors" : [ ],
+    "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestOptimizationMetricNelderMeadProcessor",
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestOptimizationMetricProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "optimizationMetricProcessorId" : 2,
+        "testEvacuationProcessorId" : 3,
+        "maxMeanPointDistance" : 0.04348786203804414,
+        "maxMeanDifferenceFuncValue" : 0.02338581202140835,
+        "infoMinPointDistanceL2" : 0.0,
+        "infoMaxPointDistanceL2" : 0.8801307467971874,
+        "infoMinFuncDifference" : -0.0019591732715724675,
+        "infoMaxFuncDifference" : 0.2936029040890915,
+        "infoStddevPointDistance" : 0.05263515246267969,
+        "infoStddevDifferenceFuncValue" : 0.0357770532188485
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
+      "id" : 2
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestEvacuationTimeProcessor",
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor",
+      "attributes" : {
+        "expectedResult" : "SUCCESS",
+        "evacuationTimeProcessorId" : 4,
+        "maximalEvacuationTime" : 300.0,
+        "minimalEvacuationTime" : 0.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 6
+    } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
   },
@@ -33,8 +80,8 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 4,
-        "numberOfCircles" : 1,
+        "stepCircleResolution" : 5,
+        "numberOfCircles" : 4,
         "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
@@ -73,8 +120,8 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : -3213925745664992646,
-      "simulationSeed" : 0,
+      "fixedSeed" : 1,
+      "simulationSeed" : 1,
       "useSalientBehavior" : false
     },
     "topography" : {
@@ -96,7 +143,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 1.3,
@@ -105,7 +152,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 1.3,
@@ -114,7 +161,7 @@
           "height" : 19.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 1.3,
@@ -123,7 +170,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       }, {
         "shape" : {
           "x" : 32.5,
@@ -132,7 +179,7 @@
           "height" : 13.8,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 7
       }, {
         "shape" : {
           "x" : 3.1,
@@ -141,7 +188,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 8
       }, {
         "shape" : {
           "x" : 3.1,
@@ -150,7 +197,7 @@
           "height" : 15.8,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 9
       }, {
         "shape" : {
           "x" : 3.1,
@@ -159,7 +206,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 10
       }, {
         "shape" : {
           "x" : 24.1,
@@ -168,7 +215,7 @@
           "height" : 11.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 11
       }, {
         "shape" : {
           "x" : 20.1,
@@ -177,7 +224,7 @@
           "height" : 11.4,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 12
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -201,7 +248,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 16.0,
           "y" : 2.0,

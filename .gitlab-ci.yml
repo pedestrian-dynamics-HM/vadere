@@ -65,6 +65,7 @@ stages:
 .template_scenario_files:
     stage: integration_test
     script:
+        - rm ~/.config/vadere.conf
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py

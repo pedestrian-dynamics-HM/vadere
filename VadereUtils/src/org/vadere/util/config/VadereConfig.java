@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class VadereConfig {
     // Static Variables
     private static final Logger LOGGER = Logger.getLogger(VadereConfig.class);
 
+    // If changing any of the following values, remember to also change it in the CI configuration
     private static final String DEFAULT_HOME_DIR = System.getProperty("user.home");
     private static final String DEFAULT_CONFIG_DIR = ".config";
 
@@ -56,6 +58,8 @@ public class VadereConfig {
     // Constructors
     private VadereConfig() {
         createDefaultConfigIfNonExisting();
+
+        LOGGER.info(String.format("Use config file from path %s", CONFIG_PATH));
 
         // If Vadere was started like "vadere-console.jar --config-file here.txt", search in current working directory.
         String basePath = (CONFIG_PATH.getParent() == null) ? System.getProperty("user.dir") : CONFIG_PATH.getParent().toString() ;
@@ -76,6 +80,9 @@ public class VadereConfig {
             LOGGER.error(String.format("Error while reading config file \"%s\": %s", CONFIG_PATH.toString(), ex.getMessage()));
             LOGGER.info("Create and use default config");
         }
+
+        compareAndChangeDefaultKeysInExistingFile();
+
     }
 
     private void createDefaultConfigIfNonExisting() {
@@ -105,7 +112,46 @@ public class VadereConfig {
         }
     }
 
-    // Static Setters
+    private void compareAndChangeDefaultKeysInExistingFile(){
+        // Function that removes and adds Key-Value pairs locally when keys are inserted or removed in Vadere.conf.
+        // For both actions a info is written on the console.
+
+        // The keys of the default config have to match the keys from the existing file!
+        Map<String, String> defaultConfig = getDefaultConfig();
+
+        // First case: if key is missing in existing file then add it but added in to the defaultConfig
+        //   -- usually happens when a new configuration key was introduced
+        for(String key : defaultConfig.keySet()){
+            if(! vadereConfig.containsKey(key)){
+                String defaultValue = defaultConfig.get(key);
+
+                vadereConfig.addProperty(key, defaultValue);
+                LOGGER.info(String.format("Added key \"%s = %s\" to file %s because the configuration key-value pair " +
+                        "was not present in the file.", key, defaultValue, CONFIG_PATH));
+            }
+        }
+
+        // Second case: if key was removed from defaultConfig, then it is also removed from the current file
+        //   -- usually happens when a configuration key was removed
+
+
+        for(Iterator<String> iter = vadereConfig.getKeys(); iter.hasNext();){
+            String key = iter.next();
+            if(! defaultConfig.containsKey(key)){
+                iter.remove();
+                LOGGER.info(String.format("Removed key \"%s\" in file %s because there is no corresponding key entry " +
+                        "in the \"defaultConfig\" in source file VadereConfig.java", key, CONFIG_PATH));
+            }
+        }
+
+        //The following "getKeys" call is only here to enforce the autosaving of the configuration file (otherwise
+        // removed / inserted keys may not immediately appear in the config file after this function call.
+        vadereConfig.getKeys();
+
+        //TODO [improvement]: sort the entries in the configuration file alphabetically.
+    }
+
+    // Static setters
     /**
      * With this setter one can inject a different config file instead of using "~/.config/vadere.conf".
      *
@@ -116,7 +162,7 @@ public class VadereConfig {
         CONFIG_FILENAME = CONFIG_PATH.getFileName().toString();
     }
 
-    // Static Setters
+    // Static setters
     /**
      * Use Apache Common Configuration API on the returned object to retrieve Vadere's config options.
      *
@@ -135,16 +181,20 @@ public class VadereConfig {
     // Methods
 
     private static Map<String, String> getDefaultConfig(){
+        //NOTE: Remember to also add the new configuration in existing vadere.conf file.
+
         final Map<String, String> defaultConfig = new HashMap<>();
 
         String defaultSearchDirectory = System.getProperty("user.home");
 
-        defaultConfig.put("Gui.dataProcessingViewMode", "gui");
-        defaultConfig.put("Gui.toolbar.size", "40");
-        defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
         defaultConfig.put("Density.measurementScale", "10.0");
         defaultConfig.put("Density.measurementRadius", "15");
         defaultConfig.put("Density.standardDeviation", "0.5");
+        defaultConfig.put("Gui.dataProcessingViewMode", "gui");
+        defaultConfig.put("Gui.toolbar.size", "40");
+        defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
+        defaultConfig.put("History.lastUsedProject", null);
+        defaultConfig.put("History.recentProjects", null);
         defaultConfig.put("Messages.language", Locale.ENGLISH.getLanguage());
         defaultConfig.put("Pedestrian.radius", "0.195");
         defaultConfig.put("PostVis.SVGWidth", "1024");
@@ -170,6 +220,7 @@ public class VadereConfig {
         defaultConfig.put("SettingsDialog.outputDirectory.path", ".");
         defaultConfig.put("SettingsDialog.snapshotDirectory.path", ".");
         defaultConfig.put("SettingsDialog.showLogo", "false");
+        defaultConfig.put("Testing.stepCircleOptimization.compareBruteForceSolution", "false");
         defaultConfig.put("TopographyCreator.dotRadius", "0.5");
 
         return defaultConfig;

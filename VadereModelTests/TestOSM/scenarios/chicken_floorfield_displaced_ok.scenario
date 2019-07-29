@@ -1,7 +1,7 @@
 {
   "name" : "chicken_floorfield_displaced_ok",
   "description" : "",
-  "release" : "1.1",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -59,6 +59,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",

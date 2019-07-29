@@ -19,7 +19,7 @@ import java.util.Random;
  *
  * @author Benedikt Zoennchen
  */
-public class PatternSearchOptimizer implements StepCircleOptimizer {
+public class PatternSearchOptimizer extends StepCircleOptimizer {
 
 	private final double distanceThreshold;
 	private final AttributesOSM attributesOSM;
