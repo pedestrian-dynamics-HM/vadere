@@ -27,14 +27,18 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 
 	private final static Logger logger = Logger.getLogger(UpdateSchemeEventDrivenParallel.class);
 
+	static {
+		logger.setDebug();
+	}
+
 	private final Topography topography;
 	private LinkedCellsGrid<PedestrianOSM> linkedCellsGrid;
 	private boolean[][] locked;
 	private double pedestrianPotentialWidth;
-	private PMesh mesh;
-	private MeshPanel<PVertex, PHalfEdge, PFace> panel;
+	//private PMesh mesh;
+	//private MeshPanel<PVertex, PHalfEdge, PFace> panel;
 	private Map<PedestrianOSM, PVertex> map;
-	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
+	//private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 
 
 	public UpdateSchemeEventDrivenParallel(@NotNull final Topography topography, @NotNull final double pedestrianPotentialWidth) {
@@ -77,13 +81,13 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		int counter = 1;
 		// event driven update ignores time credits
 		do {
-			mesh = new PMesh();
+			//mesh = new PMesh();
 			Collection<VPoint> pedPoints = topography.getElements(PedestrianOSM.class)
 					.stream()
 					.map(ped -> ped.getPosition())
 					.collect(Collectors.toList());
 
-			triangulation = new IncrementalTriangulation(mesh);
+			/*triangulation = new IncrementalTriangulation(mesh);
 			for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
 				PHalfEdge halfEdge = triangulation.insert(pedestrianOSM.getPosition().getX(), pedestrianOSM.getPosition().getY());
 				PVertex vertex = triangulation.getMesh().getVertex(halfEdge);
@@ -99,13 +103,13 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			}
 			else {
 				panel.getMeshRenderer().setMesh(mesh);
-			}
+			}*/
 
 			/*for(PVertex pedestrianPoint : mesh.getVertices()) {
 				map.put(mesh.getPoint(pedestrianPoint).pedestrianOSM, pedestrianPoint);
 			}*/
 
-			panel.repaint();
+			//panel.repaint();
 
 			double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
 			linkedCellsGrid = new LinkedCellsGrid<>(new VRectangle(topography.getBounds()), (pedestrianPotentialWidth));
@@ -118,7 +122,8 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				int[] gridPos = linkedCellsGrid.gridPos(ped.getPosition());
 
-				boolean requiresUpdate = requireUpdate(ped);
+				//boolean requiresUpdate = requireUpdate(ped);
+				boolean requiresUpdate = true;
 
 				if(!locked[gridPos[0]][gridPos[1]] && requiresUpdate) {
 					parallelUpdatablePeds.add(ped);
@@ -144,7 +149,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 					count++;
 				}
 			}
-			//logger.info("update " + parallelUpdatablePeds.size() + " in parallel in round " + counter + ".");
+			logger.debug("update " + parallelUpdatablePeds.size() + " in parallel in round " + counter + ".");
 			parallelUpdatablePeds.stream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
@@ -159,7 +164,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		logger.info("avoided updates: " + count);
 	}
 
-	private boolean requireUpdate(@NotNull final PedestrianOSM pedestrianOSM) {
+	/*private boolean requireUpdate(@NotNull final PedestrianOSM pedestrianOSM) {
 
 		PVertex vertex = map.get(pedestrianOSM);
 		if(hasChanged(pedestrianOSM)) {
@@ -173,120 +178,9 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			}
 		}
 		return false;
-	}
+	}*/
 
 	private boolean hasChanged(@NotNull final PedestrianOSM pedestrianOSM) {
 		return pedestrianOSM.getLastPosition().equals(pedestrianOSM.getPosition());
-	}
-
-	private class PedestrianPoint implements IPoint {
-
-		private final PedestrianOSM pedestrianOSM;
-		private final VPoint point;
-
-		public PedestrianPoint(VPoint point, PedestrianOSM pedestrianOSM) {
-			this.point = point;
-			this.pedestrianOSM = pedestrianOSM;
-		}
-
-		private boolean hasChanged() {
-			//System.out.println(pedestrianOSM.getFootSteps().getFootSteps().size());
-			return pedestrianOSM.getFootSteps().isEmpty() || pedestrianOSM.getFootSteps().getFootSteps().peekLast().length() > 0;
-		}
-
-		@Override
-		public double getX() {
-			return point.getX();
-		}
-
-		@Override
-		public double getY() {
-			return point.getY();
-		}
-
-		@Override
-		public IPoint add(IPoint point) {
-			return this.point.add(point);
-		}
-
-		@Override
-		public IPoint add(double x, double y) {
-			return point.add(x, y);
-		}
-
-		@Override
-		public IPoint addPrecise(IPoint point) {
-			return this.point.addPrecise(point);
-		}
-
-		@Override
-		public IPoint subtract(IPoint point) {
-			return this.point.subtract(point);
-		}
-
-		@Override
-		public IPoint multiply(IPoint point) {
-			return this.point.multiply(point);
-		}
-
-		@Override
-		public IPoint scalarMultiply(double factor) {
-			return this.point.scalarMultiply(factor);
-		}
-
-		@Override
-		public IPoint rotate(double radAngle) {
-			return this.point.rotate(radAngle);
-		}
-
-		@Override
-		public double scalarProduct(IPoint point) {
-			return this.point.scalarProduct(point);
-		}
-
-		@Override
-		public IPoint norm() {
-			return this.point.norm();
-		}
-
-		@Override
-		public IPoint norm(double len) {
-			return this.point.norm(len);
-		}
-
-		@Override
-		public IPoint normZeroSafe() {
-			return this.point.normZeroSafe();
-		}
-
-		@Override
-		public double distance(IPoint other) {
-			return this.point.distance(other);
-		}
-
-		@Override
-		public double distance(double x, double y) {
-			return this.point.distance(x, y);
-		}
-
-		@Override
-		public double distanceSq(IPoint other) {
-			return this.point.distanceSq(other);
-		}
-
-		@Override
-		public double distanceSq(double x, double y) {
-			return this.point.distanceSq(x, y);
-		}
-
-		@Override
-		public double distanceToOrigin() {
-			return this.point.distanceToOrigin();
-		}
-
-		@Override
-		public PedestrianPoint clone() {
-			return new PedestrianPoint(this.point, pedestrianOSM.clone());
-		}
 	}
 }

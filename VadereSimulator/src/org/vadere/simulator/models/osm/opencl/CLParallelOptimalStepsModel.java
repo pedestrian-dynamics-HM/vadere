@@ -981,6 +981,7 @@ public class CLParallelOptimalStepsModel {
 	public static class PedestrianOpenCL {
 		public float stepRadius;
 		public float freeFlowSpeed;
+		public float eventTime;
 		public VPoint position;
 		public VPoint newPosition;
 

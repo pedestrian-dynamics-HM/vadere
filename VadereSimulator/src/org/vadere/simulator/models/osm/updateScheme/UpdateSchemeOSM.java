@@ -4,6 +4,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.osm.opencl.CLParallelEventDrivenOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -47,7 +48,9 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			case EVENT_DRIVEN: return new UpdateSchemeEventDriven(topography);
 			case SHUFFLE: return new UpdateSchemeShuffle(topography, random);
 			//TODO: magic number!
-			case EVENT_DRIVEN_PARALLEL: return new UpdateSchemeEventDrivenParallel(topography, 1.4);
+			case EVENT_DRIVEN_PARALLEL:
+			case EVENT_DRIVEN_CL:
+				return new UpdateSchemeEventDrivenParallel(topography, 1.4);
 			default: throw new IllegalArgumentException(updateType + " is not supported.");
 		}
 	}
@@ -57,20 +60,35 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			@NotNull final AttributesOSM attributesOSM,
 			@NotNull final AttributesFloorField attributesFloorField,
 			@NotNull final EikonalSolver targetEikonalSolver,
-			@NotNull final EikonalSolver distanceEikonalSolver) {
+			@NotNull final EikonalSolver distanceEikonalSolver,
+			@NotNull final UpdateType updateType) {
 
 		try {
 			double maxStepSize = 1.2; // from seitz-2014c
 			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
-			CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
-					attributesOSM,
-					attributesFloorField,
-					new VRectangle(topography.getBounds()),
-					targetEikonalSolver,
-					distanceEikonalSolver,
-					cellSize);
 
-			return new UpdateSchemeCLParallel(topography, clOptimalStepsModel);
+			switch (updateType) {
+				case EVENT_DRIVEN_CL: {
+					CLParallelEventDrivenOSM clOptimalStepsModel = new CLParallelEventDrivenOSM(
+							attributesOSM,
+							attributesFloorField,
+							new VRectangle(topography.getBounds()),
+							targetEikonalSolver,
+							distanceEikonalSolver,
+							cellSize);
+					return new UpdateSchemeCLEventDriven(topography, clOptimalStepsModel);
+				}
+				default : {
+					CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
+							attributesOSM,
+							attributesFloorField,
+							new VRectangle(topography.getBounds()),
+							targetEikonalSolver,
+							distanceEikonalSolver,
+							cellSize);
+					return new UpdateSchemeCLParallel(topography, clOptimalStepsModel);
+				}
+			}
 
 		} catch (OpenCLException e) {
 			e.printStackTrace();
