@@ -59,7 +59,7 @@ public class VadereConfig {
     private VadereConfig() {
         createDefaultConfigIfNonExisting();
 
-        LOGGER.info(String.format("Use config file %s", CONFIG_PATH));
+        LOGGER.info(String.format("Use config file from path %s", CONFIG_PATH));
 
         // If Vadere was started like "vadere-console.jar --config-file here.txt", search in current working directory.
         String basePath = (CONFIG_PATH.getParent() == null) ? System.getProperty("user.dir") : CONFIG_PATH.getParent().toString() ;
@@ -113,30 +113,42 @@ public class VadereConfig {
     }
 
     private void compareAndChangeDefaultKeysInExistingFile(){
+        // Function that removes and adds Key-Value pairs locally when keys are inserted or removed in Vadere.conf.
+        // For both actions a info is written on the console.
 
         // The keys of the default config have to match the keys from the existing file!
         Map<String, String> defaultConfig = getDefaultConfig();
 
-        // first case: if key is missing in existing file then add it but added in to the defaultConfig
-        //   -- usually happens when a new key was introduced
+        // First case: if key is missing in existing file then add it but added in to the defaultConfig
+        //   -- usually happens when a new configuration key was introduced
         for(String key : defaultConfig.keySet()){
             if(! vadereConfig.containsKey(key)){
-                vadereConfig.setProperty(key, defaultConfig.get(key));
-                LOGGER.info(String.format("Added key %s to file %s with default value because the key was not present "
-                        + "in the file before.", key, CONFIG_PATH));
+                String defaultValue = defaultConfig.get(key);
+
+                vadereConfig.addProperty(key, defaultValue);
+                LOGGER.info(String.format("Added key \"%s = %s\" to file %s because the configuration key-value pair " +
+                        "was not present in the file.", key, defaultValue, CONFIG_PATH));
             }
         }
 
         // Second case: if key was removed from defaultConfig, then it is also removed from the current file
-        //   -- usually happens when a key was removed
+        //   -- usually happens when a configuration key was removed
+
+
         for(Iterator<String> iter = vadereConfig.getKeys(); iter.hasNext();){
             String key = iter.next();
             if(! defaultConfig.containsKey(key)){
-                vadereConfig.clearProperty(key);
-                LOGGER.info(String.format("Removed key %s in file %s because there is no entry in the " +
-                        "\"defaultConfig\" in class VadereConfig.java", key, CONFIG_PATH));
+                iter.remove();
+                LOGGER.info(String.format("Removed key \"%s\" in file %s because there is no corresponding key entry " +
+                        "in the \"defaultConfig\" in source file VadereConfig.java", key, CONFIG_PATH));
             }
         }
+
+        //The following "getKeys" call is only here to enforce the autosaving of the configuration file (otherwise
+        // removed / inserted keys may not immediately appear in the config file after this function call.
+        vadereConfig.getKeys();
+
+        //TODO [improvement]: sort the entries in the configuration file alphabetically.
     }
 
     // Static setters
