@@ -1,14 +1,3 @@
-/*
- * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- *
- */
-
 //#pragma OPENCL EXTENSION cl_amd_printf : enable
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,8 +5,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define UMAD(a, b, c)  ( (a) * (b) + (c) )
 
-#define RADIUS 0.2
-#define DIAMETER 0.4
+#define RADIUS 0.2f q
+#define DIAMETER 0.4f
 
 #define POTENTIAL_WIDTH 0.5f
 
@@ -63,8 +52,8 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-inline uint2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
-    uint2 gridPos;
+inline int2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
+    int2 gridPos;
     float2 wordOr = (*worldOrigin);
     gridPos.x = (uint)max(0, (int)floor((p.x - wordOr.x) / (*cellSize)));
     gridPos.y = (uint)max(0, (int)floor((p.y - wordOr.y) / (*cellSize)));
@@ -72,7 +61,7 @@ inline uint2 getGridPos(const float2 p, __constant const float* cellSize, __cons
 }
 
 //Calculate address in grid from position (clamping to edges)
-inline uint getGridHash(const uint2 gridPos, __constant const uint2* gridSize){
+inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     //gridPos.x = gridPos.x & ((*gridSize).x - 1);
     //gridPos.y = gridPos.y & ((*gridSize).y - 1);
@@ -116,7 +105,7 @@ inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosit
         const float2                pedPosition)
 {
     float potential = 0;
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     //Accumulate surrounding cells
     // TODO: index check!
     for(int y = -1; y <= 1; y++) {
@@ -125,7 +114,7 @@ inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosit
             if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
-            uint   hash = getGridHash((uint2)uGridPos, gridSize);
+            uint   hash = getGridHash(uGridPos, gridSize);
             uint startI = d_CellStart[hash];
 
             //Skip empty cell
@@ -154,13 +143,13 @@ inline float getFullPedestrianPotential(
         const float2                pedPosition)
 {
     float potential = 0;
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-            uint2 uGridPos = gridPos - (int2)(x, y);
+            int2 uGridPos = (gridPos - (int2)(x, y));
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
-            if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
+            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
             uint   hash = getGridHash(uGridPos, gridSize);
@@ -192,14 +181,14 @@ inline bool hasConflict(
         const float timeCredit,
         const float2 pedPosition)
 {
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     uint collisions = 0;
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-           uint2 uGridPos = gridPos - (int2)(x, y);
+           int2 uGridPos = (gridPos - (int2)(x, y));
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
-            if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
+            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
             uint   hash = getGridHash(uGridPos, gridSize);
@@ -412,7 +401,7 @@ __kernel void calcHash(
     } else {
         const float2 p = (float2) (d_Pos[index * COORDOFFSET + X], d_Pos[index * COORDOFFSET + Y]);
         //Get address in grid
-        uint2 gridPos = getGridPos(p, cellSize, worldOrigin);
+        int2 gridPos = getGridPos(p, cellSize, worldOrigin);
         gridHash = getGridHash(gridPos, gridSize);
     }
     //Store grid hash and particle index

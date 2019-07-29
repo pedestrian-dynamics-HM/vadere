@@ -911,8 +911,9 @@ public class CLParallelOptimalStepsModel {
 
 		    strings.put(0, source);
 		    lengths.put(0, source.remaining());
-		    clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
-		    logger.debug(InfoUtils.getProgramBuildInfoStringASCII(clProgram, clDevice, CL_PROGRAM_BUILD_LOG));
+			clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
+			int errCode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
+			log.debug(InfoUtils.getProgramBuildInfoStringASCII(clProgram, clDevice, CL_PROGRAM_BUILD_LOG));
 
 		    CLInfo.checkCLError(clBuildProgram(clProgram, clDevice, "", programCB, NULL));
 		    clBitonicSortLocal = clCreateKernel(clProgram, "bitonicSortLocal", errcode_ret);

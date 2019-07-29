@@ -1,5 +1,5 @@
 {
-  "name" : "chicken_floorfield_ok_GPU",
+  "name" : "chicken_floorfield_ok_GPU_event",
   "description" : "",
   "release" : "1.0",
   "processWriters" : {
@@ -51,7 +51,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "PARALLEL_OPEN_CL",
+        "updateType" : "EVENT_DRIVEN_CL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -98,7 +98,7 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
+        "absorbing" : false,
         "shape" : {
           "x" : 10.0,
           "y" : 112.9,
@@ -121,12 +121,12 @@
           "x" : 2.3,
           "y" : 2.9,
           "width" : 30.0,
-          "height" : 90.0,
+          "height" : 80.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 16384,
+        "spawnNumber" : 1024,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,

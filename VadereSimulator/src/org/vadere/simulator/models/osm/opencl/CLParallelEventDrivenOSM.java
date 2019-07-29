@@ -270,7 +270,7 @@ public class CLParallelEventDrivenOSM {
 			clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 			clReorderedPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
 			clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
-			clReorderedEventTimes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
+			clReorderedEventTimes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clIds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, iGridSize[0] * iGridSize[1] * 4, errcode_ret);
 			clEventTimesData = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 
@@ -307,14 +307,14 @@ public class CLParallelEventDrivenOSM {
 
 			clEventTimes(
 					clIds,
-					clEventTimesData,
+					clReorderedEventTimes,
 					clCellStarts,
 					clCellEnds);
 
 			clMove(
 					clReorderedPedestrians,
 					clReorderedPositions,
-					clEventTimesData,
+					clReorderedEventTimes,
 					clIds,
 					clCirclePositions,
 					clCellStarts,
@@ -359,7 +359,12 @@ public class CLParallelEventDrivenOSM {
 				newPositions.set(indices[i], newPosition);
 			}
 
-			eventTimes = CLUtils.toFloatArray(memEventTimes, numberOfElements);
+			eventTimes = new float[numberOfElements];
+			float[] tmp = CLUtils.toFloatArray(memEventTimes, numberOfElements);
+			for(int i = 0; i < numberOfElements; i++) {
+				eventTimes[indices[i]] = tmp[i];
+			}
+
 			counter++;
 			return newPositions;
 		}
@@ -556,8 +561,8 @@ public class CLParallelEventDrivenOSM {
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 2, clReorderedEventTimes));
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 3, clPedestrians));
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 4, clPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 5, clPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 6, clEventTimes));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 5, clEventTimes));
+			CLInfo.checkCLError(clSetKernelArg1i(clSwap, 6, numberOfElements));
 			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSwap", clQueue, clSwap, 1, null, clGlobalWorkSize, null, null, null));
 		}
 	}
@@ -922,9 +927,9 @@ public class CLParallelEventDrivenOSM {
 			strings.put(0, source);
 			lengths.put(0, source.remaining());
 			clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
+			int errCode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
 			log.debug(InfoUtils.getProgramBuildInfoStringASCII(clProgram, clDevice, CL_PROGRAM_BUILD_LOG));
 
-			CLInfo.checkCLError(clBuildProgram(clProgram, clDevice, "", programCB, NULL));
 			clBitonicSortLocal = clCreateKernel(clProgram, "bitonicSortLocal", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clBitonicSortLocal1 = clCreateKernel(clProgram, "bitonicSortLocal1", errcode_ret);

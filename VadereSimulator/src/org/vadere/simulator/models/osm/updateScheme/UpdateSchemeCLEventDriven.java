@@ -73,9 +73,9 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 			int count = 0;
 			while(!checkEventTimes(clOptimalStepsModel.getEventTimes(), (float)(timeStepInSec + currentTimeInSec))) {
 				result = clOptimalStepsModel.update();
-				logger.debug("iteration (" + count + ")");
 				count++;
 			}
+			logger.debug("iteration (" + count + ")");
 			logger.debug("runtime for next step computation = " + ms + " [ms]");
 
 

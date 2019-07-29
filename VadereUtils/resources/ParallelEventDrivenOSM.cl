@@ -1,15 +1,4 @@
-/*
- * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- *
- */
-
-//#pragma OPENCL EXTENSION cl_amd_printf : enable
+//#pragma OPENCL EXTENSION cl_intel_printf : enable
 
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
@@ -60,26 +49,26 @@ inline void ComparatorLocal(
 ////////////////////////////////////////////////////////////////////////////////
 // Save particle grid cell hashes and indices
 ////////////////////////////////////////////////////////////////////////////////
-inline uint2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
-    uint2 gridPos;
+inline int2 getGridPos(const float2 p, __constant const float* cellSize, __constant const float2* worldOrigin){
+    int2 gridPos;
     float2 wordOr = (*worldOrigin);
-    gridPos.x = (uint)max(0, (int)floor((p.x - wordOr.x) / (*cellSize)));
-    gridPos.y = (uint)max(0, (int)floor((p.y - wordOr.y) / (*cellSize)));
+    gridPos.x = max(0, (int)floor((p.x - wordOr.x) / (*cellSize)));
+    gridPos.y = max(0, (int)floor((p.y - wordOr.y) / (*cellSize)));
     return gridPos;
 }
 
 //Calculate address in grid from position (clamping to edges)
-inline uint getGridHash(const uint2 gridPos, __constant const uint2* gridSize){
+inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
     //Wrap addressing, assume power-of-two grid dimensions
     //gridPos.x = gridPos.x & ((*gridSize).x - 1);
     //gridPos.y = gridPos.y & ((*gridSize).y - 1);
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
-inline uint2 getGridPosFromIndex(const uint hash, __constant const uint2* gridSize){
-    uint y = hash / (*gridSize).x;
-    uint x = hash - ((*gridSize).x * y);
-    return (uint2) (x, y);
+inline int2 getGridPosFromIndex(const uint hash, __constant const uint2* gridSize){
+    int y = hash / (*gridSize).x;
+    int x = hash - ((*gridSize).x * y);
+    return (int2) (x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,13 +108,13 @@ inline float getFullPedestrianPotential(
         const float2                pedPosition)
 {
     float potential = 0;
-    uint2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
+    int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-            uint2 uGridPos = gridPos - (int2)(x, y);
+            int2 uGridPos = gridPos - (int2)(x, y);
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
-            if(uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
+            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
                 continue;
             }
             uint   hash = getGridHash(uGridPos, gridSize);
@@ -216,7 +205,7 @@ inline float getObstaclePotential(float minDistanceToObstacle){
 __kernel void move(
     __global float          *orderedPedestrians,    //input
     __global float          *orderedPositions,      //input
-    __global float          *eventTimes,
+    __global float          *orderedEventTimes,
     __global uint           *ids,
     __global const float2   *circlePositions,       //input
     __global const uint     *d_CellStart,           //input: cell boundaries
@@ -235,22 +224,23 @@ __kernel void move(
 
     const uint index = ids[get_global_id(0)];
 
-    float eventTime = eventTimes[index];
+    float eventTime = orderedEventTimes[index];
     for(int y = -1; y <= 1; y++) {
         for(int x = -1; x <= 1; x++){
-            uint2 gridPos = getGridPosFromIndex(index, gridSize);
+            int2 gridPos = getGridPosFromIndex(index, gridSize);
 
-            uint2 uGridPos = (uint2)(gridPos + (int2)(x, y));
-            if(uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
-                uint j = getGridHash(uGridPos, gridSize);
-                if(eventTimes[j] < eventTime){
-                    return;
+            int2 uGridPos = (gridPos + (int2)(x, y));
+            if(uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
+                uint hash = getGridHash(uGridPos, gridSize);
+                for(int j = d_CellStart[hash]; j < d_CellEnd[hash]; j++) {
+                    if(orderedEventTimes[j] < eventTime){
+                        return;
+                    }
                 }
             }
         }
     }
-
-    if(index < numberOfPedestrians && index >= 0) {
+    if(index < numberOfPedestrians) {
         float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
@@ -281,20 +271,20 @@ __kernel void move(
 
         //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
         //minArg = pedPosition;
-        eventTimes[index] = eventTimes[index] + duration;
+        orderedEventTimes[index] = eventTime + duration;
         orderedPositions[index * COORDOFFSET + X] = minArg.x;
         orderedPositions[index * COORDOFFSET + Y] = minArg.y;
     }
 }
 __kernel void eventTimes(
-    __global int   *ids,                // out
+    __global uint  *ids,                // out
     __global float *eventTimes,         // out
     __global const uint *d_CellStart,   //input: cell boundaries
     __global const uint *d_CellEnd      //input
 ) {
     uint gid = get_global_id(0);
     float minEventTime = 10000;
-    uint id = -1;
+    uint id = 0;
     for(uint i = d_CellStart[gid]; i < d_CellEnd[gid]; i++) {
         if(eventTimes[i] < minEventTime) {
             id = i;
@@ -321,7 +311,7 @@ __kernel void swap(
         d_Pedestrians[index * OFFSET + STEPSIZE] = d_ReorderedPedestrians[index * OFFSET + STEPSIZE];
         d_Pedestrians[index * OFFSET + DESIREDSPEED] = d_ReorderedPedestrians[index * OFFSET + DESIREDSPEED];
 
-        d_eventTimes[index] = d_ReorderedPos[index];
+        d_eventTimes[index] = d_ReorderedEventTimes[index];
     }
 }
 
@@ -342,7 +332,7 @@ __kernel void calcHash(
     } else {
         const float2 p = (float2) (d_Pos[index * COORDOFFSET + X], d_Pos[index * COORDOFFSET + Y]);
         //Get address in grid
-        uint2 gridPos = getGridPos(p, cellSize, worldOrigin);
+        int2 gridPos = getGridPos(p, cellSize, worldOrigin);
         gridHash = getGridHash(gridPos, gridSize);
     }
     //Store grid hash and particle index
@@ -372,7 +362,7 @@ __kernel void findCellBoundsAndReorder(
     __global const uint     *d_Index,   //input: particle indices sorted by hash
     __global float          *d_Pedestrians,  //output: reordered by cell hash positions
     __global const float    *d_Pos,     //input: positions array sorted by hash
-    __global const          *d_eventTimes,
+    __global const float    *d_eventTimes,
     __local uint            *localHash,          //get_group_size(0) + 1 elements
     uint                    numParticles
 ){
