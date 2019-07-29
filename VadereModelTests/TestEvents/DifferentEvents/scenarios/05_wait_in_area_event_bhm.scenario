@@ -1,7 +1,7 @@
 {
   "name" : "05_wait_in_area_event_bhm",
   "description" : "",
-  "release" : "1.1",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

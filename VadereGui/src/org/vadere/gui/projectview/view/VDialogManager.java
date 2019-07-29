@@ -1,8 +1,10 @@
 package org.vadere.gui.projectview.view;
 
 
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
@@ -14,6 +16,7 @@ import java.util.prefs.Preferences;
 
 public class VDialogManager {
 
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 	private static Logger logger = Logger.getLogger(VDialogManager.class);
 	private static final FileFilter PROJECT_FILTER = new FileNameExtensionFilter("Vadere Project", "project");
 
@@ -34,12 +37,11 @@ public class VDialogManager {
 	}
 
 	public static String loadProjectDialog() {
-		return IOUtils.chooseFile(Messages.getString("LoadProjectText"),
-				getDefaultDirectory(), PROJECT_FILTER);
+		return IOUtils.chooseFile(Messages.getString("LoadProjectText"), getDefaultDirectory(), PROJECT_FILTER);
 	}
 
 	private static String getDefaultDirectory() {
-		return Preferences.userNodeForPackage(VadereApplication.class).get("ProjectView.defaultDirectory", "/projects");
+		return CONFIG.getString("ProjectView.defaultDirectory");
 	}
 
 	public static int showConfirmDialogWithBodyAndTextArea(String title, String body, String textAreaContent,

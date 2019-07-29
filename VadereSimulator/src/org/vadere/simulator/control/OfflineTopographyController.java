@@ -1,7 +1,9 @@
 package org.vadere.simulator.control;
 
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
@@ -39,10 +41,11 @@ public class OfflineTopographyController {
 		}
 
 		// add distance function
+		ScenarioCache cache = (ScenarioCache) VadereContext.get(topography).getOrDefault("cache", ScenarioCache.empty());
 		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
-				new AttributesFloorField());
+				new AttributesFloorField(), cache);
 		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
 		this.topography.setObstacleDistanceFunction(obstacleDistance);
 

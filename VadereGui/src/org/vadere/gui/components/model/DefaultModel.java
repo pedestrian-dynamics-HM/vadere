@@ -9,6 +9,7 @@ import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
@@ -470,8 +471,11 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * @return
 	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
-				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		if(pInPixel != null) {
+			return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+					getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		}
+		return VPoint.ZERO;
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),

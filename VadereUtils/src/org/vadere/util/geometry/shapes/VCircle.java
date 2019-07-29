@@ -322,6 +322,11 @@ public class VCircle implements VShape, ICircleSector {
 	}
 
 	@Override
+	public List<VLine> lines() {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
+	@Override
 	public boolean intersects(VShape shape) {
 		if (shape instanceof VCircle) {
 			VCircle otherCircle = (VCircle) shape;

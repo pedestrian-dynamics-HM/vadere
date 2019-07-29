@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.WeilerAtherton;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,6 +101,18 @@ public class PSLG {
 	            @NotNull final Collection<VLine> segments,
 	            @NotNull final Collection<VPoint> points) {
 		this(segmentBound, holes, segments, points, new HashSet<>());
+	}
+
+	public PSLG conclose(@NotNull final VRectangle rectangle) {
+		if(!rectangle.contains(segmentBound.getBounds2D())) {
+			throw new IllegalArgumentException();
+		}
+		ArrayList<VLine> newLines = new ArrayList<>(segments.size() + segmentBound.getLinePath().size());
+		newLines.addAll(segments);
+		newLines.addAll(segmentBound.getLinePath());
+		PSLG pslg = new PSLG(new VPolygon(rectangle), holes, newLines, points);
+		pslg.protectionDiscs.addAll(this.protectionDiscs);
+		return pslg;
 	}
 
 	public PSLG addLines(@NotNull final Collection<VLine> lines) {
@@ -200,5 +214,26 @@ public class PSLG {
 		return (!isHole && GeometryUtils.isCCW(p1, p2, p3)) || (isHole && GeometryUtils.isCW(p1,p2,p3)) && GeometryUtils.angle(p1, p2, p3) < minAngle;
 	}
 
+	public static List<VPolygon> constructHoles(@NotNull final List<VPolygon> polygons) {
+		WeilerAtherton weilerAtherton = new WeilerAtherton(polygons);
+		return weilerAtherton.cup();
+	}
 
+	public static List<VPolygon> constructBound(@NotNull final VPolygon bound, @NotNull final Collection<VPolygon> polygons) {
+		List<VPolygon> originalList = new ArrayList<>();
+		List<VPolygon> leftPolygons = new ArrayList<>();
+		originalList.add(bound);
+		leftPolygons.add(bound);
+		for(VPolygon polygon : polygons) {
+			if(!bound.containsShape(polygon)) {
+				originalList.add(polygon);
+			} else {
+				leftPolygons.add(polygon);
+			}
+		}
+		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
+		VPolygon newBound = weilerAtherton.subtraction().get();
+		leftPolygons.set(0, newBound);
+		return leftPolygons;
+	}
 }

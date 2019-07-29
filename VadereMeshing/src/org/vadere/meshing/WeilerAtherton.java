@@ -25,9 +25,22 @@ import java.util.stream.Collectors;
 
 /**
  * The Weiler-Atherton-Algorithm (https://en.wikipedia.org/wiki/Weiler%E2%80%93Atherton_clipping_algorithm)
- * merges a set of polygons. Note this merging does not support holes that is if there is a hole it will be
- * filled by the merging algorithm. Two polygons will be merged if they overlap. Co-linear and duplicated points,
- * i.e. useless points, will be removed. If polygon A contains polygon B, the result will be equals to polygon A.
+ * enables boolean operations on polygons, i.e.:
+ * <ul>
+ *     <li>
+ *         INTERSECTION of polygon A (subject) and B (clipper).
+ *     </li>
+ *     <li>
+ *         UNION of polygon A (subject) and B (clipper).
+ *     </li>
+ *     <li>
+ *         SUBTRACTION of polygon B (subject) from polygon A (clipper).
+ *     </li>
+ * </ul>
+ * Note that holes are not supported, i.e. if UNION produces a polygon with holes this will be filled.
+ * If SUBTRACTION produces a hole an error will be thrown since {@link VPolygon} do not support holes.
+ * Furthermore, it is assumed that each {@link VPolygon} which is involved is a simple non-self intersecting
+ * polygon. Co-linear and duplicated points, i.e. useless points, will be removed.
  *
  * @author Benedikt Zoennchen
  */
@@ -38,6 +51,13 @@ public class WeilerAtherton {
 	private static final String propNameIntersection = "intersection";
 	private static final String propNameInside = "inside";
 	private static final String propNameTwin = "twin";
+
+	private enum Operation {
+		INTERSECTION,
+		UNION,
+		SUBTRACTION
+	}
+
 
 	/**
 	 * The default constructor.
@@ -287,6 +307,31 @@ public class WeilerAtherton {
 		return newPolygons;
 	}
 
+	public Optional<VPolygon> subtraction() {
+		List<VPolygon> newPolygons = new ArrayList<>();
+		newPolygons.addAll(polygons);
+
+		if(polygons.size() == 0) {
+			return Optional.empty();
+		}
+		else if(polygons.size() == 1) {
+			return Optional.of(polygons.get(0));
+		}
+		else {
+			VPolygon subject = polygons.get(0);
+			List<VPolygon> clippers = polygons.subList(1, polygons.size());
+			for(VPolygon clipper : clippers) {
+				Optional<VPolygon> result = subtraction(subject, clipper);
+				if(result.isPresent()) {
+					subject = result.get();
+				} else {
+					return Optional.empty();
+				}
+			}
+			return Optional.of(subject);
+		}
+	}
+
 	/**
 	 * Executes the Weiler-Atherton-Algorithm for all of its polygons.
 	 *
@@ -330,13 +375,19 @@ public class WeilerAtherton {
 	private List<VPolygon> construct(
 			@NotNull final VPolygon subjectCandidat,
 			@NotNull final VPolygon clippingCandidat,
-			final boolean cap) {
+			final Operation operation) {
 
 		//Predicate<WeilerPoint> startEdgeCondition = cap ? p -> p.isInside() : p -> !p.isInside();
 		VPolygon subject = GeometryUtils.isCCW(subjectCandidat) ? subjectCandidat : subjectCandidat.revertOrder();
-		VPolygon clipping = GeometryUtils.isCCW(clippingCandidat) ? clippingCandidat : clippingCandidat.revertOrder();
-
-
+		VPolygon clipping;
+		switch (operation) {
+			case SUBTRACTION: clipping = GeometryUtils.isCCW(clippingCandidat) ? clippingCandidat.revertOrder() : clippingCandidat; break;
+			case UNION:
+			case INTERSECTION:
+			default: {
+				clipping = GeometryUtils.isCCW(clippingCandidat) ? clippingCandidat : clippingCandidat.revertOrder(); break;
+			}
+		}
 		PMesh subjectMesh = new PMesh();
 		PMesh clippingMesh = new PMesh();
 
@@ -371,7 +422,13 @@ public class WeilerAtherton {
 		List<VPolygon> polygons = new ArrayList<>();
 		PMesh mesh = subjectMesh;
 
-		Set<PHalfEdge> intersectionSet = cap ? subjectEnteringEdges : subjectExitingEdges;
+		Set<PHalfEdge> intersectionSet;
+		switch (operation) {
+			case INTERSECTION: intersectionSet = subjectEnteringEdges; break;
+			case UNION:
+			case SUBTRACTION:
+			default: intersectionSet = subjectExitingEdges; break;
+		};
 
 		// cup will preserve the polyons.
 		if(intersectionSet.isEmpty()) {
@@ -383,27 +440,34 @@ public class WeilerAtherton {
 					.streamPoints(clippingFace)
 					.allMatch(p -> contains(subject, p));
 
-			if(cap) {
-				if(subInClip) {
-					polygons.add(subjectCandidat);
-				}
-				else if(clipInSub) {
-					polygons.add(clippingCandidat);
-				}
+			switch (operation) {
+				case INTERSECTION: {
+					if(subInClip) {
+						polygons.add(subjectCandidat);
+					}
+					else if(clipInSub) {
+						polygons.add(clippingCandidat);
+					}
+				} break;
+				case UNION: {
+					if(subInClip) {
+						polygons.add(clippingCandidat);
+					}
+					else if(clipInSub) {
+						polygons.add(subjectCandidat);
+					}
+					else {
+						polygons.add(subjectCandidat);
+						polygons.add(clippingCandidat);
+					}
+				} break;
+				case SUBTRACTION:
+				default: {
+					if(clipInSub) {
+						throw new IllegalArgumentException("subtracting a polygon which is contained in its counterpart will produce a polygon with a hole which is not supported.");
+					}
+				} break;
 			}
-			else {
-				if(subInClip) {
-					polygons.add(clippingCandidat);
-				}
-				else if(clipInSub) {
-					polygons.add(subjectCandidat);
-				}
-				else {
-					polygons.add(subjectCandidat);
-					polygons.add(clippingCandidat);
-				}
-			}
-
 			return polygons;
 		}
 
@@ -558,7 +622,7 @@ public class WeilerAtherton {
 	}
 
 	public List<VPolygon> cap(@NotNull final VPolygon subjectCandidat, @NotNull final VPolygon clippingCandidat) {
-		return construct(subjectCandidat, clippingCandidat, true);
+		return construct(subjectCandidat, clippingCandidat, Operation.INTERSECTION);
 	}
 
 	//private PVertex<VPoint, Object, Object> getTwin(@NotNull final PVertex<VPoint, Object, Object> v, PMesh<VPoint, Object, >)
@@ -571,6 +635,18 @@ public class WeilerAtherton {
 	 * @return a pair of polygon where the second element is null if the polygons got merged. This is not the case if there do not overlap.
 	 */
 	public List<VPolygon> cup(@NotNull final VPolygon subjectCandidat, @NotNull final VPolygon clippingCandidat) {
-		return construct(subjectCandidat, clippingCandidat, false);
+		return construct(subjectCandidat, clippingCandidat, Operation.UNION);
+	}
+
+	public Optional<VPolygon> subtraction(@NotNull final VPolygon subjectCandidat, @NotNull final VPolygon clippingCandidat) {
+		List<VPolygon> result = construct(subjectCandidat, clippingCandidat, Operation.SUBTRACTION);
+		assert result.size() >= 1;
+		if(result.size() == 1) {
+			return Optional.of(result.get(0));
+		} else if(result.isEmpty()) {
+			return Optional.empty();
+		} else{
+			throw new IllegalStateException("subtraction of two polygons should never produce more than one polygon.");
+		}
 	}
 }

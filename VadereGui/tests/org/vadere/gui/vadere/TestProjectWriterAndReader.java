@@ -1,16 +1,5 @@
 package org.vadere.gui.vadere;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.stream.Collectors;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
@@ -28,6 +17,18 @@ import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
 import org.vadere.state.scenario.Topography;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestProjectWriterAndReader {
 
@@ -49,7 +50,7 @@ public class TestProjectWriterAndReader {
 		tests.add(new Scenario(new ScenarioStore(testName + "1", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
 		tests.add(new Scenario(new ScenarioStore(testName + "2", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
 		tests.add(new Scenario(new ScenarioStore(testName + "3", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
-		testProject = new VadereProject(testProjectName, tests);
+		testProject = new VadereProject(testProjectName, tests, Paths.get("."));
 	}
 
 	/**

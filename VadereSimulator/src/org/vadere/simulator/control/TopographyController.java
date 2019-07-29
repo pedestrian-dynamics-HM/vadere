@@ -1,11 +1,11 @@
 package org.vadere.simulator.control;
 
-import java.util.LinkedList;
-
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
+
+import java.util.LinkedList;
 
 public class TopographyController extends OfflineTopographyController {
 

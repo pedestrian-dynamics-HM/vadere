@@ -3,6 +3,7 @@ package org.vadere.gui.onlinevisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
@@ -186,7 +187,6 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		ActionGeneratePoly generatePoly = new ActionGeneratePoly(
 				Messages.getString("ProjectView.btnPolySnapshot.tooltip"),
 				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
-				renderer,
 				model);
 
         ActionShowPotentialField showPotentialField = new ActionShowPotentialField(

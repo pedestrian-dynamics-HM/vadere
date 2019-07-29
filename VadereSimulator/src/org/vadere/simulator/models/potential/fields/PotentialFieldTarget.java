@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.fields;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -16,7 +17,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
-import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
 import java.util.HashMap;
@@ -57,7 +57,6 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	 * configuration of the agents.
 	 */
 	private AttributesAgent attributesPedestrian;
-
 
 	/**
 	 * Stores all potential fields which represent to a target (targetId).

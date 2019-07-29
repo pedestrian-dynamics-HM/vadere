@@ -3,7 +3,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.osm.opencl.CLOptimalStepsModel;
+import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -21,12 +21,12 @@ import java.util.concurrent.Future;
  */
 public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
-	private CLOptimalStepsModel clOptimalStepsModel;
+	private CLParallelOptimalStepsModel clOptimalStepsModel;
 
 	private int counter = 0;
 	private Logger logger = Logger.getLogger(UpdateSchemeCLParallel.class);
 
-	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLOptimalStepsModel clOptimalStepsModel) {
+	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLParallelOptimalStepsModel clOptimalStepsModel) {
 		super(topography);
 		this.clOptimalStepsModel = clOptimalStepsModel;
 	}
@@ -49,21 +49,22 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 			// CallMethod.SEEK runs on the GPU
 
-			List<CLOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();
+			List<CLParallelOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();
 
 			double maxStepSize = -1.0;
 			for(int i = 0; i < pedestrianOSMList.size(); i++) {
 				PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
-				CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(
+				CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(
 						pedestrianOSM.getPosition(),
-						(float)pedestrianOSM.getDesiredStepSize());
+						(float)pedestrianOSM.getDesiredStepSize(),
+						(float)pedestrianOSM.getDesiredSpeed());
 				pedestrians.add(pedestrian);
 				maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed());
 			}
 
 			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
 			long ms = System.currentTimeMillis();
-			List<CLOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, cellSize);
+			List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, cellSize);
 			ms = System.currentTimeMillis() - ms;
 			logger.debug("runtime for next step computation = " + ms + " [ms]");
 

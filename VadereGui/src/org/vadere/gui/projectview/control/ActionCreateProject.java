@@ -4,14 +4,18 @@ package org.vadere.gui.projectview.control;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
+import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.logging.Logger;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.*;
+
+import static org.vadere.gui.projectview.control.ActionAbstractSaveProject.saveProjectUnlessUserCancels;
 
 public class ActionCreateProject extends AbstractAction {
 
@@ -40,10 +44,16 @@ public class ActionCreateProject extends AbstractAction {
 			if (newProjectName == null || newProjectName.trim().length() == 0) {
 				logger.info("invalid project name");
 			} else {
-				VadereProject project = new VadereProject(newProjectName, new ArrayList<>());
-				model.setCurrentProjectPath(null);
+
+				final String projectDirectory= VDialogManager.saveProjectDialog();
+
+				if(projectDirectory == null)
+					return; // do not create project without saving it first.
+
+				VadereProject project = new VadereProject(newProjectName, new ArrayList<>(), Paths.get(projectDirectory));
 				model.setProject(project);
 				model.refreshOutputTable();
+				saveProjectUnlessUserCancels(model);
 				ProjectView.getMainWindow().setProjectSpecificActionsEnabled(true);
 				logger.info("create project: " + newProjectName);
 			}

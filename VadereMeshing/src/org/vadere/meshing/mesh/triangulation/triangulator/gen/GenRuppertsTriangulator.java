@@ -205,9 +205,9 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 						addLargeTriangle(face);
 					}
 				} else { // (4.2) else insertVertex the point (and update data structure)
-					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
+//					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 					E e = triangulation.insert(circumCenter.getX(), circumCenter.getY());
-					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
+//					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 					logger.info("inserted: " + circumCenter);
 					for(F f : getMesh().getFaceIt(getMesh().getVertex(e))) {
 						if(isBad(f)) {
@@ -233,20 +233,33 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	    }
 	}
 
-	public void removeTriangles() {
-    	if(createHoles) {
-		    for(VPolygon hole : pslg.getHoles()) {
-			    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
-			    Optional<F> optFace = getMesh().streamFaces(f -> !getMesh().isHole(f)).filter(mergeCondition).findAny();
-			    if(optFace.isPresent()) {
-				    Optional<F> optionalF = triangulation.createHole(optFace.get(), mergeCondition, true);
-			    }
-		    }
-		    if(pslg.getSegmentBound() != null) {
-			    Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
-			    triangulation.shrinkBorder(mergeCondition, true);
+	private void removeOutsideTriangles() {
+
+		// (1) remove triangles inside holes
+	    for(VPolygon hole : pslg.getHoles()) {
+		    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
+		    Optional<F> optFace = getMesh().streamFaces(f -> !getMesh().isHole(f)).filter(mergeCondition).findAny();
+		    if (optFace.isPresent()) {
+			    Optional<F> optionalF = triangulation.createHole(optFace.get(), mergeCondition, true);
 		    }
 	    }
+
+	    // (2) remove triangles outside the boundary
+	    if(pslg.getSegmentBound() != null) {
+		    Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
+		    triangulation.shrinkBorder(mergeCondition, true);
+	    }
+	}
+
+	private void markOutsideTriangles() {
+		for(VPolygon hole : pslg.getHoles()) {
+			Predicate<F> markCondition = f -> !isMarked(f) && hole.contains(getMesh().toTriangle(f).midPoint());
+			Optional<F> optFace = getMesh().streamFaces(f -> !getMesh().isHole(f)).filter(markCondition).findAny();
+			if (optFace.isPresent()) {
+				List<F> faces = triangulation.findFaces(optFace.get(), markCondition, 0);
+				faces.stream().forEach(f -> mark(f));
+			}
+		}
 	}
 
 	public void step() {
@@ -263,10 +276,16 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 
 		    triangulation.setCanIllegalPredicate(edge -> !segments.contains(edge) && !segments.contains(getMesh().getTwin(edge)));
 
+		    if(createHoles) {
+			    removeOutsideTriangles();
+		    } else {
+		    	markOutsideTriangles();
+		    }
+
 		    // (4) split all encroached segments
 		    refineSimplex1D();
 
-		    assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
+//		    assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 
 		    // (5) gather all bad triangles
 		    getMesh().streamFaces().filter(f -> isBad(f)).forEach(f -> addBadTriangle(f));
@@ -276,7 +295,6 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	    } else if(!badTriangles.isEmpty() || !largeTriangles.isEmpty()) {
 		    refineSimplex2D();
     	} else if(!generated){
-			removeTriangles();
 			generated = true;
 	    } else {
 		    logger.info("finished");
@@ -356,6 +374,9 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 				split(segment);
 			}
 		}
+
+		// we require this because split may other edges which are not direct neighbours encroached!
+		refineSimplex1D();
 	}
 
 	private void deEncrocheSgements() {
@@ -371,20 +392,23 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private Pair<E, E> split(@NotNull final E segment) {
+		E splitSegment = isBoundary(segment) ? getMesh().getTwin(segment) : segment;
 		int size = segments.size();
-		segments.remove(segment);
-		segments.remove(getMesh().getTwin(segment));
+		segments.remove(splitSegment);
+		segments.remove(getMesh().getTwin(splitSegment));
 		assert segments.size() == size - 2;
 
 		// add s1, s2
-		VLine line = getMesh().toLine(segment);
+		VLine line = getMesh().toLine(splitSegment);
 		VPoint midPoint = line.midPoint();
 		V vertex = getMesh().createVertex(midPoint.getX(), midPoint.getY());
-		V v1 = getMesh().getVertex(segment);
-		V v2 = getMesh().getTwinVertex(segment);
+		V v1 = getMesh().getVertex(splitSegment);
+		V v2 = getMesh().getTwinVertex(splitSegment);
+
+		boolean mark = !createHoles && isMarked(getMesh().getTwinFace(splitSegment));
 
 		// split s
-		List<E> toLegalize = triangulation.splitEdgeAndReturn(vertex, segment, false);
+		List<E> toLegalize = triangulation.splitEdgeAndReturn(vertex, splitSegment, false);
 
 		// update data structure: add s1, s2
 		E e1 = getMesh().getEdge(vertex, v1).get();
@@ -394,6 +418,13 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		segments.add(getMesh().getTwin(e1));
 		segments.add(e2);
 		segments.add(getMesh().getTwin(e2));
+
+		if(mark) {
+			// we have to mark the correct face, this depends on the call above i.e. V v1 = getMesh().getVertex(splitSegment);
+			// and the fact that splitSegment is not a boundary edge.
+			mark(getMesh().getFace(e1));
+			mark(getMesh().getTwinFace(e2));
+		}
 
 		for(E e : toLegalize) {
 			triangulation.legalize(e, vertex);
@@ -410,7 +441,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		}
 
 		for(F f : getMesh().getFaceIt(vertex)) {
-			if(!getMesh().isBoundary(f)) {
+			if(!isBoundary(f)) {
 				if(isBad(f)) {
 					addBadTriangle(f);
 				}
@@ -421,6 +452,18 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		}
 		handleVertexInsertion(vertex);
 		return Pair.of(e1, e2);
+	}
+
+	private boolean isBoundary(@NotNull final F f) {
+		return getMesh().isBoundary(f) || isMarked(f);
+	}
+
+	private boolean isBoundary(@NotNull final E edge) {
+		return isBoundary(getMesh().getFace(edge));
+	}
+
+	private boolean isAtBoundary(@NotNull final E edge) {
+		return isBoundary(edge) || isBoundary(getMesh().getTwin(edge));
 	}
 
     @Override
@@ -465,7 +508,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
     }
 
     private boolean isInside(@NotNull final F face) {
-		if(getMesh().isBoundary(face)) {
+		if(isBoundary(face)) {
 			return false;
 		}
 
@@ -490,7 +533,28 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		return p.distance(line.getVPoint1()) > GeometryUtils.DOUBLE_EPS && p.distance(line.getVPoint2()) > GeometryUtils.DOUBLE_EPS && diameterCircle.contains(p);
 	}
 
-    private boolean isEncroached(@NotNull final E segment) {
+	private boolean isEncroached(@NotNull final E segment) {
+		E seg = isBoundary(segment) ? getMesh().getTwin(segment) : segment;
+		VPoint p1 = getMesh().toPoint(getMesh().getNext(seg));
+		if(isEncroached(seg, p1)) {
+			return true;
+		} else if(isAtBoundary(seg)) {
+			return false;
+		} else {
+			VPoint p2 = getMesh().toPoint(getMesh().getNext(getMesh().getTwin(seg)));
+			return isEncroached(seg, p2);
+		}
+	}
+
+	private boolean isMarked(@NotNull final F face) {
+		return getMesh().getBooleanData(face, "boundary");
+	}
+
+	private void mark(@NotNull final F face) {
+		getMesh().setBooleanData(face, "boundary", true);
+	}
+
+    /*private boolean isEncroached(@NotNull final E segment) {
 		E seg = getMesh().isBoundary(segment) ? getMesh().getTwin(segment) : segment;
 	    VLine line = getMesh().toLine(seg);
 	    VPoint midPoint = line.midPoint();
@@ -510,7 +574,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	    }
 
 	    return false;
-    }
+    }*/
 
     // TODO replace this!
 	private boolean isEncroachedExpensive(@NotNull final E segment) {

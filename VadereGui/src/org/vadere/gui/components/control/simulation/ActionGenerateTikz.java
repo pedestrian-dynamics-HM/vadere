@@ -51,6 +51,7 @@ public class ActionGenerateTikz extends AbstractAction implements IRendererChang
 					: new File(fileChooser.getSelectedFile().toString() + ".tex");
 
 			tikzGenerator.generateTikz(outputFile);
+			VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 		}
 	}
 

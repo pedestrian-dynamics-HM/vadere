@@ -47,7 +47,6 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 			SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
 
-
 			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".png");
 			fileChooser.setSelectedFile(outputFile);
 
@@ -62,6 +61,7 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 
 				try {
 					ImageIO.write(bi, "png", outputFile);
+					VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 					logger.info("generate new png: " + outputFile.getAbsolutePath());
 				} catch (IOException e1) {
 					logger.error(e1.getMessage());

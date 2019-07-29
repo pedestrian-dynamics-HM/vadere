@@ -683,6 +683,11 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	@Override
+	public List<VLine> lines() {
+		return getLinePath();
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");

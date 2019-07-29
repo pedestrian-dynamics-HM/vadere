@@ -14,7 +14,7 @@ public class Parameters {
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
-    public final static double qualityMeasurement = 0.90;
+    public final static double qualityMeasurement = 0.85;
     public final static double MINIMUM = 0.25;
     public final static double DENSITYWEIGHT = 2;
     public final static int NPOINTS = 100000;

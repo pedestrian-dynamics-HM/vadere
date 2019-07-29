@@ -47,6 +47,7 @@ public class ActionGenerateSVG extends AbstractAction implements IRendererChange
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".svg") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".svg");
 			svgGenerator.generateSVG(outputFile);
+			VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 		}
 
 	}

@@ -51,18 +51,18 @@ public class IOVadere {
 		return readProject(folderpath, MigrationOptions.defaultOptions());
 	}
 
-	public static VadereProject readProject(final String folderpath, final MigrationOptions options) throws IOException {
-		String name = IOUtils.readTextFile(Paths.get(folderpath, IOUtils.VADERE_PROJECT_FILENAME).toString());
+	public static VadereProject readProject(final String projectPath, final MigrationOptions options) throws IOException {
+		String name = IOUtils.readTextFile(Paths.get(projectPath, IOUtils.VADERE_PROJECT_FILENAME).toString());
 		logger.info("read .project file");
 
 		List<Scenario> scenarios = new ArrayList<>();
 		Set<String> scenarioNames = new HashSet<>();
-		Path p = Paths.get(folderpath, IOUtils.SCENARIO_DIR);
+		Path p = Paths.get(projectPath, IOUtils.SCENARIO_DIR);
 		MigrationResult migrationStats = new MigrationResult();
 		if (Files.isDirectory(p)) {
 
 			MigrationAssistant migrationAssistant = MigrationAssistant.getNewInstance(options);
-			migrationStats = migrationAssistant.analyzeProject(folderpath);
+			migrationStats = migrationAssistant.analyzeProject(projectPath);
 			logger.info("analysed .scenario files");
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
@@ -80,10 +80,10 @@ public class IOVadere {
 			}
 		}
 
-		VadereProject project = new VadereProject(name, scenarios);
+		VadereProject project = new VadereProject(name, scenarios, Paths.get(projectPath));
 		logger.info(migrationStats.toString());
 		project.setMigrationStats(migrationStats); // TODO [priority=low] [task=refactoring] better way to tunnel those results to the GUI?
-		project.setOutputDir(Paths.get(folderpath, IOUtils.OUTPUT_DIR));
+		project.setOutputDir(Paths.get(projectPath, IOUtils.OUTPUT_DIR));
 		ProjectOutput projectOutput = new ProjectOutput(project);
 		project.setProjectOutput(projectOutput);
 		logger.info("project loaded: " + project.getName());

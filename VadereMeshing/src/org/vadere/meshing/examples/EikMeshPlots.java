@@ -4,6 +4,7 @@ import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
@@ -56,7 +57,11 @@ public class EikMeshPlots {
 
 		kaiserslautern();
 		ruppertsAndEikMeshKaiserslautern();*/
-		bridge();
+		//bridge();
+		//roomLFS();
+		//cornerLFS();
+
+		uniformRing(0.3);
 	}
 
 	public static void randomDelaunay() throws IOException {
@@ -120,16 +125,84 @@ public class EikMeshPlots {
 		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
-
-		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 
+		// (3) use EikMesh to improve the mesh
+		double h0 = 0.5;
+		var meshImprover = new PEikMesh(
+				distanceFunction,
+				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
+				h0,
+				new VRectangle(segmentBound.getBounds2D()),
+				pslg.getHoles()
+		);
+
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		meshPanel.display("Combined distance functions " + h0);
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(20);
+			meshPanel.repaint();
+		}
+		//meshImprover.generate();
+
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void roomLFS() throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/room.poly");
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> 2.0);
+		edgeLengthFunctionApprox.printPython();
+
+
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+
+		// (3) use EikMesh to improve the mesh
+		double h0 = 0.5;
+		var meshImprover = new PEikMesh(
+				distanceFunction,
+				edgeLengthFunctionApprox,
+				h0,
+				new VRectangle(segmentBound.getBounds2D()),
+				pslg.getHoles()
+		);
+
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		meshPanel.display("Combined distance functions " + h0);
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(20);
+			meshPanel.repaint();
+		}
+		//meshImprover.generate();
+
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void cornerLFS() throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/corner.poly");
+		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> 1.0);
+		edgeLengthFunctionApprox.printPython();
+
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 1.0;
 		var meshImprover = new PEikMesh(
 				distanceFunction,
-				p -> h0 + 0.5 * Math.abs(distanceFunction.apply(p)),
+				edgeLengthFunctionApprox,
 				h0,
 				new VRectangle(segmentBound.getBounds2D()),
 				pslg.getHoles()
@@ -361,9 +434,9 @@ public class EikMeshPlots {
 
 	private static void write(final String string, final String filename) throws IOException {
 		File outputFile = new File("./eikmesh/"+filename+".tex");
-		try(FileWriter fileWriter = new FileWriter(outputFile)) {
-			fileWriter.write(string);
-		}
+//		try(FileWriter fileWriter = new FileWriter(outputFile)) {
+			//fileWriter.write(string);
+//		}
 	}
 
 	private static String toTexDocument(final String tikz) {

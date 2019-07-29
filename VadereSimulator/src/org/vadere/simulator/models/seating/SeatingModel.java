@@ -56,7 +56,7 @@ public class SeatingModel implements Model {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Topography topography,
-			AttributesAgent attributesPedestrian, Random random) {
+						   AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();

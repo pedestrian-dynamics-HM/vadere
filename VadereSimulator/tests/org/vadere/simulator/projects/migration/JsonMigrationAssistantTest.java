@@ -6,10 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.entrypoints.Version;
-import org.vadere.simulator.projects.io.TestUtils;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.simulator.utils.reflection.TestResourceHandler;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ import joptsimple.internal.Strings;
 
 import static org.junit.Assert.assertEquals;
 
-public class JsonMigrationAssistantTest implements TestResourceHandler {
+public class JsonMigrationAssistantTest implements TestResourceHandlerScenario {
 
 	@Override
 	public Path getTestDir() {

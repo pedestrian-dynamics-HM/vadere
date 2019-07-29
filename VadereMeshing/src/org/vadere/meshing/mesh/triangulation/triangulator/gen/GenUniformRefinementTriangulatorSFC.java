@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
+import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -113,6 +114,10 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	private final Collection<V> fixPoints;
 
+	private Collection<V> insertedFixPoints;
+
+	private double smallestEdgeLength;
+
 	/**
 	 * <p>The default constructor.</p>
 	 *  @param meshSupplier          a {@link IMeshSupplier} required to generate a new and empty mesh.
@@ -130,6 +135,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 			final IDistanceFunction distFunc,
 			final Collection<IPoint> fixPoints) {
 
+		this.smallestEdgeLength = Double.POSITIVE_INFINITY;
 		this.meshSupplier = meshSupplier;
 		this.initialized = false;
 		this.refinementFinished = false;
@@ -142,6 +148,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		this.sfc = new GenSpaceFillingCurve<>();
 		this.mesh = meshSupplier.get();
 		this.fixPoints = fixPoints.stream().map(p -> mesh.createVertex(p.getX(), p.getY())).collect(Collectors.toList());
+		this.insertedFixPoints = new ArrayList<>();
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
@@ -461,7 +468,9 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 */
 	private V refine(final E edge) {
 		//TODO: magic number 0.01
-		IPoint midPoint = getMesh().toLine(edge).midPoint(random.nextDouble() * 0.01);
+		VLine line = getMesh().toLine(edge);
+		IPoint midPoint = line.midPoint(random.nextDouble() * 0.01);
+
 		V v = getMesh().createVertex(midPoint.getX(), midPoint.getY());
 		IPoint p = getMesh().getPoint(v);
 
@@ -469,6 +478,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 			points.add(p);
 			E newEdge = triangulation.getAnyEdge(triangulation.splitEdge(v, edge, true));
 			triangulation.insertEvent(newEdge);
+			smallestEdgeLength = Math.min(smallestEdgeLength, line.length() / 2.0);
 		}
 		else {
 			throw new IllegalStateException(p + " point already exist.");
@@ -491,6 +501,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				triangulation.finish();
 
 				// the following calls are quite expensive
+				establishConstrains();
 				shrinkBorder();
 				createHoles();
 				//triangulation.smoothBorder();
@@ -509,12 +520,15 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
     }
 
 	private void insertFixPoints(@NotNull final Collection<V> fixPoints) {
-		getTriangulation().insertVertices(fixPoints);
+		for(V vertex : fixPoints) {
+			V insertedVertex = getMesh().getVertex(getTriangulation().insertVertex(vertex));
+			insertedFixPoints.add(insertedVertex);
+		}
 	}
 
 	@Override
 	public Collection<V> getFixPoints() {
-		return fixPoints;
+		return insertedFixPoints;
 	}
 
 
@@ -580,6 +594,21 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	/**
 	 * <p>Creates holes everywhere where the distance function is positive. Neighbouring holes will be merged.</p>
 	 */
+	/*private void createHoles() {
+		List<F> faces = triangulation.getMesh().getFaces();
+		for(F face : faces) {
+			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+			}
+		}
+	}*/
+
+	private void establishConstrains() {
+		List<VLine> lines = boundary.stream().flatMap(shape -> shape.lines().stream()).collect(Collectors.toList());
+		GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
+		cdt.generate(false);
+	}
+
 	private void createHoles() {
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
@@ -587,6 +616,56 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
 			}
 		}
+	}
+
+	/*private void createHoles() {
+		List<F> faces = triangulation.getMesh().getFaces();
+		for(F face : faces) {
+			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
+				triangulation.createHole(face, f -> intersect(triangulation.getMesh().toTriangle(f)), true);
+			}
+		}
+	}*/
+
+	private boolean intersect(@NotNull final VPoint p1, @NotNull final VPoint p2) {
+		double dist1 = distFunc.apply(p1);
+		double dist2 = distFunc.apply(p2);
+		double dist = GeometryUtils.distance(p1.x, p1.y, p2.x, p2.y);
+
+		if(dist+dist1+dist1 > 0){
+			VPoint dir = p2.subtract(p1).norm();
+			VPoint start = p1.add(dir.setMagnitude(-dist1));
+			VPoint end = p2.subtract(dir.setMagnitude(-dist2));
+			double len = start.distance(end);
+			for(double dx = smallestEdgeLength * 0.2; dx < len; dx += smallestEdgeLength) {
+				VPoint dxy = dir.setMagnitude(dx);
+
+				if(distFunc.apply(start.add(dxy)) > smallestEdgeLength * 0.2) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean intersect(@NotNull final VTriangle triangle) {
+		if(distFunc.apply(triangle.midPoint()) > 0) {
+			return true;
+		}
+
+		double d1 = distFunc.apply(triangle.p1);
+		double d2 = distFunc.apply(triangle.p2);
+		double d3 = distFunc.apply(triangle.p3);
+
+		if((d1 > smallestEdgeLength && d2 > smallestEdgeLength) || (d1 > smallestEdgeLength && d3 > smallestEdgeLength) || (d2 > smallestEdgeLength && d3 > smallestEdgeLength)) {
+			return true;
+		}
+
+		/*boolean i1 = d1 > smallestEdgeLength && d2 > smallestEdgeLength && intersect(triangle.p1, triangle.p2);
+		boolean i2 = d2 > smallestEdgeLength && d3 > smallestEdgeLength && intersect(triangle.p2, triangle.p3);
+		boolean i3 = d3 > smallestEdgeLength && d1 > smallestEdgeLength && intersect(triangle.p3, triangle.p1);
+		return (i1 && i2) || (i1 && i3) || (i2 && i3);*/
+		return false;
 	}
 
 	/**
