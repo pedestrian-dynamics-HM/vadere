@@ -80,7 +80,7 @@ public class ActionLoadProject extends AbstractAction {
 
 
 			} else {
-				logger.info(String.format("user canceled loadFromFilesystem project."));
+				logger.info("User canceled loadFromFilesystem project.");
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -88,24 +88,27 @@ public class ActionLoadProject extends AbstractAction {
 	}
 
 	public static void addToRecentProjects(String path) {
-		String listStr = VadereConfig.getConfig().getString("History.recentProjects", "");
-		String str = path; // make sure the new one is at top position
-		if (listStr.length() > 0) {
-			String[] list = listStr.split(",");
-			for (int i = 0; i < list.length; i++) {
+		String existingStoredPaths = VadereConfig.getConfig().getString("History.recentProjects", "");
+		String csvPaths = path; // make sure the new one is at top position -- comma separated paths
+
+		if (existingStoredPaths.length() > 0) {
+			String[] list = existingStoredPaths.split(",");
+			for(int i = 0; i < list.length; i++) {
 				String entry = list[i];
 				if (i < 10 && !entry.equals(path) && Files.exists(Paths.get(entry)))
-					str += "," + entry;
+					csvPaths += "," + entry;
 			}
 		}
+
 		VadereConfig.getConfig().setProperty("History.lastUsedProject", path);
-		VadereConfig.getConfig().setProperty("History.recentProjects", str);
+		VadereConfig.getConfig().setProperty("History.recentProjects", csvPaths);
 		ProjectView.getMainWindow().updateRecentProjectsMenu();
 	}
 
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath){
 		loadProjectByPath(projectViewModel, projectFilePath, MigrationOptions.defaultOptions());
 	}
+
 	public static void loadProjectByPath(ProjectViewModel projectViewModel, String projectFilePath, MigrationOptions options) {
 		try {
 			VadereProject project = IOVadere.readProjectJson(projectFilePath, options);

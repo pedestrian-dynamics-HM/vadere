@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,6 +59,8 @@ public class VadereConfig {
     private VadereConfig() {
         createDefaultConfigIfNonExisting();
 
+        LOGGER.info(String.format("Use config file %s", CONFIG_PATH));
+
         // If Vadere was started like "vadere-console.jar --config-file here.txt", search in current working directory.
         String basePath = (CONFIG_PATH.getParent() == null) ? System.getProperty("user.dir") : CONFIG_PATH.getParent().toString() ;
 
@@ -77,6 +80,9 @@ public class VadereConfig {
             LOGGER.error(String.format("Error while reading config file \"%s\": %s", CONFIG_PATH.toString(), ex.getMessage()));
             LOGGER.info("Create and use default config");
         }
+
+        compareAndChangeDefaultKeysInExistingFile();
+
     }
 
     private void createDefaultConfigIfNonExisting() {
@@ -102,6 +108,33 @@ public class VadereConfig {
                                 .collect(Collectors.toList()));
             } catch (IOException e) {
                 LOGGER.error(String.format("Error while writing default config file \"%s\": %s", CONFIG_PATH, e.getMessage()));
+            }
+        }
+    }
+
+    private void compareAndChangeDefaultKeysInExistingFile(){
+
+        // The keys of the default config have to match the keys from the existing file!
+        Map<String, String> defaultConfig = getDefaultConfig();
+
+        // first case: if key is missing in existing file then add it but added in to the defaultConfig
+        //   -- usually happens when a new key was introduced
+        for(String key : defaultConfig.keySet()){
+            if(! vadereConfig.containsKey(key)){
+                vadereConfig.setProperty(key, defaultConfig.get(key));
+                LOGGER.info(String.format("Added key %s to file %s with default value because the key was not present "
+                        + "in the file before.", key, CONFIG_PATH));
+            }
+        }
+
+        // Second case: if key was removed from defaultConfig, then it is also removed from the current file
+        //   -- usually happens when a key was removed
+        for(Iterator<String> iter = vadereConfig.getKeys(); iter.hasNext();){
+            String key = iter.next();
+            if(! defaultConfig.containsKey(key)){
+                vadereConfig.clearProperty(key);
+                LOGGER.info(String.format("Removed key %s in file %s because there is no entry in the " +
+                        "\"defaultConfig\" in class VadereConfig.java", key, CONFIG_PATH));
             }
         }
     }
@@ -142,12 +175,14 @@ public class VadereConfig {
 
         String defaultSearchDirectory = System.getProperty("user.home");
 
-        defaultConfig.put("Gui.dataProcessingViewMode", "gui");
-        defaultConfig.put("Gui.toolbar.size", "40");
-        defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
         defaultConfig.put("Density.measurementScale", "10.0");
         defaultConfig.put("Density.measurementRadius", "15");
         defaultConfig.put("Density.standardDeviation", "0.5");
+        defaultConfig.put("Gui.dataProcessingViewMode", "gui");
+        defaultConfig.put("Gui.toolbar.size", "40");
+        defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
+        defaultConfig.put("History.lastUsedProject", null);
+        defaultConfig.put("History.recentProjects", null);
         defaultConfig.put("Messages.language", Locale.ENGLISH.getLanguage());
         defaultConfig.put("Pedestrian.radius", "0.195");
         defaultConfig.put("PostVis.SVGWidth", "1024");
