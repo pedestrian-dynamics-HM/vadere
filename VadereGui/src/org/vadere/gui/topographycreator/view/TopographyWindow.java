@@ -55,10 +55,13 @@ import org.vadere.util.config.VadereConfig;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEditSupport;
 
@@ -121,7 +124,7 @@ public class TopographyWindow extends JPanel {
 		selectedElementLabel = new JLabelObserver(JLabelObserver.DEFAULT_TEXT);
 
 		JsonValidIndicator jsonValidIndicator = new JsonValidIndicator();
-		final ScenarioElementView textView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
+		final ScenarioElementView scenarioElementView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
 
 		final JPanel thisPanel = this;
 
@@ -181,7 +184,6 @@ public class TopographyWindow extends JPanel {
 		panelModel.addViewportChangeListener(viewportChangeListener);
 		panelModel.addScrollPane(scrollPane);
 
-		// mainPanel.setPreferredSize(new Dimension(windowWidth, windowHeight));
 		mainPanel = new TopographyPanel(panelModel, new TopographyCreatorRenderer(panelModel), scrollPane);
 		mainPanel.addComponentListener(new PanelResizeListener(panelModel));
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
@@ -189,30 +191,35 @@ public class TopographyWindow extends JPanel {
 		panelModel.addObserver(mainPanel);
 		scrollPane.setViewportView(mainPanel);
 
-		/*
-		 * JPanel textViewPanel = new JPanel();
-		 * BorderLayout layoutManagerTextViewPanel = new BorderLayout();
-		 * textViewPanel.setLayout(layoutManagerTextViewPanel);
-		 */
-
 		selectedElementLabel.setPanelModel(panelModel);
 
-		// textViewPanel.add(selectedElementLabel, BorderLayout.PAGE_START);
-		// textViewPanel.add(textView, BorderLayout.CENTER);
-
 		panelModel.addObserver(infoPanel);
-		textView.setPreferredSize(new Dimension(1, windowHeight));
+		scenarioElementView.setPreferredSize(new Dimension(1, windowHeight));
 
 		panelModel.addObserver(selectedElementLabel);
 
+		scrollPane.setMinimumSize(new Dimension(1, 1));
+		scenarioElementView.setMinimumSize(new Dimension(1, 1));
+		JSplitPane splitPane = new JSplitPane();
+		((BasicSplitPaneUI) splitPane.getUI()).getDivider().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					int newLocation = splitPane.getSize().width - (scenarioElementView.textWidth() + 65); // 65 magic number to take gutter into account
+					if (newLocation > 0)
+						splitPane.setDividerLocation(newLocation);
+				}
+			}
+		});
+
+		splitPane.setResizeWeight(0.8);
+		splitPane.resetToPreferredSizes();
+		splitPane.setLeftComponent(scrollPane);
+		splitPane.setRightComponent(scenarioElementView);
+
 		thisPanel.add(toolbar, cc.xyw(2, 2, 4));
-		thisPanel.add(scrollPane, cc.xy(2, 4));
+		thisPanel.add(splitPane, cc.xyw(2, 4, 4));
 		thisPanel.add(infoPanel, cc.xyw(2, 6, 4));
-		// thisPanel.add(textViewPanel, cc.xy(4, 4));
-		thisPanel.add(textView, cc.xy(4, 4));
-
-
-
 
 		/* close dialog action */
 
@@ -268,7 +275,6 @@ public class TopographyWindow extends JPanel {
 				.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
-
 
 		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
 		List<Action> sourceDrawModes = new ArrayList<>();
@@ -347,8 +353,6 @@ public class TopographyWindow extends JPanel {
 		ActionSelectSelectShape selectShape = new ActionSelectSelectShape("select shape mode", new ImageIcon(
 				Resources.class.getResource("/icons/select_shapes_icon.png")), panelModel, undoSupport);
 
-
-
 		/* resize Topography */
 		TopographyAction resizeTopographyBound = new ActionResizeTopographyBound(Messages.getString("TopographyBoundDialog.tooltip"),
 				new ImageIcon(Resources.class.getResource("/icons/topography_icon.png")),
@@ -371,10 +375,6 @@ public class TopographyWindow extends JPanel {
 				new ActionTopographyMakroMenu("TopographyMakros",
 						new ImageIcon(Resources.class.getResource("/icons/auto_generate_ids.png")),
 						panelModel);
-
-//		/* Topography checker*/
-//		ActionScenarioChecker actionScenarioChecker =
-//				new ActionScenarioChecker("ScenarioChecker", panelModel, jsonValidIndicator);
 
 		int iconHeight = VadereConfig.getConfig().getInt("ProjectView.icon.height.value");
 		int iconWidth = VadereConfig.getConfig().getInt("ProjectView.icon.width.value");
@@ -431,7 +431,6 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, redoAction, "TopographyCreator.btnRedo.tooltip");
 		toolbar.add(Box.createHorizontalGlue());
 		addActionToToolbar(toolbar, actionTopographyMakroMenu, "TopographyCreator.btnGenerateIds.tooltip");
-//		addActionToToolbar(toolbar, actionScenarioChecker, "TopographyCreator.btnChecker.tooltip");
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 
