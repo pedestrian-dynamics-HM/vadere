@@ -33,6 +33,8 @@ import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_CPU;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
 import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
 import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
@@ -147,6 +149,7 @@ public class CLParallelOptimalStepsModel {
     private long clSeek;
     private long clMove;
     private long clSwap;
+	private long clResetCells;
 
     private int numberOfGridCells;
     private VRectangle bound;
@@ -317,6 +320,9 @@ public class CLParallelOptimalStepsModel {
 					clPositions,
 					numberOfElements);
 
+			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+
 			clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
 			//clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, memNextPositions, null, null);
 			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
@@ -377,8 +383,8 @@ public class CLParallelOptimalStepsModel {
 		if(counter == 0) {
 			circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
 					new VCircle(new VPoint(0,0), 1.0),
-					20, //attributesOSM.getNumberOfCircles(),
-					50, //attributesOSM.getStepCircleResolution(),
+					attributesOSM.getNumberOfCircles(),
+					attributesOSM.getStepCircleResolution(),
 					0,
 					2*Math.PI);
 			circlePositionList.add(VPoint.ZERO);
@@ -432,6 +438,18 @@ public class CLParallelOptimalStepsModel {
         initCL();
         buildProgram();
     }
+
+	private void clMemSet(final long clData, final int val, final int len) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			CLInfo.checkCLError(clSetKernelArg1p(clResetCells, 0, clData));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 1, val));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 2, len));
+			clGlobalWorkSize.put(0, len);
+			//TODO: local work size?
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clResetCellStartEnd", clQueue, clResetCells, 1, null, clGlobalWorkSize, null, null, null));
+		}
+	}
 
     private void clCalcHash(
     		final long clHashes,
@@ -665,7 +683,7 @@ public class CLParallelOptimalStepsModel {
 	    	PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
-			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 8, max_work_group_size, max_local_memory_size); // local memory for key and values (integer)
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clBitonicSortLocal, 8, max_work_group_size, max_local_memory_size); // local memory for key and values (integer)
 
 		    // small sorts
 		    if (numberOfElements <= maxWorkGroupSize) {
@@ -830,6 +848,7 @@ public class CLParallelOptimalStepsModel {
 	    CLInfo.checkCLError(clReleaseKernel(clSeek));
 	    CLInfo.checkCLError(clReleaseKernel(clMove));
 	    CLInfo.checkCLError(clReleaseKernel(clSwap));
+	    CLInfo.checkCLError(clReleaseKernel(clResetCells));
 
 	    CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
 	    CLInfo.checkCLError(clReleaseProgram(clProgram));
@@ -934,6 +953,8 @@ public class CLParallelOptimalStepsModel {
 		    clMove = clCreateKernel(clProgram, "move", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 		    clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
+		    CLInfo.checkCLError(errcode_ret);
+		    clResetCells = clCreateKernel(clProgram, "setMem", errcode_ret);
 		    CLInfo.checkCLError(errcode_ret);
 
 			max_work_group_size = InfoUtils.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);

@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define UMAD(a, b, c)  ( (a) * (b) + (c) )
 
-#define RADIUS 0.2f q
+#define RADIUS 0.2f
 #define DIAMETER 0.4f
 
 #define POTENTIAL_WIDTH 0.5f
@@ -436,7 +436,7 @@ __kernel void calcHash(
 ////////////////////////////////////////////////////////////////////////////////
 // Find cell bounds and reorder positions+velocities by sorted indices
 ////////////////////////////////////////////////////////////////////////////////
-__kernel void Memset(
+__kernel void setMem(
     __global uint *d_Data,
     uint val,
     uint N

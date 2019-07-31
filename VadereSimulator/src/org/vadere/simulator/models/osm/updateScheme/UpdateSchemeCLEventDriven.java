@@ -22,6 +22,7 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 	private CLParallelEventDrivenOSM clOptimalStepsModel;
 
 	private int counter = 0;
+	private float[] eventTimes;
 	private static Logger logger = Logger.getLogger(UpdateSchemeCLEventDriven.class);
 
 	static {
@@ -64,57 +65,48 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 					maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed() * timeStepInSec);
 				}
 				clOptimalStepsModel.setPedestrians(pedestrians);
+				eventTimes = new float[pedestrianOSMList.size()];
 			}
+
 
 			long ms = System.currentTimeMillis();
-
-			List<VPoint> result = new ArrayList<>();
-			ms = System.currentTimeMillis() - ms;
 			int count = 0;
-			while(!checkEventTimes(clOptimalStepsModel.getEventTimes(), (float)(timeStepInSec + currentTimeInSec))) {
-				result = clOptimalStepsModel.update();
-				count++;
-			}
-			logger.debug("iteration (" + count + ")");
-			logger.debug("runtime for next step computation = " + ms + " [ms]");
+
+			if(clOptimalStepsModel.getMinEventTime() < timeStepInSec + currentTimeInSec) {
+
+				while (clOptimalStepsModel.update((float)(timeStepInSec + currentTimeInSec))) {}
+				clOptimalStepsModel.readFromDevice();
+
+				List<VPoint> result = clOptimalStepsModel.getPositions();
+				eventTimes = clOptimalStepsModel.getEventTimes();
+
+				int numberOfUpdates = clOptimalStepsModel.getCounter() - counter;
+				counter = clOptimalStepsModel.getCounter();
 
 
-			if(count > 0) {
+				logger.debug("iteration (" + numberOfUpdates + ")");
+				logger.debug("runtime for next step computation = " + (System.currentTimeMillis() - ms) + " [ms] for " + timeStepInSec + "[s]");
+
 				for(int i = 0; i < pedestrianOSMList.size(); i++) {
-					//logger.info("not equals for index = " + i + ": " + pedestrianOSMList.get(i).getPosition() + " -> " + result.get(i));
 					PedestrianOSM pedestrian = pedestrianOSMList.get(i);
 					pedestrian.clearStrides();
-
-					//pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-
-					//if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-					//pedestrian.setNextPosition(result.get(i));
 					movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
-					//movedPedestrians.add(pedestrian);
-					//}
 				}
 			}
-
-
-			// these call methods run on the CPU
-			/*CallMethod[] callMethods = {CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
-			List<Future<?>> futures;
-
-			for (CallMethod callMethod : callMethods) {
-				futures = new LinkedList<>();
-				for (final PedestrianOSM pedestrian : pedestrianOSMList) {
-					Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
-					futures.add(executorService.submit(worker));
-				}
-				collectFutures(futures);
-			}*/
-
-			counter++;
-
 		} catch (OpenCLException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+
+	private int updates(float[] eventTimes1, float[] eventTimes2) {
+		int count = 0;
+		for(int i = 0; i < eventTimes1.length; i++) {
+			if(eventTimes1[i] != eventTimes2[i]) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	private boolean checkEventTimes(@NotNull final float[] eventTimes, float simTimeInSec) {

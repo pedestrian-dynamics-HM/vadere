@@ -152,6 +152,7 @@ public class CLParallelOSMLocalMem {
 	private long clMove;
 	private long clSwap;
 	private long clCount;
+	private long clResetCells;
 
 	private int numberOfGridCells;
 	private VRectangle bound;
@@ -347,6 +348,9 @@ public class CLParallelOSMLocalMem {
 					clPositions,
 					numberOfElements);
 
+			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+
 			clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
 			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
 
@@ -476,6 +480,18 @@ public class CLParallelOSMLocalMem {
 		initCallbacks();
 		initCL();
 		buildProgram();
+	}
+
+	private void clMemSet(final long clData, final int val, final int len) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			CLInfo.checkCLError(clSetKernelArg1p(clResetCells, 0, clData));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 1, val));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 2, len));
+			clGlobalWorkSize.put(0, len);
+			//TODO: local work size?
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clResetCellStartEnd", clQueue, clResetCells, 1, null, clGlobalWorkSize, null, null, null));
+		}
 	}
 
 	private void clCalcHash(
@@ -902,6 +918,7 @@ public class CLParallelOSMLocalMem {
 		CLInfo.checkCLError(clReleaseKernel(clMove));
 		CLInfo.checkCLError(clReleaseKernel(clSwap));
 		CLInfo.checkCLError(clReleaseKernel(clCount));
+		CLInfo.checkCLError(clReleaseKernel(clResetCells));
 
 		CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
 		CLInfo.checkCLError(clReleaseProgram(clProgram));
@@ -1007,6 +1024,8 @@ public class CLParallelOSMLocalMem {
 			clCount = clCreateKernel(clProgram, "count", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clResetCells = clCreateKernel(clProgram, "memset", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 
 

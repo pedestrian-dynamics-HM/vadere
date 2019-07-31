@@ -190,13 +190,17 @@ public class TestCLOSMEventDriven {
 				5.0);
 		// max step length + function width);
 		clOptimalStepsModel.setPedestrians(pedestrians);
-		List<VPoint> result = clOptimalStepsModel.update();
+		clOptimalStepsModel.update(0.4f);
+		clOptimalStepsModel.readFromDevice();
+		List<VPoint> result = clOptimalStepsModel.getPositions();
 
 		for(int i = 0; i < numberOfElements; i++) {
 			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
 		}
 		// max step length + function width);
-		result = clOptimalStepsModel.update();
+		clOptimalStepsModel.update(0.8f);
+		clOptimalStepsModel.readFromDevice();
+		result = clOptimalStepsModel.getPositions();
 
 		for(int i = 0; i < numberOfElements; i++) {
 			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));

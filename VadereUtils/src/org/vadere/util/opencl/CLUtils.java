@@ -203,10 +203,10 @@ public class CLUtils {
         return floatBuffer;
     }
 
-	public static int[] toIntArray(@NotNull final IntBuffer floatBuffer, final int size) {
+	public static int[] toIntArray(@NotNull final IntBuffer intBuffer, final int size) {
 		int[] result = new int[size];
 		for(int i = 0; i < size; i++) {
-			result[i] = floatBuffer.get(i);
+			result[i] = intBuffer.get(i);
 		}
 		return result;
 	}

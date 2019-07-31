@@ -103,6 +103,8 @@ public class CLParallelEventDrivenOSM {
 	// CL Memory
 	private long clHashes;
 	private long clIndices;
+	private long clGlobalIndexOut;
+	private long clGlobalIndexIn;
 	private long clCellStarts;
 	private long clCellEnds;
 	private long clReorderedPositions;
@@ -120,6 +122,7 @@ public class CLParallelEventDrivenOSM {
 	private long clReorderedEventTimes;
 	private long clEventTimesData;
 	private long clIds;
+	private long clMinEventTime;
 
 	// Host Memory
 	private FloatBuffer memWorldOrigin;
@@ -150,6 +153,9 @@ public class CLParallelEventDrivenOSM {
 	private long clEventTimes;
 	private long clMove;
 	private long clSwap;
+	private long clSwapIndex;
+	private long clResetCells;
+	private long clCalcMinEventTime;
 
 	private int numberOfGridCells;
 	private VRectangle bound;
@@ -178,6 +184,9 @@ public class CLParallelEventDrivenOSM {
 	private final EikonalSolver obstaclePotential;
 	private int[] indices;
 	private float[] eventTimes;
+	private List<VPoint> positions;
+	private float minEventTime = 0;
+	private boolean swap = false;
 
 	public CLParallelEventDrivenOSM(
 			@NotNull final AttributesOSM attributesOSM,
@@ -221,6 +230,7 @@ public class CLParallelEventDrivenOSM {
 		this.numberOfGridCells = this.iGridSize[0] * this.iGridSize[1];
 		this.iCellSize = (float)cellSize;
 		this.eventTimes = new float[0];
+		this.positions = new ArrayList<>();
 		init();
 	}
 
@@ -237,6 +247,7 @@ public class CLParallelEventDrivenOSM {
 		this.numberOfSortElements = (int)CLUtils.power(numberOfElements, 2);
 		this.indices = new int[pedestrians.size()];
 		this.eventTimes = new float[numberOfElements];
+		this.swap = false;
 
 		for(int i = 0; i < indices.length; i++) {
 			indices[i] = i;
@@ -249,10 +260,13 @@ public class CLParallelEventDrivenOSM {
 			freeCLMemory(clEventTimesData);
 			freeCLMemory(clHashes);
 			freeCLMemory(clIndices);
+			freeCLMemory(clGlobalIndexOut);
+			freeCLMemory(clGlobalIndexIn);
 			freeCLMemory(clReorderedPedestrians);
 			freeCLMemory(clReorderedPositions);
 			freeCLMemory(clReorderedEventTimes);
 			freeCLMemory(clIds);
+			freeCLMemory(clMinEventTime);
 			MemoryUtil.memFree(memNextPositions);
 			MemoryUtil.memFree(memIndices);
 			MemoryUtil.memFree(memEventTimes);
@@ -268,11 +282,14 @@ public class CLParallelEventDrivenOSM {
 			clPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
 			clHashes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 			clIndices = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
+			clGlobalIndexIn = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
+			clGlobalIndexOut = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * power, errcode_ret);
 			clReorderedPedestrians = clCreateBuffer(clContext, CL_MEM_READ_WRITE, OFFSET * 4 * pedestrians.size(), errcode_ret);
 			clReorderedPositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, COORDOFFSET * 4 * pedestrians.size(), errcode_ret);
 			clReorderedEventTimes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clIds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, iGridSize[0] * iGridSize[1] * 4, errcode_ret);
 			clEventTimesData = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
+			clMinEventTime = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
 
 			clEnqueueWriteBuffer(clQueue, clPedestrians, true, 0, memPedestrians, null, null);
 			clEnqueueWriteBuffer(clQueue, clPositions, true, 0, memPositions, null, null);
@@ -280,8 +297,11 @@ public class CLParallelEventDrivenOSM {
 			memEventTimes = allocPedestrianEventTimeMemory(pedestrians);
 			clEnqueueWriteBuffer(clQueue, clEventTimesData, true, 0, memEventTimes, null, null);
 
+			memIndices = CLUtils.toIntBuffer(indices);
+			clEnqueueWriteBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
+			clEnqueueWriteBuffer(clQueue, clGlobalIndexIn, true, 0, memIndices, null, null);
+
 			memNextPositions = MemoryUtil.memAllocFloat(numberOfElements * COORDOFFSET);
-			memIndices = MemoryUtil.memAllocInt(numberOfElements);
 			pedestrianSet = true;
 		}
 		MemoryUtil.memFree(memPedestrians);
@@ -290,10 +310,13 @@ public class CLParallelEventDrivenOSM {
 
 
 	//TODO: dont sort if the size is <= 1!
-	public List<VPoint> update() throws OpenCLException {
+	public boolean update(float simTimeInSec) throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
 			allocGlobalHostMemory();
 			allocGlobalDeviceMemory();
+			long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
+			long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
+
 			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
 			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
 
@@ -326,7 +349,8 @@ public class CLParallelEventDrivenOSM {
 					clWorldOrigin,
 					clPotentialFieldGridSize,
 					clPotentialFieldSize,
-					numberOfElements);
+					numberOfElements,
+					simTimeInSec);
 
 			clSwap(
 					clReorderedPedestrians,
@@ -337,40 +361,75 @@ public class CLParallelEventDrivenOSM {
 					clEventTimesData,
 					numberOfElements);
 
-			clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
-			//clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, memNextPositions, null, null);
-			clEnqueueReadBuffer(clQueue, clIndices, true, 0, memIndices, null, null);
-			clEnqueueReadBuffer(clQueue, clEventTimesData, true, 0, memEventTimes, null, null);
+			clSwapIndex(
+					clGlobalIndexOut,
+					clGlobalIndexIn,
+					clIndices,
+					numberOfElements);
+
+			clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
+
 			clFinish(clQueue);
 
-			List<VPoint> newPositions = new ArrayList<>();
-			fill(newPositions, VPoint.ZERO, numberOfElements);
-			int[] aIndices = CLUtils.toIntArray(memIndices, numberOfElements);
-			int[] tmpInices = new int[indices.length];
-			for(int i = 0; i < indices.length; i++) {
-				tmpInices[i] = indices[aIndices[i]];
-			}
-			System.arraycopy(tmpInices, 0, indices,0, indices.length);
-			float[] positionsAndRadi = CLUtils.toFloatArray(memNextPositions, numberOfElements * COORDOFFSET);
-			for(int i = 0; i < numberOfElements; i++) {
-				float x = positionsAndRadi[i * COORDOFFSET + X];
-				float y = positionsAndRadi[i * COORDOFFSET + Y];
-				VPoint newPosition = new VPoint(x,y);
-				newPositions.set(indices[i], newPosition);
-			}
+			FloatBuffer memMinEventTime = stack.callocFloat(1);
 
-			eventTimes = new float[numberOfElements];
-			float[] tmp = CLUtils.toFloatArray(memEventTimes, numberOfElements);
-			for(int i = 0; i < numberOfElements; i++) {
-				eventTimes[indices[i]] = tmp[i];
-			}
+			clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, memMinEventTime, null, null);
+			clFinish(clQueue);
+
+			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
 
 			counter++;
-			return newPositions;
+			swap = !swap;
+			minEventTime = memMinEventTime.get(0);
+
+			return minEventTime < simTimeInSec;
 		}
 	}
 
+	public void readFromDevice() {
+		clEnqueueReadBuffer(clQueue, clPositions, true, 0, memNextPositions, null, null);
+		//clEnqueueReadBuffer(clQueue, clReorderedPositions, true, 0, memNextPositions, null, null);
+		clEnqueueReadBuffer(clQueue, swap ? clGlobalIndexOut : clGlobalIndexIn, true, 0, memIndices, null, null);
+		clEnqueueReadBuffer(clQueue, clEventTimesData, true, 0, memEventTimes, null, null);
+		clFinish(clQueue);
+
+		positions = new ArrayList<>(numberOfElements);
+		fill(positions, VPoint.ZERO, numberOfElements);
+		indices = CLUtils.toIntArray(memIndices, numberOfElements);
+		float[] positionsAndRadi = CLUtils.toFloatArray(memNextPositions, numberOfElements * COORDOFFSET);
+		for(int i = 0; i < numberOfElements; i++) {
+			float x = positionsAndRadi[i * COORDOFFSET + X];
+			float y = positionsAndRadi[i * COORDOFFSET + Y];
+			VPoint newPosition = new VPoint(x,y);
+			positions.set(indices[i], newPosition);
+		}
+
+		eventTimes = new float[numberOfElements];
+		float[] tmp = CLUtils.toFloatArray(memEventTimes, numberOfElements);
+		for(int i = 0; i < numberOfElements; i++) {
+			eventTimes[indices[i]] = tmp[i];
+			//System.out.println("evac-time: " + eventTimes[indices[i]]);
+		}
+	}
+
+	public float getMinEventTime() {
+		return minEventTime;
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public List<VPoint> getPositions() {
+		return positions;
+	}
+
 	public float[] getEventTimes() {
+		/*System.out.println("event times");
+		for(float et : eventTimes) {
+			System.out.println(et);
+		}*/
 		return eventTimes;
 	}
 
@@ -413,8 +472,8 @@ public class CLParallelEventDrivenOSM {
 		if(counter == 0) {
 			circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
 					new VCircle(new VPoint(0,0), 1.0),
-					20, //attributesOSM.getNumberOfCircles(),
-					50, //attributesOSM.getStepCircleResolution(),
+					attributesOSM.getNumberOfCircles(),
+					attributesOSM.getStepCircleResolution(),
 					0,
 					2*Math.PI);
 			circlePositionList.add(VPoint.ZERO);
@@ -469,6 +528,18 @@ public class CLParallelEventDrivenOSM {
 		buildProgram();
 	}
 
+	private void clMemSet(final long clData, final int val, final int len) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			CLInfo.checkCLError(clSetKernelArg1p(clResetCells, 0, clData));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 1, val));
+			CLInfo.checkCLError(clSetKernelArg1i(clResetCells, 2, len));
+			clGlobalWorkSize.put(0, len);
+			//TODO: local work size?
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMemSet", clQueue, clResetCells, 1, null, clGlobalWorkSize, null, null, null));
+		}
+	}
+
 	private void clCalcHash(
 			final long clHashes,
 			final long clIndices,
@@ -496,7 +567,7 @@ public class CLParallelEventDrivenOSM {
 	private void clMove(
 			final long clReorderedPedestrians,
 			final long clReorderedPositions,
-			final long clEventTimes,
+			final long clReorderedEventTimes,
 			final long clIds,
 			final long clCirclePositions,
 			final long clCellStarts,
@@ -508,7 +579,8 @@ public class CLParallelEventDrivenOSM {
 			final long clWorldOrigin,
 			final long clPotentialFieldGridSize,
 			final long clPotentialFieldSize,
-			final int numberOfElements)
+			final int numberOfElements,
+			final float simTimeInSec)
 			throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
 
@@ -517,7 +589,7 @@ public class CLParallelEventDrivenOSM {
 
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 0, clReorderedPedestrians));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 1, clReorderedPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 2, clEventTimes));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 2, clReorderedEventTimes));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 3, clIds));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 4, clCirclePositions));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 5, clCellStarts));
@@ -533,13 +605,14 @@ public class CLParallelEventDrivenOSM {
 			CLInfo.checkCLError(clSetKernelArg1f(clMove, 15, timeStepInSec));
 			CLInfo.checkCLError(clSetKernelArg1i(clMove, 16, circlePositionList.size()));
 			CLInfo.checkCLError(clSetKernelArg1i(clMove, 17, numberOfElements));
+			CLInfo.checkCLError(clSetKernelArg1f(clMove, 18, simTimeInSec));
 
 			long globalWorkSize;
 			globalWorkSize = iGridSize[0] * iGridSize[1];
 			clGlobalWorkSize.put(0, globalWorkSize);
 
 			//TODO: local work size? + check 2^n constrain!
-			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSeek", clQueue, clMove, 1, null, clGlobalWorkSize, null, null, null));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMove", clQueue, clMove, 1, null, clGlobalWorkSize, null, null, null));
 		}
 	}
 
@@ -567,11 +640,57 @@ public class CLParallelEventDrivenOSM {
 		}
 	}
 
+	/*
+	__kernel void minEventTimeLocal(
+    __global float* minEventTime,
+    __global float* eventTimes,
+    __local  float* local_eventTimes,
+    uint numberOfElements
+	 */
+
+	private void clMinEventTime(
+			final long clMinEventTime,
+			final long clEventTimes,
+			final int numberOfElements) throws OpenCLException {
+
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
+			IntBuffer errcode_ret = stack.callocInt(1);
+			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clFindCellBoundsAndReorder, 4, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
+			clGlobalWorkSize.put(0, Math.min(maxWorkGroupSize, numberOfElements));
+			clLocalWorkSize.put(0, Math.min(maxWorkGroupSize, numberOfElements));
+
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcMinEventTime, 0, clMinEventTime));
+			CLInfo.checkCLError(clSetKernelArg1p(clCalcMinEventTime, 1, clEventTimes));
+			CLInfo.checkCLError(clSetKernelArg(clCalcMinEventTime, 2, maxWorkGroupSize * 4));
+			CLInfo.checkCLError(clSetKernelArg1i(clCalcMinEventTime, 3, numberOfElements));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clCalcMinEventTime", clQueue, clCalcMinEventTime, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		}
+	}
+
+	private void clSwapIndex(
+			final long clGlobalIndexOut,
+			final long clGlobalIndexIn,
+			final long clIndices,
+			final int numberOfElements) throws OpenCLException {
+
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			clGlobalWorkSize.put(0, numberOfElements);
+
+			CLInfo.checkCLError(clSetKernelArg1p(clSwapIndex, 0, clGlobalIndexOut));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwapIndex, 1, clGlobalIndexIn));
+			CLInfo.checkCLError(clSetKernelArg1p(clSwapIndex, 2, clIndices));
+			CLInfo.checkCLError(clSetKernelArg1i(clSwapIndex, 3, numberOfElements));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSwapIndices", clQueue, clSwapIndex, 1, null, clGlobalWorkSize, null, null, null));
+		}
+	}
 
 
 	private void clEventTimes(
 			final long clIds,
-			final long clEventTimesData,
+			final long clReorderedEventTimes,
 			final long clCellStarts,
 			final long clCellEnds) throws OpenCLException {
 
@@ -580,7 +699,7 @@ public class CLParallelEventDrivenOSM {
 			clGlobalWorkSize.put(0, iGridSize[0] * iGridSize[1]);
 
 			CLInfo.checkCLError(clSetKernelArg1p(clEventTimes, 0, clIds));
-			CLInfo.checkCLError(clSetKernelArg1p(clEventTimes, 1, clEventTimesData));
+			CLInfo.checkCLError(clSetKernelArg1p(clEventTimes, 1, clReorderedEventTimes));
 			CLInfo.checkCLError(clSetKernelArg1p(clEventTimes, 2, clCellStarts));
 			CLInfo.checkCLError(clSetKernelArg1p(clEventTimes, 3, clCellEnds));
 			CLInfo.checkCLError((int)enqueueNDRangeKernel("clEventTimes", clQueue, clEventTimes, 1, null, clGlobalWorkSize, null, null, null));
@@ -638,7 +757,18 @@ public class CLParallelEventDrivenOSM {
 		}
 	}
 
-	private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) throws OpenCLException {
+	private long enqueueNDRangeKernel(
+			final String name,
+			long command_queue,
+			long kernel,
+			int work_dim,
+			PointerBuffer global_work_offset,
+			PointerBuffer global_work_size,
+			PointerBuffer local_work_size,
+			PointerBuffer event_wait_list,
+			PointerBuffer event,
+			long[] time,
+			boolean print) throws OpenCLException {
 		if(profiling) {
 			try (MemoryStack stack = stackPush()) {
 				PointerBuffer clEvent = stack.mallocPointer(1);
@@ -651,7 +781,11 @@ public class CLParallelEventDrivenOSM {
 				CLInfo.checkCLError(clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, null));
 				clEvent.clear();
 				// in nanaSec
-				log.info(name + " event time " + "0x"+eventAddr + ": " + ((double)endTime.get() - startTime.get()) / 1_000_000.0 + " [ms]");
+				long executionTime = endTime.get() - startTime.get();
+				time[0] += executionTime;
+				if(print) {
+					log.info(name + " event time " + "0x"+eventAddr + ": " + toMillis(executionTime) + " [ms]");
+				}
 				endTime.clear();
 				startTime.clear();
 				return result;
@@ -660,6 +794,24 @@ public class CLParallelEventDrivenOSM {
 		else {
 			return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
 		}
+	}
+
+	private long enqueueNDRangeKernel(
+			final String name,
+			long command_queue,
+			long kernel,
+			int work_dim,
+			PointerBuffer global_work_offset,
+			PointerBuffer global_work_size,
+			PointerBuffer local_work_size,
+			PointerBuffer event_wait_list,
+			PointerBuffer event) throws OpenCLException {
+		return enqueueNDRangeKernel(name, command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event,
+				new long[1], true);
+	}
+
+	private double toMillis(long nanos) {
+		return nanos / 1_000_000.0;
 	}
 
 	// TODO: global and local work size computation
@@ -672,7 +824,7 @@ public class CLParallelEventDrivenOSM {
 			final int dir) throws OpenCLException {
 
 		try (MemoryStack stack = stackPush()) {
-
+			long[] executionTime = new long[1];
 			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 			IntBuffer errcode_ret = stack.callocInt(1);
@@ -693,7 +845,7 @@ public class CLParallelEventDrivenOSM {
 				clLocalWorkSize.put(0, numberOfElements / 2);
 
 				// run the kernel and read the result
-				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, executionTime, false));
 				CLInfo.checkCLError(clFinish(clQueue));
 			} else {
 				//Launch bitonicSortLocal1
@@ -709,7 +861,7 @@ public class CLParallelEventDrivenOSM {
 				clGlobalWorkSize.put(0, numberOfElements / 2);
 				clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal1", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, executionTime, false));
 				CLInfo.checkCLError(clFinish(clQueue));
 
 				for (int size = (int)(2 * maxWorkGroupSize); size <= numberOfElements; size <<= 1) {
@@ -731,7 +883,7 @@ public class CLParallelEventDrivenOSM {
 							clGlobalWorkSize.put(0, numberOfElements / 2);
 							clLocalWorkSize.put(0, maxWorkGroupSize / 4);
 
-							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, executionTime, false));
 							CLInfo.checkCLError(clFinish(clQueue));
 						} else {
 							//Launch bitonicMergeLocal
@@ -752,13 +904,14 @@ public class CLParallelEventDrivenOSM {
 							clGlobalWorkSize.put(0, numberOfElements / 2);
 							clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, executionTime, false));
 							CLInfo.checkCLError(clFinish(clQueue));
 							break;
 						}
 					}
 				}
 			}
+			log.info("Sorting" + " event time " + ": " + toMillis(executionTime[0]) + " [ms]");
 		}
 	}
 
@@ -794,9 +947,13 @@ public class CLParallelEventDrivenOSM {
 				CLInfo.checkCLError(clReleaseMemObject(clIds));
 				CLInfo.checkCLError(clReleaseMemObject(clHashes));
 				CLInfo.checkCLError(clReleaseMemObject(clIndices));
+				CLInfo.checkCLError(clReleaseMemObject(clGlobalIndexIn));
+				CLInfo.checkCLError(clReleaseMemObject(clGlobalIndexOut));
 				CLInfo.checkCLError(clReleaseMemObject(clReorderedPedestrians));
 				CLInfo.checkCLError(clReleaseMemObject(clReorderedPositions));
 				CLInfo.checkCLError(clReleaseMemObject(clReorderedEventTimes));
+				CLInfo.checkCLError(clReleaseMemObject(clMinEventTime));
+
 			}
 
 			if(counter > 0) {
@@ -845,6 +1002,10 @@ public class CLParallelEventDrivenOSM {
 		CLInfo.checkCLError(clReleaseKernel(clEventTimes));
 		CLInfo.checkCLError(clReleaseKernel(clMove));
 		CLInfo.checkCLError(clReleaseKernel(clSwap));
+		CLInfo.checkCLError(clReleaseKernel(clSwapIndex));
+		CLInfo.checkCLError(clReleaseKernel(clResetCells));
+		CLInfo.checkCLError(clReleaseKernel(clCalcMinEventTime));
+
 
 		CLInfo.checkCLError(clReleaseCommandQueue(clQueue));
 		CLInfo.checkCLError(clReleaseProgram(clProgram));
@@ -927,8 +1088,8 @@ public class CLParallelEventDrivenOSM {
 			strings.put(0, source);
 			lengths.put(0, source.remaining());
 			clProgram = clCreateProgramWithSource(clContext, strings, lengths, errcode_ret);
-			int errCode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
 			log.debug(InfoUtils.getProgramBuildInfoStringASCII(clProgram, clDevice, CL_PROGRAM_BUILD_LOG));
+			int errCode = clBuildProgram(clProgram, clDevice, "", programCB, NULL);
 
 			clBitonicSortLocal = clCreateKernel(clProgram, "bitonicSortLocal", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
@@ -948,6 +1109,13 @@ public class CLParallelEventDrivenOSM {
 			clMove = clCreateKernel(clProgram, "move", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clSwapIndex = clCreateKernel(clProgram, "swapIndex", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clResetCells = clCreateKernel(clProgram, "setMem", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+
+			clCalcMinEventTime = clCreateKernel(clProgram, "minEventTimeLocal", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 
 			max_work_group_size = InfoUtils.getDeviceInfoPointer(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE);
