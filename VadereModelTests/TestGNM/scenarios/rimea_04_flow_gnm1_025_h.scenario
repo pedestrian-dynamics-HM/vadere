@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_gnm1_025_h",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -74,7 +74,8 @@
           "height" : 4.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ ],

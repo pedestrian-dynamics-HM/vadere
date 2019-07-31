@@ -1,7 +1,7 @@
 {
   "name" : "rimea_10_pathfinding_gnm1",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -74,7 +74,8 @@
           "height" : 80.0
         },
         "boundingBoxWidth" : 1.0,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {

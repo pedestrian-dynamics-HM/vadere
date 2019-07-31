@@ -1,7 +1,7 @@
 {
   "name" : "T-240-240-240",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -276,7 +276,8 @@
           "height" : 12.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {

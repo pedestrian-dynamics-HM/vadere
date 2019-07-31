@@ -114,7 +114,8 @@
           "height" : 394.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {

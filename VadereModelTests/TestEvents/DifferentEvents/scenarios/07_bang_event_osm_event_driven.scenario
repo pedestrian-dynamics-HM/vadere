@@ -1,7 +1,7 @@
 {
   "name" : "07_bang_event_osm_event_driven",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -130,7 +130,8 @@
           "height" : 16.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ ],

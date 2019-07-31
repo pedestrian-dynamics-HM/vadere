@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+<bounds minlat='48.16077' minlon='11.58451' maxlat='48.16386' maxlon='11.58936' origin='CGImap 0.7.5 (31203 thorn-02.openstreetmap.org)' />
+<way id='-999069173' action='modify' visible='true'>
+  <nd ref='-127654' />
+  <nd ref='-127623' />
+  <nd ref='-127625' />
+  <nd ref='-127627' />
+  <tag k='rover:id' v='-133513' />
+  <tag k='rover:obstacle:type' v='line' />
+</way>
+<node id='-127654' action='modify' visible='true' lat='48.16332139814' lon='11.58699944481' />
+<node id='-127623' action='modify' visible='true' lat='48.16336523007' lon='11.58667489752' />
+<node id='-127625' action='modify' visible='true' lat='48.16382859388' lon='11.58671781287' />
+<node id='-127627' action='modify' visible='true' lat='48.16381785963' lon='11.58705308899' />
+</osm>

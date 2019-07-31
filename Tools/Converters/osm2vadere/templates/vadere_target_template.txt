@@ -1,0 +1,17 @@
+{
+    "id" : $id,
+    "absorbing" : $absorbing,
+    "shape" : {
+        "type" : "POLYGON",
+        "points" : [
+$points
+        ]
+    },
+    "waitingTime" : $waitingTime,
+    "waitingTimeYellowPhase" : $waitingTimeYellowPhase,
+    "parallelWaiters" : $parallelWaiters,
+    "individualWaiting" : $individualWaiting,
+    "deletionDistance" : $deletionDistance,
+    "startingWithRedLight" : $startingWithRedLight,
+    "nextSpeed" : $nextSpeed
+}
