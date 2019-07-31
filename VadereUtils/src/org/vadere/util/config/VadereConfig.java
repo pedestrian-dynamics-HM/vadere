@@ -3,20 +3,25 @@ package org.vadere.util.config;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfigurationLayout;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.vadere.util.logging.Logger;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+
 
 /**
  * A {@link VadereConfig} reads its options from a text file in "properties" style. I.e., simple key-value pairs
@@ -57,6 +62,7 @@ public class VadereConfig {
 
     // Constructors
     private VadereConfig() {
+
         createDefaultConfigIfNonExisting();
 
         LOGGER.info(String.format("Use config file from path %s", CONFIG_PATH));
@@ -83,7 +89,53 @@ public class VadereConfig {
 
         compareAndChangeDefaultKeysInExistingFile();
 
+/*  // TODO: see also issue #258 -- the problem is that this function sorts the file, but it gets reverted by the (auto-) save functionality of the builder object
+        try{
+            sortFileLinesAlphabetically(builder.getFileHandler().getFile());
+        }catch (IOException ioex){
+            LOGGER.error(String.format("Error while reading config file \"%s\": %s", CONFIG_PATH.toString(),
+                    ioex.getMessage()));
+        }
+*/
+
+        try{
+            builder.save();
+        }catch(ConfigurationException ex){
+            LOGGER.error(String.format("Error while saving config file \"%s\": %s", CONFIG_PATH.toString(),
+                    ex.getMessage()));
+        }
+
     }
+
+
+/*  // TODO: see also issue #258 -- the problem is that this function sorts the file, but it gets reverted by the (auto-) save functionality of the builder object
+    private void sortFileLinesAlphabetically(File file) throws IOException {
+        FileReader fileReader = new FileReader(file);
+
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        String inputLine;
+        List<String> lineList = new ArrayList<>();
+        while ((inputLine = bufferedReader.readLine()) != null) {
+            if(!inputLine.isBlank()) {
+                lineList.add(inputLine);
+            }
+        }
+
+        fileReader.close();
+        bufferedReader.close();
+
+        Collections.sort(lineList);
+
+        FileWriter fileWriter = new FileWriter(file);
+        PrintWriter out = new PrintWriter(fileWriter);
+        for (String outputLine : lineList) {
+            out.println(outputLine);
+        }
+
+        out.flush();
+        out.close();
+        fileWriter.close();
+    }*/
 
     private void createDefaultConfigIfNonExisting() {
         try { // Ensure that config directory exists.
@@ -133,8 +185,6 @@ public class VadereConfig {
 
         // Second case: if key was removed from defaultConfig, then it is also removed from the current file
         //   -- usually happens when a configuration key was removed
-
-
         for(Iterator<String> iter = vadereConfig.getKeys(); iter.hasNext();){
             String key = iter.next();
             if(! defaultConfig.containsKey(key)){
@@ -144,11 +194,6 @@ public class VadereConfig {
             }
         }
 
-        //The following "getKeys" call is only here to enforce the autosaving of the configuration file (otherwise
-        // removed / inserted keys may not immediately appear in the config file after this function call.
-        vadereConfig.getKeys();
-
-        //TODO [improvement]: sort the entries in the configuration file alphabetically.
     }
 
     // Static setters
@@ -214,7 +259,7 @@ public class VadereConfig {
         defaultConfig.put("ProjectView.defaultDirectory", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryAttributes", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryScenarios", defaultSearchDirectory);
-	    defaultConfig.put("ProjectView.defaultDirectoryOutputProcessors", defaultSearchDirectory);
+        defaultConfig.put("ProjectView.defaultDirectoryOutputProcessors", defaultSearchDirectory);
         defaultConfig.put("SettingsDialog.maxNumberOfTargets", "10");
         defaultConfig.put("SettingsDialog.dataFormat", "yyyy_MM_dd_HH_mm_ss");
         defaultConfig.put("SettingsDialog.outputDirectory.path", ".");
