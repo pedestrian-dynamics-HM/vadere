@@ -1,20 +1,29 @@
 package org.vadere.gui.topographycreator.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.topographycreator.control.AttributeModifier;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesCar;
+import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.scenario.AbsorbingArea;
+import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Stairs;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Teleporter;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
+
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
-
-import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.topographycreator.control.AttributeModifier;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * A TopographyBuilder builds a Topography-Object step by step. After the Topography-Object is build
@@ -152,6 +161,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		for(ScenarioElement element : topographyElements) {
 			VShape shape = element.getShape().translate(new VPoint(x, y));
 			AttributeModifier.setShapeToAttributes(element, shape);
+		}
+		if (attributes.getReferenceCoordinateSystem() != null){
+			VPoint newTranslation = attributes.getReferenceCoordinateSystem().getTranslation().add(-x, -y);
+			attributes.getReferenceCoordinateSystem().setTranslation(newTranslation);
 		}
 	}
 

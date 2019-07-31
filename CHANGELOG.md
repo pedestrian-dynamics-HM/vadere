@@ -8,6 +8,33 @@
 
 ### Changed
 
+## v1.3 (2019-07-31)
+
+### Added 
+
+- new `referenceCoordinateSystem` attributes in the topography element (default: `null`). This 
+  object holds information about the base coordinate system and an optional translation used 
+  on the coordinates in the topography. If the description field is a free text field which 
+  can be used for miscellaneous information. (see osm2vadere converter)
+```
+"referenceCoordinateSystem" : {
+      "epsgCode" : "UTM Zone 32U",
+      "description" : "OpenStreetMap export osm2vadere.py-ed63d4e94898a15a6bf25fa59c05a5b2f73d8f74-dirty",
+      "translation" : {
+        "x" : 692152.0894735109,
+        "y" : 5337384.6661008
+      }
+    }
+```
+
+### Changed 
+
+- osm2vadere.py refactored. 
+  - Extract osm-xml manipulation into `osm_helper.py`
+  - Changes command line structure
+- osm_helper.py: cl-based manipulation of osm xml to add additional information into the xml 
+  structure readable by osm2vadere.py converter.
+
 ## v1.2 (2019-07-13)
 
 ### Added

@@ -1,7 +1,7 @@
 {
   "name" : "basic_5_2_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -71,7 +71,8 @@
           "height" : 300.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ ],

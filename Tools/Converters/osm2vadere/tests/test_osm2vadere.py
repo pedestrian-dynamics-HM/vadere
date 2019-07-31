@@ -1,6 +1,8 @@
 from lxml import etree
 
 import osm2vadere
+from osm_helper import PolyObjectWidthId, PolyObjectWidthId, OsmData
+from osm2vadere import OsmConverter, PolyObjectWidthId
 import unittest
 import utm
 import os
@@ -54,7 +56,8 @@ class TestOsm2vadere(unittest.TestCase):
 
     def test_extract_latitude_and_longitude_for_each_xml_node(self):
         xml_tree = etree.parse(TEST_DATA_LON_LAT)
-        nodes_dictionary_with_lat_and_lon = osm2vadere.extract_latitude_and_longitude_for_each_xml_node(xml_tree)
+        osm_xml = OsmData(TEST_DATA_LON_LAT)
+        nodes_dictionary_with_lat_and_lon = osm_xml.node_latlon_lookup
 
         self.assertTrue(nodes_dictionary_with_lat_and_lon.get("1")[0] == "1.1")
         self.assertTrue (nodes_dictionary_with_lat_and_lon.get("1")[1] == "1.2")
@@ -63,14 +66,13 @@ class TestOsm2vadere(unittest.TestCase):
         self.assertTrue (nodes_dictionary_with_lat_and_lon.get("3")[0] == "3.1")
         self.assertTrue (nodes_dictionary_with_lat_and_lon.get("3")[1] == "3.2")
 
-
     def test_find_width_and_height(self):
         building_normal = [(1, 1), (3, 1), (1, 3), (3, 3)]
         building_negative_coordinates = [(-1, 4), (-3, 2), (10, 2)]
         building_with_floating_points = [(2.3, 1.4), (-10.5, 7), (9.99, 3), (5, 7.1), (3, 4)]
         building_points = [building_normal, building_negative_coordinates, building_with_floating_points]
-        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in building_points]
-        width, height = osm2vadere.find_width_and_height(buildings)
+        buildings = [PolyObjectWidthId(-1, building) for building in building_points]
+        width, height = OsmConverter.find_width_and_height(buildings)
 
         self.assertTrue(width == 10)
         self.assertTrue(height == 8) # 7.1 is the maximum but the function returns math.ceil
@@ -80,19 +82,19 @@ class TestOsm2vadere(unittest.TestCase):
         building_negative_coordinates = [(-1, 4), (-3, 2), (10, 2)]
         building_with_floating_points = [(2.3, 1.4), (-10.5, 7), (9.99, 3), (5, 7.1), (3, 4)]
         building_points = [building_normal, building_negative_coordinates, building_with_floating_points]
-        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in building_points]
-        new_base_point = osm2vadere.find_new_basepoint(buildings)
+        buildings = [PolyObjectWidthId(-1, building) for building in building_points]
+        new_base_point = OsmConverter.find_new_base_point(buildings)
 
         self.assertTrue(new_base_point == (-10.5, 1))
 
         building_negative_coordinates.append((3, -5))
-        new_base_point = osm2vadere.find_new_basepoint(buildings)
+        new_base_point = OsmConverter.find_new_base_point(buildings)
 
         self.assertTrue(new_base_point == (-10.5, -5))
 
         buildings_cartesian_only_positive = [[(1, 3), (1, 2), (2, 2)], [(2, 4), (7, 7), (6, 6)]]
-        buildings = [osm2vadere.PolyObjectWidthId(-1, building) for building in buildings_cartesian_only_positive]
-        new_base_point = osm2vadere.find_new_basepoint(buildings)
+        buildings = [PolyObjectWidthId(-1, building) for building in buildings_cartesian_only_positive]
+        new_base_point = OsmConverter.find_new_base_point(buildings)
 
         self.assertTrue(new_base_point == (1, 2))
 
@@ -115,8 +117,8 @@ class TestOsm2vadere(unittest.TestCase):
         buildings = [osm2vadere.PolyObjectWidthId(-1, points) for points in building_points]
         for b in buildings:
             b.shift_points([1,2])
-        self.assertEqual(buildings[0].cartesian_points, [(0, 1), (-2, 0), (1, 0)])
-        self.assertEqual(buildings[1].cartesian_points, [(1, 2), (6, 5), (5, 4)])
+        self.assertEqual(buildings[0].points, [(0, 1), (-2, 0), (1, 0)])
+        self.assertEqual(buildings[1].points, [(1, 2), (6, 5), (5, 4)])
 
 
 if __name__ == "__main__":
