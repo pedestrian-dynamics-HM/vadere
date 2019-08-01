@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelEventDrivenOSM;
+import org.vadere.simulator.models.osm.opencl.CLParallelOSMLocalMem;
 import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -79,7 +80,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 					return new UpdateSchemeCLEventDriven(topography, clOptimalStepsModel);
 				}
 				default : {
-					CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
+					CLParallelOSMLocalMem clOptimalStepsModel = new CLParallelOSMLocalMem(
 							attributesOSM,
 							attributesFloorField,
 							new VRectangle(topography.getBounds()),

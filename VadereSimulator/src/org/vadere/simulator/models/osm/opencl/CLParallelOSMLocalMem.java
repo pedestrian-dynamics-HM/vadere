@@ -1025,7 +1025,7 @@ public class CLParallelOSMLocalMem {
 			CLInfo.checkCLError(errcode_ret);
 			clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
-			clResetCells = clCreateKernel(clProgram, "memset", errcode_ret);
+			clResetCells = clCreateKernel(clProgram, "setMem", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 
 

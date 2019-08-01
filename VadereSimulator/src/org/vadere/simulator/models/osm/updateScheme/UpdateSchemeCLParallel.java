@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.osm.opencl.CLParallelOSMLocalMem;
 import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
@@ -22,12 +23,12 @@ import java.util.concurrent.Future;
  */
 public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
-	private CLParallelOptimalStepsModel clOptimalStepsModel;
+	private CLParallelOSMLocalMem clOptimalStepsModel;
 
 	private int counter = 0;
 	private Logger logger = Logger.getLogger(UpdateSchemeCLParallel.class);
 
-	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLParallelOptimalStepsModel clOptimalStepsModel) {
+	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLParallelOSMLocalMem clOptimalStepsModel) {
 		super(topography);
 		this.clOptimalStepsModel = clOptimalStepsModel;
 	}
@@ -51,11 +52,11 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 
 			if(counter == 0) {
-				List<CLParallelOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();
+				List<CLParallelOSMLocalMem.PedestrianOpenCL> pedestrians = new ArrayList<>();
 				double maxStepSize = -1.0;
 				for(int i = 0; i < pedestrianOSMList.size(); i++) {
 					PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
-					CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(
+					CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(
 							pedestrianOSM.getPosition(),
 							(float)pedestrianOSM.getDesiredStepSize(),
 							(float)pedestrianOSM.getDesiredSpeed());
