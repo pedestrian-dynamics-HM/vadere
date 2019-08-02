@@ -23,7 +23,7 @@ public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IP
     public PotentialFieldTargetGrid(@NotNull final Topography topography,
                                     @NotNull final AttributesAgent attributesPedestrian,
                                     @NotNull final AttributesFloorField attributesPotential) {
-    	super(topography, attributesPedestrian, attributesPotential);
+        super(topography, attributesPedestrian, attributesPotential);
     }
 
     @Override
@@ -42,10 +42,14 @@ public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IP
         return map;
     }
 
-	@Override
-	public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
-		double[] grad = new double[2];
-		InterpolationUtil.getGradientMollified(getCellGrids().get(ped.getNextTargetId()), new double[]{pos.getX(), pos.getY()}, grad, 0.1);
-		return new Vector2D(grad[0], grad[1]);
+    @Override
+    public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
+        double[] gradient = { 0.0, 0.0 };
+
+        if (ped.getNextTargetId() > -1) {
+            InterpolationUtil.getGradientMollified(getCellGrids().get(ped.getNextTargetId()), new double[]{pos.getX(), pos.getY()}, gradient, 0.1);
+        }
+
+        return new Vector2D(gradient[0], gradient[1]);
     }
 }
