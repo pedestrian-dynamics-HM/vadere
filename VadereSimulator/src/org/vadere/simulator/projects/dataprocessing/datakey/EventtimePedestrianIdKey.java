@@ -15,7 +15,7 @@ public class EventtimePedestrianIdKey implements DataKey<EventtimePedestrianIdKe
     private final int pedestrianId;
 
     public EventtimePedestrianIdKey(double simTime, int pedestrianId) {
-        this.simTime = simTime ;
+        this.simTime = simTime;
         this.pedestrianId = pedestrianId;
     }
 
@@ -43,7 +43,7 @@ public class EventtimePedestrianIdKey implements DataKey<EventtimePedestrianIdKe
 
     @Override
     public String toString() {
-        return "TimestepPedestrianIdKey{" +
+        return "EventtimePedestrianIdKey{" +
                 "simTime=" + this.simTime +
                 ", pedestrianId=" + pedestrianId +
                 '}';

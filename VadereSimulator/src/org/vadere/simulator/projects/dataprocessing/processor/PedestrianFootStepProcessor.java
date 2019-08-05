@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * <p>During one time step a pedestrian my move multiple times which is saved by {@link Pedestrian#getFootSteps()}, i.e.
+ * <p>During one time step a pedestrian my move multiple times which is saved by {@link Pedestrian#getTrajectory()}, i.e.
  * the {@link VTrajectory} will be adjusted after each update(simTimeInSec) call such that it contains the foot steps
  * which started at the lastSimTimeInSec!</p>
  *
@@ -36,7 +36,7 @@ public class PedestrianFootStepProcessor extends DataProcessor<EventtimePedestri
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			LinkedList<FootStep> footSteps = pedestrian.getFootSteps().clone().getFootSteps();
+			LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
 
 			for (FootStep fs : footSteps) {
 				putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);

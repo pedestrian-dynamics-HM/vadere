@@ -189,7 +189,7 @@ public class PedestrianBHM extends Pedestrian {
 			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
 		}
 
-		getFootSteps().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
+		getTrajectory().add(new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep));
 	}
 
 	/**

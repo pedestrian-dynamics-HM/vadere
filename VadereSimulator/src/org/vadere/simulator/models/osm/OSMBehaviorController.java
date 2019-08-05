@@ -11,7 +11,6 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 
@@ -79,7 +78,7 @@ public class OSMBehaviorController {
 
         // strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
-        pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime));
+        pedestrian.getTrajectory().add(new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime));
     }
 
     public void wait(PedestrianOSM pedestrian) {

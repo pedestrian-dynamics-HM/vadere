@@ -105,8 +105,7 @@ public class Pedestrian extends Agent {
 		return ScenarioElementType.PEDESTRIAN;
 	}
 
-	// TODO Rename "getFootSteps()" to "getTrajectory()".
-	public VTrajectory getFootSteps() {
+	public VTrajectory getTrajectory() {
 		return trajectory;
 	}
 
