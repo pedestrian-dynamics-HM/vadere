@@ -5,8 +5,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelEventDrivenOSM;
+import org.vadere.simulator.models.osm.opencl.CLParallelOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelOSMLocalMem;
-import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -50,7 +50,6 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			case SHUFFLE: return new UpdateSchemeShuffle(topography, random);
 			//TODO: magic number!
 			case EVENT_DRIVEN_PARALLEL:
-			case EVENT_DRIVEN_CL:
 				return new UpdateSchemeEventDrivenParallel(topography, 1.4);
 			default: throw new IllegalArgumentException(updateType + " is not supported.");
 		}
@@ -65,7 +64,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			@NotNull final UpdateType updateType) {
 
 		try {
-			double maxStepSize = 1.2 + 1.2 + 0.2 - 0.5; // from seitz-2014c
+			double maxStepSize = 1.2; // from seitz-2014c
 			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
 
 			switch (updateType) {
@@ -77,8 +76,20 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 							targetEikonalSolver,
 							distanceEikonalSolver,
 							cellSize);
-					return new UpdateSchemeCLEventDriven(topography, clOptimalStepsModel);
+					return new CLUpdateSchemeEventDriven(topography, clOptimalStepsModel);
 				}
+				case PARALLEL_CL:
+				case PARALLEL_OPEN_CL:  {
+					CLParallelOSM clOptimalStepsModel = new CLParallelOSM(
+							attributesOSM,
+							attributesFloorField,
+							new VRectangle(topography.getBounds()),
+							targetEikonalSolver,
+							distanceEikonalSolver,
+							cellSize);
+					return new CLUpdateSchemeParallel(topography, clOptimalStepsModel);
+				}
+				case PARALLEL_SHARED_MEM_CL:
 				default : {
 					CLParallelOSMLocalMem clOptimalStepsModel = new CLParallelOSMLocalMem(
 							attributesOSM,
@@ -87,7 +98,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 							targetEikonalSolver,
 							distanceEikonalSolver,
 							cellSize);
-					return new UpdateSchemeCLParallel(topography, clOptimalStepsModel);
+					return new CLUpdateSchemeParallel(topography, clOptimalStepsModel);
 				}
 			}
 

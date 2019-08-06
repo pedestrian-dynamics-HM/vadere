@@ -154,6 +154,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			@NotNull final AttributesOSM attributesOSM) {
 		switch (attributesOSM.getUpdateType()) {
 			case PARALLEL_OPEN_CL:
+			case PARALLEL_CL:
+			case PARALLEL_SHARED_MEM_CL:
 			case EVENT_DRIVEN_CL: {
 				//throw new UnsupportedOperationException("not jet implemented.");
 				return UpdateSchemeOSM.createOpenCLUpdateScheme(

@@ -218,7 +218,6 @@ __kernel void move(
     __constant const uint2  *potentialGridSize,
     __constant const float2 *potentialFieldSize,    //input
     const float             potentialCellSize,      //input
-    const float             timeStepInSec,
     const uint              numberOfPoints,         //input
     const uint              numberOfPedestrians,
     const float             simTimeInSec) {
@@ -250,8 +249,6 @@ __kernel void move(
         if(pedId < numberOfPedestrians && pedId == minIndex && eventTime <= simTimeInSec) {
             float2 pedPosition = (float2)(orderedPositions[pedId * COORDOFFSET + X], orderedPositions[pedId * COORDOFFSET + Y]);
             float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
-            /*float stepSize = 1.2f;
-            float desiredSpeed = 1.34f;*/
             float desiredSpeed = orderedPedestrians[pedId * OFFSET + DESIREDSPEED];
 
             float duration = stepSize / desiredSpeed;

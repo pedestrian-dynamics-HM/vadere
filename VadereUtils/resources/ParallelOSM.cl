@@ -14,12 +14,11 @@
 #define X 0
 #define Y 1
 
-#define OFFSET 5
+#define OFFSET 4
 #define STEPSIZE 0
 #define DESIREDSPEED 1
-#define TIMECREDIT 2
-#define NEWX 3
-#define NEWY 4
+#define NEWX 2
+#define NEWY 3
 
 inline void ComparatorPrivate(
     uint *keyA,
@@ -172,12 +171,13 @@ inline float getFullPedestrianPotential(
 }
 
 inline bool hasConflict(
-        __global float  *orderedPedestrians,  //input
-        __global const uint   *d_CellStart,
-        __global const uint   *d_CellEnd,
-        __constant const float        *cellSize,
-        __constant const uint2        *gridSize,
-        __constant const float2       *worldOrigin,
+        __global float          *orderedPedestrians,  //input
+        __global float          *orderedTimeCredits,
+        __global const uint     *d_CellStart,
+        __global const uint     *d_CellEnd,
+        __constant const float  *cellSize,
+        __constant const uint2  *gridSize,
+        __constant const float2 *worldOrigin,
         const float timeCredit,
         const float2 pedPosition)
 {
@@ -201,7 +201,7 @@ inline bool hasConflict(
             uint endI = d_CellEnd[hash];
             for(uint j = startI; j < endI; j++){
                 float2 otherPedestrian = (float2) (orderedPedestrians[j * OFFSET + NEWX], orderedPedestrians[j * OFFSET + NEWY]);
-                float otherTimeCredit = orderedPedestrians[j * OFFSET + TIMECREDIT];
+                float otherTimeCredit = orderedTimeCredits[j];
 
                 // for itself dist < RADIUS but otherTimeCredit == timeCredit and otherPedestrian.x == pedPosition.x
                 if(distance(otherPedestrian, pedPosition) < DIAMETER &&
@@ -283,11 +283,12 @@ inline float getObstaclePotential(float minDistanceToObstacle){
 __kernel void seek(
     __global float          *orderedPedestrians,    //input
     __global float          *orderedPositions,      //input
+    __global float          *orderedTimeCredits,    //input
     __global const float2   *circlePositions,       //input
     __global const uint     *d_CellStart,           //input: cell boundaries
     __global const uint     *d_CellEnd,             //input
-    __constant const float        *cellSize,
-    __constant const uint2        *gridSize,
+    __constant const float  *cellSize,
+    __constant const uint2  *gridSize,
     __global const float    *distanceField,         //input
     __global const float    *targetPotentialField,  //input
     __constant const float2 *worldOrigin,           //input
@@ -303,7 +304,7 @@ __kernel void seek(
         float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
-        float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT] + timeStepInSec;
+        float timeCredit = orderedTimeCredits[index] + timeStepInSec;
 
         float duration = stepSize / desiredSpeed;
         float2 minArg = pedPosition;
@@ -332,7 +333,7 @@ __kernel void seek(
         }
         //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
         //minArg = pedPosition;
-        orderedPedestrians[index * OFFSET + TIMECREDIT] = timeCredit;
+        orderedTimeCredits[index] = timeCredit;
         orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
         orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
     }
@@ -341,35 +342,78 @@ __kernel void seek(
 __kernel void move(
     __global float                *orderedPedestrians,    //input, update this
     __global float                *orderedPositions,      //input, update this
+    __global float                *orderedTimeCredits,      //input
     __global const uint           *d_CellStart,           //input: cell boundaries
     __global const uint           *d_CellEnd,             //input
     __constant const float        *cellSize,              //input
     __constant const uint2        *gridSize,              //input
     __constant const float2       *worldOrigin,           //input
-    const float                   timeStepInSec,
     const uint                    numberOfPedestrians     //input
 ){
     const uint index = get_global_id(0);
     if(index < numberOfPedestrians) {
         float2 newPedPosition = (float2)(orderedPedestrians[index * OFFSET + NEWX], orderedPedestrians[index * OFFSET + NEWY]);
-        //float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
-        //float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
-        float timeCredit = orderedPedestrians[index * OFFSET + TIMECREDIT];
+        float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
+        float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
+        float timeCredit = orderedTimeCredits[index];
 
-        if(!hasConflict(orderedPedestrians, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+        if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
             orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
             orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
-            orderedPedestrians[index * OFFSET + TIMECREDIT] = orderedPedestrians[index * OFFSET + TIMECREDIT] - timeStepInSec;
+            orderedTimeCredits[index] = orderedTimeCredits[index] - stepSize / desiredSpeed;
         }
     }
 }
 
+__kernel void minTimeCredit(
+    __global float* minEventTime,       // out
+    __global float* eventTimes,         // in
+    __local  float* local_eventTimes,   // cache
+    uint numberOfElements
+){
+    uint gid = get_global_id(0);
+    uint local_size = get_local_size(0);
+
+    if(numberOfElements > local_size) {
+        uint elementsPerItem = ceil(numberOfElements / ((float)local_size));
+
+        float minVal = HUGE_VALF;
+        for(int i = gid * elementsPerItem; i < (gid + 1) * elementsPerItem; i++) {
+            if(i < numberOfElements && minVal > eventTimes[i]) {
+                minVal = eventTimes[i];
+            }
+        }
+
+        local_eventTimes[get_local_id(0)] = minVal;
+    } else {
+        if(gid < numberOfElements) {
+            local_eventTimes[get_local_id(0)] = eventTimes[gid];
+        } else {
+            local_eventTimes[get_local_id(0)] = HUGE_VALF;
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+    // Reduce
+    for(uint stride = get_local_size(0) / 2; stride >= 1; stride /= 2) {
+        if (get_local_id(0) < stride) {
+            local_eventTimes[get_local_id(0)] = min(local_eventTimes[get_local_id(0)], local_eventTimes[get_local_id(0) + stride]);
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    // Save
+    (*minEventTime) = local_eventTimes[0];
+}
+
 __kernel void swap(
-    __global const float  *d_ReorderedPedestrians,
-    __global const float  *d_ReorderedPos,
-    __global float  *d_Pedestrians,
-    __global float  *d_Pos,
-    uint    numParticles
+    __global const float    *d_ReorderedPedestrians,
+    __global const float    *d_ReorderedPos,
+    __global float          *d_ReorderedTimeCredits,
+    __global float          *d_Pedestrians,
+    __global float          *d_Pos,
+    __global float          *d_TimeCredits,
+    uint                    numParticles
 ){
     const uint index = get_global_id(0);
     if(index < numParticles){
@@ -378,21 +422,22 @@ __kernel void swap(
 
         d_Pedestrians[index * OFFSET + STEPSIZE] = d_ReorderedPedestrians[index * OFFSET + STEPSIZE];
         d_Pedestrians[index * OFFSET + DESIREDSPEED] = d_ReorderedPedestrians[index * OFFSET + DESIREDSPEED];
-        d_Pedestrians[index * OFFSET + TIMECREDIT] = d_ReorderedPedestrians[index * OFFSET + TIMECREDIT];
         d_Pedestrians[index * OFFSET + NEWX] = d_ReorderedPedestrians[index * OFFSET + NEWX];
         d_Pedestrians[index * OFFSET + NEWY] = d_ReorderedPedestrians[index * OFFSET + NEWY];
+
+        d_TimeCredits[index] = d_ReorderedTimeCredits[index];
     }
 }
 
 //Calculate grid hash value for each particle
 __kernel void calcHash(
-    __global uint           *d_Hash,        //output
-    __global uint           *d_Index,       //output
-    __global const float            *d_Pos,         //input: positions
-    __constant const float        *cellSize,
-    __constant const float2       *worldOrigin,
-    __constant const uint2        *gridSize,
-    const uint                    numParticles
+    __global uint               *d_Hash,        //output
+    __global uint               *d_Index,       //output
+    __global const float        *d_Pos,         //input: positions
+    __constant const float      *cellSize,
+    __constant const float2     *worldOrigin,
+    __constant const uint2      *gridSize,
+    const uint                  numParticles
 ){
     const uint index = get_global_id(0);
     uint gridHash;
@@ -445,15 +490,29 @@ __kernel void setMem(
         d_Data[get_global_id(0)] = val;
 }
 
+__kernel void swapIndex(
+    __global uint           *d_GlobalIndexOut,
+    __global const uint     *d_GlobalIndexIn,
+    __global const uint     *d_Index,
+    uint                    numberOfElements
+){
+    uint index = get_global_id(0);
+    if(index < numberOfElements) {
+        d_GlobalIndexOut[index] = d_GlobalIndexIn[d_Index[index]];
+    }
+}
+
 __kernel void findCellBoundsAndReorder(
     __global uint   *d_CellStart,     //output: cell start index
     __global uint   *d_CellEnd,       //output: cell end index
     __global float  *d_ReorderedPedestrians,  //output: reordered by cell hash positions
     __global float  *d_ReorderedPos,  //output: reordered by cell hash positions
+    __global float  *d_ReorderedTimeCredits,  //output: reordered by cell hash positions
     __global const uint   *d_Hash,    //input: sorted grid hashes
     __global const uint   *d_Index,   //input: particle indices sorted by hash
     __global float  *d_Pedestrians,  //output: reordered by cell hash positions
     __global const float  *d_Pos,     //input: positions array sorted by hash
+    __global const float  *d_TimeCredits,     //input: positions array sorted by hash
     __local uint *localHash,          //get_group_size(0) + 1 elements
     uint    numParticles
 ){
@@ -500,9 +559,10 @@ __kernel void findCellBoundsAndReorder(
 
         d_ReorderedPedestrians[index * OFFSET + STEPSIZE] = d_Pedestrians[sortedIndex * OFFSET + STEPSIZE];
         d_ReorderedPedestrians[index * OFFSET + DESIREDSPEED] = d_Pedestrians[sortedIndex * OFFSET + DESIREDSPEED];
-        d_ReorderedPedestrians[index * OFFSET + TIMECREDIT] = d_Pedestrians[sortedIndex * OFFSET + TIMECREDIT];
         d_ReorderedPedestrians[index * OFFSET + NEWX] = d_Pedestrians[sortedIndex * OFFSET + NEWX];
         d_ReorderedPedestrians[index * OFFSET + NEWY] = d_Pedestrians[sortedIndex * OFFSET + NEWY];
+
+        d_ReorderedTimeCredits[index] = d_TimeCredits[sortedIndex];
     }
 }
 

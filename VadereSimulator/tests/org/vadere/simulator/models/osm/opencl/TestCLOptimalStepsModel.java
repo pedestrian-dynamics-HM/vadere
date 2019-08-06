@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm.opencl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistanceEikonalEq;
 import org.vadere.simulator.models.potential.fields.PotentialFieldSingleTargetGrid;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Benedikt Zoennchen
@@ -124,7 +126,7 @@ public class TestCLOptimalStepsModel {
 
 	private AttributesFloorField attributesFloorField;
 	private AttributesOSM attributesOSM;
-	private List<CLParallelOSMLocalMem.PedestrianOpenCL> pedestrians;
+	private List<PedestrianOSM> pedestrians;
 	private Topography topography;
 	private PotentialFieldDistanceEikonalEq obstacleDistancePotential;
 	private PotentialFieldSingleTargetGrid targetPotentialField;
@@ -133,7 +135,7 @@ public class TestCLOptimalStepsModel {
 	private Random random;
 	private int numberOfElements;
 	private VRectangle bound;
-	private float maxStepSize;
+	private double maxStepSize;
 
 	/*
 	AttributesOSM attributesOSM,
@@ -148,7 +150,7 @@ public class TestCLOptimalStepsModel {
 	@Before
 	public void setUp() throws IOException, TextOutOfNodeException {
 		random = new Random(0);
-		maxStepSize = 0.2f;
+		maxStepSize = 0.2;
 		//numberOfElements = 8192;
 		numberOfElements = 4;
 		attributesOSM = new AttributesOSM();
@@ -168,14 +170,19 @@ public class TestCLOptimalStepsModel {
 			VPoint randomPosition = new VPoint(
 					(float)(bound.getMinX() + random.nextDouble() * bound.getWidth()),
 					(float)(bound.getMinY() + random.nextDouble() * bound.getHeight()));
-			CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(randomPosition, maxStepSize);
-			pedestrians.add(pedestrian);
+
+			PedestrianOSM pedestrianOSM = mock(PedestrianOSM.class);
+			when(pedestrianOSM.getPosition()).thenReturn(randomPosition);
+			when(pedestrianOSM.getDesiredStepSize()).thenReturn(maxStepSize);
+			pedestrians.add(pedestrianOSM);
 		}
 
-		CLParallelOSMLocalMem.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
+		PedestrianOSM lastPedestrian = pedestrians.get(pedestrians.size()-1);
 
-		CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(-0.001, -0.001)), maxStepSize);
-		pedestrians.add(pedestrian);
+		PedestrianOSM pedestrianOSM = mock(PedestrianOSM.class);
+		when(pedestrianOSM.getPosition()).thenReturn(lastPedestrian.getPosition().add(new VPoint(-0.001, -0.001)));
+		when(pedestrianOSM.getDesiredStepSize()).thenReturn(maxStepSize);
+		pedestrians.add(pedestrianOSM);
 	}
 
 	//@Ignore
@@ -190,16 +197,21 @@ public class TestCLOptimalStepsModel {
 				5.0);
 		// max step length + function width);
 		clOptimalStepsModel.setPedestrians(pedestrians);
-		List<VPoint> result = clOptimalStepsModel.update();
+
+		while(clOptimalStepsModel.update(0.4f, 0.4f)){}
+		clOptimalStepsModel.readFromDevice();
+		List<VPoint> result = clOptimalStepsModel.getPositions();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position + " -> " + result.get(i));
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).getPosition() + " -> " + result.get(i));
 		}
 		// max step length + function width);
-		result = clOptimalStepsModel.update();
+		while(clOptimalStepsModel.update(0.8f, 0.4f)){}
+		clOptimalStepsModel.readFromDevice();
+		result = clOptimalStepsModel.getPositions();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).position  + " -> " + result.get(i));
+			logger.info("not equals for index = " + i + ": " + pedestrians.get(i).getPosition()  + " -> " + result.get(i));
 		}
 
 		clOptimalStepsModel.clear();

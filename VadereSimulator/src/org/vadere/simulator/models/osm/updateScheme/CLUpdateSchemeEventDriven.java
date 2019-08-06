@@ -17,19 +17,19 @@ import java.util.List;
 /**
  * @author Benedikt Zoennchen
  */
-public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
+public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 
 	private CLParallelEventDrivenOSM clOptimalStepsModel;
 
 	private int counter = 0;
 	private float[] eventTimes;
-	private static Logger logger = Logger.getLogger(UpdateSchemeCLEventDriven.class);
+	private static Logger logger = Logger.getLogger(CLUpdateSchemeEventDriven.class);
 
 	static {
 		logger.setDebug();
 	}
 
-	public UpdateSchemeCLEventDriven(@NotNull final Topography topography, @NotNull final CLParallelEventDrivenOSM clOptimalStepsModel) {
+	public CLUpdateSchemeEventDriven(@NotNull final Topography topography, @NotNull final CLParallelEventDrivenOSM clOptimalStepsModel) {
 		super(topography);
 		this.clOptimalStepsModel = clOptimalStepsModel;
 	}
@@ -53,28 +53,16 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 
 			if(counter == 0) {
-				List<CLParallelEventDrivenOSM.PedestrianOpenCL> pedestrians = new ArrayList<>();
-				double maxStepSize = -1.0;
-				for(int i = 0; i < pedestrianOSMList.size(); i++) {
-					PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
-					CLParallelEventDrivenOSM.PedestrianOpenCL pedestrian = new CLParallelEventDrivenOSM.PedestrianOpenCL(
-							pedestrianOSM.getPosition(),
-							(float)pedestrianOSM.getDesiredStepSize(),
-							(float)pedestrianOSM.getDesiredSpeed());
-					pedestrians.add(pedestrian);
-					maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed() * timeStepInSec);
-				}
-				clOptimalStepsModel.setPedestrians(pedestrians);
+				clOptimalStepsModel.setPedestrians(pedestrianOSMList);
 				eventTimes = new float[pedestrianOSMList.size()];
 			}
-
 
 			long ms = System.currentTimeMillis();
 			int count = 0;
 
-			if(clOptimalStepsModel.getMinEventTime() < timeStepInSec + currentTimeInSec) {
+			if(clOptimalStepsModel.getMinEventTime() < currentTimeInSec) {
 
-				while (clOptimalStepsModel.update((float)(timeStepInSec + currentTimeInSec))) {}
+				while (clOptimalStepsModel.update((float)timeStepInSec, (float)currentTimeInSec)) {}
 				clOptimalStepsModel.readFromDevice();
 
 				List<VPoint> result = clOptimalStepsModel.getPositions();

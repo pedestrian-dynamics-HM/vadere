@@ -1,5 +1,5 @@
 {
-  "name" : "chicken_floorfield_ok_GPU_parallel",
+  "name" : "chicken_floorfield_ok_GPU_event_vlarge",
   "description" : "",
   "release" : "1.0",
   "processWriters" : {
@@ -20,7 +20,7 @@
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
+        "potentialFieldResolution" : 1.0,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "timeCostAttributes" : {
@@ -39,7 +39,7 @@
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 18,
-        "numberOfCircles" : 5,
+        "numberOfCircles" : 1,
         "optimizationType" : "NELDER_MEAD",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
@@ -51,7 +51,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "PARALLEL_CL",
+        "updateType" : "EVENT_DRIVEN_CL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -72,14 +72,14 @@
     "attributesSimulation" : {
       "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.4,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : false,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 1,
-      "simulationSeed" : 1,
+      "fixedSeed" : 2,
+      "simulationSeed" : 2,
       "useSalientBehavior" : false
     },
     "topography" : {
@@ -87,8 +87,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 100.0,
-          "height" : 120.0
+          "width" : 300.0,
+          "height" : 320.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true
@@ -100,8 +100,8 @@
         "id" : 1,
         "absorbing" : false,
         "shape" : {
-          "x" : 10.0,
-          "y" : 112.9,
+          "x" : 133.8,
+          "y" : 309.4,
           "width" : 15.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
@@ -118,15 +118,15 @@
       "sources" : [ {
         "id" : 2,
         "shape" : {
-          "x" : 7.4,
-          "y" : 4.5,
-          "width" : 30.0,
-          "height" : 80.0,
+          "x" : 2.3,
+          "y" : 2.9,
+          "width" : 290.0,
+          "height" : 300.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 200,
+        "spawnNumber" : 100000,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,

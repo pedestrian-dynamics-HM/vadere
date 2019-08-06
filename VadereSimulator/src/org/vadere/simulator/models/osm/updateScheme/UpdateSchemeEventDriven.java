@@ -12,6 +12,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -21,6 +22,12 @@ import java.util.PriorityQueue;
  * @author Benedikt Zoennchen
  */
 public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
+
+	private static Logger logger = Logger.getLogger(UpdateSchemeEventDriven.class);
+
+	static {
+		logger.setDebug();
+	}
 
 	private final Topography topography;
 	protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
@@ -38,6 +45,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 		clearStrides(topography);
 
+		long ms = System.currentTimeMillis();
+
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
@@ -47,6 +56,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 				pedestrianEventsQueue.add(ped);
 			}
 		}
+		logger.debug("runtime for next step computation = " + (System.currentTimeMillis() - ms) + " [ms] for " + timeStepInSec + "[s]");
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec) {
