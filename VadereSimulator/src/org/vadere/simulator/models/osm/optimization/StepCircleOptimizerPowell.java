@@ -12,7 +12,7 @@ import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
-public class StepCircleOptimizerPowell implements StepCircleOptimizer {
+public class StepCircleOptimizerPowell extends StepCircleOptimizer {
 
 
 	private Random random;

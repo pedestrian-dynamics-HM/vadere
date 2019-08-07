@@ -30,7 +30,7 @@ public class MigrationUtil {
 
 	public MigrationUtil() {
 		dirMarker = createList("DO_NOT_MIGRATE", ".DO_NOT_MIGRATE");
-		treeMarker = createList("DO_NOT_MIGRATE_TREE", ".DO_NOT_MIGRATE_TREE");
+		treeMarker = createList("DO_NOT_MIGRATE_TREE", ".DO_NOT_MIGRATE_TREE", IOUtils.CORRUPT_DIR, IOUtils.LEGACY_DIR);
 		ignoreDirs = createList("VadereModelTests", "target", "Documentation");
 	}
 

@@ -1,24 +1,24 @@
 package org.vadere.gui.postvisualization.control;
 
 
+import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
-import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-
-import javax.swing.*;
 
 public class ActionShowPotentialField extends ActionVisualization {
 
 	private static Logger logger = Logger.getLogger(ActionShowPotentialField.class);
-	private static Resources resources = Resources.getInstance("postvisualization");
-	private final PostvisualizationModel model;
+	private static final Configuration CONFIG = VadereConfig.getConfig();	private final PostvisualizationModel model;
 
 	public ActionShowPotentialField(final String name, final Icon icon, final PostvisualizationModel model) {
 		super(name, icon, model);
@@ -29,13 +29,12 @@ public class ActionShowPotentialField extends ActionVisualization {
 	public void actionPerformed(final ActionEvent event) {
 
 		if (!model.config.isShowTargetPotentialField()) {
-			//final JFileChooser fc = new JFileChooser(resources.getProperty("View.outputDirectory.path"));
 			final JFileChooser fc = new JFileChooser(model.getOutputPath());
 			int returnVal = fc.showOpenDialog(null);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				final File file = fc.getSelectedFile();
-				resources.setProperty("SettingsDialog.outputDirectory.path", file.getParent());
+				CONFIG.setProperty("SettingsDialog.outputDirectory.path", file.getParent());
 
 				final JFrame dialog = DialogFactory.createLoadingDialog();
 				dialog.setVisible(true);
@@ -50,15 +49,14 @@ public class ActionShowPotentialField extends ActionVisualization {
 						model.setPotentialFieldContainer(container);
 						model.config.setShowTargetPotentialField(true);
 						model.notifyObservers();
-						// logger.info("read: \n" + data);
-					} catch (Exception e) {
-						e.printStackTrace();
-						logger.error(e.getMessage());
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						logger.error(ex.getMessage());
+
 						JOptionPane.showMessageDialog(
 								null,
-								resources.getProperty("InformationDialogFileError") + " - "
-										+ e.getMessage(),
-								resources.getProperty("InformationDialogError.title"),
+								ex.getMessage(),
+								Messages.getString("InformationDialogError.title"),
 								JOptionPane.ERROR_MESSAGE);
 					}
 

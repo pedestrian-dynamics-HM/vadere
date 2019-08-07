@@ -4,7 +4,7 @@
 # Steps to run this script:
 #
 # 1. Go to https://www.openstreetmap.org/.
-# 2. Click "Export" and adjust region of intereset and zoom level.
+# 2. Click "Export" and adjust region of interest and zoom level.
 # 3. Call script and pass exported file from (2):
 #
 #      python3 <script> <exported_file>
@@ -49,140 +49,400 @@
 #    "id" : -1
 #   }
 
-from lxml import etree
+from lxml.etree import Element
 from string import Template
 
 import argparse
-import utm
 import math
-import numpy as np
-import itertools as iter
-
+from git import Repo, InvalidGitRepositoryError
+import os
+from random import sample
 
 from typing import List
 
-vadere_obstacle_string = """{
+import osm_helper
+from osm_helper import PolyObjectWidthId, OsmData
+
+vadere_simple_topography_element_string = """{
+    "id" : $id,
     "shape" : {
         "type" : "POLYGON",
-        "points" : [ $points ]
-    },
-    "id" : $id
+        "points" : [ 
+$points
+        ]
+    }
 }"""
 
+source_defaults = {
+    "interSpawnTimeDistribution": "org.vadere.state.scenario.ConstantDistribution",
+    "distributionParameters": "[1.0]",
+    "spawnNumber": "1",
+    "maxSpawnNumberTotal": "-1",
+    "startTime": "0.0",
+    "endTime": "0.0",
+    "spawnAtRandomPositions": "false",
+    "useFreeSpaceOnly": "true",
+    "targetIds": "[ ]",
+    "groupSizeDistribution": "[1.0]",
+    "dynamicElementType": "PEDESTRIAN"
+}
 
-class PathToPolygon:
+target_defaults = {
+    "absorbing": "true",
+    "waitingTime": "0.0",
+    "waitingTimeYellowPhase": "0.0",
+    "parallelWaiters": "0",
+    "individualWaiting": "true",
+    "deletionDistance": "0.1",
+    "startingWithRedLight": "false",
+    "nextSpeed": "-1.0"
+}
 
-    def __init__(self, list_of_tuples, dist):
-        self.points = [np.array([p[0], p[1]]) for p in list_of_tuples]
-        self.dist = dist
-        self.rotPositive = np.array(((0, -1), (1, 0)))
-        self.rotNegative = np.array(((0, 1), (-1, 0)))
-        self.polygon = []
-        self.create_poly_points()
+
+class OsmConverter:
+    """
+    Create Vadere Topography elements based on open street map xml input files.
+    """
+
+    def __init__(self, osm_file, use_osm_id, wall_thickness=0.25):
+        self.osm_file = osm_file
+        self.osm = OsmData(self.osm_file)
+        self.use_osm_id = use_osm_id
+        self.wall_thickness = wall_thickness
+
+        # self.xml_tree = etree.parse(self.osm_file)
+        # self.node_dict = OsmConverter.extract_latitude_and_longitude_for_each_xml_node(self.xml_tree)
+        # self.simple_buildings = OsmConverter.filter_for_buildings(self.xml_tree)
+        # self.complex_buildings = OsmConverter.filter_for_buildings_in_relations(self.xml_tree)
+
+        self.base_point_lon_lat = self.osm.base_point
+        self.base_point_utm = [0.0, 0.0]
+        self.zone_map = {}
+        self.obstacles: List[Element] = []
+        self.sources: List[Element] = []
+        self.targets: List[Element] = []
+        self.measurement: List[Element] = []
+
+    def filter(self):
+        for f in self.osm.obstacle_selectors:
+            self.obstacles.extend(f())
+
+        for f in self.osm.target_selectors:
+            self.targets.extend(f())
+
+        for f in self.osm.source_selectors:
+            self.sources.extend(f())
+
+        for f in self.osm.measurement_selectors:
+            self.measurement.extend(f())
 
     @classmethod
-    def get_poly_object(cls, list_of_tuples, dist, id):
-        ptp = cls(list_of_tuples, dist)
-        return PolyObjectWidthId(id, ptp.create_poly_points())
-
-    def create_poly_points(self):
-        lines_o1 = []
-        lines_o2 = []
-        for a, b in self.pairwise(self.points):
-            lines = self.parallel_lines([a, b], self.dist)
-            lines_o1.append(lines[0])
-            lines_o2.append(lines[1])
-
-        path_o1 = self.offset_line(lines_o1)
-        path_o2 = self.offset_line(lines_o2)
-
-        self.polygon.extend(path_o1)
-        path_o2.reverse()
-        self.polygon.extend(path_o2)
-
-        if not self.polygon_closed():
-            self.polygon.append(self.polygon[0])
-
-        return self.polygon
-
-    def polygon_closed(self):
-        if len(self.polygon) < 2:
-            return False
-
-        return np.array_equal(self.polygon[0], self.polygon[-1])
-
-    def offset_line(self, lines):
-        points = [lines[0][0]]
-        for l1, l2 in self.pairwise(lines):
-            points.append(self.line_intersection(l1, l2))
-        points.append(lines[-1][-1])  # last line last point
-        return points
+    def from_args(cls, arg):
+        c = cls(arg.input, arg.use_osm_id)
+        c.filter()
+        return c
 
     @staticmethod
-    def pairwise(iterable):
-        """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
-        a, b = iter.tee(iterable)
-        next(b, None)
-        return zip(a, b)
-
-    @staticmethod
-    def line_intersection(line1, line2):
+    def get_git_hash():
         """
-        see https://stackoverflow.com/a/20677983
-        :param line1:
-        :param line2:
+        :return: name of file with commit hash of current version. If the file contains uncommitted changes a
+        'dirty' commit hash is returned.
+        """
+        try:
+            repo_base = '../../..'
+            repo = Repo(repo_base)
+            current_file = os.path.relpath(__file__, repo_base)
+            osm_helper_file = os.path.relpath(osm_helper.__file__, repo_base)
+            file_name = os.path.basename(current_file)
+            if current_file in repo.untracked_files:
+                print(
+                    f"{__file__} is not tracked by git. This is not good! You will not be able to reproduce the output"
+                    f" later on.")
+                return "not-tracked"
+
+            if repo.is_dirty(path=current_file) or repo.is_dirty(path=osm_helper_file):
+                print(
+                    f"warning: Converted output is based on a not committed script. Reproducing the result might not"
+                    f" work. Commit changes first and rerun.")
+                return f"{file_name}-{repo.commit().hexsha}-dirty"
+            else:
+                return f"{file_name}-{repo.commit().hexsha}"
+
+        except InvalidGitRepositoryError:
+            print(f"cannot find git repository at {os.path.abspath('../../..')}")
+            return "no-repo-found"
+
+    # @staticmethod
+    # def xpath_k_v_tags(key_value_list: List):
+    #     xpath = [OsmConverter.xpath_k_v_tag(*i) for i in key_value_list]
+    #     return f"({' and '.join(xpath)})"
+    #
+    # @staticmethod
+    # def xpath_k_v_tag(k: str, v: str):
+    #     return f"./tag[@k='{k}' and @v='{v}']"
+    #
+    # @staticmethod
+    # def add_ignore(ignore: List):
+    #     if ignore is None:
+    #         return ""
+    #     else:
+    #         return f" and not({OsmConverter.xpath_k_v_tags(ignore)})"
+    #
+    # @staticmethod
+    # def filter_tag(xml_tree, include: list, exclude: list = None) -> List[Element]:
+    #     """
+    #     creates xpath string which will return all elements contains tags with a specific key (e.g ('key2') without
+    #     checking the value or in the case of ('key1', 'val2') the value will be checked. All elements in the include
+    #     or
+    #     exclude list are concatenated with an 'and' operator
+    #     :param xml_tree:
+    #     :param include: list of the form [('key1', 'val1'), ('key1', 'val2'), ('key2'), ...]
+    #     :param exclude: list of the form [('key1', 'val1'), ('key1', 'val2'), ('key2'), ...]
+    #     :return:
+    #     """
+    #     include_tag_key = [element[0] for element in include if len(element) == 1]
+    #     inc_1 = [f"./tag[@k='{k}']" for k in include_tag_key]
+    #     include_tag_key_value_pair = [element for element in include if len(element) == 2]
+    #     inc_2 = [f"./tag[@k='{e[0]}' and @v='{e[1]}']" for e in include_tag_key_value_pair]
+    #
+    #     if exclude is not None:
+    #         exclude_tag_key = [element for element in exclude if len(element) == 1]
+    #         exc_1 = [f"./tag[@k='{k}']" for k in exclude_tag_key]
+    #         exclude_tag_key_value_pair = [element for element in exclude if len(element) == 2]
+    #         exc_2 = [f"./tag[@k='{e[0]}' and @v='{e[1]}']" for e in exclude_tag_key_value_pair]
+    #         exclude_xpath = f"and not ({' and '.join(exc_1 +  exc_2)})"
+    #     else:
+    #         exclude_xpath = ""
+    #
+    #     xpath = f"/osm/way[({' and '.join(inc_1 + inc_2)}) {exclude_xpath} ]"
+    #     print(xpath)
+    #     return xml_tree.xpath(xpath)
+    #
+    # @staticmethod
+    # def filter_for_buildings(xml_tree, ignore: list = None) -> List[Element]:
+    #     xpath = f"/osm/way[./tag/@k='building' {OsmConverter.add_ignore(ignore)}]"
+    #     return xml_tree.xpath(xpath)
+    #
+    # @staticmethod
+    # def filter_for_barrier(xml_tree, ignore: list = None) -> List[Element]:
+    #     xpath = f"/osm/way[./tag/@k='barrier' {OsmConverter.add_ignore(ignore)}]"
+    #     return xml_tree.xpath(xpath)
+    #
+    # @staticmethod
+    # def filter_for_buildings_in_relations(xml_tree, ignore: list = None):
+    #     # Note: A relation describes a shape with "cutting holes".
+    #
+    #     # Select "relation" nodes with a child node "tag" annotated with attribute "k='building'".
+    #     xpath = f"/osm/relation[./tag/@k='building' {OsmConverter.add_ignore(ignore)}]"
+    #     buildings = xml_tree.xpath(xpath)
+    #
+    #     # We only want the shapes and only the outer parts. role='inner' is for "cutting holes" in the shape.
+    #     members_in_the_relations = [building.xpath("./member[./@type='way' and ./@role='outer']") for building in
+    #                                 buildings]
+    #     way_ids = []
+    #     for element in members_in_the_relations:
+    #         for way in element:
+    #             way_ids.append(way.get("ref"))
+    #     ways = xml_tree.xpath("/osm/way")
+    #     ways_as_dict_with_id_key = {way.get("id"): way for way in ways}
+    #     buildings_from_relations = [ways_as_dict_with_id_key[way_id] for way_id in way_ids]
+    #     return buildings_from_relations
+
+    @staticmethod
+    def find_new_base_point(buildings: List[PolyObjectWidthId]):
+        """
+        The base point will be the smallest coordinate taken for all buildings of the current map boundary.
+        This point will most likely not correspond with the Base Point which is the lower left corner of the
+        map bound chosen at export time of the open street map xml file.
+        :param buildings:
+        :return: smallest coordinate (in utm)
+        """
+        # "buildings_cartesian" is a list of lists. The inner list contains the (x,y) tuples.
+        # search for the lowest x- and y-coordinates within the points
+        all_points = [point for building in buildings for point in building.points]
+
+        tuple_with_min_x = min(all_points, key=lambda point: point[0])
+        tuple_with_min_y = min(all_points, key=lambda point: point[1])
+
+        return tuple_with_min_x[0], tuple_with_min_y[1]
+
+    @staticmethod
+    def find_width_and_height(buildings: List[PolyObjectWidthId]):
+        """
+        :param buildings:
+        :return: utm coordinates used to bound all buildings
+        """
+        width = 0
+        height = 0
+        for cartesian_points in buildings:
+            for point in cartesian_points.points:
+                width = max(width, point[0])
+                height = max(height, point[1])
+        return math.ceil(width), math.ceil(height)
+
+    @staticmethod
+    def to_vadere_topography(width, height, translation, zone_string, obstacles=None, sources=None, targets=None,
+                             measurement_areas=None):
+        """
+
+        :param measurement_areas:
+        :param targets:
+        :param sources:
+        :param obstacles: list of Vadere obstacles (json string)
+        :param width: of the topography bound
+        :param height: of the topography bound
+        :param translation: offset used to translate the topography to (0,0). This is needed to reverse the translation
+               if needed
+        :param zone_string: epgs or UTM string encoding the coordinates system
         :return:
         """
-        x_diff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
-        y_diff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+        with open("templates/vadere_topography_template.txt", "r") as f:
+            vadere_topography_input = f.read()  # .replace('\n', '')
 
-        def det(a, b):
-            return a[0] * b[1] - a[1] * b[0]
+        epsg_description = f"OpenStreetMap export {OsmConverter.get_git_hash()}"
+        vadere_topography_output = Template(vadere_topography_input).substitute(width=width,
+                                                                                height=height,
+                                                                                obstacles=obstacles,
+                                                                                translate_x=translation[0],
+                                                                                translate_y=translation[1],
+                                                                                epsg=zone_string,
+                                                                                epsg_description=epsg_description,
+                                                                                sources=sources,
+                                                                                targets=targets,
+                                                                                measurement_areas=measurement_areas)
+        return vadere_topography_output
 
-        div = det(x_diff, y_diff)
-        if div == 0:
-            raise Exception('lines do not intersect')
-
-        d = (det(*line1), det(*line2))
-        x = det(d, x_diff) / div
-        y = det(d, y_diff) / div
-        return np.array([x, y])
-
-    def parallel_lines(self, line, dist):
+    @staticmethod
+    def apply_template(poly_object: PolyObjectWidthId, template_string, default_template_data=None, indent_level=3):
         """
-        create parallel lines moved dist amount away in +-90 deg.
-        :param line: [p1, p2] with p1 = [x1, y1]
-        :return: (line_pos, line_neg) at dist from line
+        :param indent_level:
+        :param default_template_data:
+        :param template_string:
+        :param poly_object:
+        :return: Vadere json representation of an obstacle
         """
-        p1, p2 = line[0], line[1]
-        v = p2 - p1
-        v_normalized = v / np.linalg.norm(v)
+        vadere_point_string = f"{'    '*indent_level}" + '  { "x" : $x, "y" : $y }'
 
-        # +90 and strech by dist
-        o1 = dist * np.matmul(self.rotPositive, v_normalized)
-        line_o1 = [o1 + p1, o1 + p2]
-        # -90 and strech by dist
-        o2 = dist * np.matmul(self.rotNegative, v_normalized)
-        line_o2 = [o2 + p1, o2 + p2]
+        obstacle_string_template = Template(template_string)
+        point_string_template = Template(vadere_point_string)
 
-        return [line_o1, line_o2]
+        points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in poly_object.points]
+        points_as_string_concatenated = ",\n".join(points_as_string)
 
+        template_data = {}
+        if default_template_data is not None:
+            template_data.update(default_template_data)
+        template_data.update(poly_object.template_data)
+        template_data.setdefault('points', points_as_string_concatenated)
 
-class PolyObjectWidthId:
-    """
-    Simple wrapper class around a list of points (order is important!) withn an identifier field (id)
-    """
+        vadere_obstacle_as_string = obstacle_string_template.substitute(template_data)
 
-    def __init__(self, id, utm_points):
-        self.id = id
-        self.cartesian_points = utm_points
-        self.base = None
+        return vadere_obstacle_as_string
 
-    def shift_points(self, base: list):
-        shift_in_x = -base[0]
-        shift_in_y = -base[1]
-        self.cartesian_points = [(point[0] + shift_in_x, point[1] + shift_in_y) for point in self.cartesian_points]
-        self.base = base
+    @staticmethod
+    def to_vadere_obstacles(buildings: List[PolyObjectWidthId]):
+        list_of_vadere_obstacles_as_strings = []
+        for building in buildings:
+            vadere_obstacles_as_strings = \
+                OsmConverter.apply_template(building, template_string=vadere_simple_topography_element_string)
+            list_of_vadere_obstacles_as_strings.append(vadere_obstacles_as_strings)
+        return list_of_vadere_obstacles_as_strings
+
+    @staticmethod
+    def to_vadere_measurement_area(buildings: List[PolyObjectWidthId]):
+        list_of_vadere_measurement_area_as_strings = []
+        for building in buildings:
+            vadere_measurement_area_as_strings = \
+                OsmConverter.apply_template(building, template_string=vadere_simple_topography_element_string)
+            list_of_vadere_measurement_area_as_strings.append(vadere_measurement_area_as_strings)
+        return list_of_vadere_measurement_area_as_strings
+
+    @staticmethod
+    def to_vadere_sources(sources: List[PolyObjectWidthId]):
+        list_of_vadere_sources_as_strings = []
+        with open("templates/vadere_source_template.txt", "r") as f:
+            vadere_source_template = f.read()
+        for source in sources:
+            source_string = OsmConverter.apply_template(source,
+                                                        template_string=vadere_source_template,
+                                                        default_template_data=source_defaults)
+            list_of_vadere_sources_as_strings.append(source_string)
+        return list_of_vadere_sources_as_strings
+
+    @staticmethod
+    def to_vadere_targets(targets: List[PolyObjectWidthId]):
+        list_of_vadere_target_as_strings = []
+        with open("templates/vadere_target_template.txt", "r") as f:
+            vadere_target_template = f.read()
+        for target in targets:
+            target_string = OsmConverter.apply_template(target,
+                                                        template_string=vadere_target_template,
+                                                        default_template_data=target_defaults)
+            list_of_vadere_target_as_strings.append(target_string)
+        return list_of_vadere_target_as_strings
+
+    @staticmethod
+    def print_output(output_file, output):
+        if output_file is None:
+            print(output)
+        else:
+            with open(output_file, "w") as text_file:
+                print(output, file=text_file)
+
+    def convert_way_to_utm(self, way: Element):
+        way_id = way.get("id")
+        node_ids = self.osm.way_node_refs(way_id)
+        converted_way_points = self.osm.nodes_to_utm(node_ids)
+
+        # if way is closed remove last element (it's the same as the first)
+        if self.osm.way_is_closed(way_id):
+            converted_way_points = converted_way_points[:-1]
+
+        return converted_way_points
+
+    def print_xml_parsing_statistics(self):
+        print(f"File: {self.osm_file}")
+        print(f"  Nodes: {len(self.osm.nodes)}")
+        print(f"  Polygons: {len(self.obstacles)}")
+        print(f"  Base point: {self.base_point_lon_lat} (not to be confused with utm based point which!")
+
+    def convert_to_utm_poly_object(self, data, tag_name_space=None, shift_nodes=True, base_point=None,
+                                   remove_duplicates=True):
+        polygons_in_utm = []
+        # ways which already are 'polygons'
+        for way in data:
+            # Collect nodes that belong to the current building.
+            utm_points = self.convert_way_to_utm(way)
+
+            if self.use_osm_id:
+                element = PolyObjectWidthId(way.get('id'), utm_points)
+                element.template_data.update(OsmData.tags_to_dict(way, tag_name_space))
+                polygons_in_utm.append(element)
+            else:
+                element = PolyObjectWidthId(-1, utm_points)
+                element.template_data.update(OsmData.tags_to_dict(way, tag_name_space))
+                polygons_in_utm.append(element)
+
+        utm_topography_elements = polygons_in_utm
+        if base_point is None:
+            self.base_point_utm = OsmConverter.find_new_base_point(polygons_in_utm)
+        else:
+            self.base_point_utm = list(base_point)
+
+        if shift_nodes:
+            for b in utm_topography_elements:
+                b.shift_points(self.base_point_utm)
+
+        if remove_duplicates:
+            ret = []
+            id_set = set()
+            for element in utm_topography_elements:
+                if element.id not in id_set:
+                    ret.append(element)
+                    id_set.add(element.id)
+            utm_topography_elements = ret
+
+        return utm_topography_elements, self.base_point_utm, self.osm.utm_zone_string
 
 
 def str2bool(v):
@@ -197,280 +457,105 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-
 def parse_command_line_arguments():
-    parser = argparse.ArgumentParser(description="Convert and OpenStreetMap file to a Vadere topology description.")
-    parser.add_argument("osm_file", type=str, nargs="?",
-                        help="An OSM map in XML format.",
-                        default="maps/map_hochschule_klein.osm",
-                        )
-    parser.add_argument("--use-osm-id", dest='use_osm_id', type=str2bool, const=True, nargs="?",
-                        default=True, help="Set to use osm ids for obstacles")
-    parser.add_argument("-o", "--output", type=str, nargs="?",
-                            help="Specify filename if you want the output in a file.")
+    main = argparse.ArgumentParser()
 
-    # parser.add_argument("-o", "--output", type=str, nargs="?",
-    #               help="Specify filename if you want the output in a file.")
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument("-i", "--input",
+                               dest="input",
+                               nargs="?",
+                               required=True,
+                               help="OSM input file")
 
-    subparser = parser.add_subparsers(help="sub-command help")
-    parser_converter = subparser.add_parser('convert', help='convert given osm file to Vadere topography')
-    parser_converter.set_defaults(main_func=main_convert)
+    parent_parser.add_argument("-o", "--output",
+                               dest="output",
+                               nargs="?",
+                               required=False,
+                               help="OSM output. If not set the name derived from input file")
 
+    subparsers = main.add_subparsers(title="Commands")
 
-    parser_way_to_polygon = subparser.add_parser('wayToPoly', help='convert given way id to a Vadere polygon')
-    parser_way_to_polygon.set_defaults(main_func=main_way_to_polygon)
-    parser_way_to_polygon.add_argument("-d", "--path-width", dest="d", type=float, help="Specify filename if you want the output in a file.")
-    parser_way_to_polygon.add_argument("-w", "--way", type=int, nargs="+")
+    convert_parser = subparsers.add_parser("convert",
+                                           parents=[parent_parser],
+                                           description="Convert and OpenStreetMap file to a Vadere topology "
+                                                       "description.")
+    convert_parser.add_argument("--use-osm-id",
+                                dest='use_osm_id',
+                                type=str2bool,
+                                const=True,
+                                nargs="?",
+                                default=True,
+                                help="Set to use osm ids for obstacles")
 
-    args = parser.parse_args()
+    convert_parser.set_defaults(main_func=main_convert)
 
-    return args
+    cmd_args = main.parse_args()
 
+    return cmd_args
 
-def extract_latitude_and_longitude_for_each_xml_node(xml_tree):
-    # Select all convertnodes (not only buildings).
-    nodes = xml_tree.xpath("/osm/node")
 
-    nodes_dictionary_with_lat_and_lon = {node.get("id"): (node.get("lat"), node.get("lon")) for node in nodes}
+def random_source_target_match(sources: List[PolyObjectWidthId], targets: List[PolyObjectWidthId]):
 
-    return nodes_dictionary_with_lat_and_lon
+    target_ids = [t.template_data.get('id') for t in targets]
 
+    for source in sources:
+        if "targetIds" not in source.template_data:
+            t_ids = sample(target_ids, 2)
+            if source.id in t_ids:
+                t_ids.remove(source.id)
+            source.template_data.setdefault("targetIds", f"[ {t_ids[0]} ]")
 
-def filter_for_buildings(xml_tree):
-    # Select "way" nodes with a child node "tag" annotated with attribute "k='building'".
-    buildings = xml_tree.xpath("/osm/way[./tag/@k='building']")
 
-    return buildings
-
-
-def filter_for_barrier(xml_tree, type='wall'):
-    barrier = xml_tree.xpath("/osm/way[./tag/@k='barrier']")
-
-    return barrier
-
-
-def get_way(xml_tree, id):
-    way = xml_tree.xpath(f"/osm/way[@id='{id}']")
-
-    return way
-
-
-def convert_way_to_cartesian(way, lookup_table_latitude_and_longitude, assume_closed_path=True):
-    node_references = way.xpath("./nd")
-
-    return convert_nodes_to_cartesian_points(node_references, lookup_table_latitude_and_longitude, assume_closed_path)
-
-
-def filter_for_buildings_in_relations(xml_tree):
-    # Note: A relation describes a shape with "cutting holes".
-
-    # Select "relation" nodes with a child node "tag" annotated with attribute "k='building'".
-    buildings = xml_tree.xpath("/osm/relation[./tag/@k='building']")
-
-    # We only want the shapes and only the outer parts. role='inner' is for "cutting holes" in the shape.
-    members_in_the_relations = [building.xpath("./member[./@type='way' and ./@role='outer']") for building in buildings]
-    way_ids = []
-    for element in members_in_the_relations:
-        for way in element:
-            way_ids.append(way.get("ref"))
-    ways = xml_tree.xpath("/osm/way")
-    ways_as_dict_with_id_key = {way.get("id"): way for way in ways}
-    buildings_from_relations = [ways_as_dict_with_id_key[id] for id in way_ids]
-    return buildings_from_relations
-
-
-def extract_base_point(xml_tree):
-    base_node = xml_tree.xpath("/osm/bounds")[0]
-    base_point = (base_node.get("minlat"), base_node.get("minlon"))
-
-    return base_point
-
-
-def assert_that_start_and_end_point_are_equal(node_references):
-    assert node_references[0].get("ref") == node_references[-1].get("ref")
-
-
-def convert_nodes_to_cartesian_points(nodes, lookup_table_latitude_and_longitude, assume_closed_path):
-    cartesian_points = []
-
-    # Omit last node becausenodes it should be the same as the first one.
-    if assume_closed_path:
-        max_node = len(nodes) - 1
-    else:
-        max_node = len(nodes)
-
-    for node in nodes[:max_node]:
-        reference = node.get("ref")
-        latitude, longitude = lookup_table_latitude_and_longitude[reference]
-
-        x, y, zone_number, zone_letter = utm.from_latlon(float(latitude), float(longitude))
-        point = (x, y)
-
-        # TODO: assert that ALL nodes fall into same zone_number and zone_letter!
-        cartesian_points.append(point)
-
-    return cartesian_points
-
-
-def create_vadere_obstacles_from_building(building: PolyObjectWidthId):
-    vadere_point_string = '         { "x" : $x, "y" : $y }'
-
-    obstacle_string_template = Template(vadere_obstacle_string)
-    point_string_template = Template(vadere_point_string)
-
-    points_as_string = [point_string_template.substitute(x=x, y=y) for x, y in building.cartesian_points]
-    points_as_string_concatenated = ",\n".join(points_as_string)
-
-    vadere_obstacle_as_string = obstacle_string_template.substitute(points=points_as_string_concatenated, id=building.id)
-
-    return vadere_obstacle_as_string
-
-
-def build_vadere_topography_input_with_obstacles(obstacles, width, height):
-    with open("vadere_topography_template.txt", "r") as myfile:
-        vadere_topography_input = myfile.read().replace('\n', '')
-
-    vadere_topography_output = Template(vadere_topography_input).substitute(width=width, height=height, obstacles=obstacles)
-
-    return vadere_topography_output
-
-
-def print_xml_parsing_statistics(filename, nodes_dictionary, simple_buildings, complex_buildings, base_point):
-    print("File: {}".format(filename))
-    print("  Nodes: {}".format(len(nodes_dictionary)))
-    print("  Simple buildings: {}".format(len(simple_buildings)))
-    print("  Complex buildings: {}".format(len(complex_buildings)))
-    print("  Base point: {}".format(base_point))
-
-
-def print_output(outputfile, output):
-    if outputfile == None:
-        print(output)
-    else:
-        with open(outputfile, "w") as text_file:
-            print(output, file=text_file)
-
-
-def find_width_and_height(buildings: List[PolyObjectWidthId]):
-    # search for the highest x- and y-coordinates within the points
-    width = 0
-    height = 0
-    for cartesian_points in buildings:
-        for point in cartesian_points.cartesian_points:
-            width = max(width, point[0])
-            height = max(height, point[1])
-    return math.ceil(width), math.ceil(height)
-
-
-def find_new_basepoint(buildings: List[PolyObjectWidthId]):
-    # "buildings_cartesian" is a list of lists!!!
-    # The inner list contains the (x,y) tuples!
-    # search for the lowest x- and y-coordinates within the points
-    all_points = [point for building in buildings for point in building.cartesian_points]
-
-    tuple_with_min_x = min(all_points, key=lambda point: point[0])
-    tuple_with_min_y = min(all_points, key=lambda point: point[1])
-
-    return tuple_with_min_x[0], tuple_with_min_y[1]
-
-
-def shift_way(way, base):
-    shift_in_x_direction = -base[0]
-    shift_in_y_direction = -base[1]
-    shift_cartesian_points = [(point[0] + shift_in_x_direction, point[1] + shift_in_y_direction) for point in way]
-    return shift_cartesian_points
-
-
-def convert_buildings_to_cartesian(buildings_as_xml_nodes, nodes_dictionary_with_lat_and_lon, use_osm_id: bool):
-    buildings_in_cartesian = []
-    for building in buildings_as_xml_nodes:
-        # Collect nodes that belong to the current building.
-        node_references = building.xpath("./nd")
-
-        assert_that_start_and_end_point_are_equal(node_references)
-        cartesian_points = convert_nodes_to_cartesian_points(node_references, nodes_dictionary_with_lat_and_lon,
-                                                             assume_closed_path=True)
-
-        if use_osm_id:
-            buildings_in_cartesian.append(PolyObjectWidthId(building.get('id'), cartesian_points))
-        else:
-            buildings_in_cartesian.append(PolyObjectWidthId(-1, cartesian_points))
-    return buildings_in_cartesian
-
-
-def convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings: List[PolyObjectWidthId]):
-    list_of_vadere_obstacles_as_strings = []
-    for building in buildings:
-        vadere_obstacles_as_strings = create_vadere_obstacles_from_building(building)
-        list_of_vadere_obstacles_as_strings.append(vadere_obstacles_as_strings)
-    return list_of_vadere_obstacles_as_strings
-
-
-def init(args):
-    xml_tree = etree.parse(args.osm_file)
-
-    nodes_dictionary_with_lat_and_lon = extract_latitude_and_longitude_for_each_xml_node(xml_tree)
-
-    simple_buildings = filter_for_buildings(xml_tree)
-    complex_buildings = filter_for_buildings_in_relations(xml_tree)
-    extracted_base_point = extract_base_point(xml_tree)
-
-    print_xml_parsing_statistics(args.osm_file, nodes_dictionary_with_lat_and_lon, simple_buildings, complex_buildings, extracted_base_point)
-
-    buildings_as_cartesian = convert_buildings_to_cartesian(simple_buildings + complex_buildings, nodes_dictionary_with_lat_and_lon, args.use_osm_id)
-
-    new_base = find_new_basepoint(buildings_as_cartesian)
-
-    for b in buildings_as_cartesian:
-        b.shift_points(new_base)
-
-    return xml_tree, nodes_dictionary_with_lat_and_lon, buildings_as_cartesian, new_base
-
-
-
-def main_convert(args):
+def main_convert(cmd_args):
     """
     osm2vadere.pu mf.osm convert -h // for sub command specific help
     osm2vadere.py mf.osm convert --output map.json
     """
-    print(args)
-    xml_tree, _, buildings_as_cartesian, _ = init(args)
+    if cmd_args.output is None:
+        dirname, basename = os.path.split(cmd_args.input)
+        cmd_args.output = os.path.join(dirname, f"{basename.split('.')[0]}.txt")
+
+    print(cmd_args)
+    converter = OsmConverter.from_args(cmd_args)
+    obstacles_as_utm, base_point_utm, zone_string = converter.convert_to_utm_poly_object(data=converter.obstacles)
+    sources_as_utm, _, _ = converter.convert_to_utm_poly_object(data=converter.sources,
+                                                                base_point=base_point_utm,
+                                                                tag_name_space="rover:source:")
+    targets_as_utm, _, _ = converter.convert_to_utm_poly_object(data=converter.targets,
+                                                                base_point=base_point_utm,
+                                                                tag_name_space="rover:target:")
+    measurement_as_utm, _, _ = converter.convert_to_utm_poly_object(data=converter.measurement,
+                                                                    base_point=base_point_utm,
+                                                                    tag_name_space="rover:measurementArea:")
+
+    # random preset for targetIds list for sources
+    # random_source_target_match(sources_as_utm, targets_as_utm)
 
     # make sure everything lies within the topography
-    width_topography, height_topography = find_width_and_height(buildings_as_cartesian)
+    width_topography, height_topography = OsmConverter.find_width_and_height(obstacles_as_utm)
 
-    list_of_vadere_obstacles_as_strings = convert_buildings_as_cartesian_to_buildings_as_vadere_obstacles(buildings_as_cartesian)
+    list_of_vadere_obstacles_as_strings = OsmConverter.to_vadere_obstacles(obstacles_as_utm)
+    list_of_vadere_sources_as_strings = OsmConverter.to_vadere_sources(sources_as_utm)
+    list_of_vadere_target_as_strings = OsmConverter.to_vadere_targets(targets_as_utm)
+    list_of_vadere_measurement_as_strings = OsmConverter.to_vadere_measurement_area(measurement_as_utm)
 
     obstacles_joined = ",\n".join(list_of_vadere_obstacles_as_strings)
+    sources_joined = ",\n".join(list_of_vadere_sources_as_strings)
+    targets_joined = ",\n".join(list_of_vadere_target_as_strings)
+    measurement_joined = ",\n".join(list_of_vadere_measurement_as_strings)
 
-    vadere_topography_output = build_vadere_topography_input_with_obstacles(obstacles_joined, width_topography, height_topography)
-    print_output(args.output, vadere_topography_output)
-
-
-def main_way_to_polygon(args):
-    """
-    osm2vadere.py mf.osm wayToPoly -h // for sub command specific help
-    osm2vadere.py mf.osm wayToPoly --way 116531500 --path-width 0.25
-    """
-    print('way_to_polygon:', args)
-    xml_tree, node_dict, buildings_as_cartesian, new_base = init(args)
-
-    obstacles = []
-    for w in args.way:
-        way = get_way(xml_tree, w)
-        assert len(way) == 1
-        path_list = convert_way_to_cartesian(way[0], node_dict, assume_closed_path=False)
-        path_list = shift_way(path_list, new_base)
-        vadere_obstacle = create_vadere_obstacles_from_building(PathToPolygon.get_poly_object(path_list, args.d, w))
-        obstacles.append(vadere_obstacle)
-
-    print_output(args.output, '\n'.join(obstacles))
-    return obstacles
+    vadere_topography_output = OsmConverter.to_vadere_topography(width_topography,
+                                                                 height_topography,
+                                                                 base_point_utm,
+                                                                 zone_string,
+                                                                 obstacles=obstacles_joined,
+                                                                 sources=sources_joined,
+                                                                 targets=targets_joined,
+                                                                 measurement_areas=measurement_joined)
+    OsmConverter.print_output(cmd_args.output, vadere_topography_output)
+    # converter.osm.save()
 
 
 if __name__ == "__main__":
     args = parse_command_line_arguments()
-    # map_mf_small.osm wayToPoly -w 258139211 -d 0.5
     args.main_func(args)
-
-

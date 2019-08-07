@@ -10,17 +10,16 @@ import org.vadere.simulator.entrypoints.cmd.VadereConsole;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
 import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
-import org.vadere.simulator.utils.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MigrationSubCommandTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandler {
+public class MigrationSubCommandTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandlerScenario {
 
 	private Path scenario1;
 	private JsonNode scenario1Json;

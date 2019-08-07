@@ -18,4 +18,11 @@ public enum PathFindingTag {
 	PathFindingTag() {
 		this(true, false);
 	}
+
+	public static PathFindingTag valueOf(int id){
+		if (id <0 || id > values().length)
+			throw new IllegalArgumentException("No Enum for index: " + id);
+
+		return values()[id];
+	}
 }

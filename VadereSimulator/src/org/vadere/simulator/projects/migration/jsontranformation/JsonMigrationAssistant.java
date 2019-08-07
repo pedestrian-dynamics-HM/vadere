@@ -114,6 +114,9 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 			logger.info(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
+		if (targetVersion.equals(Version.latest())){
+			transformedNode = AbstractJsonTransformation.addNewMembersWithDefaultValues(transformedNode);
+		}
 
 		try {
 			restLog();
@@ -275,6 +278,8 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 			logger.info(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
+		// will always be Version.latest()
+		transformedNode = AbstractJsonTransformation.addNewMembersWithDefaultValues(transformedNode);
 		if (legacyDir != null) {
 			migrationLogger.info("Scenario Migrated - OK. Move copy of old version to legacllyDir");
 			logger.info(migrationLogger.last());

@@ -126,4 +126,10 @@ public final class FootStep {
 	public String toString() {
 		return start + "->" + end;
 	}
+
+	public String[] getValueString(){
+		String[] valueLine = {""+startTime, ""+endTime, ""+start.x, ""+start.y, ""+end.x, ""+end.y};
+		return valueLine;
+	}
+
 }

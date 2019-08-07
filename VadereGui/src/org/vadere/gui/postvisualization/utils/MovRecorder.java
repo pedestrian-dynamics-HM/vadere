@@ -1,14 +1,16 @@
 package org.vadere.gui.postvisualization.utils;
 
 
+import org.apache.commons.configuration2.Configuration;
 import org.jcodec.api.awt.SequenceEncoder;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.postvisualization.PostVisualisation;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,12 +18,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Observable;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 public class MovRecorder implements IRecorder {
 	private static Logger logger = Logger.getLogger(MovRecorder.class);
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 	private static Resources resources = Resources.getInstance("postvisualization");
 
 	private final PostvisualizationModel model;
@@ -31,6 +31,7 @@ public class MovRecorder implements IRecorder {
 	private Rectangle2D.Double imageSize;
 	private Rectangle2D.Double viewport;
 	private boolean finished;
+	private File outputFile;
 
 	public MovRecorder(final PostvisualizationRenderer renderer) {
 		this.model = renderer.getModel();
@@ -76,6 +77,7 @@ public class MovRecorder implements IRecorder {
 			try {
 				this.finished = true;
 				enc.finish();
+				VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());
 			} catch (IndexOutOfBoundsException error) {
 				logger.debug("Nothing recorded! " + error.getMessage());
 				throw error;
@@ -105,10 +107,10 @@ public class MovRecorder implements IRecorder {
 	public void startRecording() throws IOException {
 		synchronized(model) {
 			Date todaysDate = new java.util.Date();
-			SimpleDateFormat formatter = new SimpleDateFormat(resources.getProperty("SettingsDialog.dataFormat"));
+		SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
-			JFileChooser fileChooser = new JFileChooser(Preferences.userNodeForPackage(PostVisualisation.class).get("SettingsDialog.snapshotDirectory.path", "."));
-			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
+		JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
+			outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
 			fileChooser.setSelectedFile(outputFile);
 
 			int returnVal = fileChooser.showDialog(null, "Save");

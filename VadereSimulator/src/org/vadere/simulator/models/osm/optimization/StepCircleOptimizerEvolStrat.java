@@ -15,7 +15,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  * The Class StepCircleOptimizerEvolStrat.
  * 
  */
-public class StepCircleOptimizerEvolStrat implements StepCircleOptimizer {
+public class StepCircleOptimizerEvolStrat extends StepCircleOptimizer {
 
 	private final Random random;
 	private final double startrandom;

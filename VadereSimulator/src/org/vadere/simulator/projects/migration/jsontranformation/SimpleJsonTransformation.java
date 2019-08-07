@@ -14,7 +14,6 @@ public abstract class SimpleJsonTransformation extends AbstractJsonTransformatio
         super();
         this.targetVersion = targetVersion;
         this.previousVersion = targetVersion.previousVersion();
-        //todo do something with the version.
     }
 
     @Override

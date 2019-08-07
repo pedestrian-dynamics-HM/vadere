@@ -38,14 +38,12 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
 		if(!finished) {
 			do {
-				refined = false;
 				refine();
-			} while(refined);
-
-			finished = true;
+			} while(isRefined());
 		}
 		if(finalize) {
 			triangulation.finish();
+			finished = true;
 		}
 		return triangulation;
 	}
@@ -57,6 +55,7 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 
 	@Override
 	public void refine() {
+		refined = false;
 		if(!finished) {
 			for(E edge : getMesh().getEdges()) {
 				if(!getMesh().isBoundary(edge)) {
@@ -68,6 +67,14 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 				}
 			}
 		}
+
+		if(!refined) {
+			finished = true;
+		}
+	}
+
+	public boolean isRefined() {
+		return refined;
 	}
 
 	public boolean isFinished() {

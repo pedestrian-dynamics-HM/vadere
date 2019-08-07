@@ -56,7 +56,6 @@ public class ExceptionIncident extends Incident {
 		}
 	}
 
-	//TODO: implement this cleaner
 	private Pair<String, String> getReferenceChainNodes(String errMsg) {
 		String referenceChain =
 				errMsg.substring(errMsg.indexOf("through reference chain: ") + "through reference chain: ".length());

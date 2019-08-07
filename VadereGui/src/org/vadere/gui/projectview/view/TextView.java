@@ -2,12 +2,14 @@ package org.vadere.gui.projectview.view;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import org.apache.commons.configuration2.Configuration;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rtextarea.RTextScrollPane;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -17,15 +19,16 @@ import org.vadere.state.events.json.EventInfoStore;
 import org.vadere.state.events.presettings.EventPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -41,10 +44,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class TextView extends JPanel implements IJsonView {
 
 	private static Logger logger = Logger.getLogger(TextView.class);
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private AttributeType attributeType;
-	private String default_folder;
 	private String default_resource;
+
 
 	private JPanel panelTop = new JPanel();
 
@@ -60,18 +64,19 @@ public class TextView extends JPanel implements IJsonView {
 	private DocumentListener documentListener;
 	private IScenarioChecker scenarioChecker;
 
-	private JTextArea txtrTextfiletextarea;
+	private RSyntaxTextArea textfileTextarea;
 	private ActionListener saveToFileActionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String path = IOUtils.chooseJSONFileSave(Messages.getString("TextFileView.btnSaveToFile.text"),
-					Preferences.userNodeForPackage(VadereApplication.class).get(default_resource, default_folder));
+			String path = IOUtils.chooseJSONFileSave(Messages.getString("TextFileView.btnSaveToFile.text"), CONFIG.getString(default_resource));
 
 			if (path == null)
 				return;
 
 			try {
-				IOUtils.writeTextFile(path.endsWith(".json") ? path : path + ".json", txtrTextfiletextarea.getText());
+				IOUtils.writeTextFile(path.endsWith(".json") ? path : path + ".json", textfileTextarea.getText());
+				File file = new File(path);
+				VadereConfig.getConfig().setProperty(default_resource, file.getParentFile().getAbsolutePath());
 			} catch (IOException e1) {
 				IOUtils.errorBox(e1.getLocalizedMessage(), Messages.getString("SaveFileErrorMessage.title"));
 				logger.error(e1);
@@ -83,16 +88,16 @@ public class TextView extends JPanel implements IJsonView {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			FileFilter filter = new FileNameExtensionFilter("JSON file", "json");
-			String path = IOUtils.chooseFile("Choose file...",
-					Preferences.userNodeForPackage(VadereApplication.class).get(default_resource, default_folder),
-					filter);
+			String path = IOUtils.chooseFile(Messages.getString("ChooseFile.text"), CONFIG.getString(default_resource), filter);
 
 			if (path == null)
 				return;
 
 			try {
 				String content = IOUtils.readTextFile(path);
-				txtrTextfiletextarea.setText(content);
+				File file = new File(path);
+				VadereConfig.getConfig().setProperty(default_resource, file.getParentFile().getAbsolutePath());
+				textfileTextarea.setText(content);
 			} catch (IOException e) {
 				logger.error("could not load from file: " + e.getMessage());
 			}
@@ -102,8 +107,7 @@ public class TextView extends JPanel implements IJsonView {
 	/**
 	 * Create the panel.
 	 */
-	public TextView(String default_folder, String default_resource, final AttributeType attributeType) {
-	    this.default_folder = default_folder;
+	public TextView(@NotNull final String default_resource, final AttributeType attributeType) {
 		this.default_resource = default_resource;
 		this.attributeType = attributeType;
 		setLayout(new BorderLayout(0, 0));
@@ -124,11 +128,10 @@ public class TextView extends JPanel implements IJsonView {
 
 		jsonValidIndicator = new JsonValidIndicator();
 		panelTop.add(jsonValidIndicator);
-		JScrollPane scrollPane = new JScrollPane();
-		add(scrollPane, BorderLayout.CENTER);
 
 		RSyntaxTextArea textAreaLocal = new RSyntaxTextArea();
 		textAreaLocal.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+		textAreaLocal.setCodeFoldingEnabled(true);
 		// set other color theme for text area...
 		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
 		try {
@@ -138,10 +141,15 @@ public class TextView extends JPanel implements IJsonView {
 			logger.error("could not loead theme " + e.getMessage());
 		}
 
-		txtrTextfiletextarea = textAreaLocal;
+		textfileTextarea = textAreaLocal;
 
-		scrollPane.setViewportView(txtrTextfiletextarea);
-		txtrTextfiletextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
+		RTextScrollPane sp = new RTextScrollPane(textfileTextarea);
+		sp.setFoldIndicatorEnabled(true);
+		sp.setLineNumbersEnabled(true);
+
+		add(sp, BorderLayout.CENTER);
+
+		textfileTextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
 
 		documentListener = new DocumentListener() {
 			@Override
@@ -161,7 +169,7 @@ public class TextView extends JPanel implements IJsonView {
 
 			public void setScenarioContent() {
 				if (isEditable) {
-					String json = txtrTextfiletextarea.getText(); // TODO [priority=medium] [task=bugfix] this can sometimes give the wrong text if an integer is added at the end of
+					String json = textfileTextarea.getText(); // TODO [priority=medium] [task=bugfix] this can sometimes give the wrong text if an integer is added at the end of
 																  // random-seed in simulation tab, very weird, investigate...
 					if (json.length() == 0)
 						return;
@@ -226,7 +234,7 @@ public class TextView extends JPanel implements IJsonView {
 									Messages.getString("Tab.Model.confirmLoadTemplate.title"),
 									JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
-									txtrTextfiletextarea.setText(jsonString);
+									textfileTextarea.setText(jsonString);
 								} catch (Exception e1) {
 									e1.printStackTrace();
 								}
@@ -252,42 +260,42 @@ public class TextView extends JPanel implements IJsonView {
 
 		switch (attributeType) {
 		case MODEL:
-			txtrTextfiletextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
+			textfileTextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
 					scenario.getModelAttributes(), scenario.getScenarioStore().getMainModel()));
 			break;
 		case SIMULATION:
-			txtrTextfiletextarea
+			textfileTextarea
 					.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 			break;
 		case OUTPUTPROCESSOR:
-			txtrTextfiletextarea.setText(scenario.getDataProcessingJsonManager().serialize());
+			textfileTextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
 		case TOPOGRAPHY:
 			Topography topography = scenario.getTopography().clone();
 			topography.removeBoundary();
-			txtrTextfiletextarea.setText(StateJsonConverter.serializeTopography(topography));
+			textfileTextarea.setText(StateJsonConverter.serializeTopography(topography));
 			break;
 		case EVENT:
 			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
-			txtrTextfiletextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
+			textfileTextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");
 		}
-		txtrTextfiletextarea.setCaretPosition(0);
+		textfileTextarea.setCaretPosition(0);
 	}
 
 	@Override
 	public void isEditable(boolean isEditable) {
 		this.isEditable = isEditable;
 		btnLoadFromFile.setEnabled(isEditable);
-		txtrTextfiletextarea.setEnabled(isEditable);
+		textfileTextarea.setEnabled(isEditable);
 		if (isEditable) {
-			txtrTextfiletextarea.setBackground(Color.WHITE);
-			txtrTextfiletextarea.getDocument().addDocumentListener(documentListener);
+			textfileTextarea.setBackground(Color.WHITE);
+			textfileTextarea.getDocument().addDocumentListener(documentListener);
 		} else {
-			txtrTextfiletextarea.setBackground(Color.LIGHT_GRAY);
-			txtrTextfiletextarea.getDocument().removeDocumentListener(documentListener);
+			textfileTextarea.setBackground(Color.LIGHT_GRAY);
+			textfileTextarea.getDocument().removeDocumentListener(documentListener);
 		}
 	}
 
@@ -296,15 +304,15 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	public void setText(String text) {
-		txtrTextfiletextarea.setText(text);
+		textfileTextarea.setText(text);
 	}
 
 	public String getText() {
-		return txtrTextfiletextarea.getText();
+		return textfileTextarea.getText();
 	}
 
 	public void insertAtCursor(String text) {
-		txtrTextfiletextarea.insert(text, txtrTextfiletextarea.getCaretPosition());
+		textfileTextarea.insert(text, textfileTextarea.getCaretPosition());
 	}
 
 	public void setScenarioChecker(IScenarioChecker scenarioChecker) {

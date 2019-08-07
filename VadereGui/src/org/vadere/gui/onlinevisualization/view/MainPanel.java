@@ -1,16 +1,10 @@
 package org.vadere.gui.onlinevisualization.view;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.*;
 
-import javax.swing.*;
-
-import org.vadere.gui.components.control.DefaultModeAdapter;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.control.RectangleSelectionMode;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.ScaleablePanel;
 import org.vadere.gui.onlinevisualization.control.OnlineVisSelectionMode;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
@@ -37,7 +31,6 @@ public class MainPanel extends ScaleablePanel implements Observer {
 	private final OnlineVisualizationModel model;
 	private List<IRendererChangeListener> rendererChangeListeners;
 	private static Resources resources = Resources.getInstance("global");
-
 	private IMode selectionMode = null;
 
 	/** Creates a new main panel. */
@@ -118,7 +111,7 @@ public class MainPanel extends ScaleablePanel implements Observer {
 
 	public void preLoop() {
 		this.renderer = new OnlinevisualizationRenderer(model);
-		renderer.setLogo(resources.getImage("vadere.png"));
+		resources.getImage("vadere.png");
 		setRenderer(renderer);
 		rendererChangeListeners.stream().forEach(l -> l.update(renderer));
 	}

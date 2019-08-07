@@ -1,8 +1,7 @@
 {
   "name" : "regular_wall_nelder_mead_ok",
   "description" : "",
-  "release" : "1.0",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -59,6 +58,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -68,7 +69,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {

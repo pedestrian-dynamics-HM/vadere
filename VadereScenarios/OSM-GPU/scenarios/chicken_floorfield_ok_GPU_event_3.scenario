@@ -1,8 +1,7 @@
 {
   "name" : "chicken_floorfield_ok_GPU_event_3",
   "description" : "",
-  "release" : "1.0",
-  "commithash" : "e67c45d90d61ac662fc7075307cb248835cf1343",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -24,6 +23,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -92,7 +93,8 @@
           "height" : 120.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {

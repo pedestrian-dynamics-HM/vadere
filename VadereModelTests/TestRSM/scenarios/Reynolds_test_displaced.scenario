@@ -1,8 +1,7 @@
 {
   "name" : "Reynolds_test_displaced",
   "description" : "",
-  "release" : "1.0",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -79,7 +78,8 @@
           "height" : 20.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ {

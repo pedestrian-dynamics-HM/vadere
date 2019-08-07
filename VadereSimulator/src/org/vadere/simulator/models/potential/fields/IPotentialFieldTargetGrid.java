@@ -1,8 +1,5 @@
 package org.vadere.simulator.models.potential.fields;
 
-import java.util.List;
-import java.util.Map;
-
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.queuing.PotentialFieldTargetQueuingGrid;
 import org.vadere.state.attributes.Attributes;
@@ -14,6 +11,9 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 import org.vadere.util.reflection.VadereClassNotFoundException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A static (needsUpdate returns always false) or dynamic target potential field which uses a
@@ -39,11 +39,12 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
      * @param topography            the topography
      * @param attributesPedestrian  the attributes of pedestrians
      * @param className             the name of the class of the field which will be created
-     * @return target potential fields which use a Cartesian grid
+	 * @return target potential fields which use a Cartesian grid
      */
 	static IPotentialFieldTargetGrid createPotentialField(final List<Attributes> modelAttributesList,
                                                           final Topography topography,
-                                                          final AttributesAgent attributesPedestrian, String className) {
+                                                          final AttributesAgent attributesPedestrian,
+														  String className) {
 
 		DynamicClassInstantiator<IPotentialFieldTarget> instantiator = new DynamicClassInstantiator<>();
 

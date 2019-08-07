@@ -22,6 +22,15 @@ public class PRuppertsTriangulator extends GenRuppertsTriangulator<PVertex, PHal
 
 	public PRuppertsTriangulator(
 			@NotNull final PSLG pslg,
+			@NotNull final Function<IPoint, Double> circumRadiusFunc,
+			final double minAngle,
+			final boolean createHoles) {
+		super(() -> new PMesh(), pslg, minAngle, circumRadiusFunc, createHoles);
+	}
+
+
+	public PRuppertsTriangulator(
+			@NotNull final PSLG pslg,
 			final double minAngle) {
 		super(() -> new PMesh(), pslg, minAngle, p -> Double.POSITIVE_INFINITY, true, true);
 	}

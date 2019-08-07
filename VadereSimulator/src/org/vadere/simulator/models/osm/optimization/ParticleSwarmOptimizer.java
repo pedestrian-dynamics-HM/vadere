@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Benedikt Zoennchen
  */
-public class ParticleSwarmOptimizer implements StepCircleOptimizer {
+public class ParticleSwarmOptimizer extends StepCircleOptimizer {
 
 	private final double movementThreshold;
 	private final Random random;

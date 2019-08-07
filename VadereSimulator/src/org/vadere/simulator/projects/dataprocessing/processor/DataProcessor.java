@@ -58,7 +58,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	}
 
 
-	protected Map<K, V> getData() {
+	public Map<K, V> getData() {
 		return this.data;
 	}
 

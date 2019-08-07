@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+<bounds minlat='48.16077' minlon='11.58451' maxlat='48.16386' maxlon='11.58936' origin='CGImap 0.7.5 (31203 thorn-02.openstreetmap.org)' />
+<way id='-999069167' action='modify' visible='true'>
+  <nd ref='-127405' />
+  <nd ref='-127407' />
+  <nd ref='-127425' />
+  <nd ref='-127405' />
+  <tag k='test' v='1' />
+  <tag k='rover:id' v='-133507' />
+  <tag k='rover:obstacle' v='yes' />
+  <tag k='rover:obstacle:type' v='polygon' />
+</way>
+<way id='173168628' timestamp='2014-06-30T12:12:19Z' uid='8703' user='rolandg' visible='true' version='4' changeset='23344904'>
+  <nd ref='1318876746' />
+  <nd ref='1324414637' />
+  <nd ref='1324414707' />
+  <nd ref='1318876746' />
+  <tag k='test' v='2' />
+  <tag k='addr:city' v='München' />
+  <tag k='addr:country' v='DE' />
+  <tag k='addr:housenumber' v='53' />
+  <tag k='addr:postcode' v='80802' />
+  <tag k='addr:street' v='Leopoldstraße' />
+  <tag k='building' v='yes' />
+</way>
+<node id='-127405' action='modify' visible='true' lat='48.16256981067' lon='11.5868239213' > <tag k='rover:id' v='333'/> </node>
+<node id='-127407' action='modify' visible='true' lat='48.16254537153' lon='11.58697933476' />
+<node id='-127425' action='modify' visible='true' lat='48.16255438099' lon='11.58692204178' />
+<node id='1318876746' timestamp='2011-06-10T13:33:45Z' uid='342705' user='KonB' visible='true' version='1' changeset='8397338' lat='48.1608727' lon='11.5891088' />
+<node id='1324414637' timestamp='2016-09-30T12:57:28Z' uid='14390' user='BeKri' visible='true' version='3' changeset='42541803' lat='48.1624082' lon='11.5894932' />
+<node id='1324414707' timestamp='2011-06-13T23:03:06Z' uid='342705' user='KonB' visible='true' version='1' changeset='8432586' lat='48.1630255' lon='11.588295' />
+</osm>

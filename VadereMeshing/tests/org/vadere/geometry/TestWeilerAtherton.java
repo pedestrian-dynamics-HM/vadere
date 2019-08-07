@@ -28,6 +28,18 @@ public class TestWeilerAtherton {
 	public void setUp() throws Exception {}
 
 	@Test
+	public void testSubtraction() {
+		VRectangle subject = new VRectangle(0, 0, 5, 5);
+		VRectangle clipper = new VRectangle(-1, -1, 7, 5);
+		VPolygon expectedResult = new VPolygon(new VRectangle(0, 4, 5, 1));
+		List<VPolygon> originalList = Arrays.asList(new VPolygon(subject), new VPolygon(clipper));
+		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
+		Optional<VPolygon> optPolygon = weilerAtherton.subtraction();
+		assertTrue(optPolygon.isPresent());
+		assertTrue(GeometryUtils.equalsPolygons(expectedResult, optPolygon.get()));
+	}
+
+	@Test
 	public void testRectangleIntersectionSpecialCase() {
 		VRectangle rec1 = new VRectangle(0, 0, 5, 5);
 		VRectangle rec2 = new VRectangle(2, 0, 5, 5);

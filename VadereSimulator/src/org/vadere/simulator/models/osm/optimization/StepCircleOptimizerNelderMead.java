@@ -3,11 +3,8 @@ package org.vadere.simulator.models.osm.optimization;
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.optimization.GoalType;
-import org.apache.commons.math.optimization.MultivariateRealOptimizer;
-import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.NelderMead;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -19,20 +16,18 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * The Class StepCircleOptimizerNelderMead.
+ * The class StepCircleOptimizerNelderMead.
  * 
  */
-public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
+public class StepCircleOptimizerNelderMead extends StepCircleOptimizer {
 
 	private static Logger logger = Logger
 			.getLogger(StepCircleOptimizerNelderMead.class);
 
 	private final Random random;
-	private Map<PedestrianOSM, VPoint> lastSolution;
 
 	public StepCircleOptimizerNelderMead(Random random) {
 		this.random = random;
-		this.lastSolution = new HashMap<>();
 	}
 
 	@Override
@@ -132,6 +127,13 @@ public class StepCircleOptimizerNelderMead implements StepCircleOptimizer {
 		// System.out.println(potentialEvaluationFunction.counter);
 		//logger.info("["+(minimum[0]-pedestrian.getPosition().getX())+","+(minimum[1]-pedestrian.getPosition().getY())+"]");
 		//lastSolution.put(pedestrian, new VPoint(minimum[0]-pedestrian.getPosition().getX(), minimum[1]-pedestrian.getPosition().getY()));
+
+		if(getIsComputeMetric()){
+			// See merge request !65
+			this.computeAndAddBruteForceSolutionMetric(pedestrian,
+                    new SolutionPair(new VPoint(minimum[0], minimum[1]), minimumValue));
+		}
+
 		return new VPoint(minimum[0], minimum[1]);
 
 	}

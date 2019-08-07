@@ -9,6 +9,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * A logger to debug some code.
 	 */
 	Logger log = Logger.getLogger(IPolyConnectivity.class);
+
 
 	/**
 	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>
@@ -551,6 +553,66 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 		}
 
 		return Optional.of(currentFace);
+	}
+
+	// TODO: improve performance by remembering faces
+	/**
+	 * <p>A virus like working algorithm which searches for neighbouring faces by starting at the face until
+	 * the <tt>markCondition</tt> does no longer hold or the maximal dept is reached.
+	 * This requires in the worst case O(n), where n is the number of edges of all involved faces
+	 * (i.e. the face and the merged faces).</p>
+	 *
+	 * <p>Does not changes the connectivity.</p>
+	 *
+	 * @param face                      the face
+	 * @param markCondition             the mark condition.
+	 * @param maxDept                   the maximum dept / neighbouring distance at which faces can be marked / found
+	 *
+	 * @return the merge result i.e. the resulting face.
+	 */
+	default List<F> findFaces(
+			@NotNull final F face,
+			@NotNull final Predicate<F> markCondition,
+			final int maxDept) {
+		int dept = 0;
+
+		if(!markCondition.test(face)) {
+			return Collections.EMPTY_LIST;
+		}
+
+		Set<F> markedFaces = new HashSet<>();
+		List<F> result = new ArrayList<>();
+		result.add(face);
+		markedFaces.add(face);
+
+		List<E> toProcess = getMesh().getEdges(face);
+
+		while (!toProcess.isEmpty()) {
+			dept++;
+
+			List<E> newToProcess = new ArrayList<>();
+			//assert toProcess.isEmpty() || toProcess.stream().anyMatch(e -> getMesh().getFace(e))) : "each edge of both faces is a link to the other face";
+
+			for(E edge : toProcess) {
+				// the face might be destroyed by an operation before
+				F candidate = getMesh().getTwinFace(edge);
+				if(!markedFaces.contains(candidate) &&  markCondition.test(candidate)) {
+					result.add(candidate);
+					markedFaces.add(candidate);
+					for(E e : getMesh().getEdgeIt(candidate)) {
+						newToProcess.add(e);
+					}
+				}
+			}
+
+			if(maxDept > 0 && dept >= maxDept) {
+				return result;
+			}
+
+			toProcess = newToProcess;
+		}
+
+		return result;
 	}
 
 	/**
