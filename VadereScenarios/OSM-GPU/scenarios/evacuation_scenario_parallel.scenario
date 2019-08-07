@@ -78,7 +78,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "PARALLEL_CL",
+        "updateType" : "PARALLEL_SHARED_MEM_CL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",

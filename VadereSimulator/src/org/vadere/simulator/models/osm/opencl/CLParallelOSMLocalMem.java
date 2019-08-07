@@ -53,7 +53,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  * using the GPU (see. green-2007 Building the Grid using Sorting).
  */
 public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLOptimalStepsModel {
-	private static final Logger logger = Logger.getLogger(CLParallelOSM.class);
+	private static final Logger logger = Logger.getLogger(CLParallelOSMLocalMem.class);
 
 	//
 	/*private static final int COORDOFFSET = 2;

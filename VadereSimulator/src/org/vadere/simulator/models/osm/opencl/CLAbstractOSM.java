@@ -12,6 +12,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
@@ -51,6 +52,12 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 	protected int DESIREDSPEED = 1;
 	protected int NEWX = 2;
 	protected int NEWY = 3;
+
+	private static Logger logger = Logger.getLogger(CLAbstractOSM.class);
+
+	static {
+		logger.setDebug();
+	}
 
 	// device memory
 	protected long clPositions;
@@ -503,7 +510,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 			final int dir) throws OpenCLException {
 
 		try (MemoryStack stack = stackPush()) {
-
+			long[] runtime = new long[1];
 			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 			IntBuffer errcode_ret = stack.callocInt(1);
@@ -524,7 +531,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 				clLocalWorkSize.put(0, numberOfElements / 2);
 
 				// run the kernel and read the result
-				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
 				CLInfo.checkCLError(clFinish(clQueue));
 			} else {
 				//Launch bitonicSortLocal1
@@ -540,7 +547,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 				clGlobalWorkSize.put(0, numberOfElements / 2);
 				clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null,  runtime, false));
 				CLInfo.checkCLError(clFinish(clQueue));
 
 				for (int size = (int)(2 * maxWorkGroupSize); size <= numberOfElements; size <<= 1) {
@@ -562,7 +569,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 							clGlobalWorkSize.put(0, numberOfElements / 2);
 							clLocalWorkSize.put(0, maxWorkGroupSize / 4);
 
-							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
 							CLInfo.checkCLError(clFinish(clQueue));
 						} else {
 							//Launch bitonicMergeLocal
@@ -583,13 +590,14 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 							clGlobalWorkSize.put(0, numberOfElements / 2);
 							clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
-							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
 							CLInfo.checkCLError(clFinish(clQueue));
 							break;
 						}
 					}
 				}
 			}
+			logger.debug("debug required: " + toMillis(runtime[0]));
 		}
 	}
 }

@@ -71,8 +71,8 @@ public abstract class CLAbstract {
 	private long maxLocalMemorySize;
 
 	public CLAbstract() {
-		profiling = false;
-		debug = false;
+		profiling = true;
+		debug = true;
 
 		if(debug) {
 			Configuration.DEBUG.set(true);
@@ -199,7 +199,7 @@ public abstract class CLAbstract {
 		}
 	}
 
-	private double toMillis(long nanos) {
+	protected double toMillis(long nanos) {
 		return nanos / 1_000_000.0;
 	}
 

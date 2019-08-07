@@ -41,7 +41,7 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 											 @NotNull final ScenarioCache cache) {
 
 		this.obstacles = obstacles;
-		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
+		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), 0.3/*attributesFloorField.getPotentialFieldResolution()*/, new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		boolean isInitialized = false;
 		logger.info("initialize floor field (PotentialFieldDistancesBruteForce)");

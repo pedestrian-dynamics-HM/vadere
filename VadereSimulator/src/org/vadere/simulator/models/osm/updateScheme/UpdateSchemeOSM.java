@@ -65,7 +65,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 
 		try {
 			double maxStepSize = 1.2; // from seitz-2014c
-			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
+			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize + 0.4;
 
 			switch (updateType) {
 				case EVENT_DRIVEN_CL: {

@@ -90,10 +90,12 @@ inline bool isValidCell(__constant const int2 *gridSize, int2 uGridPos) {
 
 // see PotentialFieldPedestrianCompact with useHardBodyShell = false:
 inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
-    float d = distance(pos, otherPedPosition);
+    float d = distance(pos, otherPedPosition) - DIAMETER;
     float width = 0.5f;
     float height = 12.6f;
-
+    if(d < 0) {
+        return 10000;
+    }
     if (d < width) {
         return 12.6f * exp(1 / (pown(d / width, 2) - 1));
     } else {
@@ -159,7 +161,8 @@ inline bool hasConflict(
         __constant const int2       *gridSize,
         __constant const float2     *worldOrigin,
         const float                 timeCredit,
-        const float2                pedPosition)
+        const float2                pedPosition,
+        const int                   pedId)
 {
     int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     int collisions = 0;
@@ -179,14 +182,14 @@ inline bool hasConflict(
 
                     // for itself dist < RADIUS but otherTimeCredit == timeCredit and otherPedestrian.x == pedPosition.x
                     if(distance(otherPedestrian, pedPosition) < DIAMETER &&
-                             (otherTimeCredit < timeCredit|| (otherTimeCredit == timeCredit && otherPedestrian.x < pedPosition.x))) {
-                        collisions = collisions + 1;
+                             (otherTimeCredit < timeCredit|| (otherTimeCredit == timeCredit && j < pedId))) {
+                        return true;
                     }
                 }
             }
         }
     }
-    return collisions >= 1;
+    return false;
 }
 
 inline int2 getNearestPointTowardsOrigin(float2 evalPoint, float potentialCellSize, float2 potentialFieldSize) {
@@ -426,7 +429,7 @@ __kernel void move(
         float timeCredit = orderedTimeCredits[index];
         float duration = stepSize / desiredSpeed;
         if(duration <= timeCredit) {
-            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition, index)) {
                 orderedPositions[index * COORDOFFSET + X] = newPedPosition.x;
                 orderedPositions[index * COORDOFFSET + Y] = newPedPosition.y;
                 orderedTimeCredits[index] = orderedTimeCredits[index] - duration;

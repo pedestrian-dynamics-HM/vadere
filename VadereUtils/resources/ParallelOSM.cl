@@ -1,4 +1,4 @@
-//#pragma OPENCL EXTENSION cl_amd_printf : enable
+#pragma OPENCL EXTENSION cl_amd_printf : enable
 
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
@@ -83,11 +83,14 @@ inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
 
 // see PotentialFieldPedestrianCompact with useHardBodyShell = false:
 inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
-    float d = distance(pos, otherPedPosition);
+    float d = distance(pos, otherPedPosition) - DIAMETER;
     float width = 0.5f;
     float height = 12.6f;
+    if(d < 0) {
+        return 10000;
+    }
     if (d < width) {
-        return 12.6f * native_exp(1 / (pown(d / 0.5f, 2) - 1));
+        return height * native_exp(1 / (pown(d / width, 2) - 1));
     } else {
         return 0.0f;
     }
@@ -179,7 +182,8 @@ inline bool hasConflict(
         __constant const uint2  *gridSize,
         __constant const float2 *worldOrigin,
         const float timeCredit,
-        const float2 pedPosition)
+        const float2 pedPosition,
+        const int pedId)
 {
     int2 gridPos = getGridPos(pedPosition, cellSize, worldOrigin);
     uint collisions = 0;
@@ -205,7 +209,9 @@ inline bool hasConflict(
 
                 // for itself dist < RADIUS but otherTimeCredit == timeCredit and otherPedestrian.x == pedPosition.x
                 if(distance(otherPedestrian, pedPosition) < DIAMETER &&
-                        (otherTimeCredit < timeCredit || (otherTimeCredit == timeCredit && otherPedestrian.x < pedPosition.x))) {
+                        (otherTimeCredit < timeCredit ||
+                        (otherTimeCredit == timeCredit && j < pedId)
+                       )) {
                     collisions = collisions + 1;
                 }
             }
@@ -300,16 +306,18 @@ __kernel void seek(
     const uint              numberOfPedestrians) {
 
     const uint index = get_global_id(0);
+
+
     if(index < numberOfPedestrians) {
         float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedTimeCredits[index] + timeStepInSec;
-
         float duration = stepSize / desiredSpeed;
         float2 minArg = pedPosition;
         if(timeCredit > duration) {
 
+            //printf("seek: %f > %f\n", timeCredit, duration);
             float value = 1000000;
             float minValue = value;
 
@@ -358,12 +366,14 @@ __kernel void move(
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedTimeCredits[index];
         float duration = stepSize / desiredSpeed;
-        if(duration <= timeCredit){
-            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+        if(timeCredit > duration){
+
+            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition, index)) {
                     orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
                     orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
                     orderedTimeCredits[index] = orderedTimeCredits[index] - duration;
             } else {
+                //printf("move: %f > %f\n", timeCredit, duration);
                 (*conflicts) = 1;
             }
         }

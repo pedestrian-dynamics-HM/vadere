@@ -119,6 +119,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 	@Override
 	public boolean update(float timeStepInSec, float currentTimeInSec) throws OpenCLException {
     	float timeWorkUnit = timeStepInSec;
+    	int count = 0;
     	try (MemoryStack stack = stackPush()) {
 		    FloatBuffer minTimeCredit;
 		    IntBuffer memConflicts;
@@ -201,6 +202,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			    swap = !swap;
 
 			    timeWorkUnit = 0.0f;
+			    logger.debug("counter = " + (count++));
 
 		    } while(memConflicts.get(0) >= 1);
 	    }

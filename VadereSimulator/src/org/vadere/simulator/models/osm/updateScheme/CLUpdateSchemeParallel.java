@@ -23,7 +23,11 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 	private ICLOptimalStepsModel clOptimalStepsModel;
 
 	private int counter = 0;
-	private Logger logger = Logger.getLogger(CLUpdateSchemeParallel.class);
+	private static Logger logger = Logger.getLogger(CLUpdateSchemeParallel.class);
+
+	static {
+		logger.setDebug();
+	}
 
 	public CLUpdateSchemeParallel(@NotNull final Topography topography, @NotNull final ICLOptimalStepsModel clOptimalStepsModel) {
 		super(topography);
