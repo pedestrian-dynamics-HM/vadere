@@ -348,6 +348,7 @@ __kernel void move(
     __constant const float        *cellSize,              //input
     __constant const uint2        *gridSize,              //input
     __constant const float2       *worldOrigin,           //input
+    __global   int                *conflicts,
     const uint                    numberOfPedestrians     //input
 ){
     const uint index = get_global_id(0);
@@ -356,11 +357,15 @@ __kernel void move(
         float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedTimeCredits[index];
-
-        if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
-            orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
-            orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
-            orderedTimeCredits[index] = orderedTimeCredits[index] - stepSize / desiredSpeed;
+        float duration = stepSize / desiredSpeed;
+        if(duration <= timeCredit){
+            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+                    orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];
+                    orderedPositions[index * COORDOFFSET + Y] = orderedPedestrians[index * OFFSET + NEWY];
+                    orderedTimeCredits[index] = orderedTimeCredits[index] - duration;
+            } else {
+                (*conflicts) = 1;
+            }
         }
     }
 }

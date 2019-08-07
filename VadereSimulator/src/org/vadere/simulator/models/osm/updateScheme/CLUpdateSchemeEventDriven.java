@@ -6,6 +6,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelEventDrivenOSM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
@@ -62,12 +63,11 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 
 			if(clOptimalStepsModel.getMinEventTime() < currentTimeInSec) {
 
+				eventTimes = clOptimalStepsModel.getEventTimes();
 				while (clOptimalStepsModel.update((float)timeStepInSec, (float)currentTimeInSec)) {}
 				clOptimalStepsModel.readFromDevice();
 
 				List<VPoint> result = clOptimalStepsModel.getPositions();
-				eventTimes = clOptimalStepsModel.getEventTimes();
-
 				int numberOfUpdates = clOptimalStepsModel.getCounter() - counter;
 				counter = clOptimalStepsModel.getCounter();
 
@@ -78,6 +78,9 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 				for(int i = 0; i < pedestrianOSMList.size(); i++) {
 					PedestrianOSM pedestrian = pedestrianOSMList.get(i);
 					pedestrian.clearStrides();
+					if(eventTimes[i] < currentTimeInSec) {
+						pedestrian.getFootSteps().add(new FootStep(pedestrian.getPosition(), result.get(i), eventTimes[i], eventTimes[i] + pedestrian.getDurationNextStep()));
+					}
 					movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
 				}
 			}

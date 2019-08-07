@@ -398,7 +398,7 @@ __kernel void seek(
                 /*orderedPedestrians[pedId * OFFSET + NEWX] = pedPosition.x;
                 orderedPedestrians[pedId * OFFSET + NEWY] = pedPosition.y;*/
             //}
-            orderedTimeCredits[pedId] = orderedTimeCredits[pedId] + duration;
+            orderedTimeCredits[pedId] = timeCredit;
         }
     } else {
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -415,6 +415,7 @@ __kernel void move(
     __constant const float      *cellSize,              //input
     __constant const int2       *gridSize,              //input
     __constant const float2     *worldOrigin,           //input
+    __global int                *conflicts,
     const int                   numberOfPedestrians     //input
 ){
     const int index = get_global_id(0);
@@ -424,11 +425,14 @@ __kernel void move(
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float timeCredit = orderedTimeCredits[index];
         float duration = stepSize / desiredSpeed;
-
-        if(duration <= timeCredit && !hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
-            orderedPositions[index * COORDOFFSET + X] = newPedPosition.x;
-            orderedPositions[index * COORDOFFSET + Y] = newPedPosition.y;
-            orderedTimeCredits[index] = orderedTimeCredits[index] - duration;
+        if(duration <= timeCredit) {
+            if(!hasConflict(orderedPedestrians, orderedTimeCredits, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, timeCredit, newPedPosition)) {
+                orderedPositions[index * COORDOFFSET + X] = newPedPosition.x;
+                orderedPositions[index * COORDOFFSET + Y] = newPedPosition.y;
+                orderedTimeCredits[index] = orderedTimeCredits[index] - duration;
+            } else {
+                (*conflicts) = 1;
+            }
         }
     }
 }

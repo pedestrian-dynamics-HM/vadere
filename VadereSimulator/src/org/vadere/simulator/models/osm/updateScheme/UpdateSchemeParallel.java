@@ -11,10 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
@@ -25,6 +27,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	protected final ExecutorService executorService;
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
+	private final OSMBehaviorController osmBehaviorController;
 
 	static {
 		logger.setDebug();
@@ -34,6 +37,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		this.topography = topography;
 		this.executorService = Executors.newFixedThreadPool(8);
 		this.movedPedestrians = new HashSet<>();
+		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
@@ -95,7 +99,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				updateParallelConflicts(pedestrian);
 				break;
 			case STEPS:
-				updateParallelSteps(pedestrian, timeStepInSec);
+				updateParallelSteps(pedestrian, timeStepInSec, currentTimeInSec);
 				break;
 			default:
 				throw new UnsupportedOperationException();
@@ -110,7 +114,6 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
 		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
 			movedPedestrians.add(pedestrian);
@@ -126,7 +129,6 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	private void  updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
-			pedestrian.setLastPosition(pedestrian.getPosition());
 			synchronized (topography) {
 				movePedestrian(topography, pedestrian, pedestrian.getPosition(), pedestrian.getNextPosition());
 			}
@@ -172,7 +174,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 * @param pedestrian    the pedestrian
 	 * @param timeStepInSec the duration of the time step in seconds
 	 */
-	private void updateParallelSteps(@NotNull final PedestrianOSM pedestrian, double timeStepInSec) {
+	private void updateParallelSteps(@NotNull final PedestrianOSM pedestrian, double timeStepInSec, double simTimeInSec) {
 		if (movedPedestrians.contains(pedestrian)) {
 			// did not want to make a step
 			if (pedestrian.getNextPosition().equals(pedestrian.getLastPosition())) {
@@ -187,12 +189,14 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				pedestrian.setVelocity(new Vector2D(
 						pedestrian.getNextPosition().x - pedestrian.getLastPosition().x,
 						pedestrian.getNextPosition().y - pedestrian.getLastPosition().y)
-								.multiply(1.0 / timeStepInSec));
+								.multiply(1.0 / pedestrian.getDurationNextStep()));
 			}
 			// wanted to make a step, but could not
 			else {
 				pedestrian.setVelocity(new Vector2D(0, 0));
 			}
+
+			pedestrian.getFootSteps().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getNextPosition(), simTimeInSec-pedestrian.getDurationNextStep(), simTimeInSec));
 		}
 	}
 

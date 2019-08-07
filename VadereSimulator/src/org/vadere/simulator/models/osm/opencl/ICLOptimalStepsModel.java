@@ -12,4 +12,5 @@ public interface ICLOptimalStepsModel {
 	boolean update(float timeStepInSec, float currentTimeInSec) throws OpenCLException;
 	void readFromDevice();
 	List<VPoint> getPositions();
+	float[] getTimeCredits();
 }

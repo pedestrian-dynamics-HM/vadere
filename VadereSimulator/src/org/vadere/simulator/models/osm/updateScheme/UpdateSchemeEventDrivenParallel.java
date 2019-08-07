@@ -81,36 +81,6 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		int counter = 1;
 		// event driven update ignores time credits
 		do {
-			//mesh = new PMesh();
-			Collection<VPoint> pedPoints = topography.getElements(PedestrianOSM.class)
-					.stream()
-					.map(ped -> ped.getPosition())
-					.collect(Collectors.toList());
-
-			/*triangulation = new IncrementalTriangulation(mesh);
-			for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
-				PHalfEdge halfEdge = triangulation.insert(pedestrianOSM.getPosition().getX(), pedestrianOSM.getPosition().getY());
-				PVertex vertex = triangulation.getMesh().getVertex(halfEdge);
-				triangulation.getMesh().setData(vertex, "pedestrian", pedestrianOSM);
-				map.put(pedestrianOSM, vertex);
-			}
-			triangulation.finish();
-
-
-			if(panel == null) {
-				panel = new MeshPanel<>(mesh, 1000, 1000);
-				panel.display();
-			}
-			else {
-				panel.getMeshRenderer().setMesh(mesh);
-			}*/
-
-			/*for(PVertex pedestrianPoint : mesh.getVertices()) {
-				map.put(mesh.getPoint(pedestrianPoint).pedestrianOSM, pedestrianPoint);
-			}*/
-
-			//panel.repaint();
-
 			double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
 			linkedCellsGrid = new LinkedCellsGrid<>(new VRectangle(topography.getBounds()), (pedestrianPotentialWidth));
 			locked = new boolean[linkedCellsGrid.getGridWidth()][linkedCellsGrid.getGridHeight()];

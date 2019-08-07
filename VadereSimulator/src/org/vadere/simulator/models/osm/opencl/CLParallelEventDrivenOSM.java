@@ -172,7 +172,7 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			memEventTimes = allocPedestrianEventTimeMemory(pedestrians);
 			clEnqueueWriteBuffer(clQueue, clEventTimesData, true, 0, memEventTimes, null, null);
 		}
-
+		this.eventTimes = new float[pedestrians.size()];
 		super.setPedestrians(pedestrians);
 	}
 
@@ -280,6 +280,11 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	@Override
 	public List<VPoint> getPositions() {
 		return positions;
+	}
+
+	@Override
+	public float[] getTimeCredits() {
+		return new float[0];
 	}
 
 	public float[] getEventTimes() {

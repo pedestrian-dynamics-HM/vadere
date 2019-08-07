@@ -72,6 +72,7 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 	private long clTimeCredit;
 	private long clReorderedTimeCredit;
 	private long clMinTimeCredit;
+	private long clConflicts;
 
 	// CL kernel
 	private long clFindCellBoundsAndReorder;
@@ -80,6 +81,8 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 	private long clSwap;
 	private long clCount;
 	private long clCalcMinTimeCredit;
+
+	private float[] timeCredits;
 
 	static {
 		logger.setDebug();
@@ -125,6 +128,7 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer errcode_ret = stack.callocInt(1);
 
+			clConflicts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
 			clTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clReorderedTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clMinTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
@@ -133,103 +137,130 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 			clEnqueueWriteBuffer(clQueue, clTimeCredit, true, 0, memTimeCredits, null, null);
 			MemoryUtil.memFree(memTimeCredits);
 		}
-
+		this.timeCredits = new float[pedestrians.size()];
 		super.setPedestrians(pedestrians);
 	}
 
 	@Override
 	public boolean update(float timeStepInSec, float currentTimeInSec) throws OpenCLException {
+		float timeWorkUnit = timeStepInSec;
 		try (MemoryStack stack = stackPush()) {
-			allocGlobalHostMemory();
-			allocGlobalDeviceMemory();
-			long clGlobalIndexOut = !swap ? super.clGlobalIndexOut : super.clGlobalIndexIn;
-			long clGlobalIndexIn = !swap ? super.clGlobalIndexIn : super.clGlobalIndexOut;
+			IntBuffer memConflicts;
+			do {
+				allocGlobalHostMemory();
+				allocGlobalDeviceMemory();
+				long clGlobalIndexOut = !swap ? super.clGlobalIndexOut : super.clGlobalIndexIn;
+				long clGlobalIndexIn = !swap ? super.clGlobalIndexIn : super.clGlobalIndexOut;
 
-			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
-			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
-			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clReorderedPositions, clReorderedTimeCredit,
-					clHashes, clIndices, clPedestrians, clPositions, clTimeCredit, numberOfElements);
 
-			clMaxPedCountInCell(
-					clMaxPedCountInCell,
-					clCellStarts,
-					clCellEnds,
-					clGridSize,
-					numberOfElements
-			);
+				memConflicts = stack.callocInt(1);
+				memConflicts.put(0, 0);
+				clEnqueueWriteBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
 
-			IntBuffer maxPedInCell = stack.mallocInt(1);
+				clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
+				clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
+				clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clReorderedPositions, clReorderedTimeCredit,
+						clHashes, clIndices, clPedestrians, clPositions, clTimeCredit, numberOfElements);
 
-			clEnqueueReadBuffer(clQueue, clMaxPedCountInCell, true, 0, maxPedInCell, null, null);
+				clMaxPedCountInCell(
+						clMaxPedCountInCell,
+						clCellStarts,
+						clCellEnds,
+						clGridSize,
+						numberOfElements
+				);
 
-			logger.debug("max #peds in cell: " + maxPedInCell.get(0));
+				IntBuffer maxPedInCell = stack.mallocInt(1);
 
-			/*IntBuffer memStart = stack.callocInt(numberOfGridCells);
-			IntBuffer memEnd = stack.callocInt(numberOfGridCells);
-			clEnqueueReadBuffer(clQueue, clCellStarts, true, 0, memStart, null, null);
-			clEnqueueReadBuffer(clQueue, clCellEnds, true, 0, memEnd, null, null);*/
+				clEnqueueReadBuffer(clQueue, clMaxPedCountInCell, true, 0, maxPedInCell, null, null);
 
-			clSeek(
-					clReorderedPedestrians,
-					clReorderedPositions,
-					clReorderedTimeCredit,
-					clCirclePositions,
-					clCellStarts,
-					clCellEnds,
-					clCellSize,
-					clGridSize,
-					clObstaclePotential,
-					clTargetPotential,
-					clMaxPedCountInCell,
-					clWorldOrigin,
-					clPotentialFieldGridSize,
-					clPotentialFieldSize,
-					numberOfElements,
-					maxPedInCell.get(0),
-					timeStepInSec);
+				logger.debug("max #peds in cell: " + maxPedInCell.get(0));
 
-			clMove(
-					clReorderedPedestrians,
-					clReorderedPositions,
-					clReorderedTimeCredit,
-					clCellStarts,
-					clCellEnds,
-					clCellSize,
-					clGridSize,
-					clWorldOrigin,
-					numberOfElements);
+				clSeek(
+						clReorderedPedestrians,
+						clReorderedPositions,
+						clReorderedTimeCredit,
+						clCirclePositions,
+						clCellStarts,
+						clCellEnds,
+						clCellSize,
+						clGridSize,
+						clObstaclePotential,
+						clTargetPotential,
+						clMaxPedCountInCell,
+						clWorldOrigin,
+						clPotentialFieldGridSize,
+						clPotentialFieldSize,
+						numberOfElements,
+						maxPedInCell.get(0),
+						timeWorkUnit);
 
-			clSwap(
-					clReorderedPedestrians,
-					clReorderedPositions,
-					clReorderedTimeCredit,
-					clPedestrians,
-					clPositions,
-					clTimeCredit,
-					numberOfElements);
+				clMove(
+						clReorderedPedestrians,
+						clReorderedPositions,
+						clReorderedTimeCredit,
+						clCellStarts,
+						clCellEnds,
+						clCellSize,
+						clGridSize,
+						clWorldOrigin,
+						clConflicts,
+						numberOfElements);
 
-			clSwapIndex(
-					clGlobalIndexOut,
-					clGlobalIndexIn,
-					clIndices,
-					numberOfElements);
+				clEnqueueReadBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
 
-			clCalcMinTimeCredit(
-					clMinTimeCredit,
-					clTimeCredit,
-					numberOfElements
-			);
+				clSwap(
+						clReorderedPedestrians,
+						clReorderedPositions,
+						clReorderedTimeCredit,
+						clPedestrians,
+						clPositions,
+						clTimeCredit,
+						numberOfElements);
 
-			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
-			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+				clSwapIndex(
+						clGlobalIndexOut,
+						clGlobalIndexIn,
+						clIndices,
+						numberOfElements);
 
-			clFinish(clQueue);
+				clCalcMinTimeCredit(
+						clMinTimeCredit,
+						clTimeCredit,
+						numberOfElements
+				);
 
-			counter++;
-			swap = !swap;
+				clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+				clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+
+				clFinish(clQueue);
+
+				timeWorkUnit = 0.0f;
+
+				counter++;
+				swap = !swap;
+			} while (memConflicts.get(0) >= 1);
 		}
-
 		return false;
+	}
+
+	@Override
+	public void readFromDevice() {
+		super.readFromDevice();
+		FloatBuffer memTimeCredits = CLUtils.toFloatBuffer(timeCredits);
+		clEnqueueReadBuffer(clQueue, clTimeCredit, true, 0, memTimeCredits, null, null);
+		clFinish(clQueue);
+
+		timeCredits = new float[numberOfElements];
+		float[] tmp = CLUtils.toFloatArray(memTimeCredits, numberOfElements);
+		for(int i = 0; i < numberOfElements; i++) {
+			timeCredits[indices[i]] = tmp[i];
+		}
+	}
+
+	@Override
+	public float[] getTimeCredits() {
+		return timeCredits;
 	}
 
 	@Override
@@ -268,7 +299,7 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 	protected FloatBuffer allocTimeCreditMemory(@NotNull final List<PedestrianOSM> pedestrians) {
 		float[] timeCredits = new float[pedestrians.size()];
 		for(int i = 0; i < pedestrians.size(); i++) {
-			timeCredits[i] = 500.0f;
+			timeCredits[i] = (float) Math.max(0.0f, pedestrians.get(i).getTimeCredit());
 		}
 		return CLUtils.toFloatBuffer(timeCredits);
 	}
@@ -381,6 +412,7 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 			final long clCellSize,
 			final long clGridSize,
 			final long clWorldOrigin,
+			final long clConflicts,
 			final int numberOfElements)
 			throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
@@ -397,7 +429,8 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 5, clCellSize));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 6, clGridSize));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 7, clWorldOrigin));
-			CLInfo.checkCLError(clSetKernelArg1i(clMove, 8, numberOfElements));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 8, clConflicts));
+			CLInfo.checkCLError(clSetKernelArg1i(clMove, 9, numberOfElements));
 
 			long globalWorkSize;
 			long localWorkSize;
@@ -515,14 +548,10 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 	@Override
 	protected void clearMemory() throws OpenCLException {
 		super.clearMemory();
-		try {
-			if(counter > 0) {
-				CLInfo.checkCLError(clReleaseMemObject(clMaxPedCountInCell));
-			}
-		}
-		catch (OpenCLException ex) {
-			throw ex;
-		}
+		CLInfo.checkCLError(clReleaseMemObject(clTimeCredit));
+		CLInfo.checkCLError(clReleaseMemObject(clReorderedTimeCredit));
+		CLInfo.checkCLError(clReleaseMemObject(clMaxPedCountInCell));
+		CLInfo.checkCLError(clReleaseMemObject(clConflicts));
 	}
 
 	@Override
@@ -534,6 +563,17 @@ public class CLParallelOSMLocalMem extends CLAbstractOSMParallel implements ICLO
 		CLInfo.checkCLError(clReleaseKernel(clMove));
 		CLInfo.checkCLError(clReleaseKernel(clSwap));
 		CLInfo.checkCLError(clReleaseKernel(clCount));
+	}
+
+	@Override
+	protected void clearCL() throws OpenCLException {
+		super.releaseKernels();
+		CLInfo.checkCLError(clReleaseKernel(clCalcMinTimeCredit));
+		CLInfo.checkCLError(clReleaseKernel(clFindCellBoundsAndReorder));
+		CLInfo.checkCLError(clReleaseKernel(clSeek));
+		CLInfo.checkCLError(clReleaseKernel(clMove));
+		CLInfo.checkCLError(clReleaseKernel(clSwap));
+
 	}
 
 	@Override
