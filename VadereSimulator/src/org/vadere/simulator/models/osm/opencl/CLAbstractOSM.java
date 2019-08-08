@@ -532,7 +532,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 
 				// run the kernel and read the result
 				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
-				CLInfo.checkCLError(clFinish(clQueue));
+				//CLInfo.checkCLError(clFinish(clQueue));
 			} else {
 				//Launch bitonicSortLocal1
 				CLInfo.checkCLError(clSetKernelArg1p(clBitonicSortLocal1, 0, clKeysOut));
@@ -548,7 +548,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 				clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
 				CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicSortLocal", clQueue, clBitonicSortLocal1, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null,  runtime, false));
-				CLInfo.checkCLError(clFinish(clQueue));
+				//CLInfo.checkCLError(clFinish(clQueue));
 
 				for (int size = (int)(2 * maxWorkGroupSize); size <= numberOfElements; size <<= 1) {
 					for (int stride = size / 2; stride > 0; stride >>= 1) {
@@ -570,7 +570,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 							clLocalWorkSize.put(0, maxWorkGroupSize / 4);
 
 							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeGlobal", clQueue, clBitonicMergeGlobal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
-							CLInfo.checkCLError(clFinish(clQueue));
+							//CLInfo.checkCLError(clFinish(clQueue));
 						} else {
 							//Launch bitonicMergeLocal
 							CLInfo.checkCLError(clSetKernelArg1p(clBitonicMergeLocal, 0, clKeysOut));
@@ -591,13 +591,15 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 							clLocalWorkSize.put(0, maxWorkGroupSize / 2);
 
 							CLInfo.checkCLError((int)enqueueNDRangeKernel("clBitonicMergeLocal", clQueue, clBitonicMergeLocal, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null, runtime, false));
-							CLInfo.checkCLError(clFinish(clQueue));
+							//CLInfo.checkCLError(clFinish(clQueue));
 							break;
 						}
 					}
 				}
 			}
-			logger.debug("sorting required: " + toMillis(runtime[0]));
+			if(debug) {
+				logger.debug("sorting required: " + toMillis(runtime[0]));
+			}
 		}
 	}
 }

@@ -65,8 +65,8 @@ public abstract class CLAbstract {
 	protected long clQueue;
 	protected long clProgram;
 
-	private boolean profiling;
-	private boolean debug;
+	protected boolean profiling;
+	protected boolean debug;
 	private long maxWorkGroupSize;
 	private long maxLocalMemorySize;
 

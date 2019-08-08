@@ -306,35 +306,50 @@ __kernel void eventTimes(
 }
 
 __kernel void filterIds(
-    __global int  *ids,                 // in
-    __global int  *idsOut,              // out
-    __global float *eventTimes,
+    __global int    *ids,                 // in
+    __global int    *mask,              // out
+    __global float  *eventTimes,
     __constant const uint2  *gridSize,
     const float             simTimeInSec) {
 
     const uint gid = get_global_id(0);
 
-    idsOut[gid] = ids[gid];
+    mask[gid] = (ids[gid] >= 0) ? 1 : - 1;
 
-    if(eventTimes[idsOut[gid]] > simTimeInSec){
-        idsOut[gid] = -1;
+    if(ids[gid] >= 0 && eventTimes[ids[gid]] > simTimeInSec){
+        mask[gid] = -1;
         //return;
     }
 
-    if(idsOut[gid] >= 0) {
+    if(mask[gid] >= 0) {
         for(int y = -1; y <= 1; y++) {
             for(int x = -1; x <= 1; x++){
                 int2 gridPos = getGridPosFromIndex(gid, gridSize);
                 int2 uGridPos = (gridPos + (int2)(x, y));
                 if(uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
                     uint hash = getGridHash(uGridPos, gridSize);
-                    if(ids[hash] >= 0 && eventTimes[ids[hash]] < eventTimes[idsOut[gid]]) {
-                        idsOut[gid] = -1;
+                    if(ids[hash] >= 0 && eventTimes[ids[hash]] < eventTimes[ids[gid]]) {
+                        mask[gid] = -1;
                         //return;
                     }
                 }
             }
         }
+    }
+}
+
+__kernel void align(
+    __global int  *idsIn,       // in
+    __global int  *prefixSum,   // in
+    __global int  *mask,         // in
+    __global int  *idsOut
+    ) {
+
+    const uint gid = get_global_id(0);
+    const uint pedId = idsIn[gid];
+
+    if(idsIn[gid] >= 0 && mask[gid] >= 0){
+        idsOut[gid + prefixSum[gid]] = pedId;
     }
 }
 
@@ -713,4 +728,220 @@ __kernel void bitonicMergeLocal(
     d_DstVal[                     0] = l_val[get_local_id(0) +                      0];
     d_DstKey[(LOCAL_SIZE_LIMIT / 2)] = l_key[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)];
     d_DstVal[(LOCAL_SIZE_LIMIT / 2)] = l_val[get_local_id(0) + (LOCAL_SIZE_LIMIT / 2)];
+}
+
+
+
+/*
+ * Inplace upsweep (reduce) on a local array [x] of length [m].
+ * NB: [m] must be a power of two.
+ */
+inline void upsweep_pow2(__local int *x, int m, int dir) {
+  int lid = get_local_id(0);
+  int bi = (lid*2)+1;
+
+  int depth = 1 + (int) log2((float)m);
+  for (int d=0; d<depth; d++) {
+    barrier(CLK_LOCAL_MEM_FENCE);
+    int mask = (0x1 << d) - 1;
+    if ((lid & mask) == mask) {
+      int offset = (0x1 << d);
+      int ai = bi - offset;
+      x[bi] += (x[ai] * dir > 0 ? x[ai] : 0);
+    }
+  }
+}
+
+/*
+ * Inplace sweepdown on a local array [x] of length [m].
+ * NB: [m] must be a power of two.
+ */
+inline void sweepdown_pow2(__local int *x, int m, int dir) {
+  int lid = get_local_id(0);
+  int bi = (lid*2)+1;
+
+  int depth = (int) log2((float)m);
+  for (int d=depth; d>-1; d--) {
+    barrier(CLK_LOCAL_MEM_FENCE);
+    int mask = (0x1 << d) - 1;
+    if ((lid & mask) == mask) {
+      int offset = (0x1 << d);
+      int ai = bi - offset;
+      int tmp = x[ai];
+                x[ai] = x[bi];
+                        x[bi] += (tmp * dir > 0 ? tmp : 0);
+    }
+  }
+}
+
+/*
+ * Inplace scan on a local array [x] of length [m].
+ * NB: m must be a power of two.
+ */
+inline void scan_pow2(__local int *x, int m, int dir) {
+  int lid = get_local_id(0);
+  int lane1 = (lid*2)+1;
+  upsweep_pow2(x, m, dir);
+  if (lane1 == (m-1)) {
+    x[lane1] = 0;
+  }
+  sweepdown_pow2(x, m, dir);
+}
+
+/*
+ * Inplace scan on a global array [data] of length [m].
+ * We load data into a local array [x] (also of length [m]),
+ *   and use a local upsweep and sweepdown.
+ * NB: [m] must be a power of two, and
+ *     there must be exactly one workgroup of size m/2
+ */
+__kernel void scan_pow2_wrapper(__global int *data, __local int *x, int m, int dir) {
+  int gid = get_global_id(0);
+  int lane0 = (gid*2);
+  int lane1 = (gid*2)+1;
+
+  // load data into local arrays
+  x[lane0] = (data[lane0] * dir > 0 ? data[lane0] : 0);
+  x[lane1] = (data[lane1] * dir > 0 ? data[lane1] : 0);
+
+  // inplace local scan
+  scan_pow2(x, m, dir);
+
+  // writeback data
+  data[lane0] = x[lane0];
+  data[lane1] = x[lane1];
+}
+
+__kernel void scan_pad_to_pow2(__global int *data, __local int * x, int n, int dir) {
+  int gid = get_global_id(0);
+  int lane0 = (gid*2);
+  int lane1 = (gid*2)+1;
+  int m = 2*get_local_size(0);
+
+  x[lane0] = (lane0 < n && data[lane0] * dir > 0) ? data[lane0] : 0;
+  x[lane1] = (lane1 < n && data[lane1] * dir > 0) ? data[lane1] : 0;
+
+  upsweep_pow2(x, m, dir);
+  if (lane1 == (m-1)) {
+    x[lane1] = 0;
+  }
+  sweepdown_pow2(x, m, dir);
+
+  if (lane0 < n)
+    data[lane0] = x[lane0];
+  if (lane1 < n)
+    data[lane1] = x[lane1];
+}
+
+/*
+ * First phase of a multiblock scan.
+ *
+ * Given a global array [data] of length arbitrary length [n].
+ * We assume that we have k workgroups each of size m/2 workitems.
+ * Each workgroup handles a subarray of length [m] (where m is a power of two).
+ * The last subarray will be padded with 0 if necessary (n < k*m).
+ * We use the primitives above to perform a scan operation within each subarray.
+ * We store the intermediate reduction of each subarray (following upsweep_pow2) in [part].
+ * These partial values can themselves be scanned and fed into [scan_inc_subarrays].
+ */
+__kernel void scan_subarrays(
+  __global int *data, //length [n]
+  __local  int *x,    //length [m]
+  __global int *part, //length [m]
+           int n,
+           int dir
+#if DEBUG
+  , __global int *debug   //length [k*m]
+#endif
+) {
+  // workgroup size
+  int wx = get_local_size(0);
+  // global identifiers and indexes
+  int gid = get_global_id(0);
+  int lane0 = (2*gid)  ;
+  int lane1 = (2*gid)+1;
+  // local identifiers and indexes
+  int lid = get_local_id(0);
+  int local_lane0 = (2*lid)  ;
+  int local_lane1 = (2*lid)+1;
+  int grpid = get_group_id(0);
+  // list lengths
+  int m = wx * 2;
+  int k = get_num_groups(0);
+
+  // copy into local data padding elements >= n with 0
+  x[local_lane0] = (lane0 < n && data[lane0] * dir > 0) ? data[lane0] : 0;
+  x[local_lane1] = (lane1 < n && data[lane1] * dir > 0) ? data[lane1] : 0;
+
+  // ON EACH SUBARRAY
+  // a reduce on each subarray
+  upsweep_pow2(x, m, dir);
+  // last workitem per workgroup saves last element of each subarray in [part] before zeroing
+  if (lid == (wx-1)) {
+    part[grpid] = x[local_lane1];
+                  x[local_lane1] = 0;
+  }
+  // a sweepdown on each subarray
+  sweepdown_pow2(x, m, dir);
+
+  // copy back to global data
+  if (lane0 < n) {
+    data[lane0] = x[local_lane0];
+  }
+  if (lane1 < n) {
+    data[lane1] = x[local_lane1];
+  }
+
+#if DEBUG
+  debug[lane0] = x[local_lane0];
+  debug[lane1] = x[local_lane1];
+#endif
+}
+
+/*
+ * Perform the second phase of an inplace exclusive scan on a global array [data] of arbitrary length [n].
+ *
+ * We assume that we have k workgroups each of size m/2 workitems.
+ * Each workgroup handles a subarray of length [m] (where m is a power of two).
+ * We sum each element by the sum of the preceding subarrays taken from [part].
+ */
+__kernel void scan_inc_subarrays(
+  __global int *data, //length [n]
+  __local  int *x,    //length [m]
+  __global int *part, //length [m]
+           int n,
+           int dir
+#if DEBUG
+  , __global int *debug   //length [k*m]
+#endif
+) {
+  // global identifiers and indexes
+  int gid = get_global_id(0);
+  int lane0 = (2*gid)  ;
+  int lane1 = (2*gid)+1;
+  // local identifiers and indexes
+  int lid = get_local_id(0);
+  int local_lane0 = (2*lid)  ;
+  int local_lane1 = (2*lid)+1;
+  int grpid = get_group_id(0);
+
+  // copy into local data padding elements >= n with identity
+  x[local_lane0] = (lane0 < n && data[lane0] * dir > 0) ? data[lane0] : 0;
+  x[local_lane1] = (lane1 < n && data[lane1] * dir > 0) ? data[lane1] : 0;
+
+  x[local_lane0] += (part[grpid] * dir > 0 ? part[grpid] : 0);
+  x[local_lane1] += (part[grpid] * dir > 0 ? part[grpid] : 0);
+
+  // copy back to global data
+  if (lane0 < n) {
+    data[lane0] = x[local_lane0];
+  }
+  if (lane1 < n) {
+    data[lane1] = x[local_lane1];
+  }
+
+#if DEBUG
+  debug[lane0] = x[local_lane0];
+  debug[lane1] = x[local_lane1];
+#endif
 }

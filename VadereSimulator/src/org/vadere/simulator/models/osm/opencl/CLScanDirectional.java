@@ -17,11 +17,10 @@ import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clSetKernelArg;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
-import static org.lwjgl.opencl.CL10.clSetKernelArg1l;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-public class CLScan extends CLAbstract {
+public class CLScanDirectional extends CLAbstract {
 
 	private long cl_scan_pow2;
 	private long cl_scan_pad_to_pow2;
@@ -33,15 +32,15 @@ public class CLScan extends CLAbstract {
 	int m = 2 * 256;     // length of each subarray ( = wx*2 )
 	private final String fileName;
 
-	public CLScan(@NotNull final String fileName) throws OpenCLException {
+	public CLScanDirectional(@NotNull final String fileName) throws OpenCLException {
 		this.fileName = fileName;
 	}
 
-	public CLScan() throws OpenCLException {
-		this("Scan.cl");
+	public CLScanDirectional() throws OpenCLException {
+		this("ScanDirectional.cl");
 	}
 
-	private void recursive_scan(final long clData, int n) throws OpenCLException {
+	private void recursive_scan(final long clData, int n, int dir) throws OpenCLException {
 		int k = (int) Math.ceil((float) n / (float) m);
 		long bufsize = 4 * m;
 
@@ -56,6 +55,7 @@ public class CLScan extends CLAbstract {
 					CLInfo.checkCLError(clSetKernelArg1p(cl_scan_pad_to_pow2, 0, clData));
 					CLInfo.checkCLError(clSetKernelArg(cl_scan_pad_to_pow2, 1, bufsize));
 					CLInfo.checkCLError(clSetKernelArg1i(cl_scan_pad_to_pow2, 2, n));
+					CLInfo.checkCLError(clSetKernelArg1i(cl_scan_pad_to_pow2, 3, dir));
 					CLInfo.checkCLError((int) enqueueNDRangeKernel("cl_scan_pad_to_pow2", clQueue, cl_scan_pad_to_pow2, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 
 			} // use multiple work groups
@@ -67,18 +67,20 @@ public class CLScan extends CLAbstract {
 				CLInfo.checkCLError(clSetKernelArg(cl_scan_subarrays, 1, bufsize));
 				CLInfo.checkCLError(clSetKernelArg1p(cl_scan_subarrays, 2, clPartial));
 				CLInfo.checkCLError(clSetKernelArg1i(cl_scan_subarrays, 3, n));
+				CLInfo.checkCLError(clSetKernelArg1i(cl_scan_subarrays, 4, dir));
 				PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
 				PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 				clGlobalWorkSize.put(0, gx);
 				clLocalWorkSize.put(0, wx);
 				CLInfo.checkCLError((int) enqueueNDRangeKernel("cl_scan_subarrays", clQueue, cl_scan_subarrays, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 
-				recursive_scan(clPartial, k);
+				recursive_scan(clPartial, k, dir);
 
 				CLInfo.checkCLError(clSetKernelArg1p(cl_scan_inc_subarrays, 0, clData));
 				CLInfo.checkCLError(clSetKernelArg(cl_scan_inc_subarrays, 1, bufsize));
 				CLInfo.checkCLError(clSetKernelArg1p(cl_scan_inc_subarrays, 2, clPartial));
 				CLInfo.checkCLError(clSetKernelArg1i(cl_scan_inc_subarrays, 3, n));
+				CLInfo.checkCLError(clSetKernelArg1i(cl_scan_inc_subarrays, 4, dir));
 				PointerBuffer clGlobalWorkSize2 = stack.callocPointer(1);
 				PointerBuffer clLocalWorkSize2 = stack.callocPointer(1);
 				clGlobalWorkSize2.put(0, gx);
@@ -89,7 +91,7 @@ public class CLScan extends CLAbstract {
 		}
 	}
 
-	public int[] scan(int[] data) throws OpenCLException {
+	public int[] scan(int[] data, int dir) throws OpenCLException {
 		int n = data.length + 1;
 		int[] result = new int[n];
 		init(fileName);
@@ -103,7 +105,7 @@ public class CLScan extends CLAbstract {
 			IntBuffer memData = MemoryUtil.memAllocInt(n);
 			memData = CLUtils.toIntBuffer(data, memData);
 			clEnqueueWriteBuffer(clQueue, clData, true, 0, memData, null, null);
-			recursive_scan(clData, n);
+			recursive_scan(clData, n, dir);
 			clEnqueueReadBuffer(clQueue, clData, true, 0, memData, null, null);
 			freeCLMemory(clData);
 
