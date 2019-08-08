@@ -40,9 +40,9 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
-        "numberOfCircles" : 2,
-        "optimizationType" : "NELDER_MEAD",
+        "stepCircleResolution" : 15,
+        "numberOfCircles" : 1,
+        "optimizationType" : "DISCRETE",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
@@ -88,8 +88,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 300.0,
-          "height" : 320.0
+          "width" : 600.0,
+          "height" : 620.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -102,9 +102,9 @@
         "id" : 1,
         "absorbing" : false,
         "shape" : {
-          "x" : 139.1,
-          "y" : 306.2,
-          "width" : 15.0,
+          "x" : 4.0,
+          "y" : 605.8,
+          "width" : 590.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
@@ -120,9 +120,9 @@
       "sources" : [ {
         "id" : 2,
         "shape" : {
-          "x" : 57.6,
-          "y" : 6.3,
-          "width" : 190.0,
+          "x" : 3.0,
+          "y" : 4.0,
+          "width" : 590.0,
           "height" : 180.0,
           "type" : "RECTANGLE"
         },
@@ -133,7 +133,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
