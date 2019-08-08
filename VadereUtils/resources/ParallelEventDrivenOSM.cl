@@ -202,11 +202,50 @@ inline float getObstaclePotential(float minDistanceToObstacle){
 
 // end potential field helper methods
 
-__kernel void move(
+// each work group is used for exactly one agent!
+__kernel void move (
+    __global float          *orderedPositions,      //input
+    __global float          *argValues,             // in
+    __global float          *values,                // in
+    __global int            *ids,
+
+    __local float           *local_point,
+    __local float           *local_values) {
+
+    const uint pedId = ids[get_group_id(0)];
+
+    // load everything into local memory
+    local_point[get_local_id(0) * COORDOFFSET + X] = argValues[get_global_id(0) * COORDOFFSET + X];
+    local_point[get_local_id(0) * COORDOFFSET + Y] = argValues[get_global_id(0) * COORDOFFSET + Y];
+    local_values[get_local_id(0)] = values[get_global_id(0)];
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // reduce
+    for(uint stride = get_local_size(0) / 2; stride >= 1; stride /= 2) {
+        if (get_local_id(0) < stride) {
+            if(local_values[get_local_id(0)] > local_values[get_local_id(0) + stride]) {
+                local_values[get_local_id(0)] = local_values[get_local_id(0) + stride];
+                local_point[get_local_id(0) * COORDOFFSET + X] = local_point[(get_local_id(0) + stride) * COORDOFFSET + X];
+                local_point[get_local_id(0) * COORDOFFSET + Y] = local_point[(get_local_id(0) + stride) * COORDOFFSET + Y];
+            }
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+    if(get_local_id(0) == 0) {
+        orderedPositions[pedId * COORDOFFSET + X] = local_point[X];
+        orderedPositions[pedId * COORDOFFSET + Y] = local_point[Y];
+    }
+}
+
+__kernel void evalPoints(
     __global float          *orderedPedestrians,    //input
     __global float          *orderedPositions,      //input
     __global float          *orderedEventTimes,
-    __global int            *ids,
+    __global float          *possiblePositions,     // out
+    __global float          *potentialValues,       // out
+    __global int            *ids,                   // input
     __global const float2   *circlePositions,       //input
     __global const uint     *d_CellStart,           //input: cell boundaries
     __global const uint     *d_CellEnd,             //input
@@ -219,70 +258,35 @@ __kernel void move(
     __constant const float2 *potentialFieldSize,    //input
     const float             potentialCellSize,      //input
     const uint              numberOfPoints,         //input
-    const uint              numberOfPedestrians,
-    const float             simTimeInSec) {
+    const uint              numberOfPedestrians) {
 
-    const uint hash = get_global_id(0);
-    const int pedId = ids[hash];
-    uint minIndex = pedId;
+    uint pedNr = get_global_id(0) / numberOfPoints;
+    uint pedId = ids[pedNr];
+    uint pointId = get_global_id(0) - (pedNr * numberOfPoints);
 
-    if(pedId >= 0) {
-        float eventTime = orderedEventTimes[pedId];
-        if(pedId < numberOfPedestrians) {
-            for(int y = -1; y <= 1; y++) {
-                for(int x = -1; x <= 1; x++){
-                    int2 gridPos = getGridPosFromIndex(hash, gridSize);
+    float2 pedPosition = (float2)(orderedPositions[pedId * COORDOFFSET + X], orderedPositions[pedId * COORDOFFSET + Y]);
+    float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
+    float desiredSpeed = orderedPedestrians[pedId * OFFSET + DESIREDSPEED];
 
-                    int2 uGridPos = (gridPos + (int2)(x, y));
-                    if(uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
-                        uint hash = getGridHash(uGridPos, gridSize);
-                        for(int j = d_CellStart[hash]; j < d_CellEnd[hash]; j++) {
-                            if(orderedEventTimes[j] < eventTime){
-                                minIndex = j;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    float2 circlePosition = circlePositions[pointId];
+    float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
+    float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+    float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
+    float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
+    float pedestrianPotential = getFullPedestrianPotential(orderedPositions, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
+    float value = targetPotential + obstaclePotential + pedestrianPotential;
 
-        if(pedId < numberOfPedestrians && pedId == minIndex && eventTime <= simTimeInSec) {
-            float2 pedPosition = (float2)(orderedPositions[pedId * COORDOFFSET + X], orderedPositions[pedId * COORDOFFSET + Y]);
-            float stepSize = orderedPedestrians[pedId * OFFSET + STEPSIZE];
-            float desiredSpeed = orderedPedestrians[pedId * OFFSET + DESIREDSPEED];
+    possiblePositions[get_global_id(0) * COORDOFFSET + X] = evalPoint.x;
+    possiblePositions[get_global_id(0) * COORDOFFSET + Y] = evalPoint.y;
+    potentialValues[get_global_id(0)] = value;
 
-            float duration = stepSize / desiredSpeed;
-            float2 minArg = pedPosition;
-
-            float value = 1000000;
-            float minValue = value;
-
-            // loop over all points of the disc and find the minimum value and argument
-            for(uint i = 0; i < numberOfPoints; i++) {
-                float2 circlePosition = circlePositions[i];
-                float2 evalPoint = pedPosition + (float2)(circlePosition * stepSize);
-                float targetPotential = getPotentialFieldValue(evalPoint, targetPotentialField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float minDistanceToObstacle = getPotentialFieldValue(evalPoint, distanceField, potentialCellSize, (*potentialFieldSize), (*potentialGridSize));
-                float obstaclePotential = getObstaclePotential(minDistanceToObstacle);
-                float pedestrianPotential = getFullPedestrianPotential(orderedPositions, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, evalPoint, pedPosition);
-                //float pedestrianPotential = 0.0f;
-                float value = targetPotential + obstaclePotential + pedestrianPotential;
-
-                if(minValue > value) {
-                    minValue = value;
-                    minArg = evalPoint;
-                }
-                //minArg = circlePosition;
-            }
-
-            //printf("evalPos (%f,%f) minValue (%f) currentValue (%f) \n", minArg.x, minArg.y, minValue, currentPotential);
-            //minArg = pedPosition;
-            orderedEventTimes[pedId] = orderedEventTimes[pedId] + duration;
-            orderedPositions[pedId * COORDOFFSET + X] = minArg.x;
-            orderedPositions[pedId * COORDOFFSET + Y] = minArg.y;
-        }
+    // update event times once
+    if(pointId == 0) {
+        orderedEventTimes[pedId] += (stepSize / desiredSpeed);
     }
 }
+
+
 __kernel void eventTimes(
     __global int  *ids,                // out
     __global float *eventTimes,         // out
@@ -301,14 +305,47 @@ __kernel void eventTimes(
     ids[gid] = id;
 }
 
+__kernel void filterIds(
+    __global int  *ids,                 // in
+    __global int  *idsOut,              // out
+    __global float *eventTimes,
+    __constant const uint2  *gridSize,
+    const float             simTimeInSec) {
+
+    const uint gid = get_global_id(0);
+
+    idsOut[gid] = ids[gid];
+
+    if(eventTimes[idsOut[gid]] > simTimeInSec){
+        idsOut[gid] = -1;
+        //return;
+    }
+
+    if(idsOut[gid] >= 0) {
+        for(int y = -1; y <= 1; y++) {
+            for(int x = -1; x <= 1; x++){
+                int2 gridPos = getGridPosFromIndex(gid, gridSize);
+                int2 uGridPos = (gridPos + (int2)(x, y));
+                if(uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
+                    uint hash = getGridHash(uGridPos, gridSize);
+                    if(ids[hash] >= 0 && eventTimes[ids[hash]] < eventTimes[idsOut[gid]]) {
+                        idsOut[gid] = -1;
+                        //return;
+                    }
+                }
+            }
+        }
+    }
+}
+
 __kernel void minEventTimeLocal(
     __global float* minEventTime,       // out
     __global float* eventTimes,         // in
     __local  float* local_eventTimes,   // cache
     uint numberOfElements
 ){
-    uint gid = get_global_id(0);
-    uint local_size = get_local_size(0);
+    const uint gid = get_global_id(0);
+    const uint local_size = get_local_size(0);
 
     if(numberOfElements > local_size) {
         uint elementsPerItem = ceil(numberOfElements / ((float)local_size));

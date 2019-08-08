@@ -166,7 +166,14 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 		this.iCellSize = 3.0f;
 		double radius = 0.2;
 		this.maxNumberOfElementsPerCell = (int)Math.ceil( (cellSize + radius) * (cellSize + radius) / (Math.PI * radius * radius));
-		//init();
+
+		circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
+				new VCircle(new VPoint(0,0), 1.0),
+				attributesOSM.getNumberOfCircles(),
+				attributesOSM.getStepCircleResolution(),
+				0,
+				2*Math.PI);
+		circlePositionList.add(VPoint.ZERO);
 	}
 
 	@Override
@@ -244,13 +251,6 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 
 	protected void allocGlobalHostMemory() {
 		if(counter == 0) {
-			circlePositionList = GeometryUtils.getDiscDiscretizationPoints(new Random(), false,
-					new VCircle(new VPoint(0,0), 1.0),
-					attributesOSM.getNumberOfCircles(),
-					attributesOSM.getStepCircleResolution(),
-					0,
-					2*Math.PI);
-			circlePositionList.add(VPoint.ZERO);
 			float[] circlePositions = new float[circlePositionList.size() * COORDOFFSET];
 			for(int i = 0; i < circlePositionList.size(); i++) {
 				circlePositions[i * COORDOFFSET + 0] = (float) circlePositionList.get(i).getX();
@@ -382,11 +382,11 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 	}
 
 	protected int getPotentialFieldWidth() {
-		return (int) Math.floor(bound.getWidth() / attributesFloorField.getPotentialFieldResolution()) + 1;
+		return (int) Math.ceil(bound.getWidth() / attributesFloorField.getPotentialFieldResolution()) + 1;
 	}
 
 	protected int getPotentialFieldHeight() {
-		return (int) Math.floor(bound.getHeight() / attributesFloorField.getPotentialFieldResolution()) + 1;
+		return (int) Math.ceil(bound.getHeight() / attributesFloorField.getPotentialFieldResolution()) + 1;
 	}
 
 	protected int getPotentialFieldSize() {

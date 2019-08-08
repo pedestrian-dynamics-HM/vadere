@@ -2,16 +2,11 @@ package org.vadere.simulator.models.osm.opencl;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.opencl.CLContextCallback;
-import org.lwjgl.opencl.CLProgramCallback;
-import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -19,39 +14,19 @@ import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.util.opencl.examples.InfoUtils;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
-import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
-import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
-import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
-import static org.lwjgl.opencl.CL10.CL_MEM_ALLOC_HOST_PTR;
-import static org.lwjgl.opencl.CL10.CL_MEM_COPY_HOST_PTR;
-import static org.lwjgl.opencl.CL10.CL_MEM_READ_ONLY;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_WRITE;
-import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_END;
-import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_START;
-import static org.lwjgl.opencl.CL10.CL_PROGRAM_BUILD_LOG;
-import static org.lwjgl.opencl.CL10.CL_PROGRAM_BUILD_STATUS;
-import static org.lwjgl.opencl.CL10.CL_QUEUE_PROFILING_ENABLE;
-import static org.lwjgl.opencl.CL10.CL_SUCCESS;
 import static org.lwjgl.opencl.CL10.clBuildProgram;
 import static org.lwjgl.opencl.CL10.clCreateBuffer;
 import static org.lwjgl.opencl.CL10.clCreateCommandQueue;
 import static org.lwjgl.opencl.CL10.clCreateContext;
 import static org.lwjgl.opencl.CL10.clCreateKernel;
 import static org.lwjgl.opencl.CL10.clCreateProgramWithSource;
-import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL10.clEnqueueReadBuffer;
 import static org.lwjgl.opencl.CL10.clEnqueueWriteBuffer;
 import static org.lwjgl.opencl.CL10.clFinish;
@@ -60,18 +35,14 @@ import static org.lwjgl.opencl.CL10.clGetEventProfilingInfo;
 import static org.lwjgl.opencl.CL10.clGetKernelWorkGroupInfo;
 import static org.lwjgl.opencl.CL10.clGetPlatformIDs;
 import static org.lwjgl.opencl.CL10.clGetProgramBuildInfo;
-import static org.lwjgl.opencl.CL10.clReleaseCommandQueue;
-import static org.lwjgl.opencl.CL10.clReleaseContext;
 import static org.lwjgl.opencl.CL10.clReleaseKernel;
 import static org.lwjgl.opencl.CL10.clReleaseMemObject;
-import static org.lwjgl.opencl.CL10.clReleaseProgram;
 import static org.lwjgl.opencl.CL10.clSetKernelArg;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1f;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1i;
 import static org.lwjgl.opencl.CL10.clSetKernelArg1p;
 import static org.lwjgl.opencl.CL10.clWaitForEvents;
 import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
@@ -90,7 +61,10 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	private long clReorderedEventTimes;
 	private long clEventTimesData;
 	private long clIds;
+	private long clIdsOut;
 	private long clMinEventTime;
+	private long clPossiblePositions;
+	private long clPossibleValues;
 
 	// Host Memory to write update to the host
 	private FloatBuffer memEventTimes;
@@ -98,13 +72,18 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	// CL kernel
 	private long clFindCellBoundsAndReorder;
 	private long clEventTimes;
-	private long clMove;
+	private long clEvalPoints;
 	private long clSwap;
 	private long clSwapIndex;
 	private long clCalcMinEventTime;
+	private long clFilterIds;
+	private long clMove;
 
 	private float[] eventTimes;
+	private int ids[];
 	private float minEventTime = 0;
+
+	private IntBuffer memIds;
 
 	public CLParallelEventDrivenOSM(
 			@NotNull final AttributesOSM attributesOSM,
@@ -159,16 +138,23 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			freeCLMemory(clReorderedEventTimes);
 			freeCLMemory(clIds);
 			freeCLMemory(clMinEventTime);
+			freeCLMemory(clPossiblePositions);
+			freeCLMemory(clPossibleValues);
 			MemoryUtil.memFree(memEventTimes);
+			MemoryUtil.memFree(memIds);
 		}
 
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer errcode_ret = stack.callocInt(1);
 			clReorderedEventTimes = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clIds = clCreateBuffer(clContext, CL_MEM_READ_WRITE, iGridSize[0] * iGridSize[1] * 4, errcode_ret);
+			clIdsOut = clCreateBuffer(clContext, CL_MEM_READ_WRITE, iGridSize[0] * iGridSize[1] * 4, errcode_ret);
 			clEventTimesData = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clMinEventTime = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+			clPossiblePositions = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size() * circlePositionList.size() * 2, errcode_ret);
+			clPossibleValues = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size() * circlePositionList.size(), errcode_ret);
 
+			memIds = MemoryUtil.memAllocInt(iGridSize[0] * iGridSize[1]);
 			memEventTimes = allocPedestrianEventTimeMemory(pedestrians);
 			clEnqueueWriteBuffer(clQueue, clEventTimesData, true, 0, memEventTimes, null, null);
 		}
@@ -203,23 +189,52 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					clCellStarts,
 					clCellEnds);
 
-			clMove(
-					clReorderedPedestrians,
-					clReorderedPositions,
-					clReorderedEventTimes,
-					clIds,
-					clCirclePositions,
-					clCellStarts,
-					clCellEnds,
-					clCellSize,
-					clGridSize,
-					clObstaclePotential,
-					clTargetPotential,
-					clWorldOrigin,
-					clPotentialFieldGridSize,
-					clPotentialFieldSize,
-					numberOfElements,
-					simTimeInSec);
+
+			clFilterIds(clIds, clIdsOut, clReorderedEventTimes, clGridSize, simTimeInSec);
+
+
+			clEnqueueReadBuffer(clQueue, clIdsOut, true, 0, memIds, null, null);
+			ids = CLUtils.toIntArray(memIds, iGridSize[0] * iGridSize[1]);
+
+			int j = 0;
+			for(int i = 0; i < ids.length; i++) {
+				if(ids[i] > -1) {
+					memIds.put(j, ids[i]);
+					j++;
+				}
+			}
+
+			log.debug("number of ped updates = " + j);
+
+			if(j > 0) {
+				clEnqueueWriteBuffer(clQueue, clIds, true, 0, memIds, null, null);
+
+				clEvalPoints(
+						clReorderedPedestrians,
+						clReorderedPositions,
+						clReorderedEventTimes,
+						clPossiblePositions,
+						clPossibleValues,
+						clIds,
+						clCirclePositions,
+						clCellStarts,
+						clCellEnds,
+						clCellSize,
+						clGridSize,
+						clObstaclePotential,
+						clTargetPotential,
+						clWorldOrigin,
+						clPotentialFieldGridSize,
+						clPotentialFieldSize,
+						j);
+
+				clMove(
+						clReorderedPositions,
+						clPossiblePositions,
+						clPossibleValues,
+						clIds,
+						j);
+			}
 
 			clSwap(
 					clReorderedPedestrians,
@@ -345,10 +360,12 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 		super.allocGlobalDeviceMemory();
 	}
 
-	private void clMove(
+	private void clEvalPoints(
 			final long clReorderedPedestrians,
 			final long clReorderedPositions,
 			final long clReorderedEventTimes,
+			final long clPossiblePositions,
+			final long clPossibleValues,
 			final long clIds,
 			final long clCirclePositions,
 			final long clCellStarts,
@@ -360,41 +377,74 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			final long clWorldOrigin,
 			final long clPotentialFieldGridSize,
 			final long clPotentialFieldSize,
-			final int numberOfElements,
-			final float simTimeInSec)
+			final int numberOfElements)
 			throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
 
 			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
-			//long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clMove, 0, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
+			//long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clEvalPoints, 0, max_work_group_size, max_local_memory_size); // local 4 byte (integer)
 
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 0, clReorderedPedestrians));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 1, clReorderedPositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 2, clReorderedEventTimes));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 3, clIds));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 4, clCirclePositions));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 5, clCellStarts));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 6, clCellEnds));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 7, clCellSize));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 8, clGridSize));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 9, clObstaclePotential));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 10, clTargetPotential));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 11, clWorldOrigin));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 12, clPotentialFieldGridSize));
-			CLInfo.checkCLError(clSetKernelArg1p(clMove, 13, clPotentialFieldSize));
-			CLInfo.checkCLError(clSetKernelArg1f(clMove, 14, (float)attributesFloorField.getPotentialFieldResolution()));
-			CLInfo.checkCLError(clSetKernelArg1i(clMove, 15, circlePositionList.size()));
-			CLInfo.checkCLError(clSetKernelArg1i(clMove, 16, numberOfElements));
-			CLInfo.checkCLError(clSetKernelArg1f(clMove, 17, simTimeInSec));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 0, clReorderedPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 1, clReorderedPositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 2, clReorderedEventTimes));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 3, clPossiblePositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 4, clPossibleValues));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 5, clIds));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 6, clCirclePositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 7, clCellStarts));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 8, clCellEnds));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 9, clCellSize));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 10, clGridSize));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 11, clObstaclePotential));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 12, clTargetPotential));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 13, clWorldOrigin));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 14, clPotentialFieldGridSize));
+			CLInfo.checkCLError(clSetKernelArg1p(clEvalPoints, 15, clPotentialFieldSize));
+			CLInfo.checkCLError(clSetKernelArg1f(clEvalPoints, 16, (float)attributesFloorField.getPotentialFieldResolution()));
+			CLInfo.checkCLError(clSetKernelArg1i(clEvalPoints, 17, circlePositionList.size()));
+			CLInfo.checkCLError(clSetKernelArg1i(clEvalPoints, 18, numberOfElements));
 
 			long globalWorkSize;
-			globalWorkSize = iGridSize[0] * iGridSize[1];
+			globalWorkSize = numberOfElements * circlePositionList.size();
 			clGlobalWorkSize.put(0, globalWorkSize);
 
 			//TODO: local work size? + check 2^n constrain!
-			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMove", clQueue, clMove, 1, null, clGlobalWorkSize, null, null, null));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clEvalPoints", clQueue, clEvalPoints, 1, null, clGlobalWorkSize, null, null, null));
 		}
 	}
+	/*// each work group is used for exactly one agent!
+__kernel void move (
+    __global float          *orderedPositions,      //input
+    __global float          *argValues,             // in
+    __global float          *values,                // in
+    __global int            *ids) {*/
+
+	private void clMove(
+			final long clReorderedPedestrians,
+			final long clPossiblePositions,
+			final long clPossibleValues,
+			final long clIds,
+			final long numberOfElements
+	) throws OpenCLException {
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			PointerBuffer clLocalWorkSize = stack.callocPointer(1);
+
+			clGlobalWorkSize.put(0, numberOfElements * circlePositionList.size());
+			clLocalWorkSize.put(0, circlePositionList.size());
+
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 0, clReorderedPedestrians));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 1, clPossiblePositions));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 2, clPossibleValues));
+			CLInfo.checkCLError(clSetKernelArg1p(clMove, 3, clIds));
+
+			// local memory
+			CLInfo.checkCLError(clSetKernelArg(clMove, 4, circlePositionList.size() * 4 * 2));
+			CLInfo.checkCLError(clSetKernelArg(clMove, 5, circlePositionList.size() * 4));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clMove", clQueue, clMove, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		}
+	}
+
 
 	private void clSwap(
 			final long clReorderedPedestrians,
@@ -446,6 +496,26 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			CLInfo.checkCLError(clSetKernelArg(clCalcMinEventTime, 2, maxWorkGroupSize * 4));
 			CLInfo.checkCLError(clSetKernelArg1i(clCalcMinEventTime, 3, numberOfElements));
 			CLInfo.checkCLError((int)enqueueNDRangeKernel("clCalcMinEventTime", clQueue, clCalcMinEventTime, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+		}
+	}
+
+	private void clFilterIds(
+			final long clIds,
+			final long clIdsOut,
+			final long clReorderedEventTimes,
+			final long clGridSize,
+			final float simTimeInSec) throws OpenCLException {
+
+		try (MemoryStack stack = stackPush()) {
+			PointerBuffer clGlobalWorkSize = stack.callocPointer(1);
+			clGlobalWorkSize.put(0, iGridSize[0] * iGridSize[1]);
+
+			CLInfo.checkCLError(clSetKernelArg1p(clFilterIds, 0, clIds));
+			CLInfo.checkCLError(clSetKernelArg1p(clFilterIds, 1, clIdsOut));
+			CLInfo.checkCLError(clSetKernelArg1p(clFilterIds, 2, clReorderedEventTimes));
+			CLInfo.checkCLError(clSetKernelArg1p(clFilterIds, 3, clGridSize));
+			CLInfo.checkCLError(clSetKernelArg1f(clFilterIds, 4, simTimeInSec));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clFilterIds", clQueue, clFilterIds, 1, null, clGlobalWorkSize, null, null, null));
 		}
 	}
 
@@ -525,8 +595,11 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			if(pedestrianSet) {
 				CLInfo.checkCLError(clReleaseMemObject(clEventTimesData));
 				CLInfo.checkCLError(clReleaseMemObject(clIds));
+				CLInfo.checkCLError(clReleaseMemObject(clIdsOut));
 				CLInfo.checkCLError(clReleaseMemObject(clReorderedEventTimes));
 				CLInfo.checkCLError(clReleaseMemObject(clMinEventTime));
+				CLInfo.checkCLError(clReleaseMemObject(clPossiblePositions));
+				CLInfo.checkCLError(clReleaseMemObject(clPossibleValues));
 
 			}
 		}
@@ -536,6 +609,7 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 		finally {
 			if(pedestrianSet) {
 				MemoryUtil.memFree(memEventTimes);
+				MemoryUtil.memFree(memIds);
 			}
 		}
 	}
@@ -545,10 +619,12 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 		super.releaseKernels();
 		CLInfo.checkCLError(clReleaseKernel(clFindCellBoundsAndReorder));
 		CLInfo.checkCLError(clReleaseKernel(clEventTimes));
-		CLInfo.checkCLError(clReleaseKernel(clMove));
+		CLInfo.checkCLError(clReleaseKernel(clEvalPoints));
 		CLInfo.checkCLError(clReleaseKernel(clSwap));
 		CLInfo.checkCLError(clReleaseKernel(clSwapIndex));
 		CLInfo.checkCLError(clReleaseKernel(clCalcMinEventTime));
+		CLInfo.checkCLError(clReleaseKernel(clFilterIds));
+		CLInfo.checkCLError(clReleaseKernel(clMove));
 	}
 
 	@Override
@@ -562,6 +638,8 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 
 			clEventTimes = clCreateKernel(clProgram, "eventTimes", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
+			clEvalPoints = clCreateKernel(clProgram, "evalPoints", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
 			clMove = clCreateKernel(clProgram, "move", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clSwap = clCreateKernel(clProgram, "swap", errcode_ret);
@@ -569,6 +647,8 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			clSwapIndex = clCreateKernel(clProgram, "swapIndex", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clCalcMinEventTime = clCreateKernel(clProgram, "minEventTimeLocal", errcode_ret);
+			CLInfo.checkCLError(errcode_ret);
+			clFilterIds = clCreateKernel(clProgram, "filterIds", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 		}
 	}

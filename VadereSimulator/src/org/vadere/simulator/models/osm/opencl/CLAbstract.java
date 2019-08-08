@@ -71,8 +71,8 @@ public abstract class CLAbstract {
 	private long maxLocalMemorySize;
 
 	public CLAbstract() {
-		profiling = true;
-		debug = true;
+		profiling = false;
+		debug = false;
 
 		if(debug) {
 			Configuration.DEBUG.set(true);
