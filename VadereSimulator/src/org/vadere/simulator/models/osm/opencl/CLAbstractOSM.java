@@ -597,7 +597,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 					}
 				}
 			}
-			logger.debug("debug required: " + toMillis(runtime[0]));
+			logger.debug("sorting required: " + toMillis(runtime[0]));
 		}
 	}
 }

@@ -40,9 +40,9 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 15,
+        "stepCircleResolution" : 255,
         "numberOfCircles" : 1,
-        "optimizationType" : "NELDER_MEAD",
+        "optimizationType" : "DISCRETE",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,

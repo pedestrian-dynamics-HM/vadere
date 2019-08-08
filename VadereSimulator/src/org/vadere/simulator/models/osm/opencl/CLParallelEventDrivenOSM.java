@@ -172,8 +172,14 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
 			long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
 
+			long ms = System.nanoTime();
+
 			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
 			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
+			clFinish(clQueue);
+
+			log.debug("sorting: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
 			clFindCellBoundsAndReorder(
 					clCellStarts,
@@ -183,15 +189,26 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					clReorderedEventTimes,
 					clHashes, clIndices, clPedestrians, clPositions, clEventTimesData, numberOfElements);
 
+			clFinish(clQueue);
+			log.debug("clFindCellBoundsAndReorder: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
+
 			clEventTimes(
 					clIds,
 					clReorderedEventTimes,
 					clCellStarts,
 					clCellEnds);
 
+			clFinish(clQueue);
+			log.debug("clEventTimes: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
+			clFinish(clQueue);
 			clFilterIds(clIds, clIdsOut, clReorderedEventTimes, clGridSize, simTimeInSec);
 
+			clFinish(clQueue);
+			log.debug("clFilterIds: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
 			clEnqueueReadBuffer(clQueue, clIdsOut, true, 0, memIds, null, null);
 			ids = CLUtils.toIntArray(memIds, iGridSize[0] * iGridSize[1]);
@@ -204,10 +221,20 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 				}
 			}
 
+			clFinish(clQueue);
+			log.debug("read clIdsOut: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
+
 			log.debug("number of ped updates = " + j);
 
 			if(j > 0) {
+				ms = System.nanoTime();
+
 				clEnqueueWriteBuffer(clQueue, clIds, true, 0, memIds, null, null);
+
+				clFinish(clQueue);
+				log.debug("write clIds: " + (System.nanoTime() - ms));
+				ms = System.nanoTime();
 
 				clEvalPoints(
 						clReorderedPedestrians,
@@ -228,13 +255,23 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 						clPotentialFieldSize,
 						j);
 
+				clFinish(clQueue);
+				log.debug("clEvalPoints: " + (System.nanoTime() - ms));
+				ms = System.nanoTime();
+
 				clMove(
 						clReorderedPositions,
 						clPossiblePositions,
 						clPossibleValues,
 						clIds,
 						j);
+
+				clFinish(clQueue);
+				log.debug("clMove: " + (System.nanoTime() - ms));
+				ms = System.nanoTime();
 			}
+
+			ms = System.nanoTime();
 
 			clSwap(
 					clReorderedPedestrians,
@@ -245,23 +282,38 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					clEventTimesData,
 					numberOfElements);
 
+			clFinish(clQueue);
+			log.debug("clSwap: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
+
 			clSwapIndex(
 					clGlobalIndexOut,
 					clGlobalIndexIn,
 					clIndices,
 					numberOfElements);
 
-			clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
-
 			clFinish(clQueue);
+			log.debug("clSwapIndex: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
+
+			clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
+			clFinish(clQueue);
+			log.debug("clMinEventTime: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
 			FloatBuffer memMinEventTime = stack.callocFloat(1);
 
 			clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, memMinEventTime, null, null);
 			clFinish(clQueue);
+			log.debug("read minEvacTime: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
 			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
 			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+
+			clFinish(clQueue);
+			log.debug("clResetStartEnd: " + (System.nanoTime() - ms));
+			ms = System.nanoTime();
 
 			counter++;
 			swap = !swap;
