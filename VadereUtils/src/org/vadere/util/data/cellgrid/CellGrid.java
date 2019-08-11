@@ -414,14 +414,7 @@ public class CellGrid {
 			incY = 0;
 		}
 
-		try {
-			gridPotentials[0] = getValue(gridPoint).potential;
-		} catch (ArrayIndexOutOfBoundsException ex) {
-			gridPoint = getNearestPoint(x, y);
-			gridPotentials[0] = getValue(gridPoint).potential;
-		}
-
-
+		gridPotentials[0] = getValue(gridPoint).potential;
 		gridPotentials[1] = getValue(gridPoint.x + incX, gridPoint.y).potential;
 		gridPotentials[2] = getValue(gridPoint.x + incX, gridPoint.y + incY).potential;
 		gridPotentials[3] = getValue(gridPoint.x, gridPoint.y + incY).potential;

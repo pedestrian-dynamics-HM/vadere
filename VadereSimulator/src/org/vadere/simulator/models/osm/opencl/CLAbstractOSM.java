@@ -6,8 +6,10 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.GridEikonalSolver;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -382,18 +384,37 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 	}
 
 	protected int getPotentialFieldWidth() {
-		return (int) Math.ceil(bound.getWidth() / attributesFloorField.getPotentialFieldResolution()) + 1;
+		return (int) Math.floor(bound.getWidth() / attributesFloorField.getPotentialFieldResolution() + 0.001) + 1;
 	}
 
 	protected int getPotentialFieldHeight() {
-		return (int) Math.ceil(bound.getHeight() / attributesFloorField.getPotentialFieldResolution()) + 1;
+		return (int) Math.floor(bound.getHeight() / attributesFloorField.getPotentialFieldResolution() + 0.001) + 1;
 	}
 
 	protected int getPotentialFieldSize() {
 		return getPotentialFieldWidth() * getPotentialFieldHeight();
 	}
 
+	//GridEikonalSolver
+
 	protected FloatBuffer generatePotentialFieldApproximation(@NotNull final EikonalSolver eikonalSolver) {
+		GridEikonalSolver gridsolver = (GridEikonalSolver)eikonalSolver;
+		CellGrid cellGrid = gridsolver.getCellGrid();
+		FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(getPotentialFieldSize());
+
+		int index = 0;
+		for (int row = 0; row < cellGrid.getNumPointsY(); row++) {
+			for (int col = 0; col < cellGrid.getNumPointsX(); col++) {
+				double val = cellGrid.getValue(col, row).potential;
+				floatBuffer.put(index, (float) val);
+				index++;
+			}
+		}
+
+		return floatBuffer;
+	}
+
+	/*protected FloatBuffer generatePotentialFieldApproximation(@NotNull final EikonalSolver eikonalSolver) {
 		FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(getPotentialFieldSize());
 
 		int index = 0;
@@ -412,7 +433,7 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 		}
 
 		return floatBuffer;
-	}
+	}*/
 
 	// kernel calls
 	protected void clMemSet(final long clData, final int val, final int len) throws OpenCLException {

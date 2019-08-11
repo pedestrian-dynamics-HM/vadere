@@ -123,20 +123,18 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
     	try (MemoryStack stack = stackPush()) {
 		    FloatBuffer minTimeCredit;
 		    IntBuffer memConflicts;
+			allocGlobalHostMemory();
+			allocGlobalDeviceMemory();
+
+			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
+			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
+			clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clReorderedPositions, clReorderedTimeCredit,
+					clHashes, clIndices, clPedestrians, clPositions, clTimeCredit, numberOfElements);
+
 		    do {
-			    allocGlobalHostMemory();
-			    allocGlobalDeviceMemory();
-			    long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
-			    long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
-
-			    memConflicts = stack.callocInt(1);
-			    memConflicts.put(0, 0);
-			    clEnqueueWriteBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
-
-			    clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
-			    clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
-			    clFindCellBoundsAndReorder(clCellStarts, clCellEnds, clReorderedPedestrians, clReorderedPositions, clReorderedTimeCredit,
-					    clHashes, clIndices, clPedestrians, clPositions, clTimeCredit, numberOfElements);
+				memConflicts = stack.callocInt(1);
+				memConflicts.put(0, 0);
+				clEnqueueWriteBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
 
 			    clSeek(
 					    clReorderedPedestrians,
@@ -169,42 +167,43 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 
 			    clEnqueueReadBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
 
-			    clSwap(
-					    clReorderedPedestrians,
-					    clReorderedPositions,
-					    clReorderedTimeCredit,
-					    clPedestrians,
-					    clPositions,
-					    clTimeCredit,
-					    numberOfElements);
-
-			    clCalcMinTimeCredit(
-					    clMinTimeCredit,
-					    clTimeCredit,
-					    numberOfElements
-			    );
-
-			    minTimeCredit = stack.callocFloat(1);
-			    clEnqueueReadBuffer(clQueue, clMinTimeCredit, true, 0, minTimeCredit, null, null);
-
-			    clSwapIndex(
-					    clGlobalIndexOut,
-					    clGlobalIndexIn,
-					    clIndices,
-					    numberOfElements);
-
-			    clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
-			    clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
-
+			    //minTimeCredit = stack.callocFloat(1);
+			    //clEnqueueReadBuffer(clQueue, clMinTimeCredit, true, 0, minTimeCredit, null, null);
 			    clFinish(clQueue);
 
 			    counter++;
-			    swap = !swap;
-
 			    timeWorkUnit = 0.0f;
 			    logger.debug("counter = " + (count++));
 
 		    } while(memConflicts.get(0) >= 1);
+
+			long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
+			long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
+
+			clSwap(
+					clReorderedPedestrians,
+					clReorderedPositions,
+					clReorderedTimeCredit,
+					clPedestrians,
+					clPositions,
+					clTimeCredit,
+					numberOfElements);
+
+			clCalcMinTimeCredit(
+					clMinTimeCredit,
+					clTimeCredit,
+					numberOfElements
+			);
+
+			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+			clSwapIndex(
+					clGlobalIndexOut,
+					clGlobalIndexIn,
+					clIndices,
+					numberOfElements);
+			clFinish(clQueue);
+			swap = !swap;
 	    }
     	return false;
 	}

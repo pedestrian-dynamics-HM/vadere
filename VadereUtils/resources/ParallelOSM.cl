@@ -249,11 +249,11 @@ inline float getPotentialFieldValue(float2 evalPoint, __global const float *pote
     float2 gridPointCoord = pointToCoord(gridPoint, potentialCellSize);
     uint incX = 1, incY = 1;
 
-    if (evalPoint.x >= potentialFieldSize.x) {
+    if (evalPoint.x + 1 >= potentialFieldSize.x) {
         incX = 0;
     }
 
-    if (evalPoint.y >= potentialFieldSize.y) {
+    if (evalPoint.y + 1 >= potentialFieldSize.y) {
         incY = 0;
     }
 
@@ -332,7 +332,7 @@ __kernel void seek(
                 //float pedestrianPotential = 0.0f;
                 float value = targetPotential + obstaclePotential + pedestrianPotential;
 
-                if(minValue > value) {
+                if(minValue >= value) {
                     minValue = value;
                     minArg = evalPoint;
                 }
