@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Common definitions
 ////////////////////////////////////////////////////////////////////////////////
-#define UMAD(a, b, c)  ( (a) * (b) + (c) )
+#define UMAD(a, b, c)  ((a) * (b) + (c))
 
 #define RADIUS 0.2f
 #define DIAMETER 0.4f
@@ -57,11 +57,12 @@ inline int2 getGridPos(const float2 p, __constant const float* cellSize, __const
     return gridPos;
 }
 
+inline bool isValidCell(__constant const int2 *gridSize, int2 uGridPos) {
+    return uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y;
+}
+
 //Calculate address in grid from position (clamping to edges)
 inline uint getGridHash(const int2 gridPos, __constant const uint2* gridSize){
-    //Wrap addressing, assume power-of-two grid dimensions
-    //gridPos.x = gridPos.x & ((*gridSize).x - 1);
-    //gridPos.y = gridPos.y & ((*gridSize).y - 1);
     return UMAD(  (*gridSize).x, gridPos.y, gridPos.x );
 }
 
@@ -75,23 +76,16 @@ inline int2 getGridPosFromIndex(const uint hash, __constant const uint2* gridSiz
 // Potential field helper methods
 ////////////////////////////////////////////////////////////////////////////////
 
-// see PotentialFieldPedestrianCompact with useHardBodyShell = false:
-/*inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
-    float d = distance(pos, otherPedPosition);
-    if (d < POTENTIAL_WIDTH) {
-        return 12.6f * native_exp(1 / (pown(d / POTENTIAL_WIDTH, 2) - 1));
-    } else {
-        return 0.0f;
-    }
-}*/
-
-// see PotentialFieldPedestrianCompact with useHardBodyShell = false:
+// see PotentialFieldPedestrianCompact with useHardBodyShell = true:
 inline float getPedestrianPotential(const float2 pos, const float2 otherPedPosition) {
-    float d = distance(pos, otherPedPosition);
+    float d = distance(pos, otherPedPosition) - DIAMETER;
     float width = 0.5f;
     float height = 12.6f;
+    if(d < 0) {
+        return 10000;
+    }
     if (d < width) {
-        return 12.6f * native_exp(1 / (pown(d / 0.5f, 2) - 1));
+        return height * native_exp(1 / (pown(d / width, 2) - 1));
     } else {
         return 0.0f;
     }
@@ -114,21 +108,15 @@ inline float getFullPedestrianPotential(
             int2 uGridPos = gridPos - (int2)(x, y);
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
-            if(uGridPos.x < 0 || uGridPos.y < 0 || uGridPos.x > (*gridSize).x || uGridPos.y > (*gridSize).y){
-                continue;
-            }
-            uint   hash = getGridHash(uGridPos, gridSize);
-            uint startI = d_CellStart[hash];
-
-            //Skip empty cell
-            //if(startI == 0xFFFFFFFFU)
-            //    continue;
-            //Iterate over particles in this cell
-            uint endI = d_CellEnd[hash];
-            for(uint j = startI; j < endI; j++){
-                // TODO: seperate position from rest , remove global memory access
-                float2 otherPos = (float2) (orderedPositions[j * COORDOFFSET + X], orderedPositions[j * COORDOFFSET + Y]);
-                potential += getPedestrianPotential(pos, otherPos);
+            if(isValidCell(gridSize, uGridPos)) {
+                uint hash = getGridHash(uGridPos, gridSize);
+                uint startI = d_CellStart[hash];
+                uint endI = d_CellEnd[hash];
+                for(uint j = startI; j < endI; j++){
+                    // TODO: seperate position from rest , remove global memory access
+                    float2 otherPos = (float2) (orderedPositions[j * COORDOFFSET + X], orderedPositions[j * COORDOFFSET + Y]);
+                    potential += getPedestrianPotential(pos, otherPos);
+                }
             }
         }
     }
@@ -153,14 +141,13 @@ inline float getPotentialFieldGridValue(__global const float *targetPotential, u
     return targetPotential[potentialGridSize.x * cell.y + cell.x];
 }
 
-inline float2 bilinearInterpolationWithUnkown(float4 z, float2 delta) {
-    //float knownWeights = 0;
+inline float2 bilinearInterpolationWithUnkown(const float4 z, const float2 delta) {
     float4 weights = (float4)((1.0f - delta.x) * (1.0f - delta.y), delta.x * (1.0f - delta.y), delta.x * delta.y, (1.0f - delta.x) * delta.y);
     float4 result = weights * z;
     return (float2) (result.s0 + result.s1 + result.s2 + result.s3, weights.s0 + weights.s1 + weights.s2 + weights.s3);
 }
 
-inline float getPotentialFieldValue(float2 evalPoint, __global const float *potentialField, float potentialCellSize, float2 potentialFieldSize, uint2 potentialGridSize) {
+inline float getPotentialFieldValue(const float2 evalPoint, __global const float *potentialField, const float potentialCellSize, const float2 potentialFieldSize, const uint2 potentialGridSize) {
     uint2 gridPoint = getNearestPointTowardsOrigin(evalPoint, potentialCellSize, potentialFieldSize);
     float2 gridPointCoord = pointToCoord(gridPoint, potentialCellSize);
     uint incX = 1, incY = 1;
@@ -208,7 +195,6 @@ __kernel void move (
     __global float          *argValues,             // in
     __global float          *values,                // in
     __global int            *ids,
-
     __local float           *local_point,
     __local float           *local_values) {
 
@@ -286,15 +272,14 @@ __kernel void evalPoints(
     }
 }
 
-
 __kernel void eventTimes(
-    __global int  *ids,                // out
-    __global float *eventTimes,         // out
-    __global const uint *d_CellStart,   //input: cell boundaries
-    __global const uint *d_CellEnd      //input
+    __global int            *ids,               // out
+    __global float          *eventTimes,        // out
+    __global const uint     *d_CellStart,       //input: cell boundaries
+    __global const uint     *d_CellEnd          //input
 ) {
     uint gid = get_global_id(0);
-    float minEventTime = 10000;
+    float minEventTime = HUGE_VALF;
     int id = -1;
     for(uint i = d_CellStart[gid]; i < d_CellEnd[gid]; i++) {
         if(eventTimes[i] < minEventTime) {
@@ -306,9 +291,9 @@ __kernel void eventTimes(
 }
 
 __kernel void filterIds(
-    __global int    *ids,                 // in
-    __global int    *mask,              // out
-    __global float  *eventTimes,
+    __global int            *ids,                 // in
+    __global int            *mask,              // out
+    __global float          *eventTimes,
     __constant const uint2  *gridSize,
     const float             simTimeInSec) {
 
@@ -326,11 +311,10 @@ __kernel void filterIds(
             for(int x = -1; x <= 1; x++){
                 int2 gridPos = getGridPosFromIndex(gid, gridSize);
                 int2 uGridPos = (gridPos + (int2)(x, y));
-                if(uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x <= (*gridSize).x && uGridPos.y <= (*gridSize).y){
+                if(isValidCell(gridSize, uGridPos)){
                     uint hash = getGridHash(uGridPos, gridSize);
                     if(ids[hash] >= 0 && eventTimes[ids[hash]] < eventTimes[ids[gid]]) {
                         mask[gid] = -1;
-                        //return;
                     }
                 }
             }
@@ -341,7 +325,7 @@ __kernel void filterIds(
 __kernel void align(
     __global int  *idsIn,       // in
     __global int  *prefixSum,   // in
-    __global int  *mask,         // in
+    __global int  *mask,        // in
     __global int  *idsOut
     ) {
 
@@ -396,13 +380,13 @@ __kernel void minEventTimeLocal(
 
 
 __kernel void swap(
-    __global const float  *d_ReorderedPedestrians,
-    __global const float  *d_ReorderedPos,
-    __global const float  *d_ReorderedEventTimes,
-    __global float  *d_Pedestrians,
-    __global float  *d_Pos,
-    __global float  *d_eventTimes,
-    uint    numParticles
+    __global const float    *d_ReorderedPedestrians,
+    __global const float    *d_ReorderedPos,
+    __global const float    *d_ReorderedEventTimes,
+    __global float          *d_Pedestrians,
+    __global float          *d_Pos,
+    __global float          *d_eventTimes,
+    uint                    numParticles
 ){
     const uint index = get_global_id(0);
     //TODO maybe split this into 4 kernels to improve memory loads / writes

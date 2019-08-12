@@ -58,7 +58,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 	// device memory
 	private long clTimeCredit;
 	private long clReorderedTimeCredit;
-	private long clMinTimeCredit;
+	private long clMinEventTime;
 	private long clConflicts;
 
 	private float[] timeCredits;
@@ -96,7 +96,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 	public void setPedestrians(@NotNull final List<PedestrianOSM> pedestrians) throws OpenCLException {
 		if(pedestrianSet) {
 			freeCLMemory(clConflicts);
-			freeCLMemory(clMinTimeCredit);
+			freeCLMemory(clMinEventTime);
 			freeCLMemory(clReorderedTimeCredit);
 		}
 
@@ -106,7 +106,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			clConflicts = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
 			clTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
 			clReorderedTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4 * pedestrians.size(), errcode_ret);
-			clMinTimeCredit = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
+			clMinEventTime = clCreateBuffer(clContext, CL_MEM_READ_WRITE, 4, errcode_ret);
 
 			FloatBuffer memTimeCredits = allocTimeCreditMemory(pedestrians);
 			clEnqueueWriteBuffer(clQueue, clTimeCredit, true, 0, memTimeCredits, null, null);
@@ -121,7 +121,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
     	float timeWorkUnit = timeStepInSec;
     	int count = 0;
     	try (MemoryStack stack = stackPush()) {
-		    FloatBuffer minTimeCredit;
+		    FloatBuffer minEventTime;
 		    IntBuffer memConflicts;
 		    do {
 			    allocGlobalHostMemory();
@@ -152,7 +152,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 					    clWorldOrigin,
 					    clPotentialFieldGridSize,
 					    clPotentialFieldSize,
-					    timeWorkUnit,
+					    timeStepInSec,
 					    numberOfElements);
 
 			    clMove(
@@ -176,16 +176,17 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 					    clPedestrians,
 					    clPositions,
 					    clTimeCredit,
+					    timeStepInSec,
 					    numberOfElements);
 
-			    clCalcMinTimeCredit(
-					    clMinTimeCredit,
+			    clCalcMinEventTime(
+					    clMinEventTime,
 					    clTimeCredit,
 					    numberOfElements
 			    );
 
-			    minTimeCredit = stack.callocFloat(1);
-			    clEnqueueReadBuffer(clQueue, clMinTimeCredit, true, 0, minTimeCredit, null, null);
+			    minEventTime = stack.callocFloat(1);
+			    clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, minEventTime, null, null);
 
 			    clSwapIndex(
 					    clGlobalIndexOut,
@@ -278,7 +279,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 	    super.allocGlobalDeviceMemory();
     }
 
-	private void clCalcMinTimeCredit(
+	private void clCalcMinEventTime(
 			final long clMinTimeCredit,
 			final long clTimeCredits,
 			final int numberOfElements) throws OpenCLException {
@@ -295,7 +296,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			CLInfo.checkCLError(clSetKernelArg1p(clCalcMinTimeCredit, 1, clTimeCredits));
 			CLInfo.checkCLError(clSetKernelArg(clCalcMinTimeCredit, 2, maxWorkGroupSize * 4));
 			CLInfo.checkCLError(clSetKernelArg1i(clCalcMinTimeCredit, 3, numberOfElements));
-			CLInfo.checkCLError((int)enqueueNDRangeKernel("clCalcMinTimeCredit", clQueue, clCalcMinTimeCredit, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
+			CLInfo.checkCLError((int)enqueueNDRangeKernel("clCalcMinEventTime", clQueue, clCalcMinTimeCredit, 1, null, clGlobalWorkSize, clLocalWorkSize, null, null));
 		}
 	}
 
@@ -414,6 +415,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			final long clPedestrians,
 			final long clPositions,
 			final long clTimeCredit,
+			final float timeStepInSec,
 			final int numberOfElements) throws OpenCLException {
 
 		try (MemoryStack stack = stackPush()) {
@@ -426,6 +428,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 3, clPedestrians));
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 4, clPositions));
 			CLInfo.checkCLError(clSetKernelArg1p(clSwap, 5, clTimeCredit));
+			CLInfo.checkCLError(clSetKernelArg1f(clSwap, 6, timeStepInSec));
 			CLInfo.checkCLError(clSetKernelArg1i(clSwap, 6, numberOfElements));
 			CLInfo.checkCLError((int)enqueueNDRangeKernel("clSwap", clQueue, clSwap, 1, null, clGlobalWorkSize, null, null, null));
 		}
@@ -487,7 +490,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
         super.clearMemory();
 	    CLInfo.checkCLError(clReleaseMemObject(clTimeCredit));
 	    CLInfo.checkCLError(clReleaseMemObject(clReorderedTimeCredit));
-	    CLInfo.checkCLError(clReleaseMemObject(clMinTimeCredit));
+	    CLInfo.checkCLError(clReleaseMemObject(clMinEventTime));
 	    CLInfo.checkCLError(clReleaseMemObject(clConflicts));
     }
 
@@ -508,7 +511,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			IntBuffer errcode_ret = stack.callocInt(1);
 			clFindCellBoundsAndReorder = clCreateKernel(clProgram, "findCellBoundsAndReorder", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
-			clCalcMinTimeCredit = clCreateKernel(clProgram, "minTimeCredit", errcode_ret);
+			clCalcMinTimeCredit = clCreateKernel(clProgram, "minEventTime", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
 			clSeek = clCreateKernel(clProgram, "seek", errcode_ret);
 			CLInfo.checkCLError(errcode_ret);
