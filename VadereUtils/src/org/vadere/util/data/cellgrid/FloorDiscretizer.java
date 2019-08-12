@@ -43,10 +43,10 @@ public class FloorDiscretizer {
 		Point pointLeftLower, pointRightUpper;
 
 		// Compute nearest grid point of the lower left corner of bodyBounds.
-		pointLeftLower = floorGrid.getNearestPoint(bodyBounds.getMinX(),
+		pointLeftLower = floorGrid.getClosestPoint(bodyBounds.getMinX(),
 				bodyBounds.getMinY());
 		// Compute nearest grid point of the right upper corner of bodyBounds.
-		pointRightUpper = floorGrid.getNearestPoint(bodyBounds.getMaxX(),
+		pointRightUpper = floorGrid.getClosestPoint(bodyBounds.getMaxX(),
 				bodyBounds.getMaxY());
 
 		// Run through all grid points of bounds and set its value if being
@@ -78,10 +78,10 @@ public class FloorDiscretizer {
 		Point pointLeftLower, pointRightUpper;
 
 		// Compute nearest grid point of the lower left corner of bodyBounds.
-		pointLeftLower = floorGrid.getNearestPoint(bodyBounds.getMinX(),
+		pointLeftLower = floorGrid.getClosestPoint(bodyBounds.getMinX(),
 				bodyBounds.getMinY());
 		// Compute nearest grid point of the right upper corner of bodyBounds.
-		pointRightUpper = floorGrid.getNearestPoint(bodyBounds.getMaxX(),
+		pointRightUpper = floorGrid.getClosestPoint(bodyBounds.getMaxX(),
 				bodyBounds.getMaxY());
 
 		double dx = floorGrid.width / (floorGrid.getNumPointsX() - 1);
@@ -121,10 +121,10 @@ public class FloorDiscretizer {
 		Point pointLeftLower, pointRightUpper;
 
 		/* Compute nearest grid point of the lower left corner of bodyBounds. */
-		pointLeftLower = floorGrid.getNearestPoint(obstacleBounds.getMinX(),
+		pointLeftLower = floorGrid.getClosestPoint(obstacleBounds.getMinX(),
 				obstacleBounds.getMinY());
 		/* Compute nearest grid point of the right upper corner of bodyBounds. */
-		pointRightUpper = floorGrid.getNearestPoint(obstacleBounds.getMaxX(),
+		pointRightUpper = floorGrid.getClosestPoint(obstacleBounds.getMaxX(),
 				obstacleBounds.getMaxY());
 
 		/*

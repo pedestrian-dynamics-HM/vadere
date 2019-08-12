@@ -75,7 +75,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			return new ArrayList<>();
 		}
 		Collection<Agent> result = new LinkedList<>();
-		result.addAll(topography.getElements(Agent.class));
+		result.addAll(topography.getElements(Pedestrian.class));
 		return result;
 	}
 

@@ -252,14 +252,31 @@ public class CellGrid {
 		if (y < yMin) {
 			y = yMin;
 		}
-		if (y > getHeight() + yMin) {
-			y = getHeight() + yMin;
+		if (y >= getHeight() + yMin) {
+			y = getHeight() + yMin - MathUtil.EPSILON;
 		}
-		if (x > getWidth() + xMin) {
-			x = getWidth() + xMin;
+		if (x >= getWidth() + xMin) {
+			x = getWidth() + xMin - MathUtil.EPSILON;
 		}
-		return new Point((int) ((x - xMin) / resolution + 0.5),
-				(int) ((y - yMin) / resolution + 0.5));
+		return new Point((int) ((x - xMin) / resolution),
+				(int) ((y - yMin) / resolution));
+	}
+
+	public Point getClosestPoint(double x, double y) {
+		if (x < xMin) {
+			x = xMin;
+		}
+		if (y < yMin) {
+			y = yMin;
+		}
+		if (y >= getHeight() + yMin - resolution) {
+			y = getHeight() + yMin - resolution;
+		}
+		if (x >= getWidth() + xMin - resolution) {
+			x = getWidth() + xMin - resolution;
+		}
+		return new Point((int) Math.round((x - xMin) / resolution),
+				(int) Math.round((y - yMin) / resolution));
 	}
 
 	/**
@@ -396,7 +413,6 @@ public class CellGrid {
 		if (gridPoint.y + 1 >= getNumPointsY()) {
 			incY = 0;
 		}
-
 
 		gridPotentials[0] = getValue(gridPoint).potential;
 		gridPotentials[1] = getValue(gridPoint.x + incX, gridPoint.y).potential;

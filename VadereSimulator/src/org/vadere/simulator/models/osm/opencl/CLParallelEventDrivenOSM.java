@@ -185,10 +185,6 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 		try (MemoryStack stack = stackPush()) {
 			allocGlobalHostMemory();
 			allocGlobalDeviceMemory();
-			long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
-			long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
-
-			long ms = System.nanoTime();
 
 			clCalcHash(clHashes, clIndices, clPositions, clCellSize, clWorldOrigin, clGridSize, numberOfElements, numberOfSortElements);
 			clBitonicSort(clHashes, clIndices, clHashes, clIndices, numberOfSortElements, 1);
@@ -206,91 +202,97 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					clCellStarts,
 					clCellEnds);
 
-			clFilterIds(clIds, clMask, clReorderedEventTimes, clGridSize, simTimeInSec);
-			clFinish(clQueue);
-
-			ms = System.nanoTime();
-			CLInfo.checkCLError(clEnqueueCopyBuffer(clQueue, clMask, clData, 0, 0, iGridSize[0] * iGridSize[1] * 4, null, null));
-			clFinish(clQueue);
-
-			if(debug) {
-				log.debug("copyBuffer1: " + (System.nanoTime() - ms));
-			}
-			ms = System.nanoTime();
-
-			clScan(clData, iGridSize[0] * iGridSize[1] + 1, 1);
-			clFinish(clQueue);
-			ms = System.nanoTime();
-
 			IntBuffer memUpdates = stack.mallocInt( 1);
-			clEnqueueReadBuffer(clQueue, clData, true, iGridSize[0] * iGridSize[1] * 4, memUpdates, null, null);
-			if(debug) {
-				log.debug("readBuffer: " + (System.nanoTime() - ms));
-			}
-
-
 			int numberOfUpdates = memUpdates.get(0);
 
-			if(numberOfUpdates > 0) {
+			do {
+				long ms = System.nanoTime();
+
+				long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
+				long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
+
+				clFilterIds(clIds, clMask, clReorderedEventTimes, clGridSize, simTimeInSec);
+				clFinish(clQueue);
+
 				ms = System.nanoTime();
 				CLInfo.checkCLError(clEnqueueCopyBuffer(clQueue, clMask, clData, 0, 0, iGridSize[0] * iGridSize[1] * 4, null, null));
 				clFinish(clQueue);
-				if(debug) {
-					log.debug("copyBuffer2: " + (System.nanoTime() - ms));
-				}
 
+				if(debug) {
+					log.debug("copyBuffer1: " + (System.nanoTime() - ms));
+				}
 				ms = System.nanoTime();
 
-				clScan(clData, iGridSize[0] * iGridSize[1] + 1, -1);
-				clAlign(clIds, clData, clMask, clIdsOut);
+				clScan(clData, iGridSize[0] * iGridSize[1] + 1, 1);
+				clFinish(clQueue);
+				ms = System.nanoTime();
 
-				clEvalPoints(
+				clEnqueueReadBuffer(clQueue, clData, true, iGridSize[0] * iGridSize[1] * 4, memUpdates, null, null);
+				if(debug) {
+					log.debug("readBuffer: " + (System.nanoTime() - ms));
+				}
+
+
+				if(numberOfUpdates > 0) {
+					ms = System.nanoTime();
+					CLInfo.checkCLError(clEnqueueCopyBuffer(clQueue, clMask, clData, 0, 0, iGridSize[0] * iGridSize[1] * 4, null, null));
+					clFinish(clQueue);
+					if(debug) {
+						log.debug("copyBuffer2: " + (System.nanoTime() - ms));
+					}
+
+					ms = System.nanoTime();
+
+					clScan(clData, iGridSize[0] * iGridSize[1] + 1, -1);
+					clAlign(clIds, clData, clMask, clIdsOut);
+
+					clEvalPoints(
+							clReorderedPedestrians,
+							clReorderedPositions,
+							clReorderedEventTimes,
+							clPossiblePositions,
+							clPossibleValues,
+							clIdsOut,
+							clCirclePositions,
+							clCellStarts,
+							clCellEnds,
+							clCellSize,
+							clGridSize,
+							clObstaclePotential,
+							clTargetPotential,
+							clWorldOrigin,
+							clPotentialFieldGridSize,
+							clPotentialFieldSize,
+							numberOfUpdates);
+
+					clMove(
+							clReorderedPositions,
+							clPossiblePositions,
+							clPossibleValues,
+							clIdsOut,
+							numberOfUpdates);
+
+					if(debug) {
+						log.debug("#updated agents: " + numberOfUpdates);
+					}
+				}
+
+				clSwap(
 						clReorderedPedestrians,
 						clReorderedPositions,
 						clReorderedEventTimes,
-						clPossiblePositions,
-						clPossibleValues,
-						clIdsOut,
-						clCirclePositions,
-						clCellStarts,
-						clCellEnds,
-						clCellSize,
-						clGridSize,
-						clObstaclePotential,
-						clTargetPotential,
-						clWorldOrigin,
-						clPotentialFieldGridSize,
-						clPotentialFieldSize,
-						numberOfUpdates);
+						clPedestrians,
+						clPositions,
+						clEventTimesData,
+						numberOfElements);
 
-				clMove(
-						clReorderedPositions,
-						clPossiblePositions,
-						clPossibleValues,
-						clIdsOut,
-						numberOfUpdates);
+				clSwapIndex(
+						clGlobalIndexOut,
+						clGlobalIndexIn,
+						clIndices,
+						numberOfElements);
 
-				if(debug) {
-					log.debug("#updated agents: " + numberOfUpdates);
-				}
-			}
-
-			clSwap(
-					clReorderedPedestrians,
-					clReorderedPositions,
-					clReorderedEventTimes,
-					clPedestrians,
-					clPositions,
-					clEventTimesData,
-					numberOfElements);
-
-			clSwapIndex(
-					clGlobalIndexOut,
-					clGlobalIndexIn,
-					clIndices,
-					numberOfElements);
-
-			clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
+				clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
 
 			/*FloatBuffer memMinEventTime = stack.callocFloat(1);
 
@@ -299,13 +301,14 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 			log.debug("read minEvacTime: " + (System.nanoTime() - ms));
 			ms = System.nanoTime();*/
 
-			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
-			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+				clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+				clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
 
-			counter++;
-			swap = !swap;
-			return numberOfUpdates > 0;
+				counter++;
+				swap = !swap;
+			} while (numberOfUpdates > 0);
 		}
+		return false;
 	}
 
 	@Override

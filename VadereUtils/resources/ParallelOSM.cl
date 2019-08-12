@@ -109,10 +109,6 @@ inline float getFullPedestrianPotential(
                 uint   hash = getGridHash(uGridPos, gridSize);
                 uint startI = d_CellStart[hash];
 
-                //Skip empty cell
-                //if(startI == 0xFFFFFFFFU)
-                //    continue;
-                //Iterate over particles in this cell
                 uint endI = d_CellEnd[hash];
                 for(uint j = startI; j < endI; j++){
                     // TODO: seperate position from rest , remove global memory access
@@ -247,7 +243,7 @@ __kernel void seek(
     __constant const uint2  *potentialGridSize,
     __constant const float2 *potentialFieldSize,    //input
     const float             potentialCellSize,      //input
-    const float             timeStepInSec,
+    const float             simTimeInSec,
     const uint              numberOfPoints,         //input
     const uint              numberOfPedestrians) {
 
@@ -257,7 +253,7 @@ __kernel void seek(
     if(index < numberOfPedestrians) {
         float eventTime = orderedEventTimes[index];
 
-        if(eventTime <= timeStepInSec) {
+        if(eventTime <= simTimeInSec) {
             float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
             float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
             float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
@@ -297,7 +293,7 @@ __kernel void move(
     __constant const uint2        *gridSize,              //input
     __constant const float2       *worldOrigin,           //input
     __global   int                *conflicts,
-    const float                   timeStepInSec,
+    const float                   simTimeInSec,
     const uint                    numberOfPedestrians     //input
 ){
     const uint index = get_global_id(0);
@@ -307,7 +303,7 @@ __kernel void move(
         float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
         float eventTime = orderedEventTimes[index];
         float duration = stepSize / desiredSpeed;
-        if(eventTime <= timeStepInSec){
+        if(eventTime <= simTimeInSec){
 
             if(!hasConflict(orderedPedestrians, orderedEventTimes, d_CellStart, d_CellEnd, cellSize, gridSize, worldOrigin, eventTime, newPedPosition, index)) {
                     orderedPositions[index * COORDOFFSET + X] = orderedPedestrians[index * OFFSET + NEWX];

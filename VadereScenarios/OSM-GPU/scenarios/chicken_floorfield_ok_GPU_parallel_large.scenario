@@ -20,7 +20,7 @@
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.3,
+        "potentialFieldResolution" : 0.5,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "cacheType" : "NO_CACHE",
@@ -40,9 +40,9 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
-        "numberOfCircles" : 2,
-        "optimizationType" : "NELDER_MEAD",
+        "stepCircleResolution" : 63,
+        "numberOfCircles" : 1,
+        "optimizationType" : "DISCRETE",
         "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
@@ -88,8 +88,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 300.0,
-          "height" : 320.0
+          "width" : 1000.0,
+          "height" : 1000.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -102,10 +102,10 @@
         "id" : 1,
         "absorbing" : false,
         "shape" : {
-          "x" : 139.1,
-          "y" : 306.2,
-          "width" : 15.0,
-          "height" : 5.0,
+          "x" : 4.0,
+          "y" : 955.8,
+          "width" : 990.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -120,20 +120,20 @@
       "sources" : [ {
         "id" : 2,
         "shape" : {
-          "x" : 57.6,
-          "y" : 6.3,
-          "width" : 190.0,
-          "height" : 180.0,
+          "x" : 3.0,
+          "y" : 4.0,
+          "width" : 990.0,
+          "height" : 400.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50000,
+        "spawnNumber" : 2,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
