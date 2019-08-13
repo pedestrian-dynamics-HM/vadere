@@ -65,7 +65,7 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
+        "stepCircleResolution" : 15,
         "numberOfCircles" : 5,
         "optimizationType" : "DISCRETE",
         "varyStepDirection" : false,
@@ -78,7 +78,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "EVENT_DRIVEN_CL",
+        "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",

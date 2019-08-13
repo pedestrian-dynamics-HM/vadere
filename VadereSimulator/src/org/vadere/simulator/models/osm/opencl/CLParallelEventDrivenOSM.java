@@ -183,6 +183,8 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	@Override
 	public boolean update(float timeStepInSec, float simTimeInSec) throws OpenCLException {
 		try (MemoryStack stack = stackPush()) {
+			int numberOfUpdates = 0;
+
 			allocGlobalHostMemory();
 			allocGlobalDeviceMemory();
 
@@ -196,21 +198,15 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					clReorderedEventTimes,
 					clHashes, clIndices, clPedestrians, clPositions, clEventTimesData, numberOfElements);
 
-			clEventTimes(
-					clIds,
-					clReorderedEventTimes,
-					clCellStarts,
-					clCellEnds);
-
 			IntBuffer memUpdates = stack.mallocInt( 1);
-			int numberOfUpdates = memUpdates.get(0);
 
 			do {
-				long ms = System.nanoTime();
-
-				long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
-				long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
-
+				long ms = 0;
+				clEventTimes(
+						clIds,
+						clReorderedEventTimes,
+						clCellStarts,
+						clCellEnds);
 				clFilterIds(clIds, clMask, clReorderedEventTimes, clGridSize, simTimeInSec);
 				clFinish(clQueue);
 
@@ -221,17 +217,16 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 				if(debug) {
 					log.debug("copyBuffer1: " + (System.nanoTime() - ms));
 				}
-				ms = System.nanoTime();
 
 				clScan(clData, iGridSize[0] * iGridSize[1] + 1, 1);
 				clFinish(clQueue);
-				ms = System.nanoTime();
 
+				ms = System.nanoTime();
 				clEnqueueReadBuffer(clQueue, clData, true, iGridSize[0] * iGridSize[1] * 4, memUpdates, null, null);
+				numberOfUpdates = memUpdates.get(0);
 				if(debug) {
 					log.debug("readBuffer: " + (System.nanoTime() - ms));
 				}
-
 
 				if(numberOfUpdates > 0) {
 					ms = System.nanoTime();
@@ -241,11 +236,8 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 						log.debug("copyBuffer2: " + (System.nanoTime() - ms));
 					}
 
-					ms = System.nanoTime();
-
 					clScan(clData, iGridSize[0] * iGridSize[1] + 1, -1);
 					clAlign(clIds, clData, clMask, clIdsOut);
-
 					clEvalPoints(
 							clReorderedPedestrians,
 							clReorderedPositions,
@@ -264,7 +256,6 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 							clPotentialFieldGridSize,
 							clPotentialFieldSize,
 							numberOfUpdates);
-
 					clMove(
 							clReorderedPositions,
 							clPossiblePositions,
@@ -276,37 +267,29 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 						log.debug("#updated agents: " + numberOfUpdates);
 					}
 				}
-
-				clSwap(
-						clReorderedPedestrians,
-						clReorderedPositions,
-						clReorderedEventTimes,
-						clPedestrians,
-						clPositions,
-						clEventTimesData,
-						numberOfElements);
-
-				clSwapIndex(
-						clGlobalIndexOut,
-						clGlobalIndexIn,
-						clIndices,
-						numberOfElements);
-
-				clMinEventTime(clMinEventTime, clEventTimesData, numberOfElements);
-
-			/*FloatBuffer memMinEventTime = stack.callocFloat(1);
-
-			clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, memMinEventTime, null, null);
-			clFinish(clQueue);
-			log.debug("read minEvacTime: " + (System.nanoTime() - ms));
-			ms = System.nanoTime();*/
-
-				clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
-				clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
-
 				counter++;
-				swap = !swap;
+
 			} while (numberOfUpdates > 0);
+
+			long clGlobalIndexOut = !swap ? this.clGlobalIndexOut : this.clGlobalIndexIn;
+			long clGlobalIndexIn = !swap ? this.clGlobalIndexIn : this.clGlobalIndexOut;
+
+			clSwap(
+					clReorderedPedestrians,
+					clReorderedPositions,
+					clReorderedEventTimes,
+					clPedestrians,
+					clPositions,
+					clEventTimesData,
+					numberOfElements);
+			clSwapIndex(
+					clGlobalIndexOut,
+					clGlobalIndexIn,
+					clIndices,
+					numberOfElements);
+			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
+			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+			swap = !swap;
 		}
 		return false;
 	}

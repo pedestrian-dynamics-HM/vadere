@@ -124,6 +124,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 	 */
 	default void movePedestrian(@NotNull final Topography topography, @NotNull final PedestrianOSM pedestrian, @NotNull final VPoint from, @NotNull final VPoint to) {
 		pedestrian.setPosition(to);
+		pedestrian.setLastPosition(from);
 		synchronized (topography) {
 			topography.moveElement(pedestrian, from);
 		}

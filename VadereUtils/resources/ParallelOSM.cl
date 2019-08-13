@@ -59,7 +59,7 @@ inline int2 getGridPos(const float2 p, __constant const float* cellSize, __const
     return gridPos;
 }
 
-inline bool isValidCell(__constant const int2 *gridSize, int2 uGridPos) {
+inline bool isValidCell(__constant int2 *gridSize, int2 uGridPos) {
     return uGridPos.x >= 0 && uGridPos.y >= 0 && uGridPos.x < (*gridSize).x && uGridPos.y < (*gridSize).y;
 }
 
@@ -105,7 +105,7 @@ inline float getFullPedestrianPotential(
             int2 uGridPos = (gridPos - (int2)(x, y));
 
             // note if uGridPos.x == 0 than uGridPos.x -1 = 2^N - 1 and the step is also continued!
-            if(isValidCell(gridSize, uGridPos) {
+            if(isValidCell(gridSize, uGridPos)) {
                 uint   hash = getGridHash(uGridPos, gridSize);
                 uint startI = d_CellStart[hash];
 
@@ -252,9 +252,9 @@ __kernel void seek(
 
     if(index < numberOfPedestrians) {
         float eventTime = orderedEventTimes[index];
+        float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
 
         if(eventTime <= simTimeInSec) {
-            float2 pedPosition = (float2)(orderedPositions[index * COORDOFFSET + X], orderedPositions[index * COORDOFFSET + Y]);
             float stepSize = orderedPedestrians[index * OFFSET + STEPSIZE];
             float desiredSpeed = orderedPedestrians[index * OFFSET + DESIREDSPEED];
             float duration = stepSize / desiredSpeed;
@@ -277,9 +277,13 @@ __kernel void seek(
                     minArg = evalPoint;
                 }
             }
+            orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
+            orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
+        } else {
+            orderedPedestrians[index * OFFSET + NEWX] = pedPosition.x;
+            orderedPedestrians[index * OFFSET + NEWY] = pedPosition.y;
         }
-        orderedPedestrians[index * OFFSET + NEWX] = minArg.x;
-        orderedPedestrians[index * OFFSET + NEWY] = minArg.y;
+
     }
 }
 

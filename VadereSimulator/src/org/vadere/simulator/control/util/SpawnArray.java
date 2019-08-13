@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class SpawnArray {
 	private static Logger logger = Logger.getLogger(SpawnArray.class);
@@ -82,4 +83,8 @@ public class SpawnArray {
 	public List<VPoint> getAllowedSpawnPoints() {
 		return allowedSpawnPoints;
 	}
+
+	/*public Stream<VPoint> streamAllowedSpawnPoints() {
+
+	}*/
 }

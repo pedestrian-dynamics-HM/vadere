@@ -387,8 +387,8 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 6, clGridSize));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 7, clWorldOrigin));
 			CLInfo.checkCLError(clSetKernelArg1p(clMove, 8, clConflicts));
-			CLInfo.checkCLError(clSetKernelArg1f(clSwap, 6, simTimeInSec));
-			CLInfo.checkCLError(clSetKernelArg1i(clMove, 9, numberOfElements));
+			CLInfo.checkCLError(clSetKernelArg1f(clMove, 9, simTimeInSec));
+			CLInfo.checkCLError(clSetKernelArg1i(clMove, 10, numberOfElements));
 
 			long globalWorkSize;
 			long localWorkSize;
