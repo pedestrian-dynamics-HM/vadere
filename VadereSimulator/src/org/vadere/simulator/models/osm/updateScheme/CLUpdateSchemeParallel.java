@@ -13,6 +13,7 @@ import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,8 @@ import java.util.List;
 public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 
 	private ICLOptimalStepsModel clOptimalStepsModel;
+
+	private final List<Long> computationTimes = new ArrayList<>();
 
 	private int counter = 0;
 	private static Logger logger = Logger.getLogger(CLUpdateSchemeParallel.class);
@@ -59,8 +62,10 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 			float timeCreditsBefore[] = clOptimalStepsModel.getTimeCredits();
 
 			long ms = System.currentTimeMillis();
-
 			clOptimalStepsModel.update((float)timeStepInSec, (float)currentTimeInSec);
+			ms = System.currentTimeMillis() - ms;
+			computationTimes.add(ms);
+
 			clOptimalStepsModel.readFromDevice();
 			List<VPoint> result = clOptimalStepsModel.getPositions();
 
@@ -87,6 +92,8 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+
+		printCalculationTimes(computationTimes);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
 	private final OSMBehaviorController osmBehaviorController;
+	private final List<Long> computationTimes = new ArrayList<>();
 
 	static {
 		logger.setDebug();
@@ -64,10 +66,12 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 			if(callMethod == CallMethod.SEEK) {
 				ms = System.currentTimeMillis() - ms;
+				computationTimes.add(ms);
 				logger.debug("runtime for next step computation = " + ms + " [ms]");
 			}
-
 		}
+
+		printCalculationTimes(computationTimes);
 	}
 
 	protected void collectFutures(final List<Future<?>> futures) {

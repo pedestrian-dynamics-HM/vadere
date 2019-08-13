@@ -289,6 +289,7 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 					numberOfElements);
 			clMemSet(clCellStarts, -1, iGridSize[0] * iGridSize[1]);
 			clMemSet(clCellEnds, -1, iGridSize[0] * iGridSize[1]);
+			clFinish(clQueue);
 			swap = !swap;
 		}
 		return false;

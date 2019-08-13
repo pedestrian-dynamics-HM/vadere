@@ -22,6 +22,8 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 
 	private CLParallelEventDrivenOSM clOptimalStepsModel;
 
+	private final List<Long> computationTimes = new ArrayList<>();
+
 	private int counter = 0;
 	private float[] eventTimes;
 	private static Logger logger = Logger.getLogger(CLUpdateSchemeEventDriven.class);
@@ -61,33 +63,33 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 			long ms = System.currentTimeMillis();
 			int count = 0;
 
-			if(clOptimalStepsModel.getMinEventTime() < currentTimeInSec) {
+			while (clOptimalStepsModel.update((float)timeStepInSec, (float)currentTimeInSec)) {}
+			ms = System.currentTimeMillis() - ms;
+			computationTimes.add(ms);
 
-				eventTimes = clOptimalStepsModel.getEventTimes();
-				while (clOptimalStepsModel.update((float)timeStepInSec, (float)currentTimeInSec)) {}
-				clOptimalStepsModel.readFromDevice();
-
-				List<VPoint> result = clOptimalStepsModel.getPositions();
-				int numberOfUpdates = clOptimalStepsModel.getCounter() - counter;
-				counter = clOptimalStepsModel.getCounter();
+			clOptimalStepsModel.readFromDevice();
+			List<VPoint> result = clOptimalStepsModel.getPositions();
+			int numberOfUpdates = clOptimalStepsModel.getCounter() - counter;
+			counter = clOptimalStepsModel.getCounter();
 
 
-				logger.debug("iteration (" + numberOfUpdates + ")");
-				logger.debug("runtime for next step computation = " + (System.currentTimeMillis() - ms) + " [ms] for " + timeStepInSec + "[s]");
+			logger.debug("iteration (" + numberOfUpdates + ")");
+			logger.debug("runtime for next step computation = " + (System.currentTimeMillis() - ms) + " [ms] for " + timeStepInSec + "[s]");
 
-				for(int i = 0; i < pedestrianOSMList.size(); i++) {
-					PedestrianOSM pedestrian = pedestrianOSMList.get(i);
-					pedestrian.clearStrides();
-					if(eventTimes[i] < currentTimeInSec) {
-						pedestrian.getFootSteps().add(new FootStep(pedestrian.getPosition(), result.get(i), eventTimes[i], eventTimes[i] + pedestrian.getDurationNextStep()));
-					}
-					movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
+			for(int i = 0; i < pedestrianOSMList.size(); i++) {
+				PedestrianOSM pedestrian = pedestrianOSMList.get(i);
+				pedestrian.clearStrides();
+				if(eventTimes[i] < currentTimeInSec) {
+					pedestrian.getFootSteps().add(new FootStep(pedestrian.getPosition(), result.get(i), eventTimes[i], eventTimes[i] + pedestrian.getDurationNextStep()));
 				}
+				movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
 			}
 		} catch (OpenCLException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+
+		printCalculationTimes(computationTimes);
 	}
 
 	private int updates(float[] eventTimes1, float[] eventTimes2) {

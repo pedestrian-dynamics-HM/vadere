@@ -22,6 +22,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
+import java.util.List;
 import java.util.Random;
 
 public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian>, DynamicElementAddListener<Pedestrian> {
@@ -172,4 +173,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, timeOfNextStep, entTimeOfStep));
 	}
 
+	default void printCalculationTimes(List<Long> evcuationTimes) {
+		System.out.print(evcuationTimes);
+	}
 }
