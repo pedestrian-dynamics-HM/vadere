@@ -76,6 +76,10 @@ public class OnlineVisualization implements PassiveCallback {
 		// this.window.addSelectShapeListener(onlineVisualisationPanel);
 	}
 
+	public void setEnableVisualization(boolean enableVisualization) {
+		this.enableVisualization = enableVisualization;
+	}
+
 	@Override
 	public void setTopography(final Topography scenario) {
 		this.scenario = scenario;
@@ -93,7 +97,7 @@ public class OnlineVisualization implements PassiveCallback {
 
 	@Override
 	public void preLoop(double simTimeInSec) {
-		onlineVisualisationPanel.setVisible(this.enableVisualization);
+		onlineVisualisationPanel.setVisible(enableVisualization);
 		window.preLoop();
 	}
 
@@ -108,8 +112,10 @@ public class OnlineVisualization implements PassiveCallback {
 
 	@Override
 	public void postUpdate(double simTimeInSec) {
-		pushDrawData(simTimeInSec);
-		this.model.notifyObservers();
+		if(enableVisualization) {
+			pushDrawData(simTimeInSec);
+			this.model.notifyObservers();
+		}
 	}
 
 	/**

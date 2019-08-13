@@ -100,7 +100,7 @@
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.4,
       "writeSimulationData" : true,
-      "visualizationEnabled" : true,
+      "visualizationEnabled" : false,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,

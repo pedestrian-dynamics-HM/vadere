@@ -60,7 +60,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 
 	ScenarioPanel(ProjectViewModel model) {
-		this.onlineVisualization = new OnlineVisualization(true);
+		this.onlineVisualization = new OnlineVisualization(false);
 		this.postVisualizationView = new PostvisualizationWindow(model.getCurrentProjectPath());
         this.model = model;
 
@@ -235,6 +235,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	 */
 	public void setScenario(Scenario scenario, boolean isEditable) {
 		this.scenario = scenario;
+		onlineVisualization.setEnableVisualization(scenario.getAttributesSimulation().isVisualizationEnabled());
 		model.setScenarioNameLabelString(scenario.getDisplayName());
 
 		if (!initialized) {

@@ -70,7 +70,7 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 			List<VPoint> result = clOptimalStepsModel.getPositions();
 
 			ms = System.currentTimeMillis() - ms;
-			logger.debug("runtime for next step computation = " + ms + " [ms]");
+			/*logger.debug("runtime for next step computation = " + ms + " [ms]");
 
 			for(int i = 0; i < pedestrianOSMList.size(); i++) {
 				PedestrianOSM pedestrian = pedestrianOSMList.get(i);
@@ -84,7 +84,7 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 				}
 
 				movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
-			}
+			}*/
 
 			counter++;
 

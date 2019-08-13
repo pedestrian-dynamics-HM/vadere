@@ -50,14 +50,15 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		try {
-			clearStrides(topography);
-			movedPedestrians.clear();
+			//clearStrides(topography);
+			//movedPedestrians.clear();
 
-			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
+
 
 			if(counter == 0) {
+				List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 				clOptimalStepsModel.setPedestrians(pedestrianOSMList);
-				eventTimes = new float[pedestrianOSMList.size()];
+				//eventTimes = new float[pedestrianOSMList.size()];
 			}
 
 			long ms = System.currentTimeMillis();
@@ -67,7 +68,7 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 			ms = System.currentTimeMillis() - ms;
 			computationTimes.add(ms);
 
-			clOptimalStepsModel.readFromDevice();
+			/*clOptimalStepsModel.readFromDevice();
 			List<VPoint> result = clOptimalStepsModel.getPositions();
 			int numberOfUpdates = clOptimalStepsModel.getCounter() - counter;
 			counter = clOptimalStepsModel.getCounter();
@@ -83,12 +84,12 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 					pedestrian.getFootSteps().add(new FootStep(pedestrian.getPosition(), result.get(i), eventTimes[i], eventTimes[i] + pedestrian.getDurationNextStep()));
 				}
 				movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
-			}
+			}*/
 		} catch (OpenCLException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-
+		System.out.println();
 		printCalculationTimes(computationTimes);
 	}
 
