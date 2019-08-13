@@ -363,15 +363,15 @@ public class Simulation {
 			sourceController.update(simTimeInSec);
 		}
 
-		for (TargetController targetController : this.targetControllers) {
+		/*for (TargetController targetController : this.targetControllers) {
 			targetController.update(simTimeInSec);
 		}
 
 		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {
 			absorbingAreaController.update(simTimeInSec);
-		}
+		}*/
 
-		topographyController.update(simTimeInSec); //rebuild CellGrid
+		//topographyController.update(simTimeInSec); //rebuild CellGrid
 		step++;
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);

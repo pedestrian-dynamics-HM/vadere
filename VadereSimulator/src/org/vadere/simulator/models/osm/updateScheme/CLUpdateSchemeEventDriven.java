@@ -53,7 +53,7 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 			//clearStrides(topography);
 			//movedPedestrians.clear();
 
-
+			//List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 
 			if(counter == 0) {
 				List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
@@ -89,6 +89,7 @@ public class CLUpdateSchemeEventDriven extends UpdateSchemeParallel {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+		counter++;
 		System.out.println();
 		printCalculationTimes(computationTimes);
 	}

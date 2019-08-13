@@ -342,9 +342,11 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	@Override
 	protected FloatBuffer allocPedestrianHostMemory(@NotNull final List<PedestrianOSM> pedestrians) {
 		float[] pedestrianStruct = new float[pedestrians.size() * OFFSET];
-		for(int i = 0; i < pedestrians.size(); i++) {
-			pedestrianStruct[i * OFFSET + STEPSIZE] = (float) pedestrians.get(i).getDesiredStepSize();
-			pedestrianStruct[i * OFFSET + DESIREDSPEED] = (float) pedestrians.get(i).getDesiredSpeed();
+		int i = 0;
+		for(PedestrianOSM pedestrianOSM : pedestrians) {
+			pedestrianStruct[i * OFFSET + STEPSIZE] = (float) pedestrianOSM.getDesiredStepSize();
+			pedestrianStruct[i * OFFSET + DESIREDSPEED] = (float)pedestrianOSM.getDesiredSpeed();
+			i++;
 		}
 		return CLUtils.toFloatBuffer(pedestrianStruct);
 	}
@@ -360,9 +362,11 @@ public class CLParallelEventDrivenOSM extends CLAbstractOSM implements ICLOptima
 	@Override
 	protected FloatBuffer allocPositionHostMemory(@NotNull final List<PedestrianOSM> pedestrians) {
 		float[] pedestrianStruct = new float[pedestrians.size() * COORDOFFSET];
-		for(int i = 0; i < pedestrians.size(); i++) {
-			pedestrianStruct[i * COORDOFFSET + X] = (float) pedestrians.get(i).getPosition().getX();
-			pedestrianStruct[i * COORDOFFSET + Y] = (float) pedestrians.get(i).getPosition().getY();
+		int i = 0;
+		for(PedestrianOSM pedestrianOSM : pedestrians) {
+			pedestrianStruct[i *  COORDOFFSET + X] = (float) pedestrianOSM.getPosition().getX();
+			pedestrianStruct[i * COORDOFFSET + Y] = (float) pedestrianOSM.getPosition().getY();
+			i++;
 		}
 		return CLUtils.toFloatBuffer(pedestrianStruct);
 	}

@@ -22,6 +22,8 @@ import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_CPU;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
 import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_END;
 import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_START;
@@ -129,12 +131,12 @@ public abstract class CLAbstract {
 			PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
 			CLInfo.checkCLError(clGetPlatformIDs(platformIDs, numberOfPlatforms));
 
-			clPlatform = platformIDs.get(0);
+			clPlatform = platformIDs.get(1);
 
 			IntBuffer numberOfDevices = stack.mallocInt(1);
-			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices));
+			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, null, numberOfDevices));
 			PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices));
+			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, deviceIDs, numberOfDevices));
 
 			clDevice = deviceIDs.get(0);
 

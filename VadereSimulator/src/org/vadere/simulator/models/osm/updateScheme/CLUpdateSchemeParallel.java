@@ -66,10 +66,10 @@ public class CLUpdateSchemeParallel extends UpdateSchemeParallel {
 			ms = System.currentTimeMillis() - ms;
 			computationTimes.add(ms);
 
-			clOptimalStepsModel.readFromDevice();
+			/*clOptimalStepsModel.readFromDevice();
 			List<VPoint> result = clOptimalStepsModel.getPositions();
 
-			ms = System.currentTimeMillis() - ms;
+			ms = System.currentTimeMillis() - ms;*/
 			/*logger.debug("runtime for next step computation = " + ms + " [ms]");
 
 			for(int i = 0; i < pedestrianOSMList.size(); i++) {

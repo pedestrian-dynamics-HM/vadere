@@ -169,7 +169,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 			    //clEnqueueReadBuffer(clQueue, clConflicts, true, 0, memConflicts, null, null);
 
 			    minEventTime = stack.callocFloat(1);
-			    clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, minEventTime, null, null);
+			    //clEnqueueReadBuffer(clQueue, clMinEventTime, true, 0, minEventTime, null, null);
 			    clFinish(clQueue);
 
 			    counter++;
@@ -235,12 +235,14 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 	 */
 	protected FloatBuffer allocPedestrianHostMemory(@NotNull final List<PedestrianOSM> pedestrians) {
 	    float[] pedestrianStruct = new float[pedestrians.size() * OFFSET];
-	    for(int i = 0; i < pedestrians.size(); i++) {
-		    pedestrianStruct[i * OFFSET + STEPSIZE] = (float)pedestrians.get(i).getDesiredStepSize();
-		    pedestrianStruct[i * OFFSET + DESIREDSPEED] = (float)pedestrians.get(i).getDesiredSpeed();
+	    int i = 0;
+	    for(PedestrianOSM pedestrianOSM : pedestrians) {
+		    pedestrianStruct[i * OFFSET + STEPSIZE] = (float)pedestrianOSM.getDesiredStepSize();
+		    pedestrianStruct[i * OFFSET + DESIREDSPEED] = (float)pedestrianOSM.getDesiredSpeed();
 
 		    pedestrianStruct[i * OFFSET + NEWX] = 0.0f;
 		    pedestrianStruct[i * OFFSET + NEWY] = 0.0f;
+		    i++;
 	    }
 	    return CLUtils.toFloatBuffer(pedestrianStruct);
     }
@@ -255,9 +257,11 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 
 	protected FloatBuffer allocPositionHostMemory(@NotNull final List<PedestrianOSM> pedestrians) {
 		float[] pedestrianStruct = new float[pedestrians.size() * COORDOFFSET];
-		for(int i = 0; i < pedestrians.size(); i++) {
-			pedestrianStruct[i * COORDOFFSET + X] = (float) pedestrians.get(i).getPosition().getX();
-			pedestrianStruct[i * COORDOFFSET + Y] = (float) pedestrians.get(i).getPosition().getY();
+		int i = 0;
+		for(PedestrianOSM pedestrianOSM : pedestrians) {
+			pedestrianStruct[i * COORDOFFSET + X] = (float) pedestrianOSM.getPosition().getX();
+			pedestrianStruct[i * COORDOFFSET + Y] = (float) pedestrianOSM.getPosition().getY();
+			i++;
 		}
 		return CLUtils.toFloatBuffer(pedestrianStruct);
 	}
@@ -452,6 +456,7 @@ public class CLParallelOSM extends CLAbstractOSM implements ICLOptimalStepsModel
 		    PointerBuffer clLocalWorkSize = stack.callocPointer(1);
 		    IntBuffer errcode_ret = stack.callocInt(1);
 			long maxWorkGroupSize = CLUtils.getMaxWorkGroupSizeForKernel(clDevice, clSeek, 0, getMaxWorkGroupSize(), getMaxLocalMemorySize()); // local 4 byte (integer)
+			maxWorkGroupSize = Math.min(maxWorkGroupSize, 256);
 
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 0, clCellStarts));
 		    CLInfo.checkCLError(clSetKernelArg1p(clFindCellBoundsAndReorder, 1, clCellEnds));
