@@ -1,7 +1,7 @@
 {
   "name" : "rimea_11_exitSelection_gnm1",
   "description" : "",
-  "release" : "0.9",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -16,6 +16,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -25,13 +27,15 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesGNM" : {
         "attributesODEIntegrator" : {
-          "solverType" : "DORMAND_PRINCE_45",
-          "stepSizeMin" : 1.0E-4,
+          "solverType" : "EULER",
+          "stepSizeMin" : 0.05,
           "stepSizeMax" : 1.0,
           "toleranceAbsolute" : 1.0E-5,
           "toleranceRelative" : 1.0E-4
@@ -58,7 +62,8 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : false
     },
     "topography" : {
       "attributes" : {
@@ -69,7 +74,8 @@
           "height" : 30.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {
@@ -194,7 +200,11 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

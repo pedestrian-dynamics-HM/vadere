@@ -1,8 +1,8 @@
 package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
-import org.apache.commons.math3.analysis.function.Abs;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -10,6 +10,7 @@ import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.util.Views;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,14 +33,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction"})
+@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId"})
 public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
 	private Function<IPoint, Double> obstacleDistanceFunction;
-	
+	/** A possible empty string identifying a context object. */
+	private String contextId;
+
 	// TODO [priority=low] [task=feature] magic number, use attributes / parameter?
 	/**
 	 * Cell size of the internal storage of DynamicElements. Is used in the LinkedCellsGrid.
@@ -67,11 +70,13 @@ public class Topography implements DynamicElementMover{
 	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
 	 * iteration between frames.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<AbsorbingArea> absorbingAreas;
 
 	/**
 	 * MeasurementAreas.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<MeasurementArea> measurementAreas;
 
 	/**
@@ -140,6 +145,7 @@ public class Topography implements DynamicElementMover{
 
 		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
 		this.dynamicElementIdCounter = new AtomicInteger(1);
+		this.contextId = "";
 	}
 
 	/** Clean up a set by removing {@code null}. */
@@ -447,8 +453,18 @@ public class Topography implements DynamicElementMover{
 	 * writing the topography to file.
 	 */
 	public void addBoundary(Obstacle obstacle) {
+
+		if (obstacle.getId() == Attributes.ID_NOT_SET){
+			int nextId = obstacles.stream().map(Obstacle::getId).max(Integer::compareTo).orElse(1) + 1;
+			obstacle.setId(nextId);
+		}
+
 		this.addObstacle(obstacle);
 		this.boundaryObstacles.add(obstacle);
+	}
+
+	public List<Obstacle> getBoundaryObstacles() {
+		return new ArrayList<>(boundaryObstacles);
 	}
 
 	public void removeBoundary() {
@@ -660,5 +676,13 @@ public class Topography implements DynamicElementMover{
 		}
 
 		return obstacles;
+	}
+
+	public String getContextId() {
+		return contextId;
+	}
+
+	public void setContextId(String contextId) {
+		this.contextId = contextId;
 	}
 }

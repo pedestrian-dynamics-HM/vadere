@@ -56,6 +56,10 @@ public class VCircle implements VShape, ICircleSector {
 		return Math.abs(this.center.distance(pos) - this.radius);
 	}
 
+	public double signedDistance(IPoint pos) {
+		return this.center.distance(pos) - this.radius;
+	}
+
 	public VPoint getCenter() {
 		return this.center;
 	}
@@ -138,6 +142,39 @@ public class VCircle implements VShape, ICircleSector {
 		final VPoint r = new VPoint(x3, y3);
 		return intersectionPoints.stream().min(Comparator.comparingDouble(point -> point.distance(r)));
 	}
+
+	/**
+	 * Assumption: there exist a intersection point of the line segment.
+	 *
+	 * @param x11
+	 * @param y11
+	 * @param x22
+	 * @param y22
+	 * @return
+	 */
+	public Optional<VPoint> getSegmentIntersectionPoints(final double x11, final double y11, final double x22, final double y22) {
+		ImmutableList<VPoint> list = getIntersectionPoints(x11, y11, x22, y22);
+		assert !list.isEmpty();
+
+		if(x11 == x22) {
+			for (VPoint point : list) {
+				if(point.y < y11 && point.y > y22 || point.y > y11 && point.y < y22) {
+					return Optional.of(point);
+				}
+			}
+		} else {
+			for (VPoint point : list) {
+				if(point.x < x11 && point.x > x22 || point.x > x11 && point.x < x22) {
+					return Optional.of(point);
+				}
+			}
+		}
+
+		return Optional.empty();
+
+//		throw new IllegalArgumentException("line segment ("+x11+","+y11+") - ("+x22+","+y22+") does not intersect circle " + this + ".");
+	}
+
 
 	@Override
 	public boolean intersectsLine(double x1, double y1, double x2, double y2) {
@@ -282,6 +319,11 @@ public class VCircle implements VShape, ICircleSector {
 			points.add(center.add(new VPoint(x, y)));
 		}
 		return points;
+	}
+
+	@Override
+	public List<VLine> lines() {
+		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
 	@Override

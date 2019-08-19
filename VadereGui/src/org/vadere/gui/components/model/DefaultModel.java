@@ -9,6 +9,7 @@ import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
@@ -135,18 +136,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	@Override
 	public boolean setScale(final double scale) {
-		boolean hasChanged = true;
 		double oldScale = scaleFactor;
-
-		if (scale < MIN_SCALE_FACTOR) {
-			this.scaleFactor = MIN_SCALE_FACTOR;
-		} else if (scale > MAX_SCALE_FACTOR) {
-			this.scaleFactor = MAX_SCALE_FACTOR;
-		} else if (scale != this.scaleFactor) {
-			this.scaleFactor = scale;
-		} else {
-			hasChanged = false;
-		}
+		boolean hasChanged = setScaleWithoutChangingViewport(scale);
 
 		// update the viewport, since it depends on the scaleFactor
 		if (hasChanged) {
@@ -159,6 +150,27 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			setViewportBound(newViewPort);
 			setChanged();
 		}
+		return hasChanged;
+	}
+
+	@Override
+	public boolean setScaleWithoutChangingViewport(double scale) {
+		boolean hasChanged = true;
+
+		if (scale < MIN_SCALE_FACTOR) {
+			this.scaleFactor = MIN_SCALE_FACTOR;
+		} else if (scale > MAX_SCALE_FACTOR) {
+			this.scaleFactor = MAX_SCALE_FACTOR;
+		} else if (scale != this.scaleFactor) {
+			this.scaleFactor = scale;
+		} else {
+			hasChanged = false;
+		}
+
+		if(hasChanged) {
+			setChanged();
+		}
+
 		return hasChanged;
 	}
 
@@ -254,7 +266,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
-	public void setViewportBound(final Rectangle2D.Double viewportBound) {
+	public synchronized void setViewportBound(final Rectangle2D.Double viewportBound) {
 		Rectangle2D.Double oldViewportBound = this.viewportBound;
 
 		if (!oldViewportBound.equals(viewportBound)) {
@@ -459,8 +471,11 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * @return
 	 */
 	protected VPoint pixelToWorld(final VPoint pInPixel) {
-		return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
-				getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		if(pInPixel != null) {
+			return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
+					getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
+		}
+		return VPoint.ZERO;
 		/*
 		 * return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getX() +
 		 * getViewportBound().getX(),

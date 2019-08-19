@@ -8,7 +8,7 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationOptions;
-import org.vadere.simulator.utils.reflection.TestResourceHandler;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ProjectOutputTest implements TestResourceHandler {
+public class ProjectOutputTest implements TestResourceHandlerScenario {
 
 	private VadereProject project;
 	private ProjectOutput projectOutput;
@@ -101,7 +101,6 @@ public class ProjectOutputTest implements TestResourceHandler {
 		MigrationAssistant m = MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
 //		System.out.println(m.migrateScenarioFile());
 	}
-	//ToDo: update testResources/data/simpleProject/output/... to v0.3
 
 	@Test
 	public void updateWithNew() throws IOException, URISyntaxException {
@@ -119,7 +118,7 @@ public class ProjectOutputTest implements TestResourceHandler {
 
 	@Test
 	public void projectOutputSet(){
-		VadereProject proj = new VadereProject("test", new LinkedList<>());
+		VadereProject proj = new VadereProject("test", new LinkedList<>(), Paths.get("."));
 		assertNotNull(proj.getProjectOutput());
 	}
 

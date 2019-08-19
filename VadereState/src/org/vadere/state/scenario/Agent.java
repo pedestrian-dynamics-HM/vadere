@@ -247,4 +247,5 @@ public abstract class Agent extends DynamicElement {
 		this.freeFlowSpeed = freeFlowSpeed;
 	}
 
+	public abstract Agent clone();
 }

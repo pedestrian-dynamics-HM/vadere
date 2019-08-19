@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.fields;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -11,13 +12,11 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
-import org.vadere.util.math.InterpolationUtil;
 import org.vadere.util.math.MathUtil;
 
 import java.util.HashMap;
@@ -59,7 +58,6 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	 */
 	private AttributesAgent attributesPedestrian;
 
-
 	/**
 	 * Stores all potential fields which represent to a target (targetId).
 	 * This Map has to be filled by classes extending this class.
@@ -91,8 +89,8 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	}
 
 	@Override
-	public Function<Agent, IMesh<? extends IPotentialPoint, ?, ?, ?>> getDiscretization() {
-		Map<Integer, IMesh<? extends IPotentialPoint, ?, ?, ?>> clone = new HashMap<>();
+	public Function<Agent, IMesh<?, ?, ?>> getDiscretization() {
+		Map<Integer, IMesh<?, ?, ?>> clone = new HashMap<>();
 
 		for(Map.Entry<Integer, EikonalSolver> entry : eikonalSolvers.entrySet()) {
 			Integer targetId = entry.getKey();

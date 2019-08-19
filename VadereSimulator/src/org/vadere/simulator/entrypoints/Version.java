@@ -23,8 +23,12 @@ public enum Version {
 	V0_7(0, 7),
 	V0_8(0, 8),
 	V0_9(0,9),
+	V0_10(0,10),
+	V1_0(1,0),
+	V1_1(1,1),
+	V1_2(1,2),
+	V1_3(1,3),
 	;
-
 
 
 	private String label;

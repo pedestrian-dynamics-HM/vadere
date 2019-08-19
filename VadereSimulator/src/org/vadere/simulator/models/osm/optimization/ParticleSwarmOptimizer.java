@@ -9,16 +9,18 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VCircleSector;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
-import org.vadere.util.math.pso.PSO;
+import org.vadere.util.math.optimization.pso.PSO;
 
 import java.awt.Shape;
 import java.util.*;
 import java.util.List;
 
 /**
+ * This class implements a particle swarm optimization which is not jet tested extensively.
+ *
  * @author Benedikt Zoennchen
  */
-public class ParticleSwarmOptimizer implements StepCircleOptimizer {
+public class ParticleSwarmOptimizer extends StepCircleOptimizer {
 
 	private final double movementThreshold;
 	private final Random random;

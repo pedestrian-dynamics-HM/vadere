@@ -6,12 +6,12 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.ScenarioRun;
+import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,7 +69,8 @@ public class ProjectRunSubCommand implements SubCommandRunner {
 			try {
 				Scenario scenario = ScenarioFactory.createVadereWithProjectDirectory(
 						projectDirectory.toFile().toString(),scenarioFileName);
-				new ScenarioRun(scenario, projectDirectory.resolve(IOUtils.OUTPUT_DIR).toString(), null).run();
+				ScenarioCache cache = ScenarioCache.load(scenario, scenarioFilePath.toAbsolutePath().getParent());
+				new ScenarioRun(scenario, projectDirectory.resolve(IOUtils.OUTPUT_DIR).toString(), null, projectDirectory.resolve(IOUtils.OUTPUT_DIR), cache).run();
 
 			} catch (Throwable e) {
 				logger.error(String.format("Error while executing scenario %d/%d %s. Resume with next scenario.", i, scenarioFileNames.size(), scenarioFileName));

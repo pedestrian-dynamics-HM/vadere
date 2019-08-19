@@ -1,19 +1,13 @@
 package org.vadere.gui.projectview;
 
 
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
-import org.vadere.util.io.IOUtils;
+import org.vadere.util.io.VadereArgumentParser;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.logging.StdOutErrLog;
-import org.vadere.util.opencl.CLUtils;
-
-import java.io.IOException;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-
-import javax.swing.*;
 
 /**
  * Entry point for the Vadere GUI.
@@ -21,50 +15,32 @@ import javax.swing.*;
  * 
  */
 public class VadereApplication {
-	public static final String preferencesFilename = "VadereTestingSuite.preferences.xml";
+
 	private static Logger logger = Logger.getLogger(VadereApplication.class);
 
 	public static void main(String[] args) {
 		StdOutErrLog.addStdOutErrToLog();
 		logger.info("starting Vadere GUI...");
-        // load settings
-		loadPreferences();
 
-		// set locale
+		VadereArgumentParser vadereArgumentParser = new VadereArgumentParser();
+		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
+
+		try {
+			vadereArgumentParser.parseArgsAndProcessOptions(args);
+		} catch (UnsatisfiedLinkError linkError) {
+			System.err.println("[LWJGL]: " + linkError.getMessage());
+		} catch (ArgumentParserException e) {
+			argumentParser.handleError(e);
+			System.exit(1);
+		} catch (Exception e) {
+			System.err.println("Cannot start vadere: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		Messages.loadLanguageFromPreferences(VadereApplication.class);
 
-		// start main gui
 		ProjectView.start();
 	}
 
-	/**
-	 * Load the preferences from file.
-	 */
-	private static void loadPreferences() {
-		Preferences prefs = null;
-		try {
-			prefs = IOUtils.loadUserPreferences(preferencesFilename, VadereApplication.class);
-		} catch (IOException | InvalidPreferencesFormatException e) {
-			logger.error("preferences file not found or corrupted. creating a new file...");
-			prefs = Preferences.userNodeForPackage(VadereApplication.class);
-
-			defaultPreferences(prefs);
-			try {
-				IOUtils.saveUserPreferences(preferencesFilename, prefs);
-			} catch (IOException | BackingStoreException e1) {
-				logger.error("preferences file could not be written.");
-			}
-		}
-	}
-
-	/**
-	 * Set default preferences.
-	 * 
-	 * @param prefs
-	 */
-	private static void defaultPreferences(Preferences prefs) {
-		prefs.put("default_directory", System.getProperty("user.dir") + "/projects");
-		prefs.put("default_directory_attributes", System.getProperty("user.dir") + "/attributes");
-		prefs.put("default_directory_scenarios", System.getProperty("user.dir") + "/scenarios");
-	}
 }

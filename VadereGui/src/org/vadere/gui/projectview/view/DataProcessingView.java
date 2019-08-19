@@ -2,9 +2,7 @@ package org.vadere.gui.projectview.view;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import info.clearthought.layout.TableLayout;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -21,33 +19,25 @@ import org.vadere.simulator.projects.dataprocessing.processor.DataProcessorFacto
 import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 class DataProcessingView extends JPanel implements IJsonView {
@@ -71,7 +61,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		viewPanel = new JPanel(new GridLayout(1, 1));
 		add(viewPanel, BorderLayout.CENTER);
 
-		String dataProcessingViewModeStr = Preferences.userNodeForPackage(DataProcessingView.class).get("dataProcessingViewMode", "");
+		String dataProcessingViewModeStr = VadereConfig.getConfig().getString("Gui.dataProcessingViewMode", "");
 		if (dataProcessingViewModeStr.length() > 0) {
 			inGuiViewMode = dataProcessingViewModeStr.equals(guiViewMode);
 		}
@@ -98,7 +88,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 		String link = MessageFormat.format(Messages.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
 		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
 				link+"</font></span></html>");
-		Preferences.userNodeForPackage(DataProcessingView.class).put("dataProcessingViewMode",
+		VadereConfig.getConfig().setProperty("Gui.dataProcessingViewMode",
 				inGuiViewMode ? guiViewMode : jsonViewMode);
 		viewPanel.removeAll();
 
@@ -130,7 +120,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private JMenu processorsMenu = new JMenu();
 
 	private TextView buildExpertView() {
-		TextView panel = new TextView("/" + IOUtils.OUTPUT_DIR, "default_directory_outputprocessors", AttributeType.OUTPUTPROCESSOR);
+		TextView panel = new TextView("ProjectView.defaultDirectoryOutputProcessors", AttributeType.OUTPUTPROCESSOR);
 		JMenuBar processorsMenuBar = new JMenuBar();
 		processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		processorsMenu.setEnabled(isEditable);

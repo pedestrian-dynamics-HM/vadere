@@ -124,7 +124,7 @@ public class TestCLOptimalStepsModel {
 
 	private AttributesFloorField attributesFloorField;
 	private AttributesOSM attributesOSM;
-	private List<CLOptimalStepsModel.PedestrianOpenCL> pedestrians;
+	private List<CLParallelOptimalStepsModel.PedestrianOpenCL> pedestrians;
 	private Topography topography;
 	private PotentialFieldDistanceEikonalEq obstacleDistancePotential;
 	private PotentialFieldSingleTargetGrid targetPotentialField;
@@ -167,27 +167,27 @@ public class TestCLOptimalStepsModel {
 			VPoint randomPosition = new VPoint(
 					(float)(bound.getMinX() + random.nextDouble() * bound.getWidth()),
 					(float)(bound.getMinY() + random.nextDouble() * bound.getHeight()));
-			CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(randomPosition, maxStepSize);
+			CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(randomPosition, maxStepSize);
 			pedestrians.add(pedestrian);
 		}
 
-		CLOptimalStepsModel.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
+		CLParallelOptimalStepsModel.PedestrianOpenCL lastPedestrian = pedestrians.get(pedestrians.size()-1);
 
-		CLOptimalStepsModel.PedestrianOpenCL pedestrian = new CLOptimalStepsModel.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
+		CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(lastPedestrian.position.add(new VPoint(0.01, 0.1)), maxStepSize);
 		pedestrians.add(pedestrian);
 	}
 
 	@Ignore
 	@Test
 	public void testIdentity() throws OpenCLException {
-		CLOptimalStepsModel clOptimalStepsModel = new CLOptimalStepsModel(
+		CLParallelOptimalStepsModel clOptimalStepsModel = new CLParallelOptimalStepsModel(
 				attributesOSM,
 				attributesFloorField,
 				new VRectangle(topography.getBounds()),
 				targetPotentialField.getEikonalSolver(),
 				obstacleDistancePotential.getEikonalSolver());
 		// max step length + function width);
-		List<CLOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, attributesPotentialCompact.getPedPotentialWidth());
+		List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, attributesPotentialCompact.getPedPotentialWidth());
 
 		for(int i = 0; i < numberOfElements; i++) {
 			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);

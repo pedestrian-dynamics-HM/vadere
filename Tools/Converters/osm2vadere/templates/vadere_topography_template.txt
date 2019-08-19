@@ -1,0 +1,44 @@
+{
+  "attributes" : {
+    "bounds" : {
+      "x" : 0.0,
+      "y" : 0.0,
+      "width" : $width,
+      "height" : $height
+    },
+    "boundingBoxWidth" : 0.5,
+    "bounded" : true,
+    "referenceCoordinateSystem" : {
+      "epsgCode" : "$epsg",
+      "description" : "$epsg_description",
+      "translation" : {
+        "x" : $translate_x,
+        "y" : $translate_y
+      }
+    }
+  },
+  "obstacles" : [
+ $obstacles
+  ],
+   "measurementAreas" : [
+$measurement_areas
+    ],
+  "stairs" : [ ],
+  "targets" : [
+ $targets
+  ],
+  "sources" : [
+ $sources
+  ],
+  "dynamicElements" : [ ],
+  "attributesPedestrian" : {
+    "radius" : 0.195,
+    "densityDependentSpeed" : false,
+    "speedDistributionMean" : 1.34,
+    "speedDistributionStandardDeviation" : 0.26,
+    "minimumSpeed" : 0.5,
+    "maximumSpeed" : 2.2,
+    "acceleration" : 2.0
+  },
+  "attributesCar" : null
+}

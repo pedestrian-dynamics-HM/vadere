@@ -249,4 +249,9 @@ public class VRing implements VShape {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 
+	@Override
+	public List<VLine> lines() {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
 }

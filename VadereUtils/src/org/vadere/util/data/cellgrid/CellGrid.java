@@ -1,6 +1,13 @@
 package org.vadere.util.data.cellgrid;
 
-import java.awt.Point;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.InterpolationUtil;
+import org.vadere.util.math.MathUtil;
+
+import java.awt.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
@@ -8,12 +15,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.InterpolationUtil;
-import org.vadere.util.math.MathUtil;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
 
 /**
  * Grid consisting of regular arranged sampling points an a plane, each storing
@@ -123,6 +129,44 @@ public class CellGrid {
 				};
 			}
 		};
+	}
+
+	/**
+	 * Load data for CellState[][] structure from the given table. Method asumes the dimension
+	 * of the table matches the dimension of {@link #values}
+	 *
+	 * @param table contains data in the form [x, y, (potential)value, tag]
+	 */
+	public void loadFromTable(Table table){
+		for (Row r : table){
+			values[r.getInt("x")][r.getInt("y")].potential = r.getDouble("value");
+			values[r.getInt("x")][r.getInt("y")].tag =
+					PathFindingTag.valueOf(r.getString("tag"));
+		}
+	}
+
+	/**
+	 * Generate table view of {@link #values} to save as cache
+	 * *
+	 * @return table representation of {@link #values} data in the from [x, y, (potential)value, tag]
+	 */
+	public Table asTable(){
+		int len = numPointsX * numPointsY;
+		IntColumn colX = IntColumn.create("x", new int[len]);
+		IntColumn colY = IntColumn.create("y", new int[len]);
+		DoubleColumn colVal = DoubleColumn.create("value", new double[len]);
+		StringColumn colTag = StringColumn.create("tag", new String[len]);
+		int tblRow = 0;
+		for (int row = 0; row < numPointsY; row++) {
+			for (int col = 0; col < numPointsX; col++) {
+				colX.set(tblRow, col);
+				colY.set(tblRow, row);
+				colVal.set(tblRow, values[col][row].potential);
+				colTag.set(tblRow, values[col][row].tag.name());
+				tblRow++;
+			}
+		}
+		return Table.create("floorfield").addColumns(colX, colY, colVal, colTag);
 	}
 
 	/** Returns the width of the grid. */
@@ -333,7 +377,7 @@ public class CellGrid {
 			double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
 
 			double t = (pos.getX() - gridPointCoord.x) / getResolution();
-			double u = (pos.getX() - gridPointCoord.y) / getResolution();
+			double u = (pos.getY() - gridPointCoord.y) / getResolution();
 
 			return InterpolationUtil.bilinearInterpolation(z1, z2, z3, z4, t, u);
 		};

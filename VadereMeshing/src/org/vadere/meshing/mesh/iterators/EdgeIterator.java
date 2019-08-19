@@ -12,27 +12,37 @@ import java.util.Iterator;
  * This Iterator iterates over all half-edges of a specific face.
  *
  * @author Benedikt Zoennchen
- * @param <P> the type of the vertex
- * @param <E> the type of the half-edge
- * @param <F> the type of the face
+ *
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
-public class EdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements Iterator<E> {
+public class EdgeIterator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements Iterator<E> {
 	private E currentHalfEdge;
 	private E edge;
 	private boolean started = false;
-	private IMesh<P, V, E, F> mesh;
+	private boolean reverse = false;
+	private IMesh<V, E, F> mesh;
 
-	public EdgeIterator(final IMesh<P, V, E, F> mesh, final F face){
+	public EdgeIterator(final IMesh<V, E, F> mesh, final F face){
 		this.edge = mesh.getEdge(face);
 		this.currentHalfEdge = edge;
 		this.mesh = mesh;
 	}
 
-	public EdgeIterator(final IMesh<P, V, E, F> mesh, final E edge){
+	public EdgeIterator(final IMesh<V, E, F> mesh, final E edge){
 		this.edge = edge;
 		this.currentHalfEdge = edge;
 		this.mesh = mesh;
 	}
+
+	public EdgeIterator(final IMesh<V, E, F> mesh, final E edge, final boolean reverse){
+		this.edge = edge;
+		this.currentHalfEdge = edge;
+		this.mesh = mesh;
+		this.reverse = reverse;
+	}
+
 
 	@Override
 	public boolean hasNext() {
@@ -43,7 +53,7 @@ public class EdgeIterator<P extends IPoint, V extends IVertex<P>, E extends IHal
 	public E next() {
 		started = true;
 		E result = currentHalfEdge;
-		currentHalfEdge = mesh.getNext(currentHalfEdge);
+		currentHalfEdge = reverse ? mesh.getPrev(currentHalfEdge) : mesh.getNext(currentHalfEdge);
 		return result;
 	}
 }

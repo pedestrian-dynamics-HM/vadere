@@ -1,8 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl;
 
 import org.apache.commons.lang3.tuple.Pair;
-
-import org.vadere.util.logging.Logger;
 import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
@@ -11,9 +9,10 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
-import org.vadere.meshing.mesh.triangulation.triangulator.ITriangulator;
-import org.vadere.meshing.mesh.triangulation.triangulator.UniformRefinementTriangulatorSFC;
+import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.meshing.opencl.CLDistMeshHE;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -25,20 +24,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ *
  * @author Benedikt Zoennchen
+ *
  */
-public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVertex<P>, AHalfEdge<P>, AFace<P>>, ITriangulator<P, AVertex<P>, AHalfEdge<P>, AFace<P>> {
+public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITriangulator<AVertex, AHalfEdge, AFace> {
     private static final Logger log = Logger.getLogger(CLEikMesh.class);
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private final IMeshSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> meshSupplier;
-    private IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> triangulation;
+    private final IMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier;
+    private IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
     private VRectangle bound;
     private double scalingFactor;
-    private PriorityQueue<Pair<PFace<EikMeshPoint>, Double>> heap;
+    private PriorityQueue<Pair<PFace, Double>> heap;
 
     private double initialEdgeLen = 0.4;
     private double deps;
@@ -58,7 +59,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
 
     private Object gobalAcessSynchronizer = new Object();
 
-    private CLDistMeshHE<P> clDistMesh;
+    private CLDistMeshHE clDistMesh;
     private boolean hasToRead = false;
 
     public CLEikMeshHE(
@@ -67,7 +68,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
             final double initialEdgeLen,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
-            final IMeshSupplier<P, AVertex<P>, AHalfEdge<P>, AFace<P>> meshSupplier) {
+            final IMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier) {
 
         this.bound = bound;
         this.distanceFunc = distanceFunc;
@@ -92,30 +93,28 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         log.info("##### (end) compute a uniform refined triangulation #####");
 
         log.info("##### (start) generate a triangulation #####");
-        UniformRefinementTriangulatorSFC<P, AVertex<P>, AHalfEdge<P>, AFace<P>> uniformRefinementTriangulation = new UniformRefinementTriangulatorSFC(
+        GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation = new GenUniformRefinementTriangulatorSFC(
 		        meshSupplier,
                 bound,
                 obstacleShapes,
                 edgeLengthFunc,
-		        initialEdgeLen,
-                distanceFunc,
-		        new ArrayList());
+                distanceFunc);
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMeshHE<>((AMesh<P>)triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE((AMesh)triangulation.getMesh());
         clDistMesh.init();
         clDistMesh.refresh();
         initialized = true;
         log.info("##### (end) generate a triangulation #####");
     }
 
-    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> getTriangulation() {
+    public IIncrementalTriangulation<AVertex, AHalfEdge, AFace> getTriangulation() {
         return triangulation;
     }
 
     @Override
-    public IIncrementalTriangulation<P, AVertex<P>, AHalfEdge<P>, AFace<P>> generate() {
+    public IIncrementalTriangulation<AVertex, AHalfEdge, AFace> generate() {
 		try {
 			if(!initialized) {
 				initialize();
@@ -134,7 +133,12 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
 		}
     }
 
-    public boolean isFinished() {
+	@Override
+	public IIncrementalTriangulation<AVertex, AHalfEdge, AFace> generate(boolean finalize) {
+		return generate();
+	}
+
+	public boolean isFinished() {
         return nSteps >= MAX_STEPS;
     }
 
@@ -159,12 +163,12 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     }
 
     private void removeLowQualityTriangles() {
-        List<AFace<P>> faces = getMesh().getFaces();
-        for(AFace<P> face : faces) {
+        List<AFace> faces = getMesh().getFaces();
+        for(AFace face : faces) {
             if(faceToQuality(face) < Parameters.MIN_TRIANGLE_QUALITY) {
-                Optional<AHalfEdge<P>> optEdge = getMesh().getLinkToBoundary(face);
+                Optional<AHalfEdge> optEdge = getMesh().getLinkToBoundary(face);
                 if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-                    AHalfEdge<P> edge = getMesh().getNext(optEdge.get());
+                    AHalfEdge edge = getMesh().getNext(optEdge.get());
                     projectToBoundary(getMesh().getVertex(edge));
                     triangulation.removeFaceAtBorder(face, true);
                 }
@@ -173,7 +177,7 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
     }
 
     public boolean isMovementIllegal() {
-        for(AFace<P> face : getMesh().getFaces()) {
+        for(AFace face : getMesh().getFaces()) {
             if(!getMesh().isBoundary(face) && !getMesh().isDestroyed(face) && !triangulation.isCCW(face)) {
                 return true;
             }
@@ -181,16 +185,16 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         return false;
     }
 
-    public synchronized AMesh<P> getMesh() {
+    public synchronized AMesh getMesh() {
         if(hasToRead) {
             hasToRead = false;
             clDistMesh.refresh();
         }
         // TODO: dirty casting
-        return (AMesh<P>) triangulation.getMesh();
+        return (AMesh) triangulation.getMesh();
     }
 
-    public double faceToQuality(final AFace<P> face) {
+    public double faceToQuality(final AFace face) {
 
         VLine[] lines = getMesh().toTriangle(face).getLines();
         double a = lines[0].length();
@@ -206,20 +210,21 @@ public class CLEikMeshHE<P extends EikMeshPoint> implements IMeshImprover<P, AVe
         return part;
     }
 
-    private void projectToBoundary(final AVertex<P> vertex) {
-        P position = getMesh().getPoint(vertex);
+    private void projectToBoundary(final AVertex vertex) {
+    	// TODO: get rid of VPoint
+        VPoint position = getMesh().toPoint(vertex);
         double distance = distanceFunc.apply(position);
         if(distance < 0) {
-            double dGradPX = (distanceFunc.apply(position.toVPoint().add(new VPoint(deps,0))) - distance) / deps;
-            double dGradPY = (distanceFunc.apply(position.toVPoint().add(new VPoint(0,deps))) - distance) / deps;
+            double dGradPX = (distanceFunc.apply(position.add(new VPoint(deps,0))) - distance) / deps;
+            double dGradPY = (distanceFunc.apply(position.add(new VPoint(0,deps))) - distance) / deps;
             VPoint projection = new VPoint(dGradPX * distance, dGradPY * distance);
             position.subtract(projection);
         }
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<AFace<P>> faces = triangulation.getMesh().getFaces();
-        for(AFace<P> face : faces) {
+        List<AFace> faces = triangulation.getMesh().getFaces();
+        for(AFace face : faces) {
             if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
                 triangulation.removeFaceAtBorder(face, true);
             }

@@ -1,15 +1,13 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.util.geometry.shapes.IPoint;
 
 /**
  * An array-based implementation of {@link IHalfEdge}.
  *
  * @author Benedikt Zoennchen
  */
-public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
+public class AHalfEdge implements IHalfEdge, Cloneable {
 
 	/**
 	 * The array-index of this half-edge
@@ -41,19 +39,20 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 	 */
 	private int face;
 
+
 	/**
 	 * Indicates that the half-edge is destroyed and can be removed from the array-based data structure.
 	 */
 	private boolean destroyed;
 
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end, @NotNull final int face) {
+	protected AHalfEdge(final int id, final int end, final int face) {
 		this.id = id;
 	    this.end = end;
 		this.face = face;
 		this.destroyed = false;
 	}
 
-	protected AHalfEdge(@NotNull final int id, @NotNull final int end) {
+	protected AHalfEdge(final int id, final int end) {
 		this.id = id;
 	    this.end = end;
 		this.face = -1;
@@ -70,10 +69,6 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 
 	int getEnd() {
 		return end;
-	}
-
-	boolean hasNext() {
-		return next != -1;
 	}
 
 	int getNext() {
@@ -121,7 +116,7 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 		this.end = end;
 	}
 
-	public boolean isDestroyed() {
+	boolean isDestroyed() {
 		return destroyed;
 	}
 
@@ -132,19 +127,19 @@ public class AHalfEdge<P extends IPoint> implements IHalfEdge<P>, Cloneable {
 	 *
 	 * @param id the new array-index of this face
 	 */
-    void setId(@NotNull final int id) {
+    void setId(final int id) {
         this.id = id;
     }
 
-    @Override
+	@Override
     public String toString() {
         return "" + id+"(e)->"+next+"(e), " + end+"(v)";
     }
 
     @Override
-    protected AHalfEdge<P> clone() {
+    protected AHalfEdge clone() {
         try {
-            return (AHalfEdge<P>)super.clone();
+            return (AHalfEdge)super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e.getMessage());
         }

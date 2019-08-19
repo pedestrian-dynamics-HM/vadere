@@ -21,6 +21,8 @@ public class AttributesSimulation extends Attributes {
 	private boolean useFixedSeed = true;
 	private long fixedSeed = new Random().nextLong();
 	private long simulationSeed;
+	/** Allows agent to change their behavior (e.g. from TARGET_ORIENTIED to COOPERATIVE if it is too dense) */
+	private boolean useSalientBehavior = false;
 
 	// Getter...
 
@@ -48,7 +50,6 @@ public class AttributesSimulation extends Attributes {
 		return printFPS;
 	}
 
-
 	public int getDigitsPerCoordinate() {
 		return digitsPerCoordinate;
 	}
@@ -64,6 +65,12 @@ public class AttributesSimulation extends Attributes {
 	public long getSimulationSeed() {
 		return simulationSeed;
 	}
+
+	public boolean isUseSalientBehavior() {
+		return useSalientBehavior;
+	}
+
+	// Setters...
 
 	public void setFinishTime(double finishTime) {
 		checkSealed();
@@ -116,6 +123,10 @@ public class AttributesSimulation extends Attributes {
 		this.simulationSeed = simulationSeed;
 	}
 
+	public void setUseSalientBehavior(boolean useSalientBehavior) {
+		this.useSalientBehavior = useSalientBehavior;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -130,12 +141,12 @@ public class AttributesSimulation extends Attributes {
 				digitsPerCoordinate == that.digitsPerCoordinate &&
 				useFixedSeed == that.useFixedSeed &&
 				fixedSeed == that.fixedSeed &&
-				simulationSeed == that.simulationSeed;
+				simulationSeed == that.simulationSeed &&
+				useSalientBehavior == that.useSalientBehavior;
 	}
 
 	@Override
 	public int hashCode() {
-
-		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed);
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, useSalientBehavior);
 	}
 }

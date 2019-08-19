@@ -4,7 +4,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.utils.tex.TexGraphBuilder;
+import org.vadere.meshing.utils.io.tex.TexGraphBuilder;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * Color each visited face to show the walk and Create a straight line between start q and target p
  */
-public class WalkCanvas<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-		extends SimpleTriCanvas<P, V, E, F> {
+public class WalkCanvas<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
+		extends SimpleTriCanvas<P, CE, CF, V, E, F> {
 
 	protected final VPoint q;
 	protected final VPoint p;
@@ -35,7 +35,7 @@ public class WalkCanvas<P extends IPoint, V extends IVertex<P>, E extends IHalfE
 	 * @param startEdge    Start edge which should be crossed (it seems this is not used...).
 	 * @param visitedFaces List of Faces already visited.
 	 */
-	public WalkCanvas(IMesh<P, V, E, F> mesh, VPoint q, VPoint p,
+	public WalkCanvas(IMesh<V, E, F> mesh, VPoint q, VPoint p,
 	                  F startFace,
 	                  E startEdge,
 	                  List<F> visitedFaces) {
@@ -50,15 +50,15 @@ public class WalkCanvas<P extends IPoint, V extends IVertex<P>, E extends IHalfE
 
 	//statics - Factory Methods
 
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>>
-	WalkCanvas<P, V, E, F> getDefault(IMesh<P, V, E, F> mesh,
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace>
+	WalkCanvas<P, CE, CF, V, E, F> getDefault(IMesh<V, E, F> mesh,
 									  VPoint p,
 									  VPoint q,
 									  F startFace,
 									  E startEdge,
 									  List<F> visitedFaces) {
 
-		return new WalkCanvas<P, V, E, F>(mesh, p, q, startFace, startEdge, visitedFaces);
+		return new WalkCanvas<>(mesh, p, q, startFace, startEdge, visitedFaces);
 
 	}
 

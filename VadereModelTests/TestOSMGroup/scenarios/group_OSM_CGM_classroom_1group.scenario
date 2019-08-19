@@ -1,8 +1,7 @@
 {
   "name" : "group_OSM_CGM_classroom_1group",
   "description" : "",
-  "release" : "0.8",
-  "commithash" : "warning: no commit hash",
+  "release" : "1.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -61,7 +60,8 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 9
     } ],
-    "isTimestamped" : true
+    "isTimestamped" : true,
+    "isWriteMetaData" : false
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
@@ -71,6 +71,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -80,7 +82,9 @@
           "pedestrianWeight" : 3.5,
           "queueWidthLoading" : 1.0,
           "pedestrianDynamicWeight" : 6.0,
-          "loadingType" : "CONSTANT"
+          "loadingType" : "CONSTANT",
+          "width" : 0.2,
+          "height" : 1.0
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
@@ -129,9 +133,9 @@
       "digitsPerCoordinate" : 4,
       "useFixedSeed" : false,
       "fixedSeed" : -8686918998450722109,
-      "simulationSeed" : 0
+      "simulationSeed" : 0,
+      "useSalientBehavior" : false
     },
-    "eventInfos" : [ ],
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -141,7 +145,8 @@
           "height" : 10.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {
@@ -234,6 +239,7 @@
         },
         "id" : 11
       } ],
+      "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
@@ -276,12 +282,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 1 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -310,12 +321,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 2 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -344,12 +360,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 3 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -378,12 +399,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 4 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -412,12 +438,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 5 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -446,12 +477,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 6 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -480,12 +516,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 7 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -514,12 +555,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 8 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -548,12 +594,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 9 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -582,12 +633,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 10 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -616,12 +672,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 11 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -650,12 +711,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 12 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -684,12 +750,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 13 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -718,12 +789,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 14 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -752,12 +828,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 15 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -786,12 +867,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 16 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -820,12 +906,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 17 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -854,12 +945,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 18 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -888,12 +984,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 19 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -922,12 +1023,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 20 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -956,12 +1062,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 21 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -990,12 +1101,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 22 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1024,12 +1140,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 23 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1058,12 +1179,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 24 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1092,12 +1218,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 25 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1126,12 +1257,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 26 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1160,12 +1296,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 27 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1194,12 +1335,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 28 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1228,12 +1374,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 29 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1262,12 +1413,17 @@
           "speedDistributionStandardDeviation" : 0.26,
           "minimumSpeed" : 0.5,
           "maximumSpeed" : 2.2,
-          "acceleration" : 2.0
+          "acceleration" : 2.0,
+          "footStepsToStore" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
         },
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
         "mostImportantEvent" : null,
+        "salientBehavior" : "TARGET_ORIENTED",
         "groupIds" : [ 30 ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -1283,25 +1439,15 @@
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
-        "acceleration" : 2.0
+        "acceleration" : 2.0,
+        "footStepsToStore" : 4,
+        "searchRadius" : 1.0,
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.195,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
-        "acceleration" : 2.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
-    }
+      "attributesCar" : null
+    },
+    "eventInfos" : [ ]
   }
 }

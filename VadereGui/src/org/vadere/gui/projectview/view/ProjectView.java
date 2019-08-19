@@ -4,8 +4,36 @@ package org.vadere.gui.projectview.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
-import org.vadere.gui.projectview.VadereApplication;
-import org.vadere.gui.projectview.control.*;
+import org.vadere.gui.projectview.control.ActionAddScenario;
+import org.vadere.gui.projectview.control.ActionCloneScenario;
+import org.vadere.gui.projectview.control.ActionCloseApplication;
+import org.vadere.gui.projectview.control.ActionCreateProject;
+import org.vadere.gui.projectview.control.ActionDeleteOutputDirectories;
+import org.vadere.gui.projectview.control.ActionDeleteScenarios;
+import org.vadere.gui.projectview.control.ActionEditScenarioDescription;
+import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
+import org.vadere.gui.projectview.control.ActionInterruptScenarios;
+import org.vadere.gui.projectview.control.ActionLoadProject;
+import org.vadere.gui.projectview.control.ActionLoadRecentProject;
+import org.vadere.gui.projectview.control.ActionNextTimeStep;
+import org.vadere.gui.projectview.control.ActionOpenInExplorer;
+import org.vadere.gui.projectview.control.ActionOutputToScenario;
+import org.vadere.gui.projectview.control.ActionPauseScenario;
+import org.vadere.gui.projectview.control.ActionRenameOutputFile;
+import org.vadere.gui.projectview.control.ActionRenameProject;
+import org.vadere.gui.projectview.control.ActionRenameScenario;
+import org.vadere.gui.projectview.control.ActionResumeNormalSpeed;
+import org.vadere.gui.projectview.control.ActionRunAllScenarios;
+import org.vadere.gui.projectview.control.ActionRunOutput;
+import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
+import org.vadere.gui.projectview.control.ActionSaveAsProject;
+import org.vadere.gui.projectview.control.ActionSaveProject;
+import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
+import org.vadere.gui.projectview.control.ActionShowAboutDialog;
+import org.vadere.gui.projectview.control.ActionToClipboard;
+import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
+import org.vadere.gui.projectview.control.IProjectChangeListener;
+import org.vadere.gui.projectview.control.ShowResultDialogAction;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -16,16 +44,16 @@ import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SingleScenarioFinishedListener;
 import org.vadere.simulator.projects.VadereProject;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLUtils;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +63,11 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.prefs.Preferences;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 /**
  * Main view of the Vadere GUI.
@@ -66,12 +98,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 */
 	private JPanel contentPane = new JPanel();
 	private JPanel controlPanel = new JPanel();
+	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
 	private JButton btnRunSelectedScenario;
 	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
+	private JButton btnNextSimulationStep;
+	private JButton btnResumeNormalSpeed;
 	private JMenu mntmRecentProjects;
 	private ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
@@ -259,7 +294,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
-				Preferences.userNodeForPackage(VadereApplication.class).get("last_used_project", null);
+				VadereConfig.getConfig().getString("History.lastUsedProject", null);
 		if (lastUsedProjectPath != null) {
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
@@ -288,6 +323,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunSelectedScenario.setVisible(!flag);
 		btnStopRunningScenarios.setVisible(flag);
 		btnPauseRunningScenarios.setVisible(flag);
+		btnNextSimulationStep.setVisible(flag);
+		btnResumeNormalSpeed.setVisible(flag);
 		scenarioTable.setEnabled(!flag);
 		scenarioTable.clearSelection();
 		outputTable.setEnabled(!flag);
@@ -323,7 +360,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		buildOutputTablePopup();
 		buildScenarioTablePopup(addScenarioAction);
 		buildToolBar();
-		buildRightSidePanel();
 
 		setScenariosRunning(false);
 
@@ -333,7 +369,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				closeApplicationAction.actionPerformed(null);
 			}
 		});
-		Preferences pref = Preferences.userNodeForPackage(VadereApplication.class);
 		pack();
 	}
 
@@ -397,7 +432,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		// Checkbox menu item to turn off result dialog of project run.
 		mnFile.addSeparator();
-		boolean showDialogDefault = Preferences.userNodeForPackage(VadereApplication.class)
+		boolean showDialogDefault = VadereConfig.getConfig()
 				.getBoolean("Project.simulationResult.show", false);
 		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, showDialogDefault);
 		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
@@ -427,7 +462,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		menuBar.add(mnHelp);
 
 		Action showAboutAction = new ActionShowAboutDialog(Messages.getString("ProjectView.mntmAbout.text"));
-		setAcceleratorFromLocalizedShortcut(showAboutAction, "ProjectView.mntmAbout.shortcut");
 		JMenuItem mntmAbout = new JMenuItem(showAboutAction);
 
 		mnHelp.add(mntmAbout);
@@ -487,7 +521,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		contentPane.setLayout(new BorderLayout(0, 0));
 
 		JPanel panel_1 = new JPanel();
-		contentPane.add(panel_1, BorderLayout.WEST);
 		panel_1.setLayout(new BorderLayout(0, 0));
 
 		panel_1.add(progressPanel, BorderLayout.SOUTH);
@@ -499,10 +532,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		outputTable = model.createOutputTable();
 
 		buildScenarioTable(outputTableRenderer);
-		contentPane.add(scenarioTable.getTableHeader(), BorderLayout.CENTER);
 
 		buildOutputTable(outputTableRenderer);
-		contentPane.add(outputTable.getTableHeader(), BorderLayout.CENTER);
 
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.6);
@@ -520,6 +551,28 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		panel_1.add(controlPanel, BorderLayout.NORTH);
 		FlowLayout fl_controlPanel = (FlowLayout) controlPanel.getLayout();
 		fl_controlPanel.setAlignment(FlowLayout.LEFT);
+
+		JPanel panel_2 = buildRightSidePanel();
+
+		mainSplitPanel = new JSplitPane();
+		((BasicSplitPaneUI) mainSplitPanel.getUI()).getDivider().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					mainSplitPanel.setDividerLocation(scenarioTable.getSize().width + 5);
+				}
+			}
+		});
+		mainSplitPanel.setResizeWeight(0.4);
+		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
+		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		panel_1.setMinimumSize(new Dimension(1,1));
+		panel_2.setMinimumSize(new Dimension(1, 1));
+		mainSplitPanel.setLeftComponent(panel_1_scroll);
+		mainSplitPanel.setRightComponent(panel_2);
+		mainSplitPanel.resetToPreferredSizes();
+		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
 	}
 
 	private void buildScenarioTable(OutputTableRenderer outputTableRenderer) {
@@ -699,6 +752,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnStopRunningScenarios = new JButton(interruptScenariosAction);
 		toolBar.add(btnStopRunningScenarios);
 
+		ActionResumeNormalSpeed resumeNormalSpeedAction =
+				new ActionResumeNormalSpeed(Messages.getString("ProjectView.btnResumeNormalSpeed.text"), model);
+		resumeNormalSpeedAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
+		btnResumeNormalSpeed = new JButton(resumeNormalSpeedAction);
+		toolBar.add(btnResumeNormalSpeed);
+
 		ActionPauseScenario pauseScenarioAction =
 				new ActionPauseScenario(Messages.getString("ProjectView.btnPauseRunningTests.text"), model);
 		pauseScenarioAction.putValue(Action.LONG_DESCRIPTION,
@@ -712,10 +772,18 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				KeyStroke.getKeyStroke(Messages.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
 		toolBar.getActionMap().put("pauseTests", pauseScenarioAction);
 
+		ActionNextTimeStep nextTimeStepAction =
+				new ActionNextTimeStep(Messages.getString("ProjectView.btnNextSimulationStep"), model);
+		nextTimeStepAction.putValue(Action.LONG_DESCRIPTION, "Next Step");
+		nextTimeStepAction.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_step.png")));
+		btnNextSimulationStep = new JButton(nextTimeStepAction);
+		toolBar.add(btnNextSimulationStep);
+
 		buildKeyboardShortcuts(pauseScenarioAction, interruptScenariosAction);
 	}
 
-	private void buildRightSidePanel() {
+	private JPanel buildRightSidePanel() {
 		JPanel rightSidePanel = new JPanel();
 		rightSidePanel.setLayout(new BorderLayout(0, 0));
 		contentPane.add(rightSidePanel, BorderLayout.CENTER);
@@ -727,6 +795,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		model.setScenarioNamePanel(scenarioNamePanel); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);
+		return rightSidePanel;
 	}
 
 	private void addToProjectSpecificActions(Action action) {
@@ -741,7 +810,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	public void updateRecentProjectsMenu() {
 		mntmRecentProjects.removeAll();
-		String str = Preferences.userNodeForPackage(VadereApplication.class).get("recent_projects", "");
+		String str = VadereConfig.getConfig().getString("History.recentProjects", "");
 		boolean hasEntry = false;
 		if (str.length() > 0) {
 			for (String path : str.split(",")) {
@@ -772,5 +841,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	public void updateScenarioJPanel() {
 		scenarioJPanel.updateScenario();
+	}
+
+	@Override
+	public void validate() {
+		int max_div = scenarioTable.getSize().width + 25;
+		super.validate();
+		if (mainSplitPanel.getDividerLocation() > max_div){
+			mainSplitPanel.setDividerLocation(max_div);
+		}
 	}
 }

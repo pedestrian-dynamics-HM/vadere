@@ -1,0 +1,20 @@
+{
+    "id" : $id,
+    "shape" : {
+        "type" : "POLYGON",
+        "points" : [
+$points
+        ]
+    },
+    "interSpawnTimeDistribution" : "$interSpawnTimeDistribution",
+    "distributionParameters" : $distributionParameters,
+    "spawnNumber" : $spawnNumber,
+    "maxSpawnNumberTotal" : $maxSpawnNumberTotal,
+    "startTime" : $startTime,
+    "endTime" : $endTime,
+    "spawnAtRandomPositions" : $spawnAtRandomPositions,
+    "useFreeSpaceOnly" : $useFreeSpaceOnly,
+    "targetIds" : $targetIds,
+    "groupSizeDistribution" : $groupSizeDistribution,
+    "dynamicElementType" : "$dynamicElementType"
+}

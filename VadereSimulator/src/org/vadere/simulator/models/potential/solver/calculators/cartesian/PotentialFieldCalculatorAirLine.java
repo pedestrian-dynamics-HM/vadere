@@ -1,9 +1,9 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
-import java.awt.Point;
-import java.util.LinkedList;
-
 import org.vadere.util.data.cellgrid.CellGrid;
+
+import java.awt.*;
+import java.util.LinkedList;
 
 public class PotentialFieldCalculatorAirLine extends AGridEikonalSolver {
 

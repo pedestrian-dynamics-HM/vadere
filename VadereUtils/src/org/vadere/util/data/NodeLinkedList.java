@@ -183,14 +183,15 @@ public class NodeLinkedList<E> implements Iterable<Node<E>> {
      *
      * @param element the element which will be inserted
      */
-    public void addFirst(final E element) {
+    public Node<E> addFirst(final E element) {
         if(head == null) {
-            tail = new Node<E>(this, element);
+            tail = new Node<>(this, element);
             head = tail;
         }
         else {
             head = insertPrevious(element, head);
         }
+	    return head;
     }
 
     /**
@@ -198,12 +199,13 @@ public class NodeLinkedList<E> implements Iterable<Node<E>> {
      *
      * @param element the element which will be inserted
      */
-    public void addLast(E element) {
+    public Node<E> addLast(E element) {
         if(head == null) {
-            addFirst(element);
+            return addFirst(element);
         }
         else {
             tail = insertNext(element, tail);
+            return tail;
         }
     }
 
@@ -212,8 +214,8 @@ public class NodeLinkedList<E> implements Iterable<Node<E>> {
      *
      * @param element the element which will be inserted
      */
-    public void add(E element) {
-        addLast(element);
+    public Node<E> add(E element) {
+        return addLast(element);
     }
 
     /**

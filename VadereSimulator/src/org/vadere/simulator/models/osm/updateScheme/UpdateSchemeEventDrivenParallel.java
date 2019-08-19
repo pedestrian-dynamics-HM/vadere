@@ -1,15 +1,15 @@
 package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.triangulation.triangulator.PointSetTriangulator;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.DataPoint;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -31,9 +31,10 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 	private LinkedCellsGrid<PedestrianOSM> linkedCellsGrid;
 	private boolean[][] locked;
 	private double pedestrianPotentialWidth;
-	private Map<PedestrianOSM, PVertex<PedestrianPoint>> map;
-	private PMesh<PedestrianPoint> mesh;
-	private MeshPanel<PedestrianPoint, PVertex<PedestrianPoint>, PHalfEdge<PedestrianPoint>, PFace<PedestrianPoint>> panel;
+	private PMesh mesh;
+	private MeshPanel<PVertex, PHalfEdge, PFace> panel;
+	private Map<PedestrianOSM, PVertex> map;
+	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 
 
 	public UpdateSchemeEventDrivenParallel(@NotNull final Topography topography, @NotNull final double pedestrianPotentialWidth) {
@@ -75,16 +76,22 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 
 		int counter = 1;
 		// event driven update ignores time credits
-		do{
-			mesh = new PMesh<>((x, y) -> new PedestrianPoint(new VPoint(x,y), null));
-			Collection<PedestrianPoint> pedPoints = topography.getElements(PedestrianOSM.class)
+		do {
+			mesh = new PMesh();
+			Collection<VPoint> pedPoints = topography.getElements(PedestrianOSM.class)
 					.stream()
-					.map(ped -> new PedestrianPoint(ped.getPosition(), ped))
+					.map(ped -> ped.getPosition())
 					.collect(Collectors.toList());
 
-			PointSetTriangulator<PedestrianPoint, PVertex<PedestrianPoint>, PHalfEdge<PedestrianPoint>, PFace<PedestrianPoint>> triangulator
-					= new PointSetTriangulator<>(pedPoints, mesh);
-			triangulator.generate();
+			triangulation = new IncrementalTriangulation(mesh);
+			for(PedestrianOSM pedestrianOSM : topography.getElements(PedestrianOSM.class)) {
+				PHalfEdge halfEdge = triangulation.insert(pedestrianOSM.getPosition().getX(), pedestrianOSM.getPosition().getY());
+				PVertex vertex = triangulation.getMesh().getVertex(halfEdge);
+				triangulation.getMesh().setData(vertex, "pedestrian", pedestrianOSM);
+				map.put(pedestrianOSM, vertex);
+			}
+			triangulation.finish();
+
 
 			if(panel == null) {
 				panel = new MeshPanel<>(mesh, 1000, 1000);
@@ -94,9 +101,9 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				panel.getMeshRenderer().setMesh(mesh);
 			}
 
-			for(PVertex<PedestrianPoint> pedestrianPoint : mesh.getVertices()) {
+			/*for(PVertex pedestrianPoint : mesh.getVertices()) {
 				map.put(mesh.getPoint(pedestrianPoint).pedestrianOSM, pedestrianPoint);
-			}
+			}*/
 
 			panel.repaint();
 
@@ -141,7 +148,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			parallelUpdatablePeds.stream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
-				update(ped, currentTimeInSec);
+				update(ped, timeStepInSec, currentTimeInSec);
 			});
 
 
@@ -152,17 +159,24 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		logger.info("avoided updates: " + count);
 	}
 
-	private boolean requireUpdate(PedestrianOSM pedestrianOSM) {
-		PVertex<PedestrianPoint> vertex = map.get(pedestrianOSM);
-		if(mesh.getPoint(vertex).hasChanged()) {
+	private boolean requireUpdate(@NotNull final PedestrianOSM pedestrianOSM) {
+
+		PVertex vertex = map.get(pedestrianOSM);
+		if(hasChanged(pedestrianOSM)) {
 			return true;
 		}
-		for(PVertex<PedestrianPoint> v : mesh.getAdjacentVertexIt(vertex)) {
-			if(mesh.getPoint(v).hasChanged()) {
+
+		for(PVertex v : mesh.getAdjacentVertexIt(vertex)) {
+			PedestrianOSM ped = triangulation.getMesh().getData(v, "pedestrian", PedestrianOSM.class).get();
+			if(hasChanged(ped)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean hasChanged(@NotNull final PedestrianOSM pedestrianOSM) {
+		return pedestrianOSM.getLastPosition().equals(pedestrianOSM.getPosition());
 	}
 
 	private class PedestrianPoint implements IPoint {
@@ -193,6 +207,11 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		@Override
 		public IPoint add(IPoint point) {
 			return this.point.add(point);
+		}
+
+		@Override
+		public IPoint add(double x, double y) {
+			return point.add(x, y);
 		}
 
 		@Override

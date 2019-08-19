@@ -6,7 +6,6 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.LaplacianSmother;
 
@@ -42,8 +41,8 @@ public class CPULaplacianSmoothing extends JFrame {
         LaplacianSmother meshGenerator = new LaplacianSmother(distanceFunc, edgeLengthFunc, 0.5, bbox, new ArrayList<>());
 
 
-        Predicate<PFace<EikMeshPoint>> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
-        MeshPanel<EikMeshPoint, PVertex<EikMeshPoint>, PHalfEdge<EikMeshPoint>, PFace<EikMeshPoint>> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), predicate, 1000, 800);
+        Predicate<PFace> predicate = face -> meshGenerator.getTriangulation().getMesh().toTriangle(face).isNonAcute();
+        MeshPanel<PVertex, PHalfEdge, PFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), predicate, 1000, 800);
 
         JFrame frame = distmeshPanel.display();
         frame.setVisible(true);

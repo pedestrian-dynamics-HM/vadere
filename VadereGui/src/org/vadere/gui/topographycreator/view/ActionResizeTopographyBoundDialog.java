@@ -1,15 +1,14 @@
 package org.vadere.gui.topographycreator.view;
 
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Locale;
-import org.vadere.gui.components.utils.Messages;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class ActionResizeTopographyBoundDialog {
 
@@ -23,7 +22,28 @@ public class ActionResizeTopographyBoundDialog {
 
 		textField = new JTextField();
 		textField.setText(String.format(Locale.US, "%.3f x %.3f", topographyBound.getWidth(), topographyBound.getHeight()));
-		textField.getDocument().addDocumentListener(new DialogListener());
+		textField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void handle(DocumentEvent e) {
+				String text = textField.getText().replace(" ", "");
+				String[] tmp = text.split("x");
+				double width;
+				double height;
+				try {
+					width = Double.valueOf(tmp[0]);
+					height = Double.valueOf(tmp[1]);
+
+					ActionResizeTopographyBoundDialog.this.bound =
+							new Rectangle2D.Double(ActionResizeTopographyBoundDialog.this.boundOld.getMinX(),
+									ActionResizeTopographyBoundDialog.this.boundOld.getMinY(), width, height);
+					ActionResizeTopographyBoundDialog.this.valid = true;
+					textField.setForeground(Color.BLACK);
+				}catch (Exception ex){
+					ActionResizeTopographyBoundDialog.this.valid = false;
+					textField.setForeground(Color.RED);
+				}
+			}
+		});
 
 		bound = topographyBound;
 		boundOld = topographyBound;
@@ -42,51 +62,6 @@ public class ActionResizeTopographyBoundDialog {
 				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
 	}
 
-	private class DialogListener implements DocumentListener{
-
-		private JTextField textField;
-		private String text;
-
-		DialogListener(){
-			textField = ActionResizeTopographyBoundDialog.this.textField;
-		}
-
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			handle(e);
-		}
-
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			handle(e);
-		}
-
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			handle(e);
-
-		}
-
-		private void handle(DocumentEvent e){
-			text = textField.getText().replace(" ", "");
-			String[] tmp = text.split("x");
-			double width;
-			double height;
-			try {
-				width = Double.valueOf(tmp[0]);
-				height = Double.valueOf(tmp[1]);
-
-				ActionResizeTopographyBoundDialog.this.bound =
-						new Rectangle2D.Double(ActionResizeTopographyBoundDialog.this.boundOld.getMinX(),
-										ActionResizeTopographyBoundDialog.this.boundOld.getMinY(), width, height);
-				ActionResizeTopographyBoundDialog.this.valid = true;
-				textField.setForeground(Color.BLACK);
-			}catch (Exception ex){
-				ActionResizeTopographyBoundDialog.this.valid = false;
-				textField.setForeground(Color.RED);
-			}
-		}
-	}
 }
 
 

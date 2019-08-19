@@ -31,9 +31,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 **/venv/
+_trial_temp/
 Tools/VadereAnalysisTools/VadereAnalysisTool/vadereanalysistool.egg-info/
 Tools/VadereAnalysisTools/VadereAnalysisTool/build/
 Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
+.mypy_cache/
 # Jupyter Notebooks
 **/.ipynb_checkpoints
 
@@ -44,6 +46,7 @@ VadereModelCalibration/**/output
 VadereModelTests/**/legacy
 VadereUtils/output/**
 VadereModelTests/*_private
+**/current_commit_hash.txt
 
 # Operating system files
 .DS_Store
@@ -53,17 +56,17 @@ VadereModelTests/*_private
 **/output/
 **/legacy/
 **/*_private/
-/.vscode
+
+# Vadere Cache
+**/__cache__
+**/vadere-server-output
+**/.vscode
 /Tools/PythonTargetLearning/save
 /Tools/PythonTargetLearning/notebooks/check
 /Tools/PythonTargetLearning/notebooks/juelich
 /Tools/PythonTargetLearning/notebooks/juelich-vadere
 /Tools/PythonTargetLearning/notebooks/KO
-/Tools/PythonTargetLearning/notebooks/.ipynb_checkpoints
-/Tools/PythonTargetLearning/notebooks/__pycache__
-/VadereModelTests/TestCWL/output_
-/VadereModelTests/TestCWL/output__
-/VadereModelTests/TestCWL/output_check_0
-/VadereModelTests/TestCWL/output_save
-/VadereModelTests/TestCWL/output_saved_new
-/VadereModelTests/TestCWL/legacy
+**.ipynb_checkpoints
+**/__pycache__
+/VadereModelTests/**/output*
+/VadereModelTests/**/legacy

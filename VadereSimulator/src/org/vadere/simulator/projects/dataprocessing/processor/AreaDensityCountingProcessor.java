@@ -18,6 +18,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
  * description of what the processor does.
  * See e.g. AreaDensityVoronoiProcessor / AreaDensityVoronoiAlgorithm
  */
+
 @DataProcessorClass(label = "AreaDensityCountingProcessor")
 public class AreaDensityCountingProcessor extends AreaDataProcessor<Integer>  {
 

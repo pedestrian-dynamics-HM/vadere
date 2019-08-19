@@ -10,16 +10,16 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.Iterator;
 
-public class PolyConnectivity<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> implements IPolyConnectivity<P, V, E, F> {
+public class PolyConnectivity<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPolyConnectivity<V, E, F> {
 
-	private final IMesh<P, V, E, F> mesh;
+	private final IMesh<V, E, F> mesh;
 
-	public PolyConnectivity(@NotNull final IMesh<P, V, E, F> mesh) {
+	public PolyConnectivity(@NotNull final IMesh<V, E, F> mesh) {
 		this.mesh = mesh;
 	}
 
 	@Override
-	public IMesh<P, V, E, F> getMesh() {
+	public IMesh<V, E, F> getMesh() {
 		return mesh;
 	}
 

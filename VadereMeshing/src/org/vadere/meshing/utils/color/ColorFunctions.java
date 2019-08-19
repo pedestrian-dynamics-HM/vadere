@@ -17,16 +17,18 @@ import java.util.function.BiFunction;
  * default implementations for faceDrawColor (boarder lines) and faceFillColor (filling)
  * are present.</p>
  *
- * @param <P> P extends IPoint
- * @param <V> V extends IVertex
- * @param <E> E extends IHalfEdge
- * @param <F> F extends IFace
+ * @param <P> the type of the points (containers)
+ * @param <CE> the type of container of the half-edges
+ * @param <CF> the type of the container of the faces
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
  */
 public class ColorFunctions
-		<P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> {
+		<P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
-	private BiFunction<IMesh<P, V, E, F>, F, Color> faceFillColorFunc;
-	private BiFunction<IMesh<P, V, E, F>, F, Color> faceDrawColorFunc;
+	private BiFunction<IMesh<V, E, F>, F, Color> faceFillColorFunc;
+	private BiFunction<IMesh<V, E, F>, F, Color> faceDrawColorFunc;
 	private HashMap<F, Color> faceFillColorMap;
 	private HashMap<F, Color> faceDrawColorMap;
 
@@ -48,13 +50,17 @@ public class ColorFunctions
 	 *
 	 * @param mesh Mesh used for coloring
 	 * @param face face / triangle of which the quality will be computed
-	 * @param <P> P extends IPoint
-	 * @param <V> V extends IVertex<P>
-	 * @param <E> E extends IHalfEdge<P>
-	 * @param <F> F extends IFace<P>
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return the quality in (0;1) of the triangle
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> double faceToQuality(final IMesh<P, V, E, F> mesh, final F face) {
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> double faceToQuality(final IMesh<V, E, F> mesh, final F face) {
 		VLine[] lines = mesh.toTriangle(face).getLines();
 		double a = lines[0].length();
 		double b = lines[1].length();
@@ -72,13 +78,17 @@ public class ColorFunctions
 	 *
 	 * @param mesh Mesh used for coloring
 	 * @param face face / triangle of which the color will be computed
-	 * @param <P> P extends IPoint
-	 * @param <V> V extends IVertex<P>
-	 * @param <E> E extends IHalfEdge<P>
-	 * @param <F> F extends IFace<P>
+	 *
+	 * @param <P> the type of the points (containers)
+	 * @param <CE> the type of container of the half-edges
+	 * @param <CF> the type of the container of the faces
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
 	 * @return gray scale color object
 	 */
-	public static <P extends IPoint, V extends IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> Color qualityToGrayScale(final IMesh<P, V, E, F> mesh, final F face) {
+	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> Color qualityToGrayScale(final IMesh<V, E, F> mesh, final F face) {
 		if(!mesh.isBoundary(face)) {
 			float quality = (float) faceToQuality(mesh, face);
 			if(quality <= 1 && quality >= 0) {
@@ -101,7 +111,7 @@ public class ColorFunctions
 	 * @param face Face to color
 	 * @return color object
 	 */
-	public Color faceFillColor(final IMesh<P, V, E, F> mesh, final F face) {
+	public Color faceFillColor(final IMesh<V, E, F> mesh, final F face) {
 		if (faceFillColorMap.containsKey(face)) {
 			return faceFillColorMap.get(face);
 		}
@@ -116,7 +126,7 @@ public class ColorFunctions
 	 * @param face Face to color
 	 * @return Color object
 	 */
-	public Color faceDrawColor(final IMesh<P, V, E, F> mesh, final F face) {
+	public Color faceDrawColor(final IMesh<V, E, F> mesh, final F face) {
 		if (faceDrawColorMap.containsKey(face)) {
 			return faceDrawColorMap.get(face);
 		}
@@ -139,7 +149,7 @@ public class ColorFunctions
 	 *
 	 * @param faceFillColorFunc BiFunction which specifies which color a face interior will get.
 	 */
-	public void setFaceFillColorFunc(@NotNull final BiFunction<IMesh<P, V, E, F>, F, Color> faceFillColorFunc) {
+	public void setFaceFillColorFunc(@NotNull final BiFunction<IMesh<V, E, F>, F, Color> faceFillColorFunc) {
 		this.faceFillColorFunc = faceFillColorFunc;
 	}
 
@@ -148,7 +158,7 @@ public class ColorFunctions
 	 *
 	 * @param faceDrawColorFunc BiFunction which specifies which color the face contour will get.
 	 */
-	public void setFaceDrawColorFunc(@NotNull final BiFunction<IMesh<P, V, E, F>, F, Color> faceDrawColorFunc) {
+	public void setFaceDrawColorFunc(@NotNull final BiFunction<IMesh<V, E, F>, F, Color> faceDrawColorFunc) {
 		this.faceDrawColorFunc = faceDrawColorFunc;
 	}
 

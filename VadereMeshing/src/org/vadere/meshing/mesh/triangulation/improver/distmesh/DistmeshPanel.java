@@ -46,8 +46,8 @@ public class DistmeshPanel extends Canvas {
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
 		graphics.setFont(newFont);
 		graphics.setColor(Color.GRAY);
-		graphics.translate(-bound.getMinX(), -bound.getMinY());
 		graphics.scale(scale, scale);
+		graphics.translate(-bound.getMinX(), -bound.getMinY());
 		graphics.setStroke(new BasicStroke(0.003f));
 		graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

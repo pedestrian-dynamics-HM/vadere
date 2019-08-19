@@ -8,11 +8,15 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.GrahamScan;
 
 /**
  * Note: A polygon which has the same points as a rectangle is not equals to the rectangle.
@@ -58,16 +62,10 @@ public class VPolygon extends Path2D.Double implements VShape {
 	public boolean isCCW() {
 		List<VPoint> points = getPath();
 		assert points.size() >= 3;
-		return GeometryUtils.isCCW(points.get(0), points.get(1), points.get(2));
-	}
-
-	public VPolygon toCWOrder() {
-		if(isCCW()) {
-			return revertOrder();
-		}
-		else {
-			return toCCWOrder();
-		}
+		GrahamScan scan = new GrahamScan(points);
+		Set<VPoint> convexHull = new HashSet<>(scan.getConvexHull());
+		List<VPoint> convexPartialPolygon = points.stream().filter(p -> convexHull.contains(p)).collect(Collectors.toList());
+		return GeometryUtils.isCCW(convexPartialPolygon.get(0), convexPartialPolygon.get(1), convexPartialPolygon.get(2));
 	}
 
 	public VPolygon toCCWOrder() {
@@ -77,6 +75,31 @@ public class VPolygon extends Path2D.Double implements VShape {
 		else {
 			return revertOrder();
 		}
+	}
+
+	//TODO: this does only work for certain cases!
+	public VPolygon smooth(double angle) {
+		List<VPoint> points = getPath();
+		assert points.size() >= 3;
+		boolean found;
+		do {
+			found = false;
+			for(int i = 0; i <= points.size()+1; i++) {
+				VPoint p1 = points.get(i % (points.size()));
+				VPoint p2 = points.get((i+1) % (points.size()));
+				VPoint p3 = points.get((i+2) % (points.size()));
+
+				if(GeometryUtils.isCCW(p1, p2, p3)) {
+					double triAngle = GeometryUtils.angle(p1, p2, p3);
+					if(triAngle < angle) {
+						points.remove((i+1) % (points.size()));
+						found = true;
+					}
+				}
+			}
+		} while (found);
+
+		return GeometryUtils.toPolygon(points);
 	}
 
 	public VPolygon revertOrder() {
@@ -617,7 +640,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 //		yValue /= (6 * area);
 //
 //		return new VPoint(xValue, yValue);
-		return GeometryUtils.getCentroid(getPoints());
+		return GeometryUtils.getPolygonCentroid(getPoints());
 	}
 
 	public VPolygon rotate(IPoint anchor, double angle) {
@@ -644,9 +667,24 @@ public class VPolygon extends Path2D.Double implements VShape {
 		}
 	}
 
+	public List<VLine> getLinePath() {
+		List<VPoint> points = getPoints();
+		List<VLine> lines = new ArrayList<>(points.size());
+		for(int i = 0; i < points.size(); i++) {
+			VLine line = new VLine(points.get(i), points.get((i+1) % points.size()));
+			lines.add(line);
+		}
+		return lines;
+	}
+
 	@Override
 	public List<VPoint> getPath() {
 		return getPoints();
+	}
+
+	@Override
+	public List<VLine> lines() {
+		return getLinePath();
 	}
 
 	@Override
