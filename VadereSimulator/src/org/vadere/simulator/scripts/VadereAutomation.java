@@ -2,7 +2,7 @@ package org.vadere.simulator.scripts;
 
 import org.vadere.simulator.entrypoints.ScenarioBuilder;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.ScenarioRun;
+import org.vadere.simulator.control.ScenarioRun;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.state.scenario.Source;
@@ -128,7 +128,7 @@ public class VadereAutomation {
             scenario.setName(id + "_Distribution");
 
 
-            Thread thread = new Thread(new ScenarioRun(scenario, s -> System.out.print(s + "finished")));
+            Thread thread = new Thread(new ScenarioRun(scenario, s -> System.out.print(s + "finished"), null, false, null));
             thread.start();
             arrThreads.add(thread);
 
