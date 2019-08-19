@@ -53,3 +53,17 @@ VadereModelTests/*_private
 **/output/
 **/legacy/
 **/*_private/
+/.vscode
+/Tools/PythonTargetLearning/save
+/Tools/PythonTargetLearning/notebooks/check
+/Tools/PythonTargetLearning/notebooks/juelich
+/Tools/PythonTargetLearning/notebooks/juelich-vadere
+/Tools/PythonTargetLearning/notebooks/KO
+/Tools/PythonTargetLearning/notebooks/.ipynb_checkpoints
+/Tools/PythonTargetLearning/notebooks/__pycache__
+/VadereModelTests/TestCWL/output_
+/VadereModelTests/TestCWL/output__
+/VadereModelTests/TestCWL/output_check_0
+/VadereModelTests/TestCWL/output_save
+/VadereModelTests/TestCWL/output_saved_new
+/VadereModelTests/TestCWL/legacy

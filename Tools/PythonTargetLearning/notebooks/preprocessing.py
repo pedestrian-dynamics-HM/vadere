@@ -132,7 +132,6 @@ def get_density_field(pedestrians, context):
     density_field = context.get('density_field', None)
 
     size = context.get('size', (0, 0))
-
     density_approx = np.zeros(size)
     ped_list = np.zeros([len(pedestrians), 2])
 
@@ -255,7 +254,8 @@ def process_experiment(experiment, context):
     area = context.get('area')
     resolution = context.get('resolution')
 
-    size = (int(area[3] / resolution), int(area[2] / resolution))
+    size = (int(round(area[3] / resolution, 0)), int(round(area[2] / resolution, 0)))
+    
     context['size'] = size
     context['pId2Target'] = pId2Target
 

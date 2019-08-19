@@ -44,8 +44,8 @@ RESULT_ROOT_DIRECTORY = os.path.join('I:/projects/vadere/Tools/PythonTargetLearn
 # [25, 5, 10, 10]
 # OBSERVATION_AREA = [20, 10, 10, 10]
 # OBSERVATION_AREA = [13.50, 7.25, 2.4, 1]
-OBSERVATION_AREA = [18.50, 6.7, 2.4, 1]
-# OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
+# OBSERVATION_AREA = [18.50, 6.7, 2.4, 1]
+OBSERVATION_AREA = [-2.4, 3, 2.4, 1]
 
 TIME_STEP_BOUNDS = (30, 0)  # cut off number of timesteps from start and end time
 RESOLUTION = 0.1  # 0.5  # resolution for density calculations
