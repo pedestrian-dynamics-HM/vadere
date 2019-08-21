@@ -1,11 +1,16 @@
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from tqdm import tqdm
+
+from sacred import Ingredient
+
 import matplotlib.pyplot as plt
 import numpy as np
 import joblib
 import time
 import os.path as path
+
+ingredient = Ingredient('randomforest.regression')
 
 def calculate_errors(prediction, target):
 
@@ -24,10 +29,10 @@ def calculate_errors(prediction, target):
     rmse = np.sqrt(np.mean(np.square(prediction - target), axis=0))
 
     return  {
-        'euklid': {'mean': euklid_error_mean, 'std': euklid_error_std}, 
-        'mean_abs_error': mean_abs_error.to_numpy().flatten(), 
-        'mean_error': mean_error.to_numpy().flatten(), 
-        'rmse': rmse.to_numpy().flatten()}
+        'euklid': {'mean': euklid_error_mean, 'std': euklid_error_std, 'percent': euklid_error_mean_percent}, 
+        'mean_abs_error': mean_abs_error, 
+        'mean_error': mean_error, 
+        'rmse': rmse}
     
 
 def features_importance(regressor, area):
@@ -78,17 +83,17 @@ def test(regressor, sampels, targets):
     return errors, prediction
 
 
-def single_forest(train, test, **kwargs):
+def single_forest(train_data, test_data, **kwargs):
     """Train using single forest 
 
 
     Parameters
     ----------
-    samples : array
-        3 dimentional array with n samples of dimension (m x k)
+    train_data : dict
+        training dataset, dictionary containing keys 'samples' and 'targets' of type np.array
 
-    targets : array
-        2 dimentional (n x l) array with l targets for each of the n samples
+    test_data : dict
+        test dataset, dictionary containing keys 'samples' and 'targets' of type np.array
 
     number_of_trees : int
         number of trees to be used in forest (default: 20)
@@ -96,9 +101,6 @@ def single_forest(train, test, **kwargs):
     number_of_cores : int
         number of cpu cores to use for training  (default: 1)
 
-    test_size : double
-        percentage of samples to be used as test data, must be between 0 and 1 (default: 0.2)
-    
     max_tree_depth : int
         maximal depth of tree (default: None)
 
@@ -126,25 +128,16 @@ def single_forest(train, test, **kwargs):
         tuple containing errors on test set (euklid_error_mean, euklid_error_std, mean_abs_error, mean_error, rmse)
     """
 
-    '''
-    # init options
-    test_size = kwargs.get('test_size', 0.2)
-
-    # split samples into training and test
-    train_samples, test_samples, train_targets, test_targets = \
-        train_test_split(samples, targets, shuffle = True, test_size = test_size)
-    '''
-
-    regressor = fit(train['samples'], train['targets'], **kwargs)
+    regressor = fit(train_data['samples'], train_data['targets'], **kwargs)
     
     # evaluate performance
-    score_training = regressor.score(train['samples'], train['targets'])
-    score_test = regressor.score(test['samples'], test['samples'])
+    score_training = regressor.score(train_data['samples'], train_data['targets'])
+    score_test = regressor.score(test_data['samples'], test_data['samples'])
     score_oob = regressor.oob_score_
 
 
     # calculate errors
-    errors, prediction = test(regressor, test['samples'], test['targets'])
+    errors, prediction = test(regressor, test_data['samples'], test_data['targets'])
 
 
     return regressor, prediction, (score_training, score_test, score_oob), errors
@@ -157,10 +150,10 @@ def multiple_forests(train_data, test_data, **kwargs):
     Parameters
     ----------
     train_data : dict
-        training dataset, dictionary containing keys 'samples' and 'targets'
+        training dataset, dictionary containing keys 'samples' and 'targets' of type np.array
 
     test_data : dict
-        test dataset, dictionary containing keys 'samples' and 'targets'
+        test dataset, dictionary containing keys 'samples' and 'targets' of type np.array
 
     number_of_trees : int
         number of trees to be used in forest (default: 20)
@@ -190,7 +183,7 @@ def multiple_forests(train_data, test_data, **kwargs):
 
     if n_targets is None:
         # if not provided look at data
-        n_targets = len(train_data['targets'].iloc[0])
+        n_targets = len(train_data['targets'][0])
 
     regressors = []
     predictions = np.zeros([len(test_data['targets']), n_targets]) 
@@ -199,13 +192,13 @@ def multiple_forests(train_data, test_data, **kwargs):
     score_oob = np.zeros(n_targets)
 
     # train single forest for each target
-    for i in tqdm(range(0, n_targets), desc='Learning', total=n_targets):
-        regressor = fit(train_data['samples'],  train_data['targets'].iloc[:, i], prefix='target-{0}'.format(i), **kwargs)
+    for i in tqdm(range(0, n_targets), desc='Learning targets', total=n_targets):
+        regressor = fit(train_data['samples'],  train_data['targets'][:, i], prefix='target-{0}'.format(i), **kwargs)
         regressors.append(regressor)
 
         # evaluate performance
-        score_training[i] = regressor.score(train_data['samples'], train_data['targets'].iloc[:, i])
-        score_test[i] = regressor.score(test_data['samples'], test_data['targets'].iloc[:, i])
+        score_training[i] = regressor.score(train_data['samples'], train_data['targets'][:, i])
+        score_test[i] = regressor.score(test_data['samples'], test_data['targets'][:, i])
         score_oob[i] = regressor.oob_score_
 
         prediction = regressor.predict(test_data['samples'])
