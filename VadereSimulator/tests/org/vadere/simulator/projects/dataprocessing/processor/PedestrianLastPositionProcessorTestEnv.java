@@ -38,13 +38,10 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory().add(new FootStep(new VPoint(1.0, 1.2), new VPoint(1.0, 1.2), 0,0));
-				VTrajectory traj3 = new VTrajectory().add(new FootStep(new VPoint(4.45, 1.2), new VPoint(4.45, 1.2), 0,0));
-				VTrajectory traj5 = new VTrajectory().add(new FootStep(new VPoint(3.546, 7.2342), new VPoint(3.546, 7.2342), 0,0));
+				b.clear().add(1, new VPoint(1.0, 1.2), 0)
+						.add(3, new VPoint(4.45, 1.2), 0)
+						.add(5, new VPoint(3.546, 7.2342), 0);
 
-				b.clear().add(1, traj1)
-						.add(3, traj3)
-						.add(5, traj5);
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				addToExpectedOutput(new PedestrianIdKey(1), new VPoint(1.0, 1.2));
@@ -58,13 +55,9 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory().add(new FootStep(new VPoint(33.2, 3.22), new VPoint(33.2, 3.22), 0,0));
-				VTrajectory traj3 = new VTrajectory().add(new FootStep(new VPoint(3.2, 22.3), new VPoint(3.2, 22.3), 0,0));
-				VTrajectory traj7 = new VTrajectory().add(new FootStep(new VPoint(1.2, 3.3), new VPoint(1.2, 3.3), 0,0));
-
-				b.clear().add(1, traj1)
-						.add(3, traj3)
-						.add(7, traj7);
+				b.clear().add(1, new VPoint(33.2, 3.22), 0)
+						.add(3, new VPoint(3.2, 22.3), 0)
+						.add(7, new VPoint(1.2, 3.3), 0);
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				//overwrite Values!

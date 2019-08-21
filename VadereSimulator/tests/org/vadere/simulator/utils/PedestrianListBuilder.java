@@ -5,6 +5,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -41,6 +42,14 @@ public class PedestrianListBuilder {
 			out.add(p);
 		}
 		return this;
+	}
+
+	public PedestrianListBuilder add(int id, VPoint pos, double simTimeSec){
+		// Mock a footstep, because start/end position and time are the same, pos will be taken as the position
+		// when for simulation time (in seconds) simTimeSec
+		FootStep fs = new FootStep(pos, pos, simTimeSec, simTimeSec);
+		VTrajectory trajectory = new VTrajectory().add(fs);
+		return add(id, trajectory);
 	}
 
 	public PedestrianListBuilder add(int id, VTrajectory trajectory){

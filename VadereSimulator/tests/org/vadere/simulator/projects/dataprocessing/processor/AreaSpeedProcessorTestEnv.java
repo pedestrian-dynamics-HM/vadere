@@ -52,18 +52,9 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory();
-				VTrajectory traj2 = new VTrajectory();
-				VTrajectory traj3 = new VTrajectory();
-
-				//trajectoryID
-				traj1.add(new FootStep(new VPoint(1,0), new VPoint(1,0), 0, 1));
-				traj2.add(new FootStep(new VPoint(0,0), new VPoint(0,0), 0, 1));
-				traj3.add(new FootStep(new VPoint(7,4), new VPoint(7,4), 0, 1));
-
-				b.clear().add(1, traj1)
-						.add(2, traj2)
-						.add(3, traj3);    //not in area
+				b.clear().add(1, new VPoint(1,0), 0)
+						.add(2, new VPoint(0,0), 0)
+						.add(3, new VPoint(7,4), 0);    //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(0.0);
@@ -77,17 +68,9 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory();
-				VTrajectory traj2 = new VTrajectory();
-				VTrajectory traj3 = new VTrajectory();
-
-				traj1.add(new FootStep(new VPoint(1,1), new VPoint(1,1), 1, 2.0));
-				traj2.add(new FootStep(new VPoint(3,4), new VPoint(3,4), 1, 2.0));
-				traj3.add(new FootStep(new VPoint(8,4), new VPoint(8,4), 1, 2.0));
-
-				b.clear().add(1, traj1)   //dist = 1.0
-						.add(2, traj2)    //dist = 5.0
-						.add(3, traj3);   //not in area
+				b.clear().add(1, new VPoint(1,1), 1)   //dist = 1.0
+						.add(2, new VPoint(3,4), 1)    //dist = 5.0
+						.add(3, new VPoint(8,4), 1);   //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 1.0;
@@ -104,17 +87,9 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory();
-				VTrajectory traj2 = new VTrajectory();
-				VTrajectory traj3 = new VTrajectory();
-
-				traj1.add(new FootStep(new VPoint(3,1), new VPoint(3,1), 1.0, 2.0));
-				traj2.add(new FootStep(new VPoint(5,4), new VPoint(5,4), 1.0, 2.0));
-				traj3.add(new FootStep(new VPoint(8,8), new VPoint(8,8), 1.0, 2.0));
-
-				b.clear().add(1, traj1)   //dist = 2.0
-						.add(2, traj2)    //not in area
-						.add(3, traj3);   //not in area
+				b.clear().add(1, new VPoint(3,1), 2)   //dist = 2.0
+						.add(2, new VPoint(5,4), 2)    //not in area
+						.add(3, new VPoint(8,8), 2);   //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 2.0;
@@ -131,17 +106,9 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory();
-				VTrajectory traj2 = new VTrajectory();
-				VTrajectory traj3 = new VTrajectory();
-
-				traj1.add(new FootStep(new VPoint(6,1), new VPoint(6,1), 2, 3.0));
-				traj2.add(new FootStep(new VPoint(7,4), new VPoint(7,4), 2, 3.0));
-				traj3.add(new FootStep(new VPoint(9,8), new VPoint(9,8), 2, 3.0));
-
-				b.clear().add(1, traj1)   // not in area
-						.add(2, traj2)    // not in area
-						.add(3, traj3);   // not in area
+				b.clear().add(1, new VPoint(6,1), 3)   // not in area
+						.add(2, new VPoint(7,4), 3)    // not in area
+						.add(3, new VPoint(9,8), 3);   // not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 3.0;

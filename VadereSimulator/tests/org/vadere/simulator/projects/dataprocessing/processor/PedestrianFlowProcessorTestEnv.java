@@ -52,22 +52,14 @@ public class PedestrianFlowProcessorTestEnv extends ProcessorTestEnv<TimestepPed
 			@Override
 			public void mockIt() {
 
-				VTrajectory traj1 = new VTrajectory().add(new FootStep(new VPoint(1,1), new VPoint(1,1), 0,0));
-				VTrajectory traj2 = new VTrajectory().add(new FootStep(new VPoint(1.2,1.2), new VPoint(1.2,1.2), 0,0));
-
 				VPoint p = new VPoint(1.4, 1.4);
 				VPoint pPrecise = p.clone().addPrecise(new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
 
-				VTrajectory traj3 = new VTrajectory().add(new FootStep(p, p, 0,0));
-				VTrajectory traj4 = new VTrajectory().add(new FootStep(pPrecise, pPrecise, 0,0));
-				VTrajectory traj5 = new VTrajectory().add(new FootStep(new VPoint(10,10), new VPoint(10,10), 0,0));
-
-
-				b.clear().add(1, traj1);
-				b.add(2, traj2);
-				b.add(3, traj3);
-				b.add(4, traj4);
-				b.add(5, traj5);
+				b.clear().add(1, new VPoint(1,1), 0);
+				b.add(2, new VPoint(1.2,1.2), 0);
+				b.add(3, p, 0);
+				b.add(4, pPrecise, 0);
+				b.add(5, new VPoint(10,10), 0);
 
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(0.0);
@@ -91,35 +83,14 @@ public class PedestrianFlowProcessorTestEnv extends ProcessorTestEnv<TimestepPed
 
 				VPoint mov = new VPoint(3.0, 4.0); //dist = 5 time = 1 -> 5ms^-1
 
-				VTrajectory traj1 = new VTrajectory().add(
-						new FootStep(
-								new VPoint(1,1).addPrecise(mov),
-								new VPoint(1,1).addPrecise(mov), 1,1));
-
-				VTrajectory traj2 = new VTrajectory().add(
-						new FootStep(
-								new VPoint(1.2,1.2).addPrecise(mov),
-								new VPoint(1.2,1.2).addPrecise(mov), 1,1));
-
 				VPoint p = new VPoint(1.4, 1.4);
-				VPoint pPrecise = p.clone().addPrecise(
-						new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
+				VPoint pPrecise = p.clone().addPrecise(new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
 
-				VTrajectory traj3 = new VTrajectory().add(
-						new FootStep(p.addPrecise(mov), p.addPrecise(mov), 1,1));
-
-				VTrajectory traj4 = new VTrajectory().add(
-						new FootStep(pPrecise.addPrecise(mov), pPrecise.addPrecise(mov), 1,1));
-
-				VTrajectory traj5 = new VTrajectory().add(
-						new FootStep(new VPoint(10,10).addPrecise(mov), new VPoint(10,10).addPrecise(mov), 1,1));
-
-
-				b.clear().add(1, traj1);
-				b.add(2, traj2);
-				b.add(3, traj3);
-				b.add(4, traj4);
-				b.add(5, traj5);
+				b.clear().add(1, new VPoint(1,1).addPrecise(mov), 1);
+				b.add(2, new VPoint(1.2,1.2).addPrecise(mov), 1);
+				b.add(3, p.addPrecise(mov), 1);
+				b.add(4, pPrecise.addPrecise(mov), 1);
+				b.add(5, new VPoint(10,10).addPrecise(mov), 1);
 
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				Mockito.when(state.getSimTimeInSec()).thenReturn(1.0);
