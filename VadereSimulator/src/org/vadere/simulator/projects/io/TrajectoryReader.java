@@ -288,7 +288,7 @@ public class TrajectoryReader {
 		if(stridesIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			FootStep[] footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
 			for(FootStep footStep : footSteps) {
-				ped.getTrajectory().add(footStep);
+				ped.addFootStepToTrajectory(footStep);
 			}
 		}
 

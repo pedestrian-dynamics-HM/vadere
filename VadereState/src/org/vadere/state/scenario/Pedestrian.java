@@ -7,6 +7,7 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.LastFootSteps;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -109,6 +110,10 @@ public class Pedestrian extends Agent {
 		return trajectory;
 	}
 
+	public VPoint getInterpolatedFootStepPosition(double time){
+		return FootStep.interpolateFootStep(trajectory.getFootSteps().getLast(), time);
+	}
+
 	// Setter
 	public void setIdAsTarget(int id) { this.idAsTarget = id; }
 	public void setChild(boolean child) {
@@ -137,6 +142,10 @@ public class Pedestrian extends Agent {
 	public void addGroupId(int groupId, int size){
 		groupIds.add(groupId);
 		groupSizes.add(size);
+	}
+
+	public void addFootStepToTrajectory(FootStep footStep){
+		this.trajectory = this.trajectory.add(footStep);
 	}
 
 	public void clearFootSteps() {

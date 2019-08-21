@@ -134,7 +134,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		 * strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
 		 */
 		pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), timeOfNextStep));
-		pedestrian.getTrajectory().add(new FootStep(currentPosition, nextPosition, timeOfNextStep, entTimeOfStep));
+		pedestrian.addFootStepToTrajectory(new FootStep(currentPosition, nextPosition, timeOfNextStep, entTimeOfStep));
 	}
 
 }

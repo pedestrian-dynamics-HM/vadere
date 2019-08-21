@@ -42,7 +42,9 @@ public final class FootStep {
 	 * @param endTime   end time of the foot step
 	 */
 	public FootStep(@NotNull final VPoint start, @NotNull final VPoint end, final double startTime, final double endTime) {
-		this.start = start;
+        assert startTime <= endTime;
+
+	    this.start = start;
 		this.end = end;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -121,6 +123,35 @@ public final class FootStep {
 		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
 		return intersectionTime;
 	}
+
+	static public VPoint interpolateFootStep(FootStep footStep, double time){
+		double startTime = footStep.getStartTime();
+		double endTime = footStep.getEndTime();
+		double diffTime = endTime - startTime;
+
+		if(startTime > time || endTime < time){
+			throw new IllegalArgumentException("Requested time " + time + " outside of FootSteps [start=" + startTime +
+					", end=" + endTime + "] time (no extrapolation!).");
+		}
+
+		VPoint interpolationResult;
+
+		if(diffTime < 1E-13){
+			// to avoid problems with division by very small number, simply return the start point
+			interpolationResult = footStep.getStart();
+		}else{
+			double linearTime = (time - startTime) / diffTime;
+			VPoint diffPoint = footStep.getEnd().subtract(footStep.getStart());
+
+			diffPoint.x = diffPoint.x * linearTime;
+			diffPoint.y = diffPoint.y * linearTime;
+
+			interpolationResult = footStep.getStart().add(diffPoint);
+		}
+
+		return interpolationResult;
+	}
+
 
 	@Override
 	public String toString() {

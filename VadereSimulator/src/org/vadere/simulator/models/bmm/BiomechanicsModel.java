@@ -110,7 +110,7 @@ public class BiomechanicsModel implements MainModel {
 		for(int i = 0; i < pedestriansBMM.size(); i++) {
 			PedestrianBMM agent = pedestriansBMM.get(i);
 			agent.clearFootSteps();
-			agent.getTrajectory().add(new FootStep(positions.get(i), agent.getPosition(), lastSimTimeInSec, simTimeInSec));
+			agent.addFootStepToTrajectory(new FootStep(positions.get(i), agent.getPosition(), lastSimTimeInSec, simTimeInSec));
 		}
 
 		this.lastSimTimeInSec = simTimeInSec;

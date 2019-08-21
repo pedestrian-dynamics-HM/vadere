@@ -108,11 +108,15 @@ public class VTrajectory implements Iterable<FootStep> {
 		}
 	}
 
-	public void add(@NotNull final FootStep footStep) {
-		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
+	public VTrajectory add(@NotNull final FootStep footStep) {
+
+		assert footSteps.isEmpty() ||
+				(footSteps.peekLast().getEndTime() <= footStep.getStartTime() &&  // make sure it is in order
+						footSteps.peekLast().getStartTime() < footStep.getStartTime());
 
 		footSteps.add(footStep);
 		lastFootSteps.add(footStep);
+		return this;
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
