@@ -159,11 +159,13 @@ public class Pedestrian extends Agent {
 	}
 
 	public void clearFootSteps() {
-		// Last is always the most recent (made sure in VTrajectory.add)
+		// getLast() is always the most recent (made sure in VTrajectory.add)
 		// This statement is for security and should mostly have no effect (only if someone did not use method
 		// "addFootStepToTrajectory" to add another foot step to the trajectory)
-		currentFootStep = trajectory.getFootSteps().getLast();
-		trajectory.clear();
+		if(!trajectory.isEmpty()){
+			currentFootStep = trajectory.getFootSteps().getLast();
+			trajectory.clear();
+		}
 	}
 
 	// Overridden Methods
