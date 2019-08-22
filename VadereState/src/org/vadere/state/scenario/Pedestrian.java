@@ -4,7 +4,6 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.LastFootSteps;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -27,13 +26,18 @@ public class Pedestrian extends Agent {
 	private SalientBehavior salientBehavior;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	/**
-	 * Footsteps is a list of foot steps a pedestrian made during the duration of one time step.
+	 * trajectory is a list of foot steps a pedestrian made during the duration of one time step.
 	 * For all non event driven models this is exactly one foot step. For the event driven update
 	 * one pedestrian can move multiple times during one time step. To save memory the list of foot steps
 	 * will be cleared after each completion of a time step. The output processor <tt>PedestrianStrideProcessor</tt>
 	 * can write out those foot steps.
 	 */
 	private VTrajectory trajectory;
+
+	/**
+	 * currentFootStep is the most recent foot step that is used for interpolation.
+	 */
+	private FootStep currentFootStep;
 
 	private LinkedList<Integer> groupSizes;
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
@@ -61,6 +65,7 @@ public class Pedestrian extends Agent {
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
 		trajectory = new VTrajectory(attributesAgent.getFootStepsToStore());
+		currentFootStep = null;
 	}
 
 	private Pedestrian(Pedestrian other) {
@@ -111,7 +116,11 @@ public class Pedestrian extends Agent {
 	}
 
 	public VPoint getInterpolatedFootStepPosition(double time){
-		return FootStep.interpolateFootStep(trajectory.getFootSteps().getLast(), time);
+		if(currentFootStep == null){
+			return getPosition();
+		}else{
+			return FootStep.interpolateFootStep(currentFootStep, time);
+		}
 	}
 
 	// Setter
@@ -145,10 +154,15 @@ public class Pedestrian extends Agent {
 	}
 
 	public void addFootStepToTrajectory(FootStep footStep){
+		currentFootStep = footStep;
 		this.trajectory = this.trajectory.add(footStep);
 	}
 
 	public void clearFootSteps() {
+		// Last is always the most recent (made sure in VTrajectory.add)
+		// This statement is for security and should mostly have no effect (only if someone did not use method
+		// "addFootStepToTrajectory" to add another foot step to the trajectory)
+		currentFootStep = trajectory.getFootSteps().getLast();
 		trajectory.clear();
 	}
 

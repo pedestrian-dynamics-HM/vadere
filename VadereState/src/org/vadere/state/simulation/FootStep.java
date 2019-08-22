@@ -158,6 +158,11 @@ public final class FootStep {
 		return start + "->" + end;
 	}
 
+	@Override
+	public FootStep clone(){
+		return new FootStep(this.start.clone(), this.end.clone(), this.startTime, this.endTime);
+	}
+
 	public String[] getValueString(){
 		String[] valueLine = {""+startTime, ""+endTime, ""+start.x, ""+start.y, ""+end.x, ""+end.y};
 		return valueLine;
