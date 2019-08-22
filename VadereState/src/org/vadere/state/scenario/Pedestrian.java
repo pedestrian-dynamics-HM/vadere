@@ -119,7 +119,13 @@ public class Pedestrian extends Agent {
 		if(currentFootStep == null){
 			return getPosition();
 		}else{
-			return FootStep.interpolateFootStep(currentFootStep, time);
+			if(time > currentFootStep.getEndTime()){
+				// This happens for example if a pedestrian is waiting (see Events)
+				// TODO: check with Bene K. if this is okay, or a better way?
+				return currentFootStep.getEnd();
+			}else{
+				return FootStep.interpolateFootStep(currentFootStep, time);
+			}
 		}
 	}
 
