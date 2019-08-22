@@ -54,19 +54,12 @@ public class PedestrianListBuilder {
 
 	public PedestrianListBuilder add(int id, VTrajectory trajectory){
 		Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
-		Class<?> pclass = p.getClass();
 
-		// Use reflection to set the trajectory forcefully (this bypasses a
-		// "public setTrajectory" method in Pedestrian.class)
-		try{
-			// Fails if the trajectory attribute is renamed:
-			Field trajectoryField = pclass.getDeclaredField("trajectory");
-			trajectoryField.setAccessible(true);  // trajectory is private --> we set it to accessible here
-			trajectoryField.set(p, trajectory);
-		}catch (NoSuchFieldException | IllegalAccessException ex){
-			ex.printStackTrace();
+		for(FootStep fs : trajectory){
+			p.addFootStepToTrajectory(fs);
 		}
 		out.add(p);
+
 		return this;
 	}
 
