@@ -17,6 +17,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -45,7 +46,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 
-	public void initialize(SourceTestAttributesBuilder builder) {
+	public void initialize(SourceTestAttributesBuilder builder) throws IOException{
 
 		SourceTestData d = new SourceTestData();
 
@@ -97,7 +98,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
 	 */
 	@Test
-	public void testUpdateEqualStartAndEndTime() {
+	public void testUpdateEqualStartAndEndTime() throws IOException {
 
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(0);
@@ -114,7 +115,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
 	 */
 	@Test
-	public void testUpdateEndTimeLarge() {
+	public void testUpdateEndTimeLarge() throws IOException {
 
 		double startTime = 0.0;
 		double endTime = 10.0;
@@ -136,7 +137,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
 	 */
 	@Test
-	public void testUpdateSpawnDelayThreeTimes() {
+	public void testUpdateSpawnDelayThreeTimes() throws IOException {
 
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -155,7 +156,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
 	 */
 	@Test
-	public void testUpdateSmallSpawnDelay() {
+	public void testUpdateSmallSpawnDelay() throws IOException {
 
 		double endTime = 1.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -174,7 +175,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
 	 */
 	@Test
-	public void testUpdateUseFreeSpaceOnly() {
+	public void testUpdateUseFreeSpaceOnly() throws IOException {
 
 		AttributesAgent attributesAgent = new AttributesAgent();
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()

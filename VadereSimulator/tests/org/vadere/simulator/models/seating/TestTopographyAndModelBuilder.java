@@ -13,7 +13,6 @@ import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.state.util.TextOutOfNodeException;
 
 public class TestTopographyAndModelBuilder {
 	
@@ -57,7 +56,7 @@ public class TestTopographyAndModelBuilder {
 			@SuppressWarnings("resource")
 			final String json = new Scanner(TestTopographyAndModelBuilder.class.getResourceAsStream(TEST_TRAIN_TOPOGRAPHY_RESOURCE), "UTF-8").useDelimiter("\\A").next();
 			return StateJsonConverter.deserializeTopography(json);
-		} catch (IOException | TextOutOfNodeException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}

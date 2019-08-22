@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.vadere.state.util.StateJsonConverter;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.IOException;
 
 public class TestPojoJsonDeserialization {
 
@@ -13,21 +13,21 @@ public class TestPojoJsonDeserialization {
 	private static final String completeJson = "{\"a\":4,\"b\":5}";
 
 	@Test
-	public void testEmptyDeserializationWithImplicitDefaultCtor() {
+	public void testEmptyDeserializationWithImplicitDefaultCtor() throws IOException {
 		// Important: After deserialization with incomplete JSON,
 		// the init values (for a and b) in POJOs take effect!
 		assertTestPojoEquals(new TestPojoWithImplicitDefaultConstructor(), "{}", TestPojoWithImplicitDefaultConstructor.class);
 	}
 
 	@Test
-	public void testIncompleteDeserialization() {
+	public void testIncompleteDeserialization() throws IOException{
 		// Important: After deserialization with incomplete JSON,
 		// the init values (for a and b) in POJOs take effect!
 		assertTestPojoEquals(new TestPojoWithDefaultConstructor(1, 5), incompleteJson, TestPojoWithDefaultConstructor.class);
 	}
 
 	@Test
-	public void testCompleteDeserialization() {
+	public void testCompleteDeserialization() throws IOException {
 		assertTestPojoEquals(new TestPojoWithDefaultConstructor(4, 5), completeJson, TestPojoWithDefaultConstructor.class);
 	}
 
@@ -35,8 +35,8 @@ public class TestPojoJsonDeserialization {
 	public void testIncompleteDeserializationWithoutDefaultCtor() {
 		try {
 			assertTestPojoEquals(new TestPojoWithoutDefaultConstructor(0, 5), incompleteJson, TestPojoWithoutDefaultConstructor.class);
-		} catch (RuntimeException e) {
-			assertExceptionCorrect(e);
+		} catch (IOException e) {
+			//Test successful
 		}
 	}
 
@@ -44,16 +44,12 @@ public class TestPojoJsonDeserialization {
 	public void testCompleteDeserializationWithoutDefaultCtor() {
 		try {
 			assertTestPojoEquals(new TestPojoWithoutDefaultConstructor(0, 5), completeJson, TestPojoWithoutDefaultConstructor.class);
-		} catch (RuntimeException e) {
-			assertExceptionCorrect(e);
+		} catch (IOException e) {
+			//Test successful
 		}
 	}
 
-	private void assertExceptionCorrect(RuntimeException e) {
-		assertTrue(e.getCause() instanceof JsonMappingException);
-	}
-
-	private void assertTestPojoEquals(Object pojo, String json, Class<?> clazz) {
+	private void assertTestPojoEquals(Object pojo, String json, Class<?> clazz) throws IOException {
 		assertEquals(pojo, StateJsonConverter.deserializeObjectFromJson(json, clazz));
 	}
 

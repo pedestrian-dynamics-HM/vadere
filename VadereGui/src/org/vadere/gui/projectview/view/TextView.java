@@ -205,7 +205,7 @@ public class TextView extends JPanel implements IJsonView {
 						if (scenarioChecker != null){
 							scenarioChecker.checkScenario(currentScenario);
 						}
-					} catch (Exception e) {
+					} catch (IOException  e) {
 						ScenarioPanel.setActiveJsonParsingErrorMsg(attributeType.name() + " tab:\n" + e.getMessage());
 						jsonValidIndicator.setInvalid();
 					}
