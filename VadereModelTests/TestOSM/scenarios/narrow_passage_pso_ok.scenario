@@ -604,6 +604,7 @@
         "trajectory" : {
           "footSteps" : [ ]
         },
+        "currentFootStep" : null,
         "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
@@ -643,6 +644,7 @@
         "trajectory" : {
           "footSteps" : [ ]
         },
+        "currentFootStep" : null,
         "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"

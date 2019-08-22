@@ -248,6 +248,7 @@
         "trajectory" : {
           "footSteps" : [ ]
         },
+        "currentFootStep" : null,
         "groupSizes" : [ ],
         "modelPedestrianMap" : { },
         "type" : "PEDESTRIAN"

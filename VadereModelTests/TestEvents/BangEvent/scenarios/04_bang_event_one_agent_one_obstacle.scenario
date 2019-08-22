@@ -185,6 +185,7 @@
         "trajectory" : {
           "footSteps" : [ ]
         },
+        "currentFootStep" : null,
         "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"

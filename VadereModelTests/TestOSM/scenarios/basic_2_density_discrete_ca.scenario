@@ -64,7 +64,7 @@
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
-        "potentialFieldResolution" : 0.1,
+        "potentialFieldResolution" : 0.2,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
         "cacheType" : "NO_CACHE",
@@ -116,7 +116,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 200.0,
+      "finishTime" : 400.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -133,7 +133,7 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 38.0,
+          "width" : 31.0,
           "height" : 12.0
         },
         "boundingBoxWidth" : 0.5,
