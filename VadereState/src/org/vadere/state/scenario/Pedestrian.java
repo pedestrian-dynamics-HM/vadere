@@ -34,11 +34,6 @@ public class Pedestrian extends Agent {
 	 */
 	private VTrajectory trajectory;
 
-	/**
-	 * currentFootStep is the most recent foot step that is used for interpolation.
-	 */
-	private FootStep currentFootStep;
-
 	private LinkedList<Integer> groupSizes;
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
@@ -65,7 +60,6 @@ public class Pedestrian extends Agent {
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
 		trajectory = new VTrajectory(attributesAgent.getFootStepsToStore());
-		currentFootStep = null;
 	}
 
 	private Pedestrian(Pedestrian other) {
@@ -115,19 +109,27 @@ public class Pedestrian extends Agent {
 		return trajectory;
 	}
 
-	public VPoint getInterpolatedFootStepPosition(double time){
-		if(currentFootStep == null){
-			return getPosition();
+public VPoint getInterpolatedFootStepPosition(double time){
+
+	if(this.trajectory.getLastFootStepCapacity() <= 0){
+		throw new RuntimeException("Cannot interpolate foot steps if there is no foot steps storage capacity (see " +
+				"scenario attribute 'lastFootStepsToStore'");
+	}
+
+	FootStep currentFootStep = this.trajectory.getLastFootSteps().getYoungestFootStep();
+
+	if(currentFootStep == null){
+		return getPosition();
+	}else{
+		if(time > currentFootStep.getEndTime()){
+			// This happens for example if a pedestrian is waiting (see Events)
+			// TODO: check with Bene K. if this is okay, or a better way?
+			return currentFootStep.getEnd();
 		}else{
-			if(time > currentFootStep.getEndTime()){
-				// This happens for example if a pedestrian is waiting (see Events)
-				// TODO: check with Bene K. if this is okay, or a better way?
-				return currentFootStep.getEnd();
-			}else{
-				return FootStep.interpolateFootStep(currentFootStep, time);
-			}
+			return FootStep.interpolateFootStep(currentFootStep, time);
 		}
 	}
+}
 
 	// Setter
 	public void setIdAsTarget(int id) { this.idAsTarget = id; }
@@ -160,7 +162,6 @@ public class Pedestrian extends Agent {
 	}
 
 	public void addFootStepToTrajectory(FootStep footStep){
-		currentFootStep = footStep;
 		this.trajectory = this.trajectory.add(footStep);
 	}
 
@@ -169,7 +170,6 @@ public class Pedestrian extends Agent {
 		// This statement is for security and should mostly have no effect (only if someone did not use method
 		// "addFootStepToTrajectory" to add another foot step to the trajectory)
 		if(!trajectory.isEmpty()){
-			currentFootStep = trajectory.getFootSteps().getLast();
 			trajectory.clear();
 		}
 	}

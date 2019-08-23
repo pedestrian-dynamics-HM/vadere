@@ -56,7 +56,7 @@ public class PedestrianListBuilder {
 		Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
 
 		for(FootStep fs : trajectory){
-			p.addFootStepToTrajectory(fs);
+			p.getTrajectory().add(fs);
 		}
 		out.add(p);
 
