@@ -109,26 +109,26 @@ public class Pedestrian extends Agent {
 		return trajectory;
 	}
 
-public VPoint getInterpolatedFootStepPosition(double time){
-	if(this.trajectory.getLastFootSteps().getCapacity() <= 0){
-		throw new IllegalArgumentException("Cannot interpolate foot steps if there is no capacity (larger than zero) " +
-				"for storing foot steps (see 'scenario.attributesPedestrian.footStepsToStore' field)");
-	}
+    public VPoint getInterpolatedFootStepPosition(double time){
+        if(this.trajectory.getLastFootSteps().getCapacity() <= 0){
+            throw new IllegalArgumentException("Cannot interpolate foot steps if there is no capacity (larger than zero) " +
+                    "for storing foot steps (see 'scenario.attributesPedestrian.footStepsToStore' field)");
+        }
 
-	FootStep currentFootStep = this.trajectory.getLastFootSteps().getYoungestFootStep();
+        FootStep currentFootStep = this.trajectory.getLastFootSteps().getYoungestFootStep();
 
-	if(currentFootStep == null){
-		return getPosition();
-	}else{
-		if(time > currentFootStep.getEndTime()){
-			// This happens for example if a pedestrian is waiting (see Events)
-			// TODO: check with Bene K. if this is okay, or a better way?
-			return currentFootStep.getEnd();
-		}else{
-			return FootStep.interpolateFootStep(currentFootStep, time);
-		}
-	}
-}
+        if(currentFootStep == null){
+            return getPosition();
+        }else{
+            if(time > currentFootStep.getEndTime()){
+                // This happens for example if a pedestrian is waiting (see Events)
+                // TODO: check with Bene K. if this is okay, or a better way?
+                return currentFootStep.getEnd();
+            }else{
+                return FootStep.interpolateFootStep(currentFootStep, time);
+            }
+        }
+    }
 
 	// Setter
 	public void setIdAsTarget(int id) { this.idAsTarget = id; }
