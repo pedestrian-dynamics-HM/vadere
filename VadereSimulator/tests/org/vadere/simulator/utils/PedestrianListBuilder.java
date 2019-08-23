@@ -9,7 +9,6 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +57,8 @@ public class PedestrianListBuilder {
 		for(FootStep fs : trajectory){
 			p.getTrajectory().add(fs);
 		}
+		// Set the pedestrian position to the last known position where he started a step.
+		p.setPosition(p.getTrajectory().getFootSteps().getLast().getStart());
 		out.add(p);
 
 		return this;

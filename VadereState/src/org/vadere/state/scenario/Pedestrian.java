@@ -110,10 +110,9 @@ public class Pedestrian extends Agent {
 	}
 
 public VPoint getInterpolatedFootStepPosition(double time){
-
-	if(this.trajectory.getLastFootStepCapacity() <= 0){
-		throw new RuntimeException("Cannot interpolate foot steps if there is no foot steps storage capacity (see " +
-				"scenario attribute 'lastFootStepsToStore'");
+	if(this.trajectory.getLastFootSteps().getCapacity() <= 0){
+		throw new IllegalArgumentException("Cannot interpolate foot steps if there is no capacity (larger than zero) " +
+				"for storing foot steps (see 'scenario.attributesPedestrian.footStepsToStore' field)");
 	}
 
 	FootStep currentFootStep = this.trajectory.getLastFootSteps().getYoungestFootStep();

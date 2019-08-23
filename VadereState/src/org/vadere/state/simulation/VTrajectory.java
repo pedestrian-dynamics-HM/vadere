@@ -22,7 +22,6 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public VTrajectory(int lastFootStepCapacity){
-		this.lastFootStepCapacity = lastFootStepCapacity;
 		footSteps = new LinkedList<>();
 		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
 	}
@@ -30,10 +29,6 @@ public class VTrajectory implements Iterable<FootStep> {
 	// Getters
 	public LinkedList<FootStep> getFootSteps() {
 		return new LinkedList<>(footSteps);
-	}
-
-	public int getLastFootStepCapacity() {
-		return lastFootStepCapacity;
 	}
 
 	public LastFootSteps getLastFootSteps() {
