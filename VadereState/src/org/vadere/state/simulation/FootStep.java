@@ -127,20 +127,21 @@ public final class FootStep {
 	static public VPoint interpolateFootStep(FootStep footStep, double time){
 		double startTime = footStep.getStartTime();
 		double endTime = footStep.getEndTime();
-		double diffTime = endTime - startTime;
+		double duration = footStep.duration();
 
-		if(startTime > time || endTime < time){
-			throw new IllegalArgumentException("Requested time " + time + " outside of FootSteps [start=" + startTime +
-					", end=" + endTime + "] time (no extrapolation!).");
+		if(startTime > time || endTime < time || startTime < 0 ){
+			throw new IllegalArgumentException("Requested time " + time + " outside of valid region. Outside of " +
+					"FootStep [start=" + startTime + ", end=" + endTime + "] time (no extrapolation!) or smaller than " +
+					"zero;");
 		}
 
 		VPoint interpolationResult;
 
-		if(diffTime < 1E-13){
+		if(duration < 1E-14){
 			// to avoid problems with division by very small number, simply return the start point
 			interpolationResult = footStep.getStart();
 		}else{
-			double linearTime = (time - startTime) / diffTime;
+			double linearTime = (time - startTime) / duration;
 			VPoint diffPoint = footStep.getEnd().subtract(footStep.getStart());
 
 			diffPoint.x = diffPoint.x * linearTime;
