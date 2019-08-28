@@ -14,7 +14,6 @@ public class VTrajectory implements Iterable<FootStep> {
 	// Variables
 	private LinkedList<FootStep> footSteps;
 	private transient LastFootSteps lastFootSteps;
-	private int lastFootStepCapacity;
 
 	// Constructors
 	public VTrajectory(){
