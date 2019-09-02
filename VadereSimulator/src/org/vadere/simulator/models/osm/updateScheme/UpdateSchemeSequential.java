@@ -15,6 +15,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * TODO: explain the concept of timeCredit!
+ * TODO: in the long term, replace timeCredit by eventTime (see event driven update)!
+ */
 public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
@@ -41,10 +45,10 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
+		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
+
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
-			VPoint oldPosition = pedestrian.getPosition();
 			pedestrian.clearStrides();
-			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
 				while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
@@ -54,13 +58,21 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 				}
 			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
-				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
+				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+				if(candidate != null) {
+					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+				} else {
+					pedestrian.updateNextPosition();
+					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+				}
 			}
 
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
-			osmBehaviorController.wait(pedestrian);
+			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (mostImportantEvent instanceof BangEvent) {
 			osmBehaviorController.reactToBang(pedestrian, topography);
+			pedestrian.setTimeCredit(pedestrian.getTimeCredit() - timeStepInSec);
 		}
 	}
 

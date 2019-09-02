@@ -17,6 +17,7 @@ public class Pedestrian extends Agent {
 
 	// Constants
 	public static double PEDESTRIAN_MAX_SPEED_METER_PER_SECOND = 12.0;
+	public static final double INVALID_NEXT_EVENT_TIME = -1.0;
 
 	// Variables
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
@@ -122,7 +123,6 @@ public class Pedestrian extends Agent {
         }else{
             if(time > currentFootStep.getEndTime()){
                 // This happens for example if a pedestrian is waiting (see Events)
-                // TODO: check with Bene K. if this is okay, or a better way?
                 return currentFootStep.getEnd();
             }else{
                 return FootStep.interpolateFootStep(currentFootStep, time);
