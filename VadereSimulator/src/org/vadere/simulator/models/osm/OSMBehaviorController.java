@@ -284,7 +284,7 @@ public class OSMBehaviorController {
 
         // Use "makeStep()" to swap both pedestrians to avoid "java.lang.AssertionError:
         // Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
-	    double startTimeStep = pedestrian1.getTimeOfNextStep();
+	    double startTimeStep = Math.max(pedestrian1.getTimeOfNextStep(), pedestrian2.getTimeOfNextStep());
 	    double durationStep = pedestrian1.getDurationNextStep();
 	    double endTimeStep = startTimeStep + durationStep;
 
@@ -298,6 +298,7 @@ public class OSMBehaviorController {
         // TODO The experiment showed that speed decreased (to half of free-flow velocity).
         //   Therefore, use "pedestrian.getDurationNextStep() * 2".
         pedestrian1.setTimeOfNextStep(endTimeStep);
+
         pedestrian2.setTimeOfNextStep(endTimeStep);
 
 	    pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);

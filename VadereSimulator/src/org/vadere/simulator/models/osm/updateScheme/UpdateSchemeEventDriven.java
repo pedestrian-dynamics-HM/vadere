@@ -12,6 +12,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -68,10 +69,15 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
 				// this call will also invoke setTimeOfNextStep
 				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+				//TODO: Benedikt Kleinmeier:
 				if(candidate != null) {
-					pedestrianEventsQueue.remove(candidate);
-					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-					pedestrianEventsQueue.add(candidate);
+					if(Math.abs(pedestrian.getTimeOfNextStep() - candidate.getTimeOfNextStep()) < MathUtil.EPSILON) {
+						pedestrianEventsQueue.remove(candidate);
+						osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+						pedestrianEventsQueue.add(candidate);
+					} else {
+						pedestrian.setTimeOfNextStep(candidate.getTimeOfNextStep());
+					}
 				} else {
 					pedestrian.updateNextPosition();
 					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
