@@ -15,8 +15,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.math.MathUtil;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  * @author Benedikt Zoennchen
@@ -31,7 +33,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianOSM());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianOSM.class));
-		osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
@@ -71,13 +73,13 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
 				//TODO: Benedikt Kleinmeier:
 				if(candidate != null) {
-					if(Math.abs(pedestrian.getTimeOfNextStep() - candidate.getTimeOfNextStep()) < MathUtil.EPSILON) {
+					//if(Math.abs(pedestrian.getTimeOfNextStep() - candidate.getTimeOfNextStep()) < MathUtil.EPSILON) {
 						pedestrianEventsQueue.remove(candidate);
 						osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
 						pedestrianEventsQueue.add(candidate);
-					} else {
+					/*} else {
 						pedestrian.setTimeOfNextStep(candidate.getTimeOfNextStep());
-					}
+					}*/
 				} else {
 					pedestrian.updateNextPosition();
 					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());

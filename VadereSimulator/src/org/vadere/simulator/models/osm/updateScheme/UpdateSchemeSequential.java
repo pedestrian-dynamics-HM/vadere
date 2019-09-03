@@ -12,8 +12,10 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * TODO: explain the concept of timeCredit!
@@ -23,9 +25,11 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
 	private final OSMBehaviorController osmBehaviorController;
+	private final Set<PedestrianOSM> skipUdate;
 
 	public UpdateSchemeSequential(@NotNull final Topography topography) {
 		this.topography = topography;
+		this.skipUdate = new HashSet<>();
 		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
@@ -37,42 +41,45 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double timeStepInSec) {
 		for (Pedestrian pedestrian : pedestrianOSMS) {
-			update((PedestrianOSM) pedestrian, timeStepInSec);
+			if(!skipUdate.contains(pedestrian)) {
+				update((PedestrianOSM) pedestrian, timeStepInSec);
+			}
 			//pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
 		}
+		skipUdate.clear();
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
-		pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
-
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 			pedestrian.clearStrides();
-
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
-				while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-					pedestrian.updateNextPosition();
-					osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
-					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-
-				}
+				useTimeCredit(pedestrian, timeStepInSec);
 			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
 				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
 				if(candidate != null) {
+					candidate.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+					// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
+					skipUdate.add(candidate);
 				} else {
-					pedestrian.updateNextPosition();
-					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
-					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+					useTimeCredit(pedestrian, timeStepInSec);
 				}
 			}
-
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (mostImportantEvent instanceof BangEvent) {
 			osmBehaviorController.reactToBang(pedestrian, topography);
-			pedestrian.setTimeCredit(pedestrian.getTimeCredit() - timeStepInSec);
+		}
+	}
+
+	private void useTimeCredit(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
+		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+			pedestrian.updateNextPosition();
+			osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 
