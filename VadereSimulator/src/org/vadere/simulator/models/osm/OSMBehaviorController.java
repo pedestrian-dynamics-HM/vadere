@@ -86,7 +86,9 @@ public class OSMBehaviorController {
     }
 
     public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
+        // Satisfy event-driven and sequential update scheme.
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
+        pedestrian.setTimeCredit(0);
     }
 
     // Watch out: A bang event changes only the "CombinedPotentialStrategy".
