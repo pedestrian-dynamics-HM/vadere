@@ -150,7 +150,7 @@
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 25.0,
@@ -159,7 +159,7 @@
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 10.0,
@@ -168,7 +168,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -201,7 +201,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 10.0,
           "y" : 5.0,

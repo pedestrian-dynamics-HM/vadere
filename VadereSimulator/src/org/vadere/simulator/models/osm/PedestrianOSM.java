@@ -82,7 +82,7 @@ public class PedestrianOSM extends Pedestrian {
 		this.speedAdjusters = speedAdjusters;
 		this.stepSizeAdjusters = new LinkedList<>();
 		this.relevantPedestrians = new HashSet<>();
-		this.timeCredit = INVALID_NEXT_EVENT_TIME;
+		this.timeOfNextStep = INVALID_NEXT_EVENT_TIME;
 
 		this.setVelocity(new Vector2D(0, 0));
 

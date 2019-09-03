@@ -164,7 +164,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.0,
           "y" : 2.0,
