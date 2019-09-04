@@ -19,10 +19,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "postvis.trajectories",
       "processors" : [ 1, 2 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
-      "filename" : "postviz.traj",
-      "processors" : [ 6 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -52,9 +48,6 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
-      "id" : 6
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
