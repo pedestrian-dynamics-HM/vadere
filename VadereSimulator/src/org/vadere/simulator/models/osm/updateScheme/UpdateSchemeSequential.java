@@ -36,21 +36,26 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	@Override
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		clearStrides(topography);
-		update(topography.getElements(Pedestrian.class), timeStepInSec);
+		update(topography.getElements(Pedestrian.class), currentTimeInSec, timeStepInSec);
 	}
 
-	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double timeStepInSec) {
+	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double currentTimeInSec, final double timeStepInSec) {
 		for (Pedestrian pedestrian : pedestrianOSMS) {
 			if(!skipUdate.contains(pedestrian)) {
-				update((PedestrianOSM) pedestrian, timeStepInSec);
+				update((PedestrianOSM) pedestrian, currentTimeInSec, timeStepInSec);
 			}
 			//pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
 		}
 		skipUdate.clear();
 	}
 
-	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
+	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec, final double timeStepInSec) {
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
+
+		// for the first step after creation, timeOfNextStep has to be initialized
+		if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
+			pedestrian.setTimeOfNextStep(currentTimeInSec);
+		}
 
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
 			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
