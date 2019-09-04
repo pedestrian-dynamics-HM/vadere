@@ -512,9 +512,8 @@ public class Topography implements DynamicElementMover{
 		for (MeasurementArea measurementArea : this.getMeasurementAreas()){
 			s.addMeasurementArea(measurementArea);
 		}
-
 		for (Stairs stairs : getStairs()) {
-			s.addStairs(stairs);
+			s.addStairs(stairs.clone());
 		}
 		for (Target target : getTargets()) {
 			s.addTarget(target.clone());
