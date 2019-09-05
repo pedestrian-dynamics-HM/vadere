@@ -408,7 +408,7 @@
         "minimumSpeed" : 0.3,
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0

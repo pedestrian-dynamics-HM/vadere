@@ -3,8 +3,7 @@ package org.vadere.state.scenario;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.LastFootSteps;
+import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 
@@ -33,6 +32,8 @@ public class Pedestrian extends Agent {
 	 * can write out those foot steps.
 	 */
 	private VTrajectory trajectory;
+	/** This list stores the last n footsteps. I.e., this list is NOT cleared after each simulation loop like "trajectory" variable. */
+	private transient FootstepHistory footstepHistory;
 
 	private LinkedList<Integer> groupSizes;
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
@@ -59,7 +60,8 @@ public class Pedestrian extends Agent {
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
-		trajectory = new VTrajectory(attributesAgent.getFootStepsToStore());
+		trajectory = new VTrajectory();
+		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
 	}
 
 	private Pedestrian(Pedestrian other) {
@@ -81,6 +83,7 @@ public class Pedestrian extends Agent {
 
 		trajectory = new VTrajectory();
 		trajectory = other.trajectory;
+		footstepHistory = other.footstepHistory;
 	}
 
 	// Getter
@@ -108,6 +111,10 @@ public class Pedestrian extends Agent {
 	// TODO Rename "getFootSteps()" to "getTrajectory()".
 	public VTrajectory getFootSteps() {
 		return trajectory;
+	}
+
+	public FootstepHistory getFootstepHistory() {
+		return footstepHistory;
 	}
 
 	// Setter

@@ -79,7 +79,10 @@ public class OSMBehaviorController {
 
         // strides and foot steps have no influence on the simulation itself, i.e. they are saved to analyse trajectories
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
-        pedestrian.getFootSteps().add(new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime));
+
+        FootStep currentFootstep = new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime);
+        pedestrian.getFootSteps().add(currentFootstep);
+        pedestrian.getFootstepHistory().add(currentFootstep);
     }
 
     public void wait(PedestrianOSM pedestrian) {

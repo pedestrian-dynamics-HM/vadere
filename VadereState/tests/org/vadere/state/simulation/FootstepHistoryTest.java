@@ -1,7 +1,6 @@
 package org.vadere.state.simulation;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -9,18 +8,18 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class LastFootStepsTest {
+public class FootstepHistoryTest {
 
     enum Direction { HORIZONTAL, VERTICAL, DIAGONAL};
 
     private static Double ALLOWED_DOUBLE_ERROR = 10e-3;
 
     private int expectedFootStepCapacity;
-    private LastFootSteps lastFootSteps;
+    private FootstepHistory footstepHistory;
 
     // Helper method
     private void addFootStepsToLastFootSteps(int totalFootSteps, double stepLength, Direction direction) {
-        lastFootSteps.getFootSteps().clear();
+        footstepHistory.getFootSteps().clear();
 
         for (int i = 0; i < totalFootSteps; i++) {
             FootStep currentFootStep;
@@ -40,22 +39,22 @@ public class LastFootStepsTest {
                 throw new UnsupportedOperationException();
             }
 
-            lastFootSteps.add(currentFootStep);
+            footstepHistory.add(currentFootStep);
         }
     }
 
     @Before
     public void setUp() {
         expectedFootStepCapacity = 10;
-        lastFootSteps = new LastFootSteps(expectedFootStepCapacity);
+        footstepHistory = new FootstepHistory(expectedFootStepCapacity);
     }
 
     @Test
     public void getCapacityReturnsCapacityPassedToContructor() {
         int expectedCapacity = 10;
-        LastFootSteps lastFootSteps = new LastFootSteps(expectedCapacity);
+        FootstepHistory footstepHistory = new FootstepHistory(expectedCapacity);
 
-        int actualCapacity = lastFootSteps.getCapacity();
+        int actualCapacity = footstepHistory.getCapacity();
 
         assertEquals(expectedCapacity, actualCapacity);
     }
@@ -63,33 +62,33 @@ public class LastFootStepsTest {
     @Test
     public void getFootStepsReturnsAnEmptyFootStepListByDefault() {
         int expectedListSize = 0;
-        assertEquals(expectedListSize, lastFootSteps.getFootSteps().size());
+        assertEquals(expectedListSize, footstepHistory.getFootSteps().size());
     }
 
     @Test
     public void getFootStepsReturnsListOfSizeOneIfOneElementWasAdded() {
         FootStep footStep = new FootStep();
-        lastFootSteps.getFootSteps().add(footStep);
+        footstepHistory.getFootSteps().add(footStep);
 
         int expectedListSize = 1;
-        assertEquals(expectedListSize, lastFootSteps.getFootSteps().size());
+        assertEquals(expectedListSize, footstepHistory.getFootSteps().size());
     }
 
     @Test
     public void addInsertsAnElementAndSizeIsIncrementedProperly() {
         FootStep footStep = new FootStep();
-        lastFootSteps.add(footStep);
+        footstepHistory.add(footStep);
 
         int expectedListSize = 1;
-        assertEquals(expectedListSize, lastFootSteps.getFootSteps().size());
+        assertEquals(expectedListSize, footstepHistory.getFootSteps().size());
     }
 
     @Test
     public void addInsertsThePassedFootStep() {
         FootStep expectedFootStep = new FootStep(VPoint.ZERO, VPoint.ZERO, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-        lastFootSteps.add(expectedFootStep);
+        footstepHistory.add(expectedFootStep);
 
-        FootStep actualFootStep = lastFootSteps.getFootSteps().get(0);
+        FootStep actualFootStep = footstepHistory.getFootSteps().get(0);
 
         assertEquals(expectedFootStep.getEnd(), actualFootStep.getEnd());
         assertEquals(expectedFootStep.getStart(), actualFootStep.getStart());
@@ -110,13 +109,13 @@ public class LastFootStepsTest {
                     startTime, startTime + 1);
             expectedFootSteps[i] = currentFootStep;
 
-            lastFootSteps.add(currentFootStep);
+            footstepHistory.add(currentFootStep);
         }
 
-        ArrayList<FootStep> actualFootSteps = lastFootSteps.getFootSteps();
+        ArrayList<FootStep> actualFootSteps = footstepHistory.getFootSteps();
 
         for (int i = 0; i < actualFootSteps.size(); i++) {
-            assertEquals(expectedFootSteps[i].getStartTime(), lastFootSteps.getFootSteps().get(i).getStartTime(),
+            assertEquals(expectedFootSteps[i].getStartTime(), footstepHistory.getFootSteps().get(i).getStartTime(),
                     ALLOWED_DOUBLE_ERROR);
         }
     }
@@ -132,18 +131,18 @@ public class LastFootStepsTest {
             FootStep currentFootStep = new FootStep(new VPoint(startPositionX, 0), new VPoint(startPositionX + 1, 0),
                     startTime, startTime + 1);
 
-            lastFootSteps.add(currentFootStep);
+            footstepHistory.add(currentFootStep);
 
             if (i < expectedFootStepCapacity) {
-                assertEquals(currentFootStep.getStartTime(), lastFootSteps.getFootSteps().get(i).getStartTime(), ALLOWED_DOUBLE_ERROR);
+                assertEquals(currentFootStep.getStartTime(), footstepHistory.getFootSteps().get(i).getStartTime(), ALLOWED_DOUBLE_ERROR);
             } else {
                 double expectedStartTimeHead = (startTime - expectedFootStepCapacity) + 1;
-                double actualStartTimeHead = lastFootSteps.getFootSteps().get(0).getStartTime();
+                double actualStartTimeHead = footstepHistory.getFootSteps().get(0).getStartTime();
 
                 assertEquals(expectedStartTimeHead, actualStartTimeHead, ALLOWED_DOUBLE_ERROR);
 
                 double expectedStartTimeTail = startTime;
-                double actualStartTimeTail = lastFootSteps.getFootSteps().get(expectedFootStepCapacity - 1).getStartTime();
+                double actualStartTimeTail = footstepHistory.getFootSteps().get(expectedFootStepCapacity - 1).getStartTime();
 
                 assertEquals(expectedStartTimeTail, actualStartTimeTail, ALLOWED_DOUBLE_ERROR);
             }
@@ -157,7 +156,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.HORIZONTAL);
 
         double expectedSpeedMeterPerSecond = Double.NaN;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -169,7 +168,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.HORIZONTAL);
 
         double expectedSpeedMeterPerSecond = 1;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -181,7 +180,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.VERTICAL);
 
         double expectedSpeedMeterPerSecond = 1;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -193,7 +192,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.DIAGONAL);
 
         double expectedSpeedMeterPerSecond = Math.sqrt(2);
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -205,7 +204,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.HORIZONTAL);
 
         double expectedSpeedMeterPerSecond = 1;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -217,7 +216,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.VERTICAL);
 
         double expectedSpeedMeterPerSecond = 1;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -229,7 +228,7 @@ public class LastFootStepsTest {
         addFootStepsToLastFootSteps(totalFootSteps, stepLength, Direction.DIAGONAL);
 
         double expectedSpeedMeterPerSecond = Math.sqrt(2);
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
@@ -251,19 +250,19 @@ public class LastFootStepsTest {
                 time, time + 1);
         time += 1;
 
-        lastFootSteps.add(horizontalFootStepHalfMeter);
-        lastFootSteps.add(verticalFootStepTwoMeter);
-        lastFootSteps.add(diagonalFootStepOneMeter);
+        footstepHistory.add(horizontalFootStepHalfMeter);
+        footstepHistory.add(verticalFootStepTwoMeter);
+        footstepHistory.add(diagonalFootStepOneMeter);
 
         double expectedSpeedMeterPerSecond = (0.5 + 2 + Math.sqrt(2)) / time;
-        double actualSpeedMeterPerSecond = lastFootSteps.getAverageSpeedInMeterPerSecond();
+        double actualSpeedMeterPerSecond = footstepHistory.getAverageSpeedInMeterPerSecond();
 
         assertEquals(expectedSpeedMeterPerSecond, actualSpeedMeterPerSecond, ALLOWED_DOUBLE_ERROR);
     }
 
     @Test
     public void getOldestFootStepReturnsNullIfNoFootStepsExist() {
-        assertNull(lastFootSteps.getOldestFootStep());
+        assertNull(footstepHistory.getOldestFootStep());
     }
 
     @Test
@@ -271,16 +270,16 @@ public class LastFootStepsTest {
         double expectedXWithinCapacity = -1;
         FootStep oldestFootStep = new FootStep(new VPoint(expectedXWithinCapacity, 0), new VPoint(0, 0),
                 0, 1);
-        lastFootSteps.add(oldestFootStep);
+        footstepHistory.add(oldestFootStep);
 
         for (int i = 0; i < expectedFootStepCapacity * 2; i++) {
             double expectedXOutsideCapacity = -2;
             FootStep currentFootStep = new FootStep(new VPoint(expectedXOutsideCapacity, 0), new VPoint(2, 0),
                     i, i + 1);
-            lastFootSteps.add(currentFootStep);
+            footstepHistory.add(currentFootStep);
 
             double expectedValue = (i < expectedFootStepCapacity - 1) ? expectedXWithinCapacity : expectedXOutsideCapacity;
-            double actualX = lastFootSteps.getOldestFootStep().getStart().x;
+            double actualX = footstepHistory.getOldestFootStep().getStart().x;
 
             assertEquals(expectedValue, actualX, ALLOWED_DOUBLE_ERROR);
         }
@@ -288,7 +287,7 @@ public class LastFootStepsTest {
 
     @Test
     public void getYoungestFootStepReturnsNullIfNoFootStepsExist() {
-        assertNull(lastFootSteps.getYoungestFootStep());
+        assertNull(footstepHistory.getYoungestFootStep());
     }
 
     @Test
@@ -296,10 +295,10 @@ public class LastFootStepsTest {
         for (int i = 0; i < expectedFootStepCapacity * 2; i++) {
             FootStep currentFootStep = new FootStep(new VPoint(i, 0), new VPoint(i + 1, 0),
                     i, i + 1);
-            lastFootSteps.add(currentFootStep);
+            footstepHistory.add(currentFootStep);
 
             double expectedValue = currentFootStep.getStart().x;
-            double actualX = lastFootSteps.getYoungestFootStep().getStart().x;
+            double actualX = footstepHistory.getYoungestFootStep().getStart().x;
 
             assertEquals(expectedValue, actualX, ALLOWED_DOUBLE_ERROR);
         }
