@@ -8,6 +8,12 @@
 
 ### Changed
 
+# v1.4 (2019-09-05)
+
+### Changed 
+
+- Renamed "footStepsToStore" to "footstepHistorySize" in all scenario files.
+
 ## v1.3 (2019-07-31)
 
 ### Added 
