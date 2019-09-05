@@ -24,16 +24,25 @@ public class JsonTransformationV1_3ToV1_4 extends SimpleJsonTransformation {
 		String oldName = "footStepsToStore";
 		String newName = "footstepHistorySize";
 
-		renameInTopography(node, oldName, newName);
+		renameInTopographyUnderAttributesPedestrian(node, oldName, newName);
+		renameInTopographyUnderAttributesCar(node, oldName, newName);
 		renameInMainModel(node, oldName, newName);
+		renameInDynamicElements(node, oldName, newName);
 
 		return node;
 	}
 
-	private void renameInTopography(JsonNode node, String oldName, String newName) throws MigrationException {
+	private void renameInTopographyUnderAttributesPedestrian(JsonNode node, String oldName, String newName) throws MigrationException {
 		JsonNode attributesPedestrianNode = pathMustExist(node, "scenario/topography/attributesPedestrian");
 		renameField((ObjectNode)attributesPedestrianNode, oldName, newName);
-		renameInDynamicElements(node, oldName, newName);
+	}
+
+	private void renameInTopographyUnderAttributesCar(JsonNode node, String oldName, String newName) throws MigrationException {
+		JsonNode attributesPedestrianNode = pathMustExist(node, "scenario/topography/attributesCar");
+
+		if (attributesPedestrianNode.asText() != "null") {
+			renameField((ObjectNode) attributesPedestrianNode, oldName, newName);
+		}
 	}
 
 	private void renameInMainModel(JsonNode node, String oldName, String newName) throws MigrationException {

@@ -16,12 +16,30 @@ public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
 	}
 
 	@Test
-	public void assertThatJsonTransformationV1_3ToV1_4RenamesFootStepsToStoreInTopography() throws MigrationException {
-		String scenarioFileAsString = getTestFileAsString("footStepsToStoreInTopography.scenario");
+	public void assertThatJsonTransformationV1_3ToV1_4RenamesFootStepsToStoreInTopographyUnderAttributesPedestrian() throws MigrationException {
+		String scenarioFileAsString = getTestFileAsString("footStepsToStoreInTopographyUnderAttributesPedestrian.scenario");
 		JsonNode oldScenarioAsJson = getJsonFromString(scenarioFileAsString);
 
 		String oldJsonPath = "scenario/topography/attributesPedestrian/footStepsToStore";
 		String newJsonPath = "scenario/topography/attributesPedestrian/footstepHistorySize";
+
+		pathMustExist(oldScenarioAsJson, oldJsonPath);
+		pathMustNotExist(oldScenarioAsJson, newJsonPath);
+
+		JsonTransformationV1_3ToV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
+
+		pathMustNotExist(newScenarioAsJson, oldJsonPath);
+		pathMustExist(newScenarioAsJson, newJsonPath);
+	}
+
+	@Test
+	public void assertThatJsonTransformationV1_3ToV1_4RenamesFootStepsToStoreInTopographyUnderAttributesCar() throws MigrationException {
+		String scenarioFileAsString = getTestFileAsString("footStepsToStoreInTopographyUnderAttributesCar.scenario");
+		JsonNode oldScenarioAsJson = getJsonFromString(scenarioFileAsString);
+
+		String oldJsonPath = "scenario/topography/attributesCar/footStepsToStore";
+		String newJsonPath = "scenario/topography/attributesCar/footstepHistorySize";
 
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
