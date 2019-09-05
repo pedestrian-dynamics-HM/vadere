@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_025_d",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -103,7 +103,8 @@
           "height" : 4.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ ],
@@ -171,7 +172,7 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0

@@ -1,7 +1,7 @@
 {
   "name" : "map_mf_small_2",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -3193,7 +3193,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3222,7 +3222,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3251,7 +3251,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3280,7 +3280,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3309,7 +3309,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3338,7 +3338,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3367,7 +3367,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3396,7 +3396,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3425,7 +3425,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3454,7 +3454,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3483,7 +3483,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3512,7 +3512,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
@@ -3541,7 +3541,7 @@
         "endTime" : 200.0,
         "spawnAtRandomPositions" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013],
+        "targetIds" : [ 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       } ],
@@ -3554,7 +3554,7 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0
