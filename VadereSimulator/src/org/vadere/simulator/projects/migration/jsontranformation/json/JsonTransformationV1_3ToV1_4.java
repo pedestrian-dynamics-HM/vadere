@@ -33,6 +33,7 @@ public class JsonTransformationV1_3ToV1_4 extends SimpleJsonTransformation {
 	private void renameInTopography(JsonNode node, String oldName, String newName) throws MigrationException {
 		JsonNode attributesPedestrianNode = pathMustExist(node, "scenario/topography/attributesPedestrian");
 		renameField((ObjectNode)attributesPedestrianNode, oldName, newName);
+		renameInDynamicElements(node, oldName, newName);
 	}
 
 	private void renameInMainModel(JsonNode node, String oldName, String newName) throws MigrationException {
@@ -40,6 +41,20 @@ public class JsonTransformationV1_3ToV1_4 extends SimpleJsonTransformation {
 
 		if (!attributesModelNode.isMissingNode()) {
 			renameField((ObjectNode)attributesModelNode, oldName, newName);
+		}
+	}
+
+	private void renameInDynamicElements(JsonNode node, String oldName, String newName) throws MigrationException {
+		JsonNode dynamicElementsNode = path(node, "scenario/topography/dynamicElements");
+
+		if (dynamicElementsNode.isArray()) {
+			for (JsonNode jsonNode : dynamicElementsNode) {
+				JsonNode attributesNode = path(jsonNode, "attributes");
+
+				if (!attributesNode.isMissingNode()) {
+					renameField((ObjectNode)attributesNode, oldName, newName);
+				}
+			}
 		}
 	}
 }
