@@ -60,7 +60,7 @@ def gaussian_pdf(sigma, x, radius):
     return individual_density
 
 
-def add_pedestrian_to_field(ped, matrix, area, resolution, gauss_density_bound, sigma, ped_radius, general_density_matrix):
+def add_pedestrian_to_field(ped, matrix, area, dimension, resolution, gauss_density_bound, sigma, ped_radius, general_density_matrix):
     if general_density_matrix is None:  # not None
         bool_individual_position = True
     else:
@@ -73,8 +73,8 @@ def add_pedestrian_to_field(ped, matrix, area, resolution, gauss_density_bound, 
     origin_x = area[0]
     origin_y = area[1]
 
-    width = int(area[2] / resolution)
-    height = int(area[3] / resolution)
+    height, width = dimension
+    print(width, height)
 
     # necessary to map to center of the grid instead of the edge!
     offset = resolution / 2
@@ -142,6 +142,7 @@ def get_density_field(pedestrians, context):
             pedestrian,
             density_approx,
             context.get('area', None),
+            size,
             context.get('resolution', 1),
             context.get('gauss_bounds', 1),
             context.get('sigma', 0.7),
@@ -255,14 +256,14 @@ def process_experiment(experiment, context):
     area = context.get('area')
     resolution = context.get('resolution')
 
-    size = (int(area[3] / resolution), int(area[2] / resolution))
+    size = (int(round(area[3] / resolution)), int(round(area[2] / resolution)))
     context['size'] = size
     context['pId2Target'] = pId2Target
 
     skip = context.get('skip', 1)
     all_timesteps = list(experiment.groupby('timeStep'))
     timesteps = all_timesteps[::skip]
-    print('using every ', skip, 'timestep, # of used timesteps', len(timesteps), ', # of total timesteps', len(all_timesteps))
+    print('using every ', skip, 'timestep, # of used timesteps', len(timesteps), ', # of total timesteps', len(all_timesteps), 'image size', size)
     
     total = len(timesteps)
     timesteps = list(map(lambda a: (*a, context), timesteps))

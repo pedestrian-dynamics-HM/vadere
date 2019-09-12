@@ -7,19 +7,19 @@ from multiprocessing import Pool
 
 def processRow(args):
   i, row, path = args
-  n_targets = 3
+  n_targets = 2
 
   row = np.array(row)
   targets = row[-n_targets:]
   data = row[:-n_targets]
-  name = 'density-{0}-{1:.2f}-{2:.2f}-{3:.2f}.png'.format(i, targets[0], targets[1], targets[2])
+  name = 'density-{0}-{1:.2f}-{2:.2f}.png'.format(i, targets[0], targets[1])
   filepath = os.path.join(path, name)
   
   if os.path.exists(filepath):
       #print("Skipping", filepath, 'since it already exits!')
       return False
       
-  image = data.reshape((10, 23))
+  image = data.reshape((10, 24))
   fig, ax = plt.subplots()
   ax.imshow(image, interpolation='Nearest')
   ax.axis('off')
@@ -32,6 +32,7 @@ def processRow(args):
   fig.savefig(filepath, bbox_inches='tight', pad_inches=0)
 
   return True
+
 
 def processFile(file, base_directory, image_directory, number_of_cores=1, _filter=lambda x: x):
   path = os.path.join(image_directory, file[:-4])
