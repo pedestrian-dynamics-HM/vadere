@@ -128,7 +128,10 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 				if (element.getType() == ScenarioElementType.PEDESTRIAN) {
 					Pedestrian pedestrian = (Pedestrian)element;
 					pedestrian.clearFootSteps();
-					pedestrian.getFootSteps().add(new FootStep(positions.get(i), pedestrian.getPosition(), lastSimTimeInSec, simTimeInSec));
+
+					FootStep currentFootstep = new FootStep(positions.get(i), pedestrian.getPosition(), lastSimTimeInSec, simTimeInSec);
+					pedestrian.getFootSteps().add(currentFootstep);
+					pedestrian.getFootstepHistory().add(currentFootstep);
 				}
 			}
 		}

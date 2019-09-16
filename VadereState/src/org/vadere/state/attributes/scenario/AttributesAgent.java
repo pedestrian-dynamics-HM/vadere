@@ -36,7 +36,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	private double acceleration = 2.0;
 
 	// store n last foot steps for speed calculation
-	private int footStepsToStore = 4;
+	private int footstepHistorySize = 4;
 
 	// agents search for other scenario elements (e.g., other agents) within this radius
 	private double searchRadius = 1.0;
@@ -90,7 +90,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.minimumSpeed = other.minimumSpeed;
 		this.maximumSpeed = other.maximumSpeed;
 		this.acceleration = other.acceleration;
-		this.footStepsToStore = other.footStepsToStore;
+		this.footstepHistorySize = other.footstepHistorySize;
 		this.searchRadius = other.searchRadius;
 		this.angleCalculationType = other.angleCalculationType;
 	}
@@ -125,7 +125,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 		return acceleration;
 	}
 
-	public int getFootStepsToStore() { return footStepsToStore; }
+	public int getFootstepHistorySize() { return footstepHistorySize; }
 
 	public double getSearchRadius() { return searchRadius; }
 
@@ -170,9 +170,9 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.acceleration = acceleration;
 	}
 
-	public void setFootStepsToStore(int footStepsToStore) {
+	public void setFootstepHistorySize(int footstepHistorySize) {
 		checkSealed();
-		this.footStepsToStore = footStepsToStore;
+		this.footstepHistorySize = footstepHistorySize;
 	}
 
 	public void setSearchRadius(double searchRadius) {

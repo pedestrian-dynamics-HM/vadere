@@ -4,37 +4,24 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VTrajectory implements Iterable<FootStep> {
 
 	// Variables
 	private LinkedList<FootStep> footSteps;
-	private transient LastFootSteps lastFootSteps;
 
 	// Constructors
-	public VTrajectory(){
-		this(10);
-	}
-
-	public VTrajectory(int lastFootStepCapacity){
+	public VTrajectory() {
 		footSteps = new LinkedList<>();
-		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
 	}
 
 	// Getters
 	public LinkedList<FootStep> getFootSteps() {
 		return new LinkedList<>(footSteps);
-	}
-
-	public LastFootSteps getLastFootSteps() {
-		return lastFootSteps;
 	}
 
 	// Methods
@@ -112,7 +99,6 @@ public class VTrajectory implements Iterable<FootStep> {
 		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
 
 		footSteps.add(footStep);
-		lastFootSteps.add(footStep);
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {

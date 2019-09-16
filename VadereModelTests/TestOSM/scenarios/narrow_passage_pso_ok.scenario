@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_pso_ok",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -137,7 +137,8 @@
           "height" : 5.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {
@@ -589,7 +590,7 @@
           "minimumSpeed" : 0.3,
           "maximumSpeed" : 3.0,
           "acceleration" : 2.0,
-          "footStepsToStore" : 4,
+          "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
@@ -628,7 +629,7 @@
           "minimumSpeed" : 0.3,
           "maximumSpeed" : 3.0,
           "acceleration" : 2.0,
-          "footStepsToStore" : 4,
+          "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
@@ -654,7 +655,7 @@
         "minimumSpeed" : 0.3,
         "maximumSpeed" : 3.0,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0
