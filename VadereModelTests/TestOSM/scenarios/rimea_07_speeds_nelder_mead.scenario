@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_nelder_mead",
   "description" : "",
-  "release" : "1.3",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -164,7 +164,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 2,
+        "id" : -1,
         "shape" : {
           "x" : 2.0,
           "y" : 2.0,
@@ -193,7 +193,7 @@
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.0,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0

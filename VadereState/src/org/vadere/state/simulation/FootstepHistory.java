@@ -7,17 +7,18 @@ import java.util.stream.Collectors;
 
 /**
  * Store the last foot steps of an agent to calculate the agent's average speed during simulation.
- *
- * TODO: Maybe, rename to "FootStepHistory".
  */
-public class LastFootSteps {
+public class FootstepHistory {
 
     // Variables
     private int capacity;
     private ArrayList<FootStep> footSteps;
 
     // Constructors
-    public LastFootSteps(int capacity) {
+    public FootstepHistory() {
+        this(10);
+    }
+    public FootstepHistory(int capacity) {
         this.capacity = capacity;
         this.footSteps = new ArrayList<>(capacity);
     }

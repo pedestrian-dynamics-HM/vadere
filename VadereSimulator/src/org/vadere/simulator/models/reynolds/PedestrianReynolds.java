@@ -40,11 +40,14 @@ public class PedestrianReynolds extends Pedestrian {
 
 		VPoint oldPosition = getPosition();
 		VPoint newPosition = oldPosition.add(mov);
-
 		setPosition(newPosition);
+
+        // TODO: the first footstep starts at the wrong time!
 		clearFootSteps();
-		// TODO: the first footstep starts at the wrong time!
-		addFootStepToTrajectory(new FootStep(oldPosition, newPosition, lastSimTimeInSec, simTime));
+		FootStep currentFootstep = new FootStep(oldPosition, newPosition, lastSimTimeInSec, simTime);
+		getFootSteps().add(currentFootstep);
+		getFootstepHistory().add(currentFootstep);
+
 		lastSimTimeInSec = simTime;
 	}
 

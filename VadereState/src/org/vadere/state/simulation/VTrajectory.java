@@ -14,25 +14,15 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	// Variables
 	private LinkedList<FootStep> footSteps;
-	private transient LastFootSteps lastFootSteps;
 
 	// Constructors
-	public VTrajectory(){
-		this(10);
-	}
-
-	public VTrajectory(int lastFootStepCapacity){
+	public VTrajectory() {
 		footSteps = new LinkedList<>();
-		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
 	}
 
 	// Getters
 	public LinkedList<FootStep> getFootSteps() {
 		return new LinkedList<>(footSteps);
-	}
-
-	public LastFootSteps getLastFootSteps() {
-		return lastFootSteps;
 	}
 
 	public boolean adjustEndTime(@NotNull final double endTime) {
@@ -130,7 +120,6 @@ public class VTrajectory implements Iterable<FootStep> {
 						footSteps.peekLast().getStartTime() < footStep.getStartTime());
 
 		footSteps.add(footStep);
-		lastFootSteps.add(footStep);
 		return this;
 	}
 

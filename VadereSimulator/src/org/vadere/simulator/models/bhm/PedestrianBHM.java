@@ -194,11 +194,9 @@ public class PedestrianBHM extends Pedestrian {
 			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
 		}
 
-		if(currentTimeInSec < startTimeStep) {
-			System.out.println("WTF");
-		}
-
-		addFootStepToTrajectory(new FootStep(position, getPosition(), startTimeStep, endTimeStep));
+		FootStep currentFootstep = new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep);
+		getFootSteps().add(currentFootstep);
+		getFootstepHistory().add(currentFootstep);
 	}
 
 	/**
