@@ -4,6 +4,8 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -44,9 +46,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.0, 1.0))
-						.add(2, new VPoint(2.3, 2.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1,1), 0)
+						.add(2, new VPoint(2.3,2.3), 0)
+						.add(3, new VPoint(5.7,3.3), 0);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(0.0);
@@ -63,9 +65,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.5, 1.0))
-						.add(2, new VPoint(5.3, 6.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1.5,1.0), 1)
+						.add(2, new VPoint(5.3,6.3), 1)
+						.add(3, new VPoint(5.7,3.3), 1);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(1.0);
@@ -82,9 +84,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.5, 1.0))
-						.add(2, new VPoint(5.3, 6.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1.5,1.0), 2)
+						.add(2, new VPoint(5.3,6.3), 2)
+						.add(3, new VPoint(5.7,3.3), 2);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(2.0);
@@ -104,9 +106,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.0, 1.0))
-						.add(2, new VPoint(2.3, 2.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1.0,1.0), 0)
+						.add(2, new VPoint(2.3,2.3), 0)
+						.add(3, new VPoint(5.7,3.3), 0);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(0.0);
@@ -124,9 +126,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.5, 1.0))
-						.add(2, new VPoint(5.3, 6.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1.5,1.0), 1)
+						.add(2, new VPoint(5.3,6.3), 1)
+						.add(3, new VPoint(5.7,3.3), 1);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(1.0);
@@ -144,9 +146,9 @@ public class PedestrianVelocityProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.5, 1.0))
-						.add(2, new VPoint(5.3, 6.3))
-						.add(3, new VPoint(5.7, 3.3));
+				b.clear().add(1, new VPoint(1.5,1.0), 2)
+						.add(2, new VPoint(5.3,6.3), 2)
+						.add(3, new VPoint(5.7,3.3), 2);
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(2.0);

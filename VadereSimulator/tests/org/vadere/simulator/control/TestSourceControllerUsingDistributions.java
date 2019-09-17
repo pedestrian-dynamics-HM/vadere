@@ -10,6 +10,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +30,12 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	public void testStartTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setDistributionClass(ConstantTestDistribution.class);
-		initialize(builder);
+
+		try{
+			initialize(builder);
+		}catch (IOException e){
+			throw new RuntimeException(e.getMessage());
+		}
 
 		first().sourceController.update(0);
 		pedestrianCountEquals(0);
@@ -41,7 +47,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testEndTime() {
+	public void testEndTime() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder();
 		initialize(builder);
 
@@ -55,7 +61,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testOneTimeSpawn() {
+	public void testOneTimeSpawn() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setOneTimeSpawn(1);
 		initialize(builder);
@@ -69,7 +75,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testSpawnNumber() {
+	public void testSpawnNumber() throws IOException{
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setSpawnNumber(10);
 		initialize(builder);
@@ -81,7 +87,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testSpawnRateGreaterThanUpdateRate() {
+	public void testSpawnRateGreaterThanUpdateRate() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(1)
 				.setSpawnIntervalForConstantDistribution(0.3);
@@ -96,7 +102,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testUseFreeSpaceOnly() {
+	public void testUseFreeSpaceOnly() throws IOException {
 		// expected: not stop spawning before all pedestrians are created (even after end time)
 		double startTime = 0;
 		double endTime = 1;
@@ -121,7 +127,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testUseFreeSpaceOnlyWithSingleSpawnEvent() {
+	public void testUseFreeSpaceOnlyWithSingleSpawnEvent() throws IOException {
 		// works also with sources that have startTime == endTime?
 		// expected: not stop spawning before all pedestrians are created (even after end time)
 		double startTime = 1;
@@ -148,7 +154,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testMaxSpawnNumberTotalSetTo0() {
+	public void testMaxSpawnNumberTotalSetTo0() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(0); // <-- max 0 -> spawn no peds at all
 		initialize(builder);
@@ -161,7 +167,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testMaxSpawnNumberTotalNotSet() {
+	public void testMaxSpawnNumberTotalNotSet() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL); // <-- maximum not set
 		initialize(builder);
@@ -174,7 +180,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testMaxSpawnNumberTotalWithSmallEndTime() {
+	public void testMaxSpawnNumberTotalWithSmallEndTime() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setMaxSpawnNumberTotal(4); // <-- not exhausted
 		initialize(builder);
@@ -187,7 +193,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testMaxSpawnNumberTotalWithLargeEndTime() {
+	public void testMaxSpawnNumberTotalWithLargeEndTime() throws IOException {
 		double endTime = 100;
 		int maxSpawnNumberTotal = 4;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
@@ -201,7 +207,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	}
 
 	@Test
-	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() {
+	public void testMaxSpawnNumberTotalWithLargeEndTimeAndSpawnNumberGreater1() throws IOException {
 		int maxSpawnNumberTotal = 4; // <-- exhausted!
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setEndTime(100)
@@ -219,7 +225,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	 * source and not within its bound and that no overlap occurs.
 	 */
 	@Test
-	public void testPolygonShapedSourceNoRandom() {
+	public void testPolygonShapedSourceNoRandom() throws IOException {
 		int maxSpawnNumberTotal = 5;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setEndTime(100)
@@ -253,7 +259,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	 * source and not within its bound and that no overlap occurs.
 	 */
 	@Test
-	public void testPolygonShapedSourceWithRandom() {
+	public void testPolygonShapedSourceWithRandom() throws IOException {
 		int maxSpawnNumberTotal = 5;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setEndTime(100)

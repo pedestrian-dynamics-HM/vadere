@@ -35,7 +35,7 @@ public class PedestrianLineCrossProcessor extends DataProcessor<PedestrianIdKey,
 		for(Pedestrian ped : peds) {
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
 
-			for(FootStep footStep : ped.getFootSteps()) {
+			for(FootStep footStep : ped.getTrajectory()) {
 				if(footStep.intersects(line)) {
 					double intersectionTime = footStep.computeIntersectionTime(line);
 					this.putValue(key, intersectionTime);

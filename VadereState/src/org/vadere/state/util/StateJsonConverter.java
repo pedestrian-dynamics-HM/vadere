@@ -3,6 +3,7 @@ package org.vadere.state.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -79,16 +80,10 @@ public abstract class StateJsonConverter {
 		return prettyWriter;
 	}
 
-	// TODO handle exception
-	public static <T> T deserializeObjectFromJson(String json, Class<T> objectClass) {
-		
-		try {
-			final JsonNode node = mapper.readTree(json);
-			checkForTextOutOfNode(json);
-			return mapper.treeToValue(node, objectClass);
-		} catch (TextOutOfNodeException | IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static <T> T deserializeObjectFromJson(String json, Class<T> objectClass) throws IOException {
+		final JsonNode node = mapper.readTree(json);
+		checkForTextOutOfNode(json);
+		return mapper.treeToValue(node, objectClass);
 	}
 
 	public static <T> T deserializeObjectFromJson(String json, final TypeReference<T> type) {
@@ -135,7 +130,7 @@ public abstract class StateJsonConverter {
 		AttributesTeleporter teleporter = null;
 	}
 
-	public static AttributesSimulation deserializeAttributesSimulation(String json) {
+	public static AttributesSimulation deserializeAttributesSimulation(String json) throws IOException  {
 		return deserializeObjectFromJson(json, AttributesSimulation.class);
 	}
 
@@ -158,7 +153,7 @@ public abstract class StateJsonConverter {
 		return attributesList;
 	}
 
-	public static Topography deserializeTopography(String json) throws IOException, TextOutOfNodeException {
+	public static Topography deserializeTopography(String json) throws IOException {
 		checkForTextOutOfNode(json);
 		return deserializeTopographyFromNode(mapper.readTree(json));
 	}
@@ -178,7 +173,8 @@ public abstract class StateJsonConverter {
 		return topography;
 	}
 
-	public static void checkForTextOutOfNode(String json) throws TextOutOfNodeException, IOException { // via stackoverflow.com/a/26026359
+	public static void checkForTextOutOfNode(String json) throws IOException {
+		// via stackoverflow.com/a/26026359
 		JsonParser jp = mapper.getFactory().createParser(json);
 		mapper.readValue(jp, JsonNode.class);
 		try {

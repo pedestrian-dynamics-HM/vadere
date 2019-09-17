@@ -24,11 +24,11 @@ public class JsonConverter {
 		return deserializeScenarioRunManagerFromNode(StateJsonConverter.readTree(json));
 	}
 
-	public static ModelDefinition deserializeModelDefinition(String json) throws Exception {
+	public static ModelDefinition deserializeModelDefinition(String json) throws IOException {
 		JsonNode node = StateJsonConverter.readTree(json);
 		StateJsonConverter.checkForTextOutOfNode(json);
 		if (!node.has(StateJsonConverter.MAIN_MODEL_KEY))
-			throw new Exception("No " + StateJsonConverter.MAIN_MODEL_KEY + "-entry was found.");
+			throw new IOException("No " + StateJsonConverter.MAIN_MODEL_KEY + "-entry was found.");
 		String mainModelString = null;
 		JsonNode mainModel = node.get(StateJsonConverter.MAIN_MODEL_KEY);
 		if (!mainModel.isNull()) { // avoid test-instantiating when mainModel isn't set, otherwise user has invalid json when creating a new scenario
@@ -81,8 +81,7 @@ public class JsonConverter {
 		return StateJsonConverter.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
 	}
 
-	public static JsonNode serializeScenarioRunManagerToNode(Scenario scenarioRunManager,
-			boolean commitHashIncluded) throws IOException {
+	public static JsonNode serializeScenarioRunManagerToNode(Scenario scenarioRunManager, boolean commitHashIncluded) {
 		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
 		ObjectNode rootNode = StateJsonConverter.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);

@@ -5,6 +5,8 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -38,6 +40,27 @@ public class PedestrianListBuilder {
 			Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
 			out.add(p);
 		}
+		return this;
+	}
+
+	public PedestrianListBuilder add(int id, VPoint pos, double simTimeSec){
+		// Mock a footstep, because start/end position and time are the same, pos will be taken as the position
+		// when for simulation time (in seconds) simTimeSec
+		FootStep fs = new FootStep(pos, pos, simTimeSec, simTimeSec);
+		VTrajectory trajectory = new VTrajectory().add(fs);
+		return add(id, trajectory);
+	}
+
+	public PedestrianListBuilder add(int id, VTrajectory trajectory){
+		Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
+
+		for(FootStep fs : trajectory){
+			p.getTrajectory().add(fs);
+		}
+		// Set the pedestrian position to the last known position where he started a step.
+		p.setPosition(p.getTrajectory().getFootSteps().getLast().getStart());
+		out.add(p);
+
 		return this;
 	}
 

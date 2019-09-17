@@ -66,6 +66,7 @@ public class PedestrianBHM extends Pedestrian {
 		this.random = random;
 		this.attributesBHM = attributesBHM;
 		this.topography = topography;
+		this.timeOfNextStep = INVALID_NEXT_EVENT_TIME;
 
 		this.setVelocity(new Vector2D(0, 0));
 
@@ -170,11 +171,16 @@ public class PedestrianBHM extends Pedestrian {
 		}
 
 		// for the first step after creation, timeOfNextStep has to be initialized
-		if (getTimeOfNextStep() == 0) {
+		if (getTimeOfNextStep() == INVALID_NEXT_EVENT_TIME) {
 			timeOfNextStep = currentTimeInSec;
+			return;
 		}
 
 		durationNextStep = stepLength / getFreeFlowSpeed();
+
+		double startTimeStep = timeOfNextStep;
+		double endTimeStep = timeOfNextStep + durationNextStep;
+		timeOfNextStep = endTimeStep;
 
 		Event mostImportantEvent = getMostImportantEvent();
 		VPoint position = getPosition();
@@ -182,15 +188,14 @@ public class PedestrianBHM extends Pedestrian {
 			updateTargetDirection();
 			nextPosition = navigation.getNavigationPosition();
 			makeStep();
-			timeOfNextStep += durationNextStep;
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
-			timeOfNextStep += durationNextStep;
+			// do nothing
 		} else {
 			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
 		}
 
-		FootStep currentFootstep = new FootStep(position, getPosition(), timeOfNextStep, timeOfNextStep + durationNextStep);
-		getFootSteps().add(currentFootstep);
+		FootStep currentFootstep = new FootStep(position, getPosition(), startTimeStep, endTimeStep);
+		getTrajectory().add(currentFootstep);
 		getFootstepHistory().add(currentFootstep);
 	}
 
