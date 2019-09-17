@@ -11,7 +11,6 @@ import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.state.util.TextOutOfNodeException;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -146,7 +145,7 @@ public class TestCLOptimalStepsModel {
 	 */
 	@Ignore
 	@Before
-	public void setUp() throws IOException, TextOutOfNodeException {
+	public void setUp() throws IOException {
 		random = new Random();
 		maxStepSize = 0.2f;
 		numberOfElements = 256;

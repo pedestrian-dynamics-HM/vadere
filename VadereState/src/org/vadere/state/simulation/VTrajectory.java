@@ -2,30 +2,22 @@ package org.vadere.state.simulation;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VTrajectory implements Iterable<FootStep> {
 
 	// Variables
 	private LinkedList<FootStep> footSteps;
-	private transient LastFootSteps lastFootSteps;
 
 	// Constructors
-	public VTrajectory(){
-		this(10);
-	}
-
-	public VTrajectory(int lastFootStepCapacity){
+	public VTrajectory() {
 		footSteps = new LinkedList<>();
-		lastFootSteps = new LastFootSteps(lastFootStepCapacity);
 	}
 
 	// Getters
@@ -33,8 +25,21 @@ public class VTrajectory implements Iterable<FootStep> {
 		return new LinkedList<>(footSteps);
 	}
 
-	public LastFootSteps getLastFootSteps() {
-		return lastFootSteps;
+	public boolean adjustEndTime(@NotNull final double endTime) {
+		if(!isEmpty()) {
+			while (!isEmpty() && footSteps.peekLast().getStartTime() >= endTime) {
+				footSteps.removeLast();
+			}
+
+			if(footSteps.isEmpty()) {
+				return false;
+			}
+			FootStep footStep = footSteps.removeLast();
+			footSteps.addLast(new FootStep(footStep.getStart(), footStep.getEnd(), footStep.getStartTime(), endTime));
+		} else {
+			throw new IllegalStateException("cant adjust the last footstep of an empty trajectory.");
+		}
+		return true;
 	}
 
 	// Methods
@@ -108,11 +113,14 @@ public class VTrajectory implements Iterable<FootStep> {
 		}
 	}
 
-	public void add(@NotNull final FootStep footStep) {
-		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
+	public VTrajectory add(@NotNull final FootStep footStep) {
+
+		assert footSteps.isEmpty() ||
+				(footSteps.peekLast().getEndTime() <= footStep.getStartTime() &&  // make sure it is in order
+						footSteps.peekLast().getStartTime() < footStep.getStartTime());
 
 		footSteps.add(footStep);
-		lastFootSteps.add(footStep);
+		return this;
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {

@@ -27,6 +27,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +78,12 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	public void initialize(SourceTestAttributesBuilder builder) {
 		SourceTestData d = new SourceTestData();
 
-		d.attributesSource = builder.getResult();
+		try{
+			d.attributesSource = builder.getResult();
+		} catch(IOException e){
+			throw new RuntimeException(e.getMessage());
+		}
+
 		d.attributesPedestrian = new AttributesAgent();
 
 		d.random = new Random(builder.getRandomSeed());
@@ -524,7 +530,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 
 	@Test
-	public void testCentroid() {
+	public void testCentroid() throws IOException {
 		AttributesSource attributesSource =
 				StateJsonConverter.deserializeObjectFromJson(sourceJson, AttributesSource.class);
 		Source source = new Source(attributesSource);
@@ -537,7 +543,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	}
 
 	@Test
-	public void testSource() {
+	public void testSource() throws  IOException {
 		AttributesSource attributesSource =
 				StateJsonConverter.deserializeObjectFromJson(sourceJson, AttributesSource.class);
 

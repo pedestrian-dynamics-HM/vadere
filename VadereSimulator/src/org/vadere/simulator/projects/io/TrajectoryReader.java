@@ -208,7 +208,7 @@ public class TrajectoryReader {
 		}
 	}
 
-	private Map<Step, List<Agent>> readStandardTrajectoryFile() throws IOException {
+	private Map<Step, List<Agent>> readStandardTrajectoryFile() throws IOException{
 		try (BufferedReader in = IOUtils.defaultBufferedReader(this.trajectoryFilePath)) {
 			return in.lines()                                       // a stream of lines
 					.skip(1)                                        // skip the first line i.e. the header
@@ -286,9 +286,16 @@ public class TrajectoryReader {
 		}
 
 		if(stridesIndex != NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			FootStep[] footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
+			FootStep[] footSteps;
+			try{
+				footSteps = StateJsonConverter.deserializeObjectFromJson(rowTokens[stridesIndex], FootStep[].class);
+			}catch(IOException e){
+				e.printStackTrace();
+				throw new RuntimeException("Could not deserialize foot steps.");
+			}
+
 			for(FootStep footStep : footSteps) {
-				ped.getFootSteps().add(footStep);
+				ped.addFootStepToTrajectory(footStep);
 			}
 		}
 

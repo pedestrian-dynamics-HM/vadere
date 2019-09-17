@@ -256,12 +256,7 @@ if __name__ == "__main__":
     if args.scenario is None:
 
         passed_and_failed_scenarios_model = run_all_model_tests()
-
-        if not result_dict_has_failed_tests(passed_and_failed_scenarios_model):
-            passed_and_failed_scenarios_optimization = run_all_optimization_tests()
-        else:
-            print("Skipping optimization tests...")
-            passed_and_failed_scenarios_optimization = {"failed": [], "passed": [], "failed_summary": []}  # empty
+        passed_and_failed_scenarios_optimization = run_all_optimization_tests()
 
         # Make a summery of all scenario files
         all_passed_and_failed_scenarios = result_dict_merge(passed_and_failed_scenarios_model,

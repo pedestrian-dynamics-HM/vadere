@@ -34,7 +34,7 @@ public class TargetDirectionGeoGradient implements TargetDirection {
 			VPoint gradient2 = targetPotentialField.getTargetPotentialGradient(position.add(gradient1.setMagnitude(stepLength)), pedestrianBHM).multiply(-1.0);
 
 			if(gradient2.distanceToOrigin() > GeometryUtils.DOUBLE_EPS && UtilsBHM.angle(gradient1, gradient2) < maxAngleBetweenGradients) {
-				logger.info("gradient direction");
+				//logger.info("gradient direction");
 				return gradient1.norm();
 			}
 		}

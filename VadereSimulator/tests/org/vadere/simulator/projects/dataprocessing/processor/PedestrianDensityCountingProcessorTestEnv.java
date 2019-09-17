@@ -5,6 +5,8 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianId
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -43,13 +45,15 @@ public class PedestrianDensityCountingProcessorTestEnv extends ProcessorTestEnv<
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.0, 1.0));
-				b.add(2, new VPoint(1.2, 1.2));
-				b.add(3, new VPoint(1.4, 1.4));
 				VPoint p = new VPoint(1.4, 1.4);
-				p = p.addPrecise(new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
-				b.add(4, p);
-				b.add(5, new VPoint(10.0, 10.0));
+				VPoint pPrecise = p.clone().addPrecise(new VPoint(Math.sqrt(radius) - 0.001, Math.sqrt(radius) - 0.001));
+
+				b.clear().add(1, new VPoint(1,1), 0);
+				b.add(2, new VPoint(1.2,1.2), 0);
+				b.add(3, p, 0);
+				b.add(4, pPrecise, 0);
+				b.add(5, new VPoint(10,10), 0);
+
 				Mockito.when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				int step = state.getStep();
