@@ -1,7 +1,7 @@
 {
   "name" : "T-240-150-240_OSM",
   "description" : "",
-  "release" : "1.3",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -484,7 +484,7 @@
         "minimumSpeed" : 1.0,
         "maximumSpeed" : 1.68,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0
