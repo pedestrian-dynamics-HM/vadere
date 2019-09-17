@@ -6,6 +6,7 @@ import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentia
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.BangEvent;
+import org.vadere.state.events.types.ChangeTargetEvent;
 import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -14,7 +15,9 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
+import tech.tablesaw.plotly.components.change.Change;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,6 +108,18 @@ public class OSMBehaviorController {
 
             pedestrian.setTargets(nextTarget);
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
+        } else {
+            // TODO: Maybe, log to console.
+        }
+    }
+
+    public void reactToTargetChange(PedestrianOSM pedestrian, Topography topography) {
+        Event mostImportantEvent = pedestrian.getMostImportantEvent();
+
+        if (mostImportantEvent instanceof ChangeTargetEvent) {
+            ChangeTargetEvent changeTargetEvent = (ChangeTargetEvent) pedestrian.getMostImportantEvent();
+            pedestrian.setTargets(changeTargetEvent.getNewTargetIds());
+
         } else {
             // TODO: Maybe, log to console.
         }

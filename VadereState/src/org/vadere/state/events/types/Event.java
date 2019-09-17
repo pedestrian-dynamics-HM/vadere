@@ -42,7 +42,8 @@ import java.util.stream.Collectors;
         @Type(value = BangEvent.class, name = "BangEvent"),
         @Type(value = ElapsedTimeEvent.class, name = "ElapsedTimeEvent"),
         @Type(value = WaitEvent.class, name = "WaitEvent"),
-        @Type(value = WaitInAreaEvent.class, name = "WaitInAreaEvent")
+        @Type(value = WaitInAreaEvent.class, name = "WaitInAreaEvent"),
+        @Type(value = ChangeTargetEvent.class, name = "ChangeTargetEvent")
 })
 // "time" is set when the event is actually raised and must not be de-/serialized.
 @JsonIgnoreProperties({ "time" })

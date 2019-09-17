@@ -10,6 +10,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class EventInfoStore {
 
         List<Event> events = new ArrayList<>();
         events.add(new WaitEvent());
-        // events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
+        events.add(new WaitInAreaEvent(0, new VRectangle(12.5, 0, 5, 6)));
         // events.add(new WaitInAreaEvent(0, new VCircle(5, 5, 5)));
 
         EventInfo eventInfo1 = new EventInfo();
@@ -76,17 +77,38 @@ public class EventInfoStore {
         // "VShape" are mapped by "JacksonObjectMapper" implementation.
         ObjectMapper mapper = new JacksonObjectMapper();
 
+        // De/-Serialize an "EventInfoStore":
         try {
             String jsonDataString = mapper.writeValueAsString(eventInfoStore);
-            System.out.println(jsonDataString);
 
+            System.out.println("Serialized \"EventInfoStore\":");
+            System.out.println(jsonDataString);
+            System.out.println();
+
+            System.out.println("Serialized \"EventInfo\" elements in the \"EventInfoStore\":");
             EventInfoStore deserializedEventInfoStore = mapper.readValue(jsonDataString, EventInfoStore.class);
             for (EventInfo eventInfo : deserializedEventInfoStore.getEventInfos()) {
                 System.out.print(eventInfo.getEventTimeframe());
                 System.out.print(eventInfo.getEvents());
             }
+            System.out.println();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Serialize specific events:
+        System.out.println("Examples of some event serializations:");
+
+        try {
+            LinkedList<Integer> newTargetIds = new LinkedList<>();
+            newTargetIds.add(1);
+            newTargetIds.add(2);
+
+            String changeTargetEventAsJsonString = mapper.writeValueAsString(new ChangeTargetEvent(0.0, newTargetIds));
+            System.out.println(changeTargetEventAsJsonString);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

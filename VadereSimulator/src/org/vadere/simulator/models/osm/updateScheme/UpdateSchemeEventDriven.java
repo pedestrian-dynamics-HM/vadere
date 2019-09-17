@@ -77,6 +77,11 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		} else if (mostImportantEvent instanceof ChangeTargetEvent) {
+			osmBehaviorController.reactToTargetChange(pedestrian, topography);
+
+			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 
