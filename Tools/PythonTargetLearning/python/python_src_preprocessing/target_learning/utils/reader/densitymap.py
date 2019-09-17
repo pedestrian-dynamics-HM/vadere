@@ -1,7 +1,5 @@
 import os
 import numpy as np
-import pandas as pd
-from tqdm import tqdm
 from sacred.ingredient import Ingredient
 
 ingredient = Ingredient('reader.densitymap')
@@ -32,7 +30,6 @@ def load_directory(directory, number_of_targets, file_filter, seperator):
     maps = []
     distributions = []
 
-    # for file in tqdm(files, total=len(files), desc="Loading directory {}".format(directory)):
     for file in files:
         fmaps, fdist = load_file(os.path.join(directory, file), number_of_targets, seperator=seperator)
 

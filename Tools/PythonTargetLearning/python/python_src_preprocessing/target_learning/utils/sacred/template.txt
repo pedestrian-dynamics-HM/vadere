@@ -1,0 +1,14 @@
+* RANDOM FOREST RESULTS *
+Number of targets:      ${config['number_of_targets']}
+Number of features: 	  ${info['setup']['number_of_features']}
+Number of densitymaps:
+  -  Training: 		      ${info['setup']['number_of_samples_training']}
+  -  Testing:  		      ${info['setup']['number_of_samples_testing']}
+
+
+RMSE (per direction):   ${list(map(lambda x: float('{:.6f}'.format(x)), info['error']['rmse']))}
+
+Mean Euclidean Error:   ${'{:.6f}'.format(info['error']['euclid']['mean'])}
+Std  Euclidean Error:   ${'{:.6f}'.format(info['error']['euclid']['std'])}
+Mean Euclidean Error:   ${'{:.4f}'.format(info['error']['euclid']['mean_percent'])}%
+Std  Euclidean Error:   ${'{:.4f}'.format(info['error']['euclid']['std_percent'])}%

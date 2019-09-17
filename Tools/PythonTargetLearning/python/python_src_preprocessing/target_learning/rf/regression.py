@@ -5,12 +5,11 @@ import numpy as np
 import os.path as path
 import matplotlib.pyplot as plt
 
-from tqdm import tqdm
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
 from sacred.ingredient import Ingredient
-from sacred.observers.file_storage import FileStorageObserver
+from utils.sacred.file_storage import FileStorageObserver
 
 ingredient = Ingredient('randomforest.regression')
 
@@ -31,9 +30,10 @@ def calculate_errors(prediction, target):
     rmse = np.sqrt(np.mean(np.square(prediction - target), axis=0))
 
     return  {
-        'euclid': {'mean': euclid_error_mean, 'std': euclid_error_std, 'mean_percent': euclid_error_mean_percent, 'std_percent': euclid_error_std_percent}, 'mean_abs_error': mean_abs_error, 
-        'mean_error': mean_error, 
-        'rmse': rmse}
+        'euclid': {'mean': euclid_error_mean, 'std': euclid_error_std, 'mean_percent': euclid_error_mean_percent, 'std_percent': euclid_error_std_percent}, 
+        'mean_abs_error': list(mean_abs_error), 
+        'mean_error': list(mean_error), 
+        'rmse': list(rmse)}
 
 
 def features_importance(regressor, area):
@@ -236,7 +236,7 @@ def multiple_forests(train_data, test_data, _run, _log, **kwargs):
     _run.info['training'] = []
 
     # train single forest for each target
-    for i in tqdm(range(0, n_targets), desc='Learning targets', total=n_targets):
+    for i in range(0, n_targets):
         regressor = fit(train_data['samples'],  train_data['targets'][:, i], prefix='target-{0}'.format(i), **kwargs)
         regressors.append(regressor)
 
@@ -255,9 +255,9 @@ def multiple_forests(train_data, test_data, _run, _log, **kwargs):
 
     errors = calculate_errors(normed_prediction, test_data['targets'])
 
-    errors['training_score'] = score_training
-    errors['test_score'] = score_test
-    errors['oob_score'] = score_oob
+    errors['training_score'] = list(score_training)
+    errors['test_score'] = list(score_test)
+    errors['oob_score'] = list(score_oob)
 
     _run.info['error'] = errors
 
