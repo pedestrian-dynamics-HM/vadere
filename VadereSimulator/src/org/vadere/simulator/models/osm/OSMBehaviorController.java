@@ -82,7 +82,7 @@ public class OSMBehaviorController {
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
 
         FootStep currentFootstep = new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime);
-        pedestrian.getFootSteps().add(currentFootstep);
+        pedestrian.getTrajectory().add(currentFootstep);
         pedestrian.getFootstepHistory().add(currentFootstep);
     }
 

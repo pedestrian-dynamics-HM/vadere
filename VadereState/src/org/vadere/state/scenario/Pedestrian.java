@@ -3,6 +3,7 @@ package org.vadere.state.scenario;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
 import org.vadere.state.events.types.Event;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
@@ -119,12 +120,12 @@ public class Pedestrian extends Agent {
 	}
 
     public VPoint getInterpolatedFootStepPosition(double time){
-        if(this.trajectory.getLastFootSteps().getCapacity() <= 0){
+        if(this.footstepHistory.getCapacity() <= 0){
             throw new IllegalArgumentException("Cannot interpolate foot steps if there is no capacity (larger than zero) " +
                     "for storing foot steps (see 'scenario.attributesPedestrian.footStepsToStore' field)");
         }
 
-        FootStep currentFootStep = this.trajectory.getLastFootSteps().getYoungestFootStep();
+        FootStep currentFootStep = this.footstepHistory.getYoungestFootStep();
 
         if(currentFootStep == null){
             return getPosition();
