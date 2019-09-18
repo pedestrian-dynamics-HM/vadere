@@ -7,6 +7,7 @@
 ### Added
 
 ### Changed
+- `PedestrianFootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.
 
 # v1.4 (2019-09-05)
 

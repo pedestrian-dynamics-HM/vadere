@@ -19,6 +19,9 @@ import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 
+/**
+ * TODO: should also use OSMBehaviorController.makeStep !
+ */
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	private static Logger logger = Logger.getLogger(UpdateSchemeParallel.class);

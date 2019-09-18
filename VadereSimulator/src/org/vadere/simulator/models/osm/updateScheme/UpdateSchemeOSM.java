@@ -136,7 +136,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), timeOfNextStep));
 
 		FootStep currentFootstep = new FootStep(currentPosition, nextPosition, timeOfNextStep, entTimeOfStep);
-		pedestrian.getFootSteps().add(currentFootstep);
+		pedestrian.getTrajectory().add(currentFootstep);
 		pedestrian.getFootstepHistory().add(currentFootstep);
 	}
 

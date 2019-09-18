@@ -3,6 +3,8 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -39,9 +41,18 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			public void mockIt() {
 				when(state.getStep()).thenReturn(1);
 
-				b.clear().add(1, new VPoint(1.435346, 1.0))
-						.add(2, new VPoint(2.0, 2.0))
-						.add(3, new VPoint(3.0, 3.0));
+				VTrajectory traj1 = new VTrajectory();
+				VTrajectory traj2 = new VTrajectory();
+				VTrajectory traj3 = new VTrajectory();
+
+				traj1.add(new FootStep(new VPoint(0,0 ), new VPoint(0,1), 0, 0.4));
+				traj2.add(new FootStep(new VPoint(0,0 ), new VPoint(1,0), 0, 0.2));
+				traj3.add(new FootStep(new VPoint(0,0 ), new VPoint(1,1), 0, 1.));
+
+				b.clear().add(1, traj1)
+						.add(2, traj2)
+						.add(3, traj3);
+
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				addToExpectedOutput(state.getStep(), b.getList());
 
@@ -52,9 +63,18 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(2);
-				b.clear().add(4, new VPoint(1.0, 1.0))
-						.add(2, new VPoint(5.0, 5.0))
-						.add(3, new VPoint(6.0, 6.0));
+
+                VTrajectory traj1 = new VTrajectory();
+                VTrajectory traj2 = new VTrajectory();
+                VTrajectory traj3 = new VTrajectory();
+
+                traj1.add(new FootStep(new VPoint(0,0 ), new VPoint(0,1), 0, 0.4));
+                traj2.add(new FootStep(new VPoint(0,0 ), new VPoint(1,0), 0, 0.2));
+                traj3.add(new FootStep(new VPoint(0,0 ), new VPoint(1,1), 0, 1.));
+
+				b.clear().add(4, traj1)
+						.add(5, traj2)
+						.add(6, traj3);
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				addToExpectedOutput(state.getStep(), b.getList());
 			}
@@ -64,7 +84,11 @@ public class PedestrianPositionProcessorTestEnv extends ProcessorTestEnv<Timeste
 			@Override
 			public void mockIt() {
 				when(state.getStep()).thenReturn(3);
-				b.clear().add(4, new VPoint(5.0, 5.0));
+
+                VTrajectory traj1 = new VTrajectory();
+                traj1.add(new FootStep(new VPoint(0,0 ), new VPoint(1,1), 0, 1.));
+
+				b.clear().add(7, traj1);
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				addToExpectedOutput(state.getStep(), b.getList());
 			}

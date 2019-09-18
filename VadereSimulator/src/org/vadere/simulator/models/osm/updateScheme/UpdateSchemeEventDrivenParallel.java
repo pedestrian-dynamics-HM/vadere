@@ -190,8 +190,8 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		}
 
 		private boolean hasChanged() {
-			//System.out.println(pedestrianOSM.getFootSteps().getFootSteps().size());
-			return pedestrianOSM.getFootSteps().isEmpty() || pedestrianOSM.getFootSteps().getFootSteps().peekLast().length() > 0;
+			//System.out.println(pedestrianOSM.getTrajectory().getTrajectory().size());
+			return pedestrianOSM.getTrajectory().isEmpty() || pedestrianOSM.getTrajectory().getFootSteps().peekLast().length() > 0;
 		}
 
 		@Override

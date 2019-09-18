@@ -2,6 +2,7 @@ package org.vadere.state.simulation;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Iterator;
@@ -22,6 +23,23 @@ public class VTrajectory implements Iterable<FootStep> {
 	// Getters
 	public LinkedList<FootStep> getFootSteps() {
 		return new LinkedList<>(footSteps);
+	}
+
+	public boolean adjustEndTime(@NotNull final double endTime) {
+		if(!isEmpty()) {
+			while (!isEmpty() && footSteps.peekLast().getStartTime() >= endTime) {
+				footSteps.removeLast();
+			}
+
+			if(footSteps.isEmpty()) {
+				return false;
+			}
+			FootStep footStep = footSteps.removeLast();
+			footSteps.addLast(new FootStep(footStep.getStart(), footStep.getEnd(), footStep.getStartTime(), endTime));
+		} else {
+			throw new IllegalStateException("cant adjust the last footstep of an empty trajectory.");
+		}
+		return true;
 	}
 
 	// Methods
@@ -95,10 +113,14 @@ public class VTrajectory implements Iterable<FootStep> {
 		}
 	}
 
-	public void add(@NotNull final FootStep footStep) {
-		assert footSteps.isEmpty() || footSteps.peekLast().getEndTime() <= footStep.getStartTime();
+	public VTrajectory add(@NotNull final FootStep footStep) {
+
+		assert footSteps.isEmpty() ||
+				(footSteps.peekLast().getEndTime() <= footStep.getStartTime() &&  // make sure it is in order
+						footSteps.peekLast().getStartTime() < footStep.getStartTime());
 
 		footSteps.add(footStep);
+		return this;
 	}
 
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {

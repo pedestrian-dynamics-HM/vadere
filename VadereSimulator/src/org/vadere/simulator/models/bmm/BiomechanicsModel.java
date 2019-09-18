@@ -13,7 +13,6 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -113,7 +112,7 @@ public class BiomechanicsModel implements MainModel {
 			agent.clearFootSteps();
 
 			FootStep currentFootstep = new FootStep(positions.get(i), agent.getPosition(), lastSimTimeInSec, simTimeInSec);
-			agent.getFootSteps().add(currentFootstep);
+			agent.getTrajectory().add(currentFootstep);
 			agent.getFootstepHistory().add(currentFootstep);
 		}
 

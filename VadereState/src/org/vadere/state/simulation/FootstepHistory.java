@@ -1,5 +1,7 @@
 package org.vadere.state.simulation;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,7 @@ public class FootstepHistory {
         return oldestFootStep;
     }
 
+    @Nullable
     public FootStep getYoungestFootStep() {
         FootStep youngestFootStep = null;
 

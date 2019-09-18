@@ -45,7 +45,7 @@ public class PedestrianReynolds extends Pedestrian {
         // TODO: the first footstep starts at the wrong time!
 		clearFootSteps();
 		FootStep currentFootstep = new FootStep(oldPosition, newPosition, lastSimTimeInSec, simTime);
-		getFootSteps().add(currentFootstep);
+		getTrajectory().add(currentFootstep);
 		getFootstepHistory().add(currentFootstep);
 
 		lastSimTimeInSec = simTime;

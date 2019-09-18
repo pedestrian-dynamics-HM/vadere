@@ -2,6 +2,7 @@ package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.behavior.SalientBehavior;
@@ -12,10 +13,10 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import tech.tablesaw.plotly.components.change.Change;
+import org.vadere.util.math.MathUtil;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -61,7 +62,7 @@ public class OSMBehaviorController {
 	    // end time
 	    double stepEndTime = pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep();
 
-	    assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0;
+	    assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
 
         if (nextPosition.equals(currentPosition)) {
             pedestrian.setTimeCredit(0);
@@ -84,12 +85,14 @@ public class OSMBehaviorController {
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
 
         FootStep currentFootstep = new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime);
-        pedestrian.getFootSteps().add(currentFootstep);
+        pedestrian.getTrajectory().add(currentFootstep);
         pedestrian.getFootstepHistory().add(currentFootstep);
     }
 
-    public void wait(PedestrianOSM pedestrian) {
-        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+    public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
+        // Satisfy event-driven and sequential update scheme.
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
+        pedestrian.setTimeCredit(0);
     }
 
     // Watch out: A bang event changes only the "CombinedPotentialStrategy".
@@ -129,6 +132,9 @@ public class OSMBehaviorController {
      * Try to swap the given pedestrian with the closest cooperative pedestrian.
      * Carry out the following steps:
      *
+     * TODO: Refactoring, this class should not have access to the event queue. Idea: use "old" events which will be ignored i.e.
+     * one agent might have multiple events in the queue.
+     *
      * <ol>
      *     <li>Use topography to find a close pedestrian within step circle which is closer to target than the given pedestrian.</li>
      *     <li>Check if candidate is SalientBehavior.COOPERATIVE.</li>
@@ -139,13 +145,12 @@ public class OSMBehaviorController {
      * @param pedestrian The pedestrian which would like to swap the position.
      * @param topography The topography is required to find the neighbors of the given pedestrian.
      */
-    public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography) {
+    /*public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography, PriorityQueue<PedestrianOSM> queue) {
         if (pedestrian.hasNextTarget() == false) { // Ignore pedestrians with no targets.
             // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
             pedestrian.updateNextPosition();
             makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
             pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-
             return;
         }
 
@@ -165,7 +170,7 @@ public class OSMBehaviorController {
                 }
 
                 if (closestPedIsCooperative && targetOrientationDiffers) {
-                    swapPedestrians(pedestrian, (PedestrianOSM)closestPedestrian, topography);
+                    swapPedestrians(pedestrian, (PedestrianOSM)closestPedestrian, topography, queue);
                     pedestriansSwapped = true;
                     break;
                 }
@@ -178,6 +183,37 @@ public class OSMBehaviorController {
             makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
             pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
         }
+    }*/
+
+    @Nullable
+    public PedestrianOSM findSwapCandidate(PedestrianOSM pedestrian, Topography topography) {
+
+    	List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
+
+	    if (closestPedestrians.size() > 0) {
+		    for (Pedestrian closestPedestrian : closestPedestrians) {
+		    	if(pedestrian.hasNextTarget()) {
+				    boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
+				    boolean targetOrientationDiffers = false;
+
+				    // TODO: Use "pedestrian.getTargetGradient()" instead of "calculateAngleBetweenTargets()".
+				    double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+
+				    if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
+					    targetOrientationDiffers = true;
+				    }
+
+				    if (closestPedIsCooperative && targetOrientationDiffers) {
+					    return (PedestrianOSM)closestPedestrian;
+				    }
+			    } else {
+		    		if(!closestPedestrian.hasNextTarget()) {
+					    return (PedestrianOSM)closestPedestrian;
+				    }
+			    }
+		    }
+	    }
+	    return null;
     }
 
     @NotNull
@@ -260,7 +296,7 @@ public class OSMBehaviorController {
         return vectorPedestrianToTarget;
     }
 
-    private void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
+    public void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {
         VPoint newPosition = pedestrian2.getPosition().clone();
         VPoint oldPosition = pedestrian1.getPosition().clone();
 
@@ -269,13 +305,33 @@ public class OSMBehaviorController {
 
         // Use "makeStep()" to swap both pedestrians to avoid "java.lang.AssertionError:
         // Number of pedestrians in LinkedCellGrid does not match number of pedestrians in topography".
-        makeStep(pedestrian1, topography, pedestrian1.getDurationNextStep());
-        makeStep(pedestrian2, topography, pedestrian2.getDurationNextStep());
+	    double startTimeStep = pedestrian1.getTimeOfNextStep();
+	    double durationStep = Math.max(pedestrian1.getDurationNextStep(), pedestrian2.getDurationNextStep());
+	    double endTimeStep = startTimeStep + durationStep;
+
+	    // here we interrupt the current footstep of pedestrian 2 to sync it to pedestrian 1
+	    // this is only required for the sequential update scheme since pedestrian 2 might have done some steps in this time step and
+	    // is ahead (with respect to the time) of pedestrian 1. We remove those steps which is not a good solution!
+	    if(!pedestrian2.getTrajectory().isEmpty()) {
+
+	    	// the agent was standing still, otherwise this should not be allowed
+		    pedestrian2.getTrajectory().adjustEndTime(startTimeStep);
+	    }
+
+	    // Note: Here we manipulate a pedestrian which is contained in the queue sorted by timeOfNextStep!
+	    pedestrian1.setTimeOfNextStep(startTimeStep);
+	    pedestrian2.setTimeOfNextStep(startTimeStep);
+
+	    makeStep(pedestrian1, topography, durationStep);
+        makeStep(pedestrian2, topography, durationStep);
 
         // TODO The experiment showed that speed decreased (to half of free-flow velocity).
         //   Therefore, use "pedestrian.getDurationNextStep() * 2".
-        pedestrian1.setTimeOfNextStep(pedestrian1.getTimeOfNextStep() + pedestrian1.getDurationNextStep());
-        pedestrian2.setTimeOfNextStep(pedestrian2.getTimeOfNextStep() + pedestrian2.getDurationNextStep());
-    }
+        pedestrian1.setTimeOfNextStep(endTimeStep);
+        pedestrian2.setTimeOfNextStep(endTimeStep);
 
+	    pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
+//	    assert pedestrian1.getTimeCredit() >= 0.0;
+	    pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
+    }
 }
