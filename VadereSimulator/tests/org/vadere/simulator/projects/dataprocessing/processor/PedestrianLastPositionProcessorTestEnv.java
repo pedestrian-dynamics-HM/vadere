@@ -4,6 +4,8 @@ import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -36,9 +38,10 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 			@Override
 			public void mockIt() {
 
-				b.clear().add(1, new VPoint(1.0, 1.2))
-						.add(3, new VPoint(4.45, 1.2))
-						.add(5, new VPoint(3.546, 7.2342));
+				b.clear().add(1, new VPoint(1.0, 1.2), 0)
+						.add(3, new VPoint(4.45, 1.2), 0)
+						.add(5, new VPoint(3.546, 7.2342), 0);
+
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				addToExpectedOutput(new PedestrianIdKey(1), new VPoint(1.0, 1.2));
@@ -51,9 +54,10 @@ public class PedestrianLastPositionProcessorTestEnv extends ProcessorTestEnv<Ped
 		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, new VPoint(33.2, 3.22))
-						.add(3, new VPoint(3.2, 22.3))
-						.add(7, new VPoint(1.2, 3.3));
+
+				b.clear().add(1, new VPoint(33.2, 3.22), 0)
+						.add(3, new VPoint(3.2, 22.3), 0)
+						.add(7, new VPoint(1.2, 3.3), 0);
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 
 				//overwrite Values!

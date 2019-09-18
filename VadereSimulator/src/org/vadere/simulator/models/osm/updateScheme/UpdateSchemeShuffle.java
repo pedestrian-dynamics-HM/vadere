@@ -20,10 +20,10 @@ public class UpdateSchemeShuffle extends UpdateSchemeSequential {
 	}
 
 	@Override
-	protected void update(@NotNull Collection<Pedestrian> pedestrianOSMS, double timeStepInSec) {
+	protected void update(@NotNull Collection<Pedestrian> pedestrianOSMS, double currentTimeInSec, double timeStepInSec) {
 		List<Pedestrian> shuffledList = new ArrayList<>(pedestrianOSMS.size());
 		shuffledList.addAll(pedestrianOSMS);
 		Collections.shuffle(shuffledList, random);
-		super.update(shuffledList, timeStepInSec);
+		super.update(shuffledList, currentTimeInSec, timeStepInSec);
 	}
 }

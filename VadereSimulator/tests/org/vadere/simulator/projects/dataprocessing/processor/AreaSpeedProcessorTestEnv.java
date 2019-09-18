@@ -7,6 +7,8 @@ import org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -49,9 +51,10 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		addSimState(new SimulationStateMock(1) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, new VPoint(1.0, 0.0))
-						.add(2, new VPoint(0.0, 0.0))
-						.add(3, new VPoint(7.0, 4.0));    //not in area
+
+				b.clear().add(1, new VPoint(1,0), 0)
+						.add(2, new VPoint(0,0), 0)
+						.add(3, new VPoint(7,4), 0);    //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				when(state.getSimTimeInSec()).thenReturn(0.0);
@@ -64,9 +67,10 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		addSimState(new SimulationStateMock(2) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, new VPoint(1.0, 1.0)) //dist = 1.0
-						.add(2, new VPoint(3.0, 4.0))    //dist = 5.0
-						.add(3, new VPoint(8.0, 4.0));    //not in area
+
+				b.clear().add(1, new VPoint(1,1), 1)   //dist = 1.0
+						.add(2, new VPoint(3,4), 1)    //dist = 5.0
+						.add(3, new VPoint(8,4), 1);   //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 1.0;
@@ -82,9 +86,10 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		addSimState(new SimulationStateMock(3) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, new VPoint(3.0, 1.0)) //dist = 2.0
-						.add(2, new VPoint(5.0, 4.0))    //not in area
-						.add(3, new VPoint(8.0, 8.0));    //not in area
+
+				b.clear().add(1, new VPoint(3,1), 2)   //dist = 2.0
+						.add(2, new VPoint(5,4), 2)    //not in area
+						.add(3, new VPoint(8,8), 2);   //not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 2.0;
@@ -100,9 +105,10 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 		addSimState(new SimulationStateMock(4) {
 			@Override
 			public void mockIt() {
-				b.clear().add(1, new VPoint(6.0, 1.0)) // not in area
-						.add(2, new VPoint(7.0, 4.0))    // not in area
-						.add(3, new VPoint(9.0, 8.0));    // not in area
+
+				b.clear().add(1, new VPoint(6,1), 3)   // not in area
+						.add(2, new VPoint(7,4), 3)    // not in area
+						.add(3, new VPoint(9,8), 3);   // not in area
 
 				when(state.getTopography().getElements(Pedestrian.class)).thenReturn(b.getList());
 				double simTime = 3.0;

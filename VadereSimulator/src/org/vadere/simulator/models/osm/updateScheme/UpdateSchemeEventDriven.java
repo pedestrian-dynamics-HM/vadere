@@ -12,10 +12,13 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.math.MathUtil;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  * @author Benedikt Zoennchen
@@ -30,7 +33,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianOSM());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianOSM.class));
-		osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
 	@Override
@@ -50,28 +53,41 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec) {
+		// for the first step after creation, timeOfNextStep has to be initialized
+		if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
+			pedestrian.setTimeOfNextStep(currentTimeInSec);
+			return;
+		}
+
 		Event mostImportantEvent = pedestrian.getMostImportantEvent();
 
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
-			VPoint oldPosition = pedestrian.getPosition();
-
 			double stepDuration = pedestrian.getDurationNextStep();
-
-			// for the first step after creation, timeOfNextStep has to be initialized
-			if (pedestrian.getTimeOfNextStep() == 0) {
-				pedestrian.setTimeOfNextStep(currentTimeInSec - timeStepInSec);
-			}
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
 				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
 				pedestrian.updateNextPosition();
 				osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
 				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
 			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
-				osmBehaviorController.swapWithClosestCooperativePedestrian(pedestrian, topography);
+				// this call will also invoke setTimeOfNextStep
+				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+				//TODO: Benedikt Kleinmeier:
+				if(candidate != null) {
+					//if(Math.abs(pedestrian.getTimeOfNextStep() - candidate.getTimeOfNextStep()) < MathUtil.EPSILON) {
+						pedestrianEventsQueue.remove(candidate);
+						osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+						pedestrianEventsQueue.add(candidate);
+					/*} else {
+						pedestrian.setTimeOfNextStep(candidate.getTimeOfNextStep());
+					}*/
+				} else {
+					pedestrian.updateNextPosition();
+					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+				}
 			}
-
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
-			osmBehaviorController.wait(pedestrian);
+			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (mostImportantEvent instanceof BangEvent) {
 			osmBehaviorController.reactToBang(pedestrian, topography);
 

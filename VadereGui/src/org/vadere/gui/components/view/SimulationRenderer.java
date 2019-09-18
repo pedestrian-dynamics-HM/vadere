@@ -198,7 +198,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 	    double maxDistance = Math.sqrt(model.getTopography().getBounds().getWidth() * model.getTopography().getBounds().getWidth() +
 			    model.getTopography().getBounds().getHeight() * model.getTopography().getBounds().getHeight());
-	    colorHelper = new ColorHelper((int)(maxDistance * 0.7));
+	    colorHelper = new ColorHelper((int)(maxDistance));
 
         for (int x = 0; x < potentialFieldImage.getWidth(); x++) {
             for (int y = 0; y < potentialFieldImage.getHeight(); y++) {

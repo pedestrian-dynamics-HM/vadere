@@ -292,8 +292,8 @@ public class Trajectory {
 		// use the foot step information if available
 		if(agent instanceof Pedestrian) {
 			Pedestrian pedestrian = (Pedestrian)agent;
-			if(!pedestrian.getFootSteps().isEmpty()) {
-				Iterable<FootStep> iterable = () -> pedestrian.getFootSteps().descendingIterator();
+			if(!pedestrian.getTrajectory().isEmpty()) {
+				Iterable<FootStep> iterable = () -> pedestrian.getTrajectory().descendingIterator();
 				return StreamSupport.stream(iterable.spliterator(), false).map(footStep -> footStep.getEnd());
 			}
 		}
