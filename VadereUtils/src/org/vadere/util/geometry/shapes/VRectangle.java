@@ -4,6 +4,7 @@ import org.vadere.util.geometry.GeometryUtils;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -196,5 +197,14 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	@Override
 	public List<VPoint> getPath() {
 		return Arrays.asList(new VPoint(x,y), new VPoint(x+width, y), new VPoint(x+width, y+height), new VPoint(x, y+height));
+	}
+
+	@Override
+	public List<VLine> lines() {
+		List<VLine> lines = new ArrayList<>();
+		for (VLine line : getLines()) {
+			lines.add(line);
+		}
+		return lines;
 	}
 }

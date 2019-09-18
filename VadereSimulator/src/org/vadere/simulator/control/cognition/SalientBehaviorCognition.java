@@ -2,13 +2,11 @@ package org.vadere.simulator.control.cognition;
 
 import org.vadere.state.events.types.BangEvent;
 import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.Event;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.simulation.LastFootSteps;
+import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * The SalientBehaviorCognition class should provide logic to change the salient behavior of a pedestrian
@@ -36,10 +34,10 @@ public class SalientBehaviorCognition {
             int requiredFootSteps = 2;
             double requiredSpeedInMetersPerSecondToBeCooperative = 0.05;
 
-            LastFootSteps lastFootSteps = pedestrian.getFootSteps().getLastFootSteps();
+            FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
 
-            if (lastFootSteps.size() >= requiredFootSteps) { // Adapt behavior only if we have seen some footsteps in the past
-                if (lastFootSteps.getAverageSpeedInMeterPerSecond() <= requiredSpeedInMetersPerSecondToBeCooperative) {
+            if (footstepHistory.size() >= requiredFootSteps) { // Adapt behavior only if we have seen some footsteps in the past
+                if (footstepHistory.getAverageSpeedInMeterPerSecond() <= requiredSpeedInMetersPerSecondToBeCooperative) {
                     pedestrian.setSalientBehavior(SalientBehavior.COOPERATIVE);
                 } else {
                     // TODO Maybe, check if area directed to target is free for a step (only then change to "TARGET_ORIENTED").

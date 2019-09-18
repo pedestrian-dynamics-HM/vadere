@@ -6,6 +6,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rtextarea.RTextScrollPane;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -33,7 +34,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 	private static final long serialVersionUID = -1567362675580536991L;
 	private static Logger logger = Logger.getLogger(ScenarioElementView.class);
-	private JTextArea txtrTextfiletextarea;
+	private RSyntaxTextArea txtrTextfiletextarea;
 	private IDefaultModel panelModel;
 	private DocumentListener documentListener;
 
@@ -48,8 +49,15 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		this.panelModel.addSelectScenarioElementListener(this);
 		this.jsonValidIndicator = jsonValidIndicator;
 		CellConstraints cc = new CellConstraints();
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setPreferredSize(new Dimension(1, Toolkit.getDefaultToolkit().getScreenSize().height));
+
+		txtrTextfiletextarea = new RSyntaxTextArea();
+		txtrTextfiletextarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+		txtrTextfiletextarea.setCodeFoldingEnabled(true);
+
+		RTextScrollPane sp = new RTextScrollPane(txtrTextfiletextarea);
+		sp.setFoldIndicatorEnabled(true);
+		sp.setLineNumbersEnabled(true);
+		sp.setPreferredSize(new Dimension(1, Toolkit.getDefaultToolkit().getScreenSize().height));
 
 		if (topComponent != null && this.jsonValidIndicator !=null) {
 			setLayout(new FormLayout("default:grow", "pref, default"));
@@ -63,30 +71,22 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			jsonMeta.add(topComponent);
 
 			add(jsonMeta, cc.xy(1, 1));
-			add(scrollPane, cc.xy(1, 2));
+			add(sp, cc.xy(1, 2));
 		} else {
 			setLayout(new FormLayout("default:grow", "default"));
-			add(scrollPane, cc.xy(1, 1));
+			add(sp, cc.xy(1, 1));
 		}
-
-		// JScrollPane scrollPane = new JScrollPane();
-		// add(scrollPane, BorderLayout.CENTER);
-
-		RSyntaxTextArea textAreaLocal = new RSyntaxTextArea();
-		textAreaLocal.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 
 		// set other color theme for text area...
 		InputStream in = getClass().getResourceAsStream("/syntaxthemes/idea.xml");
 		try {
 			Theme syntaxTheme = Theme.load(in);
-			syntaxTheme.apply(textAreaLocal);
+			syntaxTheme.apply(txtrTextfiletextarea);
 		} catch (IOException e) {
 			logger.error("could not loadFromFilesystem theme" + e.getMessage());
 		}
 
-		txtrTextfiletextarea = textAreaLocal;
 
-		scrollPane.setViewportView(txtrTextfiletextarea);
 
 		// documentListener = new JSONDocumentListener(defaultModel);
 		// txtrTextfiletextarea.getDocument().addDocumentListener(documentListener);
@@ -110,6 +110,10 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		};
 
 		txtrTextfiletextarea.getDocument().addDocumentListener(documentListener);
+	}
+
+	public int textWidth(){
+		return txtrTextfiletextarea.getPreferredSize().width;
 	}
 
 	private void updateModel() {

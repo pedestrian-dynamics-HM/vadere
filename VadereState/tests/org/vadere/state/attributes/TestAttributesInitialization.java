@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.util.StateJsonConverter;
 
+import java.io.IOException;
+
 public class TestAttributesInitialization {
 
 	private static final double delta = 1e-8;
@@ -24,14 +26,14 @@ public class TestAttributesInitialization {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.state.attributes.models.AttributesODEIntegrator#AttributesODEModel(java.util.Map)}
+	 * {@link org.vadere.state.attributes.models.AttributesODEIntegrator(java.util.Map)}
 	 * . Asserts the attributes are initialized correctly.
 	 * 
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 */
 	@Test
-	public void testInit() throws IllegalArgumentException, IllegalAccessException {
+	public void testInit() throws IllegalArgumentException, IOException {
 		// correct case
 		attributesPedestrian = StateJsonConverter.deserializeObjectFromJson(store, AttributesAgent.class);
 
@@ -41,14 +43,14 @@ public class TestAttributesInitialization {
 
 	/**
 	 * Test method for
-	 * {@link org.vadere.state.attributes.models.AttributesODEIntegrator#AttributesODEModel(java.util.Map)}
+	 * {@link org.vadere.state.attributes.models.AttributesODEIntegrator(java.util.Map)}
 	 * . Asserts the default attributes are initialized correctly.
 	 * 
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 */
 	@Test
-	public void testInitDefault() throws IllegalArgumentException, IllegalAccessException {
+	public void testInitDefault() throws IllegalArgumentException, IOException {
 		// correct case
 		store = "{}";
 		attributesPedestrian = StateJsonConverter.deserializeObjectFromJson(store, AttributesAgent.class);

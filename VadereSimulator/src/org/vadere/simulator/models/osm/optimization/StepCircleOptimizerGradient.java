@@ -15,7 +15,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.simulator.models.potential.solver.gradients.FloorGradientProviderDiscrete;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
-public class StepCircleOptimizerGradient implements StepCircleOptimizer {
+public class StepCircleOptimizerGradient extends StepCircleOptimizer {
 
 	private final AttributesOSM attributesOSM;
 	private final IPotentialFieldTargetGrid potentialFieldTarget;

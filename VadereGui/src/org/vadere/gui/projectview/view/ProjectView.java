@@ -52,6 +52,8 @@ import org.vadere.util.opencl.CLUtils;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +67,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 /**
  * Main view of the Vadere GUI.
@@ -95,6 +98,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 */
 	private JPanel contentPane = new JPanel();
 	private JPanel controlPanel = new JPanel();
+	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
 	private JButton btnRunSelectedScenario;
@@ -356,7 +360,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		buildOutputTablePopup();
 		buildScenarioTablePopup(addScenarioAction);
 		buildToolBar();
-		buildRightSidePanel();
 
 		setScenariosRunning(false);
 
@@ -518,7 +521,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		contentPane.setLayout(new BorderLayout(0, 0));
 
 		JPanel panel_1 = new JPanel();
-		contentPane.add(panel_1, BorderLayout.WEST);
 		panel_1.setLayout(new BorderLayout(0, 0));
 
 		panel_1.add(progressPanel, BorderLayout.SOUTH);
@@ -530,10 +532,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		outputTable = model.createOutputTable();
 
 		buildScenarioTable(outputTableRenderer);
-		contentPane.add(scenarioTable.getTableHeader(), BorderLayout.CENTER);
 
 		buildOutputTable(outputTableRenderer);
-		contentPane.add(outputTable.getTableHeader(), BorderLayout.CENTER);
 
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.6);
@@ -551,6 +551,28 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		panel_1.add(controlPanel, BorderLayout.NORTH);
 		FlowLayout fl_controlPanel = (FlowLayout) controlPanel.getLayout();
 		fl_controlPanel.setAlignment(FlowLayout.LEFT);
+
+		JPanel panel_2 = buildRightSidePanel();
+
+		mainSplitPanel = new JSplitPane();
+		((BasicSplitPaneUI) mainSplitPanel.getUI()).getDivider().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					mainSplitPanel.setDividerLocation(scenarioTable.getSize().width + 5);
+				}
+			}
+		});
+		mainSplitPanel.setResizeWeight(0.4);
+		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
+		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		panel_1.setMinimumSize(new Dimension(1,1));
+		panel_2.setMinimumSize(new Dimension(1, 1));
+		mainSplitPanel.setLeftComponent(panel_1_scroll);
+		mainSplitPanel.setRightComponent(panel_2);
+		mainSplitPanel.resetToPreferredSizes();
+		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
 	}
 
 	private void buildScenarioTable(OutputTableRenderer outputTableRenderer) {
@@ -761,7 +783,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		buildKeyboardShortcuts(pauseScenarioAction, interruptScenariosAction);
 	}
 
-	private void buildRightSidePanel() {
+	private JPanel buildRightSidePanel() {
 		JPanel rightSidePanel = new JPanel();
 		rightSidePanel.setLayout(new BorderLayout(0, 0));
 		contentPane.add(rightSidePanel, BorderLayout.CENTER);
@@ -773,6 +795,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		model.setScenarioNamePanel(scenarioNamePanel); // TODO [priority=low] [task=refactoring] breaking mvc pattern (?) - but I need access to refresh the scenarioName
 		model.addProjectChangeListener(scenarioJPanel);
 		rightSidePanel.add(scenarioJPanel, BorderLayout.CENTER);
+		return rightSidePanel;
 	}
 
 	private void addToProjectSpecificActions(Action action) {
@@ -818,5 +841,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	public void updateScenarioJPanel() {
 		scenarioJPanel.updateScenario();
+	}
+
+	@Override
+	public void validate() {
+		int max_div = scenarioTable.getSize().width + 25;
+		super.validate();
+		if (mainSplitPanel.getDividerLocation() > max_div){
+			mainSplitPanel.setDividerLocation(max_div);
+		}
 	}
 }

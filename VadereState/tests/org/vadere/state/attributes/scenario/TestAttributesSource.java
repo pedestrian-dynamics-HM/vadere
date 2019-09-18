@@ -2,6 +2,7 @@ package org.vadere.state.attributes.scenario;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +13,18 @@ public class TestAttributesSource {
 
 	private AttributesSource attributes;
 
-	private void createAttributes(SourceTestAttributesBuilder builder) {
+	private void createAttributes(SourceTestAttributesBuilder builder) throws IOException {
 		attributes = builder.getResult();
 	}
 
 	@Test
-	public void testGetInterSpawnTimeDistribution() {
+	public void testGetInterSpawnTimeDistribution() throws IOException {
 		createAttributes(new SourceTestAttributesBuilder());
 		assertEquals(ConstantDistribution.class.getName(), attributes.getInterSpawnTimeDistribution());
 	}
 
 	@Test
-	public void testGetDistributionParameters() {
+	public void testGetDistributionParameters() throws IOException {
 		final SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setDistributionParameters(new double[] {1, 2, 3});
 		createAttributes(builder);

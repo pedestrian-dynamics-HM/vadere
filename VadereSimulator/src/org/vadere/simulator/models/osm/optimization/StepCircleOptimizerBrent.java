@@ -18,7 +18,7 @@ import java.util.Random;
  * The Class StepCircleOptimizerBrent.
  * 
  */
-public class StepCircleOptimizerBrent implements StepCircleOptimizer {
+public class StepCircleOptimizerBrent extends StepCircleOptimizer {
 	private static Logger logger = Logger
 			.getLogger(StepCircleOptimizerBrent.class);
 

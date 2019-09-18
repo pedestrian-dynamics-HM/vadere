@@ -1,7 +1,7 @@
 {
   "name" : "C-180-180-095",
   "description" : "",
-  "release" : "1.2",
+  "release" : "1.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -224,7 +224,8 @@
           "height" : 16.0
         },
         "boundingBoxWidth" : 0.5,
-        "bounded" : true
+        "bounded" : true,
+        "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
         "shape" : {
@@ -377,7 +378,7 @@
         "minimumSpeed" : 1.37,
         "maximumSpeed" : 1.73,
         "acceleration" : 2.0,
-        "footStepsToStore" : 4,
+        "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
         "angleCalculationType" : "USE_CENTER",
         "targetOrientationAngleThreshold" : 45.0

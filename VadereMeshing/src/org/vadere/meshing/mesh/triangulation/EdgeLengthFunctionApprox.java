@@ -43,17 +43,21 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
-
+		var mesh = triangulation.getMesh();
 		for(var v : vertices) {
 			double minEdgeLen = Double.MAX_VALUE;
-			for(var u : triangulation.getMesh().getAdjacentVertexIt(v)) {
-				double len = v.distance(u) * 0.9;
-				if(len < minEdgeLen) {
-					minEdgeLen = len;
+			for(var e : triangulation.getMesh().getEdges(v)) {
+				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
+						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
+					var u = triangulation.getMesh().getTwinVertex(e);
+					double len = v.distance(u) * 0.9;
+					if(len < minEdgeLen) {
+						minEdgeLen = len;
+					}
 				}
 			}
 
-			triangulation.getMesh().setData(v, propName, minEdgeLen);
+			triangulation.getMesh().setDoubleData(v, propName, minEdgeLen);
 		}
 	}
 
@@ -67,21 +71,21 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 		// smooth the function based such that it is g-Lipschitz
 		var mesh = triangulation.getMesh();
 		PriorityQueue<PVertex> heap = new PriorityQueue<>(
-				Comparator.comparingDouble(v1 -> mesh.getData(v1, propName, Double.class).get())
+				Comparator.comparingDouble(v1 -> mesh.getDoubleData(v1, propName))
 		);
 		heap.addAll(mesh.getVertices());
 
 		while (!heap.isEmpty()) {
 			var v = heap.poll();
-			double hv = mesh.getData(v, propName, Double.class).get();
+			double hv = mesh.getDoubleData(v, propName);
 			for (var u : mesh.getAdjacentVertexIt(v)) {
-				double hu = mesh.getData(u, propName, Double.class).get();
+				double hu = mesh.getDoubleData(u, propName);
 				double min = Math.min(hu, hv + g * v.distance(u));
 
 				// update heap
 				if (min < hu) {
 					heap.remove(u);
-					mesh.setData(u, propName, min);
+					mesh.setDoubleData(u, propName, min);
 					heap.add(u);
 				}
 			}
@@ -110,7 +114,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 	}
 
 	public void printPython() {
-		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getData(v, propName, Double.class).get()));
+		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, propName)));
 		/*var points = triangulation.getMesh().getPoints();
 		System.out.print("[");
 		for(var dataPoint : points) {

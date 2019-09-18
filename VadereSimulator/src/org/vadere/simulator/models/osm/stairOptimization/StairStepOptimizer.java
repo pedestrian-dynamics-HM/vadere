@@ -23,7 +23,7 @@ import java.util.LinkedList;
  * Modellierungsseminar 2014/15
  * 
  */
-public class StairStepOptimizer implements StepCircleOptimizer {
+public class StairStepOptimizer extends StepCircleOptimizer {
 
 	private Stairs stairs;
 

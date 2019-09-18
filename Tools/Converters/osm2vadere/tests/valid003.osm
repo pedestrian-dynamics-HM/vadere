@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+<bounds minlat='48.16077' minlon='11.58451' maxlat='48.16386' maxlon='11.58936' origin='CGImap 0.7.5 (31203 thorn-02.openstreetmap.org)' />
+<way id='39057410' timestamp='2017-07-07T11:40:46Z' uid='367380' user='Mloni' visible='true' version='7' changeset='50106355'>
+  <nd ref='466194487' />
+  <nd ref='429741712' />
+  <nd ref='429583850' />
+  <nd ref='429583851' />
+  <nd ref='429583852' />
+  <nd ref='429583853' />
+  <nd ref='429583298' />
+  <nd ref='466194487' />
+  <tag k='addr:city' v='München' />
+  <tag k='addr:country' v='DE' />
+  <tag k='addr:housenumber' v='15' />
+  <tag k='addr:postcode' v='80802' />
+  <tag k='addr:street' v='Feilitzschstraße' />
+  <tag k='building' v='yes' />
+</way>
+<way id='36942797' timestamp='2014-11-02T20:04:54Z' uid='78613' user='heilbron' visible='true' version='8' changeset='26511966'>
+  <nd ref='466194487' />
+  <nd ref='429583279' />
+  <nd ref='429583282' />
+  <nd ref='429583298' />
+  <nd ref='466194487' />
+  <tag k='addr:city' v='München' />
+  <tag k='addr:country' v='DE' />
+  <tag k='addr:housenumber' v='2' />
+  <tag k='addr:postcode' v='80802' />
+  <tag k='addr:street' v='Occamstraße' />
+  <tag k='building' v='yes' />
+  <tag k='roof:shape' v='gabled' />
+</way>
+<node id='466194487' timestamp='2011-02-08T23:34:18Z' uid='342705' user='KonB' visible='true' version='2' changeset='7232063' lat='48.1613442' lon='11.5895291' />
+<node id='429583279' timestamp='2012-01-17T18:42:57Z' uid='8748' user='ToniE' visible='true' version='6' changeset='10420560' lat='48.1614825' lon='11.5896403' />
+<node id='429583282' timestamp='2016-09-30T12:57:39Z' uid='14390' user='BeKri' visible='true' version='7' changeset='42541803' lat='48.1615473' lon='11.5894436' />
+<node id='429583298' timestamp='2016-09-30T12:57:39Z' uid='14390' user='BeKri' visible='true' version='5' changeset='42541803' lat='48.1614152' lon='11.5893355' />
+<node id='429741712' timestamp='2016-09-30T12:57:42Z' uid='14390' user='BeKri' visible='true' version='4' changeset='42541803' lat='48.161294' lon='11.5894882' />
+<node id='429583850' timestamp='2016-09-30T12:57:39Z' uid='14390' user='BeKri' visible='true' version='5' changeset='42541803' lat='48.1612473' lon='11.5896375' />
+<node id='429583851' timestamp='2017-07-07T11:40:44Z' uid='367380' user='Mloni' visible='true' version='6' changeset='50106355' lat='48.1611339' lon='11.5895559' />
+<node id='429583852' timestamp='2016-09-30T12:57:40Z' uid='14390' user='BeKri' visible='true' version='4' changeset='42541803' lat='48.1612045' lon='11.5893331' />
+<node id='429583853' timestamp='2016-09-30T12:57:40Z' uid='14390' user='BeKri' visible='true' version='3' changeset='42541803' lat='48.16133' lon='11.5892698' />
+</osm>

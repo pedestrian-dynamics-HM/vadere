@@ -8,6 +8,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Path2D;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class SourceTestAttributesBuilder {
@@ -33,7 +34,7 @@ public class SourceTestAttributesBuilder {
 	private double y3 = 5.0;
 	private long randomSeed = 0;
 
-	public AttributesSource getResult() {
+	public AttributesSource getResult() throws IOException {
 		String json = generateSourceAttributesJson();
 		return StateJsonConverter.deserializeObjectFromJson(json, AttributesSource.class);
 	}

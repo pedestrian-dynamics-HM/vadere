@@ -172,10 +172,11 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		for(F face : faces) {
 			VPolygon polygon = mesh.toPolygon(face);
 
-			if(faceColorFunction != null) {
+			if(alertPred.test(face)) {
+				graphics.setColor(new Color(200, 0, 0));
+			}
+			else if(faceColorFunction != null) {
 				graphics.setColor(faceColorFunction.apply(face));
-			} else if(alertPred.test(face)) {
-				graphics.setColor(new Color(100, 0, 0));
 			} else {
 				graphics.setColor(Color.GRAY);
 			}

@@ -7,8 +7,10 @@ import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,9 +32,15 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
+		// This does not work currently, bcause of the mocking in the tests.
+		// Collection<Pedestrian> pedestrians = state.getTopography().getPedestrianDynamicElements().getElements();
+		Collection<Pedestrian> pedestrians = state.getTopography().getElements(Pedestrian.class);
 		Integer timeStep = state.getStep();
-		for (Pedestrian p : state.getTopography().getElements(Pedestrian.class)) {
-			this.putValue(new TimestepPedestrianIdKey(timeStep, p.getId()), p.getPosition());
+		double simTime = state.getSimTimeInSec();
+
+		for (Pedestrian pedestrian : pedestrians){
+			VPoint interpolatedPoint = pedestrian.getInterpolatedFootStepPosition(simTime);
+			this.putValue(new TimestepPedestrianIdKey(timeStep, pedestrian.getId()), interpolatedPoint);
 		}
 	}
 

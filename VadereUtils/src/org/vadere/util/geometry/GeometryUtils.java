@@ -303,8 +303,8 @@ public class GeometryUtils {
 			int numberOfGridPoints = (int) Math.ceil(circleOfGrid / circle.getRadius() * numberOfPointsOfLargestCircle);
 
 			// reduce number of grid points proportional to the constraint of direction
-			if (angle < 2 * Math.PI) {
-				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2 * Math.PI));
+			if (angle < 2.0 * Math.PI) {
+				numberOfGridPoints = (int) Math.ceil(numberOfGridPoints * angle / (2.0 * Math.PI));
 			}
 
 			double angleDelta = angle / numberOfGridPoints;
@@ -314,9 +314,7 @@ public class GeometryUtils {
 
 				double x = circleOfGrid * Math.cos(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getX();
 				double y = circleOfGrid * Math.sin(anchorAngle + angleDelta * (randOffset + i)) + circle.getCenter().getY();
-				VPoint tmpPos = new VPoint(x, y);
-
-				reachablePositions.add(tmpPos);
+				reachablePositions.add(new VPoint(x, y));
 			}
 		}
 
@@ -925,7 +923,18 @@ public class GeometryUtils {
 	 * @return a {@link VPolygon} object of the list of points
 	 */
 	public static VPolygon polygonFromPoints2D(@NotNull final List<? extends IPoint> points) {
-		return polygonFromPoints2D(points.toArray(new VPoint[0]));
+		Path2D.Double result = new Path2D.Double();
+		if (points.isEmpty())
+			return new VPolygon(result);
+
+		IPoint last = points.get(points.size() - 1);
+		result.moveTo(last.getX(), last.getY());
+
+		for (int i = 0; i < points.size(); i++) {
+			result.lineTo(points.get(i).getX(), points.get(i).getY());
+		}
+
+		return new VPolygon(result);
 	}
 
 	public static VPolygon polygonFromArea(@NotNull final Area area){
@@ -1228,6 +1237,7 @@ public class GeometryUtils {
 
 		return atan2;
 	}
+
 
 	/**
 	 * Computes the angle between the positive x-axis and the point (to - (0,0)).
