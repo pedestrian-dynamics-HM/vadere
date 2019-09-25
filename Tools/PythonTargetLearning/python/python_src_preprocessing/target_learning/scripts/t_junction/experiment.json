@@ -1,6 +1,6 @@
 {
     "dataset": {
-        "path": "I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/csvs/experiment/filtered",
+        "path": "I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/240x100/csvs/experiment/filtered",
         "test_size": 0.2,
         "shuffle": true
     },

@@ -66,6 +66,7 @@ class ScenarioOutput:
         for file in self.scenario['processWriters']['files']:
             f_name = file['filename']
             f_path = join(self.output_dir, f_name)
+            
             if os.path.exists(f_path):
                 attr_df = helper.clean_dir_name(f_name)
                 setattr(self.named_files, "df_" + attr_df, LazyDataFrameWrapper(f_path))
@@ -77,9 +78,9 @@ class ScenarioOutput:
                 attr_info_dict['dataprocessors'] = self._get_used_processors_(file['processors'])
                 attr_info_dict['path'] = os.path.abspath(f_path)
                 setattr(self.named_files, attr_info, attr_info_dict)
-            else:
-                if expect_all_outputs:
-                    raise FileNotFoundError(f"File <<{file}>> not found in")
+            # else:
+            #    if expect_all_outputs:
+            #        raise FileNotFoundError(f"File <<{file}>> not found in")
 
     @classmethod
     def create_output_from_project_output(cls, output_dir: int, expect_all_outputs: bool = True):

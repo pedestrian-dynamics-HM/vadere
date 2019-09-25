@@ -1,4 +1,5 @@
 import sys
+import os
 import itertools
 import numpy as np
 import pandas as pd
@@ -74,7 +75,7 @@ def add_pedestrian_to_field(ped, matrix, area, dimension, resolution, gauss_dens
     origin_y = area[1]
 
     height, width = dimension
-    print(width, height)
+    # print(width, height)
 
     # necessary to map to center of the grid instead of the edge!
     offset = resolution / 2
@@ -253,20 +254,24 @@ def process_experiment(experiment, context):
             [0, 0],
             context.get('pedestrian_radius', 0.195))
 
+    timestep_path = context.get('timesteps', '')
+    if timestep_path is '':
+        sys.exit(1)
+
     area = context.get('area')
     resolution = context.get('resolution')
 
-    size = (int(round(area[3] / resolution)), int(round(area[2] / resolution)))
+    size = (round(round(area[3] / resolution)), round(round(area[2] / resolution)))
     context['size'] = size
     context['pId2Target'] = pId2Target
 
     skip = context.get('skip', 1)
-    all_timesteps = list(experiment.groupby('timeStep'))
+    all_timesteps =  list(map(lambda f: os.path.join(timestep_path, f), os.listdir(timestep_path))) # list(experiment.groupby('timeStep'))
     timesteps = all_timesteps[::skip]
     print('using every ', skip, 'timestep, # of used timesteps', len(timesteps), ', # of total timesteps', len(all_timesteps), 'image size', size)
     
     total = len(timesteps)
-    timesteps = list(map(lambda a: (*a, context), timesteps))
+    timesteps = list(map(lambda a: (a, context), timesteps))
 
     lock = Lock()
 
@@ -307,7 +312,10 @@ def process_experiment(experiment, context):
 
 
 def process_timestep(args):
-    _, trajectories, context = args
+    #_, trajectories, context = args
+    file, context = args
+    
+    trajectories = pd.read_csv(file, sep=' ', header=None, names=['timeStep', 'pedestrianId', 'x', 'y'])
 
     area = context.get('area')
     pId2Target = context.get('pId2Target')
@@ -323,4 +331,8 @@ def process_timestep(args):
 
     density = get_density_field(pedestrians, context)
 
-    return pedestrians, percentiles, density, trajectories.timeStep.values[0]
+    values = trajectories.timeStep.values[0]
+
+    del trajectories
+
+    return pedestrians, percentiles, density, values

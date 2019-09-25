@@ -5,6 +5,8 @@ import numpy as np
 import os.path as path
 import matplotlib.pyplot as plt
 
+from functools import reduce
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
@@ -252,6 +254,14 @@ def multiple_forests(train_data, test_data, _run, _log, **kwargs):
     # calculate errors
     row_sums = predictions.sum(axis=1)
     normed_prediction = predictions / row_sums[:, np.newaxis]
+
+
+    # save predictions
+    prediction_path = path.join(tempfile.gettempdir(), 'prediction.csv')
+    it = [''] + list(range(n_targets))[::-1]
+    header = reduce(lambda s, x: 'prediction-'+ str(x) + ',' + str(s), it) + reduce(lambda s, x: 'target-'+ str(x) + ',' + str(s), it)
+    np.savetxt(prediction_path, np.concatenate((normed_prediction, test_data['targets']), axis=1), fmt='%.5e', delimiter=',', header=header)
+    _run.add_artifact(prediction_path, 'predictions.csv')
 
     errors = calculate_errors(normed_prediction, test_data['targets'])
 

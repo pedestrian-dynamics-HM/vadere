@@ -1,6 +1,6 @@
 {
     "dataset": {
-        "path": "I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/csvs/obstacle/reduced",
+        "path": "I:/projects/vadere/Tools/PythonTargetLearning/notebooks/check/240x100/csvs/obstacle/reduced",
         "test_size": 0.2,
         "shuffle": true
     },

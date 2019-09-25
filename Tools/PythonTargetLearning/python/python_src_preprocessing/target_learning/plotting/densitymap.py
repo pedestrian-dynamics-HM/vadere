@@ -6,7 +6,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 
 def processRow(args):
-  i, row, path = args
+  i, row, path, size = args
   n_targets = 2
 
   row = np.array(row)
@@ -19,7 +19,7 @@ def processRow(args):
       #print("Skipping", filepath, 'since it already exits!')
       return False
       
-  image = data.reshape((10, 24))
+  image = data.reshape(size)
   fig, ax = plt.subplots()
   ax.imshow(image, interpolation='Nearest')
   ax.axis('off')
@@ -34,7 +34,7 @@ def processRow(args):
   return True
 
 
-def processFile(file, base_directory, image_directory, number_of_cores=1, _filter=lambda x: x):
+def processFile(file, base_directory, image_directory, size, number_of_cores=1, _filter=lambda x: x):
   path = os.path.join(image_directory, file[:-4])
   try:
     os.mkdir(path)
@@ -45,7 +45,7 @@ def processFile(file, base_directory, image_directory, number_of_cores=1, _filte
     chunk = _filter(chunk)
     with Pool(processes=number_of_cores) as p:
         with tqdm(total=len(chunk), desc='process chunk', leave=False) as pbar:
-            rows = list(map(lambda r: (*r, path), list(chunk.iterrows())))
+            rows = list(map(lambda r: (*r, path, size), list(chunk.iterrows())))
             for i, result in enumerate(p.imap_unordered(processRow, rows)):
               pbar.update()
 
