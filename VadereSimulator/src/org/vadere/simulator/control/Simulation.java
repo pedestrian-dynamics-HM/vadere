@@ -19,11 +19,7 @@ import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.scenario.AbsorbingArea;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -85,6 +81,8 @@ public class Simulation {
 	private final EventCognition eventCognition;
 	private final SalientBehaviorCognition salientBehaviorCognition;
 	private final ScenarioCache scenarioCache;
+
+	private boolean addedTargetPedestrian = false;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
@@ -381,6 +379,39 @@ public class Simulation {
 		if (attributesSimulation.isUseSalientBehavior()) {
 			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
 		}
+
+		// Try out if class "TargetPedestrian" still works and if it can be used by event/stimuli system.
+		// Check if two pedestrians are in the scenario with different targetIds. If so, make one pedestrian
+		// following the other.
+		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
+		Pedestrian[] convertedPeds = new Pedestrian[peds.size()];
+		peds.toArray(convertedPeds);
+
+		if (addedTargetPedestrian == false && peds.size() >= 2) {
+			// Select target and follower candidate
+			Pedestrian ped1 = convertedPeds[0];
+			Pedestrian ped2 = convertedPeds[1];
+
+			// Configure target
+			int ped1TargetId = 1000;
+			ped1.setIdAsTarget(ped1TargetId);
+
+			// Create necessary target wrapper objects
+			TargetPedestrian targetPedestrian = new TargetPedestrian(ped1);
+			TargetController targetPedestrianController = new TargetController(topography, targetPedestrian);
+			targetControllers.add(targetPedestrianController);
+			topography.addTarget(targetPedestrian);
+
+			// Make ped2 a follower of ped1.
+			LinkedList<Integer> targetIdsAsList = new LinkedList<>();
+			targetIdsAsList.add(ped1TargetId);
+
+			ped2.setTargets(targetIdsAsList);
+
+			addedTargetPedestrian = true;
+		}
+
+		// Remove above code after tryout.
 
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());

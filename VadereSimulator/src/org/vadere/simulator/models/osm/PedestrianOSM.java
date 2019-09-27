@@ -71,6 +71,9 @@ public class PedestrianOSM extends Pedestrian {
 
 		super(attributesPedestrian, random);
 
+		// TODO: Save "random" object into a member variable
+		//  so that it can be cloned later on via "clone()".
+
 		this.attributesOSM = attributesOSM;
 		this.topography = topography;
 		this.potentialFieldTarget = potentialFieldTarget;
