@@ -31,6 +31,8 @@ import java.util.*;
 
 public class PedestrianOSM extends Pedestrian {
 
+	private final Random random;
+
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
 	private final transient Topography topography;
@@ -71,8 +73,7 @@ public class PedestrianOSM extends Pedestrian {
 
 		super(attributesPedestrian, random);
 
-		// TODO: Save "random" object into a member variable
-		//  so that it can be cloned later on via "clone()".
+		this.random = random;
 
 		this.attributesOSM = attributesOSM;
 		this.topography = topography;
@@ -369,7 +370,16 @@ public class PedestrianOSM extends Pedestrian {
 
 	@Override
 	public PedestrianOSM clone() {
-		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
+		return new PedestrianOSM(attributesOSM,
+				getAttributes(),
+				topography,
+				random,
+				potentialFieldTarget,
+				potentialFieldObstacle,
+				potentialFieldPedestrian,
+				speedAdjusters,
+				stepCircleOptimizer
+				);
 	}
 
 	@Override

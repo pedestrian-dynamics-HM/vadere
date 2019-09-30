@@ -63,9 +63,7 @@ public class TargetPedestrian extends Target implements DynamicElementRemoveList
 	
 	@Override
 	public TargetPedestrian clone() {
-		// FIXME: Use "pedestrian.clone()" instead of "pedestrian" (but PedestrianOSM
-		//  does not support "clone()" method).
-		return  new TargetPedestrian(pedestrian);
+		return  new TargetPedestrian(pedestrian.clone());
 	}
 
 }
