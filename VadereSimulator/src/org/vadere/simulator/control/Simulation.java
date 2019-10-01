@@ -38,6 +38,7 @@ public class Simulation {
 
 	private final Collection<SourceController> sourceControllers;
 	private final Collection<TargetController> targetControllers;
+	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
@@ -96,6 +97,7 @@ public class Simulation {
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
+		this.targetChangerControllers = new LinkedList<>();
 		this.absorbingAreaControllers = new LinkedList<>();
 		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
@@ -166,6 +168,10 @@ public class Simulation {
 
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
+		}
+
+		for (TargetChanger targetChanger : topography.getTargetChangers()) {
+			targetChangerControllers.add(new TargetChangerController(topography, targetChanger));
 		}
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
@@ -363,6 +369,10 @@ public class Simulation {
 
 		for (TargetController targetController : this.targetControllers) {
 			targetController.update(simTimeInSec);
+		}
+
+		for (TargetChangerController targetChangerController : this.targetChangerControllers) {
+			targetChangerController.update(simTimeInSec);
 		}
 
 		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {

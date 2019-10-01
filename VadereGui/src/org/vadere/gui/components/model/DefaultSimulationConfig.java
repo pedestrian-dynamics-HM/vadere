@@ -23,6 +23,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
+	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
@@ -117,6 +118,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showTargets;
 	}
 
+	public boolean isShowTargetChangers() { return showTargetChangers; }
+
 	public boolean isShowAbsorbingAreas() {
 		return showAbsorbingAreas;
 	}
@@ -136,6 +139,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowTargets(boolean showTargets) {
 		this.showTargets = showTargets;
+		setChanged();
+	}
+
+	public void setShowTargetChangers(boolean showTargetChangers) {
+		this.showTargetChangers = showTargetChangers;
 		setChanged();
 	}
 

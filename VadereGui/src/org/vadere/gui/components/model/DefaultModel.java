@@ -103,6 +103,9 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			case TARGET:
 				c = getConfig().getTargetColor();
 				break;
+            case TARGET_CHANGER:
+                c = getConfig().getTargetChangerColor();
+                break;
 			case ABSORBING_AREA:
 				c = getConfig().getAbsorbingAreaColor();
 				break;

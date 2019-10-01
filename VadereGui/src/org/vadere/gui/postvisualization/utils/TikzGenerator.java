@@ -138,6 +138,9 @@ public class TikzGenerator {
 		Color targetColor = model.getConfig().getTargetColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
 
+		Color targetChangerColor = model.getConfig().getTargetChangerColor();
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetChangerColor", targetChangerColor.getRed(), targetChangerColor.getGreen(), targetChangerColor.getBlue());
+
 		Color absorbingAreaColor = model.getConfig().getAbsorbingAreaColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AbsorbingAreaColor", absorbingAreaColor.getRed(), absorbingAreaColor.getGreen(), absorbingAreaColor.getBlue());
 
@@ -223,6 +226,17 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
+		}
+
+		if (config.isShowTargetChangers()) {
+			generatedCode += "% Target Changers\n";
+			for (TargetChanger targetChanger : topography.getTargetChangers()) {
+				VPoint centroid = targetChanger.getShape().getCentroid();
+				generatedCode += String.format(Locale.US, "\\coordinate (target_changer_%d) at (%f,%f); %%centroid coordinate for target changer %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
+				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
+			}
+		} else {
+			generatedCode += "% Target Changers (not enabled in config)\n";
 		}
 
 		if (config.isShowAbsorbingAreas()) {
