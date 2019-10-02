@@ -58,7 +58,7 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 		additionalLayeredPane.add(chShowAllTrajOnSnapshot, cc.xy(2, 8));
 
 		JCheckBox chShowEvacTimeColor = new JCheckBox(Messages.getString("PostVis.chShowEvacTimeColor.text"));
-		getColorLayeredPane().add(chShowEvacTimeColor, cc.xyw(2, 26, 8));
+		getColorSettingsPane().add(chShowEvacTimeColor, cc.xyw(2, 26, 8));
 
 		chShowEvacTimeColor.addItemListener(e -> {
 			model.config.setUseEvacuationTimeColor(!model.config.isUseEvacuationTimeColor());
@@ -66,7 +66,7 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 		});
 
 		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model.getPedestrianColorTableModel());
-		getColorLayeredPane().add(pedestrianColorPanel, cc.xyw(2, 22, 8));
+		getColorSettingsPane().add(pedestrianColorPanel, cc.xyw(2, 22, 8));
 
 
 
