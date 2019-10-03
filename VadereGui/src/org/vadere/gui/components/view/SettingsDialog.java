@@ -157,14 +157,27 @@ public class SettingsDialog extends JDialog {
 
         final JButton bChange = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
         final JPanel pPedestrian = new JPanel();
-        Optional<Color> colorByTargetId = model.config.getColorByTargetId(1);
+
+        Integer selectedTargetIdOuter = jComboTargetIds.getItemAt(jComboTargetIds.getSelectedIndex());
+        if (selectedTargetIdOuter == null) {
+            selectedTargetIdOuter = 1;
+        }
+
+        Optional<Color> colorByTargetId = model.config.getColorByTargetId(selectedTargetIdOuter);
         pPedestrian.setBackground(colorByTargetId.orElseGet(() -> model.config.getPedestrianDefaultColor()));
         pPedestrian.setPreferredSize(new Dimension(130, 20));
+        // When user changes a color, save it in the model.
         bChange.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pPedestrian,
                 jComboTargetIds));
 
+        // Retrieve configured color from "model" or use default color.
         jComboTargetIds.addActionListener(e -> {
-            Optional<Color> colorByTarget = config.getColorByTargetId(jComboTargetIds.getSelectedIndex() + 1);
+            Integer selectedTargetIdInner = jComboTargetIds.getItemAt(jComboTargetIds.getSelectedIndex());
+            if (selectedTargetIdInner == null) {
+                selectedTargetIdInner = 1;
+            }
+
+            Optional<Color> colorByTarget = config.getColorByTargetId(selectedTargetIdInner);
             pPedestrian.setBackground(colorByTarget.orElseGet(() -> model.config.getPedestrianDefaultColor()));
         });
         colorSettingsPane.add(jComboTargetIds, cc.xy(2, row += NEXT_CELL));
