@@ -1,5 +1,5 @@
 {
-  "name" : "TestTargetPedestrian",
+  "name" : "TestTargetPedestrianHasFollower",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {
@@ -155,6 +155,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 3,

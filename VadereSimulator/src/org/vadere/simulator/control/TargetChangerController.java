@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Change target id of an agent which enters the given {@link TargetChanger} area.
  *
- * TargetChanger's attributes contain two important parameters to control the change behavior:
+ * TargetChanger's attributes contain two important parameters to control the changing behavior:
  * - changeTargetProbability
  * - nextTargetIsPedestrian
  *
@@ -49,7 +49,20 @@ public class TargetChangerController {
 
             if (hasAgentReachedTargetChangerArea(agent)) {
                 notifyListenersTargetChangerAreaReached(agent);
-                // TODO: Implement logic in "update()" method.
+
+                // TODO: Implement logic to change targets based
+                //   on a Binomial distribution.
+
+                LinkedList<Integer> newTarget = new LinkedList<>();
+                newTarget.add(targetChanger.getAttributes().getNextTarget());
+
+                agent.setTargets(newTarget);
+
+                log.info(String.format("%s %d reached %s %d.",
+                        agent.getClass().getSimpleName(),
+                        agent.getId(),
+                        targetChanger.getClass().getSimpleName(),
+                        targetChanger.getId()));
 
             }
         }

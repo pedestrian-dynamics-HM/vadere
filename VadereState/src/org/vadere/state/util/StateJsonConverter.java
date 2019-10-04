@@ -294,6 +294,11 @@ public abstract class StateJsonConverter {
 				.forEach(target -> targetNodes.add(mapper.convertValue(target.getAttributes(), JsonNode.class)));
 		topographyNode.set("targets", targetNodes);
 
+		ArrayNode targetChangerNodes = mapper.createArrayNode();
+		topography.getTargetChangers()
+				.forEach(targetChanger -> targetChangerNodes.add(mapper.convertValue(targetChanger.getAttributes(), JsonNode.class)));
+		topographyNode.set("targetChangers", targetChangerNodes);
+
 		ArrayNode absorbingAreaNodes = mapper.createArrayNode();
 		topography.getAbsorbingAreas()
 				.forEach(absorbingArea -> absorbingAreaNodes.add(mapper.convertValue(absorbingArea.getAttributes(), JsonNode.class)));
