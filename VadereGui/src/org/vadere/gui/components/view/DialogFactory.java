@@ -34,17 +34,18 @@ public class DialogFactory {
 	}
 
 	public static JDialog createSettingsDialog(final SimulationModel<? extends DefaultSimulationConfig> model) {
-		//SwingUtilities.invokeLater()
-		if (settingsDialog == null || currentModel == null || !currentModel.equals(model)) {
-			currentModel = model;
-			if(model instanceof PostvisualizationModel) {
-				settingsDialog = new org.vadere.gui.postvisualization.view.SettingsDialog((PostvisualizationModel)model);
-			}
-			else {
-				settingsDialog = new SettingsDialog(model);
-			}
-			settingsDialog.initComponents();
+		currentModel = model;
+
+		// Instead of reusing an old "SettingsDialog", create a new one to avoid any problems.
+		if(model instanceof PostvisualizationModel) {
+			settingsDialog = new org.vadere.gui.postvisualization.view.SettingsDialog((PostvisualizationModel)model);
 		}
+		else {
+			settingsDialog = new SettingsDialog(model);
+		}
+
+		settingsDialog.initComponents();
+
 		return settingsDialog;
 	}
 }
