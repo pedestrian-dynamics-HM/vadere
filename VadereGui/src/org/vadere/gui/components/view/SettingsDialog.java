@@ -33,6 +33,10 @@ public class SettingsDialog extends JDialog {
     private JLayeredPane colorSettingsPane;
     private JLayeredPane otherSettingsPane;
     private JComboBox<Integer> jComboTargetIds;
+    // These two position should be stored when filling the grid layout with rows
+    // so that subclass postvisualization.SettingsDialag can add its content later on.
+    private int rowForCriteriaColoring;
+    private int rowForEvacuationColoring;
 
     public SettingsDialog(final SimulationModel<? extends DefaultSimulationConfig> model) {
         this.config = model.config;
@@ -41,6 +45,14 @@ public class SettingsDialog extends JDialog {
 
     public JLayeredPane getColorSettingsPane() {
         return colorSettingsPane;
+    }
+
+    public int getRowForCriteriaColoring() {
+        return rowForCriteriaColoring;
+    }
+
+    public int getRowForEvacuationColoring() {
+        return rowForEvacuationColoring;
     }
 
     /**
@@ -129,7 +141,7 @@ public class SettingsDialog extends JDialog {
                 .setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
 
         FormLayout colorSettingsLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-                createCellsWithSeparators(18)); // rows
+                createCellsWithSeparators(22)); // rows
         colorSettingsPane.setLayout(colorSettingsLayout);
 
         // For each scenario element, add a color preview canvas and a button to change the color.
@@ -143,6 +155,7 @@ public class SettingsDialog extends JDialog {
         colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblStair.text") + ":"), cc.xy(column, row += NEXT_CELL));
         colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
         colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+        colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
 
         createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
 
@@ -198,8 +211,12 @@ public class SettingsDialog extends JDialog {
         colorSettingsPane.add(pPedestrianNoTarget, cc.xy(4, row));
         colorSettingsPane.add(bPedestrianNoTarget, cc.xy(6, row));
 
-        // Bene's "Criteria Coloring" comes in the next row.
+        // "Criteria Coloring" comes in the next row which is added by subclass postvisualization.SettingsDialog
         row += NEXT_CELL;
+        rowForCriteriaColoring = row;
+        // "Colorize by Evacuation Time" comes in the next row which is added by subclass postvisualization.SettingsDialog
+        row += NEXT_CELL;
+        rowForEvacuationColoring = row;
 
         // Random coloring
         JCheckBox chRandomColors = new JCheckBox(Messages.getString("SettingsDialog.chbUseRandomColors.text"));
@@ -264,6 +281,14 @@ public class SettingsDialog extends JDialog {
         bAbsorbingAreaColor.addActionListener(new ActionSetAbsorbingAreaColor("Set Absorbing Area Color", model, pAbsorbingAreaColor));
         colorSettingsPane.add(pAbsorbingAreaColor, cc.xy(column2, row += NEXT_CELL));
         colorSettingsPane.add(bAbsorbingAreaColor, cc.xy(column3, row));
+
+        final JButton bTargetChangerColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+        final JPanel pTargetChangerColor = new JPanel();
+        pTargetChangerColor.setBackground(model.config.getTargetChangerColor());
+        pTargetChangerColor.setPreferredSize(new Dimension(130, 20));
+        bTargetChangerColor.addActionListener(new ActionSetTargetChangerColor("Set Target Changer Color", model, pTargetChangerColor));
+        colorSettingsPane.add(pTargetChangerColor, cc.xy(column2, row += NEXT_CELL));
+        colorSettingsPane.add(bTargetChangerColor, cc.xy(column3, row));
     }
 
     private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
@@ -284,7 +309,7 @@ public class SettingsDialog extends JDialog {
                 BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
 
         FormLayout otherSettingsLayout = new FormLayout(createCellsWithSeparators(4), // col
-                createCellsWithSeparators(13)); // rows
+                createCellsWithSeparators(15)); // rows
         otherSettingsPane.setLayout(otherSettingsLayout);
 
         // For each scenario element, add a checkbox to toggle its visibility.
@@ -294,6 +319,7 @@ public class SettingsDialog extends JDialog {
         JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
         JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
         JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
+        JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
         JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
 
         JCheckBox chHideVoronoiDiagram = new JCheckBox((Messages.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
@@ -339,9 +365,15 @@ public class SettingsDialog extends JDialog {
             model.notifyObservers();
         });
 
-        chShowStairs.setSelected(model.config.isShowSources());
+        chShowStairs.setSelected(model.config.isShowStairs());
         chShowStairs.addItemListener(e -> {
             model.config.setShowStairs(!model.config.isShowStairs());
+            model.notifyObservers();
+        });
+
+        chShowTargetChangers.setSelected(model.config.isShowTargetChangers());
+        chShowTargetChangers.addItemListener(e -> {
+            model.config.setShowTargetChangers(!model.config.isShowTargetChangers());
             model.notifyObservers();
         });
 
@@ -363,6 +395,7 @@ public class SettingsDialog extends JDialog {
         otherSettingsPane.add(chShowStairs, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowAbsorbingAreas, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowMeasurementAreas, cc.xyw(column, row += NEXT_CELL, colSpan));
+        otherSettingsPane.add(chShowTargetChangers, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
         JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
@@ -419,7 +452,7 @@ public class SettingsDialog extends JDialog {
      *    </li>
      * </ul>
      */
-    private String createCellsWithSeparators(int totalCells, String prefix, String suffix) {
+    protected String createCellsWithSeparators(int totalCells, String prefix, String suffix) {
         String cellWidth = "pref";
         String cellSeparator = ", ";
         String separatorWidth = "2dlu";
@@ -434,7 +467,7 @@ public class SettingsDialog extends JDialog {
         return finalLayout;
     }
 
-    private String createCellsWithSeparators(int totalCells) {
+    protected String createCellsWithSeparators(int totalCells) {
         String separatorWidth = "5dlu";
         String cellsWidthPrefixAndSuffix = createCellsWithSeparators(totalCells, separatorWidth, separatorWidth);
 

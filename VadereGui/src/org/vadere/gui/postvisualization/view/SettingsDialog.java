@@ -10,7 +10,9 @@ import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import javax.swing.*;
 
 public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialog {
+
 	private PostvisualizationModel model;
+
 	public SettingsDialog(@NotNull final PostvisualizationModel model) {
 		super(model);
 		this.model = model;
@@ -18,13 +20,14 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 
 	@Override
 	protected JLayeredPane getAdditionalOptionPanel() {
-		CellConstraints cc = new CellConstraints();
 		JLayeredPane additionalLayeredPane = new JLayeredPane();
 		additionalLayeredPane.setBorder(
 				BorderFactory.createTitledBorder(Messages.getString("PostVis.additional.border.text")));
+
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				createCellsWithSeparators(4)); // rows
 		additionalLayeredPane.setLayout(additionalLayout);
+
 		JCheckBox chCleanPed = new JCheckBox(Messages.getString("PostVis.chbHidePedAtTarget.text"));
 		JCheckBox chCleanSnapshot = new JCheckBox(Messages.getString("PostVis.chbCleanSnapshot.text"));
 		JCheckBox chCleanTrajecties = new JCheckBox(Messages.getString("PostVis.chbHideTrajAtTarget.text"));
@@ -52,23 +55,26 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 			model.notifyObservers();
 		});
 
-		additionalLayeredPane.add(chCleanPed, cc.xy(2, 2));
-		additionalLayeredPane.add(chCleanTrajecties, cc.xy(2, 4));
-		additionalLayeredPane.add(chCleanSnapshot, cc.xy(2, 6));
-		additionalLayeredPane.add(chShowAllTrajOnSnapshot, cc.xy(2, 8));
+		int row = 0;
+		int column = 2;
+		int colSpan = 8;
+		CellConstraints cc = new CellConstraints();
+
+		additionalLayeredPane.add(chCleanPed, cc.xy(column, row += NEXT_CELL));
+		additionalLayeredPane.add(chCleanTrajecties, cc.xy(column, row += NEXT_CELL));
+		additionalLayeredPane.add(chCleanSnapshot, cc.xy(column, row += NEXT_CELL));
+		additionalLayeredPane.add(chShowAllTrajOnSnapshot, cc.xy(column, row += NEXT_CELL));
+
+		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model.getPedestrianColorTableModel());
+		getColorSettingsPane().add(pedestrianColorPanel, cc.xyw(column, getRowForCriteriaColoring(), colSpan));
 
 		JCheckBox chShowEvacTimeColor = new JCheckBox(Messages.getString("PostVis.chShowEvacTimeColor.text"));
-		getColorSettingsPane().add(chShowEvacTimeColor, cc.xyw(2, 26, 8));
+		getColorSettingsPane().add(chShowEvacTimeColor, cc.xyw(column, getRowForEvacuationColoring(), colSpan));
 
 		chShowEvacTimeColor.addItemListener(e -> {
 			model.config.setUseEvacuationTimeColor(!model.config.isUseEvacuationTimeColor());
 			model.notifyObservers();
 		});
-
-		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model.getPedestrianColorTableModel());
-		getColorSettingsPane().add(pedestrianColorPanel, cc.xyw(2, 22, 8));
-
-
 
 		return additionalLayeredPane;
 	}
