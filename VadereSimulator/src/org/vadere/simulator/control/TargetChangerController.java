@@ -6,20 +6,23 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Change target id of an agent which enters the given {@link TargetChanger} area.
+ * Change target id of an agent which enters the corresponding {@link TargetChanger} area.
  *
- * TargetChanger's attributes contain two important parameters to control the changing behavior:
- * - changeTargetProbability
- * - nextTargetIsPedestrian
- *
- * "changeTargetProbability" defines how many percent of the agents, who enter the area,
- * should change its target. If "nextTargetIsPedestrian == false", assign a new
- * static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
+ * {@link TargetChanger}'s attributes contain two important parameters to control the changing behavior:
+ * <ul>
+ *     <li>
+ *         "changeTargetProbability": This defines how many percent of the agents,
+ *         who enter the area, should change their target.
+ *     </li>
+ *     <li>
+ *         If "nextTargetIsPedestrian == false", assign a new static target.
+ *         Otherwise, randomly choose a pedestrian (with given target id) to follow.
+ *     </li>
+ * </ul>
  */
 public class TargetChangerController {
 
@@ -28,14 +31,16 @@ public class TargetChangerController {
 
     public final TargetChanger targetChanger;
     private Topography topography;
+    private Map<Integer, Agent> processedAgents;
 
     // Constructors
     public TargetChangerController(Topography topography, TargetChanger targetChanger) {
         this.targetChanger = targetChanger;
         this.topography = topography;
+        this.processedAgents = new HashMap<>();
     }
 
-    // Other Methods
+    // Public Methods
     public void update(double simTimeInSec) {
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
 
@@ -47,23 +52,24 @@ public class TargetChangerController {
                 continue;
             }
 
-            if (hasAgentReachedTargetChangerArea(agent)) {
+            if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
+                logEnteringTimeOfAgent(agent, simTimeInSec);
+
+                // TODO: First, use Binomial distribution to decide
+                //   if target should be changed.
+                boolean changeTarget = true;
+
+                if (changeTarget) {
+                    if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
+                        useDynamicTargetForAgentOrUseStaticAsFallback(agent);
+                    } else {
+                        useStaticTargetForAgent(agent);
+                    }
+                }
+
                 notifyListenersTargetChangerAreaReached(agent);
 
-                // TODO: Implement logic to change targets based
-                //   on a Binomial distribution.
-
-                LinkedList<Integer> newTarget = new LinkedList<>();
-                newTarget.add(targetChanger.getAttributes().getNextTarget());
-
-                agent.setTargets(newTarget);
-
-                log.info(String.format("%s %d reached %s %d.",
-                        agent.getClass().getSimpleName(),
-                        agent.getId(),
-                        targetChanger.getClass().getSimpleName(),
-                        targetChanger.getId()));
-
+                processedAgents.put(agent.getId(), agent);
             }
         }
     }
@@ -90,6 +96,51 @@ public class TargetChangerController {
 
         return targetChangerShape.contains(agentPosition)
                 || targetChangerShape.distance(agentPosition) < reachDistance;
+    }
+
+    private void logEnteringTimeOfAgent(Agent agent, double simTimeInSec) {
+        Map<Integer, Double> enteringTimes = targetChanger.getEnteringTimes();
+        Integer agentId = agent.getId();
+
+        if (enteringTimes.containsKey(agentId) == false) {
+            enteringTimes.put(agentId, simTimeInSec);
+        }
+    }
+
+    private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent) {
+        int nextTarget = targetChanger.getAttributes().getNextTarget();
+
+        Collection<Pedestrian> allPedestrians = topography.getElements(Pedestrian.class);
+        List<Pedestrian> pedsWithCorrectTargetId = allPedestrians.stream()
+                .filter(pedestrian -> pedestrian.getTargets().contains(nextTarget))
+                .collect(Collectors.toList());
+
+        if (pedsWithCorrectTargetId.size() > 0) {
+            // Maybe, choose randomly in the long run.
+            Pedestrian pedToFollow = pedsWithCorrectTargetId.get(0);
+            agentFollowsOtherPedestrian(agent, pedToFollow);
+        } else {
+            useStaticTargetForAgent(agent);
+        }
+    }
+
+    private void agentFollowsOtherPedestrian(Agent agent, Pedestrian pedToFollow) {
+        // Create necessary target wrapper object.
+        // Watch out: The main simulation loop creates the necessary
+        // "TargetController" object in the next simulation step.
+        TargetPedestrian targetPedestrian = new TargetPedestrian(pedToFollow);
+        topography.addTarget(targetPedestrian);
+
+        // Make "agent" a follower of "pedToFollow".
+        LinkedList<Integer> nextTargetAsList = new LinkedList<>();
+        nextTargetAsList.add(pedToFollow.getId());
+        agent.setTargets(nextTargetAsList);
+    }
+
+    private void useStaticTargetForAgent(Agent agent) {
+        LinkedList<Integer> newTarget = new LinkedList<>();
+        newTarget.add(targetChanger.getAttributes().getNextTarget());
+        agent.setTargets(newTarget);
     }
 
     private void notifyListenersTargetChangerAreaReached(final Agent agent) {

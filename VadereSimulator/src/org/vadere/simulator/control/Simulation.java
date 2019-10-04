@@ -356,8 +356,10 @@ public class Simulation {
 	private void updateCallbacks(double simTimeInSec) {
 		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
-		// TODO Why are target controllers readded in each simulation loop?
-		// Maybe, Isabella's SIMA branch required this because pedestrians can act as targets there.
+		// "TargetControllers" are populated in each simulation loop because
+		// pedestrians can be declared as targets in each simulation loop.
+		// Therefore, create the necessary controller wrappers here for these
+		// new targets.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -389,39 +391,6 @@ public class Simulation {
 		if (attributesSimulation.isUseSalientBehavior()) {
 			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
 		}
-
-		// Try out if class "TargetPedestrian" still works and if it can be used by event/stimuli system.
-		// Check if two pedestrians are in the scenario with different targetIds. If so, make one pedestrian
-		// following the other.
-		Collection<Pedestrian> peds = topography.getElements(Pedestrian.class);
-		Pedestrian[] convertedPeds = new Pedestrian[peds.size()];
-		peds.toArray(convertedPeds);
-
-		if (addedTargetPedestrian == false && peds.size() >= 2) {
-			// Select target and follower candidate
-			Pedestrian ped1 = convertedPeds[0];
-			Pedestrian ped2 = convertedPeds[1];
-
-			// Configure target
-			int ped1TargetId = 1000;
-			ped1.setIdAsTarget(ped1TargetId);
-
-			// Create necessary target wrapper objects
-			TargetPedestrian targetPedestrian = new TargetPedestrian(ped1);
-			TargetController targetPedestrianController = new TargetController(topography, targetPedestrian);
-			targetControllers.add(targetPedestrianController);
-			topography.addTarget(targetPedestrian);
-
-			// Make ped2 a follower of ped1.
-			LinkedList<Integer> targetIdsAsList = new LinkedList<>();
-			targetIdsAsList.add(ped1TargetId);
-
-			ped2.setTargets(targetIdsAsList);
-
-			addedTargetPedestrian = true;
-		}
-
-		// Remove above code after tryout.
 
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());

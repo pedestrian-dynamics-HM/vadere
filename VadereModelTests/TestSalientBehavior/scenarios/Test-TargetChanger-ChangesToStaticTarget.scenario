@@ -1,5 +1,5 @@
 {
-  "name" : "TestTargetPedestrianHasFollower",
+  "name" : "Test-TargetChanger-ChangesToStaticTarget",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {
@@ -154,8 +154,38 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 3,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 18.0,
+          "y" : 4.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 5,
+        "shape" : {
+          "x" : 7.9,
+          "y" : 0.4801097393689986,
+          "width" : 0.8242798353909446,
+          "height" : 8.97119341563786,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : 3,
+        "probabilityToChangeTarget" : 0.0
+      } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 3,
