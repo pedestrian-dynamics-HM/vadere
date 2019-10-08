@@ -12,10 +12,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
       "id" : 1
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMostImportantEventProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSalientBehaviorProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
       "id" : 3
     } ],
     "isTimestamped" : true,
