@@ -12,9 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import tech.tablesaw.api.Table;
+
+@Deprecated
 public class OfflineSimulation {
 
-	private final Map<Step, List<Agent>> pedestriansByStep;
+	private final Table pedestriansByStep;
 	private final Map<Integer, Trajectory> trajectories;
 	private final Scenario vadere;
 	private final List<SimulationState> simulationStates;
@@ -24,7 +27,7 @@ public class OfflineSimulation {
 	private final Topography topography;
 
 
-	public OfflineSimulation(final Map<Step, List<Agent>> pedestriansByStep, final Scenario vadere,
+	public OfflineSimulation(final Table pedestriansByStep, final Scenario vadere,
 			final Path outputDir) {
 		this.pedestriansByStep = pedestriansByStep;
 		this.vadere = vadere;
@@ -32,7 +35,9 @@ public class OfflineSimulation {
 		this.topography = vadere.getTopography();
 		this.topographyController = new OfflineTopographyController(topography);
 
-		this.trajectories = pedestriansByStep
+		this.trajectories = null;
+		this.simulationStates = null;
+		/*this.trajectories = pedestriansByStep
 				.entrySet()
 				.stream()
 				.flatMap(entry -> entry.getValue().stream())
@@ -43,7 +48,7 @@ public class OfflineSimulation {
 
 		topographyController.prepareTopography();
 		simulationStates = pedestriansByStep.keySet().stream().sorted().map(step -> generateSimulationState(step))
-				.collect(Collectors.toList());
+				.collect(Collectors.toList());*/
 	}
 
 	private SimulationState generateSimulationState(final Step step) {
@@ -51,8 +56,8 @@ public class OfflineSimulation {
 		topography.reset();
 		// add pedestrians to the topography
 		trajectories.values().stream()
-				.filter(t -> t.isAlive(step))
-				.map(t -> t.getAgent(step))
+				.filter(t -> t.isAlive(step.getStepNumber()))
+				.map(t -> t.getAgent(step.getStepNumber()))
 				.filter(opt -> opt.isPresent()).forEach(opt -> topography.addElement(opt.get()));
 		return new SimulationState(vadere.getName(), topography, vadere.getScenarioStore(),
 				(step.getStepNumber()-1) * vadere.getAttributesSimulation().getSimTimeStepLength(), step.getStepNumber(), null);

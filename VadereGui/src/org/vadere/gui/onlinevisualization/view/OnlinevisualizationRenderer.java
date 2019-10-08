@@ -61,10 +61,10 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	private void renderPedestrians(final Graphics2D g) {
 		AgentRender agentRender = getAgentRender();
 		for (Agent ped : model.getAgents()) {
-			Color nonGroupColor = getPedestrianColor(ped);
-			g.setColor(nonGroupColor);
+			Color agentColor = getPedestrianColor(ped);
+			g.setColor(agentColor);
 			VPoint position = ped.getPosition();
-			agentRender.render(ped, nonGroupColor, g);
+			agentRender.render(ped, agentColor, g);
 
 			if (!pedestrianPositions.containsKey(ped.getId())) {
 				pedestrianPositions.put(ped.getId(), new LinkedList());

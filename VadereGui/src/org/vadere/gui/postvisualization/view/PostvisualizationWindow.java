@@ -357,7 +357,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		Player.getInstance(model).stop();
 
 		try {
-			model.init(IOOutput.readTrajectories(trajectoryFile.toPath(), scenario), scenario, trajectoryFile.getParent());
+			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
 			model.notifyObservers();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
@@ -388,19 +388,22 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 
 	@Override
 	public void update(java.util.Observable o, Object arg) {
-
-		String[] paths =
-				VadereConfig.getConfig().getString("recentlyOpenedFiles", "").split(",");
-		if (paths != null) {
-			mRecentFiles.removeAll();
-			int i = 1;
-			for (String path : paths) {
-				if (path.length() > 0) {
-					mRecentFiles.add(new ActionOpenFile("[" + i + "]" + " " + path, null, model, path));
-					i++;
+		SwingUtilities.invokeLater(() -> {
+			if(model.hasOutputChanged()) {
+				String[] paths =
+						VadereConfig.getConfig().getString("recentlyOpenedFiles", "").split(",");
+				if (paths != null) {
+					mRecentFiles.removeAll();
+					int i = 1;
+					for (String path : paths) {
+						if (path.length() > 0) {
+							mRecentFiles.add(new ActionOpenFile("[" + i + "]" + " " + path, null, model, path));
+							i++;
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 
 	public static void start() {
@@ -488,7 +491,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 
 				if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
 					Scenario vadereScenario = IOOutput.readScenario(scenarioFile.get().toPath());
-					model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadereScenario), vadereScenario, trajectoryFile.get().getParent());
+					model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), vadereScenario, trajectoryFile.get().getParent());
 					model.notifyObservers();
 					dialog.dispose();
 				} else {

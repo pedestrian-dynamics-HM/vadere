@@ -13,18 +13,20 @@ public class ActionSetSnapshotDirectory extends ActionVisualization {
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 	private final JTextField textField;
+	private final JDialog parent;
 
 	public ActionSetSnapshotDirectory(final String name, final SimulationModel<? extends DefaultSimulationConfig> model,
-			final JTextField textField) {
+			final JTextField textField, final JDialog parent) {
 		super(name, model);
 		this.textField = textField;
+		this.parent = parent;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		final JFileChooser fc = new JFileChooser(CONFIG.getString("SettingsDialog.snapshotDirectory.path"));
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int returnVal = fc.showOpenDialog(null);
+		int returnVal = fc.showOpenDialog(parent);
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();

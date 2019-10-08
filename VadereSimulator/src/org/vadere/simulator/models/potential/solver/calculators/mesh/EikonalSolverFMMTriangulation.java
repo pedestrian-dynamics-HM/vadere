@@ -573,8 +573,8 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 
 		E e1; // A
 		E e2; // B
-		IPoint p1;   // A
-		IPoint p2;   // B
+		V p1;   // A
+		V p2;   // B
 
         // assuming T(B) > T(A)
         if(getPotential(point1) > getPotential(point2)) {

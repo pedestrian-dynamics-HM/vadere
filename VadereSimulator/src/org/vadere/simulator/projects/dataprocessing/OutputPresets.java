@@ -26,17 +26,17 @@ public final class OutputPresets {
 		OutputDefinitionStore defaultPreset = new OutputDefinitionStore();
 
         DataProcessorStore processor1 = new DataProcessorStore();
-        processor1.setType("org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor");
+        processor1.setType("org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor");
         processor1.setId(1);
 		defaultPreset.addProcessor(processor1);
 
         DataProcessorStore processor2 = new DataProcessorStore();
-        processor2.setType("org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor");
+        processor2.setType("org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor");
         processor2.setId(2);
 		defaultPreset.addProcessor(processor2);
 
         OutputFileStore outputFile = new OutputFileStore();
-        outputFile.setType("org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile");
+        outputFile.setType("org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile");
         outputFile.setFilename(DataProcessingJsonManager.TRAJECTORIES_FILENAME);
         outputFile.setProcessors(Arrays.asList(1, 2));
 		defaultPreset.addOutputFile(outputFile);

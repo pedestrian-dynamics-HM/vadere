@@ -29,6 +29,10 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	protected final Topography topography;
 	protected final Set<Pedestrian> movedPedestrians;
 
+	static {
+		logger.setDebug();
+	}
+
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.executorService = Executors.newFixedThreadPool(8);
@@ -123,7 +127,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 *
 	 * @param pedestrian the pedestrian
 	 */
-	private void updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
+	private void  updateParallelMove(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
 			pedestrian.setLastPosition(pedestrian.getPosition());
 			synchronized (topography) {

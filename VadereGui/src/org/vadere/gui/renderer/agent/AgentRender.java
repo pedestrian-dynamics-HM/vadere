@@ -38,7 +38,7 @@ public class AgentRender implements Renderer {
 		if (model.config.isShowGroups()) {
 			try {
 				Pedestrian ped = (Pedestrian) element;
-				renderGroup(ped, g);
+				renderGroup(ped, g, color);
 			} catch (ClassCastException cce) {
 				logger.error("Error casting to Pedestrian");
 				cce.printStackTrace();
@@ -50,10 +50,10 @@ public class AgentRender implements Renderer {
 		}
 	}
 
-	private void renderGroup(Pedestrian ped, Graphics2D g) {
+	private void renderGroup(Pedestrian ped, Graphics2D g, Color color) {
 		g.setColor(Color.DARK_GRAY);
 		g.fill(ped.getShape());
-		g.setColor(getGroupColor(ped));
+		g.setColor(color);
 		DefaultRenderer.fill(getShape(ped), g);
 	}
 
@@ -69,27 +69,6 @@ public class AgentRender implements Renderer {
 		//DefaultRenderer.fill(ellipse, g);
 		//g.fill(ellipse);
 		//g.fill(rect);
-	}
-
-	private Color getHSBColor(int groupId) {
-//		float hue = ((float) (groupId) / COLOR_NUM);
-		float hue = random.nextFloat();
-//		System.out.printf("groupId: %d | hue: %f%n",groupId, hue);
-		return new Color(Color.HSBtoRGB(hue, 1f, 0.75f));
-	}
-
-	public Color getGroupColor(Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
-			return defaultColor;
-		}
-
-		int groupId = ped.getGroupIds().getFirst();
-		Color c = colorMap.get(groupId);
-		if (c == null) {
-			c = getHSBColor(groupId);
-			colorMap.put(groupId, c);
-		}
-		return c;
 	}
 
 	public VShape getShape(Pedestrian ped) {

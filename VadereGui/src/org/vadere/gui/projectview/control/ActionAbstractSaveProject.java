@@ -12,10 +12,14 @@ import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 public abstract class ActionAbstractSaveProject extends AbstractAction {
 
@@ -120,11 +124,10 @@ public abstract class ActionAbstractSaveProject extends AbstractAction {
 
 	private static void updateRecentProjectPreferences(ProjectViewModel model) {
 		final String key = "History.recentProjects";
-		final TreeSet<String> values = new TreeSet(Arrays.asList(VadereConfig.getConfig().getString(key, "").split(",")));
+		List<String> values = VadereConfig.getConfig().getList(String.class, key, Collections.EMPTY_LIST);
 		values.add(model.getCurrentProjectPath());
-		String value = values.stream().reduce("", (a, b) -> a + "," + b);
-		System.out.println(values.toString());
-		VadereConfig.getConfig().setProperty(key, value.replaceFirst(",", ""));
+		values = values.stream().distinct().collect(Collectors.toList());
+		VadereConfig.getConfig().setProperty(key, values);
 	}
 
 }
