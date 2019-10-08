@@ -4,19 +4,40 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 3 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 7, 8, 9, 10 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "overlaps.csv",
+      "processors" : [ 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "overlapCount.txt",
+      "processors" : [ 4 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "id" : 3
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
-      "id" : 2
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
+      "id" : 4,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
+      "attributes" : {
+        "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 8
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
-      "id" : 3
+      "id" : 9
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
+      "id" : 10
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -119,7 +140,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -137,7 +158,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -167,7 +188,7 @@
             "y" : 15.600000000000001
           } ]
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -189,9 +210,10 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.5,
           "y" : 8.0,

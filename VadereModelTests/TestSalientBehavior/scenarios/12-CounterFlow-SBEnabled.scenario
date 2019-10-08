@@ -4,33 +4,19 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "waitingTimes.txt",
-      "processors" : [ 2 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 7, 8, 9, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "out.txt",
+      "filename" : "overlaps.csv",
       "processors" : [ 3 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "out1.txt",
+      "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
-      "id" : 2,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
-      "attributes" : {
-        "waitingAreaId" : 1
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 3
     }, {
@@ -41,12 +27,17 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 8
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
+      "id" : 9
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
+      "id" : 10
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -206,6 +197,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 3,
