@@ -9,8 +9,8 @@ import org.vadere.util.geometry.shapes.VShape;
 import java.util.*;
 
 /**
- * An area with an arbitrary shape that changes the target of an agent
- * to another agent.
+ * An area with an arbitrary shape that changes the target of an agent.
+ * Either to another static target or to another agent.
  */
 public class TargetChanger extends ScenarioElement implements Comparable<TargetChanger> {
 

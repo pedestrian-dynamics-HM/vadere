@@ -1,5 +1,7 @@
 package org.vadere.simulator.control;
 
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -26,18 +28,30 @@ import java.util.stream.Collectors;
  */
 public class TargetChangerController {
 
-    // Variables
+    // Static Variables
     private static final Logger log = Logger.getLogger(TargetChangerController.class);
+    private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
+    // Member Variables
     public final TargetChanger targetChanger;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
+    int seed;
+    BinomialDistribution binomialDistribution;
 
     // Constructors
-    public TargetChangerController(Topography topography, TargetChanger targetChanger) {
+    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
         this.targetChanger = targetChanger;
         this.topography = topography;
         this.processedAgents = new HashMap<>();
+
+        seed = random.nextInt();
+        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+        randomGenerator.setSeed(seed);
+
+        double probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
+        int trials = BINOMIAL_DISTRIBUTION_SUCCESS_VALUE; // I.e., possible outcomes are 0 and 1 when calling "sample()".
+        binomialDistribution = new BinomialDistribution(randomGenerator, trials, probabilityToChangeTarget);
     }
 
     // Public Methods
@@ -55,9 +69,8 @@ public class TargetChangerController {
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
 
-                // TODO: First, use Binomial distribution to decide
-                //   if target should be changed.
-                boolean changeTarget = true;
+                int binomialDistributionSample = binomialDistribution.sample();
+                boolean changeTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
 
                 if (changeTarget) {
                     if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {

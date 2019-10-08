@@ -171,7 +171,7 @@ public class Simulation {
 		}
 
 		for (TargetChanger targetChanger : topography.getTargetChangers()) {
-			targetChangerControllers.add(new TargetChangerController(topography, targetChanger));
+			targetChangerControllers.add(new TargetChangerController(topography, targetChanger, random));
 		}
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
