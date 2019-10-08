@@ -512,7 +512,7 @@ public class CLOptimalStepsModel {
 
 		if(counter == 0) {
 			float[] originArray = new float[]{(float)bound.getMinX(), (float)bound.getMinX()};
-			this.worldOrigin = CLUtils.toFloatBuffer(originArray, CLUtils.toFloatBuffer(originArray));
+			this.worldOrigin = CLUtils.toFloatBuffer(originArray);
 
 			this.potenialFieldSize = MemoryUtil.memAllocFloat(2);
 			this.potenialFieldSize.put(0, (float)bound.width);
@@ -525,7 +525,7 @@ public class CLOptimalStepsModel {
 		this.cellSize = MemoryUtil.memAllocFloat(1);
 		this.cellSize.put(0, iCellSize);
 
-		this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
+		this.gridSize = CLUtils.toIntBuffer(iGridSize);
 
 		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
 		this.cellEnds = MemoryUtil.memAllocInt(numberOfGridCells);

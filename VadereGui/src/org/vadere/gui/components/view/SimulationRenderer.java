@@ -3,8 +3,10 @@ package org.vadere.gui.components.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
+import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -280,11 +282,23 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     public Color getPedestrianColor(@NotNull final Agent agent) {
 	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
-	    if (model.config.isUseRandomPedestrianColors()) {
-		   return model.config.getRandomColor(agent.getId());
-	    }
 
-	    return model.config.getColorByTargetId(targetId)
-			    .orElseGet(model.config::getPedestrianColor);
+	    switch (model.config.getAgentColoring()) {
+		    case TARGET: return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
+		    case RANDOM: return model.config.getRandomColor(agent.getId());
+		    case PREDICATE: {
+		    	if(model instanceof PostvisualizationModel) {
+				    return ((PostvisualizationModel)model).getPredicateColoringModel().getColorByPredicate(agent)
+						    .orElse(model.config.getPedestrianColor());
+			    }
+		    }
+		    case GROUP: {
+			    if(agent instanceof Pedestrian) {
+				    return model.getGroupColor((Pedestrian)agent);
+			    }
+		    }
+		    default: return model.config.getPedestrianColor();
+
+	    }
     }
 }

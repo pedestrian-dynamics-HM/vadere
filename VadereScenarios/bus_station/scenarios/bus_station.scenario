@@ -6,7 +6,11 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "exitdensity.txt",
-      "processors" : [ ]
+      "processors" : [ 1, 2, 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 4, 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
@@ -29,6 +33,12 @@
       "attributes" : {
         "measurementAreaId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 4
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -131,7 +141,7 @@
             "y" : 0.5
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -149,7 +159,7 @@
             "y" : 2.6
           } ]
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -203,7 +213,7 @@
             "y" : 5.4
           } ]
         },
-        "id" : -1
+        "id" : 6
       } ],
       "measurementAreas" : [ {
         "shape" : {

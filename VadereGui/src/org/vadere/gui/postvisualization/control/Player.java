@@ -2,10 +2,7 @@ package org.vadere.gui.postvisualization.control;
 
 
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.state.simulation.Step;
 import org.vadere.util.logging.Logger;
-
-import java.util.Optional;
 
 public class Player implements Runnable {
 	private static Logger logger = Logger.getLogger(Player.class);

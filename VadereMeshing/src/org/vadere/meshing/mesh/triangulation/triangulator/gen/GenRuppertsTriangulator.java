@@ -135,7 +135,6 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
 			final boolean createHoles,
 			final boolean allowSegmentFaces) {
-
 		this.pslg = pslg;
 		this.generated = false;
 		this.segments = new HashSet<>();
@@ -295,10 +294,26 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	    } else if(!badTriangles.isEmpty() || !largeTriangles.isEmpty()) {
 		    refineSimplex2D();
     	} else if(!generated){
+    		if(!allowSegmentFaces) {
+    			split();
+		    }
 			generated = true;
 	    } else {
 		    logger.info("finished");
 	    }
+	}
+
+	private void split() {
+		List<E> edges = getMesh().getEdges();
+		for(E edge : edges) {
+			if(!segments.contains(edge)) {
+				V v1 = getMesh().getVertex(edge);
+				V v2 = getMesh().getTwinVertex(edge);
+				if(isSegmentVertex(v1) && isSegmentVertex(v2)) {
+					getTriangulation().splitEdge(edge, true);
+				}
+			}
+		}
 	}
 
 	private F pollBadTriangle() {
@@ -487,7 +502,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	private boolean isLarge(@NotNull final F face) {
 		VTriangle triangle = getMesh().toTriangle(face);
 		return isInside(face)
-				&& (circumRadiusFunc.apply(triangle.getCircumcenter()) < triangle.getCircumscribedRadius() || isSegmentFace(face));
+				&& (circumRadiusFunc.apply(triangle.getCircumcenter()) < triangle.getCircumscribedRadius());
 	}
 
 	private boolean isSegmentFace(@NotNull final F face) {

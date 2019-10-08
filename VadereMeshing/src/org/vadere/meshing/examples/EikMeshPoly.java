@@ -1,11 +1,18 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
+import org.vadere.meshing.utils.io.poly.MeshPolyReader;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -24,11 +31,12 @@ public class EikMeshPoly {
 
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		meshPoly("/poly/mf_small_very_simple.poly");
+		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
 		//meshPoly("/poly/room.poly");
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
+		displayPolyFile("/poly/muenchner_freiheit.poly");
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
@@ -73,15 +81,32 @@ public class EikMeshPoly {
 		}
 		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "mesh");
-		System.out.println(meshImprover.getMesh().getNumberOfVertices());
 
-		// display the mesh
-		meshPanel.display("Combined distance functions " + h0);
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "mesh.tex");
+		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
+
+		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "muenchner_freiheit.poly");
+	}
+
+	public static void displayPolyFile(@NotNull final String fileName) throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(() -> new PMesh());
+		var mesh = meshPolyWriter.readMesh(inputStream);
+		var meshPanel = new PMeshPanel(mesh, 1000, 800);
+		meshPanel.display("");
+	}
+
+	public static void fmmPolyFile(@NotNull final String fileName) throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(() -> new PMesh());
+		var mesh = meshPolyWriter.readMesh(inputStream);
+		var meshPanel = new PMeshPanel(mesh, 1000, 800);
+		meshPanel.display("");
 	}
 
 	private static void write(final String string, final String filename) throws IOException {
-		File outputFile = new File("./"+filename+".tex");
+		File outputFile = new File("./"+filename);
 		try(FileWriter fileWriter = new FileWriter(outputFile)) {
 			fileWriter.write(string);
 		}

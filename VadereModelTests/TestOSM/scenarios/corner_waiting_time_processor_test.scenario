@@ -12,10 +12,6 @@
       "filename" : "evacuationTimes.txt",
       "processors" : [ 2 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "out.txt",
-      "processors" : [ ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "out1.txt",
       "processors" : [ 6 ]
@@ -34,9 +30,6 @@
       "attributes" : {
         "pedestrianStartTimeProcessorId" : 4
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 3
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 4
@@ -150,7 +143,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 10.0,
@@ -159,7 +152,7 @@
           "height" : 9.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -192,7 +185,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 1.2,
           "y" : 1.2,
@@ -249,7 +242,7 @@
           "footSteps" : [ ]
         },
         "groupSizes" : [ ],
-        "modelPedestrianMap" : { },
+        "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {

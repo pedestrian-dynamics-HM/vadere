@@ -4,12 +4,12 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
       "processors" : [ 1 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
       "id" : 1
     } ],
     "isTimestamped" : true,
@@ -103,7 +103,7 @@
           "height" : 1.4,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 1
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

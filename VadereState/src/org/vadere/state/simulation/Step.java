@@ -3,6 +3,8 @@ package org.vadere.state.simulation;
 
 /**
  * Immutable class. Java Bean that store the stepNumber and the simulation time in seconds of a specific time step.
+ * A simulation step is defined by <tt>simTimeStepLength</tt> that is if t is the simulation time than
+ * ceil(t / <tt>simTimeStepLength</tt>) is the simulation {@link Step}.
  *
  * @author Benedikt Zoennchen
  *
@@ -77,30 +79,30 @@ public class Step implements Comparable<Step> {
 		return compareTo(step) <= 0;
 	}
 
-	public static Step toFloorStep(final double simTimeInSec, final double simStepLengthInSec) {
+	public static int toFloorStep(final double simTimeInSec, final double simStepLengthInSec) {
 		Step base = new Step((int) (simTimeInSec / simStepLengthInSec));
-		double r = simTimeInSec - toSimTimeInSec(base, simStepLengthInSec);
+		double r = simTimeInSec - toSimTimeInSec(base.getStepNumber(), simStepLengthInSec);
 
 		if(r / simStepLengthInSec > MAX_TOLERANCE) {
-			return base.increment();
+			return base.increment().getStepNumber();
 		} else{
-			return base;
+			return base.getStepNumber();
 		}
 	}
 
-	public static Step toCeilStep(final double simTimeInSec, final double simStepLengthInSec) {
+	public static int toCeilStep(final double simTimeInSec, final double simStepLengthInSec) {
 		Step base = new Step((int) (simTimeInSec / simStepLengthInSec));
-		double r = simTimeInSec - toSimTimeInSec(base, simStepLengthInSec);
+		double r = simTimeInSec - toSimTimeInSec(base.getStepNumber(), simStepLengthInSec);
 
 		if(r / simStepLengthInSec < MIN_TOLERANCE) {
-			return base;
+			return base.getStepNumber();
 		} else {
-			return base.increment();
+			return base.increment().getStepNumber();
 		}
 	}
 
-	public static double toSimTimeInSec(final Step step, final double simStepLengthInSec) {
-		return step.getStepNumber() * simStepLengthInSec;
+	public static double toSimTimeInSec(final int step, final double simStepLengthInSec) {
+		return step * simStepLengthInSec;
 	}
 
 	@Override
