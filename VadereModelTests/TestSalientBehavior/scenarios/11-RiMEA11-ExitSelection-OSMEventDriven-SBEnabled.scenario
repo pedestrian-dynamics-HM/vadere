@@ -140,7 +140,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -158,7 +158,7 @@
             "y" : 5.0
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -188,7 +188,7 @@
             "y" : 15.600000000000001
           } ]
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -213,7 +213,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.5,
           "y" : 8.0,

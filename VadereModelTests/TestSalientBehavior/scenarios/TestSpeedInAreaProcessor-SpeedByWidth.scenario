@@ -46,18 +46,7 @@
       "attributes" : {
         "measurementAreaId" : 1,
         "pedestrianTrajectoryProcessorId" : 5,
-        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityDefaultProcessor",
-      "id" : 7
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentVelocity",
-      "id" : 8,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesSpeedInAreaProcessorUsingAgentVelocity",
-      "attributes" : {
-        "measurementAreaId" : 1,
-        "pedestrianVelocityDefaultProcessor" : 7
+        "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_WIDTH"
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -180,6 +169,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
