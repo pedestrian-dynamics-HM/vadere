@@ -234,8 +234,8 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 
 		String parentPath = dirName.equals(SCENARIO_DIR) ? SCENARIO_DIR + "/" : OUTPUT_DIR + "/" + scenarioFilePath.getParent().getFileName().toString() + "/";
 
-		migrationLogger.info(">> analyzing JSON tree of scenario <" + parentPath + node.get("name").asText() + ">");
-		logger.info(migrationLogger.last());
+		migrationLogger.info("Analyzing scenario file " + parentPath + node.get("name").asText());
+		logger.debug(migrationLogger.last());
 
 		Version version;
 
