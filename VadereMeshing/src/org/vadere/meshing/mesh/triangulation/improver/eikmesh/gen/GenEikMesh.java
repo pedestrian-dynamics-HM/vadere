@@ -93,7 +93,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private boolean removeLowBoundaryTriangles = false;
 	private boolean useVirtualEdges = true;
 	private boolean smoothBorder = false;
-	private boolean freezeVertices = true;
+	private boolean freezeVertices = false;
 	//private boolean splitFaces = true;
 	//private boolean useFixPoints = false;
 

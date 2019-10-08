@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.swing.*;
+
 /**
  * Manage all {@link java.util.ResourceBundle}s present in the application.
  * Each module must use this Manager to allow easy inheritance of language keys.
@@ -48,6 +50,7 @@ public class BundleManager {
 
 	public void setLanguage(Locale locale){
 		currentLocale = locale;
+		Locale.setDefault(locale);
 		reloadBundles();
 	}
 

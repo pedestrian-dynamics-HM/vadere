@@ -4,10 +4,6 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "out.txt",
       "processors" : [ 3 ]
@@ -15,14 +11,12 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "out1.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 6, 7 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
-      "id" : 2
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
       "id" : 3,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
@@ -39,6 +33,12 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 4
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -373,7 +373,7 @@
           "footSteps" : [ ]
         },
         "groupSizes" : [ ],
-        "modelPedestrianMap" : { },
+        "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
         "source" : null,
@@ -412,7 +412,7 @@
           "footSteps" : [ ]
         },
         "groupSizes" : [ ],
-        "modelPedestrianMap" : { },
+        "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {

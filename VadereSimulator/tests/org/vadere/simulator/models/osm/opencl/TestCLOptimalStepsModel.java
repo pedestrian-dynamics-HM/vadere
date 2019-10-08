@@ -184,18 +184,18 @@ public class TestCLOptimalStepsModel {
 				attributesFloorField,
 				new VRectangle(topography.getBounds()),
 				targetPotentialField.getEikonalSolver(),
-				obstacleDistancePotential.getEikonalSolver());
+				obstacleDistancePotential.getEikonalSolver(),
+				1.2);
 		// max step length + function width);
-		List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, attributesPotentialCompact.getPedPotentialWidth());
-
+		List<VPoint> result = clOptimalStepsModel.update();
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+			logger.info("not equals for index = " + i + ": " + result.get(i) + " -> " + result.get(i));
 		}
 		// max step length + function width);
-		result = clOptimalStepsModel.getNextSteps(pedestrians, 				attributesPotentialCompact.getPedPotentialWidth());
+		result = clOptimalStepsModel.update();
 
 		for(int i = 0; i < numberOfElements; i++) {
-			logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+			logger.info("not equals for index = " + i + ": " + result.get(i) + " -> " + result.get(i));
 		}
 
 		//clOptimalStepsModel.clear();

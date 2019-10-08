@@ -7,9 +7,11 @@ import org.apache.commons.configuration2.PropertiesConfigurationLayout;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.vadere.util.logging.Logger;
 
+import java.beans.IntrospectionException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,7 +75,9 @@ public class VadereConfig {
         PropertiesBuilderParameters propertiesParams = new Parameters()
                 .properties()
                 .setFileName(CONFIG_FILENAME)
-                .setBasePath(basePath);
+                .setBasePath(basePath)
+		        .setListDelimiterHandler(new DefaultListDelimiterHandler(',')
+                );
 
         FileBasedConfigurationBuilder<FileBasedConfiguration> builder =
                 new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
@@ -81,7 +85,7 @@ public class VadereConfig {
         builder.setAutoSave(true);
 
         try {
-            vadereConfig = builder.getConfiguration();
+	        vadereConfig = builder.getConfiguration();
         } catch (ConfigurationException ex) {
             LOGGER.error(String.format("Error while reading config file \"%s\": %s", CONFIG_PATH.toString(), ex.getMessage()));
             LOGGER.info("Create and use default config");
@@ -219,7 +223,6 @@ public class VadereConfig {
         if (SINGLETON_INSTANCE == null) {
             SINGLETON_INSTANCE = new VadereConfig();
         }
-
         return SINGLETON_INSTANCE.vadereConfig;
     }
 
@@ -238,15 +241,16 @@ public class VadereConfig {
         defaultConfig.put("Gui.dataProcessingViewMode", "gui");
         defaultConfig.put("Gui.toolbar.size", "40");
         defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
-        defaultConfig.put("History.lastUsedProject", null);
-        defaultConfig.put("History.recentProjects", null);
+        defaultConfig.put("History.lastUsedProject", "");
+        defaultConfig.put("History.recentProjects", "");
         defaultConfig.put("Messages.language", Locale.ENGLISH.getLanguage());
         defaultConfig.put("Pedestrian.radius", "0.195");
         defaultConfig.put("PostVis.SVGWidth", "1024");
         defaultConfig.put("PostVis.SVGHeight", "768");
         defaultConfig.put("PostVis.maxNumberOfSaveDirectories", "5");
-        defaultConfig.put("PostVis.maxFramePerSecond", "30");
-        defaultConfig.put("PostVis.framesPerSecond", "5");
+        defaultConfig.put("PostVis.maxFramePerSecond", "40");
+        defaultConfig.put("PostVis.framesPerSecond", "20");
+        defaultConfig.put("PostVis.visTimeStepLength", "0.1");
         defaultConfig.put("PostVis.cellWidth", "1.0");
         defaultConfig.put("PostVis.minCellWidth", "0.01");
         defaultConfig.put("PostVis.maxCellWidth", "10.0");

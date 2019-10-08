@@ -3,6 +3,8 @@ package org.vadere.gui.postvisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -14,15 +16,15 @@ public class PedestrianColorPanel extends JPanel {
 	private JTable colorTable;
 	private final DefaultTableModel tableModel;
 
-	public PedestrianColorPanel(final DefaultTableModel tableModel) {
-		this.tableModel = tableModel;
+	public PedestrianColorPanel(final PostvisualizationModel model) {
+		this.tableModel = model.getPredicateColoringModel().getPedestrianColorTableModel();
 		String[] headers = new String[] {"Criteria", "Color"};
 		Object[][] data = new Object[][] {
-				new Object[] {"", Color.BLUE},
-				new Object[] {"", Color.BLUE},
-				new Object[] {"", Color.BLUE},
-				new Object[] {"", Color.BLUE},
-				new Object[] {"", Color.BLUE}
+				new Object[] {"", model.config.getPedestrianDefaultColor()},
+				new Object[] {"", model.config.getPedestrianDefaultColor()},
+				new Object[] {"", model.config.getPedestrianDefaultColor()},
+				new Object[] {"", model.config.getPedestrianDefaultColor()},
+				new Object[] {"", model.config.getPedestrianDefaultColor()}
 		};
 		colorTable = new JTable(tableModel);
 		JScrollPane scrollPane = new JScrollPane(colorTable);

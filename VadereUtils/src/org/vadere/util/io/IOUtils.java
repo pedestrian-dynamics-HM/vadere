@@ -45,7 +45,7 @@ public class IOUtils {
 
 	public static final String OUTPUT_FILE_EXTENSION = ".csv";
 
-	public static final String TRAJECTORY_FILE_EXTENSION = ".trajectories";
+	public static final String TRAJECTORY_FILE_EXTENSION = ".traj";
 
 	public static final String PROJECT_PATH = System.getenv(SYSTEM_VARIABLE_PROJECT_PATH);
 

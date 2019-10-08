@@ -2,6 +2,8 @@ package org.vadere.util.io.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
@@ -127,7 +129,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split(">");
 		JsonNode obj = getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isNumber()) {
+		if (obj.isNumber() && isNumber(split[1])) {
 			return obj.asDouble() > Double.parseDouble(split[1]);
 		} else {
 			throw new ParseException("parse error in eq cause by " + expression, 0);
@@ -139,7 +141,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split(">=");
 		JsonNode obj = getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isNumber()) {
+		if (obj.isNumber() && isNumber(split[1])) {
 			return obj.asDouble() >= Double.parseDouble(split[1]);
 		} else {
 			throw new ParseException("parse error in eq cause by " + expression, 0);
@@ -150,7 +152,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split("<");
 		JsonNode obj = JsonLogicParser.getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isNumber()) {
+		if (obj.isNumber() && isNumber(split[1])) {
 			return obj.asDouble() < Double.parseDouble(split[1]);
 		} else {
 			throw new ParseException("parse error in eq cause by " + expression, 0);
@@ -162,7 +164,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split("<=");
 		JsonNode obj = getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isNumber()) {
+		if (obj.isNumber() && isNumber(split[1])) {
 			return obj.asDouble() <= Double.parseDouble(split[1]);
 		} else {
 			throw new ParseException("parse error in eq cause by " + expression, 0);
@@ -173,7 +175,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split("==");
 		JsonNode obj = getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isBoolean()) {
+		if (obj.isBoolean() && isBoolean(split[1])) {
 			return obj.asBoolean() == Boolean.parseBoolean(split[1]);
 		} else if (obj.isNumber()) {
 			return obj.asDouble() == Double.parseDouble(split[1]);
@@ -188,7 +190,7 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		String[] split = expression.split("!=");
 		JsonNode obj = getJsonPrimitiv(split[0], jsonObj);
 
-		if (obj.isBoolean()) {
+		if (obj.isBoolean() && isBoolean(split[1])) {
 			return obj.asBoolean() != Boolean.parseBoolean(split[1]);
 		} else if (obj.isNumber()) {
 			return obj.asDouble() != Double.parseDouble(split[1]);
@@ -199,5 +201,22 @@ public class JsonLogicParser extends LogicalParser<JsonNode> {
 		}
 	}
 
+	public static boolean isBoolean(@NotNull final String strBoolean) {
+		if("true".equalsIgnoreCase(strBoolean)) {
+			return true;
+		} else if("false".equalsIgnoreCase(strBoolean)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
+	public static boolean isNumber(@NotNull final String strNum) {
+		try {
+			double d = Double.parseDouble(strNum);
+		} catch (NumberFormatException | NullPointerException nfe) {
+			return false;
+		}
+		return true;
+	}
 }

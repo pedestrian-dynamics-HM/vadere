@@ -124,7 +124,15 @@ public final class FootStep {
 		return intersectionTime;
 	}
 
-	static public VPoint interpolateFootStep(final FootStep footStep, final double time){
+	public static VPoint interpolateFootStep(final double startX, final double startY, final double endX, final double endY, final double startTime, final double endTime, final double time) {
+		return interpolateFootStep(new FootStep(new VPoint(startX, startY), new VPoint(endX, endY), startTime, endTime), time);
+	}
+
+	public static VPoint interpolateFootStep(final VPoint start, final VPoint end, final double startTime, final double endTime, final double time) {
+		return interpolateFootStep(new FootStep(start, end, startTime, endTime), time);
+	}
+
+	public static VPoint interpolateFootStep(final FootStep footStep, final double time){
 		final double startTime = footStep.getStartTime();
 		final double endTime = footStep.getEndTime();
 		final double duration = footStep.duration();
