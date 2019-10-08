@@ -70,6 +70,7 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 			model.notifyObservers();
 		});
 
+		CellConstraints cc = new CellConstraints();
 		additionalLayeredPane.add(chCleanPed, cc.xy(2, 2));
 		additionalLayeredPane.add(chCleanTrajecties, cc.xy(2, 4));
 

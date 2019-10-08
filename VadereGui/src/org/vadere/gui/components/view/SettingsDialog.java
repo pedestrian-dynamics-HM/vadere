@@ -23,7 +23,7 @@ import java.util.Optional;
 public class SettingsDialog extends JDialog {
 
 	/**
-	 * The content is usually placed in every second cell (row/column).
+	 * The content is usually placed in every second cell (row or column).
 	 * Therefore, increment by two to jump to the next content cell.
 	 */
 	public final int NEXT_CELL = 2;
@@ -47,13 +47,14 @@ public class SettingsDialog extends JDialog {
 	}
 
 	/**
-	 * The settings dialogs consists of several rows:
-	 * 1. Color settings for scenario elements like targets and pedestrians
-	 * 2. Other settings consisting of
-	 *   * Visibility checkboxes to control whether scenario elements should be visible
-	 *   * Snapshot options (for PNG, SVG and TikZ export)
-	 * 3. Post-visualization options (also called additional options)
-	 * 4. A row containing a close button
+	 * The settings dialog consists of several rows:
+	 * 1. Color settings for static scenario elements like sources or targets.
+	 * 2. Color settings for agents.
+	 * 3. Other settings consisting of:
+	 *   * Visibility checkboxes to control whether scenario elements should be visible or not.
+	 *   * Snapshot options (for PNG, SVG and TikZ export).
+	 * 4. Post-visualization options (also called additional options).
+	 * 5. A row containing a close button.
 	 */
 	public void initComponents() {
 		this.setTitle(Messages.getString("SettingsDialog.title"));
@@ -137,16 +138,8 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane
 				.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
 
-		/*
-		"5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				createCellsWithSeparators(18)
-		 */
-
-		/*"5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"*/
-
 		FormLayout colorSettingsLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				createCellsWithSeparators(8)); // rows
 		colorSettingsPane.setLayout(colorSettingsLayout);
 
 		// For each scenario element, add a color preview canvas and a button to change the color.
@@ -160,19 +153,16 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblStair.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
 
 		createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
-
-		// Add options to colorize pedestrians based on different strategies (by target, evacuation time, randomly, ...=
-		// By target id:
-		//colorSettingsPane.add(new JSeparator(), cc.xyw(1, row += NEXT_CELL, 9));
 	}
 
 	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
 		CellConstraints cc = new CellConstraints();
 
 		FormLayout pedColorLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu",
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu");
+				createCellsWithSeparators(6));
 
 		colorSettingsPane.setLayout(pedColorLayout);
 		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.pedcolors.border.text")));
@@ -313,6 +303,14 @@ public class SettingsDialog extends JDialog {
 		bAbsorbingAreaColor.addActionListener(new ActionSetAbsorbingAreaColor("Set Absorbing Area Color", model, pAbsorbingAreaColor));
 		colorSettingsPane.add(pAbsorbingAreaColor, cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(bAbsorbingAreaColor, cc.xy(column3, row));
+
+		final JButton bTargetChangerColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pTargetChangerColor = new JPanel();
+		pTargetChangerColor.setBackground(model.config.getTargetChangerColor());
+		pTargetChangerColor.setPreferredSize(new Dimension(130, 20));
+		bTargetChangerColor.addActionListener(new ActionSetTargetChangerColor("Set Target Changer Color", model, pTargetChangerColor));
+		colorSettingsPane.add(pTargetChangerColor, cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(bTargetChangerColor, cc.xy(column3, row));
 	}
 
 	private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
@@ -333,7 +331,7 @@ public class SettingsDialog extends JDialog {
 				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
 
 		FormLayout otherSettingsLayout = new FormLayout(createCellsWithSeparators(4), // col
-				createCellsWithSeparators(13)); // rows
+				createCellsWithSeparators(15)); // rows
 		otherSettingsPane.setLayout(otherSettingsLayout);
 
 		// For each scenario element, add a checkbox to toggle its visibility.
@@ -343,6 +341,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
 		JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
+		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
 		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
 
 		JCheckBox chHideVoronoiDiagram = new JCheckBox((Messages.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
@@ -394,6 +393,12 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
+		chShowTargetChangers.setSelected(model.config.isShowTargetChangers());
+		chShowTargetChangers.addItemListener(e -> {
+			model.config.setShowTargetChangers(!model.config.isShowTargetChangers());
+			model.notifyObservers();
+		});
+
 		chShowPedIds.setSelected(model.config.isShowPedestrianIds());
 		chShowPedIds.addItemListener(e -> {
 			model.config.setShowPedestrianIds(!model.config.isShowPedestrianIds());
@@ -412,6 +417,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowStairs, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowAbsorbingAreas, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowMeasurementAreas, cc.xyw(column, row += NEXT_CELL, colSpan));
+		otherSettingsPane.add(chShowTargetChangers, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
 		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
