@@ -132,7 +132,7 @@ public class PedestrianOSM extends Pedestrian {
 			// }
 		} else if (!hasNextTarget() || getDurationNextStep() > getAttributesOSM().getMaxStepDuration()) {
 			this.nextPosition = getPosition();
-		} else if (topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
+		} else if (isCurrentTargetAnAgent() == false && topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
 			this.nextPosition = getPosition();
 		} else {
 			VCircle reachableArea = new VCircle(getPosition(), getDesiredStepSize());

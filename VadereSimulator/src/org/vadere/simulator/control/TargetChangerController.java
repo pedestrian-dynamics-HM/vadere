@@ -145,9 +145,7 @@ public class TargetChangerController {
         topography.addTarget(targetPedestrian);
 
         // Make "agent" a follower of "pedToFollow".
-        LinkedList<Integer> nextTargetAsList = new LinkedList<>();
-        nextTargetAsList.add(pedToFollow.getId());
-        agent.setTargets(nextTargetAsList);
+        agent.setSingleTarget(pedToFollow.getId(), true);
     }
 
     private void useStaticTargetForAgent(Agent agent) {

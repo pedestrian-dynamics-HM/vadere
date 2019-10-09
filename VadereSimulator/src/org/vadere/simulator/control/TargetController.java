@@ -147,10 +147,15 @@ public class TargetController {
 	}
 
 	private boolean isNextTargetForAgent(Agent agent) {
+		boolean isNextTargetForAgent = false;
+
 		if (agent.hasNextTarget()) {
-			return agent.getNextTargetId() == target.getId();
+			if (agent.getNextTargetId() == target.getId()
+				&& agent.isCurrentTargetAnAgent() == false)
+				isNextTargetForAgent = true;
 		}
-		return false;
+
+		return isNextTargetForAgent;
 	}
 
 	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
