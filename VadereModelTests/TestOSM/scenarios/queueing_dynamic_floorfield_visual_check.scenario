@@ -4,17 +4,11 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 6, 7 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
-      "id" : 2
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 3
     }, {
@@ -31,6 +25,12 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -123,7 +123,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 45.0,
@@ -132,7 +132,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

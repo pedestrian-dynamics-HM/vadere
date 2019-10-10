@@ -4,6 +4,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
@@ -17,20 +18,44 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 	}
 
 	@Override
+	public void initComponents() {
+		super.initComponents();
+		CellConstraints cc = new CellConstraints();
+		JRadioButton chShowEvacTimeColor = new JRadioButton(Messages.getString("PostVis.chShowEvacTimeColor.text"));
+		agentColorSettingsPane.add(chShowEvacTimeColor, cc.xyw(2, 10, 9));
+		chShowEvacTimeColor.addItemListener(e -> {
+			model.setAgentColoring(AgentColoring.EVACUATION_TIMES);
+			model.notifyObservers();
+		});
+
+
+		JRadioButton chShowCriteriaColor = new JRadioButton(Messages.getString("PostVis.chShowCriteriaColor.text") + ":");
+		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model);
+		agentColorSettingsPane.add(chShowCriteriaColor, cc.xy(2, 12,  CellConstraints.LEFT, CellConstraints.TOP));
+		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, 12, 7));
+		chShowCriteriaColor.addItemListener(e -> {
+			model.setAgentColoring(AgentColoring.PREDICATE);
+			model.notifyObservers();
+		});
+
+
+		group.add(chShowEvacTimeColor);
+		group.add(chShowCriteriaColor);
+	}
+
+	@Override
 	protected JLayeredPane getAdditionalOptionPanel() {
 		CellConstraints cc = new CellConstraints();
 		JLayeredPane additionalLayeredPane = new JLayeredPane();
 		additionalLayeredPane.setBorder(
 				BorderFactory.createTitledBorder(Messages.getString("PostVis.additional.border.text")));
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 5dlu", // col
-				"5dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu"); // rows
+				"5dlu, pref, 2dlu, pref, 5dlu"); // rows
 		additionalLayeredPane.setLayout(additionalLayout);
 		JCheckBox chCleanPed = new JCheckBox(Messages.getString("PostVis.chbHidePedAtTarget.text"));
-		JCheckBox chCleanSnapshot = new JCheckBox(Messages.getString("PostVis.chbCleanSnapshot.text"));
 		JCheckBox chCleanTrajecties = new JCheckBox(Messages.getString("PostVis.chbHideTrajAtTarget.text"));
-		JCheckBox chShowAllTrajOnSnapshot = new JCheckBox(Messages.getString("PostVis.chShowAllTrajOnSnapshot.text"));
 
-		chCleanPed.setSelected(!model.config.isShowTrajecoriesOnSnapshot());
+		chCleanPed.setSelected(!model.config.isShowFaydedPedestrians());
 		chCleanPed.addItemListener(e -> {
 			model.config.setShowFaydedPedestrians(!model.config.isShowFaydedPedestrians());
 			model.notifyObservers();
@@ -42,33 +67,8 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 			model.notifyObservers();
 		});
 
-		chCleanSnapshot.setSelected(!model.config.isShowTrajecoriesOnSnapshot());
-		chCleanSnapshot.addItemListener(
-				e -> model.config.setShowTrajecoriesOnSnapshot(!model.config.isShowTrajecoriesOnSnapshot()));
-
-		chShowAllTrajOnSnapshot.setSelected(model.config.isShowAllTrajOnSnapshot());
-		chShowAllTrajOnSnapshot.addItemListener(e -> {
-			model.config.setShowAllTrajOnSnapshot(!model.config.isShowAllTrajOnSnapshot());
-			model.notifyObservers();
-		});
-
 		additionalLayeredPane.add(chCleanPed, cc.xy(2, 2));
 		additionalLayeredPane.add(chCleanTrajecties, cc.xy(2, 4));
-		additionalLayeredPane.add(chCleanSnapshot, cc.xy(2, 6));
-		additionalLayeredPane.add(chShowAllTrajOnSnapshot, cc.xy(2, 8));
-
-		JCheckBox chShowEvacTimeColor = new JCheckBox(Messages.getString("PostVis.chShowEvacTimeColor.text"));
-		getColorSettingsPane().add(chShowEvacTimeColor, cc.xyw(2, 26, 8));
-
-		chShowEvacTimeColor.addItemListener(e -> {
-			model.config.setUseEvacuationTimeColor(!model.config.isUseEvacuationTimeColor());
-			model.notifyObservers();
-		});
-
-		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model.getPedestrianColorTableModel());
-		getColorSettingsPane().add(pedestrianColorPanel, cc.xyw(2, 22, 8));
-
-
 
 		return additionalLayeredPane;
 	}

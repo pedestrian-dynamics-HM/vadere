@@ -5,8 +5,8 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 6, 7, 9, 10 ]
+      "filename" : "speedInArea.txt",
+      "processors" : [ 1, 2, 9, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -15,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 6, 7, 11, 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -36,10 +40,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMostImportantEventProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
       "id" : 6
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSalientBehaviorProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
       "id" : 7
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessor",
@@ -59,6 +63,12 @@
         "pedestrianTrajectoryProcessorId" : 5,
         "speedCalculationStrategy" : "BY_MEASUREMENT_AREA_HEIGHT"
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 11
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 12
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -152,7 +162,7 @@
           "height" : 1.7,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 3.275,
@@ -161,7 +171,7 @@
           "height" : 1.7,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -203,7 +213,7 @@
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 1.5,
           "y" : 0.5,

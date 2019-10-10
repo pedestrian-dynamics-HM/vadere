@@ -349,16 +349,16 @@ public class CLLinkedCell extends CLOperation {
 			pos[i*2] = (float)positionList.get(i).getX();
 			pos[i*2+1] = (float)positionList.get(i).getY();
 		}
-		this.positions = CLUtils.toFloatBuffer(pos, CLUtils.toFloatBuffer(pos));
+		this.positions = CLUtils.toFloatBuffer(pos);
 		this.hashes = MemoryUtil.memAllocInt(numberOfElements);
 
 		float[] originArray = new float[]{(float)bound.getMinX(), (float)bound.getMinX()};
-		this.worldOrigin = CLUtils.toFloatBuffer(originArray, CLUtils.toFloatBuffer(originArray));
+		this.worldOrigin = CLUtils.toFloatBuffer(originArray);
 
 		this.cellSize = MemoryUtil.memAllocFloat(1);
 		this.cellSize.put(0, iCellSize);
 
-		this.gridSize = CLUtils.toIntBuffer(iGridSize, CLUtils.toIntBuffer(iGridSize));
+		this.gridSize = CLUtils.toIntBuffer(iGridSize);
 
 		this.cellStarts = MemoryUtil.memAllocInt(numberOfGridCells);
 		for(int i = 0; i < numberOfGridCells; i++) {

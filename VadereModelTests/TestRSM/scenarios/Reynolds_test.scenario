@@ -4,9 +4,9 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 7, 8 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "waitingTimes.txt",
@@ -25,9 +25,6 @@
       "processors" : [ 6 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
       "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
@@ -54,6 +51,12 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 8
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -64,7 +67,7 @@
       "org.vadere.state.attributes.models.AttributesReynolds" : { }
     },
     "attributesSimulation" : {
-      "finishTime" : 200.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.4,
       "writeSimulationData" : true,

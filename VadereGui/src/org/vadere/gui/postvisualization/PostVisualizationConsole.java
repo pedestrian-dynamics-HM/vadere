@@ -106,8 +106,6 @@ public class PostVisualizationConsole {
 		PostvisualizationModel model = new PostvisualizationModel();
 		PostvisualizationRenderer renderer = new PostvisualizationRenderer(model);
 
-
-
 		/*
 		 * Set all necessary data to the model (topography, viewport, scaleFactor, time or step).
 		 */
@@ -119,7 +117,7 @@ public class PostVisualizationConsole {
 
 			if (trajectoryFile.isPresent() && scenarioFile.isPresent()) {
 				Scenario scenario = IOOutput.readScenario(scenarioFile.get().toPath());
-				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath(), scenario);
+				TrajectoryReader reader = new TrajectoryReader(trajectoryFile.get().toPath());
 				model.init(reader.readFile(), scenario, trajectoryFile.get().getParent());
 			} else {
 				System.err.println("could not find trajectory or scenario file in: " + outputDirectoryPath);

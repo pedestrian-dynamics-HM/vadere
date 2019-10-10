@@ -48,20 +48,20 @@ public class TestTrajectory extends TestCase {
 	@Test
 	public void testGetPedestrian() {
 		Trajectory trajectory = new Trajectory(pedestriansByStep, 1, 0.4);
-		assertEquals(trajectory.getAgent(new Step(3)), (trajectory.getAgent(new Step(2))));
-		assertTrue(trajectory.getAgent(new Step(3)).isPresent());
-		assertEquals(trajectory.getAgent(new Step(6)), (trajectory.getAgent(new Step(5))));
-		assertTrue(trajectory.getAgent(new Step(6)).isPresent());
-		assertEquals(trajectory.getAgent(new Step(12)), (trajectory.getAgent(new Step(7))));
-		assertTrue(trajectory.getAgent(new Step(12)).isPresent());
-		assertEquals(trajectory.getAgent(new Step(1)), (trajectory.getAgent(new Step(2))));
-		assertTrue(trajectory.getAgent(new Step(1)).isPresent());
+		assertEquals(trajectory.getAgent(3), (trajectory.getAgent(2)));
+		assertTrue(trajectory.getAgent(3).isPresent());
+		assertEquals(trajectory.getAgent(6), (trajectory.getAgent(5)));
+		assertTrue(trajectory.getAgent(6).isPresent());
+		assertEquals(trajectory.getAgent(12), (trajectory.getAgent(7)));
+		assertTrue(trajectory.getAgent(12).isPresent());
+		assertEquals(trajectory.getAgent(1), (trajectory.getAgent(2)));
+		assertTrue(trajectory.getAgent(1).isPresent());
 
-		assertFalse(trajectory.getAgent(new Step(2)).equals(trajectory.getAgent(new Step(4))));
-		assertTrue(trajectory.getAgent(new Step(2)).isPresent());
-		assertFalse(trajectory.getAgent(new Step(1)).equals(trajectory.getAgent(new Step(12))));
-		assertTrue(trajectory.getAgent(new Step(1)).isPresent());
-		assertFalse(trajectory.getAgent(new Step(1)).equals(trajectory.getAgent(new Step(12))));
+		assertFalse(trajectory.getAgent(2).equals(trajectory.getAgent(4)));
+		assertTrue(trajectory.getAgent(2).isPresent());
+		assertFalse(trajectory.getAgent(1).equals(trajectory.getAgent(12)));
+		assertTrue(trajectory.getAgent(1).isPresent());
+		assertFalse(trajectory.getAgent(1).equals(trajectory.getAgent(12)));
 	}
 
 	@Test
@@ -69,12 +69,12 @@ public class TestTrajectory extends TestCase {
 		Trajectory trajectory = new Trajectory(pedestriansByStep, 2, 0.4);
 		trajectory.fill();
 		IntStream.rangeClosed(1, 7).forEach(stepNumber -> assertTrue(
-				trajectory.getPositionsReverse(new Step(stepNumber)).count() + "!=" + stepNumber,
-				trajectory.getPositionsReverse(new Step(stepNumber)).count() == stepNumber));
-		List<VPoint> reversePositions = trajectory.getPositionsReverse(new Step(12)).collect(Collectors.toList());
+				trajectory.getPositionsReverse(stepNumber).count() + "!=" + stepNumber,
+				trajectory.getPositionsReverse(stepNumber).count() == stepNumber));
+		List<VPoint> reversePositions = trajectory.getPositionsReverse(12).collect(Collectors.toList());
 		IntStream.rangeClosed(0, reversePositions.size() - 1)
 				.forEach(index -> assertEquals(
 						reversePositions.get(index),
-						trajectory.getAgent(new Step(reversePositions.size() - index)).get().getPosition()));
+						trajectory.getAgent(reversePositions.size() - index).get().getPosition()));
 	}
 }

@@ -18,7 +18,12 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 
@@ -88,20 +93,15 @@ public class ActionLoadProject extends AbstractAction {
 	}
 
 	public static void addToRecentProjects(String path) {
-		String existingStoredPaths = VadereConfig.getConfig().getString("History.recentProjects", "");
-		String csvPaths = path; // make sure the new one is at top position -- comma separated paths
-
-		if (existingStoredPaths.length() > 0) {
-			String[] list = existingStoredPaths.split(",");
-			for(int i = 0; i < list.length; i++) {
-				String entry = list[i];
-				if (i < 10 && !entry.equals(path) && Files.exists(Paths.get(entry)))
-					csvPaths += "," + entry;
-			}
-		}
-
+		List<String> existingStoredPaths = VadereConfig.getConfig().getList(String.class,"History.recentProjects", Collections.EMPTY_LIST);
+		existingStoredPaths.add(0, path);
+		existingStoredPaths = existingStoredPaths.stream()
+				.filter(entry -> Files.exists(Paths.get(entry)))
+				.distinct()
+				.limit(10)
+				.collect(Collectors.toList());
 		VadereConfig.getConfig().setProperty("History.lastUsedProject", path);
-		VadereConfig.getConfig().setProperty("History.recentProjects", csvPaths);
+		VadereConfig.getConfig().setProperty("History.recentProjects", existingStoredPaths);
 		ProjectView.getMainWindow().updateRecentProjectsMenu();
 	}
 

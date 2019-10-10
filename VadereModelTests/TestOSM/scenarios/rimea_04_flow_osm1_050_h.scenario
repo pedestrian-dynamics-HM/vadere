@@ -5,7 +5,7 @@
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
+      "filename" : "fundamental_diagram.txt",
       "processors" : [ 1, 2, 7 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
@@ -31,6 +31,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "dTimeStep.fundamentalDiagram",
       "processors" : [ 12 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 5, 14 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
@@ -49,7 +53,7 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
       "id" : 5
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramAProcessor",
@@ -128,6 +132,9 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 14
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

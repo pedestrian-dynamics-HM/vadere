@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.SimulationOutput;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.simulation.Step;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.VadereClassNotFoundException;
@@ -20,11 +18,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+
+import tech.tablesaw.api.Table;
 
 /**
  * This IOUtility class provides all methods to loadFromFilesystem, delete, list, clean output directories.
@@ -59,14 +58,14 @@ public abstract class IOOutput {
 				.forEach(dir -> cleanDirectory(project, dir));
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final VadereProject project, final Scenario scenario, final String directoryName) throws IOException {
-		TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION), scenario);
+	public static Table readTrajectories(final VadereProject project, final String directoryName) throws IOException {
+		TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directoryName, IOUtils.TRAJECTORY_FILE_EXTENSION));
 		return reader.readFile();
 	}
 
-	public static Map<Step, List<Agent>> readTrajectories(final Path trajectoryFilePath, final Scenario scenario) throws IOException {
-		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath, scenario);
-		Map<Step, List<Agent>> result = reader.readFile();
+	public static Table readTrajectories(final Path trajectoryFilePath) throws IOException {
+		TrajectoryReader reader = new TrajectoryReader(trajectoryFilePath);
+		Table result = reader.readFile();
 		return result;
 	}
 
@@ -76,7 +75,7 @@ public abstract class IOOutput {
 	private static boolean testTrajectories (final VadereProject project, final File directory) {
 		try {
 			TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
-			reader.checkFile();
+			reader.readFile();
 			return true;
 
 		} catch (IOException | VadereClassNotFoundException e) {
@@ -85,7 +84,7 @@ public abstract class IOOutput {
 		}
 	}
 
-    private static Optional<Map<Step, List<Agent>>> readTrajectories(final VadereProject project, final File directory) {
+    private static Optional<Table> readTrajectories(final VadereProject project, final File directory) {
         try {
             TrajectoryReader reader = new TrajectoryReader(getPathToOutputFile(project, directory.getName(), IOUtils.TRAJECTORY_FILE_EXTENSION));
             return Optional.of(reader.readFile());

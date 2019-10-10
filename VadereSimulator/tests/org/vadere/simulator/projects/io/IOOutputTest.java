@@ -36,7 +36,7 @@ public class IOOutputTest {
 
 	@Test
 	public void getSimulationOutput() throws Exception {
-		String out1Dir = "output/test_postvis_2018-01-17_16-56-37.307";
+		String out1Dir = "output/test_postvis_2019-09-23_17-32-20.881";
 		Optional<SimulationOutput> out1 =
 				IOOutput.getSimulationOutput(project, projectDir.resolve(out1Dir).toFile());
 		assertTrue(out1.isPresent());
@@ -60,8 +60,8 @@ public class IOOutputTest {
 		FileUtils.copyDirectory(corruptedOutput.toFile(), projectDir.resolve("output").toFile());
 		simOutputs = IOOutput.getSimulationOutputs(project);
 		assertEquals("There should be 14 valid SimulationOutputs",14,simOutputs.size());
-		File f = Paths.get(projectDir.toString(),"output/test_postvis_2018-01-19_13-38-11.666").toFile();
-		FileUtils.deleteDirectory(f);
+		/*File f = Paths.get(projectDir.toString(),"output/test_postvis_2019-09-23_17-32-20.881").toFile();
+		FileUtils.deleteDirectory(f);*/
 	}
 
 
