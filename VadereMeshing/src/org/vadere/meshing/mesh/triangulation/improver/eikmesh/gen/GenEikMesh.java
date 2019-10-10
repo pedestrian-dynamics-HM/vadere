@@ -698,7 +698,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 	private boolean isSlidePoint(@NotNull V vertex) {
-		return getMesh().isAtBoundary(vertex) && !isFixPoint(vertex);
+		return getMesh().isAtBoundary(vertex) && !isFixPoint(vertex) && boundaryPointToLine.containsKey(vertex);
 	}
 
 	/**

@@ -35,8 +35,8 @@ public class EikMeshPoly {
 		//meshPoly("/poly/bridge.poly");
 		//meshPoly("/poly/room.poly");
 		//meshPoly("/poly/corner.poly");
-		//meshPoly("/poly/railing.poly");
-		displayPolyFile("/poly/muenchner_freiheit.poly");
+		meshPoly("/poly/railing.poly");
+		//displayPolyFile("/poly/muenchner_freiheit.poly");
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
