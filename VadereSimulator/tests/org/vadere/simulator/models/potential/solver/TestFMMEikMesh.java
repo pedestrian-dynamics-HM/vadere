@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
@@ -27,8 +28,8 @@ public class TestFMMEikMesh {
 	@Test
 	public void testTriangulationFMM() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/muenchner_freiheit.poly");
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(() -> new PMesh());
-		var mesh = meshPolyWriter.readMesh(inputStream);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(() -> new PMesh());
+		var mesh = meshReader.readMesh(inputStream);
 
 		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(mesh);
 
@@ -50,6 +51,10 @@ public class TestFMMEikMesh {
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
-		System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
+		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
+
+		System.out.println(meshPolyWriter.to2DPoly(triangulation.getMesh(), 1, i -> "potential", v -> false));
+
+		//System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
 	}
 }

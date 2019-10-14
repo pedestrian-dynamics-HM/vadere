@@ -20,23 +20,17 @@ public class EJSliderAction implements MouseListener {
 
 	@Override
 	public void mousePressed(final MouseEvent e) {
-
+		setSliderValue(e);
 	}
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
-		Point p = e.getPoint();
-		double percent = p.x / ((double) slider.getWidth());
-		int range = slider.getMaximum() - slider.getMinimum();
-		double newVal = range * percent;
-		int result = (int) (Math.ceil(slider.getMinimum() + newVal));
-		// logger.info("change to step: " + Thread.currentThread().getName() + (result+1));
-		slider.setValue(result);
+		setSliderValue(e);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+		setSliderValue(e);
 	}
 
 	@Override
@@ -47,5 +41,15 @@ public class EJSliderAction implements MouseListener {
 	@Override
 	public void mouseExited(MouseEvent e) {
 
+	}
+
+	private void setSliderValue(MouseEvent e) {
+		Point sliderPosition = e.getPoint();
+		double percent = sliderPosition.x / ((double) slider.getWidth());
+		int sliderRange = slider.getMaximum() - slider.getMinimum();
+
+		double newValue = sliderRange * percent;
+		int result = (int) (Math.ceil(slider.getMinimum() + newValue));
+		slider.setValue(result);
 	}
 }

@@ -61,7 +61,7 @@ public class EikMeshPlots {
 		//roomLFS();
 		//cornerLFS();
 
-		uniformRing(0.3);
+		//uniformRing(0.3);
 	}
 
 	public static void randomDelaunay() throws IOException {
