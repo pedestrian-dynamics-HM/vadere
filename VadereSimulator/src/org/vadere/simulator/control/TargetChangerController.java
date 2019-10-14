@@ -138,14 +138,14 @@ public class TargetChangerController {
     }
 
     private void agentFollowsOtherPedestrian(Agent agent, Pedestrian pedToFollow) {
-        // Create necessary target wrapper object.
-        // Watch out: The main simulation loop creates the necessary
-        // "TargetController" object in the next simulation step.
+        // Create the necessary TargetPedestrian wrapper object.
+        // The simulation loop creates the corresponding controller objects
+        // in the next simulation loop based on the exisiting targets in the topography.
         TargetPedestrian targetPedestrian = new TargetPedestrian(pedToFollow);
         topography.addTarget(targetPedestrian);
 
         // Make "agent" a follower of "pedToFollow".
-        agent.setSingleTarget(pedToFollow.getId(), true);
+        agent.setSingleTarget(targetPedestrian.getId(), true);
         pedToFollow.getFollowers().add(agent);
     }
 

@@ -284,17 +284,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	@Override
 	public void update(final double simTimeInSec) {
 		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
-		// TODO: Update followers
 		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
 		lastSimTimeInSec = simTimeInSec;
-	}
-
-	private void updateTargetPotentialsOfFollowers() {
-		for (Target target : topography.getTargets()) {
-			if (target.isTargetPedestrian()) {
-				// TODO: follower.setTargetPotential().
-			}
-		}
 	}
 
 		/*

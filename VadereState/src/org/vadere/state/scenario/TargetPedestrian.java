@@ -5,18 +5,32 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class TargetPedestrian extends Target implements DynamicElementRemoveListener<Pedestrian> {
 
+	// Static Variables
+	/**
+	 * {@link Target}s and {@link TargetPedestrian}s share the same address space for ids!
+	 * This can cause conflicts when the target potential is retrieved
+	 * in "PotentialFieldTarget.getPotential()". "PotentialFieldTarget"
+	 * stores potentials in a map<targetId, potentials>. Therefore, use
+	 * a fixed offset to discriminate {@link Target}s and {@link TargetPedestrian}s.
+	 */
+	public static final int UNIQUE_ID_OFFSET = 100000;
+
+	// Member Variables
 	private final Pedestrian pedestrian;
 	private boolean isDeleted;
 
+	// Constructors
 	public TargetPedestrian(Pedestrian pedestrian) {
 		super(new AttributesTarget(pedestrian));
 		this.pedestrian = pedestrian;
 		this.isDeleted = false;
 	}
 
+	// Getters
 	@Override
-	public void setShape(VShape newShape) {
-		pedestrian.setShape(newShape);
+	public int getId() {
+		int targetId = pedestrian.getId() + TargetPedestrian.UNIQUE_ID_OFFSET;
+		return targetId;
 	}
 
 	@Override
@@ -42,6 +56,13 @@ public class TargetPedestrian extends Target implements DynamicElementRemoveList
 		isDeleted = true;
 	}
 
+	// Setters
+	@Override
+	public void setShape(VShape newShape) {
+		pedestrian.setShape(newShape);
+	}
+
+	// Methods
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

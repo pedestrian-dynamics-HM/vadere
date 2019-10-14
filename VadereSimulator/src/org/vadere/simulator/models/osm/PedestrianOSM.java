@@ -319,10 +319,6 @@ public class PedestrianOSM extends Pedestrian {
 		this.relevantPedestrians = relevantPedestrians;
 	}
 
-	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
-		this.potentialFieldTarget = potentialFieldTarget;
-	}
-
 	public void setCombinedPotentialStrategy(CombinedPotentialStrategy newStrategy) {
 		if (newStrategy == CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY) {
 			this.combinedPotentialStrategy = new TargetAttractionStrategy(this.potentialFieldTarget,
