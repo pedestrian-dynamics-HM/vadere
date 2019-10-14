@@ -146,6 +146,7 @@ public class TargetChangerController {
 
         // Make "agent" a follower of "pedToFollow".
         agent.setSingleTarget(pedToFollow.getId(), true);
+        pedToFollow.getFollowers().add(agent);
     }
 
     private void useStaticTargetForAgent(Agent agent) {

@@ -35,6 +35,8 @@ public abstract class Agent extends DynamicElement {
 	private Vector2D velocity;
 	private double freeFlowSpeed;
 
+	private LinkedList<Agent> followers;
+
 	// TODO: Maybe, add also a List<Agent> of followers for an agent.
 
 	// Constructors
@@ -46,6 +48,8 @@ public abstract class Agent extends DynamicElement {
 		targetIds = new LinkedList<>();
 		nextTargetListIndex = 0;
 		isCurrentTargetAnAgent = false;
+
+		followers = new LinkedList<>();
 	}
 
 	public Agent(AttributesAgent attributesAgent, Random random) {
@@ -75,6 +79,8 @@ public abstract class Agent extends DynamicElement {
 		this.position = other.position;
 		this.velocity = other.velocity;
 		this.freeFlowSpeed = other.freeFlowSpeed;
+
+		this.setFollowers(new LinkedList<>(other.followers));
 	}
 
 	// Getters
@@ -157,6 +163,10 @@ public abstract class Agent extends DynamicElement {
 	@Override
 	public VShape getShape() {
 		return new VCircle(position, attributes.getRadius());
+	}
+
+	public LinkedList<Agent> getFollowers() {
+		return followers;
 	}
 
 	// Setters
@@ -269,5 +279,9 @@ public abstract class Agent extends DynamicElement {
 
         return agentPositions;
     }
+
+	public void setFollowers(LinkedList<Agent> followers) {
+		this.followers = followers;
+	}
 
 }

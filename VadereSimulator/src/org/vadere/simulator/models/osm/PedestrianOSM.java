@@ -39,6 +39,7 @@ public class PedestrianOSM extends Pedestrian {
 	private final double stepLength;
 	private final double stepDeviation;
 	private final double minStepLength;
+
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
@@ -316,6 +317,10 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void setRelevantPedestrians(@NotNull final Collection<? extends Agent> relevantPedestrians) {
 		this.relevantPedestrians = relevantPedestrians;
+	}
+
+	public void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget) {
+		this.potentialFieldTarget = potentialFieldTarget;
 	}
 
 	public void setCombinedPotentialStrategy(CombinedPotentialStrategy newStrategy) {

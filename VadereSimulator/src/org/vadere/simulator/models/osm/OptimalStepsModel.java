@@ -33,9 +33,7 @@ import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -286,8 +284,17 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	@Override
 	public void update(final double simTimeInSec) {
 		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
+		// TODO: Update followers
 		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
 		lastSimTimeInSec = simTimeInSec;
+	}
+
+	private void updateTargetPotentialsOfFollowers() {
+		for (Target target : topography.getTargets()) {
+			if (target.isTargetPedestrian()) {
+				// TODO: follower.setTargetPotential().
+			}
+		}
 	}
 
 		/*
