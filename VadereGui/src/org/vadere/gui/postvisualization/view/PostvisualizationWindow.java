@@ -4,16 +4,8 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.JViewportChangeListener;
-import org.vadere.gui.components.control.PanelResizeListener;
-import org.vadere.gui.components.control.ViewportChangeListener;
-import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
-import org.vadere.gui.components.control.ActionGeneratePoly;
-import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
-import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
-import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
-import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.control.*;
+import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
@@ -115,20 +107,28 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		if (CONFIG.getBoolean("PostVis.enableJsonInformationPanel")) {
 			layout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
 					"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
+			setLayout(layout);
+
 			textView = new ScenarioElementView(model);
 			textView.setEditable(false);
 			textView.setPreferredSize(new Dimension(1, windowHeight));
-			setLayout(layout);
-			add(toolbar, cc.xyw(2, 2, 4));
-			add(scrollPane, cc.xy(2, 4));
+
+			JSplitPane splitPaneForTopographyAndJsonPane = new JSplitPane();
+			splitPaneForTopographyAndJsonPane.setResizeWeight(0.8);
+			splitPaneForTopographyAndJsonPane.resetToPreferredSizes();
+			splitPaneForTopographyAndJsonPane.setLeftComponent(scrollPane);
+			splitPaneForTopographyAndJsonPane.setRightComponent(textView);
+
+			add(toolbar, cc.xyw(2, 2, 3));
+			add(splitPaneForTopographyAndJsonPane, cc.xywh(2, 4, 4, 1));
 			add(adjustPanel, cc.xyw(2, 6, 4));
-			add(textView, cc.xy(4, 4));
-			// model.addObserver(textView);
 		} else {
 			layout = new FormLayout("2dlu, default:grow, 2dlu", // col
 					"2dlu, default, 2dlu, default, 2dlu, default, 2dlu"); // rows
-			textView = null;
 			setLayout(layout);
+
+			textView = null;
+
 			add(toolbar, cc.xy(2, 2));
 			add(scrollPane, cc.xy(2, 4));
 			add(adjustPanel, cc.xy(2, 6));
