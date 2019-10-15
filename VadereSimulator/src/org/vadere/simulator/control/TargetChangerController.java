@@ -54,6 +54,11 @@ public class TargetChangerController {
         binomialDistribution = new BinomialDistribution(randomGenerator, trials, probabilityToChangeTarget);
     }
 
+    // Getters
+    public Map<Integer, Agent> getProcessedAgents() {
+        return processedAgents;
+    }
+
     // Public Methods
     public void update(double simTimeInSec) {
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
