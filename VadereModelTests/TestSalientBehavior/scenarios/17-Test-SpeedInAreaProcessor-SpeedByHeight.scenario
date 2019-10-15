@@ -1,7 +1,8 @@
 {
-  "name" : "TestSpeedInAreaProcessor-SpeedByHeight",
+  "name" : "17-Test-SpeedInAreaProcessor-SpeedByHeight",
   "description" : "",
   "release" : "1.4",
+  "commithash" : "c770d900680db2c5e6f4794f17a8f006334bb1d8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -173,18 +174,6 @@
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 1.0,
-          "y" : 5.6
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.7573879731780782,
         "attributes" : {
           "id" : -1,
           "radius" : 0.2,
@@ -199,6 +188,20 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
+        "source" : null,
+        "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
+        "position" : {
+          "x" : 1.0,
+          "y" : 5.6
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "freeFlowSpeed" : 1.7573879731780782,
+        "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,

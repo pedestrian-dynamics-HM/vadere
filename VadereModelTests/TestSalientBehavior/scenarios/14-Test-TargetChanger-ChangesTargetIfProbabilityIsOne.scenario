@@ -1,7 +1,8 @@
 {
-  "name" : "Test-TargetChanger-DoesNotChangeTargetIfProbabilityIsZero",
+  "name" : "14-Test-TargetChanger-ChangesTargetIfProbabilityIsOne",
   "description" : "",
   "release" : "1.4",
+  "commithash" : "c770d900680db2c5e6f4794f17a8f006334bb1d8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -184,7 +185,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
         "nextTarget" : 3,
-        "probabilityToChangeTarget" : 0.0
+        "probabilityToChangeTarget" : 1.0
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
