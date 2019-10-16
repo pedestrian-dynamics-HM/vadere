@@ -4,9 +4,9 @@
   "release" : "1.4",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
-      "processors" : [ 1, 2, 5 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "postvis.traj",
+      "processors" : [ 5, 21 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -199,7 +199,7 @@
         "deltaTime" : 10.0
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 21
     } ],
     "isTimestamped" : true,
