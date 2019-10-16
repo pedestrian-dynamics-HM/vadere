@@ -296,8 +296,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
-				VadereConfig.getConfig().getString("History.lastUsedProject", null);
-		if (lastUsedProjectPath != null) {
+				VadereConfig.getConfig().getString("History.lastUsedProject");
+		if (lastUsedProjectPath != null && lastUsedProjectPath.isBlank() == false) {
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
 			}

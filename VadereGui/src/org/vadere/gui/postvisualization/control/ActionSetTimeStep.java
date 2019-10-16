@@ -42,10 +42,9 @@ public class ActionSetTimeStep extends ActionVisualization implements ChangeList
 
 	@Override
 	public void stateChanged(final ChangeEvent event) {
-		JSlider source = (JSlider) event.getSource();
-		if(!source.getValueIsAdjusting()) {
-			model.setStep(source.getValue());
-			model.notifyObservers();
-		}
+		JSlider slider = (JSlider) event.getSource();
+
+		model.setStep(slider.getValue());
+		model.notifyObservers();
 	}
 }
