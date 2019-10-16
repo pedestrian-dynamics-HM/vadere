@@ -114,7 +114,7 @@ public class AdjustPanel extends JPanel implements Observer {
 		SwingUtilities.invokeLater(() -> {
 			synchronized (model) {
 				// update view
-				slider.setValueIsAdjusting(true);
+				//slider.setValueIsAdjusting(true);
 				if(model.hasOutputChanged()) {
 					slider.setMaximum(model.getLastStep());
 					slider.setMinimum(model.getFirstStep());
@@ -126,7 +126,7 @@ public class AdjustPanel extends JPanel implements Observer {
 				sVisTimeStepLength.setValue(model.getVisTimeStepLength());
 				sTime.setValue(model.getSimTimeInSec());
 				//((SpinnerNumberModel)sModelTime).setStepSize(model.getSimTimeInSec());
-				slider.setValueIsAdjusting(false);
+				//slider.setValueIsAdjusting(false);
 			}
 		});
 	}
