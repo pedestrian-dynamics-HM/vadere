@@ -53,7 +53,7 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianFootStepProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
       "id" : 5
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramAProcessor",
