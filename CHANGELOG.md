@@ -6,7 +6,12 @@
 
 ### Added
 
+- Added new scenario element `TargetChanger`. This scenario element has an arbitrary shape and changes the target of an agent. Either to another static target or to another agent (to get a follower behavior). A `TargetChanger` has two important parameters:
+  * `changeTargetProbability`: This defines how many percent of the agents, who enter the area, should change their target.
+  * `nextTargetIsPedestrian`: If `nextTargetIsPedestrian == false`, assign a new static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
+
 ### Changed
+
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
 Was previously known as `PedestrianFootStepProcessor`
 
