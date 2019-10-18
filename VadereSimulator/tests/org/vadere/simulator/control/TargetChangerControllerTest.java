@@ -52,7 +52,7 @@ public class TargetChangerControllerTest {
     @Before
     public void setUp() throws Exception {
         topography = new Topography();
-        pedestrians = createTwoPedestrianWithTargetT1();
+        pedestrians = createTwoPedestrianWithTargetT1(1);
         targets = createTwoTargets();
         simTimeInSec = 0;
 
@@ -64,7 +64,7 @@ public class TargetChangerControllerTest {
         }
     }
 
-    private List<Pedestrian> createTwoPedestrianWithTargetT1() {
+    private List<Pedestrian> createTwoPedestrianWithTargetT1(int startId) {
         int seed = 0;
         Random random = new Random(seed);
 
@@ -73,11 +73,11 @@ public class TargetChangerControllerTest {
         LinkedList<Integer> targetsPed2 = new LinkedList<>();
         targetsPed2.add(1);
 
-        Pedestrian pedestrian1 = new Pedestrian(new AttributesAgent(1), random);
+        Pedestrian pedestrian1 = new Pedestrian(new AttributesAgent(startId), random);
         pedestrian1.setPosition(new VPoint(1, 1));
         pedestrian1.setTargets(targetsPed1);
 
-        Pedestrian pedestrian2 = new Pedestrian(new AttributesAgent(2), random);
+        Pedestrian pedestrian2 = new Pedestrian(new AttributesAgent(startId +  1), random);
         pedestrian2.setPosition(new VPoint(5, 2));
         pedestrian2.setTargets(targetsPed2);
 
@@ -257,6 +257,41 @@ public class TargetChangerControllerTest {
         LinkedList<Agent> followers = pedestrians.get(0).getFollowers();
         assertEquals(1, followers.size());
         assertEquals(pedestrians.get(1).getId(), followers.get(0).getId());
+    }
+
+    @Test
+    public void updateModifiesPedestrianWithExistingFollwersIfTargetIsDynamic() {
+        int nextTarget = 1;
+        double probability = 1.0;
+
+        // Add two new agents were one follows the other.
+        List<Pedestrian> newPedestrians = createTwoPedestrianWithTargetT1(3);
+        LinkedList<Agent> follower = new LinkedList<>();
+        follower.add(newPedestrians.get(1));
+
+        newPedestrians.get(0).setPosition(new VPoint(1, 2));
+        newPedestrians.get(1).setPosition(new VPoint(1, 3));
+        newPedestrians.get(0).setFollowers(follower);
+
+        for (Pedestrian pedestrian : newPedestrians) {
+            topography.addElement(pedestrian);
+        }
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setNextTargetIsPedestrian(true);
+        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertEquals(0, pedestrians.get(0).getFollowers().size());
+        assertEquals(1, newPedestrians.get(0).getFollowers().size());
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertEquals(0, pedestrians.get(0).getFollowers().size());
+        assertEquals(2, newPedestrians.get(0).getFollowers().size());
     }
 
     @Test

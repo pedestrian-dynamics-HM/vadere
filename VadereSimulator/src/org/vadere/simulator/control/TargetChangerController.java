@@ -134,8 +134,13 @@ public class TargetChangerController {
                 .collect(Collectors.toList());
 
         if (pedsWithCorrectTargetId.size() > 0) {
-            // Maybe, choose randomly in the long run.
-            Pedestrian pedToFollow = pedsWithCorrectTargetId.get(0);
+            // Try to use a pedestrian which has already some followers
+            // to avoid calculating multiple dynamic floor fields.
+            List<Pedestrian> pedsWithFollowers = pedsWithCorrectTargetId.stream()
+                    .filter(pedestrian -> pedestrian.getFollowers().isEmpty() == false)
+                    .collect(Collectors.toList());
+
+            Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);
             agentFollowsOtherPedestrian(agent, pedToFollow);
         } else {
             useStaticTargetForAgent(agent);
