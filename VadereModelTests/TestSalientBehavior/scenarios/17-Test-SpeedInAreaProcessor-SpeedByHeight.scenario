@@ -2,7 +2,6 @@
   "name" : "17-Test-SpeedInAreaProcessor-SpeedByHeight",
   "description" : "",
   "release" : "1.4",
-  "commithash" : "c770d900680db2c5e6f4794f17a8f006334bb1d8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

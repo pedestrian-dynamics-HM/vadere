@@ -2,7 +2,6 @@
   "name" : "16-Test-TargetChanger-ChangesToDynamicTarget",
   "description" : "",
   "release" : "1.4",
-  "commithash" : "c770d900680db2c5e6f4794f17a8f006334bb1d8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -185,10 +184,10 @@
       "targetChangers" : [ {
         "id" : 5,
         "shape" : {
-          "x" : 5.5,
+          "x" : 15.5,
           "y" : 0.6801097393689985,
-          "width" : 0.7419753086419743,
-          "height" : 4.965706447187929,
+          "width" : 0.741975308641976,
+          "height" : 2.735274876015615,
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
