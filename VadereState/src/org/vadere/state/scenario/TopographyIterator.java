@@ -34,6 +34,14 @@ public class TopographyIterator implements Iterator<ScenarioElement> {
 			elements.add(topography.getObstacles());
 		}
 
+		if (!topography.getAbsorbingAreas().isEmpty()) {
+			elements.add(topography.getAbsorbingAreas());
+		}
+
+		if (!topography.getTargetChangers().isEmpty()) {
+			elements.add(topography.getTargetChangers());
+		}
+
 		if (!elements.isEmpty()) {
 			currentIterator = elements.get(0).iterator();
 		}
