@@ -116,10 +116,41 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
             F face = triangulation.locateFace(point.getX(), point.getY()).get();
             if(!getMesh().isBoundary(face)) {
 	            targetVertices.addAll(getMesh().getVertices(face));
+	            for(F neighbourFace : getMesh().getFaceIt(face)) {
+		            if(!getMesh().isBoundary(neighbourFace)) {
+			            targetVertices.addAll(getMesh().getVertices(neighbourFace));
+		            }
+	            }
             }
             //initialFace(face, p -> point.distance(p));
         }
     }
+
+	/**
+	 * Constructor for certain target points.
+	 *
+	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
+	 * @param triangulation     the triangulation the propagating wave moves on.
+	 * @param targetVertices    Points where the propagating wave starts i.e. points that are part of the target area.
+	 */
+	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                                     @NotNull final Collection<V> targetVertices
+	) {
+		this.triangulation = triangulation;
+		this.calculationFinished = false;
+		this.timeCostFunction = timeCostFunction;
+		this.narrowBand = new PriorityQueue<>(pointComparator);
+		this.targetVertices = new HashSet<>();
+		this.distFunc = p -> IDistanceFunction.createToTargetPoints(targetVertices).apply(p);
+
+		for(V vertex : targetVertices) {
+			this.targetVertices.add(vertex);
+			for(V neighbouringVertices : getMesh().getAdjacentVertexIt(vertex)) {
+				this.targetVertices.add(neighbouringVertices);
+			}
+		}
+	}
 
     /**
      * Constructor for certain target shapes.

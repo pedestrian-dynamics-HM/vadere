@@ -57,7 +57,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private Collection<? extends IPoint> fixPoints;
 	private double scalingFactor;
 	private double deps;
-	private static final int MAX_STEPS = 250;
+	private static final int MAX_STEPS = Parameters.MAX_NUMBER_OF_STEPS;
 	private int nSteps;
 	private double initialEdgeLen;
 	private double maxMovement;
@@ -301,6 +301,10 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 
+	public Collection<V> getFixVertices() {
+		return refiner.getFixPoints();
+	}
+
 	public void initialize() {
 		initializeStep();
 	}
@@ -343,8 +347,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 	public boolean isFinished() {
 		synchronized (getMesh()) {
-			boolean converged = dQuality < 0.000000001;
-			return initializationFinished() && quality > Parameters.qualityMeasurement && converged || (maxMovement > 0 && maxMovement / initialEdgeLen < Parameters.DPTOL) || nSteps >= MAX_STEPS;
+			boolean converged = dQuality < Parameters.qualityConvergence;
+			return initializationFinished() && quality >= Parameters.qualityMeasurement && converged || (maxMovement > 0 && maxMovement / initialEdgeLen < Parameters.DPTOL) || nSteps >= MAX_STEPS;
 		}
 	}
 
