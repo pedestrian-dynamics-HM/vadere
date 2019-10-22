@@ -123,6 +123,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	}
 
+
 	void close(String[] args) throws IOException {
 
 		traCISocket.sendExact(TraCICloseCommand.build());
@@ -263,6 +264,25 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		}
 
 		TraCIResponse res =  personapi.setTargetList(elementIdentifier, targets);
+		System.out.println(res.toString());
+	}
+
+	@Override
+	public void personapi_createNew(String[] args) throws IOException {
+		if(args.length < 5){
+			System.out.println("command needs argument element id, x-coordinate, y-coordinate and at least one target");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		String x = args[2];
+		String y = args[3];
+		ArrayList<String> targets = new ArrayList<>();
+		for (int i = 4; i < args.length; i++){
+			targets.add(args[i]);
+		}
+
+		TraCIResponse res =  personapi.createNew(elementIdentifier, x, y, targets);
 		System.out.println(res.toString());
 	}
 }
