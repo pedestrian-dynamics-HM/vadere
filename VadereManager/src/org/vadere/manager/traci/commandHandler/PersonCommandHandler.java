@@ -13,6 +13,7 @@ import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -111,6 +112,17 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
+	// TODO: return the next free ID not used within the simulation. Hint: look at Topograpy.getNextDynamicElementId()
+//	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
+//	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
+//
+//		remoteManager.accessState((manager, state) -> {
+//
+//		});
+//
+//		return cmd;
+//	}
+
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIDCount", ignoreElementId = true)
 	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager){
 		remoteManager.accessState((manager, state) -> {
@@ -136,6 +148,15 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
+	// todo setVelocity (this will  setFreeFlowSpeed)
+	// HINT: look in class ByteArrayOutputStreamTraCIWriter at the switch statement in line 50 to select the correct dataTypeStr
+	// HINT: Be careful when copy-paste! TraCI>>Set<<Command != TraCI>>Get<<Command in the process_XXXX commands
+//	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.TARGET_LIST, name = "setTargetList", dataTypeStr = "Double")
+//	public TraCICommand process_setTargetList(TraCISetCommand cmd, RemoteManager remoteManager) {
+//		// implement me..
+//	}
+
+	// todo setPosition
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D, name = "getPosition2D")
 	public TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager){
 
@@ -155,6 +176,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
+	// todo setPosition
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_3D, name = "getPosition3D")
 	public TraCICommand process_getPosition3D(TraCIGetCommand cmd, RemoteManager remoteManager){
 
@@ -257,6 +279,24 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		});
 		return cmd;
 	}
+
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, name = "createNew", dataTypeStr = "VPoint")
+	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
+		VPoint tmp = (VPoint) cmd.getVariableValue();
+		Integer id =  Integer.parseInt(cmd.getElementId());
+
+		remoteManager.accessState((manager, state) -> {
+			// todo get dynamicElementFactory for given model...
+			// todo check existing id's
+//			state.getMainModel().get().getSourceControllerFactory().
+
+			cmd.setOK();
+		});
+
+		return cmd;
+	}
+
+
 
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.WAITING_TIME, name="getWaitingTime")
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.COLOR, name="getColor")

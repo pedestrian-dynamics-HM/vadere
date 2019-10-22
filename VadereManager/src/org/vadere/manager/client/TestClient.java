@@ -267,22 +267,25 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	// todo implement new methods from AbstractTestClient....
+
+
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
 		if(args.length < 5){
-			System.out.println("command needs argument element id, x-coordinate, y-coordinate and at least one target");
+			System.out.println("command needs argument element id, x-coordinate, y-coordinate");
 			return;
 		}
 
 		String elementIdentifier = args[1];
 		String x = args[2];
 		String y = args[3];
-		ArrayList<String> targets = new ArrayList<>();
-		for (int i = 4; i < args.length; i++){
-			targets.add(args[i]);
-		}
+//		ArrayList<String> targets = new ArrayList<>();
+//		for (int i = 4; i < args.length; i++){
+//			targets.add(args[i]);
+//		}
 
-		TraCIResponse res =  personapi.createNew(elementIdentifier, x, y, targets);
+		TraCIResponse res =  personapi.createNew(elementIdentifier, new VPoint(Double.parseDouble(x), Double.parseDouble(y)));
 		System.out.println(res.toString());
 	}
 }
