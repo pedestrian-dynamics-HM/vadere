@@ -146,9 +146,6 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 
 		for(V vertex : targetVertices) {
 			this.targetVertices.add(vertex);
-			for(V neighbouringVertices : getMesh().getAdjacentVertexIt(vertex)) {
-				this.targetVertices.add(neighbouringVertices);
-			}
 		}
 	}
 
