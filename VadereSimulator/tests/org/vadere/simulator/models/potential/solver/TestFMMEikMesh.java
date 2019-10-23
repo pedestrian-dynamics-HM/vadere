@@ -74,7 +74,7 @@ public class TestFMMEikMesh {
 	@Ignore
 	@Test
 	public void testFilledChickenFMM() throws IOException {
-		testTriangulationFMM("/poly/filled_chicken.poly", new VPoint(2,2), 1.0);
+		testTriangulationFMM("/poly/filled_chicken.poly", new VPoint(2,2), 3.0);
 	}
 
 	@Ignore
@@ -121,7 +121,6 @@ public class TestFMMEikMesh {
 		solver.initialize();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
-
 
 		// 4. print the result to the console i.e. standard out
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
