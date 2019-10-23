@@ -48,6 +48,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		mainPanel.setScrollPane(scrollPane);
 		scrollPane.getViewport()
 				.addChangeListener(new JViewportChangeListener(model, scrollPane.getVerticalScrollBar()));
+		model.addScrollPane(scrollPane);
 
 		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(model, scrollPane);
 		model.addViewportChangeListener(viewportChangeListener);

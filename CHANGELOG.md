@@ -14,6 +14,11 @@
 
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
 Was previously known as `PedestrianFootStepProcessor`
+- Use following shortcuts for zooming and scrolling in the topography creator:
+  * Ctrl + Mouse Wheel Scroll: Zoom in/out.
+  * Mouse Wheel Scroll: Scroll vertically.
+  * Shift + Mouse Wheel Scroll: Scroll horizontally.
+  * Use Alt key to decrease the step size while scrolling.
 
 # v1.4 (2019-09-05)
 
