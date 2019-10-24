@@ -49,14 +49,16 @@ def run_all_model_tests():
     excluded_scenarios = ["TestOVM", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 
-    scenario_files_regular_length = find_scenario_files(path="Scenarios/ModelTests", exclude_patterns=excluded_scenarios)
+    scenario_base_path = os.path.join("Scenarios" , "ModelTests")
+
+    scenario_files_regular_length = find_scenario_files(path=scenario_base_path, exclude_patterns=excluded_scenarios)
 
     passed_and_failed_scenarios = run_scenario_files_with_vadere_console(
         scenario_files_regular_length, scenario_timeout_in_sec=short_timeout_in_seconds)
 
     for scenario in long_running_scenarios:
         search_pattern = "*" + scenario + "*.scenario"
-        scenario_files_long = find_scenario_files(path="Scenarios/ModelTests", scenario_search_pattern=search_pattern)
+        scenario_files_long = find_scenario_files(path=scenario_base_path, scenario_search_pattern=search_pattern)
 
         tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(
             scenario_files_long, scenario_timeout_in_sec=long_timeout_in_seconds)
