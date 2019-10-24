@@ -68,10 +68,10 @@ def run_all_model_tests():
 
 
 def run_all_optimization_tests():
-    scenario_files = find_scenario_files(path="VadereOptimizationTests")
+    scenario_files = find_scenario_files(path=os.path.join("Scenarios", "OptimizationTests"))
 
     # enables flag to compare optimization with brute force solution
-    config_filepath = os.path.join("VadereOptimizationTests", "TestNelderMead", "vadere.conf")
+    config_filepath = os.path.join("Scenarios", "OptimizationTests", "TestNelderMead", "vadere.conf")
 
     # NOTE: it is likely that the set config file is not required by new optimization tests
     # long_timeout, because the brute force is expensive.
