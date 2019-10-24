@@ -28,10 +28,6 @@ variables:
     EIKMESH_PACKAGE_NAME_BRANCHES: "eikmesh.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip"
 
 # Stage Definitions
-# Watch out: integration tests and the seed tests run after deployment, because
-#   currently tests fail very often because of timeouts. It is not clear if
-#   Vadere has slowed down somehow or the test environment is not reliable
-#   (i.e.,the virtual machines). We have to track that!
 stages:
     - unit_test
     - integration_test
@@ -52,6 +48,7 @@ stages:
     # Skip OpenCL tests by using "-Dtest=!Test1,!Test2,..." because GitLab
     # runners do not support OpenCL.
     script:
+        - rm -f ~/.config/vadere.conf
         - mvn clean
         - mvn -Dtest=!TestConvolution,!TestBitonicSort,!TestCLLinkedList,!TestCLOptimalStepsModel,!TestLWJGL test
         - python3 Tools/ContinuousIntegration/collect_line_and_branch_coverage.py
@@ -65,7 +62,7 @@ stages:
 .template_scenario_files:
     stage: integration_test
     script:
-        - rm ~/.config/vadere.conf
+        - rm -f ~/.config/vadere.conf
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
@@ -129,7 +126,7 @@ stages:
 
 # Job Definitions
 
-## Jobs for GNU/Linux runner (which is labelled with tag "linux")
+## Jobs for GNU/Linux runner (which is labeled with tag "linux")
 run_unit_tests_on_linux:
     extends: .template_unit_tests
     tags:
@@ -169,7 +166,7 @@ deploy_branch_on_linux:
         name: branches/${CI_COMMIT_REF_NAME}/linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
 
-## Jobs for Windows runner (which is labelled with tag "windows")
+## Jobs for Windows runner (which is labeled with tag "windows")
 run_unit_tests_on_windows:
     extends: .template_unit_tests
     tags:
