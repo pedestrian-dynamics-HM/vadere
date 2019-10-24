@@ -31,7 +31,7 @@ public class JoltIdentityTransformationTest {
 	@Ignore
 	public void testIdenityTransformationV02() throws IOException {
 		List<Path> scenarioFiles = getScenarioFiles(
-				Paths.get("../VadereModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+				Paths.get("../Scenarios/ModelTests").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		testIdentity(scenarioFiles, "/identity_v0.2.json");
 	}
 
@@ -40,14 +40,14 @@ public class JoltIdentityTransformationTest {
 	@Ignore
 	public void testIdenityTransformationV01() throws IOException {
 
-		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../Scenarios/ModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		testIdentity(scenarioFiles, "/identity_v0.1.json");
 	}
 
 	@Test
 	@Ignore
 	public void testTransformationV01_to_V02() throws IOException {
-		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../Scenarios/ModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		Diffy diffy = new Diffy();
 		for (Path p : scenarioFiles) {
 			Object jsonInput = JsonUtils.filepathToObject(p.toString());
@@ -98,7 +98,7 @@ public class JoltIdentityTransformationTest {
 	@Test
 	@Ignore
 	public void transformv1t0v2() throws IOException {
-		Path scenario = Paths.get("../VadereModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
+		Path scenario = Paths.get("../Scenarios/ModelTestsV0.1/TestOSM/scenarios/basic_1_chicken_osm1.scenario");
 		List chainrSpecJson = JsonUtils.classpathToList("/transform_v0.1_to_v0.2.json");
 		Chainr transform_v1_v2 = Chainr.fromSpec(chainrSpecJson);
 		Object inputJson = JsonUtils.filepathToObject(scenario.toString());
@@ -113,7 +113,7 @@ public class JoltIdentityTransformationTest {
 	@Test
 	@Ignore
 	public void attr01() throws IOException {
-		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../VadereModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
+		List<Path> scenarioFiles = getScenarioFiles(Paths.get("../Scenarios/ModelTestsV0.1").toRealPath(LinkOption.NOFOLLOW_LINKS).toAbsolutePath());
 		LinkedHashMap<String, Object> out = new LinkedHashMap<>();
 		for (Path scenarioFile : scenarioFiles) {
 			Object inputJson = JsonUtils.filepathToObject(scenarioFile.toString());
