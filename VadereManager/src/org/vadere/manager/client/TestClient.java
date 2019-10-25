@@ -152,7 +152,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	void sendFile(String[] args) throws IOException {
 
-		String filePath = "/Users/Philipp/Repos/vadere/VadereManager/testResources/testProject001/scenarios/";
+		String userPath = new java.io.File("").getAbsolutePath();
+		String filePath = userPath.concat("/VadereManager/testResources/testProject001/scenarios/");
 
 		if (args.length > 1) {
 			filePath = filePath + args[1] + ".scenario";
