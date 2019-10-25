@@ -128,64 +128,6 @@ public class OSMBehaviorController {
         }
     }
 
-    /**
-     * Try to swap the given pedestrian with the closest cooperative pedestrian.
-     * Carry out the following steps:
-     *
-     * TODO: Refactoring, this class should not have access to the event queue. Idea: use "old" events which will be ignored i.e.
-     * one agent might have multiple events in the queue.
-     *
-     * <ol>
-     *     <li>Use topography to find a close pedestrian within step circle which is closer to target than the given pedestrian.</li>
-     *     <li>Check if candidate is SalientBehavior.COOPERATIVE.</li>
-     *     <li>Check if target orientation of candidate differs from own orientation.</li>
-     *     <li>Swap if checks (2) and (3) are true.</li>
-     * </ol>
-     *
-     * @param pedestrian The pedestrian which would like to swap the position.
-     * @param topography The topography is required to find the neighbors of the given pedestrian.
-     */
-    /*public void swapWithClosestCooperativePedestrian(PedestrianOSM pedestrian, Topography topography, PriorityQueue<PedestrianOSM> queue) {
-        if (pedestrian.hasNextTarget() == false) { // Ignore pedestrians with no targets.
-            // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-            pedestrian.updateNextPosition();
-            makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
-            pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-            return;
-        }
-
-        List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
-        boolean pedestriansSwapped = false;
-
-        if (closestPedestrians.size() > 0) {
-            for (Pedestrian closestPedestrian : closestPedestrians) {
-                boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
-                boolean targetOrientationDiffers = false;
-
-                // TODO: Compare both approaches.
-                double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
-                // double angleInRadian = angleInRadian = calculateAngleBetweenTargetGradients(pedestrian, (PedestrianOSM)closestPedestrian);
-
-                if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
-                    targetOrientationDiffers = true;
-                }
-
-                if (closestPedIsCooperative && targetOrientationDiffers) {
-                    swapPedestrians(pedestrian, (PedestrianOSM)closestPedestrian, topography, queue);
-                    pedestriansSwapped = true;
-                    break;
-                }
-            }
-        }
-
-        if (pedestriansSwapped == false) { // Try to perform a regular step
-            // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-            pedestrian.updateNextPosition();
-            makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
-            pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-        }
-    }*/
-
     @Nullable
     public PedestrianOSM findSwapCandidate(PedestrianOSM pedestrian, Topography topography) {
 
