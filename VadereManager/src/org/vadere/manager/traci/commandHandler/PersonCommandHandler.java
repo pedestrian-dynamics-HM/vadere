@@ -252,16 +252,27 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 	public TraCICommand process_getTargetList(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		// return dummy value
 		remoteManager.accessState((manager, state) -> {
-			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
-					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
-
-			if(checkIfPedestrianExists(ped, cmd))
+			if (cmd.getElementIdentifier().equals("-1")){
+				// return all targets present in the simulation.
 				cmd.setResponse(responseOK(PersonVar.TARGET_LIST.type,
-						ped.getTargets()
+						state.getTopography().getTargets()
 								.stream()
-								.map(i -> Integer.toString(i))
-								.collect(Collectors.toList())
-				));
+								.map(i -> Integer.toString(i.getId()))
+								.collect(Collectors.toList())));
+
+			} else {
+				// return all targets the given element contains.
+				Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+						.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+				if(checkIfPedestrianExists(ped, cmd))
+					cmd.setResponse(responseOK(PersonVar.TARGET_LIST.type,
+							ped.getTargets()
+									.stream()
+									.map(i -> Integer.toString(i))
+									.collect(Collectors.toList())
+					));
+			}
 		});
 		return cmd;
 	}
