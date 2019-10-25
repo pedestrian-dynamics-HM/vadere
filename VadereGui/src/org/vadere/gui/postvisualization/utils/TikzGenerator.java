@@ -8,7 +8,9 @@ import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationConfig;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.state.scenario.*;
+import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -21,6 +23,7 @@ import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,10 +31,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
 import static java.awt.geom.PathIterator.SEG_CLOSE;
 import static java.awt.geom.PathIterator.SEG_CUBICTO;
@@ -138,6 +147,9 @@ public class TikzGenerator {
 		Color targetColor = model.getConfig().getTargetColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
 
+		Color targetChangerColor = model.getConfig().getTargetChangerColor();
+		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetChangerColor", targetChangerColor.getRed(), targetChangerColor.getGreen(), targetChangerColor.getBlue());
+
 		Color absorbingAreaColor = model.getConfig().getAbsorbingAreaColor();
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AbsorbingAreaColor", absorbingAreaColor.getRed(), absorbingAreaColor.getGreen(), absorbingAreaColor.getBlue());
 
@@ -223,6 +235,17 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
+		}
+
+		if (config.isShowTargetChangers()) {
+			generatedCode += "% Target Changers\n";
+			for (TargetChanger targetChanger : topography.getTargetChangers()) {
+				VPoint centroid = targetChanger.getShape().getCentroid();
+				generatedCode += String.format(Locale.US, "\\coordinate (target_changer_%d) at (%f,%f); %%centroid coordinate for target changer %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
+				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
+			}
+		} else {
+			generatedCode += "% Target Changers (not enabled in config)\n";
 		}
 
 		if (config.isShowAbsorbingAreas()) {
@@ -320,49 +343,65 @@ public class TikzGenerator {
         return generatedCode;
 	}
 
-    private String drawTrajectories(PostvisualizationConfig config, PostvisualizationModel model) {
-	    // Use a thread-safe string implementation because streams are used here.
-        final StringBuffer generatedCode = new StringBuffer("");
+	private String drawTrajectories(PostvisualizationConfig config, PostvisualizationModel model) {
+		// Use a thread-safe string implementation because streams are used here.
+		final StringBuffer generatedCode = new StringBuffer("");
 
-	    Stream<Trajectory> trajectoryStream = config.isShowAllTrajOnSnapshot() ? model.getAppearedPedestrians() : model.getAlivePedestrians();
+		if (config.isShowTrajectories()) {
+			Collection<Agent> agents = model.getAgents();
+			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents @ simTimeInSec %f of \n",model.getSimTimeInSec()));
+			TableTrajectoryFootStep trajectories = model.getTrajectories();
+			Table dataFrame;
+			if (model.config.isShowAllTrajectories()) {
+				dataFrame = model.getAppearedPedestrians();
+			} else {
+				dataFrame = model.getAlivePedestrians();
+			}
 
+			Map<Integer, Agent> agentColors = new HashMap<>();
+			agents.forEach(agent -> agentColors.put(agent.getId(), agent));
 
-        trajectoryStream.forEach(trajectory -> {
-            Stream<VPoint> trajectoryPoints = trajectory.getPositionsReverse(model.getSimTimeInSec());
+			for(Agent agent : agents) {
+				StringBuffer trajectory = new StringBuffer("");
+				Table slice = dataFrame.where(dataFrame.intColumn(trajectories.pedIdCol).isEqualTo(agent.getId()));
 
-            // Use a newline ("to\n") for joining because TeX could possibly choke up on long lines.
-            String trajectoryAsTikzString = trajectoryPoints
-                    .map(point -> String.format(Locale.US, "(%f,%f)", point.x, point.y))
-                    .collect(Collectors.joining(" to\n"));
+				for(Row row : slice) {
+					int agentId = row.getInt(trajectories.pedIdCol);
+					boolean isLastStep = row.getDouble(trajectories.endTimeCol) > model.getSimTimeInSec();
+					double startX = row.getDouble(trajectories.startXCol);
+					double startY = row.getDouble(trajectories.startYCol);
+					double endX = row.getDouble(trajectories.endXCol);
+					double endY = row.getDouble(trajectories.endYCol);
 
-            String coloredTrajectory = applyAgentColorToTrajectory(trajectoryAsTikzString, trajectory.getAgent(model.getSimTimeInSec()));
+					if(isLastStep) {
+						VPoint interpolatedPos = FootStep.interpolateFootStep(startX, startY, endX, endY, row.getDouble(trajectories.startTimeCol), row.getDouble(trajectories.endTimeCol), model.getSimTimeInSec());
+						endX = interpolatedPos.getX();
+						endY = interpolatedPos.getY();
+					}
 
-            int pedestrianId = trajectory.getPedestrianId();
-            Optional<Step> trajectoryEndStep = trajectory.getEndStep();
-            String trajectoryEndStepAsString = (trajectoryEndStep.isPresent()) ? "" + trajectoryEndStep.get().toString() : "unknown end step" ;
+					int pedId = row.getInt(trajectories.pedIdCol);
+					trajectory.append(String.format(Locale.US, "(%f,%f) to ", startX, startY));
 
-            generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ simTimeInSec %f of %s\n", pedestrianId, model.getSimTimeInSec(), trajectoryEndStepAsString));
-            generatedCode.append(coloredTrajectory);
-        });
+					if(row.getRowNumber() == slice.rowCount()-1) {
+						trajectory.append(String.format(Locale.US, "(%f,%f)", endX, endY));
+					}
+				}
 
+				String coloredTrajectory = applyAgentColorToTrajectory(trajectory.toString(), Optional.ofNullable(agentColors.get(agent.getId())));
+				generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ simTimeInSec %f \n", agent.getId(), model.getSimTimeInSec()));
+				generatedCode.append(coloredTrajectory);
+			}
+		}
 
-
-	    return generatedCode.toString();
-    }
+		return generatedCode.toString();
+	}
 
     private String applyAgentColorToTrajectory(String trajectory, Optional<Agent> agent) {
 	    String colorString = "AgentColor";
 
 	    if (agent.get() instanceof Pedestrian) {
-		    Color pedestrianColor;
 	        Pedestrian pedestrian = (Pedestrian)agent.get();
-	        if(model.config.isShowGroups()) {
-		        pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
-	        }
-	        else {
-		        pedestrianColor = renderer.getPedestrianColor(pedestrian);
-	        }
-
+		    Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
             colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
         }
 
@@ -380,18 +419,18 @@ public class TikzGenerator {
 	private String drawWalkingDirection(final Agent agent){
 		String tikzCode= "";
 		PostvisualizationModel postVisModel = (PostvisualizationModel)model;
-		Step currentTimeStep = postVisModel.getStep();
+		int currentTimeStep = postVisModel.getStep();
 		// ensure their is a current timeStep and its not the first. (If the first there is no previous)
-		if (currentTimeStep != null && currentTimeStep.getStepNumber() > 1){
-			Step previousTimeStep = new Step(currentTimeStep.getStepNumber()-1);
+		if (currentTimeStep > 1){
+			int previousTimeStep = currentTimeStep-1;
 			Trajectory trajectory = postVisModel.getTrajectory(agent.getId());
 			if (trajectory != null){
 				Agent currAgent = trajectory.getAgent(currentTimeStep).orElse(null);
 				Agent prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
 				while (currAgent != null && prevAgent !=null && currAgent.getPosition().equals(prevAgent.getPosition())){
-					previousTimeStep = new Step(previousTimeStep.getStepNumber() -1);
+					previousTimeStep = previousTimeStep -1;
 					prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
-					if (previousTimeStep.getStepNumber() < 1){
+					if (previousTimeStep < 1){
 						// pedestrian never moved. Cannot draw walking direction.
 						prevAgent = null;
 					}
@@ -417,19 +456,19 @@ public class TikzGenerator {
     private String drawAgents(DefaultSimulationConfig config) {
 	    String generatedCode = "";
 
+
         for (Agent agent : model.getAgents()) {
-        	if(agent instanceof Pedestrian) {
+        	if(agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
 
 				if(config.isShowWalkdirection() && model instanceof PostvisualizationModel){
 					generatedCode += drawWalkingDirection(agent);
 				}
 
 		        if (model.getConfig().isShowGroups()) {
+			        Pedestrian pedestrian = (Pedestrian) agent;
+			        Color pedestrianColor = renderer.getPedestrianColor(agent);
 			        try {
-				        Pedestrian pedestrian = (Pedestrian) agent;
-				        Color pedestrianColor = renderer.getAgentRender().getGroupColor(pedestrian);
 				        Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
-
 				        String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
 				        generatedCode += String.format(Locale.US, "\\fill[pedestrian, group, fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
 			        } catch (ClassCastException cce) {

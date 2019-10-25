@@ -162,8 +162,9 @@ public class OSMBehaviorController {
                 boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
                 boolean targetOrientationDiffers = false;
 
-                // TODO: Use "pedestrian.getTargetGradient()" instead of "calculateAngleBetweenTargets()".
+                // TODO: Compare both approaches.
                 double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+                // double angleInRadian = angleInRadian = calculateAngleBetweenTargetGradients(pedestrian, (PedestrianOSM)closestPedestrian);
 
                 if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
                     targetOrientationDiffers = true;
@@ -294,6 +295,20 @@ public class OSMBehaviorController {
         }
 
         return vectorPedestrianToTarget;
+    }
+
+    private double calculateAngleBetweenTargetGradients(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
+        double angleInRadian = -1;
+
+        Vector2D targetGradientPedestrian1 = pedestrian1.getTargetGradient(pedestrian1.getPosition());
+        Vector2D targetGradientPedestrian2 = pedestrian2.getTargetGradient(pedestrian2.getPosition());
+
+        double dotProduct = targetGradientPedestrian1.dotProduct(targetGradientPedestrian2);
+        double multipliedMagnitudes = targetGradientPedestrian1.distanceToOrigin() * targetGradientPedestrian2.distanceToOrigin();
+
+        angleInRadian = Math.acos(dotProduct / multipliedMagnitudes);
+
+        return angleInRadian;
     }
 
     public void swapPedestrians(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2, Topography topography) {

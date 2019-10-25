@@ -59,6 +59,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
@@ -294,8 +296,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
-				VadereConfig.getConfig().getString("History.lastUsedProject", null);
-		if (lastUsedProjectPath != null) {
+				VadereConfig.getConfig().getString("History.lastUsedProject");
+		if (lastUsedProjectPath != null && lastUsedProjectPath.isBlank() == false) {
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
 			}
@@ -810,23 +812,22 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	public void updateRecentProjectsMenu() {
 		mntmRecentProjects.removeAll();
-		String str = VadereConfig.getConfig().getString("History.recentProjects", "");
+		java.util.List<String> recentProjectPaths = VadereConfig.getConfig().getList(String.class, "History.recentProjects", Collections.EMPTY_LIST);
 		boolean hasEntry = false;
-		if (str.length() > 0) {
-			for (String path : str.split(",")) {
-				if (Files.exists(Paths.get(path))) { // show only those that still exist
-					if (model.getCurrentProjectPath() != null) {
-						if (!model.getCurrentProjectPath().equals(Paths.get(path).getParent().toString())) { // when project loaded, hide that from recent list
-							addRecentProjectsMenuItem(path);
-							hasEntry = true;
-						}
-					} else { // no project loaded, show all from recent list
+		for (String path : recentProjectPaths) {
+			if (Files.exists(Paths.get(path))) { // show only those that still exist
+				if (model.getCurrentProjectPath() != null) {
+					if (!model.getCurrentProjectPath().equals(Paths.get(path).getParent().toString())) { // when project loaded, hide that from recent list
 						addRecentProjectsMenuItem(path);
 						hasEntry = true;
 					}
+				} else { // no project loaded, show all from recent list
+					addRecentProjectsMenuItem(path);
+					hasEntry = true;
 				}
 			}
 		}
+
 		mntmRecentProjects.setEnabled(hasEntry);
 	}
 

@@ -19,11 +19,7 @@ import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.events.types.Event;
-import org.vadere.state.scenario.AbsorbingArea;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -42,6 +38,7 @@ public class Simulation {
 
 	private final Collection<SourceController> sourceControllers;
 	private final Collection<TargetController> targetControllers;
+	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
@@ -86,6 +83,8 @@ public class Simulation {
 	private final SalientBehaviorCognition salientBehaviorCognition;
 	private final ScenarioCache scenarioCache;
 
+	private boolean addedTargetPedestrian = false;
+
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
 					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners,
@@ -98,6 +97,7 @@ public class Simulation {
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
 		this.sourceControllers = new LinkedList<>();
 		this.targetControllers = new LinkedList<>();
+		this.targetChangerControllers = new LinkedList<>();
 		this.absorbingAreaControllers = new LinkedList<>();
 		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
@@ -168,6 +168,10 @@ public class Simulation {
 
 		for (Target target : topography.getTargets()) {
 			targetControllers.add(new TargetController(topography, target));
+		}
+
+		for (TargetChanger targetChanger : topography.getTargetChangers()) {
+			targetChangerControllers.add(new TargetChangerController(topography, targetChanger, random));
 		}
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
@@ -352,8 +356,10 @@ public class Simulation {
 	private void updateCallbacks(double simTimeInSec) {
 		List<Event> events = eventController.getEventsForTime(simTimeInSec);
 
-		// TODO Why are target controllers readded in each simulation loop?
-		// Maybe, Isabella's SIMA branch required this because pedestrians can act as targets there.
+		// "TargetControllers" are populated in each simulation loop because
+		// pedestrians can be declared as targets in each simulation loop.
+		// Therefore, create the necessary controller wrappers here for these
+		// new targets.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
 			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
@@ -365,6 +371,10 @@ public class Simulation {
 
 		for (TargetController targetController : this.targetControllers) {
 			targetController.update(simTimeInSec);
+		}
+
+		for (TargetChangerController targetChangerController : this.targetChangerControllers) {
+			targetChangerController.update(simTimeInSec);
 		}
 
 		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {

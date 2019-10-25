@@ -104,7 +104,7 @@ public class ProjectOutputTest implements TestResourceHandlerScenario {
 
 	@Test
 	public void updateWithNew() throws IOException, URISyntaxException {
-		Path backup = Paths.get(getClass().getResource("/data/testOutput2").toURI());
+		Path backup = Paths.get(getClass().getResource("/data/simpleProject/output/testOutput2").toURI());
 		FileUtils.copyDirectory(backup.toFile(), project.getOutputDir().resolve("testOutput3").toFile());
 
 		projectOutput.update();

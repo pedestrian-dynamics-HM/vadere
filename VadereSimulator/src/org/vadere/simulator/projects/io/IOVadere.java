@@ -54,7 +54,7 @@ public class IOVadere {
 	public static VadereProject readProject(final String projectPath, final MigrationOptions options) throws IOException {
 		String path = Paths.get(projectPath, IOUtils.VADERE_PROJECT_FILENAME).toString();
 		String name = IOUtils.readTextFile(path);
-		logger.info(String.format("Read .project file from path %s", path));
+		logger.info(String.format("Read project: %s", path));
 
 		List<Scenario> scenarios = new ArrayList<>();
 		Set<String> scenarioNames = new HashSet<>();
@@ -64,7 +64,7 @@ public class IOVadere {
 
 			MigrationAssistant migrationAssistant = MigrationAssistant.getNewInstance(options);
 			migrationStats = migrationAssistant.analyzeProject(projectPath);
-			logger.info("Analysed .scenario files.");
+			logger.info("Analyzed scenario files.");
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
 					Scenario scenario =

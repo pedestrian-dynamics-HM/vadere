@@ -3,10 +3,12 @@ package org.vadere.meshing.mesh.triangulation;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -64,6 +66,10 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 	public EdgeLengthFunctionApprox(@NotNull final PSLG pslg) {
 		this(pslg, p -> Double.POSITIVE_INFINITY);
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
+	}
+
+	public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
+		return triangulation.getMesh();
 	}
 
 	public void smooth(double g) {

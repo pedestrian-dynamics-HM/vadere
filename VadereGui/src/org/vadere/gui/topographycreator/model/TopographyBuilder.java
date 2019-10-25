@@ -5,16 +5,7 @@ import org.vadere.gui.topographycreator.control.AttributeModifier;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
-import org.vadere.state.scenario.AbsorbingArea;
-import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Teleporter;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -44,6 +35,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private LinkedList<Stairs> stairs;
 	private LinkedList<Source> sources;
 	private LinkedList<Target> targets;
+	private LinkedList<TargetChanger> targetChangers;
 	private LinkedList<AbsorbingArea> absorbingAreas;
 	private LinkedList<MeasurementArea> measurementAreas;
 	private Teleporter teleporter;
@@ -62,6 +54,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		stairs = new LinkedList<>();
 		sources = new LinkedList<>();
 		targets = new LinkedList<>();
+		targetChangers = new LinkedList<>();
 		absorbingAreas = new LinkedList<>();
 		topographyElements = new LinkedList<>();
 		attributes = new AttributesTopography();
@@ -83,6 +76,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 			}
 			sources = new LinkedList<>(topography.getSources());
 			targets = new LinkedList<>(topography.getTargets());
+			targetChangers = new LinkedList<>(topography.getTargetChangers());
 			absorbingAreas = new LinkedList<>(topography.getAbsorbingAreas());
 			teleporter = topography.getTeleporter();
 			measurementAreas = new LinkedList<>(topography.getMeasurementAreas());
@@ -98,6 +92,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topographyElements.addAll(pedestrians);
 		topographyElements.addAll(sources);
 		topographyElements.addAll(targets);
+		topographyElements.addAll(targetChangers);
 		topographyElements.addAll(measurementAreas);
 		topographyElements.addAll(absorbingAreas);
 	}
@@ -143,6 +138,9 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		for (Target target : targets)
 			topography.addTarget(target);
 
+		for (TargetChanger targetChanger : targetChangers)
+			topography.addTargetChanger(targetChanger);
+
 		for (AbsorbingArea absorbingArea : absorbingAreas)
 			topography.addAbsorbingArea(absorbingArea);
 
@@ -187,6 +185,8 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 				return pedestrians.remove(element);
 			case TARGET:
 				return targets.remove(element);
+			case TARGET_CHANGER:
+				return targetChangers.remove(element);
 			case ABSORBING_AREA:
 				return absorbingAreas.remove(element);
 			case SOURCE:
@@ -251,6 +251,11 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		this.targets.add(target);
 	}
 
+	public void addTargetChanger(final TargetChanger targetChanger) {
+		this.topographyElements.add(targetChanger);
+		this.targetChangers.add(targetChanger);
+	}
+
 	public void addAbsorbingArea(final AbsorbingArea absorbingArea) {
 		this.topographyElements.add(absorbingArea);
 		this.absorbingAreas.add(absorbingArea);
@@ -260,6 +265,12 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		Target target = targets.removeLast();
 		topographyElements.remove(target);
 		return target;
+	}
+
+	public TargetChanger removeLastTargetChanger() {
+		TargetChanger targetChanger = targetChangers.removeLast();
+		topographyElements.remove(targetChanger);
+		return targetChanger;
 	}
 
 	public AbsorbingArea removeLastAbsorbingArea() {
@@ -320,6 +331,10 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 	public Iterator<Target> getTargetIterator() {
 		return targets.iterator();
+	}
+
+	public Iterator<TargetChanger> getTargetChangerIterator() {
+		return targetChangers.iterator();
 	}
 
 	public Iterator<AbsorbingArea> getAbsorbingAreaIterator() {

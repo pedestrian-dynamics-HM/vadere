@@ -16,7 +16,12 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ActionOpenFile extends ActionVisualization {
 	private static Logger logger = Logger.getLogger(ActionOpenFile.class);
@@ -78,7 +83,7 @@ public class ActionOpenFile extends ActionVisualization {
 
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
 						Scenario vadere = IOOutput.readScenario(snapshotFile.get().toPath());
-						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath(), vadere), vadere, trajectoryFile.get().getParent());
+						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), vadere, trajectoryFile.get().getParent());
 						model.notifyObservers();
 						dialog.dispose();
 						setLastDirectories(scenarioOutputDir);
@@ -111,22 +116,11 @@ public class ActionOpenFile extends ActionVisualization {
 		if (file == null || !file.isDirectory() || !file.exists()) {
 			throw new IllegalArgumentException("path is empty" + file);
 		}
-		String[] dirs =
-				VadereConfig.getConfig().getString("recentlyOpenedFiles", "").split(",");
 		int maxSavedDirs = CONFIG.getInt("PostVis.maxNumberOfSaveDirectories");
+		List<String> pathsList = VadereConfig.getConfig().getList(String.class, "recentlyOpenedFiles", new ArrayList<>());
+		pathsList.add(0, file.getAbsolutePath());
 
-		if (dirs != null) {
-			int i = 0;
-			String absPath = file.getAbsolutePath();
-			StringBuilder paths = new StringBuilder(absPath);
-			while (i < dirs.length && i < maxSavedDirs) {
-				if (!dirs[i].equals(absPath)) {
-					paths.append(",");
-					paths.append(dirs[i]);
-				}
-				i++;
-			}
-			VadereConfig.getConfig().setProperty("recentlyOpenedFiles", paths.toString());
-		}
+		pathsList = pathsList.stream().filter(entry -> Files.exists(Path.of(entry))).limit(maxSavedDirs).collect(Collectors.toList());
+		VadereConfig.getConfig().setProperty("recentlyOpenedFiles", pathsList);
 	}
 }

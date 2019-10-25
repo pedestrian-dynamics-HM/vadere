@@ -30,7 +30,7 @@ public class DistanceFunctionApproxBF implements IDistanceFunction {
 		VRectangle bound = GeometryUtils.boundRelative(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
-		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
+		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false, false);
 		triangulation = ruppertsTriangulator.generate();
 
 		//TODO: maybe transform into an immutable triangulation / mesh!

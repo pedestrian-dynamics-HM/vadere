@@ -19,7 +19,7 @@ public abstract class ActionSetColor extends ActionVisualization {
 
 	@Override
 	public void actionPerformed(final ActionEvent event) {
-		Color color = JColorChooser.showDialog(null, "Choose Color", coloredPanel.getBackground());
+		Color color = JColorChooser.showDialog(coloredPanel.getParent(), "Choose Color", coloredPanel.getBackground());
 		if (color != null) {
 			coloredPanel.setBackground(color);
 			saveColor(color);

@@ -42,7 +42,7 @@ The ZIP file contains:
 * **README.md** - this README file. 
 * **vadere-gui.jar** - provides the GUI version of Vadere.
 * **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
-* **VadereModelTests** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
+* **Scenarios** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
 ### Run the Application
 
@@ -50,11 +50,11 @@ Open a terminal and enter `path/to/openjdk/java -jar vadere-gui.jar`.
 
 ### Run Built-In Examples
 
-With the following steps, you can run a simulation with one of the built-in examples from [VadereModelTests](VadereModelTests):
+With the following steps, you can run a simulation with one of the built-in examples from [Scenarios](Scenarios):
 
 - Start Vadere 
 - Click *Project* > *Open* 
-- Choose `vadere.project` of one of the test projects, e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/VadereModelTests/TestOSM) and click *open*
+- Choose `vadere.project` of one of the test projects, e.g. [TestOSM](https://gitlab.lrz.de/vadere/vadere/tree/master/Scenarios/ModelTests/TestOSM) and click *open*
 - Select the scenario on the left and press *run selected scenario*
 
 ## Build from Source

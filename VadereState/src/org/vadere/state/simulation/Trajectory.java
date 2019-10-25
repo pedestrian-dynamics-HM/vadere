@@ -24,7 +24,7 @@ import org.vadere.util.geometry.shapes.VPoint;
  */
 public class Trajectory {
 
-	private final Map<Step, Agent> trajectoryPoints;
+	private final Map<Integer, Agent> trajectoryPoints;
 
 	private Optional<Step> firstStep;
 
@@ -66,10 +66,10 @@ public class Trajectory {
 		// create for each step that contains an pedestrian with the specific pedestrianId
 		this.trajectoryPoints = pedestrianByStep.entrySet().stream()
 				.filter(entry -> containsAgent(entry.getValue()))
-				.collect(Collectors.toMap(e -> e.getKey(), e -> findAnyAgent(e.getValue())));
+				.collect(Collectors.toMap(e -> e.getKey().getStepNumber(), e -> findAnyAgent(e.getValue())));
 
-		this.firstStep = pedestrianByStep.keySet().stream().filter(step -> trajectoryPoints.containsKey(step)).min(Step::compareTo);
-		this.lastStep = pedestrianByStep.keySet().stream().filter(step -> trajectoryPoints.containsKey(step)).max(Step::compareTo);
+		this.firstStep = pedestrianByStep.keySet().stream().filter(step -> trajectoryPoints.containsKey(step.getStepNumber())).min(Step::compareTo);
+		this.lastStep = pedestrianByStep.keySet().stream().filter(step -> trajectoryPoints.containsKey(step.getStepNumber())).max(Step::compareTo);
 
 		if (!isEmpty()) {
 			fill();
@@ -84,12 +84,12 @@ public class Trajectory {
 		return agents.stream().filter(agent -> agent.getId() == pedestrianId).findAny().get();
 	}
 
-	private Step last() {
-		return lastStep.get();
+	private int last() {
+		return lastStep.get().getStepNumber();
 	}
 
-	private Step first() {
-		return firstStep.get();
+	private int first() {
+		return firstStep.get().getStepNumber();
 	}
 
 	private boolean hasFirstStep() {
@@ -100,11 +100,11 @@ public class Trajectory {
 		return lastStep.isPresent();
 	}
 
-	private boolean isMissing(final Step step) {
+	private boolean isMissing(final int step) {
 		return !contains(step);
 	}
 
-	private boolean contains(final Step step) {
+	private boolean contains(final int step) {
 		return trajectoryPoints.containsKey(step);
 	}
 
@@ -114,18 +114,18 @@ public class Trajectory {
 	 * 8 = 9 = 10 = 7.
 	 */
 	public void fill() {
-		Stream.iterate(first(), s -> s.isSmallerEqThan(last()), s -> s.increment())
+		Stream.iterate(first(), s -> s <= last(), s -> s + 1)
 				.filter(s -> isMissing(s))
-				.forEachOrdered(s -> addStep(s, getAgent(s.decrement()).get()));
+				.forEachOrdered(s -> addStep(s, getAgent(s - 1).get()));
 	}
 
-	public void addStep(final Step step, @NotNull final Agent agent) {
-		if(!hasFirstStep() || first().getStepNumber() > step.getStepNumber()) {
-			firstStep = Optional.of(step);
+	public void addStep(final int step, @NotNull final Agent agent) {
+		if(!hasFirstStep() || first() > step) {
+			firstStep = Optional.of(new Step(step));
 		}
 
-		if(!hasLastStep() || last().getStepNumber() < step.getStepNumber()) {
-			lastStep = Optional.of(step);
+		if(!hasLastStep() || last() < step) {
+			lastStep = Optional.of(new Step(step));
 		}
 
 		trajectoryPoints.put(step, agent);
@@ -154,7 +154,7 @@ public class Trajectory {
 	 * @param step the time step
 	 * @return true if the pedestrian is alive at the specific time step
 	 */
-	public boolean isAlive(final Step step) {
+	public boolean isAlive(final int step) {
 		return contains(step);
 	}
 
@@ -170,7 +170,7 @@ public class Trajectory {
 	 * @return true if the pedestrian was alive at any time step smaller or equal to current one. (so all alive and dead, but no pedestrian not born yet).
 	 */
 	public boolean wasPedestrianAliveBefore(final Step step){
-		return trajectoryPoints.entrySet().stream().map(Map.Entry::getKey).anyMatch(s -> s.getStepNumber() <= step.getStepNumber());
+		return trajectoryPoints.entrySet().stream().map(Map.Entry::getKey).anyMatch(s -> s <= step.getStepNumber());
 	}
 
 	/**
@@ -179,13 +179,13 @@ public class Trajectory {
 	 * @param step the time step
 	 * @return true if the pedestrian appeared, otherwise false
 	 */
-	public boolean hasAppeared(final Step step) {
-		return contains(step) || hasFirstStep() && first().isGreaterEqThan(step);
+	public boolean hasAppeared(final int step) {
+		return contains(step) || hasFirstStep() && first() >= step;
 	}
 
 	public boolean hasAppeared(final double simTimeInSec) {
-		Step base = Step.toFloorStep(simTimeInSec,simStepLengthInSec);
-		return contains(base) || hasFirstStep() && first().isGreaterEqThan(base);
+		int base = Step.toFloorStep(simTimeInSec,simStepLengthInSec);
+		return contains(base) || hasFirstStep() && first() >= base;
 	}
 
 	/**
@@ -194,8 +194,8 @@ public class Trajectory {
 	 * @param step the time step
 	 * @return true if the pedestrian disappeared, otherwise false
 	 */
-	public boolean hasDisappeared(final Step step) {
-		return isMissing(step) && (!hasLastStep() || last().isGreaterThan(step));
+	public boolean hasDisappeared(final int step) {
+		return isMissing(step) && (!hasLastStep() || last() > step);
 	}
 
 	public boolean hasDisappeared(final double simTimeInSec) {
@@ -215,13 +215,13 @@ public class Trajectory {
 	 * @param step the time step that specify the pedestrian
 	 * @return an Optional<Pedestrian> object which is empty if the trajectory is completely empty.
 	 */
-	public Optional<Agent> getAgent(final Step step) {
+	public Optional<Agent> getAgent(final int step) {
 		if (!isEmpty()) {
 			if (isAlive(step)) {
 				return Optional.of(trajectoryPoints.get(step));
-			} else if (step.isSmallerEqThan(first())) {
+			} else if (step <= first()) {
 				return Optional.of(trajectoryPoints.get(first()));
-			} else if (step.isGreaterEqThan(last())) {
+			} else if (step >= last()) {
 				return Optional.of(trajectoryPoints.get(last()));
 			} else {
 				return Optional.empty();
@@ -232,15 +232,15 @@ public class Trajectory {
 
 	public Optional<Agent> getAgent(final double simTimeInSec) {
 		if(!isEmpty()) {
-			Step base = Step.toFloorStep(simTimeInSec, simStepLengthInSec);
-			Step next = Step.toCeilStep(simTimeInSec, simStepLengthInSec);
+			int base = Step.toFloorStep(simTimeInSec, simStepLengthInSec);
+			int next = Step.toCeilStep(simTimeInSec, simStepLengthInSec);
 
-			if(base.equals(next) || base.equals(last())) {
+			if(base == next || base == last()) {
 				return getAgent(base);
 			} else {
 				double r = simTimeInSec - Step.toSimTimeInSec(base, simStepLengthInSec);
 				Optional<Agent> optionalAgent1 = getAgent(base);
-				Optional<Agent> optionalAgent2 = getAgent(base.increment());
+				Optional<Agent> optionalAgent2 = getAgent(base + 1);
 				Agent agent1 = optionalAgent1.get();
 				Agent agent2 = optionalAgent2.get();
 				VPoint position1 = agent1.getPosition();
@@ -263,23 +263,23 @@ public class Trajectory {
 	 * @param step the step of the last pedestrian position
 	 * @return a stream of pedestrian positions to from 1 to step.getStepNumber() in reverse order
 	 */
-	public Stream<VPoint> getPositionsReverse(final Step step) {
+	public Stream<VPoint> getPositionsReverse(final int step) {
 		return getPositionsReverse(Step.toSimTimeInSec(step, simStepLengthInSec));
 	}
 
 	public Stream<VPoint> getPositionsReverse(final double simTimeInSec) {
-		Step tail = Step.toFloorStep(simTimeInSec, simStepLengthInSec);
-		Step head = Step.toCeilStep(simTimeInSec, simStepLengthInSec);
+		int tail = Step.toFloorStep(simTimeInSec, simStepLengthInSec);
+		int head = Step.toCeilStep(simTimeInSec, simStepLengthInSec);
 
 		Stream<VPoint> headStream = Stream.empty();
-		if(!tail.equals(head)) {
+		if(tail != head) {
 			Optional<Agent> optionalAgent = getAgent(simTimeInSec);
 			if(optionalAgent.isPresent()) {
 				headStream = Stream.of(optionalAgent.get().getPosition());
 			}
 		}
 
-		Stream<VPoint> tailStream = Stream.iterate(tail, s -> s.isGreaterEqThan(first()), s -> s.decrement())
+		Stream<VPoint> tailStream = Stream.iterate(tail, s -> s >= first(), s -> s - 1)
 				.map(s -> getAgent(s))
 				.filter(optAgent -> optAgent.isPresent())
 				.map(optAgent -> optAgent.get())

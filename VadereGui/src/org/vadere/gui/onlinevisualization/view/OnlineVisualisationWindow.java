@@ -3,11 +3,7 @@ package org.vadere.gui.onlinevisualization.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.gui.components.control.ActionGeneratePoly;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.JViewportChangeListener;
-import org.vadere.gui.components.control.PanelResizeListener;
-import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
@@ -52,6 +48,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		mainPanel.setScrollPane(scrollPane);
 		scrollPane.getViewport()
 				.addChangeListener(new JViewportChangeListener(model, scrollPane.getVerticalScrollBar()));
+		model.addScrollPane(scrollPane);
 
 		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(model, scrollPane);
 		model.addViewportChangeListener(viewportChangeListener);
@@ -240,10 +237,16 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog,
 				Messages.getString("ProjectView.btnSettings.tooltip"));
 
-		add(toolbar, cc.xyw(2, 2, 3));
-		add(scrollPane, cc.xy(2, 4));
+		JSplitPane splitPaneForTopographyAndJsonPane = new JSplitPane();
+		splitPaneForTopographyAndJsonPane.setResizeWeight(0.8);
+		splitPaneForTopographyAndJsonPane.resetToPreferredSizes();
+		splitPaneForTopographyAndJsonPane.setLeftComponent(scrollPane);
+		splitPaneForTopographyAndJsonPane.setRightComponent(jsonPanel);
+
 		scrollPane.setPreferredSize(new Dimension(1, windowHeight));
-		add(jsonPanel, cc.xy(4, 4));
+
+		add(toolbar, cc.xyw(2, 2, 3));
+		add(splitPaneForTopographyAndJsonPane, cc.xywh(2, 4, 4, 1));
 		add(infoPanel, cc.xyw(2, 6, 3));
 
 		repaint();

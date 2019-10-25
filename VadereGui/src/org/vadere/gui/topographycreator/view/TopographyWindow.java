@@ -240,6 +240,10 @@ public class TopographyWindow extends JPanel {
 		TopographyAction switchToTargetAction = new ActionSwitchCategory("switch to targets", panelModel,
 				ScenarioElementType.TARGET, selectRectangleAction);
 
+		/* switch category to target changer action */
+		TopographyAction switchToTargetChangerAction = new ActionSwitchCategory("switch to target changer", panelModel,
+				ScenarioElementType.TARGET_CHANGER, selectRectangleAction);
+
 		/* switch category to absorbing areas action */
 		TopographyAction switchToAbsorbingAreaAction = new ActionSwitchCategory("switch to absorbing areas", panelModel,
 				ScenarioElementType.ABSORBING_AREA, selectRectangleAction);
@@ -311,6 +315,11 @@ public class TopographyWindow extends JPanel {
 		JButton targetButton = new JButton();
 		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
 				.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
+				obstacleAndTargetDrawModes);
+
+		JButton targetChangerButton = new JButton();
+		TopographyAction openTargetChangerDialog = new ActionOpenDrawOptionMenu("TargetChanger", new ImageIcon(Resources.class
+				.getResource("/icons/target_changer_icon.png")), panelModel, switchToTargetChangerAction, targetChangerButton,
 				obstacleAndTargetDrawModes);
 
 		/* open absorbing area paint method dialog action */
@@ -398,6 +407,8 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, openTargetDialog, "TopographyCreator.btnInsertTarget.tooltip",
 				targetButton);
 		toolbar.addSeparator(new Dimension(5, 50));
+		addActionToToolbar(toolbar, openTargetChangerDialog, "TopographyCreator.btnInsertTargetChanger.tooltip",
+				targetChangerButton);
 		addActionToToolbar(toolbar, openObstacleDialog, "TopographyCreator.btnInsertObstacle.tooltip",
 				obsButton);
 		addActionToToolbar(toolbar, openAbsorbingAreaDialog, "TopographyCreator.btnInsertAbsorbingArea.tooltip",

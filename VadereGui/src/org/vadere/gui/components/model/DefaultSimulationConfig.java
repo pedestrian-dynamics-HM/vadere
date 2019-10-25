@@ -20,9 +20,9 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double densityStandardDerivation = CONFIG.getDouble("Density.standardDeviation");
 	private double pedestrianTorso = CONFIG.getDouble("Pedestrian.radius") * 2;
 
-	private boolean useRandomPedestrianColors = false;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
+	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
@@ -43,6 +43,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double gridWidth = CONFIG.getDouble("ProjectView.cellWidth");
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
 	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
+	private AgentColoring agentColoring = AgentColoring.TARGET;
 
 	public DefaultSimulationConfig() {
 		super();
@@ -71,6 +72,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showGroups = config.showGroups;
 		this.showPotentialField = config.showPotentialField;
 		this.showTargetPotentielFieldMesh = config.showTargetPotentielFieldMesh;
+		this.agentColoring = config.agentColoring;
 	}
 
 	public boolean isShowGroups() {
@@ -117,6 +119,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showTargets;
 	}
 
+	public boolean isShowTargetChangers() { return showTargetChangers; }
+
 	public boolean isShowAbsorbingAreas() {
 		return showAbsorbingAreas;
 	}
@@ -136,6 +140,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowTargets(boolean showTargets) {
 		this.showTargets = showTargets;
+		setChanged();
+	}
+
+	public void setShowTargetChangers(boolean showTargetChangers) {
+		this.showTargetChangers = showTargetChangers;
 		setChanged();
 	}
 
@@ -262,6 +271,17 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		}
 	}
 
+	public void setAgentColoring(final AgentColoring agentColoring) {
+		if(agentColoring != this.agentColoring) {
+			this.agentColoring = agentColoring;
+			setChanged();
+		}
+	}
+
+	public AgentColoring getAgentColoring() {
+		return agentColoring;
+	}
+
 	public void clearRandomColors() {
 		randomColors.clear();
 	}
@@ -271,14 +291,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 			randomColors.put(pedId, ColorHelper.randomColor());
 		}
 		return randomColors.get(pedId);
-	}
-
-	public void setUseRandomPedestrianColors(final boolean useRandomPedestrianColors) {
-		this.useRandomPedestrianColors = useRandomPedestrianColors;
-	}
-
-	public boolean isUseRandomPedestrianColors() {
-		return useRandomPedestrianColors;
 	}
 
 	public void setGridWidth(double gridWidth) {
@@ -303,6 +315,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowPedestrianIds(final boolean showPedestrianIds) {
 		this.showPedestrianIds = showPedestrianIds;
+	}
+
+	public boolean isShowFaydedPedestrians() {
+		return false;
 	}
 
 }

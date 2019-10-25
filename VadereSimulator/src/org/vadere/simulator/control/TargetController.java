@@ -147,15 +147,21 @@ public class TargetController {
 	}
 
 	private boolean isNextTargetForAgent(Agent agent) {
+		boolean isNextTargetForAgent = false;
+
 		if (agent.hasNextTarget()) {
-			return agent.getNextTargetId() == target.getId();
+			if (agent.getNextTargetId() == target.getId()
+				&& agent.isCurrentTargetAnAgent() == false)
+				isNextTargetForAgent = true;
 		}
-		return false;
+
+		return isNextTargetForAgent;
 	}
 
 	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
 	private void checkRemove(Agent agent) {
 		if (target.isAbsorbing()) {
+			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
 			final int nextTargetListIndex = agent.getNextTargetListIndex();
@@ -179,7 +185,14 @@ public class TargetController {
 			}
 		}
 	}
-	
+
+	private void changeTargetOfFollowers(Agent agent) {
+		for (Agent follower : agent.getFollowers()) {
+			follower.setSingleTarget(target.getId(), false);
+		}
+		agent.getFollowers().clear();
+	}
+
 	private void notifyListenersTargetReached(final Agent agent) {
 		for (TargetListener l : target.getTargetListeners()) {
 			l.reachedTarget(target, agent);

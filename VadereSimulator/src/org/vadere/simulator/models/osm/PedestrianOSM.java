@@ -31,12 +31,15 @@ import java.util.*;
 
 public class PedestrianOSM extends Pedestrian {
 
+	private final Random random;
+
 	private final AttributesOSM attributesOSM;
 	private final transient StepCircleOptimizer stepCircleOptimizer;
 	private final transient Topography topography;
 	private final double stepLength;
 	private final double stepDeviation;
 	private final double minStepLength;
+
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
@@ -70,6 +73,8 @@ public class PedestrianOSM extends Pedestrian {
 				  StepCircleOptimizer stepCircleOptimizer) {
 
 		super(attributesPedestrian, random);
+
+		this.random = random;
 
 		this.attributesOSM = attributesOSM;
 		this.topography = topography;
@@ -128,7 +133,7 @@ public class PedestrianOSM extends Pedestrian {
 			// }
 		} else if (!hasNextTarget() || getDurationNextStep() > getAttributesOSM().getMaxStepDuration()) {
 			this.nextPosition = getPosition();
-		} else if (topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
+		} else if (isCurrentTargetAnAgent() == false && topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
 			this.nextPosition = getPosition();
 		} else {
 			VCircle reachableArea = new VCircle(getPosition(), getDesiredStepSize());
@@ -366,7 +371,16 @@ public class PedestrianOSM extends Pedestrian {
 
 	@Override
 	public PedestrianOSM clone() {
-		throw new RuntimeException("clone is not supported for PedestrianOSM; it seems hard to implement.");
+		return new PedestrianOSM(attributesOSM,
+				getAttributes(),
+				topography,
+				random,
+				potentialFieldTarget,
+				potentialFieldObstacle,
+				potentialFieldPedestrian,
+				speedAdjusters,
+				stepCircleOptimizer
+				);
 	}
 
 	@Override

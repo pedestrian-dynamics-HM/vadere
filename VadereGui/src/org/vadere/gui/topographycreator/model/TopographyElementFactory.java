@@ -32,6 +32,8 @@ public class TopographyElementFactory {
 				return new org.vadere.state.scenario.Source(new AttributesSource(-1, shape));
 			case TARGET:
 				return new org.vadere.state.scenario.Target(new AttributesTarget(shape));
+			case TARGET_CHANGER:
+				return new org.vadere.state.scenario.TargetChanger(new AttributesTargetChanger(shape));
 			case ABSORBING_AREA:
 				return new org.vadere.state.scenario.AbsorbingArea(new AttributesAbsorbingArea(shape));
 			case PEDESTRIAN:
@@ -52,6 +54,8 @@ public class TopographyElementFactory {
 			return new org.vadere.state.scenario.Source((AttributesSource) attributes);
 		} else if (attributes instanceof AttributesTarget) {
 			return new org.vadere.state.scenario.Target((AttributesTarget) attributes);
+		} else if (attributes instanceof AttributesTargetChanger) {
+			return new org.vadere.state.scenario.TargetChanger((AttributesTargetChanger) attributes);
 		} else if (attributes instanceof AttributesMeasurementArea) {
 				return new org.vadere.state.scenario.MeasurementArea((AttributesMeasurementArea) attributes);
 		} else if (attributes instanceof AttributesAbsorbingArea) {

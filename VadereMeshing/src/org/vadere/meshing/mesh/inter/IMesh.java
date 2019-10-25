@@ -334,11 +334,11 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	<CE> Optional<CE> getData(@NotNull E edge, @NotNull final String name, @NotNull final Class<CE> clazz);
 
 	default boolean getBooleanData(@NotNull E edge, @NotNull final String name) {
-		return getData(edge, name, Boolean.class).or(null).get();
+		return getData(edge, name, Boolean.class).orElse(false);
 	}
 
 	default double getDoubleData(@NotNull E edge, @NotNull final String name) {
-		return getData(edge, name, Double.class).or(null).get();
+		return getData(edge, name, Double.class).orElse(0.0);
 	}
 
 	/**

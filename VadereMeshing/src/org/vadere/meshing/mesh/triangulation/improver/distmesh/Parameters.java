@@ -15,11 +15,12 @@ public class Parameters {
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
     public final static double qualityMeasurement = 0.85;
+	public final static double qualityConvergence = 0.001;
     public final static double MINIMUM = 0.25;
     public final static double DENSITYWEIGHT = 2;
     public final static int NPOINTS = 100000;
     public final static int SAMPLENUMBER = 10;
     public final static int SAMPLEDIVISION = 10;
     public final static int SEGMENTDIVISION = 0;
-    public final static int MAX_NUMBER_OF_STEPS = 100;
+    public final static int MAX_NUMBER_OF_STEPS = 250;
 }

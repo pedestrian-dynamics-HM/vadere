@@ -68,21 +68,68 @@ public class DefaultModeAdapter implements IMode {
 		panelModel.notifyObservers();
 	}
 
+	/**
+	 * Use following shortcuts for zooming and scrolling:
+	 * <ul>
+	 *     <li>Ctrl + Mouse Wheel Scroll: Zoom in/out.</li>
+	 *     <li>Mouse Wheel Scroll: Scroll vertically.</li>
+	 *     <li>Shift + Mouse Wheel Scroll: Scroll horizontally.</li>
+	 *     <li>Use Alt key to decrease the step size while scrolling.</li>
+	 * </ul>
+	 * @param e
+	 */
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.getWheelRotation() > 0) {
-			if (panelModel.zoomOut()) {
-				panelModel.notifyScaleListeners();
-				panelModel.notifyObservers();
+		if (e.isControlDown()) {
+			if (e.getWheelRotation() > 0) {
+				if (panelModel.zoomOut()) {
+					panelModel.notifyScaleListeners();
+					panelModel.notifyObservers();
+				}
+				delay();
+			} else if (e.getWheelRotation() < 0) {
+				if (panelModel.zoomIn()) {
+					panelModel.notifyScaleListeners();
+					panelModel.notifyObservers();
+				}
+				delay();
 			}
-			delay();
-		} else if (e.getWheelRotation() < 0) {
-			if (panelModel.zoomIn()) {
-				panelModel.notifyScaleListeners();
-				panelModel.notifyObservers();
-			}
-			delay();
+		} else {
+			MouseWheelEvent scrollEvent = (e.isAltDown()) ? getSmallStepScrollEvent(e) : getBigStepScrollEvent(e);
+			panelModel.getScrollPane().dispatchEvent(scrollEvent);
 		}
+	}
+
+	private MouseWheelEvent getSmallStepScrollEvent(MouseWheelEvent baseEvent) {
+		MouseWheelEvent smallScrollEvent = new MouseWheelEvent(
+				(Component) baseEvent.getSource(),
+				baseEvent.getID(),
+				baseEvent.getWhen(),
+				baseEvent.getModifiersEx(),
+				baseEvent.getX(),
+				baseEvent.getY(),
+				baseEvent.getClickCount(),
+				baseEvent.isPopupTrigger(),
+				MouseWheelEvent.WHEEL_UNIT_SCROLL,
+				baseEvent.getScrollAmount(),
+				baseEvent.getWheelRotation());
+		return smallScrollEvent;
+	}
+
+	private MouseWheelEvent getBigStepScrollEvent(MouseWheelEvent baseEvent) {
+		MouseWheelEvent smallScrollEvent = new MouseWheelEvent(
+				(Component) baseEvent.getSource(),
+				baseEvent.getID(),
+				baseEvent.getWhen(),
+				baseEvent.getModifiersEx(),
+				baseEvent.getX(),
+				baseEvent.getY(),
+				baseEvent.getClickCount(),
+				baseEvent.isPopupTrigger(),
+				MouseWheelEvent.WHEEL_BLOCK_SCROLL,
+				baseEvent.getScrollAmount(),
+				baseEvent.getWheelRotation());
+		return smallScrollEvent;
 	}
 
 	private void delay() {

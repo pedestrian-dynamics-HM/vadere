@@ -1,23 +1,33 @@
 package org.vadere.gui.components.model;
 
 
+import java.awt.*;
 import java.util.Collection;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 public abstract class SimulationModel<T extends DefaultSimulationConfig> extends DefaultModel {
 
 	public final T config;
+	private ConcurrentHashMap<Integer, Color> colorMap;
+	private Random random;
 
 	@SuppressWarnings("unchecked")
 	public SimulationModel(final T config) {
 		super(config);
 		this.config = config;
+		this.colorMap = new ConcurrentHashMap<>();
+		this.colorMap.put(-1, config.getPedestrianDefaultColor());
+		this.random = new Random();
 	}
 
 	public abstract Collection<Agent> getAgents();
@@ -42,6 +52,8 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 	public IMesh<?, ?, ?> getDiscretization() {
 		return new PMesh();
 	}
+
+	public abstract void setAgentColoring(@NotNull final AgentColoring agentColoring);
 
     /*public double getPotential(final int x, final int y) {
         double result = 0.0;
@@ -83,13 +95,29 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
         return result;
     }*/
 
+    public abstract boolean isAlive(int pedId);
+
+	public Color getGroupColor(@NotNull final  Pedestrian ped) {
+		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
+			return config.getPedestrianDefaultColor();
+		}
+
+		int groupId = ped.getGroupIds().getFirst();
+		Color c = colorMap.get(groupId);
+		if (c == null) {
+			c = new Color(Color.HSBtoRGB(random.nextFloat(), 1f, 0.75f));
+			colorMap.put(groupId, c);
+		}
+		return c;
+	}
+
 	@Override
 	public synchronized void notifyObservers() {
 		// synchronized (config) {
 		if (config.hasChanged()) {
 			setChanged();
 			config.clearChange();
-			if(!config.isUseRandomPedestrianColors()) {
+			if(config.getAgentColoring() != AgentColoring.RANDOM) {
 				config.clearRandomColors();
 			}
 		}

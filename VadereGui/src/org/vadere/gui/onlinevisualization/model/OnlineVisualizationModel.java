@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
@@ -227,5 +229,20 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	public double getSimTimeInSec() {
 		return simTimeInSec;
+	}
+
+	@Override
+	public void setAgentColoring(@NotNull AgentColoring agentColoring) {
+		switch (agentColoring) {
+			case TARGET:
+			case GROUP:
+			case RANDOM: config.setAgentColoring(agentColoring); break;
+			default: throw new IllegalArgumentException(agentColoring + " is not supported for the online simulation.");
+		}
+	}
+
+	@Override
+	public boolean isAlive(int pedId) {
+		return topography.getPedestrianDynamicElements().idExists(pedId);
 	}
 }

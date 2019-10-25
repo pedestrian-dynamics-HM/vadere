@@ -6,8 +6,19 @@
 
 ### Added
 
+- Added new scenario element `TargetChanger`. This scenario element has an arbitrary shape and changes the target of an agent. Either to another static target or to another agent (to get a follower behavior). A `TargetChanger` has two important parameters:
+  * `changeTargetProbability`: This defines how many percent of the agents, who enter the area, should change their target.
+  * `nextTargetIsPedestrian`: If `nextTargetIsPedestrian == false`, assign a new static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
+
 ### Changed
-- `PedestrianFootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.
+
+- `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
+Was previously known as `PedestrianFootStepProcessor`
+- Use following shortcuts for zooming and scrolling in the topography creator:
+  * Ctrl + Mouse Wheel Scroll: Zoom in/out.
+  * Mouse Wheel Scroll: Scroll vertically.
+  * Shift + Mouse Wheel Scroll: Scroll horizontally.
+  * Use Alt key to decrease the step size while scrolling.
 
 # v1.4 (2019-09-05)
 
@@ -105,7 +116,7 @@
   * The new scenario element can be selected in `TopographyCreator` via the "emergency exit" button.
   * The new scenario element is also taken into account by `SettingsDialaog` and `TikzGenerator`.
 - Configured 1-click-deployment in ".gitlab-ci.yml".
-  * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md VadereModelTests/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
+  * In short: Vadere is packaged as a single ZIP file containing following build artifacts: README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
   * Vadere is packaged for GNU/Linux and Microsoft Windows.
   * The ZIP file can be accessed on the website via: http://www.vadere.org/releases/
   * The website's filesystem contains three subdirectories for releases:

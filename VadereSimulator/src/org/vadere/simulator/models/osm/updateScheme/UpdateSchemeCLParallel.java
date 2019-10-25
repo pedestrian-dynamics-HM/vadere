@@ -3,10 +3,12 @@ package org.vadere.simulator.models.osm.updateScheme;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.osm.opencl.CLParallelOSMLocalMem;
 import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
@@ -21,12 +23,12 @@ import java.util.concurrent.Future;
  */
 public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
-	private CLParallelOptimalStepsModel clOptimalStepsModel;
+	private CLParallelOSMLocalMem clOptimalStepsModel;
 
 	private int counter = 0;
 	private Logger logger = Logger.getLogger(UpdateSchemeCLParallel.class);
 
-	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLParallelOptimalStepsModel clOptimalStepsModel) {
+	public UpdateSchemeCLParallel(@NotNull final Topography topography, @NotNull final CLParallelOSMLocalMem clOptimalStepsModel) {
 		super(topography);
 		this.clOptimalStepsModel = clOptimalStepsModel;
 	}
@@ -46,43 +48,46 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 		try {
 			clearStrides(topography);
 			movedPedestrians.clear();
+
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
-			// CallMethod.SEEK runs on the GPU
 
-			List<CLParallelOptimalStepsModel.PedestrianOpenCL> pedestrians = new ArrayList<>();
-
-			double maxStepSize = -1.0;
-			for(int i = 0; i < pedestrianOSMList.size(); i++) {
-				PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
-				CLParallelOptimalStepsModel.PedestrianOpenCL pedestrian = new CLParallelOptimalStepsModel.PedestrianOpenCL(
-						pedestrianOSM.getPosition(),
-						(float)pedestrianOSM.getDesiredStepSize(),
-						(float)pedestrianOSM.getDesiredSpeed());
-				pedestrians.add(pedestrian);
-				maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed());
+			if(counter == 0) {
+				List<CLParallelOSMLocalMem.PedestrianOpenCL> pedestrians = new ArrayList<>();
+				double maxStepSize = -1.0;
+				for(int i = 0; i < pedestrianOSMList.size(); i++) {
+					PedestrianOSM pedestrianOSM = pedestrianOSMList.get(i);
+					CLParallelOSMLocalMem.PedestrianOpenCL pedestrian = new CLParallelOSMLocalMem.PedestrianOpenCL(
+							pedestrianOSM.getPosition(),
+							(float)pedestrianOSM.getDesiredStepSize(),
+							(float)pedestrianOSM.getDesiredSpeed());
+					pedestrians.add(pedestrian);
+					maxStepSize = Math.max(maxStepSize, pedestrianOSM.getDesiredSpeed() * timeStepInSec);
+				}
+				clOptimalStepsModel.setPedestrians(pedestrians);
 			}
 
-			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize;
 			long ms = System.currentTimeMillis();
-			List<CLParallelOptimalStepsModel.PedestrianOpenCL> result = clOptimalStepsModel.getNextSteps(pedestrians, cellSize);
+			List<VPoint> result = clOptimalStepsModel.update();
 			ms = System.currentTimeMillis() - ms;
 			logger.debug("runtime for next step computation = " + ms + " [ms]");
 
-			for(int i = 0; i < pedestrians.size(); i++) {
-				//logger.info("not equals for index = " + i + ": " + result.get(i).position + " -> " + result.get(i).newPosition);
+
+			for(int i = 0; i < pedestrianOSMList.size(); i++) {
+				//logger.info("not equals for index = " + i + ": " + pedestrianOSMList.get(i).getPosition() + " -> " + result.get(i));
 				PedestrianOSM pedestrian = pedestrianOSMList.get(i);
 				pedestrian.clearStrides();
 
-				pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
+				//pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 
-				if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
-					pedestrian.setNextPosition(result.get(i).newPosition);
-					movedPedestrians.add(pedestrian);
-				}
+				//if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+					//pedestrian.setNextPosition(result.get(i));
+					movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
+					//movedPedestrians.add(pedestrian);
+				//}
 			}
 
 			// these call methods run on the CPU
-			CallMethod[] callMethods = {CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
+			/*CallMethod[] callMethods = {CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 			List<Future<?>> futures;
 
 			for (CallMethod callMethod : callMethods) {
@@ -92,7 +97,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 					futures.add(executorService.submit(worker));
 				}
 				collectFutures(futures);
-			}
+			}*/
 
 			counter++;
 
