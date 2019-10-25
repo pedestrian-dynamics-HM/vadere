@@ -96,8 +96,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	private void handleConnection() throws IOException {
 		try{
 
-
-
 			consoleReader = new ConsoleReader();
 			addCommands(consoleReader);
 			init(traCISocket, consoleReader);
@@ -178,7 +176,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	void sendFile(String[] args) throws IOException {
 
-		String filePath = "/home/stsc/repos/vadere/VadereScenarios/roVer/scenarios/";
+		String filePath;
 
 		if (args.length > 1) {
 			if (!basePath.isEmpty()){
@@ -322,5 +320,10 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 		TraCIResponse res =  personapi.createNew(elementIdentifier, new VPoint(Double.parseDouble(x), Double.parseDouble(y)));
 		System.out.println(res.toString());
+	}
+
+	@Override
+	public void personapi_getNextFreeId(String[] args) throws IOException {
+
 	}
 }

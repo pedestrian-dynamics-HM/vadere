@@ -114,15 +114,15 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 	}
 
 	// TODO: return the next free ID not used within the simulation. Hint: look at Topograpy.getNextDynamicElementId()
-//	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
-//	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
-//
-//		remoteManager.accessState((manager, state) -> {
-//
-//		});
-//
-//		return cmd;
-//	}
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
+	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
+
+		remoteManager.accessState((manager, state) -> {
+
+		});
+
+		return cmd;
+	}
 
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIDCount", ignoreElementId = true)
 	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager){
