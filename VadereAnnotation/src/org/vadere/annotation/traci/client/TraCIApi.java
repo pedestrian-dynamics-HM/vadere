@@ -24,6 +24,7 @@ public @interface TraCIApi {
 	};
 	String extendedClassName() default "TraCIClientApi";
 	String name();
+	String nameShort() default "";
 	Class singleAnnotation();
 	Class multipleAnnotation();
 	Class cmdEnum();

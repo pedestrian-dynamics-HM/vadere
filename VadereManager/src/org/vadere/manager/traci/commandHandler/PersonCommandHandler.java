@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @TraCIApi(
 		name = "PersonAPI",
+		nameShort = "pers",
 		singleAnnotation = PersonHandler.class,
 		multipleAnnotation = PersonHandlers.class,
 		cmdEnum = TraCICmd.class,

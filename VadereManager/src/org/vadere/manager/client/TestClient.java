@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -26,17 +27,36 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	private TraCISocket traCISocket;
 	private ConsoleReader consoleReader;
 	private Thread consoleThread;
+	private String basePath;
+	private String defaultScenario;
 	private boolean running;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		TestClient testClient = new TestClient(9999);
+		TestClient testClient = new TestClient(9999, args);
 		testClient.run();
 	}
 
 
-	public TestClient(int port) {
+	public TestClient (int port, String basePath, String defaultScenario){
 		this.port = port;
 		this.running = false;
+		this.basePath = basePath;
+		this.defaultScenario = defaultScenario;
+	}
+
+	public TestClient(int port, String[] args) {
+		this.port = port;
+		this.running = false;
+		if (args.length == 2){
+			this.basePath = args[0];
+			this.defaultScenario = args[1];
+		} else if (args.length == 1){
+			this.basePath = args[0];
+			this.defaultScenario  = "";
+		} else {
+			this.basePath = "";
+			this.defaultScenario  = "";
+		}
 	}
 
 
@@ -76,10 +96,16 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	private void handleConnection() throws IOException {
 		try{
 
+
+
 			consoleReader = new ConsoleReader();
 			addCommands(consoleReader);
 			init(traCISocket, consoleReader);
 			consoleThread = new Thread(consoleReader);
+			if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
+				System.out.println("send default file " + Paths.get(basePath, defaultScenario).toString());
+				sendFile(new String[]{"send_file"});
+			}
 			consoleThread.start();
 
 			consoleThread.join();
@@ -152,13 +178,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	void sendFile(String[] args) throws IOException {
 
-		String filePath = "/Users/Philipp/IdeaProjects/vadere/VadereManager/testResources/testProject001/scenarios/";
+		String filePath = "/home/stsc/repos/vadere/VadereScenarios/roVer/scenarios/";
 
 		if (args.length > 1) {
-			filePath = filePath + args[1] + ".scenario";
+			if (!basePath.isEmpty()){
+				filePath = Paths.get(basePath, args[1] + ".scenario").toString();
+			} else {
+				filePath = args[1];
+			}
 		} else {
-			System.out.println("use default scenario001.scenario");
-			filePath = filePath + "scenario001.scenario";
+			if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
+				System.out.println("use default scenario001.scenario");
+				filePath = Paths.get(basePath, defaultScenario).toString();
+			} else {
+				System.out.println("no default scenario set");
+				return;
+			}
 		}
 
 		String data;
