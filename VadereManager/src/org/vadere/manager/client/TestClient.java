@@ -186,7 +186,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 			}
 		} else {
 			if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-				System.out.println("use default scenario001.scenario");
+//				System.out.println("use default scenario001.scenario");
 				filePath = Paths.get(basePath, defaultScenario).toString();
 			} else {
 				System.out.println("no default scenario set");
