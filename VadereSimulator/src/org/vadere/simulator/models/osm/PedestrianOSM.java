@@ -43,7 +43,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-	// A setter is provided to be able to change strategy at runtime (e.g. by events).
+	// A setter is provided to be able to change strategy at runtime (e.g. by stimuli).
 	private transient ICombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
 	private transient List<StepSizeAdjuster> stepSizeAdjusters;

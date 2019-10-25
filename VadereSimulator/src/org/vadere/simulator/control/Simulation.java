@@ -18,7 +18,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
@@ -354,7 +354,7 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-		List<Event> events = eventController.getEventsForTime(simTimeInSec);
+		List<Stimulus> stimuli = eventController.getEventsForTime(simTimeInSec);
 
 		// "TargetControllers" are populated in each simulation loop because
 		// pedestrians can be declared as targets in each simulation loop.
@@ -386,7 +386,7 @@ public class Simulation {
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
-		eventCognition.prioritizeEventsForPedestrians(events, pedestrians);
+		eventCognition.prioritizeEventsForPedestrians(stimuli, pedestrians);
 
 		if (attributesSimulation.isUseSalientBehavior()) {
 			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);

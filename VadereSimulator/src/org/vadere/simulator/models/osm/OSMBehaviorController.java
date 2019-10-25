@@ -5,20 +5,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.BangEvent;
-import org.vadere.state.events.types.ChangeTargetEvent;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.stimuli.types.Bang;
+import org.vadere.state.psychology.stimuli.types.ChangeTarget;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
-import tech.tablesaw.plotly.components.change.Change;
-import org.vadere.util.math.MathUtil;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,12 +23,12 @@ import java.util.stream.Collectors;
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
  *
- * This class can be used by {@link OptimalStepsModel} to react on events.
+ * This class can be used by {@link OptimalStepsModel} to react on stimuli.
  *
  * For instance:
  * <pre>
  *     ...
- *     if (mostImportantEvent instanceof WaitEvent) {
+ *     if (mostImportantEvent instanceof Wait) {
  *         osmBehaviorController.wait()
  *     }
  * 	   ...
@@ -97,14 +94,14 @@ public class OSMBehaviorController {
 
     // Watch out: A bang event changes only the "CombinedPotentialStrategy".
     // I.e., a new target is set for the agent. The agent does not move here!
-    // Therefore, trigger only a single bang event and then use "ElapsedTimeEvent" afterwards
+    // Therefore, trigger only a single bang event and then use "ElapsedTime" afterwards
     // to let the agent walk.
     public void reactToBang(PedestrianOSM pedestrian, Topography topography) {
-        Event mostImportantEvent = pedestrian.getMostImportantEvent();
+        Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
-        if (mostImportantEvent instanceof BangEvent) {
-            BangEvent bangEvent = (BangEvent) pedestrian.getMostImportantEvent();
-            Target bangOrigin = topography.getTarget(bangEvent.getOriginAsTargetId());
+        if (mostImportantStimulus instanceof Bang) {
+            Bang bang = (Bang) pedestrian.getMostImportantStimulus();
+            Target bangOrigin = topography.getTarget(bang.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
             nextTarget.add(bangOrigin.getId());
@@ -117,11 +114,11 @@ public class OSMBehaviorController {
     }
 
     public void reactToTargetChange(PedestrianOSM pedestrian, Topography topography) {
-        Event mostImportantEvent = pedestrian.getMostImportantEvent();
+        Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
-        if (mostImportantEvent instanceof ChangeTargetEvent) {
-            ChangeTargetEvent changeTargetEvent = (ChangeTargetEvent) pedestrian.getMostImportantEvent();
-            pedestrian.setTargets(changeTargetEvent.getNewTargetIds());
+        if (mostImportantStimulus instanceof ChangeTarget) {
+            ChangeTarget changeTarget = (ChangeTarget) pedestrian.getMostImportantStimulus();
+            pedestrian.setTargets(changeTarget.getNewTargetIds());
 
         } else {
             // TODO: Maybe, log to console.

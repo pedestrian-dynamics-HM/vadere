@@ -1,4 +1,4 @@
-package org.vadere.state.events.types;
+package org.vadere.state.psychology.stimuli.types;
 
 import org.vadere.state.scenario.ScenarioElement;
 
@@ -7,17 +7,13 @@ import java.util.List;
 /**
  * Class can signal agents to wait - for instance at a red traffic light.
  */
-public class WaitEvent extends Event {
+public class Wait extends Stimulus {
 
     // Default constructor required for JSON de-/serialization.
-    public WaitEvent() { super(); }
+    public Wait() { super(); }
 
-    public WaitEvent(double time) {
+    public Wait(double time) {
         super(time);
-    }
-
-    public WaitEvent(double time, List<ScenarioElement> targets) {
-        super(time, targets);
     }
 
 }

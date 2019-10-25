@@ -1,7 +1,7 @@
 package org.vadere.simulator.control.cognition;
 
-import org.vadere.state.events.types.BangEvent;
-import org.vadere.state.behavior.SalientBehavior;
+import org.vadere.state.psychology.stimuli.types.Bang;
+import org.vadere.state.psychology.behavior.SalientBehavior;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootstepHistory;
@@ -13,7 +13,7 @@ import java.util.Collection;
  * (e.g., change to cooperative behavior when no movement is possible for n steps).
  *
  * Watch out: The {@link EventCognition} should be finished before using methods in this class because, usually,
- * first an event occurs and then pedestrians decide about their behavior. E.g., first a {@link BangEvent} occurs
+ * first an event occurs and then pedestrians decide about their behavior. E.g., first a {@link Bang} occurs
  * and then a pedestrian decides to follow a {@link SalientBehavior#COOPERATIVE} behavior.
  */
 public class SalientBehaviorCognition {

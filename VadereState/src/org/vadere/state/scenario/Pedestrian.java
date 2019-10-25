@@ -1,8 +1,8 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
@@ -24,7 +24,7 @@ public class Pedestrian extends Agent {
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
-	private Event mostImportantEvent; /** Evaluated in each time step in "EventCognition". */
+	private Stimulus mostImportantStimulus; /** Evaluated in each time step in "EventCognition". */
 	private SalientBehavior salientBehavior;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	/**
@@ -58,7 +58,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		mostImportantEvent = null;
+		mostImportantStimulus = null;
 		salientBehavior = SalientBehavior.TARGET_ORIENTED;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
@@ -73,7 +73,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = other.idAsTarget;
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
-		mostImportantEvent = other.mostImportantEvent;
+		mostImportantStimulus = other.mostImportantStimulus;
 		salientBehavior = other.salientBehavior;
 
 		if (other.groupIds != null) {
@@ -99,7 +99,7 @@ public class Pedestrian extends Agent {
 	public boolean isLikelyInjured() {
 		return isLikelyInjured;
 	}
-	public Event getMostImportantEvent() { return mostImportantEvent; }
+	public Stimulus getMostImportantStimulus() { return mostImportantStimulus; }
 	public SalientBehavior getSalientBehavior() { return salientBehavior; }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
@@ -147,7 +147,7 @@ public class Pedestrian extends Agent {
 	public void setLikelyInjured(boolean likelyInjured) {
 		this.isLikelyInjured = likelyInjured;
 	}
-	public void setMostImportantEvent(Event mostImportantEvent) { this.mostImportantEvent = mostImportantEvent; }
+	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { this.mostImportantStimulus = mostImportantStimulus; }
 	public void setSalientBehavior(SalientBehavior salientBehavior) { this.salientBehavior = salientBehavior; }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;

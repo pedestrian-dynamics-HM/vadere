@@ -1,13 +1,12 @@
-package org.vadere.state.events.types;
-
-import java.lang.reflect.Field;
+package org.vadere.state.psychology.stimuli.types;
 
 /**
- * A timeframe in which events occur.
+ * A timeframe in which one ore more stimuli can occur.
  *
- * This information is required by an event controller which raises the actual events during simulation.
+ * This information is required by a stimulus controller
+ * which injects the actual stimuli into the simulation loop.
  */
-public class EventTimeframe {
+public class Timeframe {
 
     private double startTime;
     private double endTime;
@@ -15,11 +14,11 @@ public class EventTimeframe {
     private boolean repeat;
     private double waitTimeBetweenRepetition;
 
-    public EventTimeframe() {
+    public Timeframe() {
         this(0, 0, false, 0);
     }
 
-    public EventTimeframe(double startTime, double endTime, boolean repeat, double waitTimeBetweenRepetition) {
+    public Timeframe(double startTime, double endTime, boolean repeat, double waitTimeBetweenRepetition) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.repeat = repeat;
@@ -60,7 +59,7 @@ public class EventTimeframe {
 
     @Override
     public String toString() {
-        String string = "EventTimeframe:\n";
+        String string = "Timeframe:\n";
         string += String.format("  startTime: %f\n", startTime);
         string += String.format("  endTime: %f\n", endTime);
         string += String.format("  repeat: %b\n", repeat);

@@ -15,8 +15,8 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.events.presettings.EventPresettings;
+import org.vadere.state.psychology.stimuli.json.StimulusInfoStore;
+import org.vadere.state.psychology.stimuli.presettings.StimulusPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.config.VadereConfig;
@@ -191,9 +191,9 @@ public class TextView extends JPanel implements IJsonView {
 						case TOPOGRAPHY:
 							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 							break;
-						case EVENT:
-							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
-							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
+						case STIMULUS:
+							StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
+							currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
 							break;
 						default:
 							throw new RuntimeException("attribute type not implemented.");
@@ -218,12 +218,12 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	private void generatePresettingsMenu(final AttributeType attributeType) {
-		if (attributeType == AttributeType.EVENT) {
+		if (attributeType == AttributeType.STIMULUS) {
 			JMenuBar presetMenuBar = new JMenuBar();
 			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
 			presetMenuBar.add(mnPresetMenu);
 
-			EventPresettings.PRESETTINGS_MAP.forEach(
+			StimulusPresettings.PRESETTINGS_MAP.forEach(
 					(clazz, jsonString) -> mnPresetMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
 						private static final long serialVersionUID = 1L;
 
@@ -275,9 +275,9 @@ public class TextView extends JPanel implements IJsonView {
 			topography.removeBoundary();
 			textfileTextarea.setText(StateJsonConverter.serializeTopography(topography));
 			break;
-		case EVENT:
-			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
-			textfileTextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
+		case STIMULUS:
+			StimulusInfoStore stimulusInfoStore = scenario.getScenarioStore().getStimulusInfoStore();
+			textfileTextarea.setText(StateJsonConverter.serializeStimuli(stimulusInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

@@ -1,4 +1,4 @@
-package org.vadere.state.events.types;
+package org.vadere.state.psychology.stimuli.types;
 
 import org.vadere.state.scenario.ScenarioElement;
 
@@ -7,32 +7,32 @@ import java.util.List;
 /**
  * Class signals agents a bang - for instance something exploded.
  *
- * This event holds one additional information: a target id
+ * This stimulus holds one additional information: a target id
  * which represents the origin of the bang.
  */
-public class BangEvent extends Event {
+public class Bang extends Stimulus {
 
+    // Member Variables
     private int originAsTargetId = -1;
 
+    // Constructors
     // Default constructor required for JSON de-/serialization.
-    public BangEvent() { super(); }
+    public Bang() { super(); }
 
-    public BangEvent(double time) {
+    public Bang(double time) {
         super(time);
     }
 
-    public BangEvent(double time, List<ScenarioElement> targets) {
-        super(time, targets);
-    }
-
-    public BangEvent(double time, List<ScenarioElement> targets, int originAsTargetId) {
-        super(time, targets);
+    public Bang(double time, int originAsTargetId) {
+        super(time);
 
         this.originAsTargetId = originAsTargetId;
     }
 
+    // Getter
     public int getOriginAsTargetId() { return originAsTargetId; }
 
+    // Setter
     public void setOriginAsTargetId(int originAsTargetId) { this.originAsTargetId = originAsTargetId; }
 
 }

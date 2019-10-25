@@ -11,11 +11,11 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.exceptions.UnsupportedEventException;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.WaitEvent;
-import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.state.psychology.stimuli.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.stimuli.types.ElapsedTime;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
+import org.vadere.state.psychology.stimuli.types.Wait;
+import org.vadere.state.psychology.stimuli.types.WaitInArea;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -182,16 +182,16 @@ public class PedestrianBHM extends Pedestrian {
 		double endTimeStep = timeOfNextStep + durationNextStep;
 		timeOfNextStep = endTimeStep;
 
-		Event mostImportantEvent = getMostImportantEvent();
+		Stimulus mostImportantStimulus = getMostImportantStimulus();
 		VPoint position = getPosition();
-		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+		if (mostImportantStimulus instanceof ElapsedTime) {
 			updateTargetDirection();
 			nextPosition = navigation.getNavigationPosition();
 			makeStep();
-		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
 			// do nothing
 		} else {
-			throw new UnsupportedEventException(mostImportantEvent, this.getClass());
+			throw new UnsupportedStimulusException(mostImportantStimulus, this.getClass());
 		}
 
 		FootStep currentFootstep = new FootStep(position, getPosition(), startTimeStep, endTimeStep);

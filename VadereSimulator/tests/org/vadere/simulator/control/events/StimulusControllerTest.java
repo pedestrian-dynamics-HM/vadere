@@ -2,13 +2,10 @@ package org.vadere.simulator.control.events;
 
 import org.junit.Test;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.events.json.EventInfo;
-import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventTimeframe;
-import org.vadere.state.events.types.WaitEvent;
-import org.vadere.state.events.types.WaitInAreaEvent;
+import org.vadere.state.psychology.stimuli.json.StimulusInfo;
+import org.vadere.state.psychology.stimuli.json.StimulusInfoStore;
+import org.vadere.state.psychology.stimuli.types.*;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
@@ -17,7 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class EventControllerTest {
+public class StimulusControllerTest {
 
     private ScenarioStore getScenarioStoreContainingRecurringEvent(boolean isRecurring) {
         return new ScenarioStore("name",
@@ -29,7 +26,7 @@ public class EventControllerTest {
                 getEventInfoStoreContainingRecurringEvent(isRecurring));
     }
 
-    private ScenarioStore getScenarioStore(EventInfoStore store) {
+    private ScenarioStore getScenarioStore(StimulusInfoStore store) {
         return new ScenarioStore("name",
                 "description",
                 "mainModel",
@@ -39,35 +36,35 @@ public class EventControllerTest {
                 store);
     }
 
-    private EventInfoStore getEventInfoStoreContainingRecurringEvent(boolean isRecurring) {
-        // Create "EventTimeframe" and "Event" objects and encapsulate them in "EventInfo" objects.
-        EventTimeframe eventTimeframe = new EventTimeframe(5, 30, isRecurring, 0);
-        List<Event> events = new ArrayList<>();
+    private StimulusInfoStore getEventInfoStoreContainingRecurringEvent(boolean isRecurring) {
+        // Create "Timeframe" and "Stimulus" objects and encapsulate them in "StimulusInfo" objects.
+        Timeframe timeframe = new Timeframe(5, 30, isRecurring, 0);
+        List<Stimulus> stimuli = new ArrayList<>();
 
-        EventInfo eventInfo1 = new EventInfo();
-        eventInfo1.setEventTimeframe(eventTimeframe);
-        eventInfo1.setEvents(events);
+        StimulusInfo stimulusInfo1 = new StimulusInfo();
+        stimulusInfo1.setTimeframe(timeframe);
+        stimulusInfo1.setStimuli(stimuli);
 
-        List<EventInfo> eventInfos = new ArrayList<>();
-        eventInfos.add(eventInfo1);
+        List<StimulusInfo> stimulusInfos = new ArrayList<>();
+        stimulusInfos.add(stimulusInfo1);
 
-        EventInfoStore eventInfoStore = new EventInfoStore();
-        eventInfoStore.setEventInfos(eventInfos);
+        StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
+        stimulusInfoStore.setStimulusInfos(stimulusInfos);
 
-        return eventInfoStore;
+        return stimulusInfoStore;
     }
 
-    private EventInfoStore getEventInfoStore(List<EventInfo> eventList){
-        EventInfoStore store = new EventInfoStore();
-        store.setEventInfos(eventList);
+    private StimulusInfoStore getEventInfoStore(List<StimulusInfo> eventList){
+        StimulusInfoStore store = new StimulusInfoStore();
+        store.setStimulusInfos(eventList);
         return store;
     }
 
-    private EventInfo getEventInfo(EventTimeframe eventTimeframe, Event... events){
-        EventInfo eventInfo = new EventInfo();
-        eventInfo.setEventTimeframe(eventTimeframe);
-        eventInfo.setEvents(Arrays.asList(events));
-        return eventInfo;
+    private StimulusInfo getEventInfo(Timeframe timeframe, Stimulus... stimuli){
+        StimulusInfo stimulusInfo = new StimulusInfo();
+        stimulusInfo.setTimeframe(timeframe);
+        stimulusInfo.setStimuli(Arrays.asList(stimuli));
+        return stimulusInfo;
     }
 
     @Test
@@ -105,12 +102,12 @@ public class EventControllerTest {
     @Test
     public void eventControllerConstructorDetectsOneTimeAndRecurringEventsProperly() {
         // Create a list containing one one-time and one recurring event.
-        List<EventInfo> oneTimeAndRecurringEvents = new ArrayList<>();
-        oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(false).getEventInfos());
-        oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(true).getEventInfos());
+        List<StimulusInfo> oneTimeAndRecurringEvents = new ArrayList<>();
+        oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(false).getStimulusInfos());
+        oneTimeAndRecurringEvents.addAll(getEventInfoStoreContainingRecurringEvent(true).getStimulusInfos());
 
-        EventInfoStore eventInfoStoreWithBothEvents = new EventInfoStore();
-        eventInfoStoreWithBothEvents.setEventInfos(oneTimeAndRecurringEvents);
+        StimulusInfoStore stimulusInfoStoreWithBothEvents = new StimulusInfoStore();
+        stimulusInfoStoreWithBothEvents.setStimulusInfos(oneTimeAndRecurringEvents);
 
         ScenarioStore scenarioStoreContainingOneTimeAndRecurringEvent = new ScenarioStore("name",
                 "description",
@@ -118,7 +115,7 @@ public class EventControllerTest {
                 null,
                 null,
                 null,
-                eventInfoStoreWithBothEvents);
+                stimulusInfoStoreWithBothEvents);
 
         EventController eventController = new EventController(scenarioStoreContainingOneTimeAndRecurringEvent);
 
@@ -131,7 +128,7 @@ public class EventControllerTest {
         boolean isRecurringEvent = false;
         double simulationTime = 0.8;
 
-        EventTimeframe timeframe = new EventTimeframe(0.75, 1.25, isRecurringEvent, 1.0);
+        Timeframe timeframe = new Timeframe(0.75, 1.25, isRecurringEvent, 1.0);
 
         EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
     }
@@ -145,7 +142,7 @@ public class EventControllerTest {
         double simulationTime = startTime;
         double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         for (int i = 0; i < 50; i++) {
             double currentSimulationTime = simulationTime + (i * periodicity);
@@ -164,7 +161,7 @@ public class EventControllerTest {
         double simulationTime = endTime;
         double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         for (int i = 0; i < 50; i++) {
             double currentSimulationTime = simulationTime + (i * periodicity);
@@ -183,7 +180,7 @@ public class EventControllerTest {
         double simulationTime = 1.0;
         double periodicity = (endTime - startTime) + waitTimeBetweenRepetition;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         for (int i = 0; i < 50; i++) {
             double currentSimulationTime = simulationTime + (i * periodicity);
@@ -202,7 +199,7 @@ public class EventControllerTest {
         double simulationTime = 0.10;
         double increment = 0.05;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         while (simulationTime < startTime) {
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
@@ -221,7 +218,7 @@ public class EventControllerTest {
         double simulationTime = startTime;
         double increment = 0.05;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         while (simulationTime < endTime) {
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
@@ -240,7 +237,7 @@ public class EventControllerTest {
         double simulationTime = 0;
         double increment = 0.05;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         while (simulationTime < startTime) {
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
@@ -259,7 +256,7 @@ public class EventControllerTest {
         double simulationTime = startTime;
         double increment = 0.10;
 
-        EventTimeframe timeframe = new EventTimeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
+        Timeframe timeframe = new Timeframe(startTime, endTime, recurringEvent, waitTimeBetweenRepetition);
 
         while (simulationTime < 500 * endTime) {
             boolean timeframeIsActive = EventController.timeframeIsActiveAtSimulationTime(timeframe, simulationTime);
@@ -278,13 +275,13 @@ public class EventControllerTest {
 
         double expectedSimulationTime = 1.0;
 
-        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = eventController.getEventsForTime(expectedSimulationTime);
 
-        if (activeEvents.size() == 1) {
-            Event event = activeEvents.get(0);
+        if (activeStimuli.size() == 1) {
+            Stimulus stimulus = activeStimuli.get(0);
 
-            assertEquals(ElapsedTimeEvent.class, event.getClass());
-            assertEquals(expectedSimulationTime, event.getTime(), 10e-1);
+            assertEquals(ElapsedTime.class, stimulus.getClass());
+            assertEquals(expectedSimulationTime, stimulus.getTime(), 10e-1);
         } else {
             fail("Expected only one event for simulationTime = " + expectedSimulationTime);
         }
@@ -295,25 +292,25 @@ public class EventControllerTest {
         boolean isRecurringEvent = false;
         ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
 
-        // Store one concrete one-time event in "EventInfoStore" to check if its timestamp is updated.
-        WaitEvent waitEvent = new WaitEvent();
-        List<Event> events = new ArrayList<>();
-        events.add(waitEvent);
+        // Store one concrete one-time event in "StimulusInfoStore" to check if its timestamp is updated.
+        Wait wait = new Wait();
+        List<Stimulus> stimuli = new ArrayList<>();
+        stimuli.add(wait);
 
-        EventInfo activeEventInfo = scenarioStoreContainingOneOneTimeEvent.getEventInfoStore().getEventInfos().get(0);
-        activeEventInfo.setEvents(events);
+        StimulusInfo activeStimulusInfo = scenarioStoreContainingOneOneTimeEvent.getStimulusInfoStore().getStimulusInfos().get(0);
+        activeStimulusInfo.setStimuli(stimuli);
 
         EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
 
         double expectedSimulationTime = 5.0;
 
-        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = eventController.getEventsForTime(expectedSimulationTime);
 
-        for (Event event : activeEvents) {
-            assertEquals(expectedSimulationTime, event.getTime(), 10e-1);
+        for (Stimulus stimulus : activeStimuli) {
+            assertEquals(expectedSimulationTime, stimulus.getTime(), 10e-1);
         }
 
-        assertEquals(2, activeEvents.size());
+        assertEquals(2, activeStimuli.size());
     }
 
     @Test
@@ -321,35 +318,35 @@ public class EventControllerTest {
         boolean isRecurringEvent = false;
         ScenarioStore scenarioStoreContainingOneOneTimeEvent = getScenarioStoreContainingRecurringEvent(isRecurringEvent);
 
-        // Store one concrete one-time event in "EventInfoStore" to check if its timestamp is updated.
-        WaitEvent waitEvent = new WaitEvent();
-        List<Event> events = new ArrayList<>();
-        events.add(waitEvent);
+        // Store one concrete one-time event in "StimulusInfoStore" to check if its timestamp is updated.
+        Wait wait = new Wait();
+        List<Stimulus> stimuli = new ArrayList<>();
+        stimuli.add(wait);
 
-        EventInfo inactiveEventInfo = scenarioStoreContainingOneOneTimeEvent.getEventInfoStore().getEventInfos().get(0);
-        inactiveEventInfo.setEvents(events);
-        inactiveEventInfo.setEventTimeframe(new EventTimeframe(0, 1, false, 0));
+        StimulusInfo inactiveStimulusInfo = scenarioStoreContainingOneOneTimeEvent.getStimulusInfoStore().getStimulusInfos().get(0);
+        inactiveStimulusInfo.setStimuli(stimuli);
+        inactiveStimulusInfo.setTimeframe(new Timeframe(0, 1, false, 0));
 
         EventController eventController = new EventController(scenarioStoreContainingOneOneTimeEvent);
 
         double expectedSimulationTime = 5.0;
 
-        List<Event> activeEvents = eventController.getEventsForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = eventController.getEventsForTime(expectedSimulationTime);
 
-        assertEquals(1, activeEvents.size());
-        assertEquals(0, waitEvent.getTime(), 10e-1);
+        assertEquals(1, activeStimuli.size());
+        assertEquals(0, wait.getTime(), 10e-1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void IsActiveTimeframeOnSingleEvent(){
         EventController.timeframeIsActiveAtSimulationTime(
-                new EventTimeframe(2, 7, false,0), 1);
+                new Timeframe(2, 7, false,0), 1);
         fail("Should not be reached");
     }
 
     @Test
     public void IsActiveTimeframeOnRepeatedEvent(){
-        EventTimeframe frame = new EventTimeframe(3, 4, true, 1);
+        Timeframe frame = new Timeframe(3, 4, true, 1);
         assertFalse(EventController.timeframeIsActiveAtSimulationTime(frame, 0.4));
         assertFalse(EventController.timeframeIsActiveAtSimulationTime(frame, 8.4));
 
@@ -360,64 +357,64 @@ public class EventControllerTest {
     @Test
     public void getEventsAtTime(){
 
-        Event e1 = new WaitEvent(2.0);
-        Event e2 = new WaitEvent(3.0);
-        Event e3 = new WaitInAreaEvent(12, new VRectangle(1,1,100,10.0));
-        EventInfo eventInfo1 = getEventInfo(
-                new EventTimeframe(2, 7, false,0),
+        Stimulus e1 = new Wait(2.0);
+        Stimulus e2 = new Wait(3.0);
+        Stimulus e3 = new WaitInArea(12, new VRectangle(1,1,100,10.0));
+        StimulusInfo stimulusInfo1 = getEventInfo(
+                new Timeframe(2, 7, false,0),
                 e1, e2);
 
-        EventInfo eventInfo2 = getEventInfo(
-                new EventTimeframe(3, 4, true, 1),
+        StimulusInfo stimulusInfo2 = getEventInfo(
+                new Timeframe(3, 4, true, 1),
                 e3);
 
 
 
-        EventInfoStore store = getEventInfoStore(Arrays.asList(eventInfo1, eventInfo2));
+        StimulusInfoStore store = getEventInfoStore(Arrays.asList(stimulusInfo1, stimulusInfo2));
         EventController eventController = new EventController(getScenarioStore(store));
         String errMsg = "expected event at this TimeStep";
 
-        List<Event> events;
+        List<Stimulus> stimuli;
         //only default event
-        events = eventController.getEventsForTime(0.5);
-        assertEquals(1, events.size());
-        assertTimeStamp(events, 0.5);
+        stimuli = eventController.getEventsForTime(0.5);
+        assertEquals(1, stimuli.size());
+        assertTimeStamp(stimuli, 0.5);
 
-        //only eventInfo1
-        events = eventController.getEventsForTime(2.5);
-        assertEquals(3, events.size());
-        assertTimeStamp(events, 2.5);
+        //only stimulusInfo1
+        stimuli = eventController.getEventsForTime(2.5);
+        assertEquals(3, stimuli.size());
+        assertTimeStamp(stimuli, 2.5);
 
-        //both eventInfo1 eventInfo2
-        events = eventController.getEventsForTime(3.5);
-        assertEquals(4, events.size());
-        assertTrue(errMsg, events.contains(e1));
-        assertTrue(errMsg, events.contains(e2));
-        assertTrue(errMsg, events.contains(e3));
-        assertTimeStamp(events, 3.5);
+        //both stimulusInfo1 stimulusInfo2
+        stimuli = eventController.getEventsForTime(3.5);
+        assertEquals(4, stimuli.size());
+        assertTrue(errMsg, stimuli.contains(e1));
+        assertTrue(errMsg, stimuli.contains(e2));
+        assertTrue(errMsg, stimuli.contains(e3));
+        assertTimeStamp(stimuli, 3.5);
 
-        //only eventInfo1
-        events = eventController.getEventsForTime(4.5);
-        assertEquals(3, events.size());
-        assertTrue(errMsg, events.contains(e1));
-        assertTrue(errMsg, events.contains(e2));
-        assertTimeStamp(events, 4.5);
+        //only stimulusInfo1
+        stimuli = eventController.getEventsForTime(4.5);
+        assertEquals(3, stimuli.size());
+        assertTrue(errMsg, stimuli.contains(e1));
+        assertTrue(errMsg, stimuli.contains(e2));
+        assertTimeStamp(stimuli, 4.5);
 
-        //one time event is over only events from eventInfo2
-        events = eventController.getEventsForTime(7.8);
-        assertEquals(2, events.size());
-        assertTrue(errMsg, events.contains(e3));
-        assertTimeStamp(events, 7.8);
+        //one time event is over only stimuli from stimulusInfo2
+        stimuli = eventController.getEventsForTime(7.8);
+        assertEquals(2, stimuli.size());
+        assertTrue(errMsg, stimuli.contains(e3));
+        assertTimeStamp(stimuli, 7.8);
 
         //no event (only the default time event)
-        //one time event is over only events from eventInfo2
-        events = eventController.getEventsForTime(8.3);
-        assertEquals(1, events.size());
-        assertTimeStamp(events, 8.3);
+        //one time event is over only stimuli from stimulusInfo2
+        stimuli = eventController.getEventsForTime(8.3);
+        assertEquals(1, stimuli.size());
+        assertTimeStamp(stimuli, 8.3);
 
     }
 
-    private void assertTimeStamp(List<Event> events, double simTime){
-        events.forEach(e -> assertEquals(e.getTime(), simTime, 1e-3));
+    private void assertTimeStamp(List<Stimulus> stimuli, double simTime){
+        stimuli.forEach(e -> assertEquals(e.getTime(), simTime, 1e-3));
     }
 }

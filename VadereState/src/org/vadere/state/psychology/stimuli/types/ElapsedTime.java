@@ -1,4 +1,4 @@
-package org.vadere.state.events.types;
+package org.vadere.state.psychology.stimuli.types;
 
 import org.vadere.state.scenario.ScenarioElement;
 
@@ -9,17 +9,14 @@ import java.util.List;
  *
  * The class uses the inherited "time" to represent the current time step.
  */
-public class ElapsedTimeEvent extends Event {
+public class ElapsedTime extends Stimulus {
 
+    // Constructors
     // Default constructor required for JSON de-/serialization.
-    public ElapsedTimeEvent() { super(); }
+    public ElapsedTime() { super(); }
 
-    public ElapsedTimeEvent(double time) {
+    public ElapsedTime(double time) {
         super(time);
-    }
-
-    public ElapsedTimeEvent(double time, List<ScenarioElement> targets) {
-        super(time, targets);
     }
 
 }

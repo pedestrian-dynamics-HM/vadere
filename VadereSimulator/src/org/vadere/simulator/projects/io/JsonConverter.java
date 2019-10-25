@@ -10,7 +10,7 @@ import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.psychology.stimuli.json.StimulusInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -53,9 +53,9 @@ public class JsonConverter {
 		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
 		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
-		EventInfoStore eventInfoStore = StateJsonConverter.deserializeEventsFromArrayNode(scenarioNode.get("eventInfos"));
+		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
 
-		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription, mainModel, attributesModel, attributesSimulation, topography, eventInfoStore);
+		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription, mainModel, attributesModel, attributesSimulation, topography, stimulusInfoStore);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
@@ -116,7 +116,7 @@ public class JsonConverter {
 
 		// vadere > eventInfos
 		// We get a complete tree here and not only a node. Therefore, use "setAll()" instead of "set()".
-		ObjectNode eventNode = StateJsonConverter.serializeEventsToNode(scenarioStore.getEventInfoStore());
+		ObjectNode eventNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
 		vadereNode.setAll(eventNode);
 
 		return vadereNode;
@@ -131,13 +131,17 @@ public class JsonConverter {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
-		ObjectNode eventNode = StateJsonConverter.serializeEventsToNode(scenarioStore.getEventInfoStore());
-		JsonNode eventInfoArrayNode = eventNode.get("eventInfos");
+		ObjectNode stimulusNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
+		JsonNode stimulusInfosArrayNode = stimulusNode.get("stimulusInfos");
+
+		if (stimulusInfosArrayNode == null) {
+			throw new IOException("Cannot clone scenario: No stimuli found!");
+		}
 
 		return new ScenarioStore(scenarioStore.getName(), scenarioStore.getDescription(), scenarioStore.getMainModel(),
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeEventsFromArrayNode(eventInfoArrayNode));
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode));
 	}
 }

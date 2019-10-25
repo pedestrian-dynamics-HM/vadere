@@ -6,18 +6,15 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventFactory;
+import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
+import org.vadere.state.psychology.stimuli.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
@@ -142,8 +139,8 @@ public class TableTrajectoryFootStep {
 
 		if(mostImportantEventCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			String mostImportantEventClassName = row.getString(mostImportantEventCol);
-			Event event = EventFactory.stringToEvent(mostImportantEventClassName);
-			pedestrian.setMostImportantEvent(event);
+			Stimulus stimulus = StimulusFactory.stringToStimulus(mostImportantEventClassName);
+			pedestrian.setMostImportantStimulus(stimulus);
 		}
 
 		if(salientBehaviorCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {

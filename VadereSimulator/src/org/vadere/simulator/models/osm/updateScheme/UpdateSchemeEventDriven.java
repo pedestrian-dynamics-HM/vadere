@@ -3,22 +3,13 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.*;
+import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.stimuli.types.*;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.math.MathUtil;
 
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
  * @author Benedikt Zoennchen
@@ -59,9 +50,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			return;
 		}
 
-		Event mostImportantEvent = pedestrian.getMostImportantEvent();
+		Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
-		if (mostImportantEvent instanceof ElapsedTimeEvent) {
+		if (mostImportantStimulus instanceof ElapsedTime) {
 			double stepDuration = pedestrian.getDurationNextStep();
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
 				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
@@ -86,14 +77,14 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 				}
 			}
-		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
+		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantEvent instanceof BangEvent) {
+		} else if (mostImportantStimulus instanceof Bang) {
 			osmBehaviorController.reactToBang(pedestrian, topography);
 
 			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		} else if (mostImportantEvent instanceof ChangeTargetEvent) {
+		} else if (mostImportantStimulus instanceof ChangeTarget) {
 			osmBehaviorController.reactToTargetChange(pedestrian, topography);
 
 			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.

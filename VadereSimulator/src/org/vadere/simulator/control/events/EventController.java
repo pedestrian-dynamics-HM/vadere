@@ -1,99 +1,99 @@
 package org.vadere.simulator.control.events;
 
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.events.json.EventInfo;
-import org.vadere.state.events.types.ElapsedTimeEvent;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventTimeframe;
+import org.vadere.state.psychology.stimuli.json.StimulusInfo;
+import org.vadere.state.psychology.stimuli.types.ElapsedTime;
+import org.vadere.state.psychology.stimuli.types.Stimulus;
+import org.vadere.state.psychology.stimuli.types.Timeframe;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The EventController encapsulates logic to raise events.
+ * The EventController encapsulates logic to raise stimuli.
  *
  * The EventController uses the passed {@link ScenarioStore}
- * to extract the possible events from the scenario description.
+ * to extract the possible stimuli from the scenario description.
  *
  * TODO: Clarify what should happen if "simTimeSteps" is too coarse
- * and defined events cannot be triggered correctly here.
+ * and defined stimuli cannot be triggered correctly here.
  */
 public class EventController {
 
     // Variables
     private ScenarioStore scenarioStore;
-    private List<EventInfo> oneTimeEvents;
-    private List<EventInfo> recurringEvents;
+    private List<StimulusInfo> oneTimeEvents;
+    private List<StimulusInfo> recurringEvents;
 
     // Constructors
     public EventController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
 
-        oneTimeEvents = scenarioStore.getEventInfoStore().getEventInfos().stream()
-                .filter(eventInfo -> eventInfo.getEventTimeframe().isRepeat() == false)
+        oneTimeEvents = scenarioStore.getStimulusInfoStore().getStimulusInfos().stream()
+                .filter(eventInfo -> eventInfo.getTimeframe().isRepeat() == false)
                 .collect(Collectors.toList());
 
-        recurringEvents = scenarioStore.getEventInfoStore().getEventInfos().stream()
-                .filter(eventInfo -> eventInfo.getEventTimeframe().isRepeat() == true)
+        recurringEvents = scenarioStore.getStimulusInfoStore().getStimulusInfos().stream()
+                .filter(eventInfo -> eventInfo.getTimeframe().isRepeat() == true)
                 .collect(Collectors.toList());
 
-        oneTimeEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getEventTimeframe(), false));
-        recurringEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getEventTimeframe(), true));
+        oneTimeEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getTimeframe(), false));
+        recurringEvents.stream().forEach(eventInfo -> throwExceptionIfTimeframeIsInvalid(eventInfo.getTimeframe(), true));
     }
 
     // Getters
     public ScenarioStore getScenarioStore() {
         return scenarioStore;
     }
-    public List<EventInfo> getOneTimeEvents() { return oneTimeEvents; }
-    public List<EventInfo> getRecurringEvents() { return recurringEvents; }
+    public List<StimulusInfo> getOneTimeEvents() { return oneTimeEvents; }
+    public List<StimulusInfo> getRecurringEvents() { return recurringEvents; }
 
     // Setters
     public void setScenarioStore(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
-    public void setOneTimeEvents(List<EventInfo> oneTimeEvents) { this.oneTimeEvents = oneTimeEvents; }
-    public void setRecurringEvents(List<EventInfo> recurringEvents) { this.recurringEvents = recurringEvents; }
+    public void setOneTimeEvents(List<StimulusInfo> oneTimeEvents) { this.oneTimeEvents = oneTimeEvents; }
+    public void setRecurringEvents(List<StimulusInfo> recurringEvents) { this.recurringEvents = recurringEvents; }
 
     // Methods
-    public List<Event> getEventsForTime(double simulationTime) {
-        List<Event> events = new ArrayList<>();
+    public List<Stimulus> getEventsForTime(double simulationTime) {
+        List<Stimulus> stimuli = new ArrayList<>();
 
-        // Always, create an "ElapsedTimeEvent".
-        events.add(new ElapsedTimeEvent(simulationTime));
+        // Always, create an "ElapsedTime".
+        stimuli.add(new ElapsedTime(simulationTime));
 
-        List<Event> activeOneTimeEvents = getOneTimeEventsForSimulationTime(simulationTime);
-        List<Event> activeRecurringEvents = getRecurringEventsForSimulationTime(simulationTime);
+        List<Stimulus> activeOneTimeStimuli = getOneTimeEventsForSimulationTime(simulationTime);
+        List<Stimulus> activeRecurringStimuli = getRecurringEventsForSimulationTime(simulationTime);
 
         // Set timestamp for each active event.
-        activeOneTimeEvents.stream().forEach(event -> event.setTime(simulationTime));
-        activeRecurringEvents.stream().forEach((event -> event.setTime(simulationTime)));
+        activeOneTimeStimuli.stream().forEach(event -> event.setTime(simulationTime));
+        activeRecurringStimuli.stream().forEach((event -> event.setTime(simulationTime)));
 
-        events.addAll(activeOneTimeEvents);
-        events.addAll(activeRecurringEvents);
+        stimuli.addAll(activeOneTimeStimuli);
+        stimuli.addAll(activeRecurringStimuli);
 
-        return events;
+        return stimuli;
     }
 
-    private List<Event> getOneTimeEventsForSimulationTime(double simulationTime) {
-        List<Event> activeEvents = new ArrayList<>();
+    private List<Stimulus> getOneTimeEventsForSimulationTime(double simulationTime) {
+        List<Stimulus> activeStimuli = new ArrayList<>();
 
         oneTimeEvents.stream()
-                .filter(eventInfo -> oneTimeTimeframeIsActiveAtSimulationTime(eventInfo.getEventTimeframe(), simulationTime))
-                .forEach(eventInfo -> activeEvents.addAll(eventInfo.getEvents()));
+                .filter(eventInfo -> oneTimeTimeframeIsActiveAtSimulationTime(eventInfo.getTimeframe(), simulationTime))
+                .forEach(eventInfo -> activeStimuli.addAll(eventInfo.getStimuli()));
 
-        return activeEvents;
+        return activeStimuli;
     }
 
-    private List<Event> getRecurringEventsForSimulationTime(double simulationTime) {
-        List<Event> activeEvents = new ArrayList<>();
+    private List<Stimulus> getRecurringEventsForSimulationTime(double simulationTime) {
+        List<Stimulus> activeStimuli = new ArrayList<>();
 
         recurringEvents.stream()
-                .filter(eventInfo -> timeframeIsActiveAtSimulationTime(eventInfo.getEventTimeframe(), simulationTime))
-                .forEach(eventInfo -> activeEvents.addAll(eventInfo.getEvents()));
+                .filter(eventInfo -> timeframeIsActiveAtSimulationTime(eventInfo.getTimeframe(), simulationTime))
+                .forEach(eventInfo -> activeStimuli.addAll(eventInfo.getStimuli()));
 
-        return activeEvents;
+        return activeStimuli;
     }
 
     /**
@@ -101,7 +101,7 @@ public class EventController {
      *
      * @throws IllegalArgumentException If given timeframe is a recurring one.
      */
-    public static boolean oneTimeTimeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
+    public static boolean oneTimeTimeframeIsActiveAtSimulationTime(Timeframe timeframe, double simulationTime) {
         throwExceptionIfTimeframeIsInvalid(timeframe, false);
 
         boolean eventIsActive = (simulationTime >= timeframe.getStartTime() && simulationTime <= timeframe.getEndTime());
@@ -113,8 +113,8 @@ public class EventController {
      * Given a (recurring) "timeframe" and a "simulationTime" return if the
      * timeframe is "active" at that specific "simulationTime" or not.
      *
-     * An {@link EventTimeframe} contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
-     * an {@link Event}. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
+     * An {@link Timeframe} contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
+     * an {@link Stimulus}. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
      * the period length of an event:
      *
      *   period_length = (endTime - startTime) + waitTimeBetweenRepetition
@@ -139,7 +139,7 @@ public class EventController {
      *
      * @throws IllegalArgumentException If given timeframe is a one-time timeframe.
      */
-    public static boolean timeframeIsActiveAtSimulationTime(EventTimeframe timeframe, double simulationTime) {
+    public static boolean timeframeIsActiveAtSimulationTime(Timeframe timeframe, double simulationTime) {
         throwExceptionIfTimeframeIsInvalid(timeframe, true);
 
         double eventLength = timeframe.getEndTime() - timeframe.getStartTime();
@@ -160,13 +160,13 @@ public class EventController {
     /**
      * Throw {@link IllegalArgumentException} if startTime > endTime OR timeframe does not meet recurring expectation.
      */
-    private static void throwExceptionIfTimeframeIsInvalid(EventTimeframe timeframe, boolean expectRecurring) {
+    private static void throwExceptionIfTimeframeIsInvalid(Timeframe timeframe, boolean expectRecurring) {
         if (timeframe.getStartTime() > timeframe.getEndTime()) {
-            throw new IllegalArgumentException("EventTimeframe: startTime > endTime!");
+            throw new IllegalArgumentException("Timeframe: startTime > endTime!");
         }
 
         if (timeframe.isRepeat() != expectRecurring) {
-            throw new IllegalArgumentException(String.format("EventTimeframe: \"repeat=%b\" expected!", expectRecurring));
+            throw new IllegalArgumentException(String.format("Timeframe: \"repeat=%b\" expected!", expectRecurring));
         }
     }
 

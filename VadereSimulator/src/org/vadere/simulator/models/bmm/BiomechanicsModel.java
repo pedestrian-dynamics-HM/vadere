@@ -8,7 +8,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesBMM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.exceptions.UnsupportedEventException;
+import org.vadere.state.psychology.stimuli.exceptions.UnsupportedStimulusException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -93,7 +93,7 @@ public class BiomechanicsModel implements MainModel {
 
 		List<VPoint> positions = pedestriansBMM.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
 
-		UnsupportedEventException.throwIfNotElapsedTimeEvent(pedestriansBMM, this.getClass());
+		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestriansBMM, this.getClass());
 
 		for (PedestrianBMM agent : pedestriansBMM) {
 			agent.update(simTimeInSec, deltaTime);
