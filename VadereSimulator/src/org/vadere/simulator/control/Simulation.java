@@ -388,7 +388,7 @@ public class Simulation {
 
 		eventCognition.prioritizeEventsForPedestrians(stimuli, pedestrians);
 
-		if (attributesSimulation.isUseSalientBehavior()) {
+		if (attributesSimulation.isUsePsychologyLayer()) {
 			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
 		}
 

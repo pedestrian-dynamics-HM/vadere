@@ -22,7 +22,7 @@ public class AttributesSimulation extends Attributes {
 	private long fixedSeed = new Random().nextLong();
 	private long simulationSeed;
 	/** Allows agent to change their behavior (e.g. from TARGET_ORIENTIED to COOPERATIVE if it is too dense) */
-	private boolean useSalientBehavior = false;
+	private boolean usePsychologyLayer = false;
 
 	// Getter...
 
@@ -66,8 +66,8 @@ public class AttributesSimulation extends Attributes {
 		return simulationSeed;
 	}
 
-	public boolean isUseSalientBehavior() {
-		return useSalientBehavior;
+	public boolean isUsePsychologyLayer() {
+		return usePsychologyLayer;
 	}
 
 	// Setters...
@@ -123,8 +123,8 @@ public class AttributesSimulation extends Attributes {
 		this.simulationSeed = simulationSeed;
 	}
 
-	public void setUseSalientBehavior(boolean useSalientBehavior) {
-		this.useSalientBehavior = useSalientBehavior;
+	public void setUsePsychologyLayer(boolean usePsychologyLayer) {
+		this.usePsychologyLayer = usePsychologyLayer;
 	}
 
 	@Override
@@ -142,11 +142,11 @@ public class AttributesSimulation extends Attributes {
 				useFixedSeed == that.useFixedSeed &&
 				fixedSeed == that.fixedSeed &&
 				simulationSeed == that.simulationSeed &&
-				useSalientBehavior == that.useSalientBehavior;
+				usePsychologyLayer == that.usePsychologyLayer;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, useSalientBehavior);
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, usePsychologyLayer);
 	}
 }
