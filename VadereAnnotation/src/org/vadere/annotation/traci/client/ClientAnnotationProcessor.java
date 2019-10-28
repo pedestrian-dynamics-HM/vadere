@@ -141,7 +141,7 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 								.substring(traCIApi.singleAnnotation.lastIndexOf(".") + 1).trim();
 						if (anName.equals(singeAn)){
 							ApiHandler apiHandler = new ApiHandler(traCIApi, element, anMirror);
-							apiMapping.append(String.format("\t\tconsoleReader.addCommand(\"%s.%s\", \"\", this::%s_%s);\n", traCIApi.name.toLowerCase(), apiHandler.name, traCIApi.name.toLowerCase(), apiHandler.name));
+							apiMapping.append(String.format("\t\tconsoleReader.addCommand(\"%s.%s\", \"\", this::%s_%s);\n", traCIApi.nameShort.toLowerCase(), apiHandler.name, traCIApi.name.toLowerCase(), apiHandler.name));
 							apiAbstract.append(String.format("\t\tabstract public void %s_%s (String args[]) throws IOException;\n",traCIApi.name.toLowerCase(), apiHandler.name));
 							switch (apiHandler.apiType){
 								case "GET":
@@ -188,6 +188,7 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 
 	class TraCiApiWrapper {
 		String name;
+		String nameShort;
 		String singleAnnotation;
 		String multipleAnnotation;
 		String cmdEnum;
@@ -201,6 +202,8 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 
 
 			name = traCIApi.name();
+			nameShort = traCIApi.nameShort();
+			nameShort = nameShort.isEmpty() ? name : nameShort;
 			packageName = traCIApi.packageName();
 			imports = traCIApi.imports();
 			extendedClassName = traCIApi.extendedClassName();
