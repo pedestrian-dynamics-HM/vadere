@@ -152,8 +152,8 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.SPEED, name = "setVelocity", dataTypeStr = "Double")
 	public TraCICommand process_setVelocity(TraCISetCommand cmd, RemoteManager remoteManager) {
-		String tmp = (String) cmd.getVariableValue();
-		int data = Integer.parseInt(tmp);
+		String tmp = cmd.getVariableValue().toString();
+		Double data = Double.parseDouble(tmp);
 		remoteManager.accessState((manager, state) -> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementId()));
