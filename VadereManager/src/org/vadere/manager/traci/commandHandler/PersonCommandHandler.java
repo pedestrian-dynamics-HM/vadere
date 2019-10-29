@@ -113,7 +113,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// TODO: return the next free ID not used within the simulation. Hint: look at Topograpy.getNextDynamicElementId()
+	// TODO: check wheter it is necessary to avoid the upcount on each call.
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
 	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
 		remoteManager.accessState((manager, state) -> {
@@ -150,13 +150,20 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// todo setVelocity (this will  setFreeFlowSpeed)
-	// HINT: look in class ByteArrayOutputStreamTraCIWriter at the switch statement in line 50 to select the correct dataTypeStr
-	// HINT: Be careful when copy-paste! TraCI>>Set<<Command != TraCI>>Get<<Command in the process_XXXX commands
-//	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.TARGET_LIST, name = "setTargetList", dataTypeStr = "Double")
-//	public TraCICommand process_setTargetList(TraCISetCommand cmd, RemoteManager remoteManager) {
-//		// implement me..
-//	}
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.SPEED, name = "setVelocity", dataTypeStr = "Double")
+	public TraCICommand process_setVelocity(TraCISetCommand cmd, RemoteManager remoteManager) {
+		String tmp = (String) cmd.getVariableValue();
+		int data = Integer.parseInt(tmp);
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementId()));
+			if(checkIfPedestrianExists(ped, cmd)){
+				ped.setFreeFlowSpeed(data);
+				cmd.setOK();
+			}
+		});
+		return cmd;
+	}
 
 	// todo setPosition
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D, name = "getPosition2D")

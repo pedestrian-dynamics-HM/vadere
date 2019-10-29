@@ -226,12 +226,39 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void personapi_getIDCount(String[] args) throws IOException {
-
+		TraCIGetResponse res = personapi.getIDCount();
+		System.out.println(res.getResponseData());
 	}
 
 	@Override
 	public void personapi_getSpeed(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+		String elementIdentifier = args[1];
 
+		try {
+			TraCIGetResponse res = personapi.getSpeed(elementIdentifier);
+			double p = (double) res.getResponseData();
+			System.out.println(p);
+		} catch (ClassCastException e){
+			System.out.println("Maybe the id is invalid. See getIDList for valid ids.");
+			return;
+		}
+	}
+
+	@Override
+	public void personapi_setVelocity(String[] args) throws IOException {
+		if(args.length < 3) {
+			System.out.println("command needs argument id, velocity");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double velocity = Double.parseDouble(args[2]);
+		TraCIResponse res = personapi.setVelocity(elementIdentifier, velocity);
+		System.out.println(res.toString());
 	}
 
 	@Override
