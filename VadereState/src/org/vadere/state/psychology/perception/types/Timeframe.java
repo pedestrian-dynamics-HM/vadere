@@ -1,4 +1,4 @@
-package org.vadere.state.psychology.stimuli.types;
+package org.vadere.state.psychology.perception.types;
 
 /**
  * A timeframe in which one ore more stimuli can occur.

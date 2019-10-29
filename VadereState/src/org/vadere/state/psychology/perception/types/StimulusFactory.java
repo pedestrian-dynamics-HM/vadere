@@ -1,4 +1,4 @@
-package org.vadere.state.psychology.stimuli.types;
+package org.vadere.state.psychology.perception.types;
 
 import org.jetbrains.annotations.NotNull;
 

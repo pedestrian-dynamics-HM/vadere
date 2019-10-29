@@ -1,9 +1,6 @@
-package org.vadere.state.psychology.stimuli.types;
+package org.vadere.state.psychology.perception.types;
 
-import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VShape;
-
-import java.util.List;
 
 /**
  * This event hold as additional information: an area in which the event is valid.

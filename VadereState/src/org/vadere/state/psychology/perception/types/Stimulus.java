@@ -1,4 +1,4 @@
-package org.vadere.state.psychology.stimuli.types;
+package org.vadere.state.psychology.perception.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;

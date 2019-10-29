@@ -1,8 +1,4 @@
-package org.vadere.state.psychology.stimuli.types;
-
-import org.vadere.state.scenario.ScenarioElement;
-
-import java.util.List;
+package org.vadere.state.psychology.perception.types;
 
 /**
  * Class signals agents a bang - for instance something exploded.

@@ -1,9 +1,6 @@
-package org.vadere.state.psychology.stimuli.types;
-
-import org.vadere.state.scenario.ScenarioElement;
+package org.vadere.state.psychology.perception.types;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Class signals agents to change their targets.

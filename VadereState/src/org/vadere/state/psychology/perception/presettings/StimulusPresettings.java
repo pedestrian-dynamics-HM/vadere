@@ -1,9 +1,9 @@
-package org.vadere.state.psychology.stimuli.presettings;
+package org.vadere.state.psychology.perception.presettings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.psychology.stimuli.json.StimulusInfo;
-import org.vadere.state.psychology.stimuli.json.StimulusInfoStore;
-import org.vadere.state.psychology.stimuli.types.*;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
+import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VRectangle;
 

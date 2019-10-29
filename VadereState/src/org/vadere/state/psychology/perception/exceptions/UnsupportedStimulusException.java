@@ -1,8 +1,8 @@
-package org.vadere.state.psychology.stimuli.exceptions;
+package org.vadere.state.psychology.perception.exceptions;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.psychology.stimuli.types.ElapsedTime;
-import org.vadere.state.psychology.stimuli.types.Stimulus;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;

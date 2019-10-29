@@ -2,7 +2,7 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.behavior.SalientBehavior;
-import org.vadere.state.psychology.stimuli.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;

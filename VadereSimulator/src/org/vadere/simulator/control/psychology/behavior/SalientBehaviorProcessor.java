@@ -1,6 +1,7 @@
-package org.vadere.simulator.control.cognition;
+package org.vadere.simulator.control.psychology.behavior;
 
-import org.vadere.state.psychology.stimuli.types.Bang;
+import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
+import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.behavior.SalientBehavior;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -9,19 +10,19 @@ import org.vadere.state.simulation.FootstepHistory;
 import java.util.Collection;
 
 /**
- * The SalientBehaviorCognition class should provide logic to change the salient behavior of a pedestrian
+ * The SalientBehaviorProcessor class should provide logic to change the salient behavior of a pedestrian
  * (e.g., change to cooperative behavior when no movement is possible for n steps).
  *
- * Watch out: The {@link EventCognition} should be finished before using methods in this class because, usually,
+ * Watch out: The {@link StimulusProcessor} should be finished before using methods in this class because, usually,
  * first an event occurs and then pedestrians decide about their behavior. E.g., first a {@link Bang} occurs
  * and then a pedestrian decides to follow a {@link SalientBehavior#COOPERATIVE} behavior.
  */
-public class SalientBehaviorCognition {
+public class SalientBehaviorProcessor {
 
     /** The salient behavior depends also on the surrounding environment. */
     private Topography topography;
 
-    public SalientBehaviorCognition(Topography topography) {
+    public SalientBehaviorProcessor(Topography topography) {
         this.topography = topography;
     }
 

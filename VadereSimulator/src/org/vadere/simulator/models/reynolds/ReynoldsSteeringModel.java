@@ -13,7 +13,7 @@ import org.vadere.simulator.models.reynolds.behaviour.Wander;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.stimuli.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;

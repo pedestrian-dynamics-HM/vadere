@@ -1,8 +1,8 @@
-package org.vadere.state.psychology.stimuli.json;
+package org.vadere.state.psychology.perception.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.psychology.stimuli.types.*;
+import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VRectangle;
 

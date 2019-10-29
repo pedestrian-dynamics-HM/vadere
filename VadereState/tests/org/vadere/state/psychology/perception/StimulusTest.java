@@ -1,10 +1,10 @@
-package org.vadere.state.psychology.stimuli;
+package org.vadere.state.psychology.perception;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.state.psychology.stimuli.types.ElapsedTime;
-import org.vadere.state.psychology.stimuli.types.Stimulus;
-import org.vadere.state.psychology.stimuli.types.Wait;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
+import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Wait;
 
 import java.util.ArrayList;
 import java.util.List;

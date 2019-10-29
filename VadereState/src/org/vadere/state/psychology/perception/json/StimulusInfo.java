@@ -1,7 +1,7 @@
-package org.vadere.state.psychology.stimuli.json;
+package org.vadere.state.psychology.perception.json;
 
-import org.vadere.state.psychology.stimuli.types.Stimulus;
-import org.vadere.state.psychology.stimuli.types.Timeframe;
+import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Timeframe;
 
 import java.util.List;
 

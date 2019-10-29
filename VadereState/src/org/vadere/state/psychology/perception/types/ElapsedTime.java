@@ -1,8 +1,4 @@
-package org.vadere.state.psychology.stimuli.types;
-
-import org.vadere.state.scenario.ScenarioElement;
-
-import java.util.List;
+package org.vadere.state.psychology.perception.types;
 
 /**
  * Class representing an elapsed time step.
