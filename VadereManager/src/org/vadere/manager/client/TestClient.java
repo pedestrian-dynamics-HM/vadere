@@ -218,6 +218,12 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.getResponseData());
 	}
 
+    @Override
+    public void personapi_getNextFreeId(String[] args) throws IOException {
+		TraCIGetResponse res = personapi.getNextFreeId();
+		System.out.println(res.getResponseData());
+    }
+
 	@Override
 	public void personapi_getIDCount(String[] args) throws IOException {
 
@@ -322,8 +328,4 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
-//	@Override
-	public void personapi_getNextFreeId(String[] args) throws IOException {
-
-	}
 }
