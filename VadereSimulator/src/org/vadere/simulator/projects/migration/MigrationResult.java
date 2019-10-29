@@ -1,8 +1,11 @@
 package org.vadere.simulator.projects.migration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MigrationResult {
+
 	public int total;
 	public int upToDate;
 	public int legacy;
@@ -53,11 +56,15 @@ public class MigrationResult {
 
 	@Override
 	public String toString() {
-		return "MigrationResult{" +
-				"total=" + total +
-				", upToDate=" + upToDate +
-				", legacy=" + legacy +
-				", notmigratable=" + notmigratable +
-				'}';
+		List<String> resultArray = new ArrayList<>();
+
+		String resultLineTemplate = "%s: %d";
+		resultArray.add(String.format(resultLineTemplate, "analyzed", total));
+		resultArray.add(String.format(resultLineTemplate, "migrated", legacy));
+		resultArray.add(String.format(resultLineTemplate, "upToDate", upToDate));
+		resultArray.add(String.format(resultLineTemplate, "notMigratable", notmigratable));
+
+		return String.join(", ", resultArray);
 	}
+
 }
