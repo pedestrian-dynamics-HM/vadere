@@ -11,6 +11,8 @@ import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -113,7 +115,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// TODO: check wheter it is necessary to avoid the upcount on each call.
+	// todo check wheter it is necessary to avoid the upcount on each call.
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
 	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
 		remoteManager.accessState((manager, state) -> {
@@ -165,7 +167,6 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// todo setPosition
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D, name = "getPosition2D")
 	public TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager){
 
@@ -185,7 +186,21 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// todo setPosition
+	// todo talk about restriction to subset of points without collisions
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.POS_2D, name = "setPosition2D", dataTypeStr = "VPoint")
+	public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager) {
+		VPoint data = (VPoint) cmd.getVariableValue();
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementId()));
+			if(checkIfPedestrianExists(ped, cmd)){
+				ped.setPosition(data);
+				cmd.setOK();
+			}
+		});
+		return cmd;
+	}
+
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_3D, name = "getPosition3D")
 	public TraCICommand process_getPosition3D(TraCIGetCommand cmd, RemoteManager remoteManager){
 
@@ -306,11 +321,18 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		Integer id =  Integer.parseInt(cmd.getElementId());
 
 		remoteManager.accessState((manager, state) -> {
-			// todo get dynamicElementFactory for given model...
-			// todo check existing id's
-//			state.getMainModel().get().getSourceControllerFactory().
-
-			cmd.setOK();
+			List<String> idList = state.getTopography().getTargets()
+					.stream()
+					.map(i -> Integer.toString(i.getId()))
+					.collect(Collectors.toList());
+			if(idList.contains(id)) {
+				cmd.setErr("id is not free");
+			} else {
+				// todo instantiate new ped
+				Pedestrian ped = null; // dummy
+				state.getTopography().getPedestrianDynamicElements().addElement(ped);
+				cmd.setOK();
+			}
 		});
 
 		return cmd;

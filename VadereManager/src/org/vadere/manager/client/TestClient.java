@@ -274,6 +274,21 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void personapi_setPosition2D(String[] args) throws IOException {
+		if(args.length < 4) {
+			System.out.println("command needs arguments id, x, y");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double x = Double.parseDouble(args[2]);
+		double y = Double.parseDouble(args[3]);
+		VPoint p = new VPoint(x, y);
+		TraCIResponse res = personapi.setPosition2D(elementIdentifier, p);
+		System.out.println(res.toString());
+	}
+
+	@Override
 	public void personapi_getPosition3D(String[] args) throws IOException {
 
 	}
@@ -338,20 +353,17 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
-		if(args.length < 5){
+		if(args.length < 4){
 			System.out.println("command needs argument element id, x-coordinate, y-coordinate");
 			return;
 		}
 
 		String elementIdentifier = args[1];
-		String x = args[2];
-		String y = args[3];
-//		ArrayList<String> targets = new ArrayList<>();
-//		for (int i = 4; i < args.length; i++){
-//			targets.add(args[i]);
-//		}
+		double x = Double.parseDouble(args[2]);
+		double y = Double.parseDouble(args[3]);
+		VPoint p = new VPoint(x, y);
 
-		TraCIResponse res =  personapi.createNew(elementIdentifier, new VPoint(Double.parseDouble(x), Double.parseDouble(y)));
+		TraCIResponse res =  personapi.createNew(elementIdentifier, p);
 		System.out.println(res.toString());
 	}
 
