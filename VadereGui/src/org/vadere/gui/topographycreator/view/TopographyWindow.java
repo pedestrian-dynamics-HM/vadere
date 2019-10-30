@@ -81,9 +81,10 @@ public class TopographyWindow extends JPanel {
 
 		toolbar = new ScenarioToolBar("Toolbar");
 		int toolbarSize = VadereConfig.getConfig().getInt("Gui.toolbar.size");
-		toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
-		toolbar.setBorderPainted(false);
-		toolbar.setFloatable(false);
+		Dimension prefSize = new Dimension(toolbarSize, toolbarSize);
+		//toolbar.setPreferredSize(prefSize);
+		toolbar.setBorderPainted(true);
+		toolbar.setFloatable(true);
 		toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		toolbar.setAlignmentY(Component.TOP_ALIGNMENT);
 
