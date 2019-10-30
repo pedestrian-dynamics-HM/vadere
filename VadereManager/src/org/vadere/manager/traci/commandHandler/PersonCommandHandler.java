@@ -11,8 +11,13 @@ import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.models.AgentFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesBuilder;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -318,19 +323,35 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, name = "createNew", dataTypeStr = "VPoint")
 	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
 		VPoint tmp = (VPoint) cmd.getVariableValue();
-		Integer id =  Integer.parseInt(cmd.getElementId());
+		String id =  cmd.getElementId();
 
 		remoteManager.accessState((manager, state) -> {
-			List<String> idList = state.getTopography().getTargets()
+			List<String> idList = state.getTopography().getPedestrianDynamicElements()
+					.getElements()
 					.stream()
-					.map(i -> Integer.toString(i.getId()))
+					.map(p -> Integer.toString(p.getId()))
 					.collect(Collectors.toList());
-			if(idList.contains(id)) {
+			if(idList.contains(id)){
+				// call it a failure
 				cmd.setErr("id is not free");
 			} else {
-				// todo instantiate new ped
-				Pedestrian ped = null; // dummy
+
+				// Assume all peds have the same underlying model
+				// Clone one of the pedestrians
+				Pedestrian oldPed = state.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(idList.get(0)));
+				Pedestrian ped = oldPed.clone();
+
+				// Change the clones id
+				Attributes attributes = new AttributesAgent(ped.getAttributes(), Integer.parseInt(id));
+				ped.setAttributes(attributes);
+
+				// Adapt the clones targets and position
+				ped.setTargets(new LinkedList<Integer>());
+				ped.setPosition(tmp);
+
+				// add the new ped to the topography
 				state.getTopography().getPedestrianDynamicElements().addElement(ped);
+
 				cmd.setOK();
 			}
 		});
