@@ -180,11 +180,12 @@
         "id" : 0,
         "absorbing" : true,
         "shape" : {
-          "x" : 18.3,
-          "y" : 6.8,
-          "width" : 2.9,
-          "height" : 1.5,
-          "type" : "RECTANGLE"
+          "radius" : 1,
+          "center" : {
+            "x" : 20.0,
+            "y" : 8.0
+          },
+          "type" : "CIRCLE"
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
