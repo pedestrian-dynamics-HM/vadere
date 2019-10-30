@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * For instance:
  * <pre>
  *     ...
- *     if (mostImportantEvent instanceof Wait) {
+ *     if (mostImportantStimulus instanceof Wait) {
  *         osmBehaviorController.wait()
  *     }
  * 	   ...

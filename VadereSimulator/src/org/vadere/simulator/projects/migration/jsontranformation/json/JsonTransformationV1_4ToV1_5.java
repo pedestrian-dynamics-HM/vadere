@@ -39,9 +39,11 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  *       } ]
  * </pre>
  *
- * Firstly, rename children nodes. Then, rename top-level "eventInfos" node.
+ * Firstly, rename child nodes. Then, rename top-level "eventInfos" node.
  *
- * Also, rename "useSalientBehavior" to "usePsychologyLayer" under
+ * Also, rename
+ * - "useSalientBehavior" to "usePsychologyLayer" under "attributesSimulation" node
+ * - "FootStepMostImportantEventProcessor" to "FootStepMostImportantStimulusProcessor"
  */
 @MigrationTransformation(targetVersionLabel = "1.5")
 public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
@@ -63,10 +65,10 @@ public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
 		renameEventInfosToStimulusInfos(node);
 		renameMostImportantEventInDynamicElements(node);
 		renameUseSalientBehavior(node);
+		renameOutputProcessorMostImportantEvent(node);
 
 		return node;
 	}
-
 
 	private void renameTimeframes(JsonNode node) throws MigrationException {
 		String oldName = "eventTimeframe";
@@ -163,6 +165,25 @@ public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
 
 			if (!useSalientBehaviorNode.isMissingNode()) {
 				renameField((ObjectNode)attributesSimulationNode, oldName, newName);
+			}
+		}
+	}
+
+	private void renameOutputProcessorMostImportantEvent(JsonNode node) throws MigrationException {
+		String oldName = "FootStepMostImportantEventProcessor";
+		String newName = "FootStepMostImportantStimulusProcessor";
+
+		JsonNode processorsNode = path(node, "processWriters/processors");
+
+		if (processorsNode.isArray()) {
+			for (JsonNode processorNode : processorsNode) {
+				String key = "type";
+				String processorName = processorNode.get(key).asText("");
+
+				if (processorName.contains(oldName)) {
+					String newProcessorName = processorName.replace(oldName, newName);
+					changeStringValue(processorNode, key, newProcessorName);
+				}
 			}
 		}
 	}

@@ -10,13 +10,15 @@ import org.vadere.state.simulation.VTrajectory;
 import java.util.Collection;
 
 /**
- * Save most important event of a pedestrian in each time step in an own column.
+ * Save most important stimulus of a pedestrian in each time step in an own column.
  */
 @DataProcessorClass()
-public class FootStepMostImportantEventProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
+public class FootStepMostImportantStimulusProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
 
-	public FootStepMostImportantEventProcessor() {
-		super("mostImportantEvent");
+	public static String HEADER = "mostImportantStimulus";
+
+	public FootStepMostImportantStimulusProcessor() {
+		super(HEADER);
 	}
 
 	@Override
@@ -25,9 +27,9 @@ public class FootStepMostImportantEventProcessor extends DataProcessor<Eventtime
 
 		for(Pedestrian p : pedestrians){
 			VTrajectory traj = p.getTrajectory();
-			String mostImportantEvent = p.getMostImportantStimulus().toStringForOutputProcessor();
+			String mostImportantStimulus = p.getMostImportantStimulus().toStringForOutputProcessor();
 			for(FootStep fs : traj.getFootSteps()){
-				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), mostImportantEvent);
+				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), mostImportantStimulus);
 			}
 		}
 	}

@@ -20,7 +20,7 @@ public final class ColumnNames {
 	private Set<String> groupSizeKeys;
 	private Set<String> startTimeKeys;
 	private Set<String> endTimeKeys;
-	private Set<String> mostImportantEventKeys;
+	private Set<String> mostImportantStimulusKeys;
 	private Set<String> salientBehaviorKeys;
 	private List<Set<String>> keys;
 
@@ -45,7 +45,7 @@ public final class ColumnNames {
 		targetIdKeys = new HashSet<>();
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
-		mostImportantEventKeys = new HashSet<>();
+		mostImportantStimulusKeys = new HashSet<>();
 		salientBehaviorKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
@@ -67,7 +67,7 @@ public final class ColumnNames {
 		targetIdKeys.add("targetId");
 		groupIdKeys.add("groupId");
 		groupSizeKeys.add("groupSize");
-		mostImportantEventKeys.add("mostImportantEvent");
+		mostImportantStimulusKeys.add("mostImportantStimulus");
 		salientBehaviorKeys.add("salientBehavior");
 
 		keys.add(pedestrianIdKeys);
@@ -78,7 +78,7 @@ public final class ColumnNames {
 		keys.add(targetIdKeys);
 		keys.add(groupIdKeys);
 		keys.add(groupSizeKeys);
-		keys.add(mostImportantEventKeys);
+		keys.add(mostImportantStimulusKeys);
 		keys.add(salientBehaviorKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
@@ -89,7 +89,7 @@ public final class ColumnNames {
 	}
 
 	public int getMostImportantEventCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, mostImportantEventKeys);
+		return getColId(dataFrame, mostImportantStimulusKeys);
 	}
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {

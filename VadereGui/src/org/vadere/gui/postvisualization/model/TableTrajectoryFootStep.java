@@ -54,7 +54,7 @@ public class TableTrajectoryFootStep {
 	public final int groupIdCol;
 	public final int groupSizeCol;
 
-	private final int mostImportantEventCol;
+	private final int mostImportantStimulusCol;
 	private final int salientBehaviorCol;
 
 	public static final int agentDFPedIdCol = 0;
@@ -84,7 +84,7 @@ public class TableTrajectoryFootStep {
 		targetIdCol = columnNames.getTargetIdCol(dataFrame);
 		groupIdCol = columnNames.getGroupIdCol(dataFrame);
 		groupSizeCol = columnNames.getGroupSizeCol(dataFrame);
-		mostImportantEventCol = columnNames.getMostImportantEventCol(dataFrame);
+		mostImportantStimulusCol = columnNames.getMostImportantEventCol(dataFrame);
 		salientBehaviorCol = columnNames.getSalientBehaviorCol(dataFrame);
 
 
@@ -137,14 +137,14 @@ public class TableTrajectoryFootStep {
 			pedestrian.getGroupSizes().add(groupSize);
 		}
 
-		if(mostImportantEventCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			String mostImportantEventClassName = row.getString(mostImportantEventCol);
-			Stimulus stimulus = StimulusFactory.stringToStimulus(mostImportantEventClassName);
+		if(mostImportantStimulusCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			String mostImportantStimulusClassName = row.getString(mostImportantStimulusCol);
+			Stimulus stimulus = StimulusFactory.stringToStimulus(mostImportantStimulusClassName);
 			pedestrian.setMostImportantStimulus(stimulus);
 		}
 
 		if(salientBehaviorCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			String salientBehaviorEnumName = row.getString(mostImportantEventCol);
+			String salientBehaviorEnumName = row.getString(mostImportantStimulusCol);
 			SalientBehavior salientBehavior = SalientBehavior.valueOf(salientBehaviorEnumName);
 			pedestrian.setSalientBehavior(salientBehavior);
 		}
