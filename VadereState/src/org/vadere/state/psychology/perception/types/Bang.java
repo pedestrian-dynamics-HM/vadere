@@ -10,6 +10,7 @@ public class Bang extends Stimulus {
 
     // Member Variables
     private int originAsTargetId = -1;
+    private double loudness = 1;
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
@@ -27,8 +28,10 @@ public class Bang extends Stimulus {
 
     // Getter
     public int getOriginAsTargetId() { return originAsTargetId; }
+    public double getLoudness() { return loudness; }
 
     // Setter
     public void setOriginAsTargetId(int originAsTargetId) { this.originAsTargetId = originAsTargetId; }
+    public void setLoudness(double loudness) { this.loudness = loudness; }
 
 }
