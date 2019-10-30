@@ -1,5 +1,5 @@
 {
-  "name" : "05_wait_in_area_event_bhm",
+  "name" : "05-WaitInArea-BHM",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {

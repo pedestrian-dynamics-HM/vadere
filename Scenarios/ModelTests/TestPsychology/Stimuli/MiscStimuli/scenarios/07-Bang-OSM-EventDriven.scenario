@@ -1,5 +1,5 @@
 {
-  "name" : "06_bang_event_osm_sequential",
+  "name" : "07-Bang-OSM-EventDriven",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {

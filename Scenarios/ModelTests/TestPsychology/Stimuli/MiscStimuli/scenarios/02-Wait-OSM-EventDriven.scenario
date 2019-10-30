@@ -1,5 +1,5 @@
 {
-  "name" : "02_wait_event_osm_event_driven",
+  "name" : "02-Wait-OSM-EventDriven",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {

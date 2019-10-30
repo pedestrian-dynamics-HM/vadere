@@ -1,5 +1,5 @@
 {
-  "name" : "03_bang_event_multiple_agents",
+  "name" : "01-UnsupportedEventException-IfUnsupportedLocomotionModelsSelected",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {
@@ -53,7 +53,7 @@
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
-        "updateType" : "SEQUENTIAL",
+        "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -153,123 +153,6 @@
         },
         "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.6,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 3.1
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.5,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 2.2
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.4,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.2,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 19.1,
-          "y" : 1.4
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.5,
         "attributes" : {
           "id" : -1,
           "radius" : 0.2,

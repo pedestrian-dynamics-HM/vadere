@@ -1,5 +1,5 @@
 {
-  "name" : "03_wait_event_recurring_osm_sequential",
+  "name" : "04-WaitInArea-OSM-Sequential",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {
@@ -115,7 +115,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 150.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -238,14 +238,21 @@
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
-        "startTime" : 0.0,
-        "endTime" : 10.0,
-        "repeat" : true,
-        "waitTimeBetweenRepetition" : 10.0
+        "startTime" : 10.0,
+        "endTime" : 60.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
-        "type" : "WaitEvent",
-        "targets" : [ ]
+        "type" : "WaitInAreaEvent",
+        "targets" : [ ],
+        "area" : {
+          "x" : 15.0,
+          "y" : 0.0,
+          "width" : 6.0,
+          "height" : 8.0,
+          "type" : "RECTANGLE"
+        }
       } ]
     } ]
   }

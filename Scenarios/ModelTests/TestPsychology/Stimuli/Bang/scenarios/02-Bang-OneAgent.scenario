@@ -1,5 +1,5 @@
 {
-  "name" : "02_bang_event_one_agent",
+  "name" : "02-Bang-OneAgent",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {

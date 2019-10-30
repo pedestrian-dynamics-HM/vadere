@@ -1,5 +1,5 @@
 {
-  "name" : "04_wait_in_area_event_osm_sequential",
+  "name" : "06-Bang-OSM-Sequential",
   "description" : "",
   "release" : "1.4",
   "processWriters" : {
@@ -115,7 +115,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 100.0,
+      "finishTime" : 150.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -167,6 +167,23 @@
           "y" : 1.0,
           "width" : 2.5,
           "height" : 4.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 0,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 18.3,
+          "y" : 6.8,
+          "width" : 2.9,
+          "height" : 1.5,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -238,21 +255,15 @@
     },
     "eventInfos" : [ {
       "eventTimeframe" : {
-        "startTime" : 10.0,
-        "endTime" : 60.0,
+        "startTime" : 15.0,
+        "endTime" : 15.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "events" : [ {
-        "type" : "WaitInAreaEvent",
+        "type" : "BangEvent",
         "targets" : [ ],
-        "area" : {
-          "x" : 15.0,
-          "y" : 0.0,
-          "width" : 6.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
+        "originAsTargetId" : 0
       } ]
     } ]
   }
