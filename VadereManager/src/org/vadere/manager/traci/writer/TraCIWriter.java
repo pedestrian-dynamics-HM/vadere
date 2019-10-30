@@ -27,6 +27,7 @@ public interface TraCIWriter {
 	TraCIWriter writeDoubleWithId(double val);
 	TraCIWriter writeStringWithId(String val);
 	TraCIWriter writeStringListWithId(List<String> val);
+	TraCIWriter write2DPositionListWithId(List<VPoint> val); // new
 
 	TraCIWriter writeByte(int val);
 
@@ -67,6 +68,8 @@ public interface TraCIWriter {
 	TraCIWriter writeStringList(List<String> val);
 
 	TraCIWriter write2DPosition(VPoint val);
+
+	TraCIWriter write2DPositionList(List<VPoint> val); // new
 
 	TraCIWriter write3DPosition(Vector3D val);
 

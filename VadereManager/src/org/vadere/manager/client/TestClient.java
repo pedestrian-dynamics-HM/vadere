@@ -294,6 +294,14 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void personapi_getPosition2DList(String[] args) throws IOException {
+		TraCIGetResponse res = personapi.getPosition2DList();
+		int a = 1;
+//		TraCIResponse res.getResponseData();
+//		System.out.println(p.toString());
+	}
+
+	@Override
 	public void personapi_getLength(String[] args) throws IOException {
 
 	}
@@ -349,7 +357,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	// todo implement new methods from AbstractTestClient....
-
 
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {

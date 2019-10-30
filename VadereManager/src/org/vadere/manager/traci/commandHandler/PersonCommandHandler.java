@@ -193,7 +193,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 
 	// todo talk about restriction to subset of points without collisions
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.POS_2D, name = "setPosition2D", dataTypeStr = "VPoint")
-	public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager) {
+	public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager){
 		VPoint data = (VPoint) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
@@ -225,6 +225,21 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D_LIST, name = "getPosition2DList", ignoreElementId = true)
+	public TraCICommand process_getPosition2DList(TraCIGetCommand cmd, RemoteManager remoteManager) {
+		remoteManager.accessState((manager, state) -> {
+			List<VPoint> data = state.getTopography().getPedestrianDynamicElements()
+					.getElements()
+					.stream()
+					.map(p -> p.getPosition())
+					.collect(Collectors.toList());
+			TraCIGetResponse res = responseOK(PersonVar.POS_2D_LIST.type, data);
+			cmd.setResponse(res);
+			logger.debugf("time: %f ID's: %s", state.getSimTimeInSec(), Arrays.toString(data.toArray(VPoint[]::new)));
+		});
+
+		return cmd;
+	}
 
 	@PersonHandler( cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.LENGTH, name = "getLength")
 	public TraCICommand process_getLength(TraCIGetCommand cmd, RemoteManager remoteManager){

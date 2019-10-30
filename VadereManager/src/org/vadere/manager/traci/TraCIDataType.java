@@ -14,6 +14,7 @@ public enum TraCIDataType {
 	STRING_LIST(0x0E,-1,true),
 	COMPOUND_OBJECT(0x0F,-1,true),
 	POS_2D(0x01,17,false),
+	POS_2D_LIST(0x10, -1, false), // new
 	POS_3D(0x03,25,false),
 	POS_ROAD_MAP(0x04, -1,false),
 	POS_LON_LAT(0x00,17,false),
