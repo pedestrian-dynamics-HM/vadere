@@ -84,11 +84,11 @@ public final class ColumnNames {
 		keys.add(endTimeKeys);
 	}
 
-	public int getSalientBehaviorCol(@NotNull final Table dataFrame) {
+	public int getSocialCategoryCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, socialCategoryKeys);
 	}
 
-	public int getMostImportantEventCol(@NotNull final Table dataFrame) {
+	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, mostImportantStimulusKeys);
 	}
 

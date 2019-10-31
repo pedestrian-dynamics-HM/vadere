@@ -7,6 +7,9 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.cognition.SocialCategory;
+import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -222,6 +225,16 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 		if(trajectories.groupSizeCol != -1) {
 			pedestrian.getGroupSizes().addLast(row.getInt(trajectories.groupSizeCol));
+		}
+
+		if(trajectories.mostImportantStimulusCol != -1) {
+			String mostImportantStimulusString = row.getString(trajectories.mostImportantStimulusCol);
+			pedestrian.setMostImportantStimulus(StimulusFactory.stringToStimulus(mostImportantStimulusString));
+		}
+
+		if(trajectories.socialCategoryCol != -1) {
+			String socialCategoryString = row.getString(trajectories.socialCategoryCol);
+			pedestrian.setSocialCategory(SocialCategory.valueOf(socialCategoryString));
 		}
 
 		return pedestrian;
