@@ -1,7 +1,7 @@
 package org.vadere.simulator.control;
 
 import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
-import org.vadere.simulator.control.psychology.behavior.SalientBehaviorProcessor;
+import org.vadere.simulator.control.psychology.cognition.SocialCategoryProcessor;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -80,7 +80,7 @@ public class Simulation {
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
 	private final StimulusProcessor stimulusProcessor;
-	private final SalientBehaviorProcessor salientBehaviorProcessor;
+	private final SocialCategoryProcessor socialCategoryProcessor;
 	private final ScenarioCache scenarioCache;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
@@ -118,7 +118,7 @@ public class Simulation {
 		// "stimulusController" is final. Therefore, create object here and not in helper method.
 		this.stimulusController = new StimulusController(scenarioStore);
 		this.stimulusProcessor = new StimulusProcessor();
-		this.salientBehaviorProcessor = new SalientBehaviorProcessor(topography);
+		this.socialCategoryProcessor = new SocialCategoryProcessor(topography);
 
 		createControllers(topography, mainModel, random);
 
@@ -390,7 +390,7 @@ public class Simulation {
 		stimulusProcessor.prioritizeStimuliForPedestrians(stimuli, pedestrians);
 
 		if (attributesSimulation.isUsePsychologyLayer()) {
-			salientBehaviorProcessor.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
+			socialCategoryProcessor.setSocialCategoryOfPedestrian(pedestrians, simTimeInSec);
 		}
 
 		for (Model m : models) {

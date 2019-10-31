@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.cognition.SocialCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
@@ -55,7 +55,7 @@ public class TableTrajectoryFootStep {
 	public final int groupSizeCol;
 
 	private final int mostImportantStimulusCol;
-	private final int salientBehaviorCol;
+	private final int socialCategoryCol;
 
 	public static final int agentDFPedIdCol = 0;
 	public static final int birthTimeCol = 1;
@@ -85,7 +85,7 @@ public class TableTrajectoryFootStep {
 		groupIdCol = columnNames.getGroupIdCol(dataFrame);
 		groupSizeCol = columnNames.getGroupSizeCol(dataFrame);
 		mostImportantStimulusCol = columnNames.getMostImportantEventCol(dataFrame);
-		salientBehaviorCol = columnNames.getSalientBehaviorCol(dataFrame);
+		socialCategoryCol = columnNames.getSalientBehaviorCol(dataFrame);
 
 
 		this.trajectoryDataFrame = dataFrame;
@@ -143,10 +143,10 @@ public class TableTrajectoryFootStep {
 			pedestrian.setMostImportantStimulus(stimulus);
 		}
 
-		if(salientBehaviorCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			String salientBehaviorEnumName = row.getString(mostImportantStimulusCol);
-			SalientBehavior salientBehavior = SalientBehavior.valueOf(salientBehaviorEnumName);
-			pedestrian.setSalientBehavior(salientBehavior);
+		if(socialCategoryCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			String socialCategoryEnumName = row.getString(socialCategoryCol);
+			SocialCategory socialCategory = SocialCategory.valueOf(socialCategoryEnumName);
+			pedestrian.setSocialCategory(socialCategory);
 		}
 
 		return pedestrian;

@@ -21,7 +21,7 @@ public final class ColumnNames {
 	private Set<String> startTimeKeys;
 	private Set<String> endTimeKeys;
 	private Set<String> mostImportantStimulusKeys;
-	private Set<String> salientBehaviorKeys;
+	private Set<String> socialCategoryKeys;
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -46,7 +46,7 @@ public final class ColumnNames {
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
 		mostImportantStimulusKeys = new HashSet<>();
-		salientBehaviorKeys = new HashSet<>();
+		socialCategoryKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 
@@ -68,7 +68,7 @@ public final class ColumnNames {
 		groupIdKeys.add("groupId");
 		groupSizeKeys.add("groupSize");
 		mostImportantStimulusKeys.add("mostImportantStimulus");
-		salientBehaviorKeys.add("salientBehavior");
+		socialCategoryKeys.add("socialCategory");
 
 		keys.add(pedestrianIdKeys);
 		keys.add(startX);
@@ -79,13 +79,13 @@ public final class ColumnNames {
 		keys.add(groupIdKeys);
 		keys.add(groupSizeKeys);
 		keys.add(mostImportantStimulusKeys);
-		keys.add(salientBehaviorKeys);
+		keys.add(socialCategoryKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
 	}
 
 	public int getSalientBehaviorCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, salientBehaviorKeys);
+		return getColId(dataFrame, socialCategoryKeys);
 	}
 
 	public int getMostImportantEventCol(@NotNull final Table dataFrame) {

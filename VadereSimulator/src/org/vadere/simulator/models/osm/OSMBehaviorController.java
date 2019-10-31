@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.cognition.SocialCategory;
 import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
@@ -133,7 +133,7 @@ public class OSMBehaviorController {
 	    if (closestPedestrians.size() > 0) {
 		    for (Pedestrian closestPedestrian : closestPedestrians) {
 		    	if(pedestrian.hasNextTarget()) {
-				    boolean closestPedIsCooperative = closestPedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE;
+				    boolean closestPedIsCooperative = closestPedestrian.getSocialCategory() == SocialCategory.COOPERATIVE;
 				    boolean targetOrientationDiffers = false;
 
 				    // TODO: Use "pedestrian.getTargetGradient()" instead of "calculateAngleBetweenTargets()".

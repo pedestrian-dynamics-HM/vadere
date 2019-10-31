@@ -3,7 +3,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.cognition.SocialCategory;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -55,9 +55,9 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		if (mostImportantStimulus instanceof ElapsedTime) {
 			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 			pedestrian.clearStrides();
-			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
+			if (pedestrian.getSocialCategory() == SocialCategory.TARGET_ORIENTED) {
 				useTimeCredit(pedestrian, timeStepInSec);
-			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
+			} else if (pedestrian.getSocialCategory() == SocialCategory.COOPERATIVE) {
 				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
 				if(candidate != null) {
 					candidate.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);

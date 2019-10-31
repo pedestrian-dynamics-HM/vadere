@@ -1,7 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.behavior.SalientBehavior;
+import org.vadere.state.psychology.cognition.SocialCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
@@ -25,7 +25,7 @@ public class Pedestrian extends Agent {
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 	private Stimulus mostImportantStimulus; /** Evaluated in each time step in "EventCognition". */
-	private SalientBehavior salientBehavior;
+	private SocialCategory socialCategory;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	/**
 	 * trajectory is a list of foot steps a pedestrian made during the duration of one time step.
@@ -59,7 +59,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		mostImportantStimulus = null;
-		salientBehavior = SalientBehavior.TARGET_ORIENTED;
+		socialCategory = SocialCategory.TARGET_ORIENTED;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -74,7 +74,7 @@ public class Pedestrian extends Agent {
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 		mostImportantStimulus = other.mostImportantStimulus;
-		salientBehavior = other.salientBehavior;
+		socialCategory = other.socialCategory;
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -100,7 +100,7 @@ public class Pedestrian extends Agent {
 		return isLikelyInjured;
 	}
 	public Stimulus getMostImportantStimulus() { return mostImportantStimulus; }
-	public SalientBehavior getSalientBehavior() { return salientBehavior; }
+	public SocialCategory getSocialCategory() { return socialCategory; }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -148,7 +148,7 @@ public class Pedestrian extends Agent {
 		this.isLikelyInjured = likelyInjured;
 	}
 	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { this.mostImportantStimulus = mostImportantStimulus; }
-	public void setSalientBehavior(SalientBehavior salientBehavior) { this.salientBehavior = salientBehavior; }
+	public void setSocialCategory(SocialCategory socialCategory) { this.socialCategory = socialCategory; }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}

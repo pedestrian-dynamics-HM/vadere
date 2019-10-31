@@ -44,6 +44,8 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  * Also, rename
  * - "useSalientBehavior" to "usePsychologyLayer" under "attributesSimulation" node
  * - "FootStepMostImportantEventProcessor" to "FootStepMostImportantStimulusProcessor"
+ * - "FootStepSalientBehaviorProcessor" to "FootStepSocialCategoryProcessor"
+ * - "salientBehavior" in "dynamicElements" node
  */
 @MigrationTransformation(targetVersionLabel = "1.5")
 public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
@@ -66,6 +68,8 @@ public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
 		renameMostImportantEventInDynamicElements(node);
 		renameUseSalientBehavior(node);
 		renameOutputProcessorMostImportantEvent(node);
+		renameOutputProcessorSalientBehavior(node);
+		renameSalientBehaviorInDynamicElements(node);
 
 		return node;
 	}
@@ -173,6 +177,17 @@ public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
 		String oldName = "FootStepMostImportantEventProcessor";
 		String newName = "FootStepMostImportantStimulusProcessor";
 
+		renameOutputProcessor(node, oldName, newName);
+	}
+
+	private void renameOutputProcessorSalientBehavior(JsonNode node) throws MigrationException {
+		String oldName = "FootStepSalientBehaviorProcessor";
+		String newName = "FootStepSocialCategoryProcessor";
+
+		renameOutputProcessor(node, oldName, newName);
+	}
+
+	private void renameOutputProcessor(JsonNode node, String oldName, String newName) throws MigrationException {
 		JsonNode processorsNode = path(node, "processWriters/processors");
 
 		if (processorsNode.isArray()) {
@@ -183,6 +198,23 @@ public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
 				if (processorName.contains(oldName)) {
 					String newProcessorName = processorName.replace(oldName, newName);
 					changeStringValue(processorNode, key, newProcessorName);
+				}
+			}
+		}
+	}
+
+	private void renameSalientBehaviorInDynamicElements(JsonNode node) throws MigrationException {
+		String oldName = "salientBehavior";
+		String newName = "socialCategory";
+
+		JsonNode dynamicElementsNode = path(node, "scenario/topography/dynamicElements");
+
+		if (dynamicElementsNode.isArray()) {
+			for (JsonNode dynamicElementNode : dynamicElementsNode) {
+				JsonNode salientBehaviorNode = path(dynamicElementNode, "salientBehavior");
+
+				if (!salientBehaviorNode.isMissingNode()) {
+					renameField((ObjectNode)dynamicElementNode, oldName, newName);
 				}
 			}
 		}

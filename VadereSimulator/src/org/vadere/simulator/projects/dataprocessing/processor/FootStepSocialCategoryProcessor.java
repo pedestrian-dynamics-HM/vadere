@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
@@ -11,13 +10,15 @@ import org.vadere.state.simulation.VTrajectory;
 import java.util.Collection;
 
 /**
- * Save salient behavior of a pedestrian in each time step in an own column.
+ * Save social category of a pedestrian in each time step in an own column.
  */
 @DataProcessorClass()
-public class FootStepSalientBehaviorProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
+public class FootStepSocialCategoryProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
 
-	public FootStepSalientBehaviorProcessor() {
-		super("salientBehavior");
+	public static String HEADER = "socialCategory";
+
+	public FootStepSocialCategoryProcessor() {
+		super(HEADER);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class FootStepSalientBehaviorProcessor extends DataProcessor<EventtimePed
 
 		for(Pedestrian p : pedestrians){
 			VTrajectory traj = p.getTrajectory();
-			String slaientBehavior = p.getSalientBehavior().toString();
+			String slaientBehavior = p.getSocialCategory().toString();
 			for(FootStep fs : traj.getFootSteps()){
 				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), slaientBehavior);
 			}
