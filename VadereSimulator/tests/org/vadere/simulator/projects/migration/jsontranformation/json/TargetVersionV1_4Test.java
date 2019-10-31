@@ -7,7 +7,7 @@ import org.vadere.simulator.projects.migration.jsontranformation.JsonTransformat
 
 import java.nio.file.Path;
 
-public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
+public class TargetVersionV1_4Test extends JsonTransformationTest {
 
 	@Override
 	public Path getTestDir() {
@@ -25,7 +25,7 @@ public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		JsonTransformationV1_3ToV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -43,7 +43,7 @@ public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		JsonTransformationV1_3ToV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -61,7 +61,7 @@ public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		JsonTransformationV1_3ToV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -86,7 +86,7 @@ public class JsonTransformationV1_3ToV1_4Test extends JsonTransformationTest {
 			}
 		}
 
-		JsonTransformationV1_3ToV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		// Assert that "attributes" node in "dynamicElements" is renamed here.

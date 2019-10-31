@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @MigrationTransformation(targetVersionLabel = "0.8")
-public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
+public class TargetVersionV0_8 extends SimpleJsonTransformation {
 
     ObjectMapper mapper;
 
-    public JsonTransformV7ToV8() {
+    public TargetVersionV0_8() {
         super(Version.V0_8);
         this.mapper = StateJsonConverter.getMapper();
     }
@@ -165,7 +165,7 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
         String jsonStr = r.lines().collect(Collectors.joining("\n"));
         ObjectMapper mapper = StateJsonConverter.getMapper();
         JsonNode jsonNode = StateJsonConverter.deserializeToNode(jsonStr);
-        JsonTransformV7ToV8 transformation = new JsonTransformV7ToV8();
+        TargetVersionV0_8 transformation = new TargetVersionV0_8();
 
         JsonNode newScenario = transformation.applyAll(jsonNode);
 

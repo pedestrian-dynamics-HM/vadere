@@ -9,13 +9,12 @@ import org.vadere.simulator.projects.migration.jsontranformation.JsonTransformat
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
-public class JsonTransformV7ToV8Test extends JsonTransformationTest {
+public class V07ToV08Test extends JsonTransformationTest {
 
 //    JsonNode jsonOld;
 //    JsonNode jsonNew;
@@ -39,7 +38,7 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
         String jsonStr = getTestFileAsString("typ1.scenario");
         JsonNode jsonOld = getJsonFromString(jsonStr);
         JsonNode jsonNew = getJsonFromString(jsonStr);
-        JsonTransformV7ToV8 transformation = factory.getJsonTransformV7ToV8();
+        TargetVersionV0_8 transformation = factory.getJsonTransformV7ToV8();
         jsonNew = transformation.applyMeasurementAreaType1(jsonNew);
 
         for (String type : processorTypes) {
@@ -67,7 +66,7 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
         String jsonStr = getTestFileAsString("typ2.scenario");
         JsonNode jsonOld = getJsonFromString(jsonStr);
         JsonNode jsonNew = getJsonFromString(jsonStr);
-        JsonTransformV7ToV8 transformation = factory.getJsonTransformV7ToV8();
+        TargetVersionV0_8 transformation = factory.getJsonTransformV7ToV8();
         jsonNew = transformation.applyMeasurementAreaType2(jsonNew);
 
         for (String type : processorTypes) {
@@ -100,7 +99,7 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
         String jsonStr = getTestFileAsString("typ4.scenario");
         JsonNode jsonOld = getJsonFromString(jsonStr);
         JsonNode jsonNew = getJsonFromString(jsonStr);
-        JsonTransformV7ToV8 transformation = factory.getJsonTransformV7ToV8();
+        TargetVersionV0_8 transformation = factory.getJsonTransformV7ToV8();
         jsonNew = transformation.applyMeasurementAreaType4(jsonNew);
 
         for (String type : processorTypes) {
@@ -127,7 +126,7 @@ public class JsonTransformV7ToV8Test extends JsonTransformationTest {
         String jsonStr = getTestFileAsString("typ4.scenario");
         JsonNode jsonOld = getJsonFromString(jsonStr);
         JsonNode jsonNew = getJsonFromString(jsonStr);
-        JsonTransformV7ToV8 transformation = factory.getJsonTransformV7ToV8();
+        TargetVersionV0_8 transformation = factory.getJsonTransformV7ToV8();
         jsonNew = transformation.applyMeasurementAreaType5(jsonNew);
 
         for (String type : processorTypes) {

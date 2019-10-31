@@ -48,9 +48,9 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  * - "salientBehavior" in "dynamicElements" node
  */
 @MigrationTransformation(targetVersionLabel = "1.5")
-public class JsonTransformationV1_4ToV1_5 extends SimpleJsonTransformation {
+public class TargetVersionV1_5 extends SimpleJsonTransformation {
 
-	public JsonTransformationV1_4ToV1_5(){
+	public TargetVersionV1_5(){
 		super(Version.V1_5);
 	}
 
