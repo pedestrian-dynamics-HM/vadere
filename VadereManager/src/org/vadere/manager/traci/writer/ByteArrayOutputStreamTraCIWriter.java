@@ -15,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
@@ -70,7 +71,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 				write2DPosition((VPoint) data);
 				break;
 			case POS_2D_LIST:										// new
-				write2DPositionListWithId((List<VPoint>) data);     // new
+				write2DPositionListWithId((Map<String, VPoint>) data);     // new
 				break;
 			case POS_3D:
 				write3DPosition((Vector3D) data);
@@ -196,17 +197,20 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		return this;
 	}
 
-	@Override	// new
-	public TraCIWriter write2DPositionListWithId(List<VPoint> data){
+	@Override
+	public TraCIWriter write2DPositionListWithId(Map<String, VPoint> data){
 		writeUnsignedByte(TraCIDataType.POS_2D_LIST.id);
 		write2DPositionList(data);
 		return this;
 	}
 
-	@Override	// new
-	public TraCIWriter write2DPositionList(List<VPoint> data){
-		writeInt(data.size());
-		data.forEach(this::write2DPosition);
+	@Override
+	public TraCIWriter write2DPositionList(Map<String, VPoint> data){
+		writeInt(data.entrySet().size());
+		data.entrySet().stream().forEach(p -> {
+			writeString(p.getKey());
+			write2DPosition(p.getValue());
+		});
 		return this;
 	}
 

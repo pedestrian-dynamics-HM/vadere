@@ -9,6 +9,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 public interface TraCIWriter {
 
@@ -27,7 +28,7 @@ public interface TraCIWriter {
 	TraCIWriter writeDoubleWithId(double val);
 	TraCIWriter writeStringWithId(String val);
 	TraCIWriter writeStringListWithId(List<String> val);
-	TraCIWriter write2DPositionListWithId(List<VPoint> val); // new
+	TraCIWriter write2DPositionListWithId(Map<String, VPoint> data); // new
 
 	TraCIWriter writeByte(int val);
 
@@ -69,7 +70,7 @@ public interface TraCIWriter {
 
 	TraCIWriter write2DPosition(VPoint val);
 
-	TraCIWriter write2DPositionList(List<VPoint> val); // new
+	TraCIWriter write2DPositionList(Map<String, VPoint> data); // new
 
 	TraCIWriter write3DPosition(Vector3D val);
 

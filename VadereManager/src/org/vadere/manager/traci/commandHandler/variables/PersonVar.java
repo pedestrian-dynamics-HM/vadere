@@ -13,8 +13,8 @@ public enum PersonVar {
 	COUNT(0x01, TraCIDataType.INTEGER), // get
 	NEXT_ID(0x02, TraCIDataType.INTEGER), // get
 	SPEED(0x40, TraCIDataType.DOUBLE), // get, set
-	POS_2D(0x42, TraCIDataType.POS_2D), // get, NEW: set
-	POS_2D_LIST(0xff, TraCIDataType.POS_2D_LIST), // get                // new
+	POS_2D(0x42, TraCIDataType.POS_2D), // get, set
+	POS_2D_LIST(0xff, TraCIDataType.POS_2D_LIST), // get
 	POS_3D(0x42, TraCIDataType.POS_3D), // get
 	ANGLE(0x43, TraCIDataType.DOUBLE), // get
 	SLOPE(0x36, TraCIDataType.DOUBLE), // get
@@ -29,7 +29,8 @@ public enum PersonVar {
 	NEXT_EDGE(0xc1, TraCIDataType.STRING), // get
 	REMAINING_STAGES(0xc2, TraCIDataType.INTEGER), // get
 	VEHICLE(0xc3, TraCIDataType.STRING), // get
-	ADD(0x80, TraCIDataType.COMPOUND_OBJECT),
+	ADD(0x80, TraCIDataType.POS_2D), // set todo: change back to TraCIDataType.COMPOUND_OBJECT
+//	ADD(0x80, TraCIDataType.COMPOUND_OBJECT),
 	APPEND_STAGE(0xc4, TraCIDataType.COMPOUND_OBJECT), // set
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
 	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set

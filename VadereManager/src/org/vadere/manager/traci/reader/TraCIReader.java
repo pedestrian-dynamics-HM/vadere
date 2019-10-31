@@ -10,6 +10,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -43,6 +44,8 @@ public interface TraCIReader {
 	List<String> readStringList();
 
 	VPoint read2DPosition();
+
+	Map<String, VPoint> read2DPositionList();
 
 	Vector3D read3DPosition();
 

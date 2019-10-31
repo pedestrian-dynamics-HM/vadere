@@ -18,15 +18,14 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesBuilder;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -228,14 +227,19 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D_LIST, name = "getPosition2DList", ignoreElementId = true)
 	public TraCICommand process_getPosition2DList(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		remoteManager.accessState((manager, state) -> {
-			List<VPoint> data = state.getTopography().getPedestrianDynamicElements()
+			Map<String, VPoint> data = state.getTopography().getPedestrianDynamicElements()
 					.getElements()
 					.stream()
-					.map(p -> p.getPosition())
-					.collect(Collectors.toList());
+					.map(p -> {
+						String id = Integer.toString(p.getId());
+						VPoint position = p.getPosition();
+						Map.Entry<String, VPoint> entry = new HashMap.SimpleEntry<String, VPoint>(id, position);
+						return entry;
+					})
+					.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
 			TraCIGetResponse res = responseOK(PersonVar.POS_2D_LIST.type, data);
 			cmd.setResponse(res);
-			logger.debugf("time: %f ID's: %s", state.getSimTimeInSec(), Arrays.toString(data.toArray(VPoint[]::new)));
+			logger.debugf("time: %f (ID,POSITION)s: %s", state.getSimTimeInSec(), data.toString());
 		});
 
 		return cmd;
@@ -351,21 +355,9 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 				cmd.setErr("id is not free");
 			} else {
 
-				// Assume all peds have the same underlying model
-				// Clone one of the pedestrians
 				Pedestrian oldPed = state.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(idList.get(0)));
-				Pedestrian ped = oldPed.clone();
-
-				// Change the clones id
-				Attributes attributes = new AttributesAgent(ped.getAttributes(), Integer.parseInt(id));
-				ped.setAttributes(attributes);
-
-				// Adapt the clones targets and position
-				ped.setTargets(new LinkedList<Integer>());
-				ped.setPosition(tmp);
-
-				// add the new ped to the topography
-				state.getTopography().getPedestrianDynamicElements().addElement(ped);
+				Pedestrian newDynamicElement = (Pedestrian) state.getMainModel().get().createElement(tmp, Integer.parseInt(id), oldPed.getClass());
+				state.getTopography().getPedestrianDynamicElements().addElement(newDynamicElement);
 
 				cmd.setOK();
 			}
