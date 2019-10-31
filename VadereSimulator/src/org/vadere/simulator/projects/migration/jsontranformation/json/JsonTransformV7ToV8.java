@@ -161,7 +161,7 @@ public class JsonTransformV7ToV8 extends SimpleJsonTransformation {
 
     public static void main(String[] arg) throws Exception {
         BufferedReader r = new BufferedReader(
-                new FileReader("/home/lphex/hm.d/vadere/VadereModelTests/TestOSM/scenarios/rimea_04_flow_osm1_125_h.scenario"));
+                new FileReader("/home/lphex/hm.d/vadere/Scenarios/ModelTests/TestOSM/scenarios/rimea_04_flow_osm1_125_h.scenario"));
         String jsonStr = r.lines().collect(Collectors.joining("\n"));
         ObjectMapper mapper = StateJsonConverter.getMapper();
         JsonNode jsonNode = StateJsonConverter.deserializeToNode(jsonStr);

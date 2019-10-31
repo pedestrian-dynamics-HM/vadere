@@ -1,0 +1,28 @@
+# nVertices dimension nAttributes boundaryMarker
+8 2 0 0
+# vertexId x y
+1 0.500000 0.500000
+2 34.500000 0.500000
+3 26.000000 21.000000
+4 26.000000 41.000000
+5 9.000000 41.000000
+6 9.000000 21.000000
+7 0.500000 59.500000
+8 34.500000 59.500000
+#
+# nSegments boundaryMarker
+8 0
+# lineId vertexId1 vertexId2
+1 2 8
+2 8 7
+3 7 1
+4 1 2
+5 3 4
+6 4 5
+7 5 6
+8 6 3
+#
+# nHoles
+1
+# vertexId x y (of a vertex which lies inside the hole)
+1 17.500000 31.000000

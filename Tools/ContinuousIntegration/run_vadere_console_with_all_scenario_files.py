@@ -1,5 +1,5 @@
 # Use "vadere-console.jar", which is created by "mvn package", to run all
-# scenario files under "VadereModelTests" subdirectory.
+# scenario files under "Scenarios/ModelTests" subdirectory.
 #
 # Note: script contains some print statements so that progress can be tracked
 # a little bit while script is running in continuous integration pipeline.
@@ -26,7 +26,7 @@ def parse_command_line_arguments():
 
     parser.add_argument("scenario", type=str, nargs="?",
                         help="Run only the given scenario file and not all. E.g., "
-                             "\"VadereModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
+                             "\"Scenarios/ModelTests/TestOSM/scenarios/basic_2_density_discrete_ca.scenario\"")
 
     return parser.parse_args()
 
@@ -49,14 +49,16 @@ def run_all_model_tests():
     excluded_scenarios = ["TestOVM", "output", "legacy"]
     excluded_scenarios.extend(long_running_scenarios)
 
-    scenario_files_regular_length = find_scenario_files(path="VadereModelTests", exclude_patterns=excluded_scenarios)
+    scenario_base_path = os.path.join("Scenarios" , "ModelTests")
+
+    scenario_files_regular_length = find_scenario_files(path=scenario_base_path, exclude_patterns=excluded_scenarios)
 
     passed_and_failed_scenarios = run_scenario_files_with_vadere_console(
         scenario_files_regular_length, scenario_timeout_in_sec=short_timeout_in_seconds)
 
     for scenario in long_running_scenarios:
         search_pattern = "*" + scenario + "*.scenario"
-        scenario_files_long = find_scenario_files(path="VadereModelTests", scenario_search_pattern=search_pattern)
+        scenario_files_long = find_scenario_files(path=scenario_base_path, scenario_search_pattern=search_pattern)
 
         tmp_passed_and_failed_scenarios = run_scenario_files_with_vadere_console(
             scenario_files_long, scenario_timeout_in_sec=long_timeout_in_seconds)
@@ -68,10 +70,10 @@ def run_all_model_tests():
 
 
 def run_all_optimization_tests():
-    scenario_files = find_scenario_files(path="VadereOptimizationTests")
+    scenario_files = find_scenario_files(path=os.path.join("Scenarios", "OptimizationTests"))
 
     # enables flag to compare optimization with brute force solution
-    config_filepath = os.path.join("VadereOptimizationTests", "TestNelderMead", "vadere.conf")
+    config_filepath = os.path.join("Scenarios", "OptimizationTests", "TestNelderMead", "vadere.conf")
 
     # NOTE: it is likely that the set config file is not required by new optimization tests
     # long_timeout, because the brute force is expensive.
@@ -129,9 +131,9 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
         try:
             print(f"Running scenario file ({i + 1}/{total_scenario_files}): {scenario_file}")
             
-            # A scenario filename has the form "VadereModelTests/TestOSM/scenarios/chicken_floorfield_ok.scenario"
-            # Use second-level directory as subdirectory for logging (e.g., "TestOSM").
-            log_sub_dir = scenario_file.split(os.path.sep)[1]
+            # A scenario filename has the form "Scenarios/ModelTests/TestOSM/scenarios/chicken_floorfield_ok.scenario"
+            # Use third-level directory as subdirectory for logging (e.g., "TestOSM").
+            log_sub_dir = scenario_file.split(os.path.sep)[2]
             log_dir = os.path.join(".", log_base_dir, log_sub_dir)
             
             makedirs_if_non_existing(log_dir)
@@ -219,12 +221,14 @@ def result_dict_print_summary(passed_and_failed_scenarios):
     failed_summary = passed_and_failed_scenarios["failed_summary"]
 
     if result_dict_has_failed_tests(passed_and_failed_scenarios):
+        print("")
         print("##################")
         print("# Failed Summary #")
         print("##################")
         for line in failed_summary:
             print(line)
 
+    print("")
     print("###########")
     print("# Summary #")
     print("###########")

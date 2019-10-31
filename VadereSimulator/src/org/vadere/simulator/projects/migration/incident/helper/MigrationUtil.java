@@ -31,7 +31,7 @@ public class MigrationUtil {
 	public MigrationUtil() {
 		dirMarker = createList("DO_NOT_MIGRATE", ".DO_NOT_MIGRATE");
 		treeMarker = createList("DO_NOT_MIGRATE_TREE", ".DO_NOT_MIGRATE_TREE", IOUtils.CORRUPT_DIR, IOUtils.LEGACY_DIR);
-		ignoreDirs = createList("VadereModelTests", "target", "Documentation");
+		ignoreDirs = createList("Scenarios", "target", "Documentation");
 	}
 
 	public static void main(String[] args) throws URISyntaxException, IOException {

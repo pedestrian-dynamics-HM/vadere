@@ -286,7 +286,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	public synchronized List<VPoint> getPositions() {
 		List<VPoint> positions = new ArrayList<>();
-		trajectories.getAgents(getSimTimeInSec()).forEach(row -> toPosition(row));
+		trajectories.getAgents(getSimTimeInSec()).forEach(row -> positions.add(toPosition(row)));
 		return positions;
 	}
 

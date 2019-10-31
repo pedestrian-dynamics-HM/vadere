@@ -48,6 +48,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		mainPanel.setScrollPane(scrollPane);
 		scrollPane.getViewport()
 				.addChangeListener(new JViewportChangeListener(model, scrollPane.getVerticalScrollBar()));
+		model.addScrollPane(scrollPane);
 
 		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(model, scrollPane);
 		model.addViewportChangeListener(viewportChangeListener);
@@ -60,7 +61,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		this.toolbar = new JToolBar("OnlineVisualizationToolbar");
 		toolbar.setFloatable(false);
-		// toolbar.setBorderPainted(false);
+		toolbar.setBorderPainted(false);
 		toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		toolbar.setAlignmentY(Component.TOP_ALIGNMENT);
 		// TODO: Should this be really configurable in a config file?

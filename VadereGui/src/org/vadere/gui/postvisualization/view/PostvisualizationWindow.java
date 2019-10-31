@@ -89,7 +89,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		// 6. construct the toolbar
 		toolbar = new JToolBar("Toolbar");
 		int toolbarSize = CONFIG.getInt("Gui.toolbar.size");
-		toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
+		//toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
 		toolbar.setBorderPainted(false);
 		toolbar.setFloatable(false);
 		toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
