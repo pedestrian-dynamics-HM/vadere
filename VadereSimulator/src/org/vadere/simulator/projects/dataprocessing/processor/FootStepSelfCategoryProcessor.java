@@ -10,14 +10,14 @@ import org.vadere.state.simulation.VTrajectory;
 import java.util.Collection;
 
 /**
- * Save social category of a pedestrian in each time step in an own column.
+ * Save self category of a pedestrian in each time step in an own column.
  */
 @DataProcessorClass()
-public class FootStepSocialCategoryProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
+public class FootStepSelfCategoryProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
 
-	public static String HEADER = "socialCategory";
+	public static String HEADER = "selfCategory";
 
-	public FootStepSocialCategoryProcessor() {
+	public FootStepSelfCategoryProcessor() {
 		super(HEADER);
 	}
 
@@ -27,9 +27,9 @@ public class FootStepSocialCategoryProcessor extends DataProcessor<EventtimePede
 
 		for(Pedestrian p : pedestrians){
 			VTrajectory traj = p.getTrajectory();
-			String slaientBehavior = p.getSocialCategory().toString();
+			String selfCategoryString = p.getSelfCategory().toString();
 			for(FootStep fs : traj.getFootSteps()){
-				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), slaientBehavior);
+				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), selfCategoryString);
 			}
 		}
 	}

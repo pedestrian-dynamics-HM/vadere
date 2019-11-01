@@ -44,7 +44,7 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  * Also, rename
  * - "useSalientBehavior" to "usePsychologyLayer" under "attributesSimulation" node
  * - "FootStepMostImportantEventProcessor" to "FootStepMostImportantStimulusProcessor"
- * - "FootStepSalientBehaviorProcessor" to "FootStepSocialCategoryProcessor"
+ * - "FootStepSalientBehaviorProcessor" to "FootStepSelfCategoryProcessor"
  * - "salientBehavior" in "dynamicElements" node
  */
 @MigrationTransformation(targetVersionLabel = "1.5")
@@ -182,7 +182,7 @@ public class TargetVersionV1_5 extends SimpleJsonTransformation {
 
 	private void renameOutputProcessorSalientBehavior(JsonNode node) throws MigrationException {
 		String oldName = "FootStepSalientBehaviorProcessor";
-		String newName = "FootStepSocialCategoryProcessor";
+		String newName = "FootStepSelfCategoryProcessor";
 
 		renameOutputProcessor(node, oldName, newName);
 	}
@@ -205,7 +205,7 @@ public class TargetVersionV1_5 extends SimpleJsonTransformation {
 
 	private void renameSalientBehaviorInDynamicElements(JsonNode node) throws MigrationException {
 		String oldName = "salientBehavior";
-		String newName = "socialCategory";
+		String newName = "selfCategory";
 
 		JsonNode dynamicElementsNode = path(node, "scenario/topography/dynamicElements");
 
