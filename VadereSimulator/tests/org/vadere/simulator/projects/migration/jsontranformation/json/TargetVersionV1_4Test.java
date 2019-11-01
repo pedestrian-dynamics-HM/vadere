@@ -25,7 +25,7 @@ public class TargetVersionV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getTargetVersionV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -43,7 +43,7 @@ public class TargetVersionV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getTargetVersionV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -61,7 +61,7 @@ public class TargetVersionV1_4Test extends JsonTransformationTest {
 		pathMustExist(oldScenarioAsJson, oldJsonPath);
 		pathMustNotExist(oldScenarioAsJson, newJsonPath);
 
-		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getTargetVersionV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		pathMustNotExist(newScenarioAsJson, oldJsonPath);
@@ -86,7 +86,7 @@ public class TargetVersionV1_4Test extends JsonTransformationTest {
 			}
 		}
 
-		TargetVersionV1_4 transform = factory.getJsonTransformationV1_3ToV1_4();
+		TargetVersionV1_4 transform = factory.getTargetVersionV1_4();
 		JsonNode newScenarioAsJson = transform.applyAll(oldScenarioAsJson);
 
 		// Assert that "attributes" node in "dynamicElements" is renamed here.

@@ -27,7 +27,7 @@ public class TargetVersionV1_2Test extends JsonTransformationTest {
 		assertThat(typeOld, equalTo("CSV_CACHE"));
 
 
-		TargetVersionV1_2 transform = factory.getJsonTransformationV1_1ToV1_2();
+		TargetVersionV1_2 transform = factory.getTargetVersionV1_2();
 		JsonNode jsonNew = transform.applyAll(old);
 
 		String typeNew =pathMustExist(jsonNew, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesFloorField/cacheType").asText();
@@ -42,7 +42,7 @@ public class TargetVersionV1_2Test extends JsonTransformationTest {
 		assertThat(typeOld, equalTo("BIN_CACHE"));
 
 
-		TargetVersionV1_2 transform = factory.getJsonTransformationV1_1ToV1_2();
+		TargetVersionV1_2 transform = factory.getTargetVersionV1_2();
 		JsonNode jsonNew = transform.applyAll(old);
 
 		String typeNew =pathMustExist(jsonNew, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesFloorField/cacheType").asText();
