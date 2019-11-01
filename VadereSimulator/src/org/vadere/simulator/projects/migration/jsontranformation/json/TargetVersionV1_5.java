@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration.jsontranformation.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.entrypoints.Version;
@@ -45,7 +46,27 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  * - "useSalientBehavior" to "usePsychologyLayer" under "attributesSimulation" node
  * - "FootStepMostImportantEventProcessor" to "FootStepMostImportantStimulusProcessor"
  * - "FootStepSalientBehaviorProcessor" to "FootStepSelfCategoryProcessor"
- * - "salientBehavior" in "dynamicElements" node
+ * - "salientBehavior" to "selfCategory" in "dynamicElement" nodes
+ *
+ * After renaming, encapsulate two psychology-related attributes into
+ * a new "psychlogy" node in "dynamicElement" nodes:
+ * - mostImportantStimulus
+ * - selfCategory
+ *
+ * A resctructured dynamic element node looks like this:
+ * <pre>
+ * {
+ *   ...
+ *   "psychology" : {
+ *     "mostImportantStimulus" : {
+ *       "type" : "ElapsedTime"
+ *     },
+ *     "selfCategory" : "TARGET_ORIENTED"
+ *   },
+ *   ...
+ *   "type" : "PEDESTRIAN"
+ * }
+ * </pre>
  */
 @MigrationTransformation(targetVersionLabel = "1.5")
 public class TargetVersionV1_5 extends SimpleJsonTransformation {
@@ -70,6 +91,8 @@ public class TargetVersionV1_5 extends SimpleJsonTransformation {
 		renameOutputProcessorMostImportantEvent(node);
 		renameOutputProcessorSalientBehavior(node);
 		renameSalientBehaviorInDynamicElements(node);
+
+		createNewPsychologyNodeInDynamicElements(node);
 
 		return node;
 	}
@@ -215,6 +238,41 @@ public class TargetVersionV1_5 extends SimpleJsonTransformation {
 
 				if (!salientBehaviorNode.isMissingNode()) {
 					renameField((ObjectNode)dynamicElementNode, oldName, newName);
+				}
+			}
+		}
+	}
+
+	private void createNewPsychologyNodeInDynamicElements(JsonNode node) throws MigrationException {
+		String newNodeName = "psychology";
+
+		String[] nodeNamesToMove = new String[] {
+			"mostImportantStimulus",
+			"selfCategory"
+		};
+
+		JsonNode dynamicElementsNode = path(node, "scenario/topography/dynamicElements");
+
+		if (dynamicElementsNode.isArray()) {
+			for (JsonNode dynamicElementNode : dynamicElementsNode) {
+
+				// Create parent node for the nodes which will be moved
+				ObjectNode psychologyNode = JsonNodeFactory.instance.objectNode();
+
+				for (String nodeName : nodeNamesToMove) {
+					JsonNode nodeToMove = path(dynamicElementNode, nodeName);
+
+					if (!nodeToMove.isMissingNode()) {
+						psychologyNode.set(nodeName, nodeToMove);
+						remove(dynamicElementNode, nodeName);
+					}
+				}
+
+				// If new parent node is not empty, add it to the current "dynamicElement".
+				// Otherwise, the "psychology" node will be added by the Jackson library
+				// automatically.
+				if (psychologyNode.elements().hasNext()) {
+					((ObjectNode)dynamicElementNode).set(newNodeName, psychologyNode);
 				}
 			}
 		}
