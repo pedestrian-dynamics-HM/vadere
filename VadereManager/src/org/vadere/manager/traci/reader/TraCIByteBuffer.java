@@ -131,7 +131,9 @@ public class TraCIByteBuffer implements TraCIReader {
 
 		Map<String, VPoint> map = new HashMap<String, VPoint>();
 		for(int i=0; i < numOfKeyValuePairs; i++){
-			map.put(readString(), read2DPosition());
+			String id = readString();
+			VPoint position = read2DPosition();
+			map.put(id, position);
 		}
 
 		return map;

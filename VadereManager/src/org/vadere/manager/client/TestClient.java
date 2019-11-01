@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public class TestClient extends org.vadere.manager.client.AbstractTestClient implements Runnable{
 
@@ -296,9 +297,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	@Override
 	public void personapi_getPosition2DList(String[] args) throws IOException {
 		TraCIGetResponse res = personapi.getPosition2DList();
-		int a = 1;
-//		TraCIResponse res.getResponseData();
-//		System.out.println(p.toString());
+		System.out.println(((Map<String, VPoint>) res.getResponseData()).toString());
 	}
 
 	@Override

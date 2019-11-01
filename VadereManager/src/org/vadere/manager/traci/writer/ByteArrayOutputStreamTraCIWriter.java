@@ -209,7 +209,9 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		writeInt(data.entrySet().size());
 		data.entrySet().stream().forEach(p -> {
 			writeString(p.getKey());
-			write2DPosition(p.getValue());
+			VPoint position = p.getValue();
+			writeDouble(position.x);
+			writeDouble(position.y);
 		});
 		return this;
 	}
