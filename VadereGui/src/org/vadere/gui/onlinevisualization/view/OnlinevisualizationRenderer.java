@@ -60,7 +60,7 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 
 	private void renderPedestrians(final Graphics2D g) {
 		AgentRender agentRender = getAgentRender();
-		for (Agent ped : model.getAgents()) {
+		for (Pedestrian ped : model.getPedestrians()) {
 			Color agentColor = getPedestrianColor(ped);
 			g.setColor(agentColor);
 			VPoint position = ped.getPosition();
@@ -71,7 +71,15 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 			}
 
 			// reverse the point order
-			pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+			if(!model.config.isInterpolatePositions()) {
+				pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+			} else {
+				if(ped.getFootstepHistory().getCapacity() > 0) {
+					pedestrianPositions.get(ped.getId()).addFirst(ped.getFootstepHistory().getYoungestFootStep().getStart());
+				} else {
+					pedestrianPositions.get(ped.getId()).addFirst(ped.getPosition());
+				}
+			}
 
 			if (model.config.isShowTrajectories()) {
 				renderTrajectory(g, pedestrianPositions.get(ped.getId()), ped);

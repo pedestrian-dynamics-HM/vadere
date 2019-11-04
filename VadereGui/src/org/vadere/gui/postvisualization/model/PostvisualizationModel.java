@@ -177,6 +177,16 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return agentList;
 	}
 
+	@Override
+	public Collection<Pedestrian> getPedestrians() {
+		Table agents = getAgentTable();
+		List<Pedestrian> agentList = new ArrayList<>(agents.rowCount());
+		for(Row agentRow : agents) {
+			agentList.add(toAgent(agentRow));
+		}
+		return agentList;
+	}
+
 	public synchronized TableTrajectoryFootStep getTrajectories() {
 		return trajectories;
 	}
@@ -193,7 +203,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.getAgentDataFrame();
 	}
 
-	private Agent toAgent(final Row row) {
+	private Pedestrian toAgent(final Row row) {
 		int pedId = row.getInt(trajectories.pedIdCol);
 		double startTime = row.getDouble(trajectories.startTimeCol);
 		double endTime = row.getDouble(trajectories.endTimeCol);
@@ -203,7 +213,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		double endY = row.getDouble(trajectories.endYCol);
 
 		VPoint position;
-		if(startTime <= getSimTimeInSec() && endTime >= getSimTimeInSec()) {
+		if(config.isInterpolatePositions() && (startTime <= getSimTimeInSec() && endTime >= getSimTimeInSec())) {
 			position = FootStep.interpolateFootStep(startX, startY, endX, endY, startTime, endTime, getSimTimeInSec());
 		} else {
 			position = new VPoint(endX, endY);
