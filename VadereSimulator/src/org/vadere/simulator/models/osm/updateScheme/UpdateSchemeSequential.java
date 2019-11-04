@@ -17,10 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * TODO: explain the concept of timeCredit!
- * TODO: in the long term, replace timeCredit by eventTime (see event driven update)!
- */
 public class UpdateSchemeSequential implements UpdateSchemeOSM {
 
 	private final Topography topography;
@@ -58,19 +54,17 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		}
 
 		if (mostImportantEvent instanceof ElapsedTimeEvent) {
-			pedestrian.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 			pedestrian.clearStrides();
 			if (pedestrian.getSalientBehavior() == SalientBehavior.TARGET_ORIENTED) {
-				useTimeCredit(pedestrian, timeStepInSec);
+				steoForward(pedestrian, currentTimeInSec, timeStepInSec);
 			} else if (pedestrian.getSalientBehavior() == SalientBehavior.COOPERATIVE) {
 				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
 				if(candidate != null) {
-					candidate.setTimeCredit(pedestrian.getTimeCredit() + timeStepInSec);
 					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
 					// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
 					skipUdate.add(candidate);
 				} else {
-					useTimeCredit(pedestrian, timeStepInSec);
+					steoForward(pedestrian, currentTimeInSec, timeStepInSec);
 				}
 			}
 		} else if (mostImportantEvent instanceof WaitEvent || mostImportantEvent instanceof WaitInAreaEvent) {
@@ -80,8 +74,8 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		}
 	}
 
-	private void useTimeCredit(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
-		while (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
+	private void steoForward(@NotNull final PedestrianOSM pedestrian, final double simTimeInSec, final double timeStepInSec) {
+		while (pedestrian.getTimeOfNextStep() < simTimeInSec) {
 			pedestrian.updateNextPosition();
 			osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());

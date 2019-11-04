@@ -86,6 +86,16 @@ public class OSMBehaviorController {
         pedestrian.getFootstepHistory().add(currentFootstep);
     }
 
+    public void undoStep(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
+	    FootStep footStep = pedestrian.getTrajectory().removeLast();
+	    pedestrian.getFootstepHistory().removeLast();
+	    pedestrian.setPosition(footStep.getStart());
+	    synchronized (topography) {
+		    topography.moveElement(pedestrian, footStep.getEnd());
+	    }
+	    pedestrian.setVelocity(new Vector2D(0, 0));
+    }
+
     public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
         // Satisfy event-driven and sequential update scheme.
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);

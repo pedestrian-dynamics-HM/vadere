@@ -39,6 +39,11 @@ public class FootstepHistory {
         return successful;
     }
 
+	public void removeLast() {
+		assert !footSteps.isEmpty();
+		footSteps.remove(footSteps.size()-1);
+	}
+
     public double getAverageSpeedInMeterPerSecond() {
         double speed = Double.NaN;
 

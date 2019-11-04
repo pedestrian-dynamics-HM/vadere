@@ -38,9 +38,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-
 		clearStrides(topography);
-
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
