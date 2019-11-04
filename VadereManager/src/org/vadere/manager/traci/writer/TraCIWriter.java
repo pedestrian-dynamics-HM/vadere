@@ -1,5 +1,6 @@
 package org.vadere.manager.traci.writer;
 
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
@@ -83,6 +84,8 @@ public interface TraCIWriter {
 	TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases);
 
 	TraCIWriter writeColor(Color color);
+
+	TraCIWriter writeCompoundObject(CompoundObject compoundObject);
 
 	TraCIWriter writeCommandLength(int cmdLen);
 

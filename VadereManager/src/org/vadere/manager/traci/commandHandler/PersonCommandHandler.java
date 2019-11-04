@@ -292,7 +292,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, name = "createNew", dataTypeStr = "VPoint")
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, name = "createNew", dataTypeStr = "CompoundObject")
 	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
 		VPoint tmp = (VPoint) cmd.getVariableValue();
 		Integer id =  Integer.parseInt(cmd.getElementId());
