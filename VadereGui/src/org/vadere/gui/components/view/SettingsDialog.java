@@ -331,10 +331,11 @@ public class SettingsDialog extends JDialog {
 				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
 
 		FormLayout otherSettingsLayout = new FormLayout(createCellsWithSeparators(4), // col
-				createCellsWithSeparators(15)); // rows
+				createCellsWithSeparators(16)); // rows
 		otherSettingsPane.setLayout(otherSettingsLayout);
 
 		// For each scenario element, add a checkbox to toggle its visibility.
+		JCheckBox chInterpolatePositions = new JCheckBox((Messages.getString("SettingsDialog.chbInterpolatePositions.text")));
 		JCheckBox chShowObstacles = new JCheckBox((Messages.getString("SettingsDialog.chbShowObstacles.text")));
 		JCheckBox chShowTargets = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargets.text")));
 		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
@@ -343,8 +344,13 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
 		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
-
 		JCheckBox chHideVoronoiDiagram = new JCheckBox((Messages.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
+
+		chInterpolatePositions.setSelected(model.config.isInterpolatePositions());
+		chInterpolatePositions.addItemListener(e -> {
+			model.config.setInterpolatePositions(!model.config.isInterpolatePositions());
+			model.notifyObservers();
+		});
 
 		chHideVoronoiDiagram.setSelected(!model.isVoronoiDiagramVisible());
 		chHideVoronoiDiagram.addItemListener(e -> {
@@ -410,6 +416,7 @@ public class SettingsDialog extends JDialog {
 		int colSpan = 5;
 		CellConstraints cc = new CellConstraints();
 
+		otherSettingsPane.add(chInterpolatePositions, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chHideVoronoiDiagram, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowObstacles, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowTargets, cc.xyw(column, row += NEXT_CELL, colSpan));
