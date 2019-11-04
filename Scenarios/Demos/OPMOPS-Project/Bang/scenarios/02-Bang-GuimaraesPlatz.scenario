@@ -1,7 +1,7 @@
 {
   "name" : "02-Bang-GuimaraesPlatz",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -121,7 +121,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -5666974701049342956,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -1139,6 +1139,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
@@ -1198,17 +1199,17 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
+    "stimulusInfos" : [ {
+      "timeframe" : {
         "startTime" : 67.0,
         "endTime" : 67.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
-      "events" : [ {
-        "type" : "BangEvent",
-        "targets" : [ ],
-        "originAsTargetId" : 0
+      "stimuli" : [ {
+        "type" : "Bang",
+        "originAsTargetId" : 0,
+        "loudness" : 1.0
       } ]
     } ]
   }

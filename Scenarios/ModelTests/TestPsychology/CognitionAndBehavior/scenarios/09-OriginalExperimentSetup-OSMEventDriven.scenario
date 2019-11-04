@@ -1,7 +1,7 @@
 {
   "name" : "09-OriginalExperimentSetup-OSMEventDriven",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -40,10 +40,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
       "id" : 5
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
       "id" : 6
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
       "id" : 7
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianSpeedInAreaProcessorUsingAgentTrajectory",
@@ -140,7 +140,7 @@
       "useFixedSeed" : false,
       "fixedSeed" : -7548557034348592525,
       "simulationSeed" : 0,
-      "useSalientBehavior" : true
+      "usePsychologyLayer" : true
     },
     "topography" : {
       "attributes" : {
@@ -275,13 +275,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -316,13 +318,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -357,13 +361,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -398,13 +404,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -439,13 +447,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -480,13 +490,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -521,13 +533,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -562,13 +576,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -603,13 +619,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -644,13 +662,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -685,13 +705,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -726,13 +748,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
@@ -767,13 +791,15 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
@@ -793,6 +819,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "06-Bang-OSM-Sequential",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -125,7 +125,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 1,
       "simulationSeed" : 1,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -180,7 +180,7 @@
         "id" : 0,
         "absorbing" : true,
         "shape" : {
-          "radius" : 1,
+          "radius" : 1.0,
           "center" : {
             "x" : 20.0,
             "y" : 8.0
@@ -195,6 +195,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 1,
@@ -254,17 +255,17 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
+    "stimulusInfos" : [ {
+      "timeframe" : {
         "startTime" : 15.0,
         "endTime" : 15.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
-      "events" : [ {
-        "type" : "BangEvent",
-        "targets" : [ ],
-        "originAsTargetId" : 0
+      "stimuli" : [ {
+        "type" : "Bang",
+        "originAsTargetId" : 0,
+        "loudness" : 1.0
       } ]
     } ]
   }

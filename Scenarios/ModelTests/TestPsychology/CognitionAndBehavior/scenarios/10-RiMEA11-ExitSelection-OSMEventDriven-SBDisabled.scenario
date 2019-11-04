@@ -1,7 +1,7 @@
 {
   "name" : "10-RiMEA11-ExitSelection-OSMEventDriven-SBDisabled",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -33,10 +33,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 8
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
       "id" : 9
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
       "id" : 10
     } ],
     "isTimestamped" : true,
@@ -109,7 +109,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 3213925745664992646,
       "simulationSeed" : 1,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -250,6 +250,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

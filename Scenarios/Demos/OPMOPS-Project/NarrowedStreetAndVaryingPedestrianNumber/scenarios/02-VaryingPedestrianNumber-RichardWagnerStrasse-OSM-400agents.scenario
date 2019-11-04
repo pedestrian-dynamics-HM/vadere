@@ -1,7 +1,7 @@
 {
   "name" : "02-VaryingPedestrianNumber-RichardWagnerStrasse-OSM-400agents",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -5666974701049342956,
       "simulationSeed" : -5666974701049342956,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -2537,6 +2537,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
@@ -2576,6 +2577,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

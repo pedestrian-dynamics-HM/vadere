@@ -1,7 +1,7 @@
 {
   "name" : "14-Test-TargetChanger-ChangesTargetIfProbabilityIsOne",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -3989740141114319444,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -264,6 +264,6 @@
         }
       }
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "12-CounterFlow-SBEnabled",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -33,10 +33,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 8
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSalientBehaviorProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
       "id" : 9
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantEventProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
       "id" : 10
     } ],
     "isTimestamped" : true,
@@ -109,7 +109,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 1,
       "simulationSeed" : 1,
-      "useSalientBehavior" : true
+      "usePsychologyLayer" : true
     },
     "topography" : {
       "attributes" : {
@@ -257,6 +257,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

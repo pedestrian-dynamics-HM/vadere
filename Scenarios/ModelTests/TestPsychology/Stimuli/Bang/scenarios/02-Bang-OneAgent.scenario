@@ -1,7 +1,7 @@
 {
   "name" : "02-Bang-OneAgent",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -2062305966864041707,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -124,7 +124,7 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "radius" : 1,
+          "radius" : 1.0,
           "center" : {
             "x" : 28.0,
             "y" : 2.5
@@ -139,21 +139,10 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
-        "source" : null,
-        "targetIds" : [ 1 ],
-        "position" : {
-          "x" : 20.4,
-          "y" : 2.5
-        },
-        "velocity" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "nextTargetListIndex" : 0,
-        "freeFlowSpeed" : 1.6,
         "attributes" : {
           "id" : -1,
           "radius" : 0.2,
@@ -168,16 +157,32 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
+        "source" : null,
+        "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
+        "position" : {
+          "x" : 20.4,
+          "y" : 2.5
+        },
+        "velocity" : {
+          "x" : 0.0,
+          "y" : 0.0
+        },
+        "freeFlowSpeed" : 1.6,
+        "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ ],
+        "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
@@ -197,17 +202,17 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ {
-      "eventTimeframe" : {
+    "stimulusInfos" : [ {
+      "timeframe" : {
         "startTime" : 0.0,
         "endTime" : 0.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
-      "events" : [ {
-        "type" : "BangEvent",
-        "targets" : [ ],
-        "originAsTargetId" : 1
+      "stimuli" : [ {
+        "type" : "Bang",
+        "originAsTargetId" : 1,
+        "loudness" : 1.0
       } ]
     } ]
   }
