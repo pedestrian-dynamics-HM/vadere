@@ -61,7 +61,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 		this.toolbar = new JToolBar("OnlineVisualizationToolbar");
 		toolbar.setFloatable(false);
-		// toolbar.setBorderPainted(false);
+		toolbar.setBorderPainted(false);
 		toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
 		toolbar.setAlignmentY(Component.TOP_ALIGNMENT);
 		// TODO: Should this be really configurable in a config file?
