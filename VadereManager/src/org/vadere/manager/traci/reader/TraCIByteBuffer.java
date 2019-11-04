@@ -16,8 +16,9 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * A {@link ByteBuffer} based implementation of the {@link TraCIReader} interface.
@@ -121,6 +122,22 @@ public class TraCIByteBuffer implements TraCIReader {
 		double x = byteBuffer.getDouble();
 		double y = byteBuffer.getDouble();
 		return new VPoint(x,y);
+	}
+
+	@Override
+	public Map<String, VPoint> read2DPositionList(){
+	    // the problem may be in this function
+		ensureBytes(4); // 1x int
+		int numOfKeyValuePairs = byteBuffer.getInt();
+
+		Map<String, VPoint> map = new HashMap<String, VPoint>();
+		for(int i=0; i < numOfKeyValuePairs; i++){
+			String id = readString();
+			VPoint position = read2DPosition();
+			map.put(id, position);
+		}
+
+		return map;
 	}
 
 	@Override
@@ -244,6 +261,8 @@ public class TraCIByteBuffer implements TraCIReader {
 				return readStringList();
 			case POS_2D:
 				return read2DPosition();
+			case POS_2D_LIST:
+				return read2DPositionList();
 			case POS_3D:
 				return read3DPosition();
 			case POS_ROAD_MAP:
