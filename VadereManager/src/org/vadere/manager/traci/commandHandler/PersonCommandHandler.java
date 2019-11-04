@@ -10,22 +10,20 @@ import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
+import org.vadere.manager.traci.compoundobjects.PersonCreateData;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
-import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.models.AgentFactory;
-import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesBuilder;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -339,9 +337,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, name = "createNew", dataTypeStr = "CompoundObject")
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, ignoreElementId = true, name = "createNew", dataTypeStr = "CompoundObject")
 	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
-		VPoint tmp = (VPoint) cmd.getVariableValue();
+		PersonCreateData data = new PersonCreateData((CompoundObject) cmd.getVariableValue());
+		VPoint pos = data.getPos();
+		LinkedList<Integer> targets = data.getTargetsAsInt();
 		String id =  cmd.getElementId();
 
 		remoteManager.accessState((manager, state) -> {
@@ -354,9 +354,9 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 				// call it a failure
 				cmd.setErr("id is not free");
 			} else {
-
 				Pedestrian oldPed = state.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(idList.get(0)));
-				Pedestrian newDynamicElement = (Pedestrian) state.getMainModel().get().createElement(tmp, Integer.parseInt(id), oldPed.getClass());
+				Pedestrian newDynamicElement = (Pedestrian) state.getMainModel().get().createElement(pos, Integer.parseInt(id), oldPed.getClass());
+				newDynamicElement.setTargets(targets);
 				state.getTopography().getPedestrianDynamicElements().addElement(newDynamicElement);
 
 				cmd.setOK();

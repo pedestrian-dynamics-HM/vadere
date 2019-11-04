@@ -99,6 +99,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 				break;
 			case COMPOUND_OBJECT:
 				writeCompoundObject((CompoundObject) data);
+				break;
 			default:
 				logger.errorf("cannot write %s", dataType.toString());
 
@@ -302,7 +303,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
 	@Override
 	public TraCIWriter writeCompoundObject(CompoundObject compoundObject) {
-		writeUnsignedByteWithId(TraCIDataType.COMPOUND_OBJECT.id);
+		writeUnsignedByte(TraCIDataType.COMPOUND_OBJECT.id);
 		writeInt(compoundObject.size());
 		Iterator<Pair<TraCIDataType, Object>> iter = compoundObject.itemIterator();
 		while (iter.hasNext()){

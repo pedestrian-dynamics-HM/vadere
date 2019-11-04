@@ -233,7 +233,7 @@ public class TraCIByteBuffer implements TraCIReader {
 
 		CompoundObject compoundObject = new CompoundObject(noElements);
 
-		for(int i = 0; i<= noElements; i++){
+		for(int i = 0; i < noElements; i++){
 			TraCIDataType type = TraCIDataType.fromId(readUnsignedByte());
 			if (type.equals(TraCIDataType.COMPOUND_OBJECT))
 				throw new TraCIException("Recursive CompoundObject are not allowed.");

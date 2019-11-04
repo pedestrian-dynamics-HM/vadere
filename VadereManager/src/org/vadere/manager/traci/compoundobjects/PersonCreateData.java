@@ -4,6 +4,8 @@ import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class PersonCreateData extends GenericCompoundObject{
 
@@ -11,7 +13,7 @@ public class PersonCreateData extends GenericCompoundObject{
 	private VPoint pos;
 	private ArrayList<String> targets;
 
-	PersonCreateData(CompoundObject o){
+	public PersonCreateData(CompoundObject o){
 		super(o, 3);
 	}
 
@@ -33,4 +35,9 @@ public class PersonCreateData extends GenericCompoundObject{
 	public ArrayList<String> getTargets() {
 		return targets;
 	}
+
+	public LinkedList<Integer> getTargetsAsInt(){
+		return targets.stream().mapToInt(Integer::parseInt).boxed().collect(Collectors.toCollection(LinkedList::new));
+	}
+
 }

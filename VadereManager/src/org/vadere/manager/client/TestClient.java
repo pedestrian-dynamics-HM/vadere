@@ -372,7 +372,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		String[] targets = Arrays.copyOfRange(args,4,args.length);
 
 
-		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(x, y, targets);
+		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
 		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}

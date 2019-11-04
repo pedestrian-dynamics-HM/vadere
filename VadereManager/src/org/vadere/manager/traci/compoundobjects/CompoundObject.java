@@ -6,6 +6,22 @@ import org.vadere.manager.traci.TraCIDataType;
 
 import java.util.Iterator;
 
+/**
+ * CompoundObject implementation based on TraCI as described in https://sumo.dlr.de/docs/TraCI/Protocol.html#atomar_types
+ *
+ * This implementation consist of two equally long arrays {@link #type} and {@link #data}. The
+ * {@link #type} array saves Type of the objects at the same index in {@link #data}.
+ *
+ * At time of creation it must be stated how many objects will be tide together. See @{@link CompoundObjectBuilder}
+ * for usage of Constructor and the {@link #add(int, Object)} method.
+ *
+ * See @{@link GenericCompoundObject} and its subclasses on the use of {@link #getData(int, TraCIDataType)}
+ * to create objects type specific child classes @{@link GenericCompoundObject} to correctly parse the
+ * objects in {@link #data} into useful objects.
+ *
+ * See @{{@link PersonCreateData}} on how to use @{@link CompoundObject}.
+ *
+ */
 public class CompoundObject {
 
 	private TraCIDataType[] type;
