@@ -358,8 +358,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
-		if(args.length < 4){
-			System.out.println("command needs argument element id, x-coordinate, y-coordinate");
+		if(args.length < 5){
+			System.out.println("command needs argument element id, x-coordinate, y-coordinate, target");
 			return;
 		}
 
@@ -367,6 +367,10 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		double x = Double.parseDouble(args[2]);
 		double y = Double.parseDouble(args[3]);
 		VPoint p = new VPoint(x, y);
+		ArrayList<String> targets = new ArrayList<>();
+		for (int i = 4; i < args.length; i++){
+			targets.add(args[i]);
+		}
 
 		TraCIResponse res =  personapi.createNew(elementIdentifier, p);
 		System.out.println(res.toString());
