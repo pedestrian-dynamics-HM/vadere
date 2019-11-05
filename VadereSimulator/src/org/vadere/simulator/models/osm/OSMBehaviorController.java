@@ -58,13 +58,13 @@ public class OSMBehaviorController {
         VPoint currentPosition = pedestrian.getPosition();
         VPoint nextPosition = pedestrian.getNextPosition();
 
-	    // start time
+        // start time
         double stepStartTime = pedestrian.getTimeOfNextStep();
 
-	    // end time
-	    double stepEndTime = pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep();
+        // end time
+        double stepEndTime = pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep();
 
-	    assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
+        assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
 
         if (nextPosition.equals(currentPosition)) {
             pedestrian.setTimeCredit(0);
@@ -134,36 +134,40 @@ public class OSMBehaviorController {
         }
     }
 
+    // TODO: Write unit tests for the critical methods below!
     @Nullable
     public PedestrianOSM findSwapCandidate(PedestrianOSM pedestrian, Topography topography) {
+        // Agents with no targets don't want to swap places.
+        if (pedestrian.hasNextTarget() == false) {
+            return null;
+        }
 
-    	List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
+        List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
 
-	    if (closestPedestrians.size() > 0) {
-		    for (Pedestrian closestPedestrian : closestPedestrians) {
-		    	if(pedestrian.hasNextTarget()) {
-				    boolean closestPedIsCooperative = closestPedestrian.getSelfCategory() == SelfCategory.COOPERATIVE;
-				    boolean targetOrientationDiffers = false;
+        if (closestPedestrians.size() > 0) {
+            for (Pedestrian closestPedestrian : closestPedestrians) {
+                if (closestPedestrian.hasNextTarget()) {
+                    boolean closestPedIsCooperative = closestPedestrian.getSelfCategory() == SelfCategory.COOPERATIVE;
+                    boolean targetOrientationDiffers = false;
 
-				    // TODO: Use "pedestrian.getTargetGradient()" instead of "calculateAngleBetweenTargets()".
-				    double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+                    // TODO: Make both options configurable in JSON file.
+                    // double angleInRadian = calculateAngleBetweenTargets(pedestrian, closestPedestrian, topography);
+                    double angleInRadian = calculateAngleBetweenTargetGradients(pedestrian, (PedestrianOSM)closestPedestrian);
 
-				    if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
-					    targetOrientationDiffers = true;
-				    }
+                    if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getTargetOrientationAngleThreshold()) {
+                        targetOrientationDiffers = true;
+                    }
 
-				    if (closestPedIsCooperative && targetOrientationDiffers) {
-					    return (PedestrianOSM)closestPedestrian;
-				    }
-			    } else {
-		    		if(!closestPedestrian.hasNextTarget()) {
-					    return (PedestrianOSM)closestPedestrian;
-				    }
-			    }
-		    }
-	    }
+                    if (closestPedIsCooperative && targetOrientationDiffers) {
+                        return (PedestrianOSM)closestPedestrian;
+                    }
+                } else {
+                    return (PedestrianOSM)closestPedestrian;
+                }
+            }
+        }
 
-	    return null;
+        return null;
     }
 
     @NotNull
@@ -278,23 +282,23 @@ public class OSMBehaviorController {
         pedestrian2.setNextPosition(oldPosition);
 
         // Synchronize movement of both pedestrians
-	    double startTimeStep = pedestrian1.getTimeOfNextStep();
-	    double durationStep = Math.max(pedestrian1.getDurationNextStep(), pedestrian2.getDurationNextStep());
-	    double endTimeStep = startTimeStep + durationStep;
+        double startTimeStep = pedestrian1.getTimeOfNextStep();
+        double durationStep = Math.max(pedestrian1.getDurationNextStep(), pedestrian2.getDurationNextStep());
+        double endTimeStep = startTimeStep + durationStep;
 
-	    // We interrupt the current footstep of pedestrian 2 to sync it with
+        // We interrupt the current footstep of pedestrian 2 to sync it with
         // pedestrian 1. It is only required for the sequential update scheme
         // since pedestrian 2 might have done some steps in this time step and
-	    // is ahead (with respect to the time) of pedestrian 1.
+        // is ahead (with respect to the time) of pedestrian 1.
         // We remove those steps which is not a good solution!
-	    if(!pedestrian2.getTrajectory().isEmpty()) {
-		    pedestrian2.getTrajectory().adjustEndTime(startTimeStep);
-	    }
+        if(!pedestrian2.getTrajectory().isEmpty()) {
+            pedestrian2.getTrajectory().adjustEndTime(startTimeStep);
+        }
 
-	    pedestrian1.setTimeOfNextStep(startTimeStep);
-	    pedestrian2.setTimeOfNextStep(startTimeStep);
+        pedestrian1.setTimeOfNextStep(startTimeStep);
+        pedestrian2.setTimeOfNextStep(startTimeStep);
 
-	    makeStep(pedestrian1, topography, durationStep);
+        makeStep(pedestrian1, topography, durationStep);
         makeStep(pedestrian2, topography, durationStep);
 
         // TODO The experiment showed that speed decreased (to half of free-flow velocity).
@@ -302,7 +306,7 @@ public class OSMBehaviorController {
         pedestrian1.setTimeOfNextStep(endTimeStep);
         pedestrian2.setTimeOfNextStep(endTimeStep);
 
-	    pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
-	    pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
+        pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
+        pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
     }
 }
