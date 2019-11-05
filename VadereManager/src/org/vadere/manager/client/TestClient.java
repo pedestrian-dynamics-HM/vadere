@@ -5,6 +5,8 @@ import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
 import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
+import org.vadere.manager.traci.compoundobjects.CompoundObjectBuilder;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIResponse;
@@ -188,6 +190,10 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		} else {
 			if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
 				filePath = Paths.get(basePath, defaultScenario).toString();
+<<<<<<< HEAD
+=======
+				System.out.println("use default " + defaultScenario);
+>>>>>>> test_client_stsc
 			} else {
 				System.out.println("no default scenario set");
 				return;
@@ -359,20 +365,18 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
 		if(args.length < 5){
-			System.out.println("command needs argument element id, x-coordinate, y-coordinate, target");
+			System.out.println("command needs argument element id, x-coordinate, y-coordinate, list of targets");
 			return;
 		}
 
 		String elementIdentifier = args[1];
-		double x = Double.parseDouble(args[2]);
-		double y = Double.parseDouble(args[3]);
-		VPoint p = new VPoint(x, y);
-		ArrayList<String> targets = new ArrayList<>();
-		for (int i = 4; i < args.length; i++){
-			targets.add(args[i]);
-		}
 
-		TraCIResponse res =  personapi.createNew(elementIdentifier, p);
+		String x = args[2];
+		String y = args[3];
+		String[] targets = Arrays.copyOfRange(args,4,args.length);
+
+		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
+		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}
 

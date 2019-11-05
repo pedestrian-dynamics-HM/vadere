@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.reader;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.LightPhase;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
@@ -226,6 +227,23 @@ public class TraCIByteBuffer implements TraCIReader {
 	}
 
 	@Override
+	public CompoundObject readCompoundObject(){
+		ensureBytes(4);
+		int noElements = readInt();
+
+		CompoundObject compoundObject = new CompoundObject(noElements);
+
+		for(int i = 0; i < noElements; i++){
+			TraCIDataType type = TraCIDataType.fromId(readUnsignedByte());
+			if (type.equals(TraCIDataType.COMPOUND_OBJECT))
+				throw new TraCIException("Recursive CompoundObject are not allowed.");
+			compoundObject.add(type, readTypeValue(type));
+		}
+
+		return compoundObject;
+	}
+
+	@Override
 	public Object readTypeValue(TraCIDataType type) {
 
 		switch (type){
@@ -260,7 +278,7 @@ public class TraCIByteBuffer implements TraCIReader {
 			case COLOR:
 				return readColor();
 			case COMPOUND_OBJECT:
-				return null; // todo: simple fix. For now we ignore Compound Objects.
+				return readCompoundObject();
 			default:
 				throw new TraCIException("Unknown Datatype: " + type.toString());
 		}

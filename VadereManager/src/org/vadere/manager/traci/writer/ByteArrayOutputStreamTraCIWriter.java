@@ -1,6 +1,8 @@
 package org.vadere.manager.traci.writer;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
@@ -14,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -93,6 +96,9 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 				break;
 			case COLOR:
 				writeColor((Color) data);
+				break;
+			case COMPOUND_OBJECT:
+				writeCompoundObject((CompoundObject) data);
 				break;
 			default:
 				logger.errorf("cannot write %s", dataType.toString());
@@ -292,6 +298,20 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());
 		writeUnsignedByte(color.getAlpha());
+		return this;
+	}
+
+	@Override
+	public TraCIWriter writeCompoundObject(CompoundObject compoundObject) {
+		writeUnsignedByte(TraCIDataType.COMPOUND_OBJECT.id);
+		writeInt(compoundObject.size());
+		Iterator<Pair<TraCIDataType, Object>> iter = compoundObject.itemIterator();
+		while (iter.hasNext()){
+			Pair<TraCIDataType, Object> p = iter.next();
+			if (p.getLeft().equals(TraCIDataType.COMPOUND_OBJECT))
+					throw new TraCIException("Recursive CompoundObject are not allowed.");
+			writeObjectWithId(p.getLeft(), p.getRight());
+		}
 		return this;
 	}
 

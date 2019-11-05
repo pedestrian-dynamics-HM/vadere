@@ -29,8 +29,7 @@ public enum PersonVar {
 	NEXT_EDGE(0xc1, TraCIDataType.STRING), // get
 	REMAINING_STAGES(0xc2, TraCIDataType.INTEGER), // get
 	VEHICLE(0xc3, TraCIDataType.STRING), // get
-	ADD(0x80, TraCIDataType.POS_2D), // set todo: change back to TraCIDataType.COMPOUND_OBJECT
-//	ADD(0x80, TraCIDataType.COMPOUND_OBJECT),
+	ADD(0x80, TraCIDataType.COMPOUND_OBJECT), // set
 	APPEND_STAGE(0xc4, TraCIDataType.COMPOUND_OBJECT), // set
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
 	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set
