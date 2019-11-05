@@ -275,14 +275,14 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listToLatest(version)) {
 			migrationLogger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
-			logger.info(migrationLogger.last());
+			logger.debug(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
 		// will always be Version.latest()
 		transformedNode = AbstractJsonTransformation.addNewMembersWithDefaultValues(transformedNode);
 		if (legacyDir != null) {
 			migrationLogger.info("Scenario Migrated - OK. Move copy of old version to legacllyDir");
-			logger.info(migrationLogger.last());
+			logger.debug(migrationLogger.last());
 			moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getLegacyExtension(), false);
 		}
 		IOUtils.writeTextFile(scenarioFilePath.toString(), StateJsonConverter.serializeJsonNode(transformedNode));

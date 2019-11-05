@@ -2,17 +2,35 @@ package org.vadere.gui.postvisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.*;
-import org.vadere.gui.components.control.simulation.*;
+import org.vadere.gui.components.control.ActionGeneratePoly;
+import org.vadere.gui.components.control.IViewportChangeListener;
+import org.vadere.gui.components.control.JViewportChangeListener;
+import org.vadere.gui.components.control.PanelResizeListener;
+import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.components.view.ScenarioElementView;
-import org.vadere.gui.postvisualization.control.*;
+import org.vadere.gui.postvisualization.control.ActionOpenFile;
+import org.vadere.gui.postvisualization.control.ActionPause;
+import org.vadere.gui.postvisualization.control.ActionPlay;
+import org.vadere.gui.postvisualization.control.ActionRecording;
+import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
+import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
+import org.vadere.gui.postvisualization.control.ActionStop;
+import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
+import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.simulator.projects.Scenario;
@@ -20,10 +38,14 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 import java.util.Optional;
+
+import javax.swing.*;
 
 /**
  * Main Window of the new post visualization.
@@ -89,7 +113,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		// 6. construct the toolbar
 		toolbar = new JToolBar("Toolbar");
 		int toolbarSize = CONFIG.getInt("Gui.toolbar.size");
-		toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
+		//toolbar.setPreferredSize(new Dimension(toolbarSize, toolbarSize));
 		toolbar.setBorderPainted(false);
 		toolbar.setFloatable(false);
 		toolbar.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -246,6 +270,9 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				renderer, model);
 		AbstractAction tikzImg = new ActionGenerateTikz(Messages.getString("ProjectView.btnTikZSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
 				renderer, model);
+		AbstractAction inetImg = new ActionGenerateINETenv(Messages.getString("ProjectView.btnINETSnapshot.tooltip"), resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer, model);
+
 		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), resources.getIcon("camera_poly.png", iconWidth, iconHeight),
 				model);
 
@@ -255,6 +282,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		imgOptions.add(pngImg);
 		imgOptions.add(svgImg);
 		imgOptions.add(tikzImg);
+		imgOptions.add(inetImg);
 		imgOptions.add(polyImg);
 		// add Action to List ....
 

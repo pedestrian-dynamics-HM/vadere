@@ -158,7 +158,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		addCommandWithExtendedLenField(cmdBuilder.asByteArray());
 	}
 
-		public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
+	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
 		TraCIGetVersionResponse res = cmd.getResponse();
 
 		if(res.isOKResponseStatus())

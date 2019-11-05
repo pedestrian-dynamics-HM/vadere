@@ -5,6 +5,8 @@ import org.vadere.manager.traci.commands.control.TraCICloseCommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
 import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
+import org.vadere.manager.traci.compoundobjects.CompoundObjectBuilder;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIResponse;
@@ -20,6 +22,7 @@ import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public class TestClient extends org.vadere.manager.client.AbstractTestClient implements Runnable{
 
@@ -186,8 +189,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 			}
 		} else {
 			if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-//				System.out.println("use default scenario001.scenario");
 				filePath = Paths.get(basePath, defaultScenario).toString();
+				System.out.println("use default " + defaultScenario);
 			} else {
 				System.out.println("no default scenario set");
 				return;
@@ -218,14 +221,47 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.getResponseData());
 	}
 
+    @Override
+    public void personapi_getNextFreeId(String[] args) throws IOException {
+		TraCIGetResponse res = personapi.getNextFreeId();
+		System.out.println(res.getResponseData());
+    }
+
 	@Override
 	public void personapi_getIDCount(String[] args) throws IOException {
-
+		TraCIGetResponse res = personapi.getIDCount();
+		System.out.println(res.getResponseData());
 	}
 
 	@Override
 	public void personapi_getSpeed(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument (id)");
+			return;
+		}
+		String elementIdentifier = args[1];
 
+		try {
+			TraCIGetResponse res = personapi.getSpeed(elementIdentifier);
+			double p = (double) res.getResponseData();
+			System.out.println(p);
+		} catch (ClassCastException e){
+			System.out.println("Maybe the id is invalid. See getIDList for valid ids.");
+			return;
+		}
+	}
+
+	@Override
+	public void personapi_setVelocity(String[] args) throws IOException {
+		if(args.length < 3) {
+			System.out.println("command needs argument id, velocity");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double velocity = Double.parseDouble(args[2]);
+		TraCIResponse res = personapi.setVelocity(elementIdentifier, velocity);
+		System.out.println(res.toString());
 	}
 
 	@Override
@@ -241,8 +277,29 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void personapi_setPosition2D(String[] args) throws IOException {
+		if(args.length < 4) {
+			System.out.println("command needs arguments id, x, y");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double x = Double.parseDouble(args[2]);
+		double y = Double.parseDouble(args[3]);
+		VPoint p = new VPoint(x, y);
+		TraCIResponse res = personapi.setPosition2D(elementIdentifier, p);
+		System.out.println(res.toString());
+	}
+
+	@Override
 	public void personapi_getPosition3D(String[] args) throws IOException {
 
+	}
+
+	@Override
+	public void personapi_getPosition2DList(String[] args) throws IOException {
+		TraCIGetResponse res = personapi.getPosition2DList();
+		System.out.println(((Map<String, VPoint>) res.getResponseData()).toString());
 	}
 
 	@Override
@@ -302,28 +359,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	// todo implement new methods from AbstractTestClient....
 
-
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
 		if(args.length < 5){
-			System.out.println("command needs argument element id, x-coordinate, y-coordinate");
+			System.out.println("command needs argument element id, x-coordinate, y-coordinate, list of targets");
 			return;
 		}
 
 		String elementIdentifier = args[1];
 		String x = args[2];
 		String y = args[3];
-//		ArrayList<String> targets = new ArrayList<>();
-//		for (int i = 4; i < args.length; i++){
-//			targets.add(args[i]);
-//		}
+		String[] targets = Arrays.copyOfRange(args,4,args.length);
 
-		TraCIResponse res =  personapi.createNew(elementIdentifier, new VPoint(Double.parseDouble(x), Double.parseDouble(y)));
+
+		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
+		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}
 
-//	@Override
-	public void personapi_getNextFreeId(String[] args) throws IOException {
-
-	}
 }

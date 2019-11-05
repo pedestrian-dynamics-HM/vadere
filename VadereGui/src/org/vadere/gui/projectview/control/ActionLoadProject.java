@@ -1,8 +1,6 @@
 package org.vadere.gui.projectview.control;
 
-
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.projectview.VadereApplication;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -14,6 +12,7 @@ import org.vadere.simulator.projects.migration.MigrationResult;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,11 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.swing.*;
 
 public class ActionLoadProject extends AbstractAction {
 
@@ -135,45 +130,47 @@ public class ActionLoadProject extends AbstractAction {
 				SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 					@Override
 					public Void doInBackground() {
-						int total = stats.total;
-						int migrated = stats.legacy;
-						int nonmigratable = stats.notmigratable;
-						int untouched = total - migrated - nonmigratable;
+						String migrationResult = String.format("%s %s:\n\n",
+								Messages.getString("MigrationAssistant.Results.title"),
+								Version.latest().label());
+						migrationResult += String.join("\n", getMigrationResult(stats));
 
-						// TODO pull this text from the language files
-
-						String message =
-								"The migration assistant analyzed the " + total + " scenarios in the scenarios and output " +
-										"directories of this project and attempted to upgrade them to the latest version "
-										+ Version.latest().label() + ".\n" +
-										"Log-files have been created in legacy/scenarios and legacy/output.\n\n";
-
-						if (untouched > 0)
-							message += "(" + untouched + "/" + total  + ") of the scenarios were already up to date.\n\n";
-						if (nonmigratable > 0)
-							message += "(" + nonmigratable + "/" + total
-									+ ") scenarios could not automatically be upgraded and were moved to the legacy-folder. They can't be opened unless the upgrade is done manually.\n\n";
-						if (migrated > 0)
-							message += "(" + migrated + "/" + total
-									+ ") scenarios were successfully upgraded. The old versions were moved to the legacy-folder.\n\n";
+						if (stats.legacy > 0) {
+							migrationResult += String.format("\n\n%s", Messages.getString("MigrationAssistant.Results.migratedInfo"));
+						}
 
 						JOptionPane.showMessageDialog(
 								ProjectView.getMainWindow(),
-								message, "JoltMigrationAssistant assistant",
+								migrationResult, Messages.getString("MigrationAssistant.title"),
 								JOptionPane.INFORMATION_MESSAGE);
+
 						return null;
 					}
 				};
 				worker.execute();
-			} else {
-				logger.info("Nothing to migrate all up to date " + stats);
 			}
-
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "JoltMigrationAssistant assistant",
+			JOptionPane.showMessageDialog(null, e.getMessage(), Messages.getString("MigrationAssistant.title"),
 					JOptionPane.ERROR_MESSAGE);
 			logger.error("could not loadFromFilesystem project: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * The "MigrationResult" class cannot access "Messages.getString(...)"
+	 * because of avoiding cyclic dependencies between view and controller classes.
+	 * Therefore, translate the migration results here.
+	 */
+	public static List<String> getMigrationResult(MigrationResult migrationResult) {
+		List<String> resultArray = new ArrayList<>();
+
+		String resultLineTemplate = "%s: %d";
+		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.analyzed"), migrationResult.total));
+		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.migrated"), migrationResult.legacy));
+		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.upToDate"), migrationResult.upToDate));
+		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.notMigratable"), migrationResult.notmigratable));
+
+		return resultArray;
 	}
 }

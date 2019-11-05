@@ -1,6 +1,7 @@
 # Build artifacts, log and preference files
 *.out
 *.preferences.xml
+**/current_commit_hash.txt
 bin/
 swing-inspector-linux-1.2.3/
 target/
@@ -39,14 +40,11 @@ Tools/VadereAnalysisTools/VadereAnalysisTool/dist/
 # Jupyter Notebooks
 **/.ipynb_checkpoints
 
-#model test output
-VadereModelTests/**/output
-VadereModelTests/*_private
-VadereModelCalibration/**/output
-VadereModelTests/**/legacy
+# Test output
+Scenarios/**/output
+Scenarios/**/*_private
+Scenarios/**/**/legacy
 VadereUtils/output/**
-VadereModelTests/*_private
-**/current_commit_hash.txt
 
 # Operating system files
 .DS_Store

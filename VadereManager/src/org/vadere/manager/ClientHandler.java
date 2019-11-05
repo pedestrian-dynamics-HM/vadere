@@ -44,7 +44,6 @@ public class ClientHandler implements Runnable{
 		} catch (Exception e){
 			logger.error("Error while handling TraCI Message", e);
 		}
-
 	}
 
 	private void handleClient() throws IOException{
@@ -58,7 +57,6 @@ public class ClientHandler implements Runnable{
 				if (traCIPacketBuffer.hasRemaining()){
 					TraCICommand cmd = traCIPacketBuffer.nextCommand();
 					while (cmd != null ){
-
 
 						TraCIPacket response = cmdExecutor.execute(cmd);
 						logger.debugf("send packet with %d byte", response.size());
