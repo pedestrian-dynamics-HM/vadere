@@ -301,11 +301,13 @@ public class OSMBehaviorController {
         makeStep(pedestrian1, topography, durationStep);
         makeStep(pedestrian2, topography, durationStep);
 
-        // TODO The experiment showed that speed decreased (to half of free-flow velocity).
-        //   Maybe, use "pedestrian.getDurationNextStep() * 2".
         pedestrian1.setTimeOfNextStep(endTimeStep);
         pedestrian2.setTimeOfNextStep(endTimeStep);
 
+        // TODO:
+        //  "makeStep()" already invokes
+        //  "pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep())"
+        //  => Ask BZ if is it really necessary to call it twice (and subtract duration twice)?
         pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
         pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
     }
