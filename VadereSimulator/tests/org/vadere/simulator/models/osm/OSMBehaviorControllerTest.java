@@ -28,10 +28,55 @@ public class OSMBehaviorControllerTest {
     private PedestrianOSM pedestrian2;
     private Topography topography;
 
-    private void createTwoTargetsAndTwoPedestrians(VPoint target1Position, VPoint target2Position, VPoint pedestrian1Position, VPoint pedestrian2Position) {
-        // Create a topography with two targets.
-        topography = new Topography();
+    private void createSameDirectionTopography() {
+        createTwoTargetsAndTwoPedestrians(
+                new VPoint(-1, 0), // target1
+                new VPoint(-1, 0), // target2
+                new VPoint(0, 0), // pedestrian1
+                new VPoint(1, 0) // pedestrian2
+        );
+    }
 
+    private void createPerpendicularVariation1Topography() {
+        createTwoTargetsAndTwoPedestrians(
+                new VPoint(0, 1), // target1
+                new VPoint(-1, 0), // target2
+                new VPoint(0, 0), // pedestrian1
+                new VPoint(1, 0)  // pedestrian2
+        );
+    }
+
+    private void createPerpendicularVariation2Topography() {
+        createTwoTargetsAndTwoPedestrians(
+                new VPoint(1, 0), // target1
+                new VPoint(1, -1), // target2
+                new VPoint(0, 0), // pedestrian1
+                new VPoint(1, 0)  // pedestrian2
+        );
+    }
+
+    private void createOppositeDirectionTopography() {
+        createTwoTargetsAndTwoPedestrians(
+                new VPoint(-1, 0), // target1
+                new VPoint(2, 0), // target2
+                new VPoint(0, 0), // pedestrian1
+                new VPoint(1, 0)  // pedestrian2
+        );
+    }
+
+    private void createTwoTargetsAndTwoPedestrians(VPoint target1Position, VPoint target2Position, VPoint pedestrian1Position, VPoint pedestrian2Position) {
+        List<Target> targets = createTwoTargets(target1Position, target2Position);
+
+        topography = new Topography();
+        topography.addTarget(targets.get(0));
+        topography.addTarget(targets.get(1));
+
+        List<PedestrianOSM> pedestrians = createTwoPedestrianOSM(pedestrian1Position, pedestrian2Position, topography);
+        pedestrian1 = pedestrians.get(0);
+        pedestrian2 = pedestrians.get(1);
+    }
+
+    private List<Target> createTwoTargets(VPoint target1Position, VPoint target2Position) {
         Target target1 = new Target(new AttributesTarget());
         target1.setShape(new VCircle(target1Position, 1));
         target1.getAttributes().setId(1);
@@ -40,10 +85,14 @@ public class OSMBehaviorControllerTest {
         target2.setShape(new VCircle(target2Position, 1));
         target2.getAttributes().setId(2);
 
-        topography.addTarget(target1);
-        topography.addTarget(target2);
+        List<Target> targets = new ArrayList<>();
+        targets.add(target1);
+        targets.add(target2);
 
-        // Create two pedestrians and assign them the two targets from above.
+        return targets;
+    }
+
+    private List<PedestrianOSM> createTwoPedestrianOSM(VPoint pedestrian1Position, VPoint pedestrian2Position, Topography topography) {
         AttributesAgent attributesAgent = new AttributesAgent();
         AttributesOSM attributesOSM = new AttributesOSM();
         int seed = 1;
@@ -55,30 +104,32 @@ public class OSMBehaviorControllerTest {
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
 
-        pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        PedestrianOSM pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
-        pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        PedestrianOSM pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
 
         pedestrian1.setPosition(pedestrian1Position);
         LinkedList<Integer> targetsPedestrian1 = new LinkedList<>();
-        targetsPedestrian1.add(target1.getId());
+        targetsPedestrian1.add(topography.getTarget(1).getId());
         pedestrian1.setTargets(targetsPedestrian1);
+
 
         pedestrian2.setPosition(new VPoint(pedestrian2Position));
         LinkedList<Integer> targetsPedestrian2 = new LinkedList<>();
-        targetsPedestrian2.add(target2.getId());
+        targetsPedestrian2.add(topography.getTarget(2).getId());
         pedestrian2.setTargets(targetsPedestrian2);
+
+        List<PedestrianOSM> pedestrians = new ArrayList<>();
+        pedestrians.add(pedestrian1);
+        pedestrians.add(pedestrian2);
+
+        return pedestrians;
     }
 
     @Test
-    public void calculateAngleBetweenTargetsReturnsCorrectResultIfTargetAndPedestriansAreVerticalZeroQuarterCircle() {
-        createTwoTargetsAndTwoPedestrians(
-                new VPoint(-1, 0), // target1
-                new VPoint(-1, 0), // target2
-                new VPoint(0, 0), // pedestrian1
-                new VPoint(1, 0) // pedestrian2
-        );
+    public void calculateAngleBetweenTargetsReturnsZeroIfTargetsAreInSameDirection() {
+        createSameDirectionTopography();
 
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
 
@@ -89,13 +140,8 @@ public class OSMBehaviorControllerTest {
     }
 
     @Test
-    public void calculateAngleBetweenTargetsReturnsCorrectResultIfTargetAndPedestriansAreVerticalOneQuarterCircle() {
-        createTwoTargetsAndTwoPedestrians(
-                new VPoint(0, 1), // target1
-                new VPoint(-1, 0), // target2
-                new VPoint(0, 0), // pedestrian1
-                new VPoint(1, 0)  // pedestrian2
-        );
+    public void calculateAngleBetweenTargetsReturnsPiHalfIfPedestriansWalkPerpendicularVariation1() {
+        createPerpendicularVariation1Topography();
 
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
 
@@ -106,34 +152,24 @@ public class OSMBehaviorControllerTest {
     }
 
     @Test
-    public void calculateAngleBetweenTargetsReturnsCorrectResultIfTargetAndPedestriansAreVerticalTwoQuarterCircle() {
-        createTwoTargetsAndTwoPedestrians(
-                new VPoint(-1, 0), // target1
-                new VPoint(2, 0), // target2
-                new VPoint(0, 0), // pedestrian1
-                new VPoint(1, 0)  // pedestrian2
-        );
+    public void calculateAngleBetweenTargetsReturnsPiHalfIfPedestriansWalkPerpendicularVariation2() {
+        createPerpendicularVariation2Topography();
+
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+
+        double expectedAngle = Math.PI / 2;
+        double actualAngle = controllerUnderTest.calculateAngleBetweenTargets(pedestrian1, pedestrian2, topography);
+
+        assertEquals(expectedAngle, actualAngle, ALLOWED_DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    public void calculateAngleBetweenTargetsReturnsPiIfPedestriansWalkInOppositeDirections() {
+        createOppositeDirectionTopography();
 
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
 
         double expectedAngle = Math.PI;
-        double actualAngle = controllerUnderTest.calculateAngleBetweenTargets(pedestrian1, pedestrian2, topography);
-
-        assertEquals(expectedAngle, actualAngle, ALLOWED_DOUBLE_TOLERANCE);
-    }
-
-    @Test
-    public void calculateAngleBetweenTargetsReturnsCorrectResultIfTargetAndPedestriansAreVerticalThreeQuarterCircle() {
-        createTwoTargetsAndTwoPedestrians(
-                new VPoint(1, 0), // target1
-                new VPoint(1, -1), // target2
-                new VPoint(0, 0), // pedestrian1
-                new VPoint(1, 0)  // pedestrian2
-        );
-
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-
-        double expectedAngle = Math.PI / 2;
         double actualAngle = controllerUnderTest.calculateAngleBetweenTargets(pedestrian1, pedestrian2, topography);
 
         assertEquals(expectedAngle, actualAngle, ALLOWED_DOUBLE_TOLERANCE);
@@ -169,9 +205,9 @@ public class OSMBehaviorControllerTest {
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
 
-        pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
-        pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
 
         // Position of pedestrian1
@@ -230,9 +266,9 @@ public class OSMBehaviorControllerTest {
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
 
-        pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        pedestrian1 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
-        pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(1),
+        pedestrian2 = new PedestrianOSM(new AttributesOSM(), attributesAgent, topography, new Random(seed),
                 potentialFieldTargetGrid, null, null, null, null);
 
         // Position of pedestrian1

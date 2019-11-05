@@ -253,7 +253,7 @@ public class OSMBehaviorController {
         return vectorPedestrianToTarget;
     }
 
-    private double calculateAngleBetweenTargetGradients(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
+    public double calculateAngleBetweenTargetGradients(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
         double angleInRadian = -1;
 
         Vector2D targetGradientPedestrian1 = pedestrian1.getTargetGradient(pedestrian1.getPosition());
