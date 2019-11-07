@@ -1,7 +1,6 @@
 package org.vadere.simulator.control;
 
 import org.vadere.simulator.context.VadereContext;
-import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -9,18 +8,20 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.data.cellgrid.CellGridReachablePointProvider;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.function.Function;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class OfflineTopographyController {
 
 	private final Topography topography;
+	protected final Random random;
 
-	public OfflineTopographyController(final Topography topography) {
+	public OfflineTopographyController(final Topography topography, final Random random) {
 		this.topography = topography;
+		this.random = random;
 	}
 
 	protected void update(double simTimeInSec) {
@@ -42,13 +43,14 @@ public class OfflineTopographyController {
 
 		// add distance function
 		ScenarioCache cache = (ScenarioCache) VadereContext.get(topography).getOrDefault("cache", ScenarioCache.empty());
-		IPotentialField distanceField = new PotentialFieldDistancesBruteForce(
+		PotentialFieldDistancesBruteForce distanceField = new PotentialFieldDistancesBruteForce(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
 				new AttributesFloorField(), cache);
-		Function<IPoint, Double> obstacleDistance = p -> distanceField.getPotential(p, null);
-		this.topography.setObstacleDistanceFunction(obstacleDistance);
+		this.topography.setObstacleDistanceFunction(distanceField);
 
+		this.topography.setReachablePointProvider(CellGridReachablePointProvider.createUniform(
+				distanceField.getCellGrid(), random));
 	}
 
 	/**

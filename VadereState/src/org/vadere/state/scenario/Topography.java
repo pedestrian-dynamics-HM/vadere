@@ -17,6 +17,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.random.IReachablePointProvider;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -39,7 +40,8 @@ public class Topography implements DynamicElementMover{
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	private Function<IPoint, Double> obstacleDistanceFunction;
+	private ObstacleDistanceFunction obstacleDistanceFunction;
+	private IReachablePointProvider reachablePointProvider;
 	/** A possible empty string identifying a context object. */
 	private String contextId;
 
@@ -147,7 +149,12 @@ public class Topography implements DynamicElementMover{
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		recomputeCells = false;
 
-		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
+		this.obstacleDistanceFunction = point ->  obstacles.stream()
+				.map(Obstacle::getShape)
+				.map(shape -> shape.distance(point))
+				.min(Double::compareTo)
+				.orElse(Double.MAX_VALUE);
+
 		this.dynamicElementIdCounter = new AtomicInteger(1);
 		this.contextId = "";
 	}
@@ -200,10 +207,22 @@ public class Topography implements DynamicElementMover{
 	}
 
 	public double distanceToObstacle(@NotNull IPoint point) {
-		return this.obstacleDistanceFunction.apply(point);
+		return this.obstacleDistanceFunction.getDistance(point);
 	}
 
-	public void setObstacleDistanceFunction(@NotNull Function<IPoint, Double> obstacleDistanceFunction) {
+	public ObstacleDistanceFunction getObstacleDistanceFunction() {
+			return obstacleDistanceFunction;
+	}
+
+	public IReachablePointProvider getReachablePointProvider() {
+		return reachablePointProvider;
+	}
+
+	public void setReachablePointProvider(@NotNull IReachablePointProvider reachablePointProvider) {
+		this.reachablePointProvider = reachablePointProvider;
+	}
+
+	public void setObstacleDistanceFunction(@NotNull ObstacleDistanceFunction obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 

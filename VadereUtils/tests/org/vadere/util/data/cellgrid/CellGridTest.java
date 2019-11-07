@@ -2,6 +2,7 @@ package org.vadere.util.data.cellgrid;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.vadere.util.random.IPointOffsetProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +59,29 @@ public class CellGridTest {
 		}
 
 		compare(cellGrid.asTable(), cellGrid);
+	}
+
+	@Test
+	public void randomFreeSpace(){
+		Random rnd = new Random(4);
+		CellGrid cellGrid = new CellGrid(3.0, 3.0, 1.0, new CellState(), 0.0, 0.0);
+		cellGrid.setValue(0, 0, new CellState(1.0, PathFindingTag.Reachable));
+		cellGrid.setValue(0, 1, new CellState(2.0, PathFindingTag.Reachable));
+		cellGrid.setValue(0, 2, new CellState(3.0, PathFindingTag.Reachable));
+		cellGrid.setValue(0, 3, new CellState(4.0, PathFindingTag.Reachable));
+		cellGrid.setValue(1, 0, new CellState(1.0, PathFindingTag.Reachable));
+		cellGrid.setValue(1, 1, new CellState(2.0, PathFindingTag.Reachable));
+		cellGrid.setValue(1, 2, new CellState(3.0, PathFindingTag.Reachable));
+		cellGrid.setValue(1, 3, new CellState(4.0, PathFindingTag.Reachable));
+
+
+		CellGridReachablePointProvider provider = CellGridReachablePointProvider.createUniform(cellGrid, rnd);
+		provider.setIPointOffsetProvider(IPointOffsetProvider.noOffset());
+
+//		provider.stream(aDouble -> true).limit(9).forEach(System.out::println);
+		System.out.println("------");
+		provider.randomStream(aDouble -> aDouble < 2).limit(50).forEach(System.out::println);
+
 	}
 
 	private void compare(Table t, CellGrid cellGrid){
