@@ -10,17 +10,13 @@ import struct
 
 def go(data):
     con = traci.connect(port=9999)
-    con._queue.append(1)
-    con._string = data
+    con.sendFile(data)
 
 scenPath = r"/Users/Philipp/Repos/vadere/Scenarios/Demos/roVer/scenarios/scenario002.scenario"
 scenFile = open(scenPath, 'r')
 scenario = scenFile.read()
 
-data = struct.pack("BBBBBBBBBB",0,0,0,34,13,117,0,0,0,4)\
-    + "Test".encode('us-ascii')\
-    + struct.pack('BBBB',0,0,33,251)\
-    + scenario.encode('us-ascii')
+data = ["Test", scenario]
 
 # connect and sendFile
 go(data)
