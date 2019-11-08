@@ -302,7 +302,7 @@ class Connection:
         Send a scenario file.
         args = [fileName, scenarioContent]
         """
-        self._queue.append(tc.CMD_LOAD)
+        self._queue.append(tc.CMD_SEND_FILE)
         self._string += struct.pack("!BiB", 0, 1 + 1 + 4 + 4 * len(args) + sum(map(len, args)), 117)
         for s in args:
            self._string += struct.pack("!i", len(s)) + s.encode('us-ascii')

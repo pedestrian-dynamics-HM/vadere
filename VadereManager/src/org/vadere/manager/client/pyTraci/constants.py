@@ -286,6 +286,8 @@ CMD_SUBSCRIBE_PERSON_VARIABLE = 0xde
 #  response: subscribe person variable
 RESPONSE_SUBSCRIBE_PERSON_VARIABLE = 0xee
 
+# command: send file
+CMD_SEND_FILE = 0x75
 
 #  ****************************************
 #  POSITION REPRESENTATIONS
