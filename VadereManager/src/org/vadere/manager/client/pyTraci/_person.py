@@ -212,19 +212,15 @@ class PersonDomain(Domain):
             self.removeStage(personID, 1)
         self.removeStage(personID, 0)
 
-    def add(self, personID, edgeID, pos, depart=tc.DEPARTFLAG_NOW, typeID="DEFAULT_PEDTYPE"):
-        """add(string, string, double, double, string)
-        Inserts a new person to the simulation at the given edge, position and
-        time (in s). This function should be followed by appending Stages or the person
-        will immediately vanish on departure.
+    def add(self, personID, pos2D, *targets):
+        """add(string, (double, double), stringlist)
         """
         self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.ADD, personID,
-                                       1 + 4 + 1 + 4 + len(typeID) + 1 + 4 + len(edgeID) + 1 + 8 + 1 + 8)
-        self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 4)
-        self._connection._packString(typeID)
-        self._connection._packString(edgeID)
-        self._connection._string += struct.pack("!Bd", tc.TYPE_DOUBLE, depart)
-        self._connection._string += struct.pack("!Bd", tc.TYPE_DOUBLE, pos)
+                                       1 + 4 + 1 + + 1 + 4 + 1 + 8 + 8 + 1 + 4 + len(targets) + 4 * len(targets))
+        self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 3)
+        self._connection._packString(personID)
+        self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, *pos2D)
+        self._connection._packStringList(targets)
         self._connection._sendExact()
 
     def appendWaitingStage(self, personID, duration, description="waiting", stopID=""):

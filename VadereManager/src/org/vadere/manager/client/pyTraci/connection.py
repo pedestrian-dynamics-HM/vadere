@@ -61,7 +61,7 @@ class Connection:
     def _packStringList(self, l):
         self._string += struct.pack("!Bi", tc.TYPE_STRINGLIST, len(l))
         for s in l:
-            self._string += struct.pack("!i", len(s)) + s.encode("latin1")
+            self._string += struct.pack("!i", len(s)) + s.encode("us-ascii")
 
     def _packDoubleList(self, l):
         self._string += struct.pack("!Bi", tc.TYPE_DOUBLELIST, len(l))

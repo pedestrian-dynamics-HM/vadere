@@ -26,5 +26,8 @@ if __name__ == '__main__':
     traci.init(port=9999)
     traci.sendFile(["Test", scenario])
 
+    traci.person.add("5", (2.0, 3.0), "1", "2")
+    traci.simulationStep(1)
+
     # interactive
     embed()
