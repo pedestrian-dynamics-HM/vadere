@@ -50,8 +50,6 @@ public class PedestrianOSM extends Pedestrian {
 	private VPoint nextPosition;
 	private VPoint lastPosition;
 
-	// for unit time clock update...
-	private double timeCredit;
 	// for event driven update...
 	private double timeOfNextStep;
 
@@ -297,14 +295,6 @@ public class PedestrianOSM extends Pedestrian {
 
 	public void setLastPosition(VPoint lastPosition) {
 		this.lastPosition = lastPosition;
-	}
-
-	public double getTimeCredit() {
-		return timeCredit;
-	}
-
-	public void setTimeCredit(double timeCredit) {
-		this.timeCredit = timeCredit;
 	}
 
 	public void refreshRelevantPedestrians() {

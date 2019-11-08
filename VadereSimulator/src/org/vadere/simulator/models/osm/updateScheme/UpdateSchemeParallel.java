@@ -39,7 +39,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
-		this.executorService = Executors.newFixedThreadPool(8);
+		this.executorService = Executors.newFixedThreadPool(1);
 		this.movedPedestrians = new HashSet<>();
 		this.stepPedestrians = new HashSet<>();
 		this.osmBehaviorController = new OSMBehaviorController();
@@ -49,30 +49,32 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		clearStrides(topography);
 
-		movedPedestrians.clear();
-		stepPedestrians.clear();
-		CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
-		List<Future<?>> futures;
+		do {
+			movedPedestrians.clear();
+			stepPedestrians.clear();
+			CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
+			List<Future<?>> futures;
 
-		for (CallMethod callMethod : callMethods) {
-			long ms = 0;
-			if(callMethod == CallMethod.SEEK) {
-				ms = System.currentTimeMillis();
+			for (CallMethod callMethod : callMethods) {
+				long ms = 0;
+				if(callMethod == CallMethod.SEEK) {
+					ms = System.currentTimeMillis();
+				}
+
+				futures = new LinkedList<>();
+				for (final PedestrianOSM pedestrian : CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
+					Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
+					futures.add(executorService.submit(worker));
+				}
+				collectFutures(futures);
+
+				if(callMethod == CallMethod.SEEK) {
+					ms = System.currentTimeMillis() - ms;
+					logger.debug("runtime for next step computation = " + ms + " [ms]");
+				}
+
 			}
-
-			futures = new LinkedList<>();
-			for (final PedestrianOSM pedestrian : CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class)) {
-				Runnable worker = () -> update(pedestrian, timeStepInSec, currentTimeInSec, callMethod);
-				futures.add(executorService.submit(worker));
-			}
-			collectFutures(futures);
-
-			if(callMethod == CallMethod.SEEK) {
-				ms = System.currentTimeMillis() - ms;
-				logger.debug("runtime for next step computation = " + ms + " [ms]");
-			}
-
-		}
+		} while (!movedPedestrians.isEmpty());
 	}
 
 	protected void collectFutures(final List<Future<?>> futures) {
@@ -127,7 +129,9 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 		if (pedestrian.getTimeOfNextStep() < currentTimeInSec) {
 			pedestrian.updateNextPosition();
-			movedPedestrians.add(pedestrian);
+			synchronized (movedPedestrians) {
+				movedPedestrians.add(pedestrian);
+			}
 		}
 	}
 
@@ -175,7 +179,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 					stepPedestrians.add(pedestrian);
 				}
 			} else {
-				osmBehaviorController.undoStep(pedestrian, topography);
+				//osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}
@@ -186,7 +190,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 				//osmBehaviorController.undoStep(pedestrian, topography);
 			} else {
-				//osmBehaviorController.undoStep(pedestrian, topography);
+				osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}

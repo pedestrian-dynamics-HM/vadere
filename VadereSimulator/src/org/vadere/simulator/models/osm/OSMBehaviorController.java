@@ -62,12 +62,9 @@ public class OSMBehaviorController {
 	    assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
 
         if (nextPosition.equals(currentPosition)) {
-            pedestrian.setTimeCredit(0);
             pedestrian.setVelocity(new Vector2D(0, 0));
 
         } else {
-            pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep());
-
             pedestrian.setPosition(nextPosition);
             synchronized (topography) {
                 topography.moveElement(pedestrian, currentPosition);
@@ -100,7 +97,6 @@ public class OSMBehaviorController {
     public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
         // Satisfy event-driven and sequential update scheme.
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
-        pedestrian.setTimeCredit(0);
     }
 
     // Watch out: A bang event changes only the "CombinedPotentialStrategy".
@@ -340,9 +336,5 @@ public class OSMBehaviorController {
         //   Therefore, use "pedestrian.getDurationNextStep() * 2".
         pedestrian1.setTimeOfNextStep(endTimeStep);
         pedestrian2.setTimeOfNextStep(endTimeStep);
-
-	    pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
-//	    assert pedestrian1.getTimeCredit() >= 0.0;
-	    pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
     }
 }
