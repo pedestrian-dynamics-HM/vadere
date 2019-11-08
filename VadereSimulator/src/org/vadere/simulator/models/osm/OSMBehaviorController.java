@@ -89,6 +89,7 @@ public class OSMBehaviorController {
     public void undoStep(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
 	    FootStep footStep = pedestrian.getTrajectory().removeLast();
 	    pedestrian.getFootstepHistory().removeLast();
+
 	    pedestrian.setPosition(footStep.getStart());
 	    synchronized (topography) {
 		    topography.moveElement(pedestrian, footStep.getEnd());

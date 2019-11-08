@@ -120,6 +120,11 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 * @param timeStepInSec the duration of the time step in seconds
 	 */
 	protected void updateParallelSeek(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec, final double timeStepInSec) {
+		if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
+			pedestrian.setTimeOfNextStep(currentTimeInSec);
+			return;
+		}
+
 		if (pedestrian.getTimeOfNextStep() < currentTimeInSec) {
 			pedestrian.updateNextPosition();
 			movedPedestrians.add(pedestrian);
@@ -147,6 +152,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
 		if (movedPedestrians.contains(pedestrian)) {
+			pedestrian.refreshRelevantPedestrians();
 			List<Agent> others = getCollisionPedestrians(pedestrian);
 
 			boolean undoStep = false;
@@ -168,6 +174,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				synchronized (stepPedestrians) {
 					stepPedestrians.add(pedestrian);
 				}
+			} else {
+				osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}
@@ -176,8 +184,9 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		if(movedPedestrians.contains(pedestrian)) {
 			if(stepPedestrians.contains(pedestrian)) {
 				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+				//osmBehaviorController.undoStep(pedestrian, topography);
 			} else {
-				osmBehaviorController.undoStep(pedestrian, topography);
+				//osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}
