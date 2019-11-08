@@ -68,13 +68,14 @@ public class Pedestrian extends Agent {
 		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
 	}
 
-	private Pedestrian(Pedestrian other) {
+	protected Pedestrian(Pedestrian other) {
 		super(other);
 
 		idAsTarget = other.idAsTarget;
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 
+		//TODO: @author Benedikt K. this is not a clone
 		psychology = new AttributesAgentPsychology();
 		psychology.setMostImportantStimulus(other.getMostImportantStimulus());
 		psychology.setSelfCategory(other.getSelfCategory());
