@@ -1,11 +1,30 @@
-import sys
-import org.vadere.manager.client.pyTraci as traci
+import sys, os
+import argparse
 from IPython import embed
 
-scenPath = r"C:\Users\Philipp\Repos\vadere\Scenarios\Demos\roVer\scenarios\scenario002.scenario"
-scenFile = open(scenPath, 'r')
-scenario = scenFile.read()
+import org.vadere.manager.client.pyTraci as traci
 
-con = traci.connect(port=9999)
-con.sendFile(["Test", scenario])
-embed()
+def readScenario(scenPath):
+    with open(scenPath, 'r') as scenFile:
+        scenario = scenFile.read()
+    return scenario
+
+
+if __name__ == '__main__':
+
+    # args
+    parser = argparse.ArgumentParser(description="Python client to vadere via traci")
+    parser.add_argument('-scenPath', type=str, help='Path to the scenario')
+    parser.add_argument('-scenFName', type=str, help='Filename of the scenario. E.g. scenario002.scenario')
+    args = parser.parse_args()
+
+    # go
+    scenPath = os.path.join(args.scenPath, args.scenFName)
+    scenName = "Test"
+    scenario = readScenario(scenPath)
+
+    traci.init(port=9999)
+    traci.sendFile(["Test", scenario])
+
+    # interactive
+    embed()

@@ -32,8 +32,8 @@ if 'SUMO_HOME' in os.environ:
 else:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import sumolib  # noqa
-from sumolib.miscutils import getFreeSocketPort  # noqa
+# import sumolib  # noqa
+# from sumolib.miscutils import getFreeSocketPort  # noqa
 
 from .domain import _defaultDomains  # noqa
 # StepListener needs to be imported for backwards compatibility
@@ -99,7 +99,7 @@ def connect(port=8813, numRetries=10, host="localhost", proc=None):
     raise FatalTraCIError("Could not connect in %s tries" % (numRetries + 1))
 
 
-def init(port=8813, numRetries=10, host="localhost", label="default", proc=None):
+def init(port=9999, numRetries=10, host="localhost", label="default", proc=None):
     """
     Establish a connection to a TraCI-Server and store it under the given
     label. This method is not thread-safe. It accesses the connection
@@ -110,24 +110,24 @@ def init(port=8813, numRetries=10, host="localhost", label="default", proc=None)
     return getVersion()
 
 
-def start(cmd, port=None, numRetries=10, label="default"):
-    """
-    Start a sumo server using cmd, establish a connection to it and
-    store it under the given label. This method is not thread-safe.
-    """
-    if label in _connections:
-        raise TraCIException("Connection '%s' is already active." % label)
-    while numRetries >= 0 and label not in _connections:
-        sumoPort = sumolib.miscutils.getFreeSocketPort() if port is None else port
-        sumoProcess = subprocess.Popen(cmd + ["--remote-port", str(sumoPort)])
-        try:
-            return init(sumoPort, numRetries, "localhost", label, sumoProcess)
-        except TraCIException:
-            if port is not None:
-                break
-            warnings.warn("Could not connect to TraCI server using port %s. Retrying with different port." % sumoPort)
-            numRetries -= 1
-    raise FatalTraCIError("Could not connect.")
+# def start(cmd, port=None, numRetries=10, label="default"):
+#     """
+#     Start a sumo server using cmd, establish a connection to it and
+#     store it under the given label. This method is not thread-safe.
+#     """
+#     if label in _connections:
+#         raise TraCIException("Connection '%s' is already active." % label)
+#     while numRetries >= 0 and label not in _connections:
+#         sumoPort = sumolib.miscutils.getFreeSocketPort() if port is None else port
+#         sumoProcess = subprocess.Popen(cmd + ["--remote-port", str(sumoPort)])
+#         try:
+#             return init(sumoPort, numRetries, "localhost", label, sumoProcess)
+#         except TraCIException:
+#             if port is not None:
+#                 break
+#             warnings.warn("Could not connect to TraCI server using port %s. Retrying with different port." % sumoPort)
+#             numRetries -= 1
+#     raise FatalTraCIError("Could not connect.")
 
 
 def isLibsumo():
@@ -141,6 +141,10 @@ def hasGUI():
     except TraCIException:
         return False
 
+def sendFile(args):
+    if "" not in _connections:
+        raise FatalTraCIError("Not connected.")
+    return _connections[""].sendFile(args)
 
 def load(args):
     """load([optionOrParam, ...])
