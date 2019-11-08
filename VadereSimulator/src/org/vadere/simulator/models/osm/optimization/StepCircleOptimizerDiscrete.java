@@ -39,15 +39,11 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		double stepSize = ((VCircle) reachableArea).getRadius();
 		List<VPoint> positions = getReachablePositions(pedestrian, (VCircle) reachableArea, random);
 
-		return getNextPosition(pedestrian, positions, stepSize, false);
+		return getNextPosition(pedestrian, positions, stepSize);
 	}
 
 	public VPoint getNextPosition(@NotNull final PedestrianOSM pedestrian, final List<VPoint> positions,
-								  final double stepSize, final boolean bruteForce){
-
-		/*bruteForce gets exactly the best (numerical) position among the tested 'positions' without any side
-		* conditions.
-		* */
+								  final double stepSize){
 
 		PotentialEvaluationFunction potentialEvaluationFunction = new PotentialEvaluationFunction(pedestrian);
 		potentialEvaluationFunction.setStepSize(stepSize);
@@ -56,32 +52,19 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		VPoint nextPos = curPos.clone();
 		double curPosPotential = pedestrian.getPotential(curPos);
 		double potential = curPosPotential;
-		double currentPotential = 0;
+		double currentPotential;
 
 		for (VPoint currentPosition : positions) {
 			try {
 				currentPotential = potentialEvaluationFunction.getPotential(currentPosition);
 
-				boolean fineTuneCondition;
-				if(bruteForce){
-					fineTuneCondition = false;
-				}else{
-					// DL: it is not exactly clear how this condition works (where is the value 0.0001 coming from?, Why
-					// is there a random boolean?
-					fineTuneCondition = (Math.abs(currentPotential - potential) <= 0.0001 && random.nextBoolean());
-				}
-
-				if(bruteForce && currentPotential < potential) {
-					potential = currentPotential;
-					nextPos = currentPosition;
-				}else if (currentPotential < potential || fineTuneCondition) {
+				if(currentPotential < potential) {
 					potential = currentPotential;
 					nextPos = currentPosition;
 				}
 			} catch (Exception e) {
 				Logger.getLogger(StepCircleOptimizerDiscrete.class).error("Potential evaluation threw an error: " + e.getMessage());
 			}
-
 		}
 
 		// pedestrian.getTargetPotential(nextPos) > 0 => agent is not jet on his target otherwise the agent would wait forever
@@ -100,7 +83,7 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 		potentialEvaluationFunction.setStepSize(reachableArea.getRadius());
 
 		VPoint optimalPoint = getNextPosition(pedestrian, getBruteForcePointsCircles(reachableArea),
-				reachableArea.getRadius(), true);
+				reachableArea.getRadius());
 
 		double optimalFuncValue;  // -1 = invalid number
 		try{

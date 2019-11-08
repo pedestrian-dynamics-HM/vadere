@@ -273,6 +273,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			frame.setVisible(true);
 			frame.setSize(1200, 800);
 
+			frame.setIconImage(Toolkit.getDefaultToolkit()
+					.getImage(ProjectView.class.getResource("/icons/vadere-icon.png")));
+
 			frame.openLastUsedProject(model);
 			checkDependencies(frame);
 		});

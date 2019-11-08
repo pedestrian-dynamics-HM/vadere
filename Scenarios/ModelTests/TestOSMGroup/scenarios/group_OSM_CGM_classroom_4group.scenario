@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_classroom_4group",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -134,7 +134,7 @@
       "useFixedSeed" : false,
       "fixedSeed" : -8686918998450722109,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -259,11 +259,28 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
+        "attributes" : {
+          "id" : -1,
+          "radius" : 0.195,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0,
+          "footstepHistorySize" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
+        },
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.07,
           "y" : 4.6
@@ -272,8 +289,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.1348916052594489,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 1 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -288,21 +320,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 1 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.65,
           "y" : 4.6
@@ -311,8 +332,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 0.985477924015236,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 1 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -327,21 +363,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 1 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.23,
           "y" : 4.6
@@ -350,8 +375,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.3951279182280936,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 1 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -366,21 +406,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 1 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.81,
           "y" : 4.6
@@ -389,37 +418,41 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.193973333193623,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.195,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
+        "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ 1 ],
+        "groupSizes" : [ 4 ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ 4 ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
+        "attributes" : {
+          "id" : -1,
+          "radius" : 0.195,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0,
+          "footstepHistorySize" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
+        },
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.38,
           "y" : 4.6
@@ -428,8 +461,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.3100780179645153,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 2 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -444,21 +492,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 2 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.96,
           "y" : 4.6
@@ -467,8 +504,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.1596409061423667,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 2 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -483,21 +535,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 2 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 4.54,
           "y" : 4.6
@@ -506,8 +547,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.541372542871089,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 2 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -522,21 +578,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 2 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 5.12,
           "y" : 4.6
@@ -545,37 +590,41 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.247274685871017,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.195,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
+        "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ 2 ],
+        "groupSizes" : [ 4 ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ 4 ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       }, {
+        "attributes" : {
+          "id" : -1,
+          "radius" : 0.195,
+          "densityDependentSpeed" : false,
+          "speedDistributionMean" : 1.34,
+          "speedDistributionStandardDeviation" : 0.26,
+          "minimumSpeed" : 0.5,
+          "maximumSpeed" : 2.2,
+          "acceleration" : 2.0,
+          "footstepHistorySize" : 4,
+          "searchRadius" : 1.0,
+          "angleCalculationType" : "USE_CENTER",
+          "targetOrientationAngleThreshold" : 45.0
+        },
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.07,
           "y" : 3.4
@@ -584,8 +633,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.3271306502213973,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 3 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -600,21 +664,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 3 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.65,
           "y" : 3.4
@@ -623,8 +676,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.1869380892569947,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 3 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -639,21 +707,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 3 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.23,
           "y" : 3.4
@@ -662,8 +719,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.0552498775768466,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 3 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -678,21 +750,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 3 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.81,
           "y" : 3.4
@@ -701,8 +762,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.4214897900423298,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 3 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -717,21 +793,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 3 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.38,
           "y" : 3.4
@@ -740,8 +805,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.5065672080593984,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 4 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -756,21 +836,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 4 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.96,
           "y" : 3.4
@@ -779,8 +848,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.0239990134386723,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 4 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -795,21 +879,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 4 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 4.54,
           "y" : 3.4
@@ -818,8 +891,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.4508307174625035,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 4 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -834,21 +922,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 4 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 5.12,
           "y" : 3.4
@@ -857,8 +934,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 0.9473754630799853,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 4 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -873,21 +965,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 4 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.07,
           "y" : 2.3
@@ -896,8 +977,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.4560250801171954,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 5 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -912,21 +1008,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 5 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.65,
           "y" : 2.3
@@ -935,8 +1020,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.4503619632061748,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 5 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -951,21 +1051,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 5 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.23,
           "y" : 2.3
@@ -974,8 +1063,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.245225922626731,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 5 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -990,21 +1094,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 5 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.81,
           "y" : 2.3
@@ -1013,8 +1106,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.6141115847344805,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 5 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1029,21 +1137,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 5 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.38,
           "y" : 2.3
@@ -1052,8 +1149,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.2033001564229202,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 6 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1068,21 +1180,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 6 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.96,
           "y" : 2.3
@@ -1091,8 +1192,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.0476015414355162,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 6 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1107,21 +1223,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 6 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 4.54,
           "y" : 2.3
@@ -1130,8 +1235,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.527274814562284,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 6 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1146,21 +1266,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 6 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 5.12,
           "y" : 2.3
@@ -1169,8 +1278,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 0.9189325926167355,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 6 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1185,21 +1309,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 6 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.24,
           "y" : 1.1
@@ -1208,8 +1321,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 0.8250036142722942,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 7 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1224,21 +1352,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 7 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 1.98,
           "y" : 1.1
@@ -1247,8 +1364,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.303757989460029,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 7 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1263,21 +1395,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 7 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 2.72,
           "y" : 1.1
@@ -1286,8 +1407,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.0238393317681713,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 7 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1302,21 +1438,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 7 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 3.47,
           "y" : 1.1
@@ -1325,8 +1450,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.6788990349964072,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 7 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1341,21 +1481,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 7 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 4.21,
           "y" : 1.1
@@ -1364,8 +1493,23 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.2973149122597776,
+        "followers" : [ ],
+        "idAsTarget" : -1,
+        "isChild" : false,
+        "isLikelyInjured" : false,
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
+        "groupIds" : [ 8 ],
+        "groupSizes" : [ 4 ],
+        "trajectory" : {
+          "footSteps" : [ ]
+        },
+        "modelPedestrianMap" : null,
+        "type" : "PEDESTRIAN"
+      }, {
         "attributes" : {
           "id" : -1,
           "radius" : 0.195,
@@ -1380,21 +1524,10 @@
           "angleCalculationType" : "USE_CENTER",
           "targetOrientationAngleThreshold" : 45.0
         },
-        "idAsTarget" : -1,
-        "isChild" : false,
-        "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
-        "groupIds" : [ 8 ],
-        "trajectory" : {
-          "footSteps" : [ ]
-        },
-        "groupSizes" : [ 4 ],
-        "modelPedestrianMap" : null,
-        "type" : "PEDESTRIAN"
-      }, {
         "source" : null,
         "targetIds" : [ 1 ],
+        "nextTargetListIndex" : 0,
+        "isCurrentTargetAnAgent" : false,
         "position" : {
           "x" : 4.95,
           "y" : 1.1
@@ -1403,32 +1536,20 @@
           "x" : 0.0,
           "y" : 0.0
         },
-        "nextTargetListIndex" : 0,
         "freeFlowSpeed" : 1.394319879669855,
-        "attributes" : {
-          "id" : -1,
-          "radius" : 0.195,
-          "densityDependentSpeed" : false,
-          "speedDistributionMean" : 1.34,
-          "speedDistributionStandardDeviation" : 0.26,
-          "minimumSpeed" : 0.5,
-          "maximumSpeed" : 2.2,
-          "acceleration" : 2.0,
-          "footstepHistorySize" : 4,
-          "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
-        },
+        "followers" : [ ],
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "mostImportantEvent" : null,
-        "salientBehavior" : "TARGET_ORIENTED",
+        "psychology" : {
+          "mostImportantStimulus" : null,
+          "selfCategory" : "TARGET_ORIENTED"
+        },
         "groupIds" : [ 8 ],
+        "groupSizes" : [ 4 ],
         "trajectory" : {
           "footSteps" : [ ]
         },
-        "groupSizes" : [ 4 ],
         "modelPedestrianMap" : null,
         "type" : "PEDESTRIAN"
       } ],
@@ -1448,6 +1569,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

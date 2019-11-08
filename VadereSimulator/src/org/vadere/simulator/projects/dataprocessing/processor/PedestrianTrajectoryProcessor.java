@@ -46,6 +46,6 @@ public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey
 
 	@Override
 	public String[] toStrings(PedestrianIdKey key) {
-		return new String[]{"[" + StateJsonConverter.serialidzeObject(getValue(key)) + "]"};
+		return new String[]{"[" + StateJsonConverter.serializeObject(getValue(key)) + "]"};
 	}
 }
