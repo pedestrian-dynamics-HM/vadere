@@ -699,4 +699,9 @@ public class VPolygon extends Path2D.Double implements VShape {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	@Override
+	public VPolygon copy() {
+		return new VPolygon(this);
+	}
 }

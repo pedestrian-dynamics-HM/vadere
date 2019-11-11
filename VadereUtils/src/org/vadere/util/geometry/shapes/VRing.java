@@ -246,12 +246,17 @@ public class VRing implements VShape {
 
 	@Override
 	public List<VPoint> getPath() {
-		throw new UnsupportedOperationException("not jet implemented.");
+		throw new UnsupportedOperationException("not yet implemented.");
 	}
 
 	@Override
 	public List<VLine> lines() {
-		throw new UnsupportedOperationException("not jet implemented.");
+		throw new UnsupportedOperationException("not yet implemented.");
+	}
+
+	@Override
+	public VRing copy() {
+		return new 	VRing(center.clone(), radiusInnerCircle, radiusOuterCircle);
 	}
 
 }

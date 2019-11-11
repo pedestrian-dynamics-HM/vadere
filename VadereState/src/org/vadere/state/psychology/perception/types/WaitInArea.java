@@ -24,6 +24,12 @@ public class WaitInArea extends Stimulus {
         this.area = area;
     }
 
+    public WaitInArea(WaitInArea other) {
+        super(other.time);
+
+        this.area = other.getArea().copy();
+    }
+
     // Getter
     public VShape getArea() {
         return area;
@@ -32,6 +38,12 @@ public class WaitInArea extends Stimulus {
     // Setter
     public void setArea(VShape area) {
         this.area = area;
+    }
+
+    // Methods
+    @Override
+    public WaitInArea clone() {
+        return new WaitInArea(this);
     }
 
 }

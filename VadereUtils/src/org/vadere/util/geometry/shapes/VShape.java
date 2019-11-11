@@ -29,7 +29,13 @@ public interface VShape extends Shape, Cloneable {
 
 	VShape scale(final double scalar);
 
-
+	/**
+	 * Require a "copy()" method instead of the usual "clone() method
+	 * because subclass {@link VPolygon} extends {@link Path2D.Double} which
+	 * already provides a "clone()" that conflicts with this method signature
+	 * (it does not return a (sub-) type VShape).
+	 */
+	VShape copy();
 
 	default boolean atBorder(final VPoint point){
 		VShape circle = new VCircle(new VPoint(point.getX(), point.getY()), BORDER_TOLERANCE);

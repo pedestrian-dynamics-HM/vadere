@@ -75,10 +75,10 @@ public class Pedestrian extends Agent {
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 
-		//TODO: @author Benedikt K. this is not a clone
-		psychology = new AttributesAgentPsychology();
-		psychology.setMostImportantStimulus(other.getMostImportantStimulus());
-		psychology.setSelfCategory(other.getSelfCategory());
+		psychology = new AttributesAgentPsychology(
+				other.getMostImportantStimulus() != null ? other.getMostImportantStimulus().clone() : null,
+				other.getSelfCategory()
+		);
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);

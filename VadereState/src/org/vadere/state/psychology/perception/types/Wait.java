@@ -12,4 +12,12 @@ public class Wait extends Stimulus {
         super(time);
     }
 
+    public Wait(Wait other) { super(other.time); }
+
+    // Methods
+    @Override
+    public Wait clone() {
+        return new Wait(this);
+    }
+
 }

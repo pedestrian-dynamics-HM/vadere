@@ -207,4 +207,10 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		}
 		return lines;
 	}
+
+	@Override
+	public VRectangle copy() {
+		return new VRectangle(x, y, width, height);
+	}
+
 }

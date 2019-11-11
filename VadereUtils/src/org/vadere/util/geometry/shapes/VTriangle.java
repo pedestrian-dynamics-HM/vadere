@@ -1,14 +1,10 @@
 package org.vadere.util.geometry.shapes;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.Vector3D;
 
-import static java.lang.Double.isInfinite;
-import static java.lang.Double.isNaN;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * A triangle. Points must be given in counter clockwise manner to get correct
@@ -248,5 +244,10 @@ public class VTriangle extends VPolygon {
     @Override
     public String toString() {
         return "["+p1 + "," + p2 + "," + p3 + "]";
+    }
+
+    @Override
+    public VTriangle copy() {
+        return new VTriangle(p1.clone(), p2.clone(), p3.clone());
     }
 }

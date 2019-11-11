@@ -12,8 +12,6 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 /**
  * A triangle with additional double data at each point.
- * 
- * 
  */
 public class DataTriangle extends VTriangle {
 
@@ -195,5 +193,11 @@ public class DataTriangle extends VTriangle {
 		dataPoints.add((DataPoint) p3);
 
 		return dataPoints;
+	}
+
+	@Override
+	public DataTriangle copy() {
+		DataPoint measurePointCopy = new DataPoint(measurePoint.x, measurePoint.y, measurePoint.getData());
+		return new DataTriangle(p1.clone(), p2.clone(), p3.clone(), measurePointCopy);
 	}
 }

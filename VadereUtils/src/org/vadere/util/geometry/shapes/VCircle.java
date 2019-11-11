@@ -343,4 +343,9 @@ public class VCircle implements VShape, ICircleSector {
 				", radius=" + radius +
 				'}';
 	}
+
+	@Override
+	public VCircle copy() {
+		return new VCircle(center.clone(), radius);
+	}
 }
