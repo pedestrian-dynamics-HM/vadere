@@ -61,7 +61,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 			Rectangle2D.Double  rec = state.getTopography().getBounds();
 
 			VPoint lowLeft = new VPoint(rec.getMinX(), rec.getMinY());
-			VPoint highRight = new VPoint(rec.getMaxX(), rec.getMaxX());
+			VPoint highRight = new VPoint(rec.getMaxX(), rec.getMaxY());
 			ArrayList<VPoint> polyList = new ArrayList<>();
 			polyList.add(lowLeft);
 			polyList.add(highRight);
