@@ -22,8 +22,10 @@ from . import _simulation as simulation
 
 _RETURN_VALUE_FUNC = {tc.TRACI_ID_LIST: Storage.readStringList,
                       tc.ID_COUNT: Storage.readInt,
+                      tc.NEXT_FREE_ID: Storage.readInt,
                       tc.VAR_SPEED: Storage.readDouble,
-                      tc.VAR_POSITION: lambda result: result.read("!dd"),
+                      tc.VAR_POSITION: Storage.readPosition,
+                      tc.VAR_POSITION_LIST: Storage.readPositionList,
                       tc.VAR_POSITION3D: lambda result: result.read("!ddd"),
                       tc.VAR_ANGLE: Storage.readDouble,
                       tc.VAR_SLOPE: Storage.readDouble,
@@ -41,6 +43,7 @@ _RETURN_VALUE_FUNC = {tc.TRACI_ID_LIST: Storage.readStringList,
                       tc.VAR_STAGES_REMAINING: Storage.readInt,
                       tc.VAR_VEHICLE: Storage.readString,
                       tc.VAR_EDGES: Storage.readStringList,
+                      tc.VAR_TARGET_LIST: Storage.readStringList,
                       }
 
 
@@ -50,6 +53,15 @@ class PersonDomain(Domain):
                         tc.CMD_SUBSCRIBE_PERSON_VARIABLE, tc.RESPONSE_SUBSCRIBE_PERSON_VARIABLE,
                         tc.CMD_SUBSCRIBE_PERSON_CONTEXT, tc.RESPONSE_SUBSCRIBE_PERSON_CONTEXT,
                         _RETURN_VALUE_FUNC)
+
+    def getTargetList(self, personID):
+        """Get possible targets
+
+        """
+        return self._getUniversal(tc.VAR_TARGET_LIST, personID)
+
+    def getPositionList(self):
+        return self._getUniversal(tc.VAR_POSITION_LIST)
 
     def getSpeed(self, personID):
         """getSpeed(string) -> double
@@ -216,7 +228,7 @@ class PersonDomain(Domain):
         """add(string, (double, double), stringlist)
         """
         self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.ADD, personID,
-                                       1 + 4 + 1 + + 1 + 4 + 1 + 8 + 8 + 1 + 4 + len(targets) + 4 * len(targets))
+                                       1 + 4 + 1 + 1 + 4 + 1 + 8 + 8 + 1 + 4 + len(targets) + 4 * len(targets))
         self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 3)
         self._connection._packString(personID)
         self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, *pos2D)

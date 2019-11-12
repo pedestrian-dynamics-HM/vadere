@@ -126,7 +126,6 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	@Override
 	public Map<String, VPoint> read2DPositionList(){
-	    // the problem may be in this function
 		ensureBytes(4); // 1x int
 		int numOfKeyValuePairs = byteBuffer.getInt();
 

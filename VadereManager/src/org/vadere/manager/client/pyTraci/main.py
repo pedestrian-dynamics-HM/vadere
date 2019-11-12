@@ -110,26 +110,6 @@ def init(port=9999, numRetries=10, host="localhost", label="default", proc=None)
     return getVersion()
 
 
-# def start(cmd, port=None, numRetries=10, label="default"):
-#     """
-#     Start a sumo server using cmd, establish a connection to it and
-#     store it under the given label. This method is not thread-safe.
-#     """
-#     if label in _connections:
-#         raise TraCIException("Connection '%s' is already active." % label)
-#     while numRetries >= 0 and label not in _connections:
-#         sumoPort = sumolib.miscutils.getFreeSocketPort() if port is None else port
-#         sumoProcess = subprocess.Popen(cmd + ["--remote-port", str(sumoPort)])
-#         try:
-#             return init(sumoPort, numRetries, "localhost", label, sumoProcess)
-#         except TraCIException:
-#             if port is not None:
-#                 break
-#             warnings.warn("Could not connect to TraCI server using port %s. Retrying with different port." % sumoPort)
-#             numRetries -= 1
-#     raise FatalTraCIError("Could not connect.")
-
-
 def isLibsumo():
     return False
 
@@ -141,21 +121,11 @@ def hasGUI():
     except TraCIException:
         return False
 
+
 def sendFile(args):
     if "" not in _connections:
         raise FatalTraCIError("Not connected.")
     return _connections[""].sendFile(args)
-
-def load(args):
-    """load([optionOrParam, ...])
-    Let sumo load a simulation using the given command line like options
-    Example:
-      load(['-c', 'run.sumocfg'])
-      load(['-n', 'net.net.xml', '-r', 'routes.rou.xml'])
-    """
-    if "" not in _connections:
-        raise FatalTraCIError("Not connected.")
-    return _connections[""].load(args)
 
 
 def simulationStep(step=0):

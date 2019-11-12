@@ -121,12 +121,18 @@ class Domain:
         """
         return self._getUniversal(tc.TRACI_ID_LIST, "")
 
+    # def getNextFreeID(self):
+    #     return self._getUniversal(tc.TRACI_NEXT_FREE_ID, "")
+
     def getIDCount(self):
         """getIDCount() -> integer
 
         Returns the number of currently loaded objects.
         """
         return self._getUniversal(tc.ID_COUNT, "")
+
+    def getNextFreeID(self):
+        return self._getUniversal(tc.NEXT_FREE_ID, "")
 
     def subscribe(self, objectID, varIDs=None, begin=tc.INVALID_DOUBLE_VALUE, end=tc.INVALID_DOUBLE_VALUE):
         """subscribe(string, list(integer), double, double) -> None

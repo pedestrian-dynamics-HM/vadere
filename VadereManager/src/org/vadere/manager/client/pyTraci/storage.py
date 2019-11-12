@@ -86,6 +86,21 @@ class Storage:
         assert(expectedSize is None or s == expectedSize)
         return s
 
+    def readPosition(self):
+        return self.read("!dd")
+
+    def readPositionWithID(self):
+        id = self.readString()
+        pos_x, pos_y = self.readPosition()
+        return id, pos_x, pos_y
+
+    def readPositionList(self):
+        s = self.read("!i")[0]
+        pos_list = []
+        for i in range(s):
+            pos_list += [self.readPositionWithID()]
+        return pos_list
+
     def ready(self):
         return self._pos < len(self._content)
 

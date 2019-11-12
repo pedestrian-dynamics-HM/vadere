@@ -26,8 +26,16 @@ if __name__ == '__main__':
     traci.init(port=9999)
     traci.sendFile(["Test", scenario])
 
-    traci.person.add("5", (2.0, 3.0), "1", "2")
-    traci.simulationStep(1)
+    ### Implemented features
+    #print(traci.person.getNextFreeID())
+
+    #print(traci.person.getPositionList())
+
+    # print(traci.person.getTargetList("-1"))
+    # print(traci.person.getTargetList("1"))
+
+    # traci.person.add("5", (2.0, 3.0), "2")
+    # traci.simulationStep(1)
 
     # interactive
     embed()

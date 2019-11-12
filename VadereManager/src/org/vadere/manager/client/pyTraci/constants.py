@@ -481,6 +481,9 @@ TRACI_ID_LIST = 0x00
 #  count of instances (get: all)
 ID_COUNT = 0x01
 
+# next free id
+NEXT_FREE_ID = 0x02
+
 #  subscribe object variables (get: all)
 AUTOMATIC_VARIABLES_SUBSCRIPTION = 0x02
 
@@ -597,6 +600,9 @@ VAR_MAXSPEED = 0x41
 
 #  position (2D) (get: vehicle, poi, inductionloop, areadetector; set: poi)
 VAR_POSITION = 0x42
+
+# List of Positions with IDs
+VAR_POSITION_LIST = 0xff
 
 #  position (3D) (get: vehicle, poi, set: poi)
 VAR_POSITION3D = 0x39
@@ -988,6 +994,9 @@ VAR_TRACK_VEHICLE = 0xa6
 
 #  presence of view
 VAR_HAS_VIEW = 0xa7
+
+# target list
+VAR_TARGET_LIST = 0xfe
 
 # @name currently wanted lane-change action
 # @{
