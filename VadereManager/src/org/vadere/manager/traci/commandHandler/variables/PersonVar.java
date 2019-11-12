@@ -34,6 +34,7 @@ public enum PersonVar {
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
 	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set
 	TARGET_LIST(0xfe, TraCIDataType.STRING_LIST), // get, set
+	HEURISTIC(0xd0, TraCIDataType.STRING), // get, set
 	;
 
 

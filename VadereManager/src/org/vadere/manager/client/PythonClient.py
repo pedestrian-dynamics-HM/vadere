@@ -27,6 +27,12 @@ if __name__ == '__main__':
     traci.sendFile(["Test", scenario])
 
     ### Implemented features
+    pos = (2., 3.)
+    traci.person.setPosition("1", *pos)
+    actual_pos = traci.person.getPosition("1")
+    assert(pos == actual_pos)
+
+
     #print(traci.person.getNextFreeID())
 
     #print(traci.person.getPositionList())

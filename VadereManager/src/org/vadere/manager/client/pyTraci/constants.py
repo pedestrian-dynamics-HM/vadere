@@ -481,7 +481,7 @@ TRACI_ID_LIST = 0x00
 #  count of instances (get: all)
 ID_COUNT = 0x01
 
-# next free id
+# next free id (get: person)
 NEXT_FREE_ID = 0x02
 
 #  subscribe object variables (get: all)
@@ -598,7 +598,7 @@ VAR_SPEED_LAT = 0x32
 #  maximum allowed/possible speed (get: vehicle types, lanes, set: edges, lanes)
 VAR_MAXSPEED = 0x41
 
-#  position (2D) (get: vehicle, poi, inductionloop, areadetector; set: poi)
+#  position (2D) (get: vehicle, poi, inductionloop, areadetector, person; set: poi)
 VAR_POSITION = 0x42
 
 # List of Positions with IDs
@@ -997,6 +997,10 @@ VAR_HAS_VIEW = 0xa7
 
 # target list
 VAR_TARGET_LIST = 0xfe
+
+# cognitive heurisitic of the BHM Model
+VAR_HEURISTIC = 0xd0
+
 
 # @name currently wanted lane-change action
 # @{

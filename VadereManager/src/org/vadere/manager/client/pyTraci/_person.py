@@ -369,6 +369,11 @@ class PersonDomain(Domain):
         self._connection._string += struct.pack("!BB", tc.TYPE_BYTE, keepRoute)
         self._connection._sendExact()
 
+    def setPosition(self, personID, x, y):
+        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.VAR_POSITION, personID, 1 + 8 + 8)
+        self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, x, y)
+        self._connection._sendExact()
+
     def setSpeed(self, personID, speed):
         """setSpeed(string, double) -> None
 
@@ -376,6 +381,11 @@ class PersonDomain(Domain):
         """
         self._connection._sendDoubleCmd(
             tc.CMD_SET_PERSON_VARIABLE, tc.VAR_SPEED, personID, speed)
+
+    def setHeuristic(self, personID, heuristic):
+        self._connection._sendStringCmd(
+            tc.CMD_SET_PERSON_VARIABLE, tc.VAR_HEURISTIC, personID, heuristic
+        )
 
     def setType(self, personID, typeID):
         """setType(string, string) -> None

@@ -377,4 +377,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void personapi_setHeuristic(String[] args) throws IOException {}
+
 }

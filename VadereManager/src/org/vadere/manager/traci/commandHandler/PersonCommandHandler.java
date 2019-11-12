@@ -13,6 +13,8 @@ import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.compoundobjects.PersonCreateData;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -117,7 +119,6 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// todo check wheter it is necessary to avoid the upcount on each call.
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_ID, name = "getNextFreeId", ignoreElementId = true)
 	public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager){
 		remoteManager.accessState((manager, state) -> {
@@ -188,7 +189,6 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return cmd;
 	}
 
-	// todo talk about restriction to subset of points without collisions
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.POS_2D, name = "setPosition2D", dataTypeStr = "VPoint")
 	public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager){
 		VPoint data = (VPoint) cmd.getVariableValue();
@@ -335,6 +335,24 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 			}
 		});
 		return cmd;
+	}
+
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.HEURISTIC, name = "setHeuristic", dataTypeStr = "String")
+	public TraCICommand process_setHeuristic(TraCISetCommand cmd, RemoteManager remoteManager) {
+		String heu = (String) cmd.getVariableValue();
+		remoteManager.accessState((manager, state) -> {
+			try {
+				PedestrianBHM ped = (PedestrianBHM) state.getTopography().getPedestrianDynamicElements()
+						.getElement(Integer.parseInt(cmd.getElementId()));
+				if(checkIfPedestrianExists(ped, cmd)){
+					//todo
+					cmd.setOK();
+				}
+			} catch(Exception e) {
+				cmd.setErr("Heuristic can only be set if BHM is used.");
+			}
+		});
+		return null;
 	}
 
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, ignoreElementId = true, name = "createNew", dataTypeStr = "CompoundObject")
