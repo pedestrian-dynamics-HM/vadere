@@ -136,10 +136,22 @@ class OsmConverter:
         for f in self.osm.measurement_selectors:
             self.measurement.extend(f())
 
+
+    def filter_area_of_interest(self):
+        aoi = self.osm.get_area_of_intrest()
+
+        if aoi:
+            self.obstacles = [o for o in self.obstacles if self.osm.contained_in_area_of_intrest(aoi, o)]
+            self.targets = [o for o in self.targets if self.osm.contained_in_area_of_intrest(aoi, o)]
+            self.sources = [o for o in self.sources if self.osm.contained_in_area_of_intrest(aoi, o)]
+            self.measurement = [o for o in self.measurement if self.osm.contained_in_area_of_intrest(aoi, o)]
+
+
     @classmethod
     def from_args(cls, arg):
         c = cls(arg.input, arg.use_osm_id)
         c.filter()
+        c.filter_area_of_interest()
         return c
 
     @staticmethod
@@ -557,5 +569,12 @@ def main_convert(cmd_args):
 
 
 if __name__ == "__main__":
+    # i = '/home/stsc/repos/vadere/Scenarios/Demos/roVer/scenarios/mf_underground.osm'
+    # o = '/home/stsc/repos/vadere/Scenarios/Demos/roVer/scenarios/mf_underground.scenario'
+    # c = OsmConverter(i, True)
+    # c.filter()
+    # c.filter_area_of_interest()
+    #
+    # #
     args = parse_command_line_arguments()
     args.main_func(args)
