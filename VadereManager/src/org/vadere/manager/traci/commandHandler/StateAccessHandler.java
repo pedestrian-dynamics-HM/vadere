@@ -1,7 +1,8 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.vadere.manager.RemoteManager;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.Simulation;
+import org.vadere.simulator.control.simulation.SimulationState;
 
 /**
  * Interface used to allow access to the {@link SimulationState}
@@ -13,7 +14,7 @@ import org.vadere.simulator.control.SimulationState;
  * managerd and monitored to ensure that {@link SimulationState} access is synchronized
  * and only occurs if the simulation is halted.
  *
- * (see singleStepMode in {@link org.vadere.simulator.control.Simulation})
+ * (see singleStepMode in {@link Simulation})
  * 
  */
 @FunctionalInterface

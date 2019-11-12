@@ -1,8 +1,8 @@
 package org.vadere.manager;
 
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
-import org.vadere.simulator.control.RemoteRunListener;
-import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.control.simulation.RemoteRunListener;
+import org.vadere.simulator.control.simulation.ScenarioRun;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;

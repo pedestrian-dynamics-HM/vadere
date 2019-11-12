@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

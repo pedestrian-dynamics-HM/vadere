@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
@@ -95,7 +96,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateEqualStartAndEndTime() throws IOException {
@@ -112,7 +113,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateEndTimeLarge() throws IOException {
@@ -134,7 +135,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateSpawnDelayThreeTimes() throws IOException {
@@ -153,7 +154,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateSmallSpawnDelay() throws IOException {
@@ -172,7 +173,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateUseFreeSpaceOnly() throws IOException {
