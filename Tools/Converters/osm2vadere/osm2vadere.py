@@ -151,7 +151,8 @@ class OsmConverter:
     def from_args(cls, arg):
         c = cls(arg.input, arg.use_osm_id)
         c.filter()
-        c.filter_area_of_interest()
+        if arg.use_aoi:
+            c.filter_area_of_interest()
         return c
 
     @staticmethod
@@ -498,6 +499,15 @@ def parse_command_line_arguments():
                                 nargs="?",
                                 default=True,
                                 help="Set to use osm ids for obstacles")
+
+    convert_parser.add_argument("--use-aoi",
+                                dest='use_aoi',
+                                type=str2bool,
+                                const=True,
+                                nargs="?",
+                                default=False,
+                                help="Set to reduce export to elements within an area of interest. "
+                                     "(way taged with vadere:area-of-intrest) ")
 
     convert_parser.set_defaults(main_func=main_convert)
 

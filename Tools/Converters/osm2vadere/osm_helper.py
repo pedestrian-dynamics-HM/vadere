@@ -808,6 +808,12 @@ class OsmData:
         lon = [0,0]
         nodes = [self.lookup.node_to_latlon[int(id)] for id in self.xml.xpath("/osm/way[./tag/@k='vadere:area-of-intrest']/nd/@ref")][:-1]
 
+        if len(nodes) == 0:
+            raise RuntimeError(f"No area of interst found. Map does not contain a way with the tag 'vadere:area-of-intrest'")
+        elif len(nodes) < 2:
+            raise RuntimeError(f"area-of-intrest path contains only '{len(nodes)}' nodes. Need at least 3 nodes to "
+                               f"create area of interest.")
+
         node_lat = [n[0] for n in nodes]
         node_lon = [n[1] for n in nodes]
 
