@@ -27,10 +27,10 @@ if __name__ == '__main__':
     traci.sendFile(["Test", scenario])
 
     ### Implemented features
-    pos = (2., 3.)
-    traci.person.setPosition("1", *pos)
-    actual_pos = traci.person.getPosition("1")
-    assert(pos == actual_pos)
+    #pos = (2., 3.)
+    #traci.person.setPosition("1", *pos)
+    #actual_pos = traci.person.getPosition("1")
+    #assert(pos == actual_pos)
 
 
     #print(traci.person.getNextFreeID())
@@ -40,8 +40,8 @@ if __name__ == '__main__':
     # print(traci.person.getTargetList("-1"))
     # print(traci.person.getTargetList("1"))
 
-    # traci.person.add("5", (2.0, 3.0), "2")
-    # traci.simulationStep(1)
+    traci.person.add("5", (2.0, 3.0), "2")
+    traci.simulationStep(1)
 
     # interactive
     embed()

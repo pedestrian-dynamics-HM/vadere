@@ -65,6 +65,12 @@ public class CompoundObjectBuilder {
 				.build(id, p, targetList);
 	}
 
+	static public CompoundObject createTargetChanger(String id, ArrayList<String> points, double reachDist, boolean nextTargetIsPedestrian, String nextTarget, double prob) {
+		return CompoundObjectBuilder.builder()
+				.rest()
+				.add(TraCIDataType.STRING)
+				.build(id, points, reachDist);
+	}
 
 	static public CompoundObject createIdPosData(String id, String x, String y){
 

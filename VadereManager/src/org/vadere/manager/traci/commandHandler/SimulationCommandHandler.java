@@ -33,6 +33,9 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		init(SimulationHandler.class, SimulationHandlers.class);
 	}
 
+	//todo process_addTargetChanger
+	//todo process_addWaitingArea
+
 	@Override
 	protected void init_HandlerSingle(Method m) {
 		SimulationHandler an = m.getAnnotation(SimulationHandler.class);

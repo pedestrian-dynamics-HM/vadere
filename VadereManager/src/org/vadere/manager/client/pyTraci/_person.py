@@ -60,6 +60,10 @@ class PersonDomain(Domain):
         """
         return self._getUniversal(tc.VAR_TARGET_LIST, personID)
 
+    def setTargetList(self, personID, targetList):
+        self._connection._sendDoubleCmd(
+            tc.CMD_SET_PERSON_VARIABLE, tc.VAR_TARGET_LIST, personID, targetList)
+
     def getPositionList(self):
         return self._getUniversal(tc.VAR_POSITION_LIST)
 
