@@ -24,6 +24,16 @@
 - Add INET environment export:
   * create an INET environment xml file based on the current topography. For now only prism shapes 
     are possible with a fixed height of 5m.
+- vadere-console `utils` subCommand:
+  * A miscellaneous collector of simple function operating on a single scenario file.
+  * -f (input [required]) 
+  * -o (ouput file or directory depending on method m [optional]) 
+  * -m (name of method.) See subparser help for allowed functions.
+  * currently implementd:
+    * `getHash`: Hash value of given scenario. (-o option ignored)
+    * `binCache`: calculate binary cache (-o must be a directory. If missing it will be created)
+    * `txtCache`: calculate text based cache (-o must be a directory. If missing it will be created)
+
 
 ### Changed
 
@@ -49,7 +59,7 @@ Was previously known as `PedestrianFootStepProcessor`
      `cacheDir` path. `Vadere.cache.flobalCacheBaseDir` defaults to `${user.home}\.cache\vadere`
   
 
-# v1.4 (2019-09-05)
+## v1.4 (2019-09-05)
 
 ### Changed 
 
