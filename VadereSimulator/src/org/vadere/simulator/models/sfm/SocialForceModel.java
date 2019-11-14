@@ -12,13 +12,12 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.exceptions.UnsupportedEventException;
+import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
@@ -140,7 +139,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
-		UnsupportedEventException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);

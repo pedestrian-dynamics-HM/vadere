@@ -1,7 +1,7 @@
 {
   "name" : "scenario001",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 183115877309837713,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -156,6 +156,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 1,
@@ -195,6 +196,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }
