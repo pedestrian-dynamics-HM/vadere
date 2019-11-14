@@ -11,8 +11,11 @@ import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.compoundobjects.TargetChangerData;
+import org.vadere.manager.traci.compoundobjects.WaitingAreaData;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.TargetChanger;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -112,7 +115,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		return cmd;
 	}
 
-	//todo process_addTargetChanger
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, name = "createTargetChanger")
 	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
 		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
@@ -130,7 +133,22 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 
 		return cmd;
 	}
-	// todo process_addWaitingArea
+
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_WAITING_AREA, name = "createWaitingArea")
+	public TraCICommand process_addWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
+		WaitingAreaData data = (WaitingAreaData) cmd.getVariableValue();
+		remoteManager.accessState((manager, state) -> {
+			AttributesMeasurementArea attr = new AttributesMeasurementArea(
+					data.getIdAsInt(),
+					data.getPointsAsVPolygon()
+			);
+			MeasurementArea ma = new MeasurementArea(attr);
+			state.getTopography().getMeasurementAreas().add(ma);
+			cmd.setOK();
+		});
+
+		return cmd;
+	}
 
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager){
 		return processValueSub(rawCmd, remoteManager, this::processGet,

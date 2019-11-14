@@ -41,7 +41,7 @@ public class TargetChangerData extends GenericCompoundObject{
         VPolygon pointsAsVPolygon = new VPolygon();
         for(int i = 0; i < points.size(); i += 2){
             double x = Double.parseDouble(points.get(i));
-            double y = Double.parseDouble(points.get(i));
+            double y = Double.parseDouble(points.get(i + 1));
             VPoint p = new VPoint(x, y);
             pointsAsVPolygon.getPoints().add(p);
         }

@@ -89,5 +89,13 @@ public class CompoundObjectBuilder {
 				.build(id, p);
 	}
 
+	static public CompoundObject createWaitingArea(String id, ArrayList<String> points){
+		return CompoundObjectBuilder.builder()
+				.rest()
+				.add(TraCIDataType.STRING)
+				.add(TraCIDataType.STRING_LIST)
+				.build(id, points);
+	}
+
 
 }
