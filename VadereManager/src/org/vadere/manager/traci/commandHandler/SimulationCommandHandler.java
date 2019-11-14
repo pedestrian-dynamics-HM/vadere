@@ -8,7 +8,12 @@ import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
+import org.vadere.manager.traci.commands.TraCISetCommand;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
+import org.vadere.manager.traci.compoundobjects.TargetChangerData;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.state.attributes.scenario.AttributesTargetChanger;
+import org.vadere.state.scenario.TargetChanger;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.geom.Rectangle2D;
@@ -33,8 +38,6 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		init(SimulationHandler.class, SimulationHandlers.class);
 	}
 
-	//todo process_addTargetChanger
-	//todo process_addWaitingArea
 
 	@Override
 	protected void init_HandlerSingle(Method m) {
@@ -109,11 +112,30 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		return cmd;
 	}
 
+	//todo process_addTargetChanger
+	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
+		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
+		remoteManager.accessState((manager, state) -> {
+			AttributesTargetChanger attr = new AttributesTargetChanger(
+					data.getPointsAsVPolygon(),
+					data.getIdAsInt(),
+					data.getReachDist(),
+					data.getNextTargetAsInt(),
+					data.getProb()
+			);
+			TargetChanger tc = new TargetChanger(attr);
+			state.getTopography().addTargetChanger(tc);
+			cmd.setOK();
+		});
+
+		return cmd;
+	}
+	// todo process_addWaitingArea
+
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager){
 		return processValueSub(rawCmd, remoteManager, this::processGet,
 				TraCICmd.GET_SIMULATION_VALUE, TraCICmd.RESPONSE_SUB_SIMULATION_VALUE);
 	}
-
 
 	public TraCICommand processGet(TraCICommand rawCmd, RemoteManager remoteManager){
 

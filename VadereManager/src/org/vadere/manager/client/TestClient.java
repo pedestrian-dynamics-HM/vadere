@@ -357,6 +357,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	// todo simulationapi_addTargetChanger
+
 	// todo implement new methods from AbstractTestClient....
 
 	@Override

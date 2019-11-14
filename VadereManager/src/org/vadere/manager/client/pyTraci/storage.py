@@ -13,6 +13,7 @@
 # @author  Mario Krumnow
 # @author  Daniel Krajzewicz
 # @author  Jakob Erdmann
+# @author  Philipp Schuegraf
 # @date    2008-10-09
 # @version $Id$
 

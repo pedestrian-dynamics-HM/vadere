@@ -9,7 +9,7 @@
 
 # @file    _person_vadere.py
 # @author  Philipp Schuegraf
-# @date    2015-02-06
+# @date    2019-11-13
 # @version $Id$
 
 from __future__ import absolute_import
