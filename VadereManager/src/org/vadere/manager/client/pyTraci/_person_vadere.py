@@ -32,11 +32,21 @@ class PersonVadereDomain(PersonDomain):
         return self._getUniversal(tc.VAR_TARGET_LIST, personID)
 
     def setTargetList(self, personID, targetList):
-        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.VAR_TARGET_LIST, personID, 1 + 4 + len(targetList))
+        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.VAR_TARGET_LIST, personID,
+                                       1 + 4 + (4 + 1) * len(targetList))
         self._connection._packStringList(targetList)
+        self._connection._sendExact()
 
     def getPositionList(self):
         return self._getUniversal(tc.VAR_POSITION_LIST)
+
+    def getPositionListAscendingIds(self):
+        listOfTuples = self._getUniversal(tc.VAR_POSITION_LIST)
+        listOfPositions = [(0., 0.) for i in range(len(listOfTuples))]
+        for t in listOfTuples:
+            index = int(t[0]) - 1
+            listOfPositions[index] = (t[1], t[2])
+        return listOfPositions
 
     def add(self, personID, pos2D, *targets):
         """add(string, (double, double), stringlist)
