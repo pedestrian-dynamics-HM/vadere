@@ -160,9 +160,7 @@ public class TargetChangerController {
     }
 
     private void useStaticTargetForAgent(Agent agent) {
-        LinkedList<Integer> newTarget = new LinkedList<>();
-        newTarget.add(targetChanger.getAttributes().getNextTarget());
-        agent.setTargets(newTarget);
+        agent.setSingleTarget(targetChanger.getAttributes().getNextTarget(), false);
     }
 
     private void notifyListenersTargetChangerAreaReached(final Agent agent) {

@@ -171,6 +171,32 @@ public class TargetChangerControllerTest {
     }
 
     @Test
+    public void updateSetsNextTargetListIndexToZeroOfAffectedPedestrianIfProbabilityIsOne() {
+        LinkedList<Integer> currentTargets = new LinkedList<Integer>(Arrays.asList(1, 2, 3));
+        int nextTargetIndex = 1;
+
+        pedestrians.get(1).setTargets(currentTargets);
+        pedestrians.get(1).setNextTargetListIndex(nextTargetIndex);
+
+        int nextTarget = 2;
+        double probability = 1.0;
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertEquals(nextTargetIndex, pedestrians.get(1).getNextTargetListIndex());
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertEquals(0, pedestrians.get(1).getNextTargetListIndex());
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), nextTarget);
+    }
+
+    @Test
     public void updateDoesNotChangeTargetListOfAffectedPedestrianIfProbabilityIsZero() {
         int nextTarget = 2;
         double probability = 0.0;
