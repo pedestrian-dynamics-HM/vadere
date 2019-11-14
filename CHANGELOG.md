@@ -9,6 +9,21 @@
 - Added new scenario element `TargetChanger`. This scenario element has an arbitrary shape and changes the target of an agent. Either to another static target or to another agent (to get a follower behavior). A `TargetChanger` has two important parameters:
   * `changeTargetProbability`: This defines how many percent of the agents, who enter the area, should change their target.
   * `nextTargetIsPedestrian`: If `nextTargetIsPedestrian == false`, assign a new static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
+- Add Scenario Hash to info panel below of the TopographyCreator and Post-Visualisation View:
+  * will show if changes to the scenario will change the floorfield 
+  * Hover over hash to see full value
+  * Left-Click to copy full hash to clipboard.
+- TraCI commands: 
+  * getHash: return Scenario hash for given scenario 
+  * CompoundObject implementation to allow complex get/set commands (i.e. create pedestrian hat 
+    random location during simulation run)
+- osm2vadere converter:
+  * it is possible to specify a way with the tag `area-of-intrest` (AOI). If this is present and the 
+    corresponding command line argument is given, only elements within the bounding box of the
+    AOI will be converted.
+- Add INET environment export:
+  * create an INET environment xml file based on the current topography. For now only prism shapes 
+    are possible with a fixed height of 5m.
 
 ### Changed
 
@@ -19,6 +34,20 @@ Was previously known as `PedestrianFootStepProcessor`
   * Mouse Wheel Scroll: Scroll vertically.
   * Shift + Mouse Wheel Scroll: Scroll horizontally.
   * Use Alt key to decrease the step size while scrolling.
+- CachePath lookup:
+  The new cache lookup now allows a 'global' lookup. Previously all cache files are saved in 
+  a `__cache__` folder relative (as sibling) to the currently running scenario file. This works 
+  good for local testing and runs. However, if one scenario is duplicated and integrated in other 
+  projects the same cache would be created at multiple locations. The current solution would be 
+  to enter an absolute path as the `cacheDir` but this will break interoperatbility between 
+  windows and linux as well as sharing scenario files with other users. CacheDir Lookup order:
+  1. `cacheDir` is an absolute path: Use it; and log the path to console.
+  2. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=false` (default): 
+     save cache in a `__cache__` folder relative (as sibling) to the currently running scenario file
+  3. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=true`:
+     Lookup `Vadere.cache.flobalCacheBaseDir` and use this as the base path for the relative 
+     `cacheDir` path. `Vadere.cache.flobalCacheBaseDir` defaults to `${user.home}\.cache\vadere`
+  
 
 # v1.4 (2019-09-05)
 
