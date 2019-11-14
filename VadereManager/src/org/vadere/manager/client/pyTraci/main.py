@@ -40,7 +40,7 @@ from .domain import _defaultDomains  # noqa
 from .connection import Connection, StepListener  # noqa
 from .exceptions import FatalTraCIError, TraCIException  # noqa
 from . import _inductionloop, _lanearea, _multientryexit, _trafficlight  # noqa
-from . import _lane, _person, _route, _vehicle, _vehicletype  # noqa
+from . import _lane, _person, _person_vadere, _route, _vehicle, _vehicletype  # noqa
 from . import _edge, _gui, _junction, _poi, _polygon, _simulation  # noqa
 
 inductionloop = _inductionloop.InductionLoopDomain()
@@ -49,6 +49,7 @@ multientryexit = _multientryexit.MultiEntryExitDomain()
 trafficlight = _trafficlight.TrafficLightDomain()
 lane = _lane.LaneDomain()
 person = _person.PersonDomain()
+person_vadere = _person_vadere.PersonVadereDomain()
 route = _route.RouteDomain()
 vehicle = _vehicle.VehicleDomain()
 vehicletype = _vehicletype.VehicleTypeDomain()

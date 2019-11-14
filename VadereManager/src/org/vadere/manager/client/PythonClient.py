@@ -26,22 +26,24 @@ if __name__ == '__main__':
     traci.init(port=9999)
     traci.sendFile(["Test", scenario])
 
-    ### Implemented features
-    #pos = (2., 3.)
-    #traci.person.setPosition("1", *pos)
-    #actual_pos = traci.person.getPosition("1")
-    #assert(pos == actual_pos)
-
-
-    #print(traci.person.getNextFreeID())
-
-    #print(traci.person.getPositionList())
-
-    # print(traci.person.getTargetList("-1"))
-    # print(traci.person.getTargetList("1"))
-
-    traci.person.add("5", (2.0, 3.0), "2")
+    # ### Implemented features
+    traci.person_vadere.setTargetList("2", ["2", "3"])
     traci.simulationStep(1)
+    # pos = (2., 3.)
+    # traci.person_vadere.setPosition("1", *pos)
+    # actual_pos = traci.person_vadere.getPosition("1")
+    # assert(pos == actual_pos)
+    #
+    #
+    # print(traci.person_vadere.getNextFreeID())
+    #
+    # print(traci.person_vadere.getPositionList())
+    #
+    # print(traci.person_vadere.getTargetList("-1"))
+    # print(traci.person_vadere.getTargetList("1"))
+    #
+    # traci.person_vadere.add("5", (2.0, 3.0), "2")
+    # traci.simulationStep(1)
 
     # interactive
     embed()

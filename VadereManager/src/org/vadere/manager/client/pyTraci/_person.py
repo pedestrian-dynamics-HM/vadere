@@ -22,10 +22,8 @@ from . import _simulation as simulation
 
 _RETURN_VALUE_FUNC = {tc.TRACI_ID_LIST: Storage.readStringList,
                       tc.ID_COUNT: Storage.readInt,
-                      tc.NEXT_FREE_ID: Storage.readInt,
                       tc.VAR_SPEED: Storage.readDouble,
-                      tc.VAR_POSITION: Storage.readPosition,
-                      tc.VAR_POSITION_LIST: Storage.readPositionList,
+                      tc.VAR_POSITION: lambda result: result.read("!dd"),
                       tc.VAR_POSITION3D: lambda result: result.read("!ddd"),
                       tc.VAR_ANGLE: Storage.readDouble,
                       tc.VAR_SLOPE: Storage.readDouble,
@@ -43,7 +41,6 @@ _RETURN_VALUE_FUNC = {tc.TRACI_ID_LIST: Storage.readStringList,
                       tc.VAR_STAGES_REMAINING: Storage.readInt,
                       tc.VAR_VEHICLE: Storage.readString,
                       tc.VAR_EDGES: Storage.readStringList,
-                      tc.VAR_TARGET_LIST: Storage.readStringList,
                       }
 
 
@@ -53,19 +50,6 @@ class PersonDomain(Domain):
                         tc.CMD_SUBSCRIBE_PERSON_VARIABLE, tc.RESPONSE_SUBSCRIBE_PERSON_VARIABLE,
                         tc.CMD_SUBSCRIBE_PERSON_CONTEXT, tc.RESPONSE_SUBSCRIBE_PERSON_CONTEXT,
                         _RETURN_VALUE_FUNC)
-
-    def getTargetList(self, personID):
-        """Get possible targets
-
-        """
-        return self._getUniversal(tc.VAR_TARGET_LIST, personID)
-
-    def setTargetList(self, personID, targetList):
-        self._connection._sendDoubleCmd(
-            tc.CMD_SET_PERSON_VARIABLE, tc.VAR_TARGET_LIST, personID, targetList)
-
-    def getPositionList(self):
-        return self._getUniversal(tc.VAR_POSITION_LIST)
 
     def getSpeed(self, personID):
         """getSpeed(string) -> double
@@ -228,15 +212,19 @@ class PersonDomain(Domain):
             self.removeStage(personID, 1)
         self.removeStage(personID, 0)
 
-    def add(self, personID, pos2D, *targets):
-        """add(string, (double, double), stringlist)
+    def add(self, personID, edgeID, pos, depart=tc.DEPARTFLAG_NOW, typeID="DEFAULT_PEDTYPE"):
+        """add(string, string, double, double, string)
+        Inserts a new person to the simulation at the given edge, position and
+        time (in s). This function should be followed by appending Stages or the person
+        will immediately vanish on departure.
         """
         self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.ADD, personID,
-                                       1 + 4 + 1 + 1 + 4 + 1 + 8 + 8 + 1 + 4 + len(targets) + 4 * len(targets))
-        self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 3)
-        self._connection._packString(personID)
-        self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, *pos2D)
-        self._connection._packStringList(targets)
+                                       1 + 4 + 1 + 4 + len(typeID) + 1 + 4 + len(edgeID) + 1 + 8 + 1 + 8)
+        self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 4)
+        self._connection._packString(typeID)
+        self._connection._packString(edgeID)
+        self._connection._string += struct.pack("!Bd", tc.TYPE_DOUBLE, depart)
+        self._connection._string += struct.pack("!Bd", tc.TYPE_DOUBLE, pos)
         self._connection._sendExact()
 
     def appendWaitingStage(self, personID, duration, description="waiting", stopID=""):
@@ -373,11 +361,6 @@ class PersonDomain(Domain):
         self._connection._string += struct.pack("!BB", tc.TYPE_BYTE, keepRoute)
         self._connection._sendExact()
 
-    def setPosition(self, personID, x, y):
-        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.VAR_POSITION, personID, 1 + 8 + 8)
-        self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, x, y)
-        self._connection._sendExact()
-
     def setSpeed(self, personID, speed):
         """setSpeed(string, double) -> None
 
@@ -385,11 +368,6 @@ class PersonDomain(Domain):
         """
         self._connection._sendDoubleCmd(
             tc.CMD_SET_PERSON_VARIABLE, tc.VAR_SPEED, personID, speed)
-
-    def setHeuristic(self, personID, heuristic):
-        self._connection._sendStringCmd(
-            tc.CMD_SET_PERSON_VARIABLE, tc.VAR_HEURISTIC, personID, heuristic
-        )
 
     def setType(self, personID, typeID):
         """setType(string, string) -> None
