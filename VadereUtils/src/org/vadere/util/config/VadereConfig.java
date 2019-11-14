@@ -3,7 +3,6 @@ package org.vadere.util.config;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.PropertiesConfigurationLayout;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
@@ -11,18 +10,14 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.vadere.util.logging.Logger;
 
-import java.beans.IntrospectionException;
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.List;
-import java.util.Collections;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 
 /**
@@ -270,6 +265,8 @@ public class VadereConfig {
         defaultConfig.put("SettingsDialog.showLogo", "false");
         defaultConfig.put("Testing.stepCircleOptimization.compareBruteForceSolution", "false");
         defaultConfig.put("TopographyCreator.dotRadius", "0.5");
+        defaultConfig.put("Vadere.cache.useGlobalCacheBaseDir", "false");
+        defaultConfig.put("Vadere.cache.flobalCacheBaseDir", defaultSearchDirectory + "/.cache/vadere-cache");
 
         return defaultConfig;
     }

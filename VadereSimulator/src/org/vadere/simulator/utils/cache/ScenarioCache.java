@@ -8,12 +8,14 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.CacheType;
 import org.vadere.state.types.EikonalSolverType;
 import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class ScenarioCache {
@@ -60,7 +62,31 @@ public class ScenarioCache {
 		this.scenario = null;
 	}
 
-	private ScenarioCache(Scenario scenario, Path scenarioParentDir){
+	private Path resolveCachePath(Path cacheParentDir, String scenarioFileConfig){
+		Path scenarioConfig = Paths.get(scenarioFileConfig);
+
+		// check if scenario file specifies an absolute path. --> If yes use it.
+		if (scenarioConfig.isAbsolute()){
+			logger.infof("Cache path overwritten: Scenario specified absolute cache path. %s",
+					scenarioConfig.toAbsolutePath().toString());
+			return scenarioConfig.toAbsolutePath();
+		}
+
+		Path base;
+		// scenario file uses relative path. Check config for global override
+		if (VadereConfig.getConfig().getBoolean("Vadere.cache.useGlobalCacheBaseDir", false)){
+			logger.info("Global override for cache location found.");
+			base = Paths.get(VadereConfig.getConfig().getString("Vadere.cache.flobalCacheBaseDir"));
+		} else {
+			base = cacheParentDir.resolve(CACHE_DIR_NAME);
+		}
+
+		Path ret = base.resolve(scenarioConfig);
+		logger.infof("Cache search location: %s", ret.toAbsolutePath());
+		return ret.toAbsolutePath();
+	}
+
+	private ScenarioCache(Scenario scenario, Path cacheParentDir){
 		this.empty = scenario == null;
 		this.scenario = scenario;
 
@@ -74,7 +100,7 @@ public class ScenarioCache {
 			if(attFF != null){
 				this.attFF = attFF;
 				this.hash = StateJsonConverter.getFloorFieldHash(topography, attFF);
-				this.cachePath = scenarioParentDir.resolve(CACHE_DIR_NAME).resolve(attFF.getCacheDir());
+				this.cachePath = resolveCachePath(cacheParentDir, attFF.getCacheDir()); //cacheParentDir.resolve(CACHE_DIR_NAME).resolve(attFF.getCacheDir());
 				empty = !attFF.isUseCachedFloorField(); // deactivate cache object if caching is not active.
 				if (!empty)
 					findCacheOnFileSystem();
