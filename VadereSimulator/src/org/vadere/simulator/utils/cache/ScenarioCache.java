@@ -42,6 +42,19 @@ public class ScenarioCache {
 		return new ScenarioCache(scenario, cacheParentDir);
 	}
 
+	public static String getHash(final Scenario scenario){
+		Topography topography = scenario.getTopography();
+		AttributesFloorField attFF = scenario.getModelAttributes()
+				.stream()
+				.filter(a -> a instanceof AttributesFloorField)
+				.map(a ->(AttributesFloorField)a)
+				.findFirst().orElse(null);
+		if(attFF != null) {
+			return StateJsonConverter.getFloorFieldHash(topography, attFF);
+		}
+		return null;
+	}
+
 	private ScenarioCache(){
 		this.empty = true;
 		this.scenario = null;
