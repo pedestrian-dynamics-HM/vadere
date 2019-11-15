@@ -407,6 +407,12 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	public void simulationapi_createTargetChanger(String[] args) throws IOException{}
 
 	@Override
+	public void simulationapi_removeWaitingArea(String[] args) throws IOException{}
+
+	@Override
+	public void simulationapi_removeTargetChanger(String[] args) throws IOException{}
+
+	@Override
 	public void simulationapi_getHash(String[] args) throws IOException {
 
 		String data;

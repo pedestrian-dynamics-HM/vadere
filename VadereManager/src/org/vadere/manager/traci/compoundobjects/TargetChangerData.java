@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.compoundobjects;
 
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 
@@ -16,7 +17,7 @@ public class TargetChangerData extends GenericCompoundObject{
     String nextTarget;
     double prob;
 
-    TargetChangerData(CompoundObject o) {
+    public TargetChangerData(CompoundObject o) {
         super(o, 6);
     }
 
@@ -38,13 +39,15 @@ public class TargetChangerData extends GenericCompoundObject{
 
     public VPolygon getPointsAsVPolygon(){
 
-        VPolygon pointsAsVPolygon = new VPolygon();
+        ArrayList<VPoint> vps = new ArrayList<VPoint>();
         for(int i = 0; i < points.size(); i += 2){
             double x = Double.parseDouble(points.get(i));
             double y = Double.parseDouble(points.get(i + 1));
             VPoint p = new VPoint(x, y);
-            pointsAsVPolygon.getPoints().add(p);
+            vps.add(p);
         }
+
+        VPolygon pointsAsVPolygon = GeometryUtils.polygonFromPoints2D(vps);
 
         return pointsAsVPolygon;
     }

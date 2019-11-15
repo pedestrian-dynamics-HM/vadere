@@ -43,3 +43,27 @@ class SimulationVadereDomain(SimulationDomain):
         self._connection._string += struct.pack("!Bd", tc.TYPE_DOUBLE, prob)
         self._connection._sendExact()
 
+    def addWaitingArea(self, waitingAreaID, points):
+        lenID = 1 + 4 + len(waitingAreaID)
+        lenPoints = 1 + 4 + 4 * len(points) + sum(map(len, points))
+        lenObj = lenID + lenPoints
+
+        self._connection._beginMessage(tc.CMD_SET_SIM_VARIABLE, tc.ADD_WAITING_AREA, waitingAreaID, 1 + 4 + lenObj)
+        self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 2)
+        self._connection._packString(waitingAreaID)
+        self._connection._packStringList(points)
+        self._connection._sendExact()
+
+    def removeTargetChanger(self, targetChangerID):
+        lenID = 1 + 4 + len(targetChangerID)
+
+        self._connection._beginMessage(tc.CMD_SET_SIM_VARIABLE, tc.REMOVE_WAITING_AREA, targetChangerID, lenID)
+        self._connection._packString(targetChangerID)
+        self._connection._sendExact()
+
+    def removeWaitingArea(self, waitingAreaID):
+        lenID = 1 + 4 + len(waitingAreaID)
+
+        self._connection._beginMessage(tc.CMD_SET_SIM_VARIABLE, tc.REMOVE_WAITING_AREA, waitingAreaID, lenID)
+        self._connection._packString(waitingAreaID)
+        self._connection._sendExact()

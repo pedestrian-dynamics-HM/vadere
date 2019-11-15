@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Simulation API
@@ -158,7 +159,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, dataTypeStr = "CompoundObject", name = "createTargetChanger")
 	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager){
-		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
+		TargetChangerData data = new TargetChangerData((CompoundObject) cmd.getVariableValue());
 		remoteManager.accessState((manager, state) -> {
 			AttributesTargetChanger attr = new AttributesTargetChanger(
 					data.getPointsAsVPolygon(),
@@ -186,6 +187,43 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 			MeasurementArea ma = new MeasurementArea(attr);
 			state.getTopography().getMeasurementAreas().add(ma);
 			cmd.setOK();
+		});
+
+		return cmd;
+	}
+
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.REMOVE_TARGET_CHANGER, dataTypeStr = "CompoundObject", name = "removeTargetChanger")
+	public TraCICommand process_removeTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager){
+		remoteManager.accessState((manager, state) -> {
+			LinkedList<TargetChanger> lltc = (LinkedList<TargetChanger>) state.getTopography().getTargetChangers();
+
+			boolean found = false;
+			for( int index = 0; index < lltc.size(); index++ ){
+				if(lltc.get(index).getId() == Integer.parseInt(cmd.getElementId())){
+					lltc.remove(index);
+					found = true;
+					cmd.setOK();
+				}
+			}
+			if(!found) cmd.setErr("ID not found.");
+		});
+
+		return cmd;
+	}
+
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.REMOVE_WAITING_AREA, dataTypeStr = "CompoundObject", name = "removeWaitingArea")
+	public TraCICommand process_removeWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager){
+		remoteManager.accessState((manager, state) -> {
+			LinkedList<MeasurementArea> llma = (LinkedList<MeasurementArea>) state.getTopography().getMeasurementAreas();
+			boolean found = false;
+			for( int index = 0; index < llma.size(); index++ ){
+				if(llma.get(index).getId() == Integer.parseInt(cmd.getElementId())){
+					llma.remove(index);
+					found = true;
+					cmd.setOK();
+				}
+			}
+			if(!found) cmd.setErr("ID not found.");
 		});
 
 		return cmd;
@@ -230,6 +268,10 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 				return process_addWaitingArea(cmd, remoteManager);
 			case ADD_TARGET_CHANGER:
 				return process_addTargetChanger(cmd, remoteManager);
+			case REMOVE_WAITING_AREA:
+				return process_removeWaitingArea(cmd, remoteManager);
+			case REMOVE_TARGET_CHANGER:
+				return process_removeTargetChanger(cmd, remoteManager);
 			default:
 				return process_NotImplemented(cmd, remoteManager);
 		}

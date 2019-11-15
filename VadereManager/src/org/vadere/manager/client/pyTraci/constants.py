@@ -921,9 +921,12 @@ VAR_PARAMETER = 0x7e
 #  add an instance (poi, polygon, vehicle, person, route)
 ADD = 0x80
 
-# add target changer or waiting area (simulation)
+# add and remove target changer or waiting area (simulation)
 ADD_TARGET_CHANGER = 0x80
 ADD_WAITING_AREA = 0x81
+
+REMOVE_TARGET_CHANGER = 0x90
+REMOVE_WAITING_AREA = 0x91
 
 #  remove an instance (poi, polygon, vehicle, person)
 REMOVE = 0x81
