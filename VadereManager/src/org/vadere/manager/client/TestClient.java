@@ -363,10 +363,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res =  personapi.setTargetList(elementIdentifier, targets);
 		System.out.println(res.toString());
 	}
-
-	// todo simulationapi_addTargetChanger
-
-	// todo implement new methods from AbstractTestClient....
+	@Override
+	public void personapi_setHeuristic(String[] args) throws IOException{}
 
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
@@ -385,6 +383,12 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}
+
+	@Override
+	public void simulationapi_createWaitingArea(String[] args) throws IOException{}
+
+	@Override
+	public void simulationapi_createTargetChanger(String[] args) throws IOException{}
 
 	@Override
 	public void simulationapi_getHash(String[] args) throws IOException {
@@ -408,7 +412,5 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res = simulationapi.getTime();
 		System.out.println(res.toString());
 	}
-	@Override
-	public void personapi_setHeuristic(String[] args) throws IOException {}
 
 }
