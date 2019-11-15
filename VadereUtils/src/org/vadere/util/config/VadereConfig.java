@@ -266,7 +266,7 @@ public class VadereConfig {
         defaultConfig.put("Testing.stepCircleOptimization.compareBruteForceSolution", "false");
         defaultConfig.put("TopographyCreator.dotRadius", "0.5");
         defaultConfig.put("Vadere.cache.useGlobalCacheBaseDir", "false");
-        defaultConfig.put("Vadere.cache.flobalCacheBaseDir", defaultSearchDirectory + "/.cache/vadere-cache");
+        defaultConfig.put("Vadere.cache.globalCacheBaseDir", defaultSearchDirectory + "/.cache/vadere");
 
         return defaultConfig;
     }
