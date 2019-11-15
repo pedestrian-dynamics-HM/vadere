@@ -198,17 +198,17 @@ public class VadereConsole {
 				.help("Run utility functions.")
 				.setDefault("func", utilsSubCommand);
 
-		misc.addArgument("--scenario-file", "-f")
+		misc.addArgument("-i")
 				.required(true)
 				.type(String.class)
-				.dest("scenario-file")
-				.help("Scenario to work with.");
+				.dest("input")
+				.help("A input file or directory depending on called method.");
 
-		misc.addArgument("--output", "-o")
+		misc.addArgument( "-o")
 				.required(false)
 				.type(String.class)
 				.dest("output")
-				.help("A output file or folder depending on called method.");
+				.help("A output file or directory depending on called method.");
 
 
 		String[] utilMethods = utilsSubCommand.methodsString();
@@ -217,7 +217,7 @@ public class VadereConsole {
 				.type(String.class)
 				.choices(utilMethods)
 				.dest("method")
-				.help("Method name to call.");
+				.help("Method name to call." + utilsSubCommand.methodHelp());
 	}
 
 }

@@ -26,7 +26,7 @@
     are possible with a fixed height of 5m.
 - vadere-console `utils` subCommand:
   * A miscellaneous collector of simple function operating on a single scenario file.
-  * -f (input [required]) 
+  * -f (input file or directory depending on method m [required]) 
   * -o (ouput file or directory depending on method m [optional]) 
   * -m (name of method.) See subparser help for allowed functions.
   * currently implementd:

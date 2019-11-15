@@ -3,6 +3,7 @@ package org.vadere.simulator.entrypoints.cmd.commands;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -28,13 +29,13 @@ public class UtilsSubCommand implements SubCommandRunner {
 
 	private final static Logger logger = Logger.getLogger(UtilsSubCommand.class);
 
-	private HashMap<String, SubCommandRunner> methods;
+	private HashMap<String, Pair<String, SubCommandRunner>> methods;
 
 	public UtilsSubCommand() {
 		methods = new HashMap<>();
-		methods.put("getHash", this::getHash);
-		methods.put("binCache", this::calculateBinCache);
-		methods.put("txtCache", this::calculateTextCache);
+		methods.put("getHash", Pair.of("[-i: file, -o: ignored]", this::getHash));
+		methods.put("binCache", Pair.of("[-i: file, -o: directory]",this::calculateBinCache));
+		methods.put("txtCache", Pair.of("[-i: file, -o: directory]",this::calculateTextCache));
 
 	}
 
@@ -43,6 +44,12 @@ public class UtilsSubCommand implements SubCommandRunner {
 		String[] ret = new String[mSet.size()];
 		mSet.toArray(ret);
 		return ret;
+	}
+
+	public String methodHelp(){
+		StringBuilder sb = new StringBuilder();
+		methods.forEach((key, value) -> sb.append("\n --> ").append(key).append(":").append(value.getLeft()));
+		return sb.toString();
 	}
 
 	private Scenario createScenario(String path) throws IOException {
@@ -61,7 +68,7 @@ public class UtilsSubCommand implements SubCommandRunner {
 	public void run(Namespace ns, ArgumentParser parser) throws Exception {
 
 		String m = ns.get("method");
-		SubCommandRunner runner = methods.get(m);
+		SubCommandRunner runner = methods.get(m).getRight();
 		if (runner != null){
 			runner.run(ns, parser);
 		} else {
