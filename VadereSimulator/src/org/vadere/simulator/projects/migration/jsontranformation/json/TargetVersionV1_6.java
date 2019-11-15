@@ -61,10 +61,17 @@ public class TargetVersionV1_6 extends SimpleJsonTransformation {
 		String oldName = "psychology";
 		String newName = "psychologyStatus";
 
-		renameInTopographyUnderAttributesPedestrian(node, oldName, newName);
-		renameInTopographyUnderAttributesCar(node, oldName, newName);
-		renameInMainModel(node, oldName, newName);
-		renameInDynamicElements(node, oldName, newName);
+		JsonNode dynamicElementsNode = path(node, "scenario/topography/dynamicElements");
+
+		if (dynamicElementsNode.isArray()) {
+			for (JsonNode dynamicElementNode : dynamicElementsNode) {
+				JsonNode psychologyNode = path(dynamicElementNode, "psychology");
+
+				if (!psychologyNode.isMissingNode()) {
+					renameField((ObjectNode)dynamicElementNode, oldName, newName);
+				}
+			}
+		}
 
 		return node;
 	}
