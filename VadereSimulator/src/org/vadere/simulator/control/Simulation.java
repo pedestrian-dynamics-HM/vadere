@@ -1,8 +1,8 @@
 package org.vadere.simulator.control;
 
-import org.vadere.simulator.control.cognition.EventCognition;
-import org.vadere.simulator.control.cognition.SalientBehaviorCognition;
-import org.vadere.simulator.control.events.EventController;
+import org.vadere.simulator.control.psychology.cognition.SelfCategoryProcessor;
+import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -18,7 +18,7 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
@@ -78,12 +78,10 @@ public class Simulation {
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
-	private final EventController eventController;
-	private final EventCognition eventCognition;
-	private final SalientBehaviorCognition salientBehaviorCognition;
+	private final StimulusController stimulusController;
+	private final StimulusProcessor stimulusProcessor;
+	private final SelfCategoryProcessor selfCategoryProcessor;
 	private final ScenarioCache scenarioCache;
-
-	private boolean addedTargetPedestrian = false;
 
 	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
 					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
@@ -117,40 +115,17 @@ public class Simulation {
 		this.remoteRunListeners = remoteRunListeners;
 		this.singleStepMode = singleStepMode;
 
-		// "eventController" is final. Therefore, create object here and not in helper method.
-		this.eventController = new EventController(scenarioStore);
-		this.eventCognition = new EventCognition();
-		this.salientBehaviorCognition = new SalientBehaviorCognition(topography);
+		// "stimulusController" is final. Therefore, create object here and not in helper method.
+		this.stimulusController = new StimulusController(scenarioStore);
+		this.stimulusProcessor = new StimulusProcessor();
+		this.selfCategoryProcessor = new SelfCategoryProcessor(topography);
 
 		createControllers(topography, mainModel, random);
 
-		// ::start:: this code is to visualize the potential fields. It may be refactored later.
+		// this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
-			IPotentialFieldTarget pft = null;
-			IPotentialField pt = null;
-			if(mainModel instanceof PotentialFieldModel) {
-				pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
-			} else if(mainModel instanceof BehaviouralHeuristicsModel) {
-				pft = ((BehaviouralHeuristicsModel) mainModel).getPotentialFieldTarget();
-			}
-
-			if(pft != null) {
-				pt = (pos, agent) -> {
-					if(agent instanceof PedestrianOSM) {
-						return ((PedestrianOSM)agent).getPotential(pos);
-					}
-					else {
-						return 0.0;
-					}
-				};
-			}
-
-			for (PassiveCallback pc : this.passiveCallbacks) {
-				pc.setPotentialFieldTarget(pft);
-				pc.setPotentialField(pt);
-			}
+			initPotentialFieldsForVisualization(mainModel);
 		}
-		// ::end::
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setTopography(topography);
@@ -181,6 +156,32 @@ public class Simulation {
 		if (topography.hasTeleporter()) {
 			this.teleporterController = new TeleporterController(
 					topography.getTeleporter(), topography);
+		}
+	}
+
+	private void initPotentialFieldsForVisualization(MainModel mainModel) {
+		IPotentialFieldTarget pft = null;
+		IPotentialField pt = null;
+		if(mainModel instanceof PotentialFieldModel) {
+			pft = ((PotentialFieldModel) mainModel).getPotentialFieldTarget();
+		} else if(mainModel instanceof BehaviouralHeuristicsModel) {
+			pft = ((BehaviouralHeuristicsModel) mainModel).getPotentialFieldTarget();
+		}
+
+		if(pft != null) {
+			pt = (pos, agent) -> {
+				if(agent instanceof PedestrianOSM) {
+					return ((PedestrianOSM)agent).getPotential(pos);
+				}
+				else {
+					return 0.0;
+				}
+			};
+		}
+
+		for (PassiveCallback pc : this.passiveCallbacks) {
+			pc.setPotentialFieldTarget(pft);
+			pc.setPotentialField(pt);
 		}
 	}
 
@@ -354,7 +355,7 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-		List<Event> events = eventController.getEventsForTime(simTimeInSec);
+		List<Stimulus> stimuli = stimulusController.getStimuliForTime(simTimeInSec);
 
 		// "TargetControllers" are populated in each simulation loop because
 		// pedestrians can be declared as targets in each simulation loop.
@@ -386,10 +387,10 @@ public class Simulation {
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
-		eventCognition.prioritizeEventsForPedestrians(events, pedestrians);
+		stimulusProcessor.prioritizeStimuliForPedestrians(stimuli, pedestrians);
 
-		if (attributesSimulation.isUseSalientBehavior()) {
-			salientBehaviorCognition.setSalientBehaviorForPedestrians(pedestrians, simTimeInSec);
+		if (attributesSimulation.isUsePsychologyLayer()) {
+			selfCategoryProcessor.setSelfCategoryOfPedestrian(pedestrians, simTimeInSec);
 		}
 
 		for (Model m : models) {

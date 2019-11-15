@@ -128,11 +128,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         graphics.dispose();
     }
 
-    protected void renderTrajectory(final Graphics2D g, final java.util.List<VPoint> points, final Agent pedestrain) {
+    protected void renderTrajectory(final Graphics2D g, final java.util.List<VPoint> points, final Pedestrian pedestrain) {
         renderTrajectory(g, points.stream(), pedestrain);
     }
 
-    protected void renderTrajectory(final Graphics2D g, final Stream<VPoint> points, final Agent pedestrain) {
+    protected void renderTrajectory(final Graphics2D g, final Stream<VPoint> points, final Pedestrian pedestrain) {
         Color color = g.getColor();
         Stroke stroke = g.getStroke();
 
@@ -143,8 +143,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
         }
 
+        VPoint endPos = model.config.isInterpolatePositions() ? pedestrain.getInterpolatedFootStepPosition(model.getSimTimeInSec()) : pedestrain.getPosition();
         Path2D.Double path = new Path2D.Double();
-        path.moveTo(pedestrain.getPosition().getX(), pedestrain.getPosition().getY());
+        path.moveTo(
+		        endPos.getX(), endPos.getY());
         points.forEachOrdered(
                 p -> path.lineTo(p.getX(), p.getY()));
 

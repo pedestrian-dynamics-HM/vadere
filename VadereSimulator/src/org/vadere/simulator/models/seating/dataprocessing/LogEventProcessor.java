@@ -91,7 +91,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void doUpdate(SimulationState state) {
 		updateTime(state);
-		// sit-down events are logged by a target listener registered in init()
+		// sit-down stimuli are logged by a target listener registered in init()
 	}
 
 	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {

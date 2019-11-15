@@ -1,7 +1,7 @@
 {
   "name" : "mf_001",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -3418930040050646469,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -10762,6 +10762,7 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ ],
@@ -10781,6 +10782,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

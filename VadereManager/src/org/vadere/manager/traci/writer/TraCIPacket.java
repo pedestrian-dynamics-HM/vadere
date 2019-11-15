@@ -102,8 +102,8 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return new ByteArrayOutputStreamTraCIWriter();
 	}
 
-	public TraCIPacket wrapSetCommand(TraCICmd commandIdentifier, String elementIdentifier,
-									  int variableIdentifier, TraCIDataType dataType, Object data){
+	public TraCIPacket wrapCommand(TraCICmd commandIdentifier, String elementIdentifier,
+								   int variableIdentifier, TraCIDataType dataType, Object data){
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
 		cmdBuilder.writeUnsignedByte(commandIdentifier.id)

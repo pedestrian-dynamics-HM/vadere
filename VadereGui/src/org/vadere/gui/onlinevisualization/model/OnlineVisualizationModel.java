@@ -69,6 +69,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		this.drawDataSynchronizer = new Object();
 		this.voronoiSnapshots = new LinkedList<>();
 		this.observationAreaSnapshots = new LinkedList<>();
+		this.config.setInterpolatePositions(false);
 	}
 
 	@Override
@@ -78,6 +79,16 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		}
 		Collection<Agent> result = new LinkedList<>();
 		result.addAll(topography.getElements(Agent.class));
+		return result;
+	}
+
+	@Override
+	public Collection<Pedestrian> getPedestrians() {
+		if (topography == null) {
+			return new ArrayList<>();
+		}
+		Collection<Pedestrian> result = new LinkedList<>();
+		result.addAll(topography.getElements(Pedestrian.class));
 		return result;
 	}
 

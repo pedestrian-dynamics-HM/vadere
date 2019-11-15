@@ -25,4 +25,6 @@ public @interface SimulationHandler {
 	TraCICmd cmd();
 	SimulationVar var() ;
 	String name(); // name of client function.
+	boolean ignoreElementId() default false;
+	String dataTypeStr() default "";
 }

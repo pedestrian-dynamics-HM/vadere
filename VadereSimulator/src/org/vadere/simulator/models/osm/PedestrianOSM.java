@@ -28,6 +28,7 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PedestrianOSM extends Pedestrian {
 
@@ -43,7 +44,7 @@ public class PedestrianOSM extends Pedestrian {
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
 	private transient PotentialFieldAgent potentialFieldPedestrian;
-	// A setter is provided to be able to change strategy at runtime (e.g. by events).
+	// A setter is provided to be able to change strategy at runtime (e.g. by stimuli).
 	private transient ICombinedPotentialStrategy combinedPotentialStrategy;
 	private transient List<SpeedAdjuster> speedAdjusters;
 	private transient List<StepSizeAdjuster> stepSizeAdjusters;
@@ -104,6 +105,30 @@ public class PedestrianOSM extends Pedestrian {
 		this.lastPosition = getPosition();
 		this.nextPosition = getPosition();
 		this.strides = new LinkedList<>();
+	}
+
+	private PedestrianOSM(@NotNull final PedestrianOSM other) {
+		super(other);
+
+		this.attributesOSM = other.attributesOSM;
+		this.topography = other.topography;
+		this.potentialFieldTarget = other.potentialFieldTarget;
+		this.potentialFieldObstacle = other.potentialFieldObstacle;
+		this.potentialFieldPedestrian = other.potentialFieldPedestrian;
+		this.combinedPotentialStrategy = other.combinedPotentialStrategy;
+		this.stepCircleOptimizer = other.stepCircleOptimizer;
+
+		this.speedAdjusters = new LinkedList<>(other.speedAdjusters);
+		this.stepSizeAdjusters = new LinkedList<>(other.stepSizeAdjusters);
+		this.relevantPedestrians = new ArrayList<>(other.relevantPedestrians);
+		this.timeOfNextStep = INVALID_NEXT_EVENT_TIME;
+		this.stepDeviation = other.stepDeviation;
+		this.stepLength = other.stepLength;
+		this.minStepLength = other.minStepLength;
+		this.lastPosition = other.lastPosition;
+		this.nextPosition = other.nextPosition;
+		this.strides = new LinkedList<>(other.strides);
+		this.random = other.random;
 	}
 
 	/*public void update(double timeStepInSec, double currentTimeInSec, CallMethod callMethod) {
@@ -371,16 +396,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	@Override
 	public PedestrianOSM clone() {
-		return new PedestrianOSM(attributesOSM,
-				getAttributes(),
-				topography,
-				random,
-				potentialFieldTarget,
-				potentialFieldObstacle,
-				potentialFieldPedestrian,
-				speedAdjusters,
-				stepCircleOptimizer
-				);
+		return new PedestrianOSM(this);
 	}
 
 	@Override

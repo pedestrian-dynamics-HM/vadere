@@ -32,6 +32,8 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 
 	public abstract Collection<Agent> getAgents();
 
+	public abstract Collection<Pedestrian> getPedestrians();
+
 	public abstract int getTopographyId();
 
 	public abstract double getSimTimeInSec();

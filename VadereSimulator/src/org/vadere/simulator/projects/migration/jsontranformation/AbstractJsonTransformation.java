@@ -131,13 +131,28 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
     // choose  sort order based on targetVersion.
     public JsonNode sort (JsonNode node) {
 
-        if (getTargetVersion().equalOrBigger(Version.V0_8)){
+        if (getTargetVersion().equalOrBigger(Version.V1_5)){
+            node = sort_since_V1_5(node);
+        } else if (getTargetVersion().equalOrBigger(Version.V0_8)){
             node = sort_since_V08(node);
         } else {
             node = sort_since_V01(node);
         }
 
         return  node;
+    }
+
+    private JsonNode sort_since_V1_5(JsonNode node) {
+        LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
+        LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
+        putObject(sortedRoot, source, "name");
+        putObject(sortedRoot, source, "description");
+        putObject(sortedRoot, source, "release");
+        putObject(sortedRoot, source, "commithash");
+        putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography", "stimulusInfos");
+
+        return  StateJsonConverter.deserializeToNode(sortedRoot);
     }
 
     private JsonNode sort_since_V08(JsonNode node) {
