@@ -5,7 +5,8 @@ public enum SubCommand {
 	PROJECT_RUN("project-run"),
 	SCENARO_RUN("scenario-run"),
 	SUQ("suq"),
-	MIGRATE("migrate");
+	MIGRATE("migrate"),
+	UTILS("utils");
 
 	private String cmdName;
 

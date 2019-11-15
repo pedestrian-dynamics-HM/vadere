@@ -141,7 +141,7 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 								.substring(traCIApi.singleAnnotation.lastIndexOf(".") + 1).trim();
 						if (anName.equals(singeAn)){
 							ApiHandler apiHandler = new ApiHandler(traCIApi, element, anMirror);
-							apiMapping.append(String.format("\t\tconsoleReader.addCommand(\"%s.%s\", \"\", this::%s_%s);\n", traCIApi.name.toLowerCase(), apiHandler.name, traCIApi.name.toLowerCase(), apiHandler.name));
+							apiMapping.append(String.format("\t\tconsoleReader.addCommand(\"%s.%s\", \"\", this::%s_%s);\n", traCIApi.nameShort.toLowerCase(), apiHandler.name, traCIApi.name.toLowerCase(), apiHandler.name));
 							apiAbstract.append(String.format("\t\tabstract public void %s_%s (String args[]) throws IOException;\n",traCIApi.name.toLowerCase(), apiHandler.name));
 							switch (apiHandler.apiType){
 								case "GET":
@@ -160,25 +160,37 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 	}
 
 	protected void writeGET(PrintWriter writer, ApiHandler apiHandler){
-		if (apiHandler.ignoreElementId){
-			writer.append("\tpublic TraCIGetResponse ").append(apiHandler.name).append("() throws IOException {").println();
-			writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", ").append(apiHandler.varId).append(", \"-1\");").println();
-		}
-		else {
-			writer.append("\tpublic TraCIGetResponse ").append(apiHandler.name).append("(String elementID) throws IOException {").println();
-			writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", ").append(apiHandler.varId).append(", elementID);").println();
+		if (apiHandler.dataTypeStr.isEmpty()){
+			// standard GET command without additional data
+			if (apiHandler.ignoreElementId){
+				writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("() throws IOException {").println();
+				writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", ").append(apiHandler.varId).append(", \"-1\");").println();
+			}
+			else {
+				writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(String elementID) throws IOException {").println();
+				writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", ").append(apiHandler.varId).append(", elementID);").println();
+			}
+		} else {
+			// extended GET command which accepts any kind of data based on the standard traci data types
+			if (apiHandler.ignoreElementId){
+				writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(").append(apiHandler.dataTypeStr).append(" data) throws IOException {").println();
+				writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", \"-1\" , ").append(apiHandler.varId).append(", ").append(apiHandler.varType).append(", data);").println();
+			} else {
+				writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(String elementId, ").append(apiHandler.dataTypeStr).append(" data) throws IOException {").println();
+				writer.append("\t\tTraCIPacket p = TraCIGetCommand.build(").append(apiHandler.cmd).append(", elementId, ").append(apiHandler.varId).append(", ").append(apiHandler.varType).append(", data);").println();
+			}
 		}
 
+
 		writer.append("\n\t\tsocket.sendExact(p);\n").println();
-		writer.append("\t\treturn (TraCIGetResponse) socket.receiveResponse();").println();
+		writer.append("\t\treturn socket.receiveResponse();").println();
 		writer.append("\t}").println();
 		writer.println();
 	}
 
 	protected void writeSET(PrintWriter writer, ApiHandler apiHandler){
 		writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(String elementId, ").append(apiHandler.dataTypeStr).append(" data) throws IOException {").println();
-		writer.append("\t\tTraCIPacket p = TraCISetCommand.build(")
-				.append(apiHandler.cmd).append(", elementId, ").append(apiHandler.varId).append(", ").append(apiHandler.varType).append(", data);").println();
+		writer.append("\t\tTraCIPacket p = TraCISetCommand.build(").append(apiHandler.cmd).append(", elementId, ").append(apiHandler.varId).append(", ").append(apiHandler.varType).append(", data);").println();
 
 		writer.append("\n\t\tsocket.sendExact(p);\n").println();
 		writer.append("\t\treturn socket.receiveResponse();").println();
@@ -188,6 +200,7 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 
 	class TraCiApiWrapper {
 		String name;
+		String nameShort;
 		String singleAnnotation;
 		String multipleAnnotation;
 		String cmdEnum;
@@ -201,6 +214,8 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 
 
 			name = traCIApi.name();
+			nameShort = traCIApi.nameShort();
+			nameShort = nameShort.isEmpty() ? name : nameShort;
 			packageName = traCIApi.packageName();
 			imports = traCIApi.imports();
 			extendedClassName = traCIApi.extendedClassName();
