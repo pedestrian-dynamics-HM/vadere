@@ -700,8 +700,4 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return builder.toString();
 	}
 
-	@Override
-	public VPolygon copy() {
-		return new VPolygon(this);
-	}
 }

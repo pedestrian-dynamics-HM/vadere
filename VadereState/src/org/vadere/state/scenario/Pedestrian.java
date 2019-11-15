@@ -1,7 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesAgentPsychology;
+import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
@@ -26,7 +26,8 @@ public class Pedestrian extends Agent {
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
-	private AttributesAgentPsychology psychology;
+	private PsychologyStatus psychologyStatus;
+
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
 
@@ -60,7 +61,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		psychology = new AttributesAgentPsychology(null, SelfCategory.TARGET_ORIENTED);
+		psychologyStatus = new PsychologyStatus(null, SelfCategory.TARGET_ORIENTED);
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -75,10 +76,7 @@ public class Pedestrian extends Agent {
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
 
-		psychology = new AttributesAgentPsychology(
-				other.getMostImportantStimulus() != null ? other.getMostImportantStimulus().clone() : null,
-				other.getSelfCategory()
-		);
+		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -103,8 +101,8 @@ public class Pedestrian extends Agent {
 	public boolean isLikelyInjured() {
 		return isLikelyInjured;
 	}
-	public Stimulus getMostImportantStimulus() { return psychology.getMostImportantStimulus(); }
-	public SelfCategory getSelfCategory() { return psychology.getSelfCategory(); }
+	public Stimulus getMostImportantStimulus() { return psychologyStatus.getMostImportantStimulus(); }
+	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -151,8 +149,8 @@ public class Pedestrian extends Agent {
 	public void setLikelyInjured(boolean likelyInjured) {
 		this.isLikelyInjured = likelyInjured;
 	}
-	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychology.setMostImportantStimulus(mostImportantStimulus); }
-	public void setSelfCategory(SelfCategory selfCategory) { psychology.setSelfCategory(selfCategory); }
+	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychologyStatus.setMostImportantStimulus(mostImportantStimulus); }
+	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}

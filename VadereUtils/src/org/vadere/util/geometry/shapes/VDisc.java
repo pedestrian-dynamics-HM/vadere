@@ -17,9 +17,4 @@ public class VDisc extends VCircle {
 		return getCenter().distance(pos) - getRadius();
 	}
 
-	@Override
-	public VDisc copy() {
-		return new VDisc(getCenter().clone(), getRadius());
-	}
-
 }

@@ -15,8 +15,8 @@ import java.util.List;
  * Rename following pedestrian attributes:
  * - "targetOrientationAngleThreshold" to "walkingDirectionSameIfAngleLessOrEqual"
  * - "angleCalculationType" to "walkingDirectionCalculation"
- *
- * Also adapt possible values for "walkingDirectionCalculation".
+ *   Also adapt possible values for "walkingDirectionCalculation".
+ * - "psychology" to "psychologyStatus"
  */
 @MigrationTransformation(targetVersionLabel = "1.6")
 public class TargetVersionV1_6 extends SimpleJsonTransformation {
@@ -29,6 +29,7 @@ public class TargetVersionV1_6 extends SimpleJsonTransformation {
 	protected void initDefaultHooks() {
 		addPostHookFirst(this::renameTargetOrientationAngleThreshold);
 		addPostHookFirst(this::renameAngleCalculationType);
+		addPostHookFirst(this::renamePsychology);
 		addPostHookLast(this::sort);
 	}
 
@@ -47,6 +48,18 @@ public class TargetVersionV1_6 extends SimpleJsonTransformation {
 	public JsonNode renameAngleCalculationType(JsonNode node) throws MigrationException {
 		String oldName = "angleCalculationType";
 		String newName = "walkingDirectionCalculation";
+
+		renameInTopographyUnderAttributesPedestrian(node, oldName, newName);
+		renameInTopographyUnderAttributesCar(node, oldName, newName);
+		renameInMainModel(node, oldName, newName);
+		renameInDynamicElements(node, oldName, newName);
+
+		return node;
+	}
+
+	public JsonNode renamePsychology(JsonNode node) throws MigrationException {
+		String oldName = "psychology";
+		String newName = "psychologyStatus";
 
 		renameInTopographyUnderAttributesPedestrian(node, oldName, newName);
 		renameInTopographyUnderAttributesCar(node, oldName, newName);

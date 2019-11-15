@@ -2,7 +2,6 @@ package org.vadere.util.geometry.shapes;
 
 import org.vadere.util.geometry.GeometryUtils;
 
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,11 +205,6 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 			lines.add(line);
 		}
 		return lines;
-	}
-
-	@Override
-	public VRectangle copy() {
-		return new VRectangle(x, y, width, height);
 	}
 
 }

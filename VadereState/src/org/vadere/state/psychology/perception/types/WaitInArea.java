@@ -27,7 +27,10 @@ public class WaitInArea extends Stimulus {
     public WaitInArea(WaitInArea other) {
         super(other.time);
 
-        this.area = other.getArea().copy();
+        // According to BZ, "VShape" can be seen as immutable (i.e., usually
+        // they have only "final" fields). Therefore, use "other.getArea()" directly
+        // instead of cloning or allocating a new one.
+        this.area = other.getArea();
     }
 
     // Getter

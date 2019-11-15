@@ -246,8 +246,4 @@ public class VTriangle extends VPolygon {
         return "["+p1 + "," + p2 + "," + p3 + "]";
     }
 
-    @Override
-    public VTriangle copy() {
-        return new VTriangle(p1.clone(), p2.clone(), p3.clone());
-    }
 }

@@ -195,9 +195,4 @@ public class DataTriangle extends VTriangle {
 		return dataPoints;
 	}
 
-	@Override
-	public DataTriangle copy() {
-		DataPoint measurePointCopy = new DataPoint(measurePoint.x, measurePoint.y, measurePoint.getData());
-		return new DataTriangle(p1.clone(), p2.clone(), p3.clone(), measurePointCopy);
-	}
 }

@@ -254,9 +254,4 @@ public class VRing implements VShape {
 		throw new UnsupportedOperationException("not yet implemented.");
 	}
 
-	@Override
-	public VRing copy() {
-		return new 	VRing(center.clone(), radiusInnerCircle, radiusOuterCircle);
-	}
-
 }
