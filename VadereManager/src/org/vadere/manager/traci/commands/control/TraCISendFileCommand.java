@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class TraCISendFileCommand extends TraCICommand {
 
 	private String fileName;
-	private String file;
+	private String file; // file content
 
 	public static TraCIPacket TraCISendFileCommand(String fileName, String file){
 		int strLen = file.getBytes(StandardCharsets.US_ASCII).length;
