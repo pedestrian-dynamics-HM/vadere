@@ -404,13 +404,51 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
-	public void simulationapi_createTargetChanger(String[] args) throws IOException{}
+	public void simulationapi_createTargetChanger(String[] args) throws IOException{
+		if(args.length < 7){
+			System.out.println("command needs argument element id, reach distance, next target is pedestrian, next target, probability, list of polygon corners");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double reachDist = Double.parseDouble(args[2]);
+		int nextTargetIsPedestrian = Integer.parseInt(args[3]);
+		String nextTarget = args[4];
+		double prob = Double.parseDouble(args[5]);
+		ArrayList<String> polyCorners = new ArrayList<String>();
+		for(int i = 6; i < args.length; i++){
+			polyCorners.add(args[i]);
+		}
+
+		CompoundObject compoundObject = CompoundObjectBuilder.createTargetChanger(
+				elementIdentifier, polyCorners, reachDist, nextTargetIsPedestrian, nextTarget, prob);
+		TraCIResponse res = simulationapi.createTargetChanger(elementIdentifier, compoundObject);
+		System.out.println(res.toString());
+	}
 
 	@Override
-	public void simulationapi_removeWaitingArea(String[] args) throws IOException{}
+	public void simulationapi_removeWaitingArea(String[] args) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		TraCIResponse res = simulationapi.removeWaitingArea(elementIdentifier, null);
+		System.out.println(res.toString());
+	}
 
 	@Override
-	public void simulationapi_removeTargetChanger(String[] args) throws IOException{}
+	public void simulationapi_removeTargetChanger(String[] args) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		TraCIResponse res = simulationapi.removeTargetChanger(elementIdentifier, null);
+		System.out.println(res.toString());
+	}
 
 	@Override
 	public void simulationapi_getHash(String[] args) throws IOException {
