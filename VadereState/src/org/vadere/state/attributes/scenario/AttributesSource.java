@@ -22,6 +22,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	private int id = ID_NOT_SET;
 
 	/** Shape and position. */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private VShape shape = null;
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;

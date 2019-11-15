@@ -20,6 +20,7 @@ public enum SimulationVar {
 	NETWORK_BOUNDING_BOX_2D(0x7c, TraCIDataType.POLYGON),
 	ADD_TARGET_CHANGER(0x80, TraCIDataType.COMPOUND_OBJECT),
 	ADD_WAITING_AREA(0x81, TraCIDataType.COMPOUND_OBJECT),
+	CACHE_HASH(0x7d, TraCIDataType.STRING)
 	;
 
 	public int id;

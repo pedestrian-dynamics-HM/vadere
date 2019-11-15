@@ -64,6 +64,14 @@ public class StatusResponse {
 		this.description = description;
 	}
 
+	boolean isErr(){
+		return response.equals(TraCIStatusResponse.ERR);
+	}
+
+	boolean isOk(){
+		return response.equals(TraCIStatusResponse.OK);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

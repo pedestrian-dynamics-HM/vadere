@@ -22,7 +22,6 @@ import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class TestClient extends org.vadere.manager.client.AbstractTestClient implements Runnable{
 
@@ -176,7 +175,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(cmd.toString());
 	}
 
-
 	void sendFile(String[] args) throws IOException {
 
 		String filePath;
@@ -215,22 +213,31 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(cmd.toString());
 	}
 
+	private void printGet(TraCIResponse res){
+		if (res.isErr()){
+			System.out.println(res.toString());
+		} else {
+			System.out.println(res.getStatusResponse().toString());
+			System.out.println("--> " + ((TraCIGetResponse)res).getResponseData());
+		}
+	}
+
 	@Override
 	public void personapi_getIDList(String[] args) throws IOException {
-		TraCIGetResponse res = personapi.getIDList();
-		System.out.println(res.getResponseData());
+		TraCIResponse res = personapi.getIDList();
+		printGet(res);
 	}
 
     @Override
     public void personapi_getNextFreeId(String[] args) throws IOException {
-		TraCIGetResponse res = personapi.getNextFreeId();
-		System.out.println(res.getResponseData());
+		TraCIResponse res = personapi.getNextFreeId();
+		printGet(res);
     }
 
 	@Override
 	public void personapi_getIDCount(String[] args) throws IOException {
-		TraCIGetResponse res = personapi.getIDCount();
-		System.out.println(res.getResponseData());
+		TraCIResponse res = personapi.getIDCount();
+		printGet(res);
 	}
 
 	@Override
@@ -242,7 +249,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		String elementIdentifier = args[1];
 
 		try {
-			TraCIGetResponse res = personapi.getSpeed(elementIdentifier);
+			TraCIGetResponse res = (TraCIGetResponse)personapi.getSpeed(elementIdentifier);
 			double p = (double) res.getResponseData();
 			System.out.println(p);
 		} catch (ClassCastException e){
@@ -271,7 +278,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 			return;
 		}
 		String elementIdentifier = args[1];
-		TraCIGetResponse res = personapi.getPosition2D(elementIdentifier);
+		TraCIGetResponse res = (TraCIGetResponse)personapi.getPosition2D(elementIdentifier);
 		VPoint p = (VPoint) res.getResponseData();
 		System.out.println(p.toString());
 	}
@@ -298,8 +305,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void personapi_getPosition2DList(String[] args) throws IOException {
-		TraCIGetResponse res = personapi.getPosition2DList();
-		System.out.println(((Map<String, VPoint>) res.getResponseData()).toString());
+		TraCIResponse res = personapi.getPosition2DList();
+		printGet(res);
 	}
 
 	@Override
@@ -335,7 +342,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		}
 
 		String elementIdentifier = args[1];
-		TraCIGetResponse res = personapi.getTargetList(elementIdentifier);
+		TraCIGetResponse res = (TraCIGetResponse)personapi.getTargetList(elementIdentifier);
 		ArrayList<String> targets = (ArrayList<String>) res.getResponseData();
 		System.out.println(elementIdentifier + ": " + Arrays.toString(targets.toArray()));
 	}
@@ -369,16 +376,38 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		}
 
 		String elementIdentifier = args[1];
-
 		String x = args[2];
 		String y = args[3];
 		String[] targets = Arrays.copyOfRange(args,4,args.length);
+
 
 		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
 		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void simulationapi_getHash(String[] args) throws IOException {
+
+		String data;
+		try{
+			data = IOUtils.readTextFile(Paths.get(basePath, defaultScenario).toString());
+		} catch (IOException e){
+			System.out.println("File not found: " + Paths.get(basePath, defaultScenario).toString());
+			return;
+		}
+
+		TraCIResponse cmd =  simulationapi.getHash(data);
+
+		System.out.println(cmd.toString());
+
+	}
+
+	@Override
+	public void simulationapi_getTime(String[] args) throws IOException {
+		TraCIResponse res = simulationapi.getTime();
+		System.out.println(res.toString());
+	}
 	@Override
 	public void personapi_setHeuristic(String[] args) throws IOException {}
 
