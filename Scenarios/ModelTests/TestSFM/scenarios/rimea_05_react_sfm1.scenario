@@ -1,7 +1,7 @@
 {
   "name" : "rimea_05_react_sfm1",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -150,8 +150,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "angleCalculationType" : "USE_CENTER",
+        "targetOrientationAngleThreshold" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null
