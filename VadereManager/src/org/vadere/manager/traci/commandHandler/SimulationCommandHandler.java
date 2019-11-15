@@ -115,7 +115,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, name = "createTargetChanger")
+	//@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, name = "createTargetChanger")
 	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
 		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
@@ -180,7 +180,6 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 
 	public TraCICommand processSet(TraCICommand cmd, RemoteManager remoteManager) {
 		return process_NotImplemented(cmd, remoteManager);
-
 	}
 
 }

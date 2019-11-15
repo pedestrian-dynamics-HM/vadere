@@ -51,8 +51,11 @@ class PersonVadereDomain(PersonDomain):
     def add(self, personID, pos2D, *targets):
         """add(string, (double, double), stringlist)
         """
-        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.ADD, personID,
-                                       1 + 4 + 1 + 1 + 4 + 1 + 8 + 8 + 1 + 4 + len(targets) + 4 * len(targets))
+        lenID = 1 + 4 + 1
+        lenPos = 1 + 8 + 8
+        lenTargets = 1 + 4 + (1 + 4) * len(targets)
+        lenObj = lenID + lenPos + lenTargets
+        self._connection._beginMessage(tc.CMD_SET_PERSON_VARIABLE, tc.ADD, personID, 1 + 4 + lenObj)
         self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 3)
         self._connection._packString(personID)
         self._connection._string += struct.pack("!Bdd", tc.POSITION_2D, *pos2D)

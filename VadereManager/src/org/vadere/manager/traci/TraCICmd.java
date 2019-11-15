@@ -54,7 +54,7 @@ public enum TraCICmd {
 	SET_POT_STATE(0xc7, CmdType.VALUE_SET),
 	SET_POLYGON_STATE(0xc8, CmdType.VALUE_SET),
 	SET_EDGE_STATE(0xca, CmdType.VALUE_SET),
-	SET_SIMULATION_STATE(0xcc, CmdType.VALUE_SET),
+	SET_SIMULATION_STATE(0xcb, CmdType.VALUE_SET), // changed: 0xcc -> 0xcb to match sumo/tools/traci
 	SET_GUI_STATE(0xcc, CmdType.VALUE_SET),
 	// TraCI/Object Variable Subscription
 	SUB_INDUCTION_LOOP_VALUE(0xd0, CmdType.VALUE_SUB),

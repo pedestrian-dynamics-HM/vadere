@@ -41,8 +41,9 @@ if __name__ == '__main__':
     traci.sendFile(["Test", scenario])
 
     # ### Implemented features
-    traci.person_vadere.setTargetList("2", ["2", "3"])
-    traci.simulationStep(1)
+    traci.simulation_vadere.addTargetChanger("1", ["2.", "3.", "3.", "2.", "4.", "4."], 1., 0, "3", 1.)
+    # traci.person_vadere.setTargetList("2", ["2", "3"])
+    # traci.simulationStep(1)
     # pos = (2., 3.)
     # traci.person_vadere.setPosition("1", *pos)
     # actual_pos = traci.person_vadere.getPosition("1")
