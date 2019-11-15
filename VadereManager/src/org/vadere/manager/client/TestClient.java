@@ -363,6 +363,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res =  personapi.setTargetList(elementIdentifier, targets);
 		System.out.println(res.toString());
 	}
+
 	@Override
 	public void personapi_setHeuristic(String[] args) throws IOException{}
 
@@ -385,7 +386,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
-	public void simulationapi_createWaitingArea(String[] args) throws IOException{}
+	public void simulationapi_createWaitingArea(String[] args) throws IOException{
+		if(args.length < 3){
+			System.out.println("command needs argument element id, list of polygon corners");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		ArrayList<String> polyCorners = new ArrayList<String>();
+		for(int i = 2; i < args.length; i++){
+			polyCorners.add(args[i]);
+		}
+
+		CompoundObject compoundObject = CompoundObjectBuilder.createWaitingArea(elementIdentifier, polyCorners);
+		TraCIResponse res = simulationapi.createWaitingArea(elementIdentifier, compoundObject);
+		System.out.println(res.toString());
+	}
 
 	@Override
 	public void simulationapi_createTargetChanger(String[] args) throws IOException{}

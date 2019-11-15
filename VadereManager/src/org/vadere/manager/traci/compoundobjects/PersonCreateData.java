@@ -19,7 +19,7 @@ public class PersonCreateData extends GenericCompoundObject{
 
 	@Override
 	protected void init(CompoundObject o) {
-		id = (String) o.getData(0, TraCIDataType.STRING);
+		id = (String)o.getData(0, TraCIDataType.STRING);
 		pos = (VPoint)o.getData(1, TraCIDataType.POS_2D);
 		targets = (ArrayList<String>)o.getData(2, TraCIDataType.STRING_LIST);
 	}

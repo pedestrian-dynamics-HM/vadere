@@ -11,7 +11,7 @@ public class WaitingAreaData extends GenericCompoundObject {
     String id;
     ArrayList<String> points;
 
-    WaitingAreaData(CompoundObject o) { super(o, 2); }
+    public WaitingAreaData(CompoundObject o) { super(o, 2); }
 
     @Override
     protected void init(CompoundObject o) {

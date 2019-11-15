@@ -157,7 +157,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 	}
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, dataTypeStr = "CompoundObject", name = "createTargetChanger")
-	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
+	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager){
 		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
 			AttributesTargetChanger attr = new AttributesTargetChanger(
@@ -176,8 +176,8 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 	}
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_WAITING_AREA, dataTypeStr = "CompoundObject", name = "createWaitingArea")
-	public TraCICommand process_addWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
-		WaitingAreaData data = (WaitingAreaData) cmd.getVariableValue();
+	public TraCICommand process_addWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager){
+		WaitingAreaData data = new WaitingAreaData((CompoundObject) cmd.getVariableValue());
 		remoteManager.accessState((manager, state) -> {
 			AttributesMeasurementArea attr = new AttributesMeasurementArea(
 					data.getIdAsInt(),
@@ -221,8 +221,18 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		}
 	}
 
-	public TraCICommand processSet(TraCICommand cmd, RemoteManager remoteManager) {
-		return process_NotImplemented(cmd, remoteManager);
+	public TraCICommand processSet(TraCICommand rawCmd, RemoteManager remoteManager) {
+
+		TraCISetCommand cmd = (TraCISetCommand) rawCmd;
+		SimulationVar var = SimulationVar.fromId(cmd.getVariableId());
+		switch (var){
+			case ADD_WAITING_AREA:
+				return process_addWaitingArea(cmd, remoteManager);
+			case ADD_TARGET_CHANGER:
+				return process_addTargetChanger(cmd, remoteManager);
+			default:
+				return process_NotImplemented(cmd, remoteManager);
+		}
 
 	}
 
