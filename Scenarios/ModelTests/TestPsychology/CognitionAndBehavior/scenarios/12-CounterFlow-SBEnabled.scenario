@@ -251,7 +251,7 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionCalculation" : "BY_GRADIENT",
         "walkingDirectionSameIfAngleLessOrEqual" : 25.0
       },
       "teleporter" : null,
