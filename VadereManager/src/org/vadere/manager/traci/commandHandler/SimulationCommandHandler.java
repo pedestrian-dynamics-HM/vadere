@@ -156,7 +156,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, name = "createTargetChanger")
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_TARGET_CHANGER, dataTypeStr = "CompoundObject", name = "createTargetChanger")
 	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
 		TargetChangerData data = (TargetChangerData) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
@@ -175,7 +175,7 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_WAITING_AREA, name = "createWaitingArea")
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.ADD_WAITING_AREA, dataTypeStr = "CompoundObject", name = "createWaitingArea")
 	public TraCICommand process_addWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar){
 		WaitingAreaData data = (WaitingAreaData) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
