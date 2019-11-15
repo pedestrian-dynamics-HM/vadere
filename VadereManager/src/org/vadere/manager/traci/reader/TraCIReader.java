@@ -1,5 +1,6 @@
 package org.vadere.manager.traci.reader;
 
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
@@ -10,6 +11,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -44,6 +46,8 @@ public interface TraCIReader {
 
 	VPoint read2DPosition();
 
+	Map<String, VPoint> read2DPositionList();
+
 	Vector3D read3DPosition();
 
 	RoadMapPosition readRoadMapPosition();
@@ -59,6 +63,8 @@ public interface TraCIReader {
 	Object readTypeValue(TraCIDataType type);
 
 	Color readColor();
+
+	CompoundObject readCompoundObject();
 
 	boolean hasRemaining();
 
