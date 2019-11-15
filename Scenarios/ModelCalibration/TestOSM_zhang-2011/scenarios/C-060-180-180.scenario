@@ -1,7 +1,7 @@
 {
   "name" : "C-060-180-180",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -216,7 +216,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : 5116495530058623348,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -332,6 +332,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : -1,
@@ -371,6 +372,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

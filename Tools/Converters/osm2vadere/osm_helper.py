@@ -782,6 +782,44 @@ class OsmData:
         print(f"created new hull-way (id:{hull_way.id}) containing {way_ids}")
         return hull_way.id
 
+
+    def contained_in_area_of_intrest(self, aoi, way: Element):
+        min_lat = aoi[0][0]
+        max_lat = aoi[0][1]
+        min_lon = aoi[1][0]
+        max_lon = aoi[1][1]
+        nodes = [self.lookup.node_to_latlon[int(id)] for id in way.xpath("nd/@ref")]
+
+        for n in nodes:
+            if n[0] < min_lat or n[0] > max_lat or n[1] < min_lon or n[1] > max_lon:
+                return False
+
+        return True
+
+
+    def get_area_of_intrest(self):
+        '''
+        Return lat/lon min/max values for element within area of intrest
+        :return:
+        '''
+        self.xml.xpath("/osm/way/tag[@k='vadere:area-of-intrest']")
+
+        lat = [0,0]
+        lon = [0,0]
+        nodes = [self.lookup.node_to_latlon[int(id)] for id in self.xml.xpath("/osm/way[./tag/@k='vadere:area-of-intrest']/nd/@ref")][:-1]
+
+        if len(nodes) == 0:
+            raise RuntimeError(f"No area of interst found. Map does not contain a way with the tag 'vadere:area-of-intrest'")
+        elif len(nodes) < 2:
+            raise RuntimeError(f"area-of-intrest path contains only '{len(nodes)}' nodes. Need at least 3 nodes to "
+                               f"create area of interest.")
+
+        node_lat = [n[0] for n in nodes]
+        node_lon = [n[1] for n in nodes]
+
+        return ([min(node_lat), max(node_lat)], [min(node_lon), max(node_lon)])
+
+
     def lint_add_ids(self, dry_run=False):
         ways_without_id: List[Element] = self.xml.xpath("/osm/way[@id < 0 and not (./tag[@k='rover:id'])]")
         print(f"found {len(ways_without_id)} way elements without id")

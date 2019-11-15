@@ -109,7 +109,8 @@ public class OnlineVisualization implements PassiveCallback {
 	@Override
 	public void postUpdate(double simTimeInSec) {
 		pushDrawData(simTimeInSec);
-		this.model.notifyObservers();
+		model.popDrawData();
+		model.notifyObservers();
 	}
 
 	/**

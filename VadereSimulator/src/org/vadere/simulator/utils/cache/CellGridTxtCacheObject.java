@@ -32,10 +32,16 @@ public class CellGridTxtCacheObject extends AbstractCacheObject implements ICell
 	@Override
 	public void persistObject(CellGrid object) throws CacheException {
 		try {
+			logger.infof("write cache: %s", getCacheLocation());
 			CellGridReadWriter.write(object).toTextFile(cacheLocation);
 		} catch (Exception e) {
 			logger.errorf("cannot save cache %s", cacheLocation.getAbsolutePath());
 		}
+	}
+
+	@Override
+	public String getCacheLocation() {
+		return cacheLocation.getAbsolutePath().toString();
 	}
 
 }

@@ -62,6 +62,7 @@ public class Topography implements DynamicElementMover{
 	 * Sources of scenario by id. Tree maps ensures same update order during
 	 * iteration between frames.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final List<Source> sources;
 	/**
 	 * Targets of scenario by id. Tree maps ensures same update order during
@@ -71,6 +72,7 @@ public class Topography implements DynamicElementMover{
 	/**
 	 * TargetChangers of scenario
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<TargetChanger> targetChangers;
 	/**
 	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
@@ -96,7 +98,9 @@ public class Topography implements DynamicElementMover{
 	private transient final DynamicElementContainer<Car> cars;
 	private boolean recomputeCells;
 
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesAgent attributesPedestrian;
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesCar attributesCar;
 
 	/** Used to get attributes of all scenario elements. */

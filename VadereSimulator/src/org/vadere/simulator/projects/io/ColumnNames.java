@@ -20,8 +20,8 @@ public final class ColumnNames {
 	private Set<String> groupSizeKeys;
 	private Set<String> startTimeKeys;
 	private Set<String> endTimeKeys;
-	private Set<String> mostImportantEventKeys;
-	private Set<String> salientBehaviorKeys;
+	private Set<String> mostImportantStimulusKeys;
+	private Set<String> selfCategoryKeys;
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -45,8 +45,8 @@ public final class ColumnNames {
 		targetIdKeys = new HashSet<>();
 		groupIdKeys = new HashSet<>();
 		groupSizeKeys = new HashSet<>();
-		mostImportantEventKeys = new HashSet<>();
-		salientBehaviorKeys = new HashSet<>();
+		mostImportantStimulusKeys = new HashSet<>();
+		selfCategoryKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 
@@ -67,8 +67,8 @@ public final class ColumnNames {
 		targetIdKeys.add("targetId");
 		groupIdKeys.add("groupId");
 		groupSizeKeys.add("groupSize");
-		mostImportantEventKeys.add("mostImportantEvent");
-		salientBehaviorKeys.add("salientBehavior");
+		mostImportantStimulusKeys.add("mostImportantStimulus");
+		selfCategoryKeys.add("selfCategory");
 
 		keys.add(pedestrianIdKeys);
 		keys.add(startX);
@@ -78,18 +78,18 @@ public final class ColumnNames {
 		keys.add(targetIdKeys);
 		keys.add(groupIdKeys);
 		keys.add(groupSizeKeys);
-		keys.add(mostImportantEventKeys);
-		keys.add(salientBehaviorKeys);
+		keys.add(mostImportantStimulusKeys);
+		keys.add(selfCategoryKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
 	}
 
-	public int getSalientBehaviorCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, salientBehaviorKeys);
+	public int getSelfCategoryCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, selfCategoryKeys);
 	}
 
-	public int getMostImportantEventCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, mostImportantEventKeys);
+	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, mostImportantStimulusKeys);
 	}
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {

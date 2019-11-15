@@ -100,6 +100,19 @@ public class TraCIResponse {
 		this.responseIdentifier = responseIdentifier;
 	}
 
+	public boolean isErr(){
+		return this.statusResponse.getResponse().equals(TraCIStatusResponse.ERR);
+	}
+
+	public boolean isOK(){
+		return this.statusResponse.getResponse().equals(TraCIStatusResponse.OK);
+	}
+
+	public boolean isNotImpl(){
+		return this.statusResponse.getResponse().equals(TraCIStatusResponse.NOT_IMPLEMENTED);
+	}
+
+
 	@Override
 	public String toString() {
 		return "TraCIResponse{" +

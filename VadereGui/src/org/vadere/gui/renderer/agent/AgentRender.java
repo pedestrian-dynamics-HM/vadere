@@ -6,6 +6,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
@@ -59,12 +60,17 @@ public class AgentRender implements Renderer {
 
 	private void renderDefault(final ScenarioElement element, Graphics2D g, Color c) {
 		g.setColor(c);
+		VShape shape = element.getShape();
+		if(model.config.isInterpolatePositions()) {
+			VPoint pos = ((Pedestrian)element).getInterpolatedFootStepPosition(model.getSimTimeInSec());
+			shape = shape.translate(pos.subtract(((Pedestrian)element).getPosition()));
+		}
 		/*VCircle circle = (VCircle) element.getShape();
 		Pedestrian ped = (Pedestrian) element;
 		Ellipse2D.Float ellipse = new Ellipse2D.Float((float)ped.getPosition().x, (float)ped.getPosition().y, (float)ped.getRadius() * 2, (float)ped.getRadius() * 2);
 		Rectangle2D.Double rect = new Rectangle2D.Double(ped.getPosition().x, ped.getPosition().y, ped.getRadius() * 2, ped.getRadius() * 2);*/
 		//g.fill(new VCircle(ped.getPosition(), ped.getRadius()));
-		DefaultRenderer.fill(element.getShape(), g);
+		DefaultRenderer.fill(shape, g);
 		//g.draw(ellipse);
 		//DefaultRenderer.fill(ellipse, g);
 		//g.fill(ellipse);
@@ -72,12 +78,19 @@ public class AgentRender implements Renderer {
 	}
 
 	public VShape getShape(Pedestrian ped) {
+		VShape shape = ped.getShape();
+		VPoint pos = ped.getPosition();
+		if(model.config.isInterpolatePositions()) {
+			pos = ped.getInterpolatedFootStepPosition(model.getSimTimeInSec());
+			shape = shape.translate(pos.subtract(ped.getPosition()));
+		}
+
 		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
-			return ped.getShape();
+			return shape;
 		} else if (ped.getGroupIds().getFirst() == 1) {
-			return ped.getShape();
+			return shape;
 		} else {
-			return FormHelper.getShape(ped.getGroupIds().getFirst(), ped.getPosition(), ped.getRadius());
+			return FormHelper.getShape(ped.getGroupIds().getFirst(), pos, ped.getRadius());
 		}
 	}
 }

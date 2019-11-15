@@ -38,7 +38,7 @@ public class TraCISetCommand extends TraCICommand{
 
 	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data){
 		return TraCIPacket.create()
-				.wrapSetCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
 						dataType, data);
 	}
 
