@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId"})
+@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId", "reachablePointProvider"})
 public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
