@@ -8,13 +8,13 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Random;
 
-public class UniformIntegerIPointSupplier implements RandomIPointProvider {
+public class SimpleUniformIntegerPointProvider implements IPointProvider {
 
     private IntegerDistribution xDist;
     private IntegerDistribution yDist;
 
 
-    public UniformIntegerIPointSupplier(final Random random, int xUpperBound, int yUpperBound){
+    public SimpleUniformIntegerPointProvider(final Random random, int xUpperBound, int yUpperBound){
         xDist = new UniformIntegerDistribution(new JDKRandomGenerator(random.nextInt()), 0, xUpperBound);
         yDist = new UniformIntegerDistribution(new JDKRandomGenerator(random.nextInt()), 0, yUpperBound);
     }

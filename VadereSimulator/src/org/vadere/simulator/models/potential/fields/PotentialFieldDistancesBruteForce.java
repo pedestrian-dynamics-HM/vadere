@@ -7,7 +7,6 @@ import org.vadere.simulator.utils.cache.ICellGridCacheObject;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.ObstacleDistanceFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
@@ -30,7 +29,7 @@ import java.util.Collection;
  *
  * Note: This can be computational expensive if there are many and or complex obstacles.
  */
-public class PotentialFieldDistancesBruteForce implements IPotentialField, ObstacleDistanceFunction {
+public class PotentialFieldDistancesBruteForce implements IPotentialField {
 
 	private static Logger logger = Logger.getLogger(PotentialFieldDistancesBruteForce.class);
 	private final CellGrid cellGrid;
@@ -93,15 +92,6 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField, Obsta
 	@Override
 	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
 		return cellGrid.getInterpolatedValueAt(pos).getLeft();
-	}
-
-	public CellGrid getCellGrid(){
-		return cellGrid;
-	}
-
-	@Override
-	public double getDistance(IPoint point) {
-		return getPotential(point, null);
 	}
 
 }

@@ -76,7 +76,7 @@ public class ScenarioCache {
 		// scenario file uses relative path. Check config for global override
 		if (VadereConfig.getConfig().getBoolean("Vadere.cache.useGlobalCacheBaseDir", false)){
 			logger.info("Global override for cache location found.");
-			base = Paths.get(VadereConfig.getConfig().getString("Vadere.cache.flobalCacheBaseDir"));
+			base = Paths.get(VadereConfig.getConfig().getString("Vadere.cache.globalCacheBaseDir"));
 		} else {
 			base = cacheParentDir.resolve(CACHE_DIR_NAME);
 		}

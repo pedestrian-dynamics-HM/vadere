@@ -2,9 +2,10 @@ package org.vadere.util.random;
 
 import org.vadere.util.geometry.shapes.IPoint;
 
-import java.util.stream.Stream;
-
-public interface RandomIPointProvider {
+/**
+ * Returns a point within a bound defined by the four bound functions.
+ */
+public interface IPointProvider {
 
     double getSupportUpperBoundX();
     double getSupportLowerBoundX();

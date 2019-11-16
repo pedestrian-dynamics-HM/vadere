@@ -8,8 +8,8 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.data.cellgrid.CellGridReachablePointProvider;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.random.SimpleReachablePointProvider;
 
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -47,10 +47,14 @@ public class OfflineTopographyController {
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 				new VRectangle(topography.getBounds()),
 				new AttributesFloorField(), cache);
-		this.topography.setObstacleDistanceFunction(distanceField);
 
-		this.topography.setReachablePointProvider(CellGridReachablePointProvider.createUniform(
-				distanceField.getCellGrid(), random));
+		this.topography.setObstacleDistanceFunction(iPoint -> distanceField.getPotential(iPoint, null));
+
+		// use PotentialFieldDistancesBruteForce as distance function
+		this.topography.setReachablePointProvider(SimpleReachablePointProvider.uniform(
+				random,
+				topography.getBounds(),
+				iPoint -> distanceField.getPotential(iPoint, null)));
 	}
 
 	/**

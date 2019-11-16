@@ -1,11 +1,11 @@
 package org.vadere.util.random;
 
-import com.google.common.base.Supplier;
-
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class ConstantIntegerPointProvider implements RandomIPointProvider {
+import java.util.function.Supplier;
+
+public class ConstantIntegerPointProvider implements IPointProvider {
 
     private Supplier<IPoint> iPointSupplier;
 
