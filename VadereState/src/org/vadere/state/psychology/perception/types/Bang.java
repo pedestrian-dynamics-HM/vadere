@@ -26,6 +26,13 @@ public class Bang extends Stimulus {
         this.originAsTargetId = originAsTargetId;
     }
 
+    public Bang(Bang other) {
+        super(other);
+
+        this.originAsTargetId = other.getOriginAsTargetId();
+        this.loudness = other.getLoudness();
+    }
+
     // Getter
     public int getOriginAsTargetId() { return originAsTargetId; }
     public double getLoudness() { return loudness; }
@@ -34,4 +41,8 @@ public class Bang extends Stimulus {
     public void setOriginAsTargetId(int originAsTargetId) { this.originAsTargetId = originAsTargetId; }
     public void setLoudness(double loudness) { this.loudness = loudness; }
 
+    @Override
+    public Bang clone() {
+        return new Bang(this);
+    }
 }

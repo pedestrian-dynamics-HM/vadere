@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;

@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.scenario.Pedestrian;

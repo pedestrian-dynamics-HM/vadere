@@ -29,8 +29,6 @@ public interface VShape extends Shape, Cloneable {
 
 	VShape scale(final double scalar);
 
-
-
 	default boolean atBorder(final VPoint point){
 		VShape circle = new VCircle(new VPoint(point.getX(), point.getY()), BORDER_TOLERANCE);
 		return intersects(circle) && !containsShape(circle);

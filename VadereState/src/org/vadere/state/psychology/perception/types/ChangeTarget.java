@@ -24,12 +24,25 @@ public class ChangeTarget extends Stimulus {
         this.newTargetIds = newTargetIds;
     }
 
+    public ChangeTarget(ChangeTarget other) {
+        super(other);
+
+        newTargetIds = new LinkedList<>();
+        newTargetIds.addAll(other.newTargetIds);
+    }
+
     // Getter
     public LinkedList<Integer> getNewTargetIds() { return newTargetIds; }
 
     // Setter
     public void setNewTargetIds(LinkedList<Integer> newTargetIds) {
         this.newTargetIds = newTargetIds;
+    }
+
+    // Methods
+    @Override
+    public ChangeTarget clone() {
+        return new ChangeTarget(this);
     }
 
 }

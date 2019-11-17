@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
 public interface RemoteRunListener {
 

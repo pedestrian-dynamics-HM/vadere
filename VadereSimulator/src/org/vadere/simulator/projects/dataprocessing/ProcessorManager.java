@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing;
 
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;

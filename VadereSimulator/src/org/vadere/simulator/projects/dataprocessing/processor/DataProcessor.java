@@ -1,9 +1,8 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
