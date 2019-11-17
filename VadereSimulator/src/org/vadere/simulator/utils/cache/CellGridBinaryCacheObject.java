@@ -25,10 +25,10 @@ public class CellGridBinaryCacheObject extends AbstractCacheObject implements IC
 	@Override
 	public void initializeObjectFromCache(CellGrid object) throws CacheException {
 		try {
-			logger.infof("write cache: %s", getCacheLocation());
+			logger.infof("read cache: %s", getCacheLocation());
 			CellGridReadWriter.read(object).fromBinary(new DataInputStream(new FastBufferedInputStream(inputStream)));
 		} catch (Exception e) {
-			throw new CacheException("Cannot load cache from CSV InputStream", e);
+			throw new CacheException("Cannot load cache from BIN InputStream", e);
 		}
 	}
 
@@ -43,6 +43,11 @@ public class CellGridBinaryCacheObject extends AbstractCacheObject implements IC
 
 	@Override
 	public String getCacheLocation() {
-		return cacheLocation.getAbsolutePath().toString();
+
+		if (cacheLocation != null ){
+			return cacheLocation.getAbsolutePath();
+		} else {
+			return "provided via TraCI";
+		}
 	}
 }
