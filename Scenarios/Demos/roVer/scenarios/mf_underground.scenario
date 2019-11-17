@@ -1,7 +1,7 @@
 {
   "name" : "mf_underground",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.5",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -103,7 +103,7 @@
       "useFixedSeed" : true,
       "fixedSeed" : -359668230868604320,
       "simulationSeed" : 0,
-      "useSalientBehavior" : false
+      "usePsychologyLayer" : false
     },
     "topography" : {
       "attributes" : {
@@ -676,36 +676,6 @@
           } ]
         },
         "id" : -2146927222
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 84.96860056673177,
-            "y" : 36.651517294347286
-          }, {
-            "x" : 78.83781157096382,
-            "y" : 37.782799964770675
-          }, {
-            "x" : 78.62198751559481,
-            "y" : 36.67081364430487
-          }, {
-            "x" : 84.69108036812395,
-            "y" : 35.51722181588411
-          }, {
-            "x" : 84.59771335334517,
-            "y" : 35.026016764342785
-          }, {
-            "x" : 78.03568812133744,
-            "y" : 36.27337254397571
-          }, {
-            "x" : 78.44153373665176,
-            "y" : 38.36440683621913
-          }, {
-            "x" : 85.05933140020352,
-            "y" : 37.143216628581285
-          } ]
-        },
-        "id" : -2146927212
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -1255,6 +1225,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }
