@@ -1,5 +1,7 @@
 package org.vadere.meshing.utils.io.poly;
 
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -10,6 +12,10 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -58,12 +64,43 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 			int nAttributes,
 			@Nullable final Function<Integer, String> attrNameFunc,
 			@NotNull Predicate<V> targetPredicate) {
+		StringBuilder builder = new StringBuilder();
+		to2DPoly(mesh, nAttributes, attrNameFunc, targetPredicate, new Appender(builder));
+		return builder.toString();
+	}
+
+	/**
+	 * Transforms a {@link IMesh} into a Poly-{@link String} and writes it into the <tt>write</tt>.
+	 *
+	 * @param mesh              the mesh
+	 * @param nAttributes       number of vertex attributes
+	 * @param attrNameFunc      a function attributeIndex -> attributeName
+	 * @param targetPredicate   mark a specific vertex to be a target vertex
+	 * @param writer            the print writer where the string will be written into.
+	 *
+	 * @return a PSLG-{@link String}
+	 */
+	public void to2DPoly(
+			@NotNull final IMesh<V, E, F> mesh,
+			int nAttributes,
+			@Nullable final Function<Integer, String> attrNameFunc,
+			@NotNull Predicate<V> targetPredicate,
+			@NotNull final PrintWriter writer) {
+		StringBuilder builder = new StringBuilder();
+		to2DPoly(mesh, nAttributes, attrNameFunc, targetPredicate, new Appender(writer));
+	}
+
+	private void to2DPoly(
+			@NotNull final IMesh<V, E, F> mesh,
+			int nAttributes,
+			@Nullable final Function<Integer, String> attrNameFunc,
+			@NotNull Predicate<V> targetPredicate,
+			@NotNull final Appender appender) {
 		int dimension = 2;
 		int boundaryMarker = 1;
 		int targetMarker = 2;
-		StringBuilder builder = new StringBuilder();
-		builder.append("#nVertices dimension boundaryMarker targetMarker nAttributes\n");
-		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
+		appender.append("#nVertices dimension boundaryMarker targetMarker nAttributes\n");
+		appender.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
 
 		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
@@ -71,58 +108,92 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 			int boundary = mesh.isAtBoundary(v) ? 1 : 0;
 			int target = targetPredicate.test(v) ? targetMarker : 0;
 			map.put(v, id);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR + "%f" + SEPARATOR + "%f", id, boundary, target, v.getX(), v.getY()));
+			appender.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR + "%f" + SEPARATOR + "%f", id, boundary, target, v.getX(), v.getY()));
 			for (int j = 1; j <= nAttributes; j++) {
-				builder.append(String.format(Locale.US, SEPARATOR + "%f", mesh.getDoubleData(v, attrNameFunc.apply(j))));
+				appender.append(String.format(Locale.US, SEPARATOR + "%f", mesh.getDoubleData(v, attrNameFunc.apply(j))));
 			}
-			builder.append("\n");
+			appender.append("\n");
 			id++;
 		}
 
 		// 1 boundary
-		builder.append("# nBorders\n");
-		builder.append(1+"\n");
-		builder.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
+		appender.append("# nBorders\n");
+		appender.append(1+"\n");
+		appender.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
+		boolean first = true;
 		for(V v : mesh.getVertices(mesh.getBorder())) {
-			builder.append(map.get(v) + SEPARATOR);
+			if(!first) {
+				appender.append(SEPARATOR);
+			}
+			appender.append(map.get(v).toString());
 		}
-		builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-		builder.append("\n");
+		appender.append("\n");
 
-		builder.append("# nTriangels\n");
-		builder.append(mesh.getNumberOfFaces()+"\n");
+		appender.append("# nTriangels\n");
+		appender.append(mesh.getNumberOfFaces()+"\n");
 
-		builder.append("# nVertices vertexIds\n");
+		appender.append("# nVertices vertexIds\n");
 		for(F face : mesh.getFaces()) {
 			//builder.append("1 0\n");
-			builder.append(mesh.getPoints(face).size() + SEPARATOR);
+			appender.append(mesh.getPoints(face).size() + "");
 			for(V v : mesh.getVertices(face)) {
-				builder.append(map.get(v) + SEPARATOR);
+				appender.append(SEPARATOR + map.get(v));
 			}
-			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-			builder.append("\n");
+			appender.append("\n");
 		}
-		builder.append("# nHoles\n");
+		appender.append("# nHoles\n");
 		List<F> holes = mesh.getHoles();
-		builder.append(holes.size()+"\n");
+		appender.append(holes.size()+"\n");
 
 		//
 		for(F hole : holes) {
 			int size = mesh.getPoints(hole).size();
-			builder.append(size + SEPARATOR);
+			appender.append(size + "");
 			for(V V : mesh.getVertices(hole)) {
-				builder.append(map.get(V) + SEPARATOR);
+				appender.append(SEPARATOR + map.get(V));
 			}
-			builder.delete(builder.length()-SEPARATOR.length(), builder.length());
-			builder.append("\n");
+			appender.append("\n");
 		}
-		builder.append("# interior points for each hole\n");
+		appender.append("# interior points for each hole\n");
 		id = 1;
 		for(F hole : holes) {
 			VPolygon polygon = mesh.toPolygon(hole);
 			VPoint p = GeometryUtils.getInteriorPoint(polygon);
-			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
+			appender.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
 		}
-		return builder.toString();
+	}
+
+	public void to2DPoly(
+			@NotNull final IMesh<V, E, F> mesh,
+			int nAttributes,
+			@Nullable final Function<Integer, String> attrNameFunc,
+			@NotNull Predicate<V> targetPredicate,
+			@NotNull final OutputStream outputStream) {
+		PrintWriter stream = new PrintWriter(
+				new FastBufferedOutputStream(outputStream));
+	}
+
+	private static class Appender {
+
+		private final StringBuilder builder;
+		private final PrintWriter writer;
+
+		private Appender(@NotNull final StringBuilder builder) {
+			this.builder = builder;
+			this.writer = null;
+		}
+
+		private Appender(@NotNull final PrintWriter writer) {
+			this.writer = writer;
+			this.builder = null;
+		}
+
+		private void append(@NotNull final String txt) {
+			if(writer != null) {
+				writer.append(txt);
+			} else {
+				builder.append(txt);
+			}
+		}
 	}
 }

@@ -73,6 +73,14 @@ public interface IDistanceFunction extends Function<IPoint, Double> {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}
 
+	static IDistanceFunction create(final VRectangle regionBoundingBox, final Collection<? extends VShape> obstacles, final Collection<? extends VShape> targets) {
+		return new DistanceFunction(regionBoundingBox, obstacles, targets);
+	}
+
+	static IDistanceFunction create(final VPolygon regionBoundingBox, final Collection<? extends VShape> obstacles, final Collection<? extends VShape> targets) {
+		return new DistanceFunction(regionBoundingBox, obstacles, targets);
+	}
+
 	static IDistanceFunction create(final VPolygon regionBoundingBox, final Collection<? extends VShape> obstacles) {
 		return new DistanceFunction(regionBoundingBox, obstacles);
 	}

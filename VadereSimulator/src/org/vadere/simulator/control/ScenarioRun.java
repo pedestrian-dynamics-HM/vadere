@@ -1,6 +1,9 @@
 package org.vadere.simulator.control;
 
 import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.examples.MeshExamples;
+import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -15,7 +18,10 @@ import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

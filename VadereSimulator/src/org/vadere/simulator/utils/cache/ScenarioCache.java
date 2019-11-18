@@ -96,9 +96,11 @@ public class ScenarioCache {
 				cacheMap.put(cacheIdentifier, new CellGridBinaryCacheObject(cacheIdentifier, file));
 			}
 		} else {
-			// Mesh ...
+			if(cacheType == CacheType.TXT_CACHE){
+				file = buildCsvCachePath(cacheIdentifier).toFile();
+				cacheMap.put(cacheIdentifier, new MeshTxtCacheObject(cacheIdentifier, file));
+			}
 		}
-
 	}
 
 	private Path buildCsvCachePath(String floorFieldIdentifier){

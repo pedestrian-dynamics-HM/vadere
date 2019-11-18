@@ -17,6 +17,7 @@ import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -25,6 +26,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class EikMeshPoly {
 	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
@@ -33,9 +36,9 @@ public class EikMeshPoly {
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		//meshPoly("/poly/room.poly");
+		meshPoly("/poly/room.poly");
 		//meshPoly("/poly/corner.poly");
-		meshPoly("/poly/railing.poly");
+		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
 	}
 
@@ -46,10 +49,13 @@ public class EikMeshPoly {
 		edgeLengthFunctionApprox.smooth(0.4);
 		edgeLengthFunctionApprox.printPython();
 
+		VPolygon targetShape = new VRectangle(4, 4, 2, 2).toPolygon();
+		List<VShape> singleTarget = Collections.singletonList(targetShape);
+
 
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
-		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes, singleTarget);
 
 		var ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -59,14 +65,17 @@ public class EikMeshPoly {
 		);
 		ruppert.generate();
 
+		Collection<VPolygon> polygons = pslg.getAllPolygons();
+		polygons.add(targetShape);
+
 		// (3) use EikMesh to improve the mesh
-		double h0 = 1.0;
+		double h0 = 0.2;
 		var meshImprover = new PEikMesh(
 				distanceFunction,
-				edgeLengthFunctionApprox,
+				p -> h0 + 0.5*Math.abs(distanceFunction.apply(p)),
 				h0,
 				pslg.getBoundingBox(),
-				pslg.getAllPolygons()
+				polygons
 		);
 
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), f -> meshImprover.getMesh().getBooleanData(f, "frozen"), 1000, 800);

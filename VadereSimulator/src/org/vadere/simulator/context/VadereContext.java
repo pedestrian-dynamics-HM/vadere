@@ -30,7 +30,6 @@ public class VadereContext extends Context {
 
 	private EikonalSolverProvider eikonalSolverProvider;
 
-
 	public VadereContext() {
 		this.eikonalSolverProvider = new EikonalSolverDefaultProvider();
 	}

@@ -72,6 +72,10 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 */
 	private final IMeshSupplier<V, E, F> meshSupplier;
 
+	private final Map<V, VLine> projections;
+
+	private final Collection<E> constrains;
+
 	/**
 	 * The set of inserted points.
 	 */
@@ -118,6 +122,8 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	private double smallestEdgeLength;
 
+	private final double minEdgeLen;
+
 	/**
 	 * <p>The default constructor.</p>
 	 *  @param meshSupplier          a {@link IMeshSupplier} required to generate a new and empty mesh.
@@ -135,11 +141,23 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 			final IDistanceFunction distFunc,
 			final Collection<IPoint> fixPoints) {
 
+		this(meshSupplier, bound, boundary, lenFunc, Double.POSITIVE_INFINITY, distFunc, fixPoints);
+	}
+
+	public GenUniformRefinementTriangulatorSFC(
+			final IMeshSupplier<V, E, F> meshSupplier,
+			final VRectangle bound,
+			final Collection<? extends VShape> boundary,
+			final IEdgeLengthFunction lenFunc,
+			final double h0,
+			final IDistanceFunction distFunc,
+			final Collection<IPoint> fixPoints) {
+
 		this.smallestEdgeLength = Double.POSITIVE_INFINITY;
 		this.meshSupplier = meshSupplier;
 		this.initialized = false;
 		this.refinementFinished = false;
-	    this.distFunc = distFunc;
+		this.distFunc = distFunc;
 		this.boundary = boundary;
 		this.lenFunc = lenFunc;
 		this.bbox = bound;
@@ -149,6 +167,9 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		this.mesh = meshSupplier.get();
 		this.fixPoints = fixPoints.stream().map(p -> mesh.createVertex(p.getX(), p.getY())).collect(Collectors.toList());
 		this.insertedFixPoints = new ArrayList<>();
+		this.projections = new HashMap<>();
+		this.constrains = new ArrayList<>();
+		this.minEdgeLen = h0;
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
@@ -503,7 +524,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				// the following calls are quite expensive
 				establishConstrains();
 				shrinkBorder();
-				createHoles();
+				//createHoles();
 				//triangulation.smoothBorder();
 
 				sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));
@@ -591,6 +612,16 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		triangulation.shrinkBorder(removePredicate, true);
 	}
 
+	@Override
+	public Map<V, VLine> getProjections() {
+		return projections;
+	}
+
+	@Override
+	public Collection<E> getConstrains() {
+		return constrains;
+	}
+
 	/**
 	 * <p>Creates holes everywhere where the distance function is positive. Neighbouring holes will be merged.</p>
 	 */
@@ -603,10 +634,14 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		}
 	}*/
 
+
+
 	private void establishConstrains() {
 		List<VLine> lines = boundary.stream().flatMap(shape -> shape.lines().stream()).collect(Collectors.toList());
 		GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
 		cdt.generate(false);
+		projections.putAll(cdt.getProjections());
+		constrains.addAll(cdt.getConstrains());
 	}
 
 	private void createHoles() {
@@ -713,7 +748,22 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 */
 	private boolean isSmallEnough(@NotNull final E edge) {
 		VLine line = getMesh().toLine(edge);
-		return (line.length() <= lenFunc.apply(line.midPoint()));
+		LinkedList<VLine> lines = new LinkedList<>();
+		lines.addFirst(line);
+		while (!lines.isEmpty()) {
+			VLine l = lines.poll();
+
+			if(line.length() > lenFunc.apply(l.midPoint())) {
+				return false;
+			}
+
+			if(l.length() > minEdgeLen) {
+				lines.addLast(new VLine(l.getVPoint1(), l.midPoint()));
+				lines.addLast(new VLine(l.getVPoint2(), l.midPoint()));
+			}
+		}
+
+		return true;
 	}
 
 	/**

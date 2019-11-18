@@ -39,7 +39,9 @@ public class Topography implements DynamicElementMover{
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
+	/** A function which gives the distance to the closest obstacle for any point inside the topography bound */
 	private Function<IPoint, Double> obstacleDistanceFunction;
+
 	/** A possible empty string identifying a context object. */
 	private String contextId;
 

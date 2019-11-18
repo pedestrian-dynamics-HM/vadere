@@ -7,6 +7,7 @@ import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
+import org.vadere.simulator.utils.pslg.PSLGConverter;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -58,30 +59,10 @@ public class ActionGeneratePoly extends AbstractAction {
 			outputFile = fileChooser.getSelectedFile().toString().endsWith(".poly") ? fileChooser.getSelectedFile()
 					: new File(fileChooser.getSelectedFile().toString() + ".poly");
 
-			List<Obstacle> boundingObstacles = model.getTopography().getBoundaryObstacles();
+			PSLGConverter pslgConverter = new PSLGConverter();
+			PSLG pslg = pslgConverter.toPSLG(model.getTopography());
+			String polyString = PSLGGenerator.toPSLG(pslg.getSegmentBound(), pslg.getHoles());
 
-
-			Rectangle2D.Double boundWithBorder = model.getTopography().getBounds();
-			double boundWidth = model.getTopography().getBoundingBoxWidth();
-			VRectangle bound = new VRectangle(boundWithBorder.x + boundWidth, boundWithBorder.y + boundWidth, boundWithBorder.width - 2*boundWidth, boundWithBorder.height - 2*boundWidth);
-
-			List<Obstacle> obstacles = new ArrayList<>(model.getTopography().getObstacles());
-			obstacles.removeAll(model.getTopography().getBoundaryObstacles());
-
-			List<VPolygon> obsShapes = obstacles.stream()
-					.map(obs -> obs.getShape())
-					.map(shape -> new VPolygon(shape))
-					.collect(Collectors.toList());
-
-			// this computes the union of intersecting obstacles.
-			obsShapes = PSLG.constructHoles(obsShapes);
-
-			// this will help to construct a valid non-rectangular bound.
-			List<VPolygon> polygons = PSLG.constructBound(new VPolygon(bound), obsShapes);
-
-			String polyString = PSLGGenerator.toPSLG(
-					polygons.get(0),
-					polygons.size() > 1 ? polygons.subList(1, polygons.size()) : Collections.emptyList());
 			try {
 				outputFile.createNewFile();
 				Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");

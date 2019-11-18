@@ -3,7 +3,11 @@ package org.vadere.simulator.models.potential.solver;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
+import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -15,6 +19,7 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.simulator.utils.pslg.PSLGConverter;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Obstacle;
@@ -115,24 +120,57 @@ public abstract class EikonalSolverProvider  {
 		 * Use a mesh based method.
 		 */
 		else {
-			//Collection<VShape> holes = Topography.createObstacleBoundary(topography).stream().map(obs -> obs.getShape()).collect(Collectors.toList());
-			Collection<VShape> holes = new ArrayList<>();
 
-			holes.addAll(topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()));
-			holes.addAll(topography.getTargets(targetId).stream().map(target -> target.getShape()).collect(Collectors.toList()));
-			VRectangle bbox = new VRectangle(bounds);
+			/*
+			 * (1) Build a valid PSLG from the topography.
+			 */
+			PSLG pslg = new PSLGConverter().toPSLG(topography);
 
-	        /*
-	          A default distance function which uses all shapes to compute the distance.
-	         */
-			IDistanceFunction distanceFunc = new DistanceFunction(bbox, holes);
-			IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(0, -distanceFunc.apply(p));
+			/*
+			 * (2) choose a minimal edge length h0
+			 */
+			double h0 = 2.0;
 
-	        /*
-	          Generate the mesh, we use the pointer based implementation here.
-	         */
-			PEikMesh meshGenerator = new PEikMesh(distanceFunc,edgeLengthFunction, 0.7, bbox, holes);
-			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshGenerator.generate();
+			/*
+			 * (3) Construct an edge length function which depends on the geometry i.e. the PSLG.
+			 */
+			EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> Double.POSITIVE_INFINITY, p -> h0);
+			edgeLengthFunctionApprox.smooth(0.4);
+			//edgeLengthFunctionApprox.printPython();
+
+			/*
+			 * (4) Compute or define a distance function which defines the geometry.
+			 */
+			DistanceFunctionApproxBF distanceFunction = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()));
+			distanceFunction.printPython();
+
+			/*
+			 * (5) use EikMesh to construct a mesh
+			 */
+			var meshImprover = new PEikMesh(
+					distanceFunction,
+					edgeLengthFunctionApprox,
+					h0,
+					pslg.getBoundingBox(),
+					pslg.getAllPolygons()
+			);
+
+			var meshPanel = new PMeshPanel(meshImprover.getMesh(), f -> meshImprover.getMesh().getBooleanData(f, "frozen"), 1000, 800);
+			meshPanel.display("Combined distance functions " + h0);
+			meshImprover.improve();
+			while (!meshImprover.isFinished()) {
+				synchronized (meshImprover.getMesh()) {
+					meshImprover.improve();
+				}
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				meshPanel.repaint();
+			}
+
+			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshImprover.getTriangulation();
 
 			ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 					attributesPotential.getTimeCostAttributes(),
@@ -151,10 +189,9 @@ public abstract class EikonalSolverProvider  {
 			}
 
 			eikonalSolver = new EikonalSolverFMMTriangulation(
+					topography.getTargets().stream().map(target -> target.getShape()).collect(Collectors.toList()),
 					timeCost,
-					triangulation,
-					targetVertices,
-					distanceFunc);
+					triangulation);
 
 		}
 		return eikonalSolver;

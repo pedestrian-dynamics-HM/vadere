@@ -1315,6 +1315,21 @@ public class GeometryUtils {
 		return new VRectangle(pMin.getX()-padding, pMin.getY()-padding, pMax.getX() - pMin.getX() + 2*padding, pMax.getY() - pMin.getY() + 2*padding);
 	}
 
+	public static <P extends IPoint> VRectangle boundRelativeSquared(final Collection<P> points, final double persentage) {
+		if(points.isEmpty()) {
+			throw new IllegalArgumentException("the point collection is empty.");
+		}
+
+		VPoint pMax = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()))).get();
+		VPoint pMin = points.stream().map(p -> new VPoint(p.getX(), p.getY())).reduce((p1, p2) -> new VPoint(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()))).get();
+
+		double max = Math.max(pMax.x - pMin.x, pMax.y - pMin.y);
+
+		double padding = max * persentage;
+
+		return new VRectangle(pMin.getX()-padding, pMin.getY()-padding, pMin.getX() + max + 2*padding, pMin.getY() + max + 2*padding);
+	}
+
 	public static <P extends IPoint> VRectangle boundRelative(final Collection<P> points) {
 		return boundRelative(points, 0.01);
 	}

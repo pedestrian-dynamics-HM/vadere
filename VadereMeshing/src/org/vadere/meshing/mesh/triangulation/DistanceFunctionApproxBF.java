@@ -27,7 +27,7 @@ public class DistanceFunctionApproxBF implements IDistanceFunction {
 		/**
 		 * Add a bound around so the edge function is also defined outside.
 		 */
-		VRectangle bound = GeometryUtils.boundRelative(pslg.getSegmentBound().getPoints(), 0.3);
+		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
 		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false, false);
