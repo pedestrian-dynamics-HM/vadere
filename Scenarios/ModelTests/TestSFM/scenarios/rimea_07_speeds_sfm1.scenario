@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_sfm1",
   "description" : "",
-  "release" : "1.5",
+  "release" : "1.6",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -146,8 +146,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "angleCalculationType" : "USE_CENTER",
-        "targetOrientationAngleThreshold" : 45.0
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

@@ -2,7 +2,7 @@ package org.vadere.manager;
 
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -21,7 +21,7 @@ import java.util.Map;
  *  This class acts as interface between the TraCI handling and the actual simulation.
  *  All synchronization is handled by the {@link RemoteScenarioRun} class. All access to
  *  the simulation state must be wrapped within a {@link StateAccessHandler} to decouple
- *  the {@link org.vadere.simulator.control.SimulationState} from the command handing.
+ *  the {@link SimulationState} from the command handing.
  *
  *  Within the {@link StateAccessHandler#execute(RemoteManager, SimulationState)} method
  *  the {@link SimulationState} is save to access and change. Be really careful what you

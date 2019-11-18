@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -23,7 +23,7 @@ public class OfflineTopographyController {
 		this.topography = topography;
 	}
 
-	protected void update(double simTimeInSec) {
+	public void update(double simTimeInSec) {
 		recomputeCells();
 	}
 

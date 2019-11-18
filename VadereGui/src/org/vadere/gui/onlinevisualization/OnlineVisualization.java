@@ -8,7 +8,7 @@ import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.onlinevisualization.view.MainPanel;
 import org.vadere.gui.onlinevisualization.view.OnlineVisualisationWindow;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.simulator.control.PassiveCallback;
+import org.vadere.simulator.control.simulation.PassiveCallback;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.Agent;

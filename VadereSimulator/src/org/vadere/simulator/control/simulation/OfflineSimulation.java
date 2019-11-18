@@ -1,7 +1,7 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
+import org.vadere.simulator.control.scenarioelements.OfflineTopographyController;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
@@ -10,7 +10,6 @@ import org.vadere.util.logging.Logger;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import tech.tablesaw.api.Table;
 

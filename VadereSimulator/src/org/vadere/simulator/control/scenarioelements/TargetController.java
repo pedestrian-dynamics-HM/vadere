@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;

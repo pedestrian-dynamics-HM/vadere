@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects;
 
-import org.vadere.simulator.control.PassiveCallback;
-import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.control.simulation.PassiveCallback;
+import org.vadere.simulator.control.simulation.ScenarioRun;
 import org.vadere.simulator.projects.migration.MigrationResult;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.io.IOUtils;

@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor.tests;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor;

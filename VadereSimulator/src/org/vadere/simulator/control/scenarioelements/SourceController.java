@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -79,8 +79,7 @@ public abstract class SourceController {
 
 	abstract public void update(double simTimeInSec);
 
-
-	protected boolean isSourceFinished(double simTimeInSec) {
+	public boolean isSourceFinished(double simTimeInSec) {
 		if (isMaximumNumberOfSpawnedElementsReached()) {
 			return true;
 		}

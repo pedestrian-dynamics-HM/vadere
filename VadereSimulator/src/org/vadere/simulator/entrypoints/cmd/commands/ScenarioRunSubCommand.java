@@ -6,7 +6,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.control.ScenarioRun;
+import org.vadere.simulator.control.simulation.ScenarioRun;
 import org.vadere.simulator.utils.scenariochecker.ConsoleScenarioCheckerMessageFormatter;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;

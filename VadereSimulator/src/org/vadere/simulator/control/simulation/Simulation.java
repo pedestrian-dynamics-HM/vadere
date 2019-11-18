@@ -1,9 +1,10 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.psychology.cognition.SelfCategoryProcessor;
 import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;

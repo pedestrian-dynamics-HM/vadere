@@ -5,7 +5,7 @@
 //import org.mockito.internal.stubbing.answers.DoesNothing;
 //import org.mockito.invocation.InvocationOnMock;
 //import org.mockito.stubbing.Answer;
-//import org.vadere.simulator.control.SimulationState;
+//import org.vadere.simulator.control.simulation.SimulationState;
 //import org.vadere.simulator.projects.dataprocessing.processor.*;
 //import org.vadere.state.attributes.AttributesBuilder;
 //import org.vadere.state.attributes.processor.AttributesDensityVoronoiProcessor;

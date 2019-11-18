@@ -1,9 +1,8 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
-import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.simulator.control.util.SingleSpawnArray;

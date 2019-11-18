@@ -1,7 +1,7 @@
 package org.vadere.simulator.control.factory;
 
-import org.vadere.simulator.control.GroupSourceController;
-import org.vadere.simulator.control.SourceController;
+import org.vadere.simulator.control.scenarioelements.GroupSourceController;
+import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.simulator.models.groups.GroupSizeDeterminator;
