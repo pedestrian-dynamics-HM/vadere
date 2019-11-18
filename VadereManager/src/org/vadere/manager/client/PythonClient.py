@@ -7,16 +7,17 @@
 # http://www.eclipse.org/legal/epl-v20.html
 # SPDX-License-Identifier: EPL-2.0
 
-# @file    _person_vadere.py
+# @file    PythonClient.py
 # @author  Philipp Schuegraf
 # @date    2019-11-13
 # @version $Id$
 
 import sys, os
+sys.path.append("/Users/Philipp/Repos/vadere/Tools/PyTraci")
 import argparse
 from IPython import embed
 
-import pyTraci as traci
+import pytraci as traci
 
 def readScenario(scenPath):
     with open(scenPath, 'r') as scenFile:
