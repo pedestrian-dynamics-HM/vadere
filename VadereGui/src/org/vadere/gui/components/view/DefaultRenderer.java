@@ -65,7 +65,9 @@ public abstract class DefaultRenderer {
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
 		synchronized (defaultModel) {
-			targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+			if (defaultModel.getTopographyBound() != null){
+				targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+			}
 			targetGraphics2D.dispose();
 		}
 	}
