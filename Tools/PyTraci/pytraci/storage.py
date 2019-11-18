@@ -17,8 +17,9 @@
 # @date    2008-10-09
 # @version $Id$
 
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
 import struct
 
 from . import constants as tc
@@ -42,7 +43,7 @@ class Storage:
 
     def readTypedInt(self):
         t, i = self.read("!Bi")
-        assert(t == tc.TYPE_INTEGER)
+        assert (t == tc.TYPE_INTEGER)
         return i
 
     def readDouble(self):
@@ -50,7 +51,7 @@ class Storage:
 
     def readTypedDouble(self):
         t, d = self.read("!Bd")
-        assert(t == tc.TYPE_DOUBLE)
+        assert (t == tc.TYPE_DOUBLE)
         return d
 
     def readLength(self):
@@ -65,7 +66,7 @@ class Storage:
 
     def readTypedString(self):
         t = self.read("!B")[0]
-        assert(t == tc.TYPE_STRING)
+        assert (t == tc.TYPE_STRING)
         return self.readString()
 
     def readStringList(self):
@@ -74,7 +75,7 @@ class Storage:
 
     def readTypedStringList(self):
         t = self.read("!B")[0]
-        assert(t == tc.TYPE_STRINGLIST)
+        assert (t == tc.TYPE_STRINGLIST)
         return self.readStringList()
 
     def readShape(self):
@@ -83,8 +84,8 @@ class Storage:
 
     def readCompound(self, expectedSize=None):
         t, s = self.read("!Bi")
-        assert(t == tc.TYPE_COMPOUND)
-        assert(expectedSize is None or s == expectedSize)
+        assert (t == tc.TYPE_COMPOUND)
+        assert (expectedSize is None or s == expectedSize)
         return s
 
     def readPosition(self):

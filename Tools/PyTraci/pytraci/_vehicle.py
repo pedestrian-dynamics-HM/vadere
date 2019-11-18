@@ -20,12 +20,14 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
 import warnings
-from .domain import Domain
-from .storage import Storage
+
 from . import constants as tc
+from .domain import Domain
 from .exceptions import TraCIException
+from .storage import Storage
 
 
 def _readBestLanes(result):
@@ -752,7 +754,7 @@ class VehicleDomain(Domain):
         """
         return self._getUniversal(tc.VAR_NEXT_STOPS, vehID)
 
-    def subscribeLeader(self, vehID, dist=0., begin=0, end=2**31 - 1):
+    def subscribeLeader(self, vehID, dist=0., begin=0, end=2 ** 31 - 1):
         """subscribeLeader(string, double) -> None
 
         Subscribe for the leading vehicle id together with the distance.
@@ -867,7 +869,7 @@ class VehicleDomain(Domain):
         }
 
         def prettifyBitstring(intval):
-            return [v for k, v in constants.items() if (intval & 2**k)]
+            return [v for k, v in constants.items() if (intval & 2 ** k)]
 
         state, stateTraCI = self.getLaneChangeState(vehID, direction)
         return prettifyBitstring(state), prettifyBitstring(stateTraCI)
@@ -1623,7 +1625,7 @@ class VehicleDomain(Domain):
         self._connection._string += struct.pack("!BB", tc.TYPE_BYTE, keepRoute)
         self._connection._sendExact()
 
-    def subscribe(self, objectID, varIDs=(tc.VAR_ROAD_ID, tc.VAR_LANEPOSITION), begin=0, end=2**31 - 1):
+    def subscribe(self, objectID, varIDs=(tc.VAR_ROAD_ID, tc.VAR_LANEPOSITION), begin=0, end=2 ** 31 - 1):
         """subscribe(string, list(integer), int, int) -> None
 
         Subscribe to one or more object values for the given interval.
@@ -1631,7 +1633,7 @@ class VehicleDomain(Domain):
         Domain.subscribe(self, objectID, varIDs, begin, end)
 
     def subscribeContext(self, objectID, domain, dist, varIDs=(
-            tc.VAR_ROAD_ID, tc.VAR_LANEPOSITION), begin=0, end=2**31 - 1):
+            tc.VAR_ROAD_ID, tc.VAR_LANEPOSITION), begin=0, end=2 ** 31 - 1):
         """subscribe(string, int, double, list(integer), int, int) -> None
 
         Subscribe to one or more object values of the given domain around the

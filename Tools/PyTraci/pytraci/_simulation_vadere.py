@@ -13,13 +13,11 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
-import warnings
+
 from . import constants as tc
-from .domain import Domain
-from ._simulation import SimulationDomain, _RETURN_VALUE_FUNC
-from .storage import Storage
-from .exceptions import FatalTraCIError
+from ._simulation import SimulationDomain
 
 
 class SimulationVadereDomain(SimulationDomain):

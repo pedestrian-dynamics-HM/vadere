@@ -22,11 +22,12 @@ This script extracts definitions from <SUMO>/src/libsumo/TraCIConstants.h
   -o tools/contributed/traas/src/main/java/de/tudresden/sumo/config/Constants.java
 """
 
-from __future__ import print_function
 from __future__ import absolute_import
-import os
-import datetime
+from __future__ import print_function
+
 import argparse
+import datetime
+import os
 import re
 
 dirname = os.path.dirname(__file__)

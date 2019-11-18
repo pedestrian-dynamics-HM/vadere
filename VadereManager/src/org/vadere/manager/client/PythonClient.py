@@ -13,7 +13,6 @@
 # @version $Id$
 
 import sys, os
-sys.path.append("/Users/Philipp/Repos/vadere/Tools/PyTraci")
 import argparse
 from IPython import embed
 

@@ -16,15 +16,16 @@
 # @date    2008-10-09
 # @version $Id$
 
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
 import copy
 import struct
 import warnings
 
 from . import constants as tc
-from .storage import Storage
 from .exceptions import FatalTraCIError
+from .storage import Storage
 
 _defaultDomains = []
 

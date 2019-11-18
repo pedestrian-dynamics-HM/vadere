@@ -14,9 +14,10 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
+from . import constants as tc
 from .domain import Domain
 from .storage import Storage
-from . import constants as tc
 
 
 def readVehicleData(result):

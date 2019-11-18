@@ -14,11 +14,13 @@
 # @version $Id$
 
 from __future__ import absolute_import
-from .domain import Domain
-from .storage import Storage
+
 import struct
+
 from . import constants as tc
 from . import exceptions
+from .domain import Domain
+from .storage import Storage
 
 _RETURN_VALUE_FUNC = {tc.VAR_LENGTH: Storage.readDouble,
                       tc.VAR_MAXSPEED: Storage.readDouble,

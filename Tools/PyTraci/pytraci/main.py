@@ -18,12 +18,13 @@
 
 # pylint: disable=E1101
 
-from __future__ import print_function
 from __future__ import absolute_import
-import socket
-import time
-import sys
+from __future__ import print_function
+
 import os
+import socket
+import sys
+import time
 
 if 'SUMO_HOME' in os.environ:
     sys.path.append(os.path.join(os.environ['SUMO_HOME'], 'tools'))

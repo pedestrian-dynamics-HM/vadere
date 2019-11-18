@@ -16,9 +16,10 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
+from . import constants as tc
 from .domain import Domain
 from .storage import Storage
-from . import constants as tc
 
 
 def _readLinks(result):
@@ -26,21 +27,21 @@ def _readLinks(result):
     nbLinks = result.readInt()
     links = []
     for i in range(nbLinks):
-        result.read("!B")                           # Type String
+        result.read("!B")  # Type String
         approachedLane = result.readString()
-        result.read("!B")                           # Type String
+        result.read("!B")  # Type String
         approachedInternal = result.readString()
-        result.read("!B")                           # Type Byte
+        result.read("!B")  # Type Byte
         hasPrio = bool(result.read("!B")[0])
-        result.read("!B")                           # Type Byte
+        result.read("!B")  # Type Byte
         isOpen = bool(result.read("!B")[0])
-        result.read("!B")                           # Type Byte
+        result.read("!B")  # Type Byte
         hasFoe = bool(result.read("!B")[0])
-        result.read("!B")                           # Type String
+        result.read("!B")  # Type String
         state = result.readString()
-        result.read("!B")                           # Type String
+        result.read("!B")  # Type String
         direction = result.readString()
-        result.read("!B")                           # Type Float
+        result.read("!B")  # Type Float
         length = result.readDouble()
         links.append((approachedLane, hasPrio, isOpen, hasFoe,
                       approachedInternal, state, direction, length))

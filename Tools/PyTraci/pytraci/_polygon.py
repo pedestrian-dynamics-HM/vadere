@@ -13,10 +13,12 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
+
+from . import constants as tc
 from .domain import Domain
 from .storage import Storage
-from . import constants as tc
 
 _RETURN_VALUE_FUNC = {tc.VAR_TYPE: Storage.readString,
                       tc.VAR_SHAPE: Storage.readShape,
@@ -150,11 +152,11 @@ class PolygonDomain(Domain):
                      The center of rotation is the object's position.
         """
         msg_length = 1 + 4 \
-            + 1 + 4 + len(trackedObjectID) \
-            + 1 + 4 + len(timeSpan)*8 \
-            + 1 + 4 + len(alphaSpan)*8 \
-            + 1 + 1 \
-            + 1 + 1
+                     + 1 + 4 + len(trackedObjectID) \
+                     + 1 + 4 + len(timeSpan) * 8 \
+                     + 1 + 4 + len(alphaSpan) * 8 \
+                     + 1 + 1 \
+                     + 1 + 1
         self._connection._beginMessage(tc.CMD_SET_POLYGON_VARIABLE, tc.VAR_ADD_DYNAMICS, polygonID, msg_length)
         self._connection._string += struct.pack("!Bi", tc.TYPE_COMPOUND, 5)
         self._connection._packString(trackedObjectID)

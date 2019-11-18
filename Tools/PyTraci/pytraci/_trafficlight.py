@@ -13,11 +13,13 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
-from .domain import Domain
-from .storage import Storage
+
 from . import constants as tc
+from .domain import Domain
 from .exceptions import TraCIException
+from .storage import Storage
 
 
 class Phase:
@@ -104,8 +106,8 @@ def _readLinks(result):
         nbControlledLinks = result.read("!i")[0]
         controlledLinks = []
         for __ in range(nbControlledLinks):
-            result.read("!B")                       # Type of Link j
-            link = result.readStringList()          # Link j
+            result.read("!B")  # Type of Link j
+            link = result.readStringList()  # Link j
             controlledLinks.append(link)
         signals.append(controlledLinks)
     return signals
@@ -123,7 +125,6 @@ _RETURN_VALUE_FUNC = {tc.TL_RED_YELLOW_GREEN_STATE: Storage.readString,
 
 
 class TrafficLightDomain(Domain):
-
     Phase = Phase
     Logic = Logic
 
@@ -271,7 +272,7 @@ class TrafficLightDomain(Domain):
         See getCompleteRedYellowGreenDefinition.
         """
         length = 1 + 4 + 1 + 4 + \
-            len(tls.programID) + 1 + 4 + 1 + 4 + 1 + 4  # tls parameter
+                 len(tls.programID) + 1 + 4 + 1 + 4 + 1 + 4  # tls parameter
         for p in tls.phases:
             length += (1 + 4 + 1 + 8 + 1 + 4 + len(p.state)
                        + 1 + 8 + 1 + 8  # minDur, maxDur

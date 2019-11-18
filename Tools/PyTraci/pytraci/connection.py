@@ -17,24 +17,24 @@
 # @date    2008-10-09
 # @version $Id$
 
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
+import abc
 import socket
 import struct
 import sys
 import warnings
-import abc
 
 from . import constants as tc
-from .exceptions import TraCIException, FatalTraCIError
 from .domain import _defaultDomains
+from .exceptions import TraCIException, FatalTraCIError
 from .storage import Storage
 
 _RESULTS = {0x00: "OK", 0x01: "Not implemented", 0xFF: "Error"}
 
 
 class Connection:
-
     """Contains the socket, the composed message string
     together with a list of TraCI commands which are inside.
     """
@@ -160,7 +160,7 @@ class Connection:
         if response - cmdID != 16 or retVarID != varID or objectID != objID:
             raise FatalTraCIError("Received answer %s,%s,%s for command %s,%s,%s."
                                   % (response, retVarID, objectID, cmdID, varID, objID))
-        result.read("!B")     # Return type of the variable
+        result.read("!B")  # Return type of the variable
         return result
 
     def _readSubscription(self, result):
@@ -259,12 +259,12 @@ class Connection:
         if filterType in (tc.FILTER_TYPE_NONE, tc.FILTER_TYPE_NOOPPOSITE,
                           tc.FILTER_TYPE_TURN, tc.FILTER_TYPE_LEAD_FOLLOW):
             # filter without parameter
-            assert(params is None)
+            assert (params is None)
             length = 1 + 1 + 1  # length + CMD + FILTER_ID
             self._string += struct.pack("!BBB", length, command, filterType)
         elif filterType in (tc.FILTER_TYPE_DOWNSTREAM_DIST, tc.FILTER_TYPE_UPSTREAM_DIST):
             # filter with float parameter
-            assert(type(params) is float)
+            assert (type(params) is float)
             length = 1 + 1 + 1 + 1 + 8  # length + CMD + FILTER_ID + floattype + float
             self._string += struct.pack("!BBBBd", length, command, filterType, tc.TYPE_DOUBLE, params)
         elif filterType in (tc.FILTER_TYPE_VCLASS, tc.FILTER_TYPE_VTYPE):
@@ -306,7 +306,7 @@ class Connection:
         self._queue.append(tc.CMD_SEND_FILE)
         self._string += struct.pack("!BiB", 0, 1 + 1 + 4 + 4 * len(args) + sum(map(len, args)), 117)
         for s in args:
-           self._string += struct.pack("!i", len(s)) + s.encode('us-ascii')
+            self._string += struct.pack("!i", len(s)) + s.encode('us-ascii')
         self._sendExact()
 
     def simulationStep(self, step=0.):

@@ -13,10 +13,12 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
-from .storage import Storage
+
 from . import constants as tc
 from ._person import PersonDomain, _RETURN_VALUE_FUNC
+from .storage import Storage
 
 _RETURN_VALUE_FUNC[tc.NEXT_FREE_ID] = Storage.readInt
 _RETURN_VALUE_FUNC[tc.VAR_POSITION_LIST] = Storage.readPositionList

@@ -16,7 +16,6 @@
 This script contains TraCI constant definitions from <SUMO_HOME>/src/libsumo/TraCIConstants.h.
 """
 
-
 #  ****************************************
 #  VERSION
 #  ****************************************
@@ -66,7 +65,6 @@ CMD_CLOSE = 0x7F
 
 #  command: add subscription filter
 CMD_ADD_SUBSCRIPTION_FILTER = 0x7e
-
 
 #  command: subscribe induction loop (e1) context
 CMD_SUBSCRIBE_INDUCTIONLOOP_CONTEXT = 0x80
@@ -304,7 +302,6 @@ POSITION_3D = 0x03
 #  Position on road map
 POSITION_ROADMAP = 0x04
 
-
 #  ****************************************
 #  DATA TYPES
 #  ****************************************
@@ -329,7 +326,6 @@ TYPE_DOUBLELIST = 0x10
 #  color (four ubytes)
 TYPE_COLOR = 0x11
 
-
 #  ****************************************
 #  RESULT TYPES
 #  ****************************************
@@ -350,7 +346,6 @@ INVALID_INT_VALUE = -1073741824
 #  maximum value for client ordering (2 ^ 30)
 MAX_ORDER = 1073741824
 
-
 #  ****************************************
 #  DIFFERENT DISTANCE REQUESTS
 #  ****************************************
@@ -358,7 +353,6 @@ MAX_ORDER = 1073741824
 REQUEST_AIRDIST = 0x00
 #  driving distance
 REQUEST_DRIVINGDIST = 0x01
-
 
 #  ****************************************
 #  VEHICLE REMOVAL REASONS
@@ -917,7 +911,6 @@ CMD_SAVE_SIMSTATE = 0x95
 #  sets/retrieves abstract parameter
 VAR_PARAMETER = 0x7e
 
-
 #  add an instance (poi, polygon, vehicle, person, route)
 ADD = 0x80
 
@@ -1008,7 +1001,6 @@ VAR_TARGET_LIST = 0xfe
 
 # cognitive heurisitic of the BHM Model
 VAR_HEURISTIC = 0xd0
-
 
 # @name currently wanted lane-change action
 # @{

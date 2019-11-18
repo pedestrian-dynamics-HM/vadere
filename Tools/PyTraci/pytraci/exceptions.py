@@ -16,12 +16,11 @@
 # @date    2008-10-09
 # @version $Id$
 
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
 
 
 class TraCIException(Exception):
-
     """Exception class for all TraCI errors which keep the connection intact"""
 
     def __init__(self, desc, command=None, errorType=None):
@@ -37,7 +36,6 @@ class TraCIException(Exception):
 
 
 class FatalTraCIError(Exception):
-
     """Exception class for all TraCI errors which do not allow for continuation"""
 
     def __init__(self, desc):

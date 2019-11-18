@@ -15,12 +15,14 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
 import warnings
+
 from . import constants as tc
 from .domain import Domain
-from .storage import Storage
 from .exceptions import FatalTraCIError
+from .storage import Storage
 
 
 class Stage(object):
@@ -67,7 +69,7 @@ class Stage(object):
 
 def _readStage(result):
     # compound size and type
-    assert(result.read("!i")[0] == 13)
+    assert (result.read("!i")[0] == 13)
     stageType = result.readTypedInt()
     vType = result.readTypedString()
     line = result.readTypedString()
@@ -153,7 +155,6 @@ _RETURN_VALUE_FUNC = {tc.VAR_TIME: Storage.readDouble,
 
 
 class SimulationDomain(Domain):
-
     Stage = Stage
 
     def __init__(self):
@@ -514,7 +515,7 @@ class SimulationDomain(Domain):
         answer = self._connection._checkResult(tc.CMD_GET_SIM_VARIABLE, tc.FIND_INTERMODAL_ROUTE, "")
         result = []
         for c in range(answer.readInt()):
-            answer.read("!B")                   # Type
+            answer.read("!B")  # Type
             result.append(_readStage(answer))
         return result
 
@@ -530,7 +531,7 @@ class SimulationDomain(Domain):
         self._connection._packString(fileName)
         self._connection._sendExact()
 
-    def subscribe(self, varIDs=(tc.VAR_DEPARTED_VEHICLES_IDS,), begin=0, end=2**31 - 1):
+    def subscribe(self, varIDs=(tc.VAR_DEPARTED_VEHICLES_IDS,), begin=0, end=2 ** 31 - 1):
         """subscribe(list(integer), double, double) -> None
 
         Subscribe to one or more simulation values for the given interval.

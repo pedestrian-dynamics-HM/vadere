@@ -14,12 +14,13 @@
 # @version $Id$
 
 from __future__ import absolute_import
+
 import struct
+
 from . import constants as tc
 from .domain import Domain
-from .storage import Storage
 from .exceptions import TraCIException
-
+from .storage import Storage
 
 _RETURN_VALUE_FUNC = {tc.VAR_EDGE_TRAVELTIME: Storage.readDouble,
                       tc.VAR_WAITING_TIME: Storage.readDouble,
