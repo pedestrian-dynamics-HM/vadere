@@ -39,6 +39,11 @@ public class Teleporter extends ScenarioElement {
 	}
 
 	@Override
+	public void setId(int id) {
+		// do nothing?
+	}
+
+	@Override
 	public AttributesTeleporter getAttributes() {
 		return attributes;
 	}

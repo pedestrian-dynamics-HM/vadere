@@ -474,7 +474,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	 * @return
 	 */
 	protected synchronized VPoint pixelToWorld(final VPoint pInPixel) {
-		if(pInPixel != null) {
+		if(pInPixel != null && getTopographyBound() != null) {
 			return new VPoint(pInPixel.getX() / scaleFactor + getTopographyBound().getMinX(),
 					getTopographyBound().getMinY() + (getTopographyBound().getHeight() * scaleFactor - pInPixel.getY()) / scaleFactor);
 		}

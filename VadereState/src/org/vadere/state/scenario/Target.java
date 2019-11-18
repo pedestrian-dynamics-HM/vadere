@@ -1,15 +1,15 @@
 package org.vadere.state.scenario;
 
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.geometry.shapes.VShape;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VShape;
 
 public class Target extends ScenarioElement implements Comparable<Target> {
 
@@ -62,6 +62,11 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	@Override
 	public int getId() {
 		return attributes.getId();
+	}
+
+	@Override
+	public void setId(int id) {
+		attributes.setId(id);
 	}
 
 	@Override

@@ -1,19 +1,19 @@
 package org.vadere.state.scenario;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.math.TruncatedNormalDistribution;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public abstract class Agent extends DynamicElement {
 
@@ -94,7 +94,12 @@ public abstract class Agent extends DynamicElement {
         return attributes.getId();
     }
 
-    public Source getSource() {
+	@Override
+	public void setId(int id) {
+		attributes.setId(id);
+	}
+
+	public Source getSource() {
         return source;
     }
 

@@ -98,6 +98,11 @@ public class Stairs extends ScenarioElement {
 		return attributes.getId();
 	}
 
+	@Override
+	public void setId(int id) {
+		attributes.setId(id);
+	}
+
 	public Tread[] getTreads() {
 		return this.treads;
 	}

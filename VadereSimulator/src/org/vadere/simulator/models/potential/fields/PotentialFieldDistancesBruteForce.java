@@ -93,4 +93,5 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
 		return cellGrid.getInterpolatedValueAt(pos).getLeft();
 	}
+
 }

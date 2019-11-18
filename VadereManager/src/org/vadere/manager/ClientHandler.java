@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable{
 
 	private final ServerSocket serverSocket;
 	private final TraCISocket traCISocket;
-	private final CommandExecutor cmdExecutor;
+	private CommandExecutor cmdExecutor;
 	private RemoteManager remoteManager;
 
 
@@ -70,6 +70,10 @@ public class ClientHandler implements Runnable{
 		} finally {
 			traCISocket.close();
 			remoteManager.stopSimulationIfRunning();
+			cmdExecutor = null;
+			remoteManager = null;
+			// hint VM to call garbage collection. The current simulation is done.
+			System.gc();
 		}
 
 	}

@@ -6,14 +6,15 @@ import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
 
 	private final Topography topography;
 	private final DynamicElementFactory dynamicElementFactory;
 
-	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory) {
-		super(topography);
+	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory, final Random random) {
+		super(topography, random);
 		this.topography = topography;
 		this.dynamicElementFactory = dynamicElementFactory;
 	}

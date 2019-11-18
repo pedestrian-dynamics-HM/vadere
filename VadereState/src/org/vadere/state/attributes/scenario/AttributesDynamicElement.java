@@ -16,4 +16,9 @@ public class AttributesDynamicElement extends Attributes {
 	public int getId() {
 		return id;
 	}
+
+	public void setId(int id) {
+		checkSealed();
+		this.id = id;
+	}
 }
