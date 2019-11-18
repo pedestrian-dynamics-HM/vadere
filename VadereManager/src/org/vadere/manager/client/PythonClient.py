@@ -16,7 +16,7 @@ import sys, os
 import argparse
 from IPython import embed
 
-import org.vadere.manager.client.pyTraci as traci
+import pyTraci as traci
 
 def readScenario(scenPath):
     with open(scenPath, 'r') as scenFile:

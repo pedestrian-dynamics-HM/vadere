@@ -22,8 +22,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 import socket
 import time
-import subprocess
-import warnings
 import sys
 import os
 
@@ -37,7 +35,7 @@ else:
 
 from .domain import _defaultDomains  # noqa
 # StepListener needs to be imported for backwards compatibility
-from .connection import Connection, StepListener  # noqa
+from .connection import Connection  # noqa
 from .exceptions import FatalTraCIError, TraCIException  # noqa
 from . import _inductionloop, _lanearea, _multientryexit, _trafficlight  # noqa
 from . import _lane, _person, _person_vadere, _route, _vehicle, _vehicletype  # noqa
