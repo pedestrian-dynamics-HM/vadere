@@ -24,6 +24,8 @@ import javax.swing.*;
 public class InfoPanel extends JPanel implements Observer {
 
 	private static final long serialVersionUID = -1865670281109979704L;
+	public static final String NO_HASH = "--------";
+
 	private final IDefaultModel defaultModel;
 	private JLabel lblScenarioSizeLabel;
 	private JLabel lblGridResulutionLabel;
@@ -69,6 +71,8 @@ public class InfoPanel extends JPanel implements Observer {
 		add(lblScenarioHashLabel);
 		add(lblScenarioHashValue);
 
+		hash = NO_HASH;
+
 		// copy full FloorFieldHash to clipboard after clicking on the short version of the hash
 		lblScenarioHashValue.addMouseListener(new MouseAdapter() {
 			@Override
@@ -105,11 +109,12 @@ public class InfoPanel extends JPanel implements Observer {
 					hash = 	StateJsonConverter.getFloorFieldHash(m.getTopography(), attFF);
 				}
 			} else  {
-				hash = "--------";
+				hash = NO_HASH;
 			}
-			lblScenarioHashValue.setText(hash.substring(0, 8) + " | ");
-			lblScenarioHashValue.setToolTipText(hash);
 
+			int hashSubstringEnd = Math.min(8, hash.length());
+			lblScenarioHashValue.setText(hash.substring(0, hashSubstringEnd) + " | ");
+			lblScenarioHashValue.setToolTipText(hash);
 		}
 	}
 }
