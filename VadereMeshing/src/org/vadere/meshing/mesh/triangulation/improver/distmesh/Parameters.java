@@ -10,7 +10,8 @@ public class Parameters {
     public final static double DELTAT = 0.2;
     public final static double MIN_TRIANGLE_QUALITY = 0.1;
     public final static double MIN_FORCE_RATIO = 0.3;
-    public final static double MIN_SPLIT_TRIANGLE_QUALITY = 0.5;
+    public final static double MIN_COLLAPSE_QUALITY = 0.5;
+	public final static double MIN_SPLIT_QUALITY = 0.5;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"

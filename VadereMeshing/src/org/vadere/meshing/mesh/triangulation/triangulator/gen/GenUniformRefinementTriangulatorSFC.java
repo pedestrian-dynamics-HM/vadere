@@ -524,7 +524,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				// the following calls are quite expensive
 				establishConstrains();
 				shrinkBorder();
-				//createHoles();
+				createHoles();
 				//triangulation.smoothBorder();
 
 				sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));

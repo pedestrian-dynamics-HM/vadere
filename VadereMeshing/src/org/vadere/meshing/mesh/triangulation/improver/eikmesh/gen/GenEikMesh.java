@@ -771,7 +771,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 	/**
-	 * Updates all boundary edges. Some of those edges might get split.
+	 * Updates all boundary edges. Some of those edges might get split, some may collapse.
 	 */
 	private void updateEdges() {
 		getMesh().getBoundaryEdges().forEach(e -> updateBoundaryEdges(e));
@@ -786,9 +786,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 	private boolean updateEdge(@NotNull final E edge) {
-		if(getTriangulation().isShortestHalfEdge(edge) &&
-				(faceToQuality(getMesh().getFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY
-						|| faceToQuality(getMesh().getTwinFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY)) {
+		if(getTriangulation().isShortestHalfEdge(edge) && (faceToQuality(edge) < Parameters.MIN_COLLAPSE_QUALITY)) {
 			V v1 = getMesh().getVertex(edge);
 			V v2 = getMesh().getTwinVertex(edge);
 
@@ -813,7 +811,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 				if(isLegalMove(getMesh().getVertex(edge), newPosition.getX(), newPosition.getY()) &&
 						isLegalMove(getMesh().getTwinVertex(edge), newPosition.getX(), newPosition.getY())) {
+
 					V v = getTriangulation().collapseEdge(edge, true);
+
 					getMesh().setPoint(v, newPosition);
 
 					if((isSlidePoint(v1) && !isFixPoint(v1))) {
@@ -918,7 +918,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if the edge breaks under the pressure of the forces, otherwise false.
 	 */
 	private boolean isBreaking(@NotNull final E edge) {
-		return getMesh().isLongestEdge(edge) && faceToQuality(getMesh().getFace(edge)) < Parameters.MIN_SPLIT_TRIANGLE_QUALITY;
+		return getMesh().isLongestEdge(edge) && faceToQuality(edge) < Parameters.MIN_SPLIT_QUALITY;
 	}
 
 	/**

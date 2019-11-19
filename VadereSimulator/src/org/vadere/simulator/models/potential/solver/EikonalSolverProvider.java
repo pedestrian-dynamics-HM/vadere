@@ -124,31 +124,31 @@ public abstract class EikonalSolverProvider  {
 			/*
 			 * (1) Build a valid PSLG from the topography.
 			 */
-			PSLG pslg = new PSLGConverter().toPSLG(topography);
+			PSLG pslg = new PSLGConverter().toPSLG(topography, targetId);
 
 			/*
 			 * (2) choose a minimal edge length h0
 			 */
-			double h0 = 2.0;
+			double h0 = 3.0;
 
 			/*
 			 * (3) Construct an edge length function which depends on the geometry i.e. the PSLG.
 			 */
-			EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> Double.POSITIVE_INFINITY, p -> h0);
+			EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> Double.POSITIVE_INFINITY, p -> Double.POSITIVE_INFINITY);
 			edgeLengthFunctionApprox.smooth(0.4);
 			//edgeLengthFunctionApprox.printPython();
 
 			/*
 			 * (4) Compute or define a distance function which defines the geometry.
 			 */
-			DistanceFunctionApproxBF distanceFunction = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()));
-			distanceFunction.printPython();
+			DistanceFunctionApproxBF distanceFunctionApprox = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()));
+			//distanceFunctionApprox.printPython();
 
 			/*
 			 * (5) use EikMesh to construct a mesh
 			 */
 			var meshImprover = new PEikMesh(
-					distanceFunction,
+					distanceFunctionApprox,
 					edgeLengthFunctionApprox,
 					h0,
 					pslg.getBoundingBox(),
@@ -162,11 +162,11 @@ public abstract class EikonalSolverProvider  {
 				synchronized (meshImprover.getMesh()) {
 					meshImprover.improve();
 				}
-				try {
+				/*try {
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
+				}*/
 				meshPanel.repaint();
 			}
 

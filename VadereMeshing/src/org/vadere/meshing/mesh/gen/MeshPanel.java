@@ -108,7 +108,7 @@ public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		    @NotNull final Predicate<F> alertPred,
 		    final double width,
 		    final double height) {
-    	this(mesh, alertPred, width, height, f -> Color.WHITE, e -> Color.GRAY);
+    	this(mesh, alertPred, width, height, defaultFaceColors, e -> Color.GRAY);
     }
 
 	/**

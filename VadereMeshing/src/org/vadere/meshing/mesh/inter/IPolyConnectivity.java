@@ -2,6 +2,8 @@ package org.vadere.meshing.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
+import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -653,20 +655,25 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
 	 */
 	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
-		boolean modified = true;
+		List<F> borderFaces = getMesh().getFaces(getMesh().getBorder());
+		List<F> neighbouringFaces = borderFaces;
 
-		while (modified) {
-			modified = false;
-			List<F> neighbouringFaces = getMesh().getFaces(getMesh().getBorder());
-
+		do {
+			List<F> nextNeighbouringFaces = new ArrayList<>();
 			for(F neighbouringFace : neighbouringFaces) {
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && removeCondition.test(neighbouringFace)) {
+					for(F face : getMesh().getFaceIt(neighbouringFace)) {
+						assert getMesh().isBorder(face) || !getMesh().isBoundary(face);
+						if(!getMesh().isBorder(face)) {
+							nextNeighbouringFaces.add(face);
+						}
+					}
 					removeFaceAtBorder(neighbouringFace, deleteIsolatedVertices);
-					modified = true;
 				}
 			}
-		}
+			neighbouringFaces = nextNeighbouringFaces;
+		} while (!neighbouringFaces.isEmpty());
 	}
 
 	default void removeFacesAtBoundary(@NotNull final Predicate<F> mergePredicate, @NotNull final Predicate<F> errorPredicate) throws IllegalMeshException {
