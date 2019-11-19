@@ -75,8 +75,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
-        "cacheType" : "TXT_CACHE",
-        "cacheDir" : ".cache",
+        "cacheType" : "NO_CACHE",
+        "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -122,7 +122,7 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
+        "absorbing" : false,
         "shape" : {
           "x" : 0.6690997566909975,
           "y" : 8.832116788321168,
@@ -189,7 +189,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 1,
+        "id" : 5,
         "absorbing" : false,
         "shape" : {
           "x" : 0.9,
