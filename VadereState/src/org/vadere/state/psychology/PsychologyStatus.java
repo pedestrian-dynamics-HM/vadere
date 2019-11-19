@@ -1,22 +1,27 @@
-package org.vadere.state.attributes.scenario;
+package org.vadere.state.psychology;
 
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 
-public class AttributesAgentPsychology {
+public class PsychologyStatus {
 
     // Member Variables
     private Stimulus mostImportantStimulus;
     private SelfCategory selfCategory;
 
     // Constructors
-    public AttributesAgentPsychology() {
+    public PsychologyStatus() {
         this(null, SelfCategory.TARGET_ORIENTED);
     }
 
-    public AttributesAgentPsychology(Stimulus mostImportantStimulus, SelfCategory selfCategory) {
+    public PsychologyStatus(Stimulus mostImportantStimulus, SelfCategory selfCategory) {
         this.mostImportantStimulus = mostImportantStimulus;
         this.selfCategory = selfCategory;
+    }
+
+    public PsychologyStatus(PsychologyStatus other) {
+        this.mostImportantStimulus = other.getMostImportantStimulus() != null ? other.getMostImportantStimulus().clone() : null;
+        this.selfCategory = other.getSelfCategory();
     }
 
     // Getter

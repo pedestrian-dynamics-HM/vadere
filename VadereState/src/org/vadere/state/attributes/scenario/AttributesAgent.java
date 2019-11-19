@@ -10,9 +10,15 @@ package org.vadere.state.attributes.scenario;
  */
 public class AttributesAgent extends AttributesDynamicElement {
 
-	// calculate the angle between agent's current position and the target by using either the center of the target or
-	// the closest point between agent and target
-	public enum AngleCalculationType { USE_CENTER, USE_CLOSEST_POINT };
+	// Calculate agent's walking direction by using different strategies.
+	// "BY_GRADIENT" can only be used in conjunction with locomotion models
+	// which uses a floor field (which provides a gradient). "BY_TARGET_CENTER"
+	// and "BY_TARGET_CLOSEST_POINT" is supported by all locomotion models.
+	public enum WalkingDirectionCalculation {
+		BY_GRADIENT,
+		BY_TARGET_CENTER,
+		BY_TARGET_CLOSEST_POINT
+	};
 
 	// from weidmann-1992 page 18, deviates in seitz-2016c page 2 (Methods): 2.0
 	private double radius = 0.2;
@@ -41,14 +47,14 @@ public class AttributesAgent extends AttributesDynamicElement {
 	// agents search for other scenario elements (e.g., other agents) within this radius
 	private double searchRadius = 1.0;
 
-	// the more robust strategy should be use the target's center for angle calculation
-	// because the closest point can vary while the agent moves through the topography.
-	private AngleCalculationType angleCalculationType = AngleCalculationType.USE_CENTER;
+	// Use "BY_TARGET_CENTER" as default because it is supported by all locomotion models.
+	// "BY_TARGET_CLOSEST_POINT" might be a fragile solution because the closest point between
+	// the agent and the target varies while the agent moves.
+	// "BY_GRADIENT" should be the most realistic configuration because it represents the
+	// instantaneous walking direction.
+	private WalkingDirectionCalculation walkingDirectionCalculation = WalkingDirectionCalculation.BY_TARGET_CENTER;
 
-	/* angle in degree which is used to decide if two pedestrians move into the same direction
-	 *
-	 * The angle "a" is calculated between the two vectors v1 and v2 where
-	 * v1 = (TargetPedestrian1 - pedestrian1) and v2 = (TargetPedestrian2 - pedestrian2):
+	/* angle in degree which is used to decide if two pedestrians move into the same direction, for instance:
 	 *
 	 * <pre>
 	 *     T2 o   o T1
@@ -68,7 +74,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	 * If the calculated angle "a" is equal or below this threshold, it is assumed that both pedestrians move into
 	 * the same direction and both cannot be swapped.
 	 */
-	private double targetOrientationAngleThreshold = 45.0;
+	private double walkingDirectionSameIfAngleLessOrEqual = 45.0;
 
 	public AttributesAgent() {
 		this(-1);
@@ -92,7 +98,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.acceleration = other.acceleration;
 		this.footstepHistorySize = other.footstepHistorySize;
 		this.searchRadius = other.searchRadius;
-		this.angleCalculationType = other.angleCalculationType;
+		this.walkingDirectionCalculation = other.walkingDirectionCalculation;
 	}
 
 	// Getters...
@@ -129,9 +135,9 @@ public class AttributesAgent extends AttributesDynamicElement {
 
 	public double getSearchRadius() { return searchRadius; }
 
-	public AngleCalculationType getAngleCalculationType() { return angleCalculationType; }
+	public WalkingDirectionCalculation getWalkingDirectionCalculation() { return walkingDirectionCalculation; }
 
-	public double getTargetOrientationAngleThreshold() { return targetOrientationAngleThreshold; }
+	public double getWalkingDirectionSameIfAngleLessOrEqual() { return walkingDirectionSameIfAngleLessOrEqual; }
 
 	// Setters...
 
@@ -180,13 +186,13 @@ public class AttributesAgent extends AttributesDynamicElement {
 		this.searchRadius = searchRadius;
 	}
 
-	public void setAngleCalculationType(AngleCalculationType angleCalculationType) {
+	public void setWalkingDirectionCalculation(WalkingDirectionCalculation walkingDirectionCalculation) {
 		checkSealed();
-		this.angleCalculationType = angleCalculationType;
+		this.walkingDirectionCalculation = walkingDirectionCalculation;
 	}
 
-	public void setTargetOrientationAngleThreshold(double targetOrientationAngleThreshold) {
+	public void setWalkingDirectionSameIfAngleLessOrEqual(double walkingDirectionSameIfAngleLessOrEqual) {
 		checkSealed();
-		this.targetOrientationAngleThreshold = targetOrientationAngleThreshold;
+		this.walkingDirectionSameIfAngleLessOrEqual = walkingDirectionSameIfAngleLessOrEqual;
 	}
 }

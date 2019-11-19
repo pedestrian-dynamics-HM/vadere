@@ -12,8 +12,6 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 /**
  * A triangle with additional double data at each point.
- * 
- * 
  */
 public class DataTriangle extends VTriangle {
 
@@ -196,4 +194,5 @@ public class DataTriangle extends VTriangle {
 
 		return dataPoints;
 	}
+
 }

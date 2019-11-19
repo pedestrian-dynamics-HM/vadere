@@ -3,6 +3,7 @@ package org.vadere.simulator.control;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;

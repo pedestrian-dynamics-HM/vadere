@@ -343,4 +343,5 @@ public class VCircle implements VShape, ICircleSector {
 				", radius=" + radius +
 				'}';
 	}
+
 }

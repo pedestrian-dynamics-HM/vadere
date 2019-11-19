@@ -65,7 +65,9 @@ public abstract class DefaultRenderer {
 
 	public void render(final Graphics2D targetGraphics2D, final int x, final int y, final int width, final int height) {
 		synchronized (defaultModel) {
-			targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+			if (defaultModel.getTopographyBound() != null){
+				targetGraphics2D.drawImage(renderImage(width, height), x, y, null);
+			}
 			targetGraphics2D.dispose();
 		}
 	}
@@ -121,20 +123,23 @@ public abstract class DefaultRenderer {
 	protected void transformGraphics(final Graphics2D graphics2D) {
 		synchronized (defaultModel) {
 			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-			mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
-			graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
+			if (topographyBound != null){
+
+				mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
+				graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
 
 
-			//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
+				//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
 
-			/*
-			 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
-			 */
-			Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
-			double dy = topographyBound.getHeight() - viewportBound.getHeight();
+				/*
+				 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
+				 */
+				Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
+				double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-			graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
-			// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
+				graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
+				// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
+			}
 		}
 	}
 
