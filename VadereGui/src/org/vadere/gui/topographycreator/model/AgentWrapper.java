@@ -1,8 +1,5 @@
 package org.vadere.gui.topographycreator.model;
 
-import java.util.LinkedList;
-import java.util.Random;
-
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -11,6 +8,9 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * The AgentWrapper wraps an AgentInitialStore to a ScenarioElement, so
@@ -58,6 +58,11 @@ public final class AgentWrapper extends ScenarioElement {
 	@Override
 	public int getId() {
 		return agent.getId();
+	}
+
+	@Override
+	public void setId(int id) {
+		agent.setId(id);
 	}
 
 	@Override
