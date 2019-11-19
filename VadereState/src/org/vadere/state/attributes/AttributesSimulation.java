@@ -6,7 +6,6 @@ import java.util.Random;
 /**
  * Provides attributes for the simulation, like visualizationEnabled and
  * writeSimulationData.
- * 
  */
 public class AttributesSimulation extends Attributes {
 
@@ -23,6 +22,7 @@ public class AttributesSimulation extends Attributes {
 	private long simulationSeed;
 	/** Allows agent to change their behavior (e.g. from TARGET_ORIENTIED to COOPERATIVE if it is too dense) */
 	private boolean usePsychologyLayer = false;
+	private AttributesPsychology psychologyLayer = new AttributesPsychology();
 
 	// Getter...
 
@@ -69,6 +69,8 @@ public class AttributesSimulation extends Attributes {
 	public boolean isUsePsychologyLayer() {
 		return usePsychologyLayer;
 	}
+
+	public AttributesPsychology getPsychologyLayer() { return psychologyLayer; }
 
 	// Setters...
 
@@ -124,7 +126,13 @@ public class AttributesSimulation extends Attributes {
 	}
 
 	public void setUsePsychologyLayer(boolean usePsychologyLayer) {
+		checkSealed();
 		this.usePsychologyLayer = usePsychologyLayer;
+	}
+
+	public void setPsychologyLayer(AttributesPsychology attributesPsychology) {
+		checkSealed();
+		this.psychologyLayer = attributesPsychology;
 	}
 
 	@Override
@@ -142,11 +150,12 @@ public class AttributesSimulation extends Attributes {
 				useFixedSeed == that.useFixedSeed &&
 				fixedSeed == that.fixedSeed &&
 				simulationSeed == that.simulationSeed &&
-				usePsychologyLayer == that.usePsychologyLayer;
+				usePsychologyLayer == that.usePsychologyLayer &&
+				psychologyLayer.equals(that.psychologyLayer);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, usePsychologyLayer);
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, usePsychologyLayer, psychologyLayer);
 	}
 }

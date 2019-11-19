@@ -6,6 +6,7 @@ import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,6 +43,6 @@ public interface IPerceptionModel {
 	 * @param pedestrians The pedestrians to update
 	 * @param stimuli The stimuli which occurred in this simulation step.
 	 */
-	void update(List<Pedestrian> pedestrians, List<Stimulus> stimuli);
+	void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli);
 
 }

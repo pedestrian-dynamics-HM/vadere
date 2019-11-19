@@ -4,6 +4,7 @@ import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class SimplePerceptionModel implements IPerceptionModel {
     }
 
     @Override
-    public void update(List<Pedestrian> pedestrians, List<Stimulus> stimuli) {
+    public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
         for (Pedestrian pedestrian : pedestrians) {
             Stimulus mostImportantStimulus = rankChangeTargetAndBangHigherThanWait(stimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
