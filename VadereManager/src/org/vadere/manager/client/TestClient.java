@@ -480,15 +480,110 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	// polygonapi
 
 	@Override
-	public void polygonapi_getIdList(String[] args) throws IOException { return; }
+	public void polygonapi_getIDList(String[] args) throws IOException {
+		TraCIResponse res = polygonapi.getIDList();
+		System.out.println(res.toString());
+	}
 
 	@Override
-	public void polygonapi_getType(String[] args) throws IOException { return; }
+	public void polygonapi_getType(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getType(elementID);
+		System.out.println(res.toString());
+	}
 
 	@Override
-	public void polygonapi_getShape(String[] args) throws IOException { return; }
+	public void polygonapi_getShape(String[] args) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getShape(elementID);
+		System.out.println(res.toString());
+	}
 
 	@Override
-	public void polygonapi_getPosition2D(String[] args) throws IOException { return; }
+	public void polygonapi_getPosition2D(String[] args) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getShape(elementID);
+		System.out.println(res.toString());
+	}
+
+
+	@Override
+	public void polygonapi_getIDCount(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getIDCount();
+		System.out.println(res.toString());
+	}
+
+	@Override
+	public void polygonapi_getColor(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getColor(elementID);
+		System.out.println(res.toString());
+	}
+
+
+	@Override
+	public void polygonapi_getImageFile(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getImageFile(elementID);
+		System.out.println(res.toString());
+	}
+
+	@Override
+	public void polygonapi_getImageWidth(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getImageWidth(elementID);
+		System.out.println(res.toString());
+	}
+
+	@Override
+	public void polygonapi_getImageHeight(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getImageHeight(elementID);
+		System.out.println(res.toString());
+	}
+
+	@Override
+	public void polygonapi_getImageAngle(String args[]) throws IOException{
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+		String elementID = args[1];
+		TraCIResponse res = polygonapi.getImageAngle(elementID);
+		System.out.println(res.toString());
+	}
 
 }

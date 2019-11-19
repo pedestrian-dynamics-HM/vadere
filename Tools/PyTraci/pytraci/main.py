@@ -40,7 +40,8 @@ from .connection import Connection  # noqa
 from .exceptions import FatalTraCIError, TraCIException  # noqa
 from . import _inductionloop, _lanearea, _multientryexit, _trafficlight  # noqa
 from . import _lane, _person, _person_vadere, _route, _vehicle, _vehicletype  # noqa
-from . import _edge, _gui, _junction, _poi, _polygon, _simulation, _simulation_vadere  # noqa
+from . import _edge, _gui, _junction, _poi, _polygon, _polygon_vadere
+from . import _simulation, _simulation_vadere  # noqa
 
 inductionloop = _inductionloop.InductionLoopDomain()
 lanearea = _lanearea.LaneAreaDomain()
@@ -57,6 +58,7 @@ gui = _gui.GuiDomain()
 junction = _junction.JunctionDomain()
 poi = _poi.PoiDomain()
 polygon = _polygon.PolygonDomain()
+polygon_vadere = _polygon_vadere.PolygonVadereDomain()
 simulation = _simulation.SimulationDomain()
 simulation_vadere = _simulation_vadere.SimulationVadereDomain()
 

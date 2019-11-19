@@ -25,4 +25,5 @@ public @interface PolygonHandler {
 	TraCICmd cmd();
 	PolygonVar var() ;
 	String name(); // name of client function.
+	boolean ignoreElementId() default false;
 }

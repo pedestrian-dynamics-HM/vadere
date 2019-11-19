@@ -76,7 +76,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return true;
 	}
 
-	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.ID_LIST, name = "getIdList")
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.ID_LIST, name = "getIDList", ignoreElementId = true)
 	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
@@ -90,6 +90,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.COUNT, name = "getIDCount", ignoreElementId = true)
 	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
@@ -120,6 +121,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.COLOR, name = "getColor")
 	public TraCICommand process_getColor(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseOK(traCIVar.returnType, Color.BLACK));
 		return cmd;
@@ -138,21 +140,25 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.IMAGE_FILE, name = "getImageFile")
 	public TraCICommand process_getImageFile(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.WIDTH, name = "getImageWidth")
 	public TraCICommand process_getImageWidth(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.HEIGHT, name = "getImageHeight")
 	public TraCICommand process_getImageHeight(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.ANGLE, name = "getImageAngle")
 	public TraCICommand process_getImageAngle(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
