@@ -222,6 +222,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		}
 	}
 
+	// personapi
+
 	@Override
 	public void personapi_getIDList(String[] args) throws IOException {
 		TraCIResponse res = personapi.getIDList();
@@ -385,6 +387,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	// simulationapi
+
 	@Override
 	public void simulationapi_createWaitingArea(String[] args) throws IOException{
 		if(args.length < 3){
@@ -472,5 +476,19 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res = simulationapi.getTime();
 		System.out.println(res.toString());
 	}
+
+	// polygonapi
+
+	@Override
+	public void polygonapi_getIdList(String[] args) throws IOException { return; }
+
+	@Override
+	public void polygonapi_getType(String[] args) throws IOException { return; }
+
+	@Override
+	public void polygonapi_getShape(String[] args) throws IOException { return; }
+
+	@Override
+	public void polygonapi_getPosition2D(String[] args) throws IOException { return; }
 
 }

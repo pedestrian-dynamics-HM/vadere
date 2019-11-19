@@ -1,5 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
+import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
@@ -21,6 +22,15 @@ import java.util.stream.Collectors;
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Polygon API
  */
+@TraCIApi(
+		name = "PolygonAPI",
+		nameShort = "poly",
+		singleAnnotation = PolygonHandler.class,
+		multipleAnnotation = PolygonHandlers.class,
+		cmdEnum = TraCICmd.class,
+		varEnum = PolygonVar.class
+)
+
 public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 
 	public static PolygonCommandHandler instance;
@@ -66,6 +76,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return true;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.ID_LIST, name = "getIdList")
 	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
@@ -89,11 +100,13 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.TYPE, name = "getType")
 	public TraCICommand process_getType(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		cmd.setResponse(responseOK(traCIVar.returnType, "building"));
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.SHAPE, name = "getShape")
 	public TraCICommand process_getShape(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 
 		remoteManager.accessState((manager, state) -> {
@@ -112,6 +125,7 @@ public class PolygonCommandHandler  extends CommandHandler<PolygonVar>{
 		return cmd;
 	}
 
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.POS_2D, name = "getPosition2D")
 	public TraCICommand process_getPosition2D(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar){
 		remoteManager.accessState((manager, state) -> {
 			Optional<Obstacle> obstacle = state.getTopography().getObstacles().stream()
