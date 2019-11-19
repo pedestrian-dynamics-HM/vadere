@@ -107,4 +107,19 @@ public class CompoundObject {
 		}
 	}
 
+
+	static public CompoundObject writeAsJson(String json){
+		return CompoundObjectBuilder.builder()
+				.rest()
+				.add(TraCIDataType.STRING)
+				.build(json);
+	}
+
+	static public String readAsJson(CompoundObject object){
+		if (object.size() != 1){ // one String object
+			throw new TraCIException("Element mismatch: Cannot create Json String from CompoundObject containing %s", object.types());
+		}
+		return (String) object.getData(0, TraCIDataType.STRING);
+	}
+
 }
