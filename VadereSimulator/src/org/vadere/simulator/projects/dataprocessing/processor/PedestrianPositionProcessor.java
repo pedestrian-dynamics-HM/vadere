@@ -6,6 +6,8 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
+import org.vadere.state.attributes.processor.AttributesPedestrianLastPositionProcessor;
+import org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -39,8 +41,8 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 		double simTime = state.getSimTimeInSec();
 
 		for (Pedestrian pedestrian : pedestrians){
-			VPoint interpolatedPoint = pedestrian.getInterpolatedFootStepPosition(simTime);
-			this.putValue(new TimestepPedestrianIdKey(timeStep, pedestrian.getId()), interpolatedPoint);
+			VPoint position = getAttributes().isInterpolate() ? pedestrian.getInterpolatedFootStepPosition(simTime) : pedestrian.getPosition();
+			this.putValue(new TimestepPedestrianIdKey(timeStep, pedestrian.getId()), position);
 		}
 	}
 
@@ -59,5 +61,13 @@ public class PedestrianPositionProcessor extends DataProcessor<TimestepPedestria
 			return new String[]{Double.toString(p.x), Double.toString(p.y)};
 		}
 		//return new String[]{Double.toString(p.x), Double.toString(p.y)};
+	}
+
+	@Override
+	public AttributesPedestrianPositionProcessor getAttributes() {
+		if(super.getAttributes() == null) {
+			setAttributes(new AttributesPedestrianPositionProcessor());
+		}
+		return (AttributesPedestrianPositionProcessor)super.getAttributes();
 	}
 }
