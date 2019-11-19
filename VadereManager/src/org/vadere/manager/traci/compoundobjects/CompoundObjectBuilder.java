@@ -72,7 +72,6 @@ public class CompoundObjectBuilder {
 				.add(TraCIDataType.STRING_LIST)
 				.add(TraCIDataType.DOUBLE)
 				.add(TraCIDataType.INTEGER)
-				.add(TraCIDataType.INTEGER)
 				.add(TraCIDataType.STRING)
 				.add(TraCIDataType.DOUBLE)
 				.build(id, points, reachDist, nextTargetIsPedestrian, nextTarget, prob);
