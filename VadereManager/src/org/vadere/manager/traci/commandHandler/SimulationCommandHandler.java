@@ -16,6 +16,8 @@ import org.vadere.manager.traci.compoundobjects.TargetChangerData;
 import org.vadere.manager.traci.compoundobjects.WaitingAreaData;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
 import org.vadere.state.scenario.MeasurementArea;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Simulation API
@@ -169,6 +172,11 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 					data.getProb()
 			);
 			TargetChanger tc = new TargetChanger(attr);
+			//todo[random]: use Random object from context for now. This should be replaced by the meta seed.
+			VadereContext ctx = VadereContext.get(state.getTopography());
+			Random rnd = (Random)ctx.get("random");
+			TargetChangerController tcc = new TargetChangerController(state.getTopography(), tc, rnd);
+			manager.getRemoteSimulationRun().addTargetChangeController(tcc);
 			state.getTopography().addTargetChanger(tc);
 			cmd.setOK();
 		});

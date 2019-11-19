@@ -454,6 +454,10 @@ public class Simulation {
 		notify();
 	}
 
+	synchronized void addTargetChangeController(TargetChangerController controller){
+		targetChangerControllers.add(controller);
+	}
+
 	synchronized SimulationState getSimulationState(){
 		return simulationState;
 	}

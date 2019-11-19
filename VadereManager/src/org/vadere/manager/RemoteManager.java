@@ -116,6 +116,11 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
+	public RemoteScenarioRun getRemoteSimulationRun(){
+		return currentSimulationRun;
+	}
+
+
 	public boolean nextStep(double simTime){
 		if (simulationFinished)
 			return false;

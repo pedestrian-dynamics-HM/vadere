@@ -1,7 +1,9 @@
 package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.context.Context;
 import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
@@ -130,6 +132,8 @@ public class ScenarioRun implements Runnable {
 
 				final MainModel mainModel = modelBuilder.getModel();
 				final Random random = modelBuilder.getRandom();
+				//todo[random]: place the Random object in the context for now. This should be replaced by the meta seed.
+				VadereContext.get(scenarioStore.getTopography()).put("random", random);
 
 				// prepare processors and simulation data writer
 				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
@@ -200,6 +204,10 @@ public class ScenarioRun implements Runnable {
 			throw new IllegalStateException("Simulation is not in 'remoteControl' state");
 
 		simulation.nextSimCommand(simulateUntilInSec);
+	}
+
+	public void addTargetChangeController(TargetChangerController controller){
+		simulation.addTargetChangeController(controller);
 	}
 
 	public void pause() {
