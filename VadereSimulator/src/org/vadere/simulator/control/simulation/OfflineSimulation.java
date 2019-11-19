@@ -1,5 +1,6 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
+import org.vadere.simulator.control.scenarioelements.OfflineTopographyController;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
@@ -10,6 +11,7 @@ import org.vadere.util.logging.Logger;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import tech.tablesaw.api.Table;
@@ -25,6 +27,7 @@ public class OfflineSimulation {
 	private final Path outputDir;
 	private final OfflineTopographyController topographyController;
 	private final Topography topography;
+	private final Random random;
 
 
 	public OfflineSimulation(final Table pedestriansByStep, final Scenario vadere,
@@ -33,7 +36,9 @@ public class OfflineSimulation {
 		this.vadere = vadere;
 		this.outputDir = outputDir;
 		this.topography = vadere.getTopography();
-		this.topographyController = new OfflineTopographyController(topography);
+		long seed = vadere.getAttributesSimulation().getSimulationSeed();
+		this.random = new Random(seed);
+		this.topographyController = new OfflineTopographyController(topography, random);
 
 		this.trajectories = null;
 		this.simulationStates = null;

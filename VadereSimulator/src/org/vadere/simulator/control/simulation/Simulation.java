@@ -1,9 +1,10 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.psychology.cognition.SelfCategoryProcessor;
 import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -133,7 +134,7 @@ public class Simulation {
 	}
 
 	private void createControllers(Topography topography, MainModel mainModel, Random random) {
-		this.topographyController = new TopographyController(topography, mainModel);
+		this.topographyController = new TopographyController(topography, mainModel, random);
 
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory

@@ -29,6 +29,11 @@ public class Source extends ScenarioElement {
 	}
 
 	@Override
+	public void setId(int id) {
+		attributes.setId(id);
+	}
+
+	@Override
 	public AttributesSource getAttributes() {
 		return attributes;
 	}

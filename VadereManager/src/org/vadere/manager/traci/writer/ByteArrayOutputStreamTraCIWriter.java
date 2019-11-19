@@ -1,6 +1,8 @@
 package org.vadere.manager.traci.writer;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
@@ -14,7 +16,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 
@@ -69,6 +73,9 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 			case POS_2D:
 				write2DPosition((VPoint) data);
 				break;
+			case POS_2D_LIST:										// new
+				write2DPositionListWithId((Map<String, VPoint>) data);     // new
+				break;
 			case POS_3D:
 				write3DPosition((Vector3D) data);
 				break;
@@ -89,6 +96,9 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 				break;
 			case COLOR:
 				writeColor((Color) data);
+				break;
+			case COMPOUND_OBJECT:
+				writeCompoundObject((CompoundObject) data);
 				break;
 			default:
 				logger.errorf("cannot write %s", dataType.toString());
@@ -194,6 +204,25 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
+	public TraCIWriter write2DPositionListWithId(Map<String, VPoint> data){
+		writeUnsignedByte(TraCIDataType.POS_2D_LIST.id);
+		write2DPositionList(data);
+		return this;
+	}
+
+	@Override
+	public TraCIWriter write2DPositionList(Map<String, VPoint> data){
+		writeInt(data.entrySet().size());
+		data.entrySet().stream().forEach(p -> {
+			writeString(p.getKey());
+			VPoint position = p.getValue();
+			writeDouble(position.x);
+			writeDouble(position.y);
+		});
+		return this;
+	}
+
+	@Override
 	public TraCIWriter write3DPosition(Vector3D val){
 		writeUnsignedByte(TraCIDataType.POS_3D.id);
 		writeDouble(val.x);
@@ -269,6 +298,20 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());
 		writeUnsignedByte(color.getAlpha());
+		return this;
+	}
+
+	@Override
+	public TraCIWriter writeCompoundObject(CompoundObject compoundObject) {
+		writeUnsignedByte(TraCIDataType.COMPOUND_OBJECT.id);
+		writeInt(compoundObject.size());
+		Iterator<Pair<TraCIDataType, Object>> iter = compoundObject.itemIterator();
+		while (iter.hasNext()){
+			Pair<TraCIDataType, Object> p = iter.next();
+			if (p.getLeft().equals(TraCIDataType.COMPOUND_OBJECT))
+					throw new TraCIException("Recursive CompoundObject are not allowed.");
+			writeObjectWithId(p.getLeft(), p.getRight());
+		}
 		return this;
 	}
 

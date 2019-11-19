@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.seating.SeatingModel;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;

@@ -15,4 +15,12 @@ public class ElapsedTime extends Stimulus {
         super(time);
     }
 
+    public ElapsedTime(ElapsedTime other) { super(other.time); }
+
+    // Methods
+    @Override
+    public ElapsedTime clone() {
+        return new ElapsedTime(this);
+    }
+
 }

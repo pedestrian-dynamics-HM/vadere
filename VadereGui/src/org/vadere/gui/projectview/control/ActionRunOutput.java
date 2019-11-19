@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.control;
 
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
-import org.vadere.simulator.control.OfflineSimulation;
+import org.vadere.simulator.control.simulation.OfflineSimulation;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.logging.Logger;

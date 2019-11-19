@@ -2,8 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.control.Simulation;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;

@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.scenarioelements.GroupSourceController;
+import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.simulator.models.groups.GroupSizeDeterminator;
@@ -226,7 +228,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	}
 
 	/**
-	 * Test method for {@link org.vadere.simulator.control.SourceController#update(double)}.
+	 * Test method for {@link SourceController#update(double)}.
 	 */
 	@Test
 	public void testUpdateUseFreeSpaceOnly() {

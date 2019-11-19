@@ -2,9 +2,19 @@ package org.vadere.gui.onlinevisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.gui.components.control.*;
-import org.vadere.gui.components.control.simulation.*;
+import org.vadere.gui.components.control.ActionGeneratePoly;
+import org.vadere.gui.components.control.IViewportChangeListener;
+import org.vadere.gui.components.control.JViewportChangeListener;
+import org.vadere.gui.components.control.PanelResizeListener;
+import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
+import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
+import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
+import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
@@ -18,12 +28,13 @@ import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.util.config.VadereConfig;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.swing.*;
 
 public class OnlineVisualisationWindow extends JPanel implements Observer {
 
@@ -181,6 +192,12 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				renderer,
 				model);
 
+		ActionGenerateINETenv generateINETenv = new ActionGenerateINETenv(
+				Messages.getString("ProjectView.btnINETSnapshot.tooltip"),
+				resources.getIcon("camera_tikz.png", iconWidth, iconHeight),
+				renderer,
+				model);
+
 		ActionGeneratePoly generatePoly = new ActionGeneratePoly(
 				Messages.getString("ProjectView.btnPolySnapshot.tooltip"),
 				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
@@ -194,6 +211,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
 		mainPanel.addRendererChangeListener(generateTikz);
+		mainPanel.addRendererChangeListener(generateINETenv);
 		mainPanel.addRendererChangeListener(showPotentialField);
 
 
@@ -221,6 +239,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		imgOptions.add(generatePNG);
 		imgOptions.add(generateSVG);
 		imgOptions.add(generateTikz);
+		imgOptions.add(generateINETenv);
 		imgOptions.add(generatePoly);
 
 		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(

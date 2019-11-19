@@ -240,7 +240,7 @@ public class OSMBehaviorControllerTest {
         pedestrian1.setTargets(targetsPedestrian1);
 
         // Watch out: the closest point to ped1 is (4, 0) while center is (4.5, 0.5).
-        pedestrian1.getAttributes().setAngleCalculationType(AttributesAgent.AngleCalculationType.USE_CENTER);
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CENTER);
 
         // Position of pedestrian2
         pedestrian2.setPosition(new VPoint(2, 0));
@@ -301,7 +301,7 @@ public class OSMBehaviorControllerTest {
         pedestrian1.setTargets(targetsPedestrian1);
 
         // Watch out: the closest point to ped1 is (4, 0) while center is (4.5, 0.5).
-        pedestrian1.getAttributes().setAngleCalculationType(AttributesAgent.AngleCalculationType.USE_CLOSEST_POINT);
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CLOSEST_POINT);
 
         // Position of pedestrian2
         pedestrian2.setPosition(new VPoint(2, 0));
@@ -546,6 +546,94 @@ public class OSMBehaviorControllerTest {
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
         assertEquals(pedestrian2, swapCandidate);
+    }
+
+    @Test
+    public void findSwapCandidateReturnsCandidateIfWalkingDirectionCalculationIsByGradient() {
+        createOppositeDirectionVariation2Topography();
+
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_GRADIENT);
+        pedestrian1.getAttributes().setWalkingDirectionSameIfAngleLessOrEqual(45.0);
+        pedestrian2.setSelfCategory(SelfCategory.COOPERATIVE);
+
+        double searchRadius = 1.5;
+        pedestrian1.getAttributes().setSearchRadius(searchRadius);
+
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
+
+        assertEquals(pedestrian2.getId(), swapCandidate.getId());
+        assertEquals(pedestrian2, swapCandidate);
+    }
+
+    @Test
+    public void findSwapCandidateReturnsCandidateIfWalkingDirectionCalculationIsByTargetCenter() {
+        createOppositeDirectionVariation2Topography();
+
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CENTER);
+        pedestrian1.getAttributes().setWalkingDirectionSameIfAngleLessOrEqual(45.0);
+        pedestrian2.setSelfCategory(SelfCategory.COOPERATIVE);
+
+        double searchRadius = 1.5;
+        pedestrian1.getAttributes().setSearchRadius(searchRadius);
+
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
+
+        assertEquals(pedestrian2.getId(), swapCandidate.getId());
+        assertEquals(pedestrian2, swapCandidate);
+    }
+
+    @Test
+    public void findSwapCandidateReturnsCandidateIfWalkingDirectionCalculationIsByTargetClosestPoint() {
+        createOppositeDirectionVariation2Topography();
+
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CLOSEST_POINT);
+        pedestrian1.getAttributes().setWalkingDirectionSameIfAngleLessOrEqual(45.0);
+        pedestrian2.setSelfCategory(SelfCategory.COOPERATIVE);
+
+        double searchRadius = 1.5;
+        pedestrian1.getAttributes().setSearchRadius(searchRadius);
+
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
+
+        assertEquals(pedestrian2.getId(), swapCandidate.getId());
+        assertEquals(pedestrian2, swapCandidate);
+    }
+
+    @Test
+    public void findSwapCandidateReturnsNullCandidateIfParameterWalkingDirectionSameIfAngleIsTooLarge() {
+        createOppositeDirectionVariation2Topography();
+
+        pedestrian1.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_GRADIENT);
+        pedestrian1.getAttributes().setWalkingDirectionSameIfAngleLessOrEqual(270.0);
+        pedestrian2.setSelfCategory(SelfCategory.COOPERATIVE);
+
+        double searchRadius = 1.5;
+        pedestrian1.getAttributes().setSearchRadius(searchRadius);
+
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
+
+        assertNull(swapCandidate);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findSwapCandidateUsesAttributesFromFirstPedestrian() {
+        createOppositeDirectionVariation2Topography();
+
+        pedestrian2.getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_GRADIENT);
+        pedestrian2.getAttributes().setWalkingDirectionSameIfAngleLessOrEqual(270.0);
+        pedestrian2.setSelfCategory(SelfCategory.COOPERATIVE);
+
+        double searchRadius = 1.5;
+        pedestrian1.getAttributes().setSearchRadius(searchRadius);
+
+        // Exception expected because ped1 requests calculation type "BY_TARGET_CENTER",
+        // but ped2 requests "BY_GRADIENT" which contradicts.
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
     }
 
     @Test

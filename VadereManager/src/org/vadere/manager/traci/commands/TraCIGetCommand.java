@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
@@ -30,6 +31,7 @@ public class TraCIGetCommand extends TraCICommand {
 
 	protected int variableIdentifier;
 	protected String elementIdentifier;
+	protected TraCICommandBuffer cmdBuffer;
 
 	private TraCIGetResponse response;
 
@@ -45,16 +47,25 @@ public class TraCIGetCommand extends TraCICommand {
 		return packet;
 	}
 
+	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data){
+		return TraCIPacket.create()
+				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+						dataType, data);
+	}
+
+
 	public TraCIGetCommand(TraCICmd traCICmd, int variableIdentifier, String elementIdentifier) {
 		super(traCICmd);
 		this.variableIdentifier = variableIdentifier;
 		this.elementIdentifier = elementIdentifier;
+		this.cmdBuffer = TraCICommandBuffer.empty();
 	}
 
 	public TraCIGetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
-		variableIdentifier = cmdBuffer.readUnsignedByte();
-		elementIdentifier = cmdBuffer.readString();
+		this.variableIdentifier = cmdBuffer.readUnsignedByte();
+		this.elementIdentifier = cmdBuffer.readString();
+		this.cmdBuffer = cmdBuffer;
 	}
 
 	public int getVariableIdentifier() {
@@ -81,6 +92,10 @@ public class TraCIGetCommand extends TraCICommand {
 		response.setVariableIdentifier(variableIdentifier);
 		response.setElementIdentifier(elementIdentifier);
 		this.response = response;
+	}
+
+	public TraCICommandBuffer getCmdBuffer() {
+		return cmdBuffer;
 	}
 
 	@Override

@@ -24,6 +24,8 @@ public abstract class ScenarioElement {
 
 	public abstract int getId();
 
+	public abstract void setId(int id);
+
 	public abstract ScenarioElementType getType();
 
 	/**

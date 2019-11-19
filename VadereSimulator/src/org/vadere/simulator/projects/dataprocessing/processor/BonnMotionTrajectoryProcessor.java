@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.BonnMotionKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
