@@ -5,7 +5,7 @@
 ## In Progress:
 
 ### Added
-- Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model in the simulation is a `PotentialFieldModel`.
+- Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.
 - Add `AttributesPedestrianPositionProcessor` to the `PedestrianPositionProcessor` such that the user can disable interpolation (using the default it is enabled), making it more flexible.
 - Positions can now be interpolated i.e. Agents offer two methods: `getPosition` and `getInterpolatedPosition`. `getPosition` returns the Position the model is working with and `getInterpolatedPosition` the position the agent is approximatily at. For ODE-based models both methods return the same position but for footstep based models like the OSM the position is interpolated assuming that an agent performs his current step with a constant speed. This gives more accurate positions for visualizing and computing measures like the density.
 - Added position interpolation to all footstep based models such as the OSM and the BHM which is used for the Postvisualization, Onlinevisualization and the Outputprocessors:
