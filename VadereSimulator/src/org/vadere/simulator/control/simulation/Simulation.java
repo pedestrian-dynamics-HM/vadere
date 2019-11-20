@@ -1,9 +1,9 @@
 package org.vadere.simulator.control.simulation;
 
-import org.vadere.simulator.control.psychology.cognition.SelfCategoryProcessor;
+import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -75,6 +75,7 @@ public class Simulation {
 	private final ScenarioStore scenarioStore;
 	private final MainModel mainModel;
 	private final IPerceptionModel perceptionModel;
+	private final ICognitionModel cognitionModel;
 
 	/** Hold the topography in an extra field for convenience. */
 	private final Topography topography;
@@ -82,19 +83,20 @@ public class Simulation {
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
-	private final SelfCategoryProcessor selfCategoryProcessor;
 	private final ScenarioCache scenarioCache;
 
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
-					  double startTimeInSec, final String name,
-					  ScenarioStore scenarioStore, List<PassiveCallback> passiveCallbacks,
-					  Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners,
-					  boolean singleStepMode, ScenarioCache scenarioCache) {
+					  ICognitionModel cognitionModel, double startTimeInSec,
+					  final String name, ScenarioStore scenarioStore,
+					  List<PassiveCallback> passiveCallbacks, Random random,
+					  ProcessorManager processorManager, SimulationResult simulationResult,
+					  List<RemoteRunListener> remoteRunListeners, boolean singleStepMode,
+					  ScenarioCache scenarioCache) {
 
 		this.name = name;
 		this.mainModel = mainModel;
 		this.perceptionModel = perceptionModel;
+		this.cognitionModel = cognitionModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
@@ -122,8 +124,6 @@ public class Simulation {
 
 		// "stimulusController" is final. Therefore, create object here and not in helper method.
 		this.stimulusController = new StimulusController(scenarioStore);
-		// TODO: Replace by following "IPerception" example.
-		this.selfCategoryProcessor = new SelfCategoryProcessor(topography);
 
 		createControllers(topography, mainModel, random);
 
@@ -394,7 +394,7 @@ public class Simulation {
 		perceptionModel.update(pedestrians, stimuli);
 
 		if (attributesSimulation.isUsePsychologyLayer()) {
-			selfCategoryProcessor.setSelfCategoryOfPedestrian(pedestrians, simTimeInSec);
+			cognitionModel.update(pedestrians);
 		}
 
 		for (Model m : models) {

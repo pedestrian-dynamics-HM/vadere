@@ -12,7 +12,8 @@ import java.util.Random;
  * This class encapsulates the creation of a concrete {@link IPerceptionModel}
  * which is defined by the user in the JSON scenario description.
  *
- * The user provides the simple class name. I.e., no fully qualified classname.
+ * The user provides the simple class name in the JSON scenario file.
+ * I.e., no fully qualified classname.
  */
 public class PerceptionModelBuilder {
 

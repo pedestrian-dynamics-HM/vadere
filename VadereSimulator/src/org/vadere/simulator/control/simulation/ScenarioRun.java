@@ -2,6 +2,8 @@ package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
 import org.vadere.simulator.models.MainModel;
@@ -147,19 +149,20 @@ public class ScenarioRun implements Runnable {
 				}
 
 				IPerceptionModel perceptionModel = PerceptionModelBuilder.instantiateModel(scenarioStore);
+				ICognitionModel cognitionModel = CognitionModelBuilder.instantiateModel(scenarioStore);
 
 				// ensure all elements have unique id before attributes are sealed
 				scenario.getTopography().generateUniqueIdIfNotSet();
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				// TODO: Add "PerceptionModel" to "Simulation" contructor.
 				simulation = new Simulation(mainModel, perceptionModel,
-						0.0, scenarioStore.getName(),
-						scenarioStore, passiveCallbacks,
-						random, processorManager,
-						simulationResult, remoteRunListeners,
-						singleStepMode, scenarioCache);
+						cognitionModel, 0.0,
+						scenarioStore.getName(), scenarioStore,
+						passiveCallbacks, random,
+						processorManager, simulationResult,
+						remoteRunListeners, singleStepMode,
+						scenarioCache);
 			}
 
 			simulation.run();
