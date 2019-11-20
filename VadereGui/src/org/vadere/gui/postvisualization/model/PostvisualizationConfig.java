@@ -17,7 +17,7 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 
 	private int fps = CONFIG.getInt("PostVis.framesPerSecond");
 	private final int MAX_VELOCITY = CONFIG.getInt("PostVis.maxFramePerSecond");
-	private double visTimeStepLength = CONFIG.getDouble("PostVis.visTimeStepLength");
+	private double timeResolution = CONFIG.getDouble("PostVis.timeResolution");
 	private Observable observable;
 
 	public PostvisualizationConfig() {}
@@ -37,9 +37,9 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 		setChanged();
 	}
 
-	public void setVisTimeStepLength(double visTimeStepLength) {
-		this.visTimeStepLength = visTimeStepLength;
-		CONFIG.setProperty("PostVis.visTimeStepLength", visTimeStepLength);
+	public void setTimeResolution(double timeResolution) {
+		this.timeResolution = timeResolution;
+		CONFIG.setProperty("PostVis.timeResolution", timeResolution);
 		setChanged();
 	}
 
@@ -47,8 +47,8 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 		return fps;
 	}
 
-	public double getVisTimeStepLength() {
-		return visTimeStepLength;
+	public double getTimeResolution() {
+		return timeResolution;
 	}
 
 	public int getMaxVelocity() {
