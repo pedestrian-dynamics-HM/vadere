@@ -60,6 +60,7 @@ public class CellGridTest {
 		compare(cellGrid.asTable(), cellGrid);
 	}
 
+
 	private void compare(Table t, CellGrid cellGrid){
 		for (int row = 0; row < cellGrid.numPointsY; row++) {
 			for (int col = 0; col < cellGrid.numPointsX; col++) {

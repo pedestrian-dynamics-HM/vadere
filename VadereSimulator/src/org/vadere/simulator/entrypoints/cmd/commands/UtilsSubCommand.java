@@ -54,6 +54,8 @@ public class UtilsSubCommand implements SubCommandRunner {
 
 	private Scenario createScenario(String path) throws IOException {
 		Scenario scenario = null;
+
+		path = path.replace("~", System.getProperty("user.home"));
 		try {
 			scenario = ScenarioFactory.createScenarioWithScenarioFilePath(Paths.get(path));
 		} catch (IOException e) {
@@ -82,7 +84,7 @@ public class UtilsSubCommand implements SubCommandRunner {
 	 *  Return the hash used to check if a new cache value needed to be calculated.
 	 */
 	private void getHash(Namespace ns, ArgumentParser parser) throws Exception{
-		Scenario scenario = createScenario(ns.getString("scenario-file"));
+		Scenario scenario = createScenario(ns.getString("input"));
 		System.out.println(ScenarioCache.getHash(scenario));
 	}
 
@@ -103,7 +105,7 @@ public class UtilsSubCommand implements SubCommandRunner {
 	 * 	To ensure recalculation use a clean output directory
 	 */
 	private void calculateCache(Namespace ns, ArgumentParser parser, CacheType cacheType) throws Exception{
-		Scenario scenario = createScenario(ns.getString("scenario-file"));
+		Scenario scenario = createScenario(ns.getString("input"));
 		if (ns.getString("output") == null){
 			logger.errorf("need output folder for this method");
 			System.exit(-1);

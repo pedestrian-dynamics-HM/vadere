@@ -138,7 +138,7 @@ public class Simulation {
 	}
 
 	private void createControllers(Topography topography, MainModel mainModel, Random random) {
-		this.topographyController = new TopographyController(topography, mainModel);
+		this.topographyController = new TopographyController(topography, mainModel, random);
 
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory

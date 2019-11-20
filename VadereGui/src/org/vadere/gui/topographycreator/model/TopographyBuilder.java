@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeModifier;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
@@ -14,7 +15,10 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A TopographyBuilder builds a Topography-Object step by step. After the Topography-Object is build
@@ -44,6 +48,8 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
 
+	private AtomicInteger idProvider;
+
 	/**
 	 * Default-Constructor that initialize an empty TopographyBuilder.
 	 */
@@ -58,6 +64,8 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		absorbingAreas = new LinkedList<>();
 		topographyElements = new LinkedList<>();
 		attributes = new AttributesTopography();
+
+		idProvider = new AtomicInteger(1);
 	}
 
 	/**
@@ -89,12 +97,28 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topographyElements = new LinkedList<>();
 		topographyElements.addAll(obstacles);
 		topographyElements.addAll(stairs);
-		topographyElements.addAll(pedestrians);
 		topographyElements.addAll(sources);
 		topographyElements.addAll(targets);
 		topographyElements.addAll(targetChangers);
 		topographyElements.addAll(measurementAreas);
 		topographyElements.addAll(absorbingAreas);
+		topographyElements.addAll(pedestrians);
+
+		idProvider = new AtomicInteger(1);
+	}
+
+	private void setIds(){
+		Set<Integer> usedIds = topographyElements.stream().map(ScenarioElement::getId).filter(id-> id != Attributes.ID_NOT_SET).collect(Collectors.toSet());
+
+		topographyElements.stream()
+				.filter(e -> e.getId() == Attributes.ID_NOT_SET)
+				.forEach(e -> {
+					while (usedIds.contains(idProvider.get())){
+						idProvider.incrementAndGet();
+					}
+					usedIds.add(idProvider.get());
+					e.setId(idProvider.get());
+				});
 	}
 
 	/**
@@ -152,6 +176,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 
 		topography.setTeleporter(teleporter);
 
+		setIds();
 		return topography;
 	}
 
