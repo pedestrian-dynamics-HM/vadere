@@ -259,6 +259,7 @@ public class VadereConfig {
         defaultConfig.put("ProjectView.defaultDirectoryAttributes", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryScenarios", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryOutputProcessors", defaultSearchDirectory);
+        defaultConfig.put("Project.simulationResult.show", "true");
         defaultConfig.put("SettingsDialog.dataFormat", "yyyy_MM_dd_HH_mm_ss");
         defaultConfig.put("SettingsDialog.outputDirectory.path", ".");
         defaultConfig.put("SettingsDialog.snapshotDirectory.path", ".");
