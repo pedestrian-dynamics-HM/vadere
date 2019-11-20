@@ -54,7 +54,7 @@ public class IOVadere {
 	public static VadereProject readProject(final String projectPath, final MigrationOptions options) throws IOException {
 		String path = Paths.get(projectPath, IOUtils.VADERE_PROJECT_FILENAME).toString();
 		String name = IOUtils.readTextFile(path);
-		logger.info(String.format("Read project: %s", path));
+		logger.info(String.format("read project: %s", path));
 
 		List<Scenario> scenarios = new ArrayList<>();
 		Set<String> scenarioNames = new HashSet<>();
@@ -64,14 +64,17 @@ public class IOVadere {
 
 			MigrationAssistant migrationAssistant = MigrationAssistant.getNewInstance(options);
 			migrationStats = migrationAssistant.analyzeProject(projectPath);
-			logger.info("Analyzed scenario files.");
+			logger.info("analyzed scenario files.");
+
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
 					Scenario scenario =
 							JsonConverter.deserializeScenarioRunManager(IOUtils.readTextFile(file.getAbsolutePath()));
 					if (!scenarioNames.add(scenario.getName())) {
-						logger.error("There are two scenarios with the same name!");
-						throw new IOException("Found two scenarios with the same name.");
+						String errorMessage = String.format("There are two scenarios with the same name: %s\nConflicting file: %s",
+								scenario.getName(), file.getAbsolutePath());
+						logger.error(errorMessage);
+						throw new IOException(errorMessage);
 					}
 					scenarios.add(scenario);
 				} catch (Exception e) {

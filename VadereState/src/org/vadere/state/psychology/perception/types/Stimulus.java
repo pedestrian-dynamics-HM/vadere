@@ -39,7 +39,7 @@ import java.util.List;
 })
 // "time" is set when the stimulus is actually into the simulation and must not be de-/serialized.
 @JsonIgnoreProperties({ "time" })
-public abstract class Stimulus {
+public abstract class Stimulus implements Cloneable {
 
     // Member Variables
     protected double time;
@@ -54,6 +54,10 @@ public abstract class Stimulus {
         this.time = time;
     }
 
+    protected Stimulus(Stimulus other) {
+        this(other.time);
+    }
+
     // Getter
     public double getTime() {
         return time;
@@ -63,6 +67,10 @@ public abstract class Stimulus {
     public void setTime(double time) {
         this.time = time;
     }
+
+    // Methods
+    @Override
+    public abstract Stimulus clone();
 
     // Static Methods
     public static boolean listContainsStimulus(List<Stimulus> stimuli, Class<? extends Stimulus> eventToCheck) {

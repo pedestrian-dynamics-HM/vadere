@@ -1,15 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.control.SimulationState;
-import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.util.logging.Logger;
 import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
-
-import java.util.Optional;
 
 @DataProcessorClass
 public class PedestrianGroupSizeProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> implements ModelFilter {

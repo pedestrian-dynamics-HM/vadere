@@ -5,13 +5,41 @@
 ## In Progress:
 
 ### Added
-
+- Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.
+- Add `AttributesPedestrianPositionProcessor` to the `PedestrianPositionProcessor` such that the user can disable interpolation (using the default it is enabled), making it more flexible.
+- Positions can now be interpolated i.e. Agents offer two methods: `getPosition` and `getInterpolatedPosition`. `getPosition` returns the Position the model is working with and `getInterpolatedPosition` the position the agent is approximatily at. For ODE-based models both methods return the same position but for footstep based models like the OSM the position is interpolated assuming that an agent performs his current step with a constant speed. This gives more accurate positions for visualizing and computing measures like the density.
 - Added new scenario element `TargetChanger`. This scenario element has an arbitrary shape and changes the target of an agent. Either to another static target or to another agent (to get a follower behavior). A `TargetChanger` has two important parameters:
   * `changeTargetProbability`: This defines how many percent of the agents, who enter the area, should change their target.
   * `nextTargetIsPedestrian`: If `nextTargetIsPedestrian == false`, assign a new static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
+- Add Scenario Hash to info panel below of the TopographyCreator and Post-Visualisation View:
+  * will show if changes to the scenario will change the floorfield 
+  * Hover over hash to see full value
+  * Left-Click to copy full hash to clipboard.
+- TraCI commands: 
+  * getHash: return Scenario hash for given scenario 
+  * CompoundObject implementation to allow complex get/set commands (i.e. create pedestrian hat 
+    random location during simulation run)
+- osm2vadere converter:
+  * it is possible to specify a way with the tag `area-of-intrest` (AOI). If this is present and the 
+    corresponding command line argument is given, only elements within the bounding box of the
+    AOI will be converted.
+- Add INET environment export:
+  * create an INET environment xml file based on the current topography. For now only prism shapes 
+    are possible with a fixed height of 5m.
+- vadere-console `utils` subCommand:
+  * A miscellaneous collector of simple function operating on a single scenario file.
+  * -f (input file or directory depending on method m [required]) 
+  * -o (ouput file or directory depending on method m [optional]) 
+  * -m (name of method.) See subparser help for allowed functions.
+  * currently implementd:
+    * `getHash`: Hash value of given scenario. (-o option ignored)
+    * `binCache`: calculate binary cache (-o must be a directory. If missing it will be created)
+    * `txtCache`: calculate text based cache (-o must be a directory. If missing it will be created)
+
 
 ### Changed
 
+- The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
 Was previously known as `PedestrianFootStepProcessor`
 - Use following shortcuts for zooming and scrolling in the topography creator:
@@ -19,8 +47,22 @@ Was previously known as `PedestrianFootStepProcessor`
   * Mouse Wheel Scroll: Scroll vertically.
   * Shift + Mouse Wheel Scroll: Scroll horizontally.
   * Use Alt key to decrease the step size while scrolling.
+- CachePath lookup:
+  The new cache lookup now allows a 'global' lookup. Previously all cache files are saved in 
+  a `__cache__` folder relative (as sibling) to the currently running scenario file. This works 
+  good for local testing and runs. However, if one scenario is duplicated and integrated in other 
+  projects the same cache would be created at multiple locations. The current solution would be 
+  to enter an absolute path as the `cacheDir` but this will break interoperatbility between 
+  windows and linux as well as sharing scenario files with other users. CacheDir Lookup order:
+  1. `cacheDir` is an absolute path: Use it; and log the path to console.
+  2. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=false` (default): 
+     save cache in a `__cache__` folder relative (as sibling) to the currently running scenario file
+  3. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=true`:
+     Lookup `Vadere.cache.flobalCacheBaseDir` and use this as the base path for the relative 
+     `cacheDir` path. `Vadere.cache.flobalCacheBaseDir` defaults to `${user.home}\.cache\vadere`
+  
 
-# v1.4 (2019-09-05)
+## v1.4 (2019-09-05)
 
 ### Changed 
 
@@ -92,11 +134,14 @@ Was previously known as `PedestrianFootStepProcessor`
   - add option to include osm ids into each obstacle created
 
 `PostVis` added functionalities:
-- the PostVis works now on the basis of simulation time instead of time steps. Agents' position will be interpolated.
+- the PostVis (optionally) works now on the basis of simulation time instead of time steps. Agents' position will be interpolated. The option can be enabled and disabled via the `SettingsDialog`
     - the user can jump to a specific simulation time
     - the user can step forward by steps as small as 0.01s
     - the user can make videos using also this new feature which results in very smooth movement
     - the frames per seconds (FPS) is now more accurate
+
+`OnlineVis` added functionalities:
+- the OnlineVis (optionally) works now on the basis of simulation time instead of time steps. Agents' position will be interpolated. The option can be enabled and disabled via the `SettingsDialog`.
 
 ### Changed
 

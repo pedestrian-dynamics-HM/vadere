@@ -17,6 +17,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.random.IReachablePointProvider;
+import org.vadere.util.random.SimpleReachablePointProvider;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -27,21 +30,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId"})
+@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId", "reachablePointProvider"})
 public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	/** A function which gives the distance to the closest obstacle for any point inside the topography bound */
-	private Function<IPoint, Double> obstacleDistanceFunction;
-
+	private IDistanceFunction obstacleDistanceFunction;
+	private IReachablePointProvider reachablePointProvider;
 	/** A possible empty string identifying a context object. */
 	private String contextId;
 
@@ -62,6 +64,7 @@ public class Topography implements DynamicElementMover{
 	 * Sources of scenario by id. Tree maps ensures same update order during
 	 * iteration between frames.
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final List<Source> sources;
 	/**
 	 * Targets of scenario by id. Tree maps ensures same update order during
@@ -71,6 +74,7 @@ public class Topography implements DynamicElementMover{
 	/**
 	 * TargetChangers of scenario
 	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<TargetChanger> targetChangers;
 	/**
 	 * AbsorbingAreas of scenario by id. Tree maps ensures same update order during
@@ -96,7 +100,9 @@ public class Topography implements DynamicElementMover{
 	private transient final DynamicElementContainer<Car> cars;
 	private boolean recomputeCells;
 
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesAgent attributesPedestrian;
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesCar attributesCar;
 
 	/** Used to get attributes of all scenario elements. */
@@ -149,7 +155,18 @@ public class Topography implements DynamicElementMover{
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		recomputeCells = false;
 
-		this.obstacleDistanceFunction = p -> obstacles.stream().map(obs -> obs.getShape()).map(shape -> shape.distance(p)).min(Double::compareTo).orElse(Double.MAX_VALUE);
+		this.obstacleDistanceFunction = point ->  obstacles.stream()
+				.map(Obstacle::getShape)
+				.map(shape -> shape.distance(point))
+				.min(Double::compareTo)
+				.orElse(Double.MAX_VALUE);
+
+		// some meaningful default value if used before simulation is started.
+		// will be replaced in the preeLoop like the obstacleDistanceFunction
+		this.reachablePointProvider = SimpleReachablePointProvider.uniform(
+				new Random(42), getBounds(), obstacleDistanceFunction);
+
+
 		this.dynamicElementIdCounter = new AtomicInteger(1);
 		this.contextId = "";
 	}
@@ -205,7 +222,19 @@ public class Topography implements DynamicElementMover{
 		return this.obstacleDistanceFunction.apply(point);
 	}
 
-	public void setObstacleDistanceFunction(@NotNull Function<IPoint, Double> obstacleDistanceFunction) {
+	public IDistanceFunction getObstacleDistanceFunction() {
+			return obstacleDistanceFunction;
+	}
+
+	public IReachablePointProvider getReachablePointProvider() {
+		return reachablePointProvider;
+	}
+
+	public void setReachablePointProvider(@NotNull IReachablePointProvider reachablePointProvider) {
+		this.reachablePointProvider = reachablePointProvider;
+	}
+
+	public void setObstacleDistanceFunction(@NotNull IDistanceFunction obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
 	}
 
@@ -654,6 +683,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
 		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
+		usedIds.addAll(getInitialElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -680,6 +710,11 @@ public class Topography implements DynamicElementMover{
 				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 
 		absorbingAreas.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+
+		getInitialElements(Pedestrian.class).stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 	}

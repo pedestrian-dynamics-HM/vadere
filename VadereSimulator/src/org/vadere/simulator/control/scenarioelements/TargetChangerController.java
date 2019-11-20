@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -160,9 +160,7 @@ public class TargetChangerController {
     }
 
     private void useStaticTargetForAgent(Agent agent) {
-        LinkedList<Integer> newTarget = new LinkedList<>();
-        newTarget.add(targetChanger.getAttributes().getNextTarget());
-        agent.setTargets(newTarget);
+        agent.setSingleTarget(targetChanger.getAttributes().getNextTarget(), false);
     }
 
     private void notifyListenersTargetChangerAreaReached(final Agent agent) {

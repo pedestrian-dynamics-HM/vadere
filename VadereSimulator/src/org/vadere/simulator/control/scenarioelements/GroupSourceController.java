@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.scenarioelements;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.util.GroupSpawnArray;

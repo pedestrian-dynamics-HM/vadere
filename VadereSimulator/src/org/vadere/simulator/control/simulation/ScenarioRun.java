@@ -1,4 +1,4 @@
-package org.vadere.simulator.control;
+package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.examples.MeshExamples;

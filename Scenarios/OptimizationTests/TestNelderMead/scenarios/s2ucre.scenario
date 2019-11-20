@@ -1,7 +1,7 @@
 {
   "name" : "s2ucre",
   "description" : "",
-  "release" : "1.5",
+  "release" : "1.6",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.11145469470145097,
-        "maxMeanDifferenceFuncValue" : 0.023782107248396297,
-        "infoMinPointDistanceL2" : 0.005467775994727584,
-        "infoMaxPointDistanceL2" : 0.6825148285371956,
-        "infoMinFuncDifference" : 1.0532856536293878E-4,
-        "infoMaxFuncDifference" : 0.10498155287141664,
-        "infoStddevPointDistance" : 0.07134475478590001,
-        "infoStddevDifferenceFuncValue" : 0.0122377396313633
+        "maxMeanPointDistance" : 0.0899909260756839,
+        "maxMeanDifferenceFuncValue" : 0.02454599248184318,
+        "infoMinPointDistanceL2" : 0.00486214225177224,
+        "infoMaxPointDistanceL2" : 0.5618698000962584,
+        "infoMinFuncDifference" : 1.8282880538400548E-4,
+        "infoMaxFuncDifference" : 0.115304814384805,
+        "infoStddevPointDistance" : 0.07170356699761087,
+        "infoStddevDifferenceFuncValue" : 0.01275342857630046
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -272,8 +272,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "angleCalculationType" : "USE_CENTER",
-        "targetOrientationAngleThreshold" : 45.0
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null

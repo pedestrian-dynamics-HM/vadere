@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.reader;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.LightPhase;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
@@ -15,8 +16,9 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * A {@link ByteBuffer} based implementation of the {@link TraCIReader} interface.
@@ -123,6 +125,22 @@ public class TraCIByteBuffer implements TraCIReader {
 	}
 
 	@Override
+	public Map<String, VPoint> read2DPositionList(){
+	    // the problem may be in this function
+		ensureBytes(4); // 1x int
+		int numOfKeyValuePairs = byteBuffer.getInt();
+
+		Map<String, VPoint> map = new HashMap<String, VPoint>();
+		for(int i=0; i < numOfKeyValuePairs; i++){
+			String id = readString();
+			VPoint position = read2DPosition();
+			map.put(id, position);
+		}
+
+		return map;
+	}
+
+	@Override
 	public Vector3D read3DPosition(){
 		// id already consumed
 		ensureBytes(24); // 3x double
@@ -209,6 +227,23 @@ public class TraCIByteBuffer implements TraCIReader {
 	}
 
 	@Override
+	public CompoundObject readCompoundObject(){
+		ensureBytes(4);
+		int noElements = readInt();
+
+		CompoundObject compoundObject = new CompoundObject(noElements);
+
+		for(int i = 0; i < noElements; i++){
+			TraCIDataType type = TraCIDataType.fromId(readUnsignedByte());
+			if (type.equals(TraCIDataType.COMPOUND_OBJECT))
+				throw new TraCIException("Recursive CompoundObject are not allowed.");
+			compoundObject.add(type, readTypeValue(type));
+		}
+
+		return compoundObject;
+	}
+
+	@Override
 	public Object readTypeValue(TraCIDataType type) {
 
 		switch (type){
@@ -226,6 +261,8 @@ public class TraCIByteBuffer implements TraCIReader {
 				return readStringList();
 			case POS_2D:
 				return read2DPosition();
+			case POS_2D_LIST:
+				return read2DPositionList();
 			case POS_3D:
 				return read3DPosition();
 			case POS_ROAD_MAP:
@@ -241,7 +278,7 @@ public class TraCIByteBuffer implements TraCIReader {
 			case COLOR:
 				return readColor();
 			case COMPOUND_OBJECT:
-				return null; // todo: simple fix. For now we ignore Compound Objects.
+				return readCompoundObject();
 			default:
 				throw new TraCIException("Unknown Datatype: " + type.toString());
 		}

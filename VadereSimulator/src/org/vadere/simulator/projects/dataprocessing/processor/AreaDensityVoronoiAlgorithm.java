@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VPoint;
