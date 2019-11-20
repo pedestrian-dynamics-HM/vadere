@@ -5,7 +5,11 @@
 ## In Progress:
 
 ### Added
-
+- Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model in the simulation is a `PotentialFieldModel`.
+- Add `AttributesPedestrianPositionProcessor` to the `PedestrianPositionProcessor` such that the user can disable interpolation (using the default it is enabled), making it more flexible.
+- Positions can now be interpolated i.e. Agents offer two methods: `getPosition` and `getInterpolatedPosition`. `getPosition` returns the Position the model is working with and `getInterpolatedPosition` the position the agent is approximatily at. For ODE-based models both methods return the same position but for footstep based models like the OSM the position is interpolated assuming that an agent performs his current step with a constant speed. This gives more accurate positions for visualizing and computing measures like the density.
+- Added position interpolation to all footstep based models such as the OSM and the BHM which is used for the Postvisualization, Onlinevisualization and the Outputprocessors:
+  * Postvisualization: It is a new option which can be disabled and enabled in the `SettingsDialog`. If disabled the 
 - Added new scenario element `TargetChanger`. This scenario element has an arbitrary shape and changes the target of an agent. Either to another static target or to another agent (to get a follower behavior). A `TargetChanger` has two important parameters:
   * `changeTargetProbability`: This defines how many percent of the agents, who enter the area, should change their target.
   * `nextTargetIsPedestrian`: If `nextTargetIsPedestrian == false`, assign a new static target. Otherwise, randomly choose a pedestrian (with given target id) to follow.
@@ -37,6 +41,7 @@
 
 ### Changed
 
+- The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
 Was previously known as `PedestrianFootStepProcessor`
 - Use following shortcuts for zooming and scrolling in the topography creator:
@@ -131,11 +136,14 @@ Was previously known as `PedestrianFootStepProcessor`
   - add option to include osm ids into each obstacle created
 
 `PostVis` added functionalities:
-- the PostVis works now on the basis of simulation time instead of time steps. Agents' position will be interpolated.
+- the PostVis (optionally) works now on the basis of simulation time instead of time steps. Agents' position will be interpolated. The option can be enabled and disabled via the `SettingsDialog`
     - the user can jump to a specific simulation time
     - the user can step forward by steps as small as 0.01s
     - the user can make videos using also this new feature which results in very smooth movement
     - the frames per seconds (FPS) is now more accurate
+
+`OnlineVis` added functionalities:
+- the OnlineVis (optionally) works now on the basis of simulation time instead of time steps. Agents' position will be interpolated. The option can be enabled and disabled via the `SettingsDialog`.
 
 ### Changed
 
