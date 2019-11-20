@@ -392,17 +392,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	@Override
 	public void simulationapi_createWaitingArea(String[] args) throws IOException{
 		if(args.length < 3){
-			System.out.println("command needs argument element id, list of polygon corners");
+			System.out.println("command needs argument time, list of polygon corners");
 			return;
 		}
 
 		String elementIdentifier = args[1];
+		double startTime = Double.parseDouble(args[2]);
+		double endTime = Double.parseDouble(args[3]);
+		int repeat = Integer.parseInt(args[4]);
+		double waitTimeBetweenRepetition = Double.parseDouble(args[5]);
+		double time = Double.parseDouble(args[6]);
 		ArrayList<String> polyCorners = new ArrayList<String>();
-		for(int i = 2; i < args.length; i++){
+		for(int i = 7; i < args.length; i++){
 			polyCorners.add(args[i]);
 		}
 
-		CompoundObject compoundObject = CompoundObjectBuilder.createWaitingArea(elementIdentifier, polyCorners);
+		CompoundObject compoundObject = CompoundObjectBuilder.createWaitingArea(elementIdentifier, startTime, endTime, repeat, waitTimeBetweenRepetition, time, polyCorners);
 		TraCIResponse res = simulationapi.createWaitingArea(elementIdentifier, compoundObject);
 		System.out.println(res.toString());
 	}

@@ -19,15 +19,15 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation {
@@ -458,6 +458,18 @@ public class Simulation {
 		targetChangerControllers.add(controller);
 	}
 
+	synchronized void addWaitingArea(WaitInArea wia, Timeframe tf){
+		List<Stimulus> als = new ArrayList<Stimulus>();
+		als.add(wia);
+		StimulusInfo si = new StimulusInfo();
+		si.setStimuli(als);
+		si.setTimeframe(tf);
+		List<StimulusInfo> alsi = new ArrayList<StimulusInfo>();
+		alsi.add(si);
+		stimulusController.setRecurringStimuli(alsi);
+		//stimulusProcessor.prioritizeStimuliForPedestrians(als);
+	}
+
 	synchronized SimulationState getSimulationState(){
 		return simulationState;
 	}
@@ -495,6 +507,10 @@ public class Simulation {
 
 	public void setStartTimeInSec(double startTimeInSec) {
 		this.startTimeInSec = startTimeInSec;
+	}
+
+	public StimulusController getStimulusController(){
+		return stimulusController;
 	}
 
 }

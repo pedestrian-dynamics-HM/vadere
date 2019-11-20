@@ -805,6 +805,23 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ {
+      "timeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 10.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "stimuli" : [ {
+        "type" : "WaitInArea",
+        "area" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 10.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        }
+      } ]
+    } ]
   }
 }

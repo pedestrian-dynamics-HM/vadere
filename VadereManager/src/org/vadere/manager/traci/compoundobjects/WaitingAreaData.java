@@ -10,14 +10,45 @@ import java.util.ArrayList;
 public class WaitingAreaData extends GenericCompoundObject {
 
     String id;
+    double startTime, endTime, waitTimeBetweenRepetition, time;
+    int repeat;
     ArrayList<String> points;
 
-    public WaitingAreaData(CompoundObject o) { super(o, 2); }
+    public WaitingAreaData(CompoundObject o) { super(o, 7); }
+
+    public double getStartTime() {
+        return startTime;
+    }
+
+    public double getEndTime() {
+        return endTime;
+    }
+
+    public double getWaitTimeBetweenRepetition() {
+        return waitTimeBetweenRepetition;
+    }
+
+    public int getRepeat() {
+        return repeat;
+    }
+
+    public boolean getRepeatAsBool(){
+        if(repeat == 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
     @Override
     protected void init(CompoundObject o) {
         id = (String)o.getData(0, TraCIDataType.STRING);
-        points = (ArrayList<String>)o.getData(1, TraCIDataType.STRING_LIST);
+        startTime = (double)o.getData(1, TraCIDataType.DOUBLE);
+        endTime = (double)o.getData(2, TraCIDataType.DOUBLE);
+        repeat = (int)o.getData(3, TraCIDataType.INTEGER);
+        waitTimeBetweenRepetition = (double)o.getData(4, TraCIDataType.DOUBLE);
+        time = (double)o.getData(5, TraCIDataType.DOUBLE);
+        points = (ArrayList<String>)o.getData(6, TraCIDataType.STRING_LIST);
     }
 
     public String getId() {
@@ -26,6 +57,10 @@ public class WaitingAreaData extends GenericCompoundObject {
 
     public int getIdAsInt() {
         return Integer.parseInt(id);
+    }
+
+    public double getTime() {
+        return time;
     }
 
     public ArrayList<String> getPoints() {

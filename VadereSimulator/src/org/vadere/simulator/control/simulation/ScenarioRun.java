@@ -3,6 +3,7 @@ package org.vadere.simulator.control.simulation;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.context.Context;
 import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -14,6 +15,8 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
@@ -208,6 +211,10 @@ public class ScenarioRun implements Runnable {
 
 	public void addTargetChangeController(TargetChangerController controller){
 		simulation.addTargetChangeController(controller);
+	}
+
+	public void addWaitingArea(WaitInArea wia, Timeframe tf){
+		simulation.addWaitingArea(wia, tf);
 	}
 
 	public void pause() {
