@@ -1,7 +1,8 @@
 {
-  "name" : "map_mf_small_2",
+  "name" : "mf_base",
   "description" : "",
   "release" : "1.6",
+  "commithash" : "6d1bf2389d9aa8765a6d5bd41980ef77ed9aa1fa",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
