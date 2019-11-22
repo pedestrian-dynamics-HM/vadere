@@ -17,11 +17,9 @@ public class TraCIEntryPoint {
     protected org.vadere.manager.client.traci.PolygonAPI polygonapi;
     protected org.vadere.manager.client.traci.PersonAPI personapi;
 
-    public TraCIEntryPoint(TraCISocket socket) {
-        simulationapi = new org.vadere.manager.client.traci.SimulationAPI(socket);
-        polygonapi = new org.vadere.manager.client.traci.PolygonAPI(socket);
-        personapi = new org.vadere.manager.client.traci.PersonAPI(socket);
-    }
+    private boolean running;
+    private int port;
+    private TraCISocket traCISocket;
 
     public SimulationAPI getSimulationapi() {
         return simulationapi;
@@ -35,17 +33,26 @@ public class TraCIEntryPoint {
         return personapi;
     }
 
-    //todo main....  https://www.py4j.org/getting_started.html
     public static void main(String[] args) throws IOException, InterruptedException {
-        int port = 9999;
-        TraCISocket traCISocket;
+
+        TraCIEntryPoint entryPoint = new TraCIEntryPoint();
+        entryPoint.establishConnection();
+        entryPoint.connectApi();
+
+        GatewayServer gatewayServer = new GatewayServer(entryPoint);
+        gatewayServer.start();
+        System.out.println("Gateway Server Started");
+    }
+
+    private void establishConnection() throws IOException, InterruptedException {
+        port = 9999;
         Socket socket = new Socket();
         socket.setTcpNoDelay(true);
         int waitTime = 500; //ms
-        System.out.println("Connect to 127.0.0.1:" + port);
+        System.out.println("Connect to 127.0.0.1:" + this.port);
         for (int i = 0; i < 14; i++) {
             try {
-                socket.connect(new InetSocketAddress("127.0.0.1", port));
+                socket.connect(new InetSocketAddress("127.0.0.1", this.port));
                 break;
             } catch (ConnectException ex) {
                 Thread.sleep(waitTime);
@@ -61,8 +68,12 @@ public class TraCIEntryPoint {
         System.out.println("connected...");
         traCISocket = new TraCISocket(socket);
 
-        GatewayServer gatewayServer = new GatewayServer(new TraCIEntryPoint(traCISocket));
-        gatewayServer.start();
-        System.out.println("Gateway Server Started");
+        running = true;
+    }
+
+    private void connectApi(){
+        simulationapi = new org.vadere.manager.client.traci.SimulationAPI(traCISocket);
+        polygonapi = new org.vadere.manager.client.traci.PolygonAPI(traCISocket);
+        personapi = new org.vadere.manager.client.traci.PersonAPI(traCISocket);
     }
 }
