@@ -1,13 +1,15 @@
 package org.vadere.gui.onlinevisualization.view;
 
-import java.util.*;
-
 import org.vadere.gui.components.control.IMode;
-import org.vadere.gui.components.control.RectangleSelectionMode;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.ScaleablePanel;
 import org.vadere.gui.onlinevisualization.control.OnlineVisSelectionMode;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 
 /**
@@ -31,7 +33,8 @@ public class MainPanel extends ScaleablePanel implements Observer {
 	private final OnlineVisualizationModel model;
 	private List<IRendererChangeListener> rendererChangeListeners;
 	private static Resources resources = Resources.getInstance("global");
-	private IMode selectionMode = null;
+	private IMode selectionMode;
+
 
 	/** Creates a new main panel. */
 	public MainPanel(final OnlineVisualizationModel model) {
@@ -39,11 +42,30 @@ public class MainPanel extends ScaleablePanel implements Observer {
 		this.model = model;
 		this.rendererChangeListeners = new ArrayList<>();
 
-		RectangleSelectionMode selectionMode = new OnlineVisSelectionMode(model);
+		this.selectionMode = new OnlineVisSelectionMode(model);
 		addMouseListener(selectionMode);
 		addMouseMotionListener(selectionMode);
 		addMouseWheelListener(selectionMode);
 	}
+
+	// [issue 280] remove listener if model is not valid.
+	public void addListener(){
+		if (selectionMode == null)
+			selectionMode = new OnlineVisSelectionMode(model);
+			addMouseListener(selectionMode);
+			addMouseMotionListener(selectionMode);
+			addMouseWheelListener(selectionMode);
+	}
+
+	// [issue 280] add listener if model is valid.
+	public void removeListeners(){
+		if (selectionMode != null){
+			removeMouseListener(this.selectionMode);
+			removeMouseMotionListener(this.selectionMode);
+			removeMouseWheelListener(this.selectionMode);
+		}
+	}
+
 
 	public void addRendererChangeListener(final IRendererChangeListener listener) {
 		rendererChangeListeners.add(listener);
