@@ -1,10 +1,13 @@
 from py4j.java_gateway import JavaGateway
+from IPython import embed
 
 if __name__ == '__main__':
 
     gateway = JavaGateway()
     entryPoint = gateway.entry_point
 
-    personApi = entryPoint.getPersonapi()
-    simulationApi = entryPoint.getSimulationapi()
-    polygonApi = entryPoint.getPolygonapi()
+    pers = entryPoint.getPersonapi()
+    sim = entryPoint.getSimulationapi()
+    poly = entryPoint.getPolygonapi()
+
+    embed()
