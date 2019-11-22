@@ -109,7 +109,7 @@ public class OnlineVisualization implements PassiveCallback {
 		onlineVisualisationPanel.setVisible(false);
 		model.reset();
 
-		// [issue 280] activate mouse listeners because model is not valid anymore
+		// [issue 280] deactivate mouse listeners because model is not valid anymore
 		window.removeListeners();
 	}
 
