@@ -1,21 +1,28 @@
 from py4j.java_gateway import JavaGateway, java_import
 from IPython import embed
 from pythontraciwrapper import PersonapiWrapper
+from pythontraciwrapper import ControllWrapper
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    # start
-    gateway = JavaGateway()
-    entryPoint = gateway.entry_point
+# start
+gateway = JavaGateway()
+entryPoint = gateway.entry_point
 
-    # api
-    personapi = entryPoint.getPersonapi()
-    simulationapi = entryPoint.getSimulationapi()
-    polygonapi = entryPoint.getPolygonapi()
+# api
+personapi = entryPoint.getPersonapi()
+simulationapi = entryPoint.getSimulationapi()
+polygonapi = entryPoint.getPolygonapi()
+controll = entryPoint.getTraciControll()
 
-    pers = PersonapiWrapper(personapi, gateway)
-    print(pers.createNew("3", "5.7", "3.2", ["3"]))
-    print(pers.getIDList())
+# controll command
+ctr = ControllWrapper(controll, gateway)
+ctr.sendFile()
 
-    # continue interactive
-    embed()
+# personapi commands
+pers = PersonapiWrapper(personapi, gateway)
+print(pers.createNew("5", "5.7", "3.2", ["3"]))
+print(pers.getIDList())
+
+# continue interactive
+embed()

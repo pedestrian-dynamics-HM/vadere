@@ -26,91 +26,6 @@ public class TraCIEntryPoint implements Runnable {
     protected org.vadere.manager.client.traci.SimulationAPI simulationapi;
     protected org.vadere.manager.client.traci.PolygonAPI polygonapi;
     protected org.vadere.manager.client.traci.PersonAPI personapi;
-
-    class TraCIControll{
-
-        TraCISocket socket;
-        String basePath = "";
-        String defaultScenario = "";
-
-        TraCIControll(TraCISocket socket, String basePath, String defaultScenario){
-            this.socket = socket;
-            this.basePath = basePath;
-            this.defaultScenario = defaultScenario;
-        }
-
-        public void getVersion() throws IOException {
-            TraCIPacket p = TraCIGetVersionCommand.build();
-            socket.sendExact(p);
-
-            TraCIPacketBuffer buf = socket.receiveExact();
-            TraCIResponse cmd = buf.nextResponse();
-
-            System.out.println(cmd.toString());
-
-        }
-
-        public void close(String[] args) throws IOException {
-
-            socket.sendExact(TraCICloseCommand.build());
-
-            TraCIResponse cmd = socket.receiveResponse();
-            System.out.println(cmd);
-
-            System.out.println("Bye");
-        }
-
-        public void nextSimTimeStep(String[] args) throws IOException{
-            double nextSimTime = -1.0;
-
-            if (args.length > 1)
-                nextSimTime = Double.parseDouble(args[1]);
-
-            TraCIPacket packet = TraCISimStepCommand.build(nextSimTime);
-            socket.sendExact(packet);
-
-            TraCISimTimeResponse cmd = (TraCISimTimeResponse) socket.receiveResponse();
-            System.out.println(cmd.toString());
-        }
-
-        public void sendFile(String[] args) throws IOException {
-
-            String filePath;
-
-            if (args.length > 1) {
-                if (!basePath.isEmpty()){
-                    filePath = Paths.get(basePath, args[1] + ".scenario").toString();
-                } else {
-                    filePath = args[1];
-                }
-            } else {
-                if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-                    filePath = Paths.get(basePath, defaultScenario).toString();
-                    System.out.println("use default " + defaultScenario);
-                } else {
-                    System.out.println("no default scenario set");
-                    return;
-                }
-            }
-
-            String data;
-            try{
-                data = IOUtils.readTextFile(filePath);
-            } catch (IOException e){
-                System.out.println("File not found: " + filePath);
-                return;
-            }
-
-            TraCIPacket packet = TraCISendFileCommand.TraCISendFileCommand("Test", data);
-
-            traCISocket.sendExact(packet);
-
-            TraCIPacketBuffer buf = traCISocket.receiveExact();
-            TraCIResponse cmd = buf.nextResponse();
-
-            System.out.println(cmd.toString());
-        }
-    }
     protected TraCIControll traciControll;
 
     private boolean running;
@@ -167,6 +82,9 @@ public class TraCIEntryPoint implements Runnable {
             init();
             GatewayServer gatewayServer = new GatewayServer(this);
             gatewayServer.start();
+            while(true){
+                wait(10000);
+            }
         } finally {
             if (traCISocket != null)
                 traCISocket.close();
