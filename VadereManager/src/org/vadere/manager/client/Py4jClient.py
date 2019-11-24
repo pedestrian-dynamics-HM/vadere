@@ -1,28 +1,35 @@
 from py4j.java_gateway import JavaGateway, java_import
 from IPython import embed
-from pythontraciwrapper import PersonapiWrapper
+from pythontraciwrapper import PersonapiWrapper, SimulationapiWrapper, PolygonapiWrapper
 from pythontraciwrapper import ControllWrapper
 
-# if __name__ == '__main__':
+class Py4jClient():
 
-# start
-gateway = JavaGateway()
-entryPoint = gateway.entry_point
+    def __init__(self):
 
-# api
-personapi = entryPoint.getPersonapi()
-simulationapi = entryPoint.getSimulationapi()
-polygonapi = entryPoint.getPolygonapi()
-controll = entryPoint.getTraciControll()
+        # start
+        gateway = JavaGateway()
+        entryPoint = gateway.entry_point
 
-# controll command
-ctr = ControllWrapper(controll, gateway)
-ctr.sendFile()
+        # api
+        personapi = entryPoint.getPersonapi()
+        simulationapi = entryPoint.getSimulationapi()
+        polygonapi = entryPoint.getPolygonapi()
+        controll = entryPoint.getTraciControll()
 
-# personapi commands
-pers = PersonapiWrapper(personapi, gateway)
-print(pers.createNew("5", "5.7", "3.2", ["3"]))
-print(pers.getIDList())
+        # wrap apis
+        self.ctr = ControllWrapper(controll, gateway)
+        self.pers = PersonapiWrapper(personapi, gateway)
+        self.sim = SimulationapiWrapper(simulationapi, gateway)
+        self.poly = PolygonapiWrapper(polygonapi, gateway)
 
-# continue interactive
-embed()
+    def start(self, scenarioPath, interactive=False):
+        self.ctr.sendFile(scenarioPath)
+        if interactive is True:
+            embed()
+
+
+scenarioPath = "scenario002"
+client = Py4jClient()
+client.start(scenarioPath, interactive=True)
+#print(client.pers.getPosition2DList())
