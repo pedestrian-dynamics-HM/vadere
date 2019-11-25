@@ -2,10 +2,9 @@ package org.vadere.state.scenario;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -13,45 +12,28 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 public class DistributionFactory {
 
-	private Class<? extends RealDistribution> distributionClass;
+	private String distributionCanonicalPath;
 
-	public DistributionFactory(Class<? extends RealDistribution> distributionClass) {
-		this.distributionClass = distributionClass;
+	public DistributionFactory(String distributionCanonicalPath) {
+		this.distributionCanonicalPath = distributionCanonicalPath;
+
 	}
 
-	public static DistributionFactory fromDistributionClassName(String className) throws ClassNotFoundException {
-		@SuppressWarnings("unchecked")
-		Class<? extends RealDistribution> distributionClass =
-				(Class<? extends RealDistribution>) Class.forName(className);
-		// This cast does not throw a ClassCastException :( I don't know why
-		// A wrong class here comes back later in createDistribution
-		return new DistributionFactory(distributionClass);
-	}
-
-	public RealDistribution createDistribution(Random random, List<Double> parameters)
+	public SpawnDistribution createDistribution(Random random, int spawnNumber, List<Double> parameters)
 			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
 			SecurityException {
 
-		final List<Object> argList = new LinkedList<>(parameters);
-		argList.add(0, new JDKRandomGenerator(random.nextInt()));
+		RandomGenerator randomGenerator = new JDKRandomGenerator(random.nextInt());
+		SpawnDistribution returnDistribution;
 
-		final int argCount = argList.size();
-		final Object[] args = argList.toArray(new Object[argCount]);
+		if (distributionCanonicalPath .equals("org.vadere.state.scenario.ConstantDistributionReplace")){
+			returnDistribution = new ConstantDistributionReplace(randomGenerator, spawnNumber, parameters);
+		}else{
+			throw new IllegalArgumentException(distributionCanonicalPath  + " not known in DistributionFactory");
+		}
 
-		final Class<?>[] argTypes = new Class<?>[argCount];
-		argTypes[0] = RandomGenerator.class;
-		Arrays.fill(argTypes, 1, argTypes.length, double.class);
+		return returnDistribution;
 
-		Constructor<?> constructor = distributionClass.getConstructor(argTypes);
-		return (RealDistribution) constructor.newInstance(args);
-	}
-
-	public RealDistribution createDistribution(Random random, Double... parameters)
-			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
-			SecurityException {
-
-		List<Double> list = Arrays.asList(parameters);
-		return createDistribution(random, list);
 	}
 
 }

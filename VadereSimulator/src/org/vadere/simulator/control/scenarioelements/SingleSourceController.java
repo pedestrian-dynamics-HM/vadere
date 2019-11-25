@@ -56,7 +56,7 @@ public class SingleSourceController extends SourceController {
 									.collect(Collectors.toList())
 					);
 
-					numberToSpawn -= spawnPoints.size();
+					numberToSpawn = numberToSpawn - spawnPoints.size();
 					assert (numberToSpawn >= 0);
 
 
@@ -171,8 +171,8 @@ public class SingleSourceController extends SourceController {
 	@Override
 	protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += sourceAttributes.getSpawnNumber();
-			createNextEvent();
+			numberToSpawn += distribution.getSpawnNumber(simTimeInSec);
+			createNextEvent(simTimeInSec);
 		}
 	}
 

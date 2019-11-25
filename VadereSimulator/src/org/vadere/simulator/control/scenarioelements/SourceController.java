@@ -1,18 +1,10 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DistributionFactory;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -37,7 +29,7 @@ public abstract class SourceController {
 	 * <code>null</code>, if there is no next event.
 	 */
 	protected Double timeOfNextEvent;
-	protected RealDistribution distribution;
+	protected SpawnDistribution distribution;
 	protected final AttributesSource sourceAttributes;
 	protected final AttributesDynamicElement attributesDynamicElement;
 	protected int dynamicElementsCreatedTotal;
@@ -56,12 +48,15 @@ public abstract class SourceController {
 
 		timeOfNextEvent = sourceAttributes.getStartTime();
 		try {
-			DistributionFactory factory = DistributionFactory
-					.fromDistributionClassName(sourceAttributes.getInterSpawnTimeDistribution());
-			distribution = factory.createDistribution(random, sourceAttributes.getDistributionParameters());
+			distribution = new DistributionFactory(sourceAttributes.getInterSpawnTimeDistribution()).
+					createDistribution(
+							random,
+							sourceAttributes.getSpawnNumber(),
+							sourceAttributes.getDistributionParameters());
+
 		} catch (Exception e) {
-			throw new IllegalArgumentException("problem with scenario parameters for source: "
-					+ "interSpawnTimeDistribution and/or distributionParameters. see causing excepion.", e);
+			throw new IllegalArgumentException("Problem with scenario parameters for source: "
+					+ "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
 		}
 	}
 
@@ -93,8 +88,8 @@ public abstract class SourceController {
 		return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
 	}
 
-	protected boolean isAfterSourceEndTime(double time) {
-		return time > sourceAttributes.getEndTime();
+	protected boolean isAfterSourceEndTime(double simTimeInSec) {
+		return simTimeInSec > sourceAttributes.getEndTime();
 	}
 
 	protected boolean isMaximumNumberOfSpawnedElementsReached() {
@@ -119,14 +114,14 @@ public abstract class SourceController {
 		return topography;
 	}
 
-	protected void createNextEvent() {
+	protected void createNextEvent(double simTimeInSec) {
 		if (isSourceWithOneSingleSpawnEvent()) {
 			timeOfNextEvent = NO_EVENT;
 			return;
 		}
 
 		// sample() could yield negative results. but that is a problem of the distribution.
-		timeOfNextEvent += distribution.sample();
+		timeOfNextEvent += distribution.getNextSpawnTime(simTimeInSec);
 
 		if (isAfterSourceEndTime(timeOfNextEvent)) {
 			timeOfNextEvent = NO_EVENT;

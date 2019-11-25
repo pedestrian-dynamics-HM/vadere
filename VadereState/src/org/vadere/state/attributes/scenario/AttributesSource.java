@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.scenario.ConstantDistributionReplace;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class AttributesSource extends AttributesEmbedShape {
 
-	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
+	public static final String CONSTANT_DISTRIBUTION = ConstantDistributionReplace.class.getName();
 	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
