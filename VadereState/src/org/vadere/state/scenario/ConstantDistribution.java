@@ -5,8 +5,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import java.util.List;
 
 
-
-
 /**
  * "Constant" distribution for <code>interSpawnTimeDistribution</code> of
  * {@link org.vadere.state.attributes.scenario.AttributesSource}.
