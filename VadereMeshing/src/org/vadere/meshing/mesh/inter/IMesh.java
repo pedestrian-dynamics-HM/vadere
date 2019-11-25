@@ -1919,7 +1919,6 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 				minDistance = distance;
 			}
 		}
-
 		return result;
 	}
 

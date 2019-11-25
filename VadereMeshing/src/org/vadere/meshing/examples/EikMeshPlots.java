@@ -79,7 +79,7 @@ public class EikMeshPlots {
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
 		var meshImprover = new PEikMesh(
-				p -> 1.0,
+				p -> 2.0,
 				dt.getTriangulation()
 		);
 
@@ -94,6 +94,20 @@ public class EikMeshPlots {
 
 		meshImprover.finish();
 		meshPanel.repaint();
+
+		var meshImprover2 = new PEikMesh(
+				p -> 0.1,
+				dt.getTriangulation(),
+				true
+		);
+
+		while (!meshImprover2.isFinished()) {
+			meshImprover2.improve();
+			Thread.sleep(10);
+			meshPanel.repaint();
+			System.out.println("imp");
+		}
+		System.out.println("end");
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_after");
 
 

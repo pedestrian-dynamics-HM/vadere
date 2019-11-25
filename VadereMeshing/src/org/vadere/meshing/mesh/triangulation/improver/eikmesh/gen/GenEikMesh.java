@@ -91,9 +91,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private boolean allowEdgeSplits = true;
 	private boolean allowVertexCollapse = true;
 	private boolean allowEdgeCollapse = true;
-	private boolean allowFaceCollapse = false;
+	private boolean allowFaceCollapse = true;
 	private boolean removeLowBoundaryTriangles = false;
-	private boolean useVirtualEdges = true;
+	private boolean useVirtualEdges = false;
 
 	// if no PSLG set this to be true
 	private boolean smoothBorder;
@@ -149,7 +149,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.distanceFunc = null;
 		this.nonEmptyBaseMode = true;
 		this.fixPoints = Collections.EMPTY_LIST;
-		this.pointToSlidingLine = Collections.EMPTY_MAP;
+		this.pointToSlidingLine = new HashMap<>();
 		//this.frozenFaces = new HashSet<>();
 		//this.frozenVertices = new HashSet<>();
 		//this.poorFaces = new LinkedList<>();
@@ -542,7 +542,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					VPoint q1 = getMesh().toPoint(prev);
 					VPoint q2 = getMesh().toPoint(getMesh().getPrev(prev));
 					VPoint m = q1.add(q2).scalarMultiply(0.5);
-					VPoint dir = m.subtract(p1).scalarMultiply(1.5);
+					VPoint dir = m.subtract(p1).scalarMultiply(1.4);
 					VPoint q3 = getMesh().toPoint(p1).add(dir);
 					VPoint virtualForce = getForce(getMesh().toPoint(p1), q3);
 					increaseVelocity(vertex, virtualForce);
@@ -1019,7 +1019,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * this method constructs a map : boundary vertex -> line which gives quick access to the projection line.
 	 */
 	private void computeSlidingLines() {
-		if(hasRefiner()) {
+		/*if(hasRefiner()) {
 			pointToSlidingLine = refiner.getProjections();
 
 			for (V v : refiner.getFixPoints()) {
@@ -1031,7 +1031,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					setConstraint(e, true);
 				}
 			}
-		} else {
+		} else {*/
 			/*
 			 *
 			 */
@@ -1055,6 +1055,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 							VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(vertex));
 							for(V slicePoint : slicePoints) {
 								pointToSlidingLine.put(slicePoint, line);
+								setFixPoint(slicePoint, true);
 							}
 							startFixPoint = vertex;
 							slicePoints.clear();
@@ -1067,11 +1068,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 						VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(sf));
 						for(V slicePoint : slicePoints) {
 							pointToSlidingLine.put(slicePoint, line);
+							setFixPoint(slicePoint, true);
 						}
 					}
 				}
 			}
-		}
+		//}
 		assert getMesh().getBoundaryVertices().stream().filter(v -> isSlidePoint(v)).allMatch(v -> pointToSlidingLine.containsKey(v));
 	}
 
