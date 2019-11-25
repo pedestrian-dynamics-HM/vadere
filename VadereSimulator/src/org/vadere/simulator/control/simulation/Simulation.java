@@ -306,7 +306,6 @@ public class Simulation {
 				}
 
 
-
 				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {

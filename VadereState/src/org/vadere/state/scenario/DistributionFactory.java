@@ -23,8 +23,10 @@ public class DistributionFactory {
 		RandomGenerator randomGenerator = new JDKRandomGenerator(random.nextInt());
 		SpawnDistribution returnDistribution;
 
-		if (distributionCanonicalPath .equals("org.vadere.state.scenario.ConstantDistribution")){
+		if (distributionCanonicalPath.equals("org.vadere.state.scenario.ConstantDistribution")){
 			returnDistribution = new ConstantDistribution(randomGenerator, spawnNumber, parameters);
+		}else if(distributionCanonicalPath.equals("org.vadere.state.scenario.LinearInterpolationSpawnDistribution")){
+			returnDistribution = new LinearInterpolationSpawnDistribution(randomGenerator, parameters);
 		}else{
 			throw new IllegalArgumentException(distributionCanonicalPath  + " not known in DistributionFactory");
 		}

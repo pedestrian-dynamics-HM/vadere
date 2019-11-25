@@ -147,10 +147,8 @@ public class SingleSourceController extends SourceController {
             if(setNumberAgents != numberToSpawn){
 				logger.debug("Could only set " +
 						setNumberAgents + "/" + setNumberAgents +" agents. " +
-						"Either the source is too small or spawn number too high. ");
-
+						"Either the source is too small or spawn number too high.");
 			}
-
 		}
 
 		return randomPositions;
@@ -158,16 +156,16 @@ public class SingleSourceController extends SourceController {
 
 
 	private Optional<VPoint> getNextRandomPosition(@NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes,
-												   final int tries_find_valid_point, final int tries_reposition) {
+												   final int triesFindValidPoint, final int triesReposition) {
 		Rectangle2D rec = source.getShape().getBounds2D();
 
-		for (int i = 0; i < tries_reposition; i++) {
+		for (int i = 0; i < triesReposition; i++) {
 			VShape freeSpaceRequired = null;
 			VPoint randomPoint = null;
 			boolean pointFound = false;
 			// find point in source boundary
 			int j = 0;
-			while (j < tries_find_valid_point && !pointFound) {
+			while (j < triesFindValidPoint && !pointFound) {
 				randomPoint = new VPoint(rec.getMinX() + random.nextDouble() * rec.getWidth(), rec.getMinY() + random.nextDouble() * rec.getHeight());
 				freeSpaceRequired = dynamicElementFactory.getDynamicElementRequiredPlace(randomPoint);
 				pointFound = source.getShape().containsShape(freeSpaceRequired);
@@ -192,7 +190,7 @@ public class SingleSourceController extends SourceController {
 	@Override
 	protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += distribution.getSpawnNumber(simTimeInSec);
+			numberToSpawn += distribution.getSpawnNumber(timeOfNextEvent);
 			createNextEvent();
 		}
 	}
