@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.06642665170830378,
-        "maxMeanDifferenceFuncValue" : 0.038131134445867326,
+        "maxMeanPointDistance" : 0.07032687521241791,
+        "maxMeanDifferenceFuncValue" : 0.03480114233444013,
         "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.0500643679096149,
-        "infoMinFuncDifference" : -0.0053311824072430625,
-        "infoMaxFuncDifference" : 3.112265864907295,
-        "infoStddevPointDistance" : 0.10963419080612646,
-        "infoStddevDifferenceFuncValue" : 0.14872546127402636
+        "infoMaxPointDistanceL2" : 1.3986496595476534,
+        "infoMinFuncDifference" : -0.010149427397823985,
+        "infoMaxFuncDifference" : 2.563180447354023,
+        "infoStddevPointDistance" : 0.12029822051457525,
+        "infoStddevDifferenceFuncValue" : 0.11224623990550493
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
