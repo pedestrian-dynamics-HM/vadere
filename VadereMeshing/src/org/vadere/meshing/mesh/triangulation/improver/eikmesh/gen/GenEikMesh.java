@@ -91,6 +91,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private boolean allowEdgeSplits = true;
 	private boolean allowVertexCollapse = true;
 	private boolean allowEdgeCollapse = true;
+	private boolean allowFaceCollapse = false;
 	private boolean removeLowBoundaryTriangles = false;
 	private boolean useVirtualEdges = true;
 
@@ -416,9 +417,13 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 				if(hasDistanceFunction() && smoothBorder) {
 					getTriangulation().smoothBoundary(distanceFunc, v -> isFixPoint(v));
-				} else {
-					// TODO
+				}
 
+				if(allowFaceCollapse) {
+					getTriangulation().collapseBorderFaces(
+							f -> true,
+							e -> !isFixPoint(getMesh().getVertex(e)) && getTriangulation().isLargeAngle(e, Parameters.MAX_COLLAPSE_ANGLE),
+							v -> pointToSlidingLine.put(v, getMesh().toLine(getMesh().getBoundaryEdge(v).get())));
 				}
 				/*if(splitFaces) {
 					for(F f : getMesh().getFaces()) {

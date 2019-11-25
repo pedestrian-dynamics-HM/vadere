@@ -2024,6 +2024,56 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		smoothHoles(null);
 	}
 
+	default void collapseBorderFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
+			E twin = getMesh().getTwin(edge);
+			F face = getMesh().getFace(twin);
+
+			assert !getMesh().isBoundary(face);
+
+			/*
+			 * to avoid duplicated smoothing
+			 */
+			if(getMesh().getFace(edge).equals(getMesh().getBorder()) &&
+					!getMesh().isAtBoundary(getMesh().getNext(twin)) && !getMesh().isAtBoundary(getMesh().getPrev(twin)) &&
+					collapsePredicate.test(face)) {
+
+				V vr = getMesh().getVertex(getMesh().getPrev(edge));
+				V vp = getMesh().getVertex(getMesh().getNext(twin));
+				V vq = getMesh().getVertex(edge);
+
+
+				if(edgeCollapsePredicate.test(getMesh().getNext(twin))) {
+					VPoint r = getMesh().toPoint(vr);
+					VPoint q = getMesh().toPoint(vq);
+
+					VPoint midPoint = new VLine(r, q).midPoint();
+					removeFaceAtBorder(face, true);
+					getMesh().setPoint(vp, midPoint);
+					action.accept(vp);
+				}
+			}
+		}
+	}
+
+	default boolean isLargeAngle(@NotNull final E edge, double minAngle) {
+		assert !getMesh().isBoundary(getMesh().getFace(edge));
+		V vp = getMesh().getVertex(edge);
+		V vq = getMesh().getVertex(getMesh().getNext(edge));
+		V vr = getMesh().getVertex(getMesh().getPrev(edge));
+
+		VPoint r = getMesh().toPoint(vr);
+		VPoint p = getMesh().toPoint(vp);
+		VPoint q = getMesh().toPoint(vq);
+
+		if(GeometryUtils.isCCW(r, p, q)) {
+			double angle = GeometryUtils.angle(r, p, q);
+			return angle > minAngle;
+		}
+
+		return false;
+	}
+
 	default void smoothBorder(@Nullable final IDistanceFunction distanceFunction, @NotNull final Predicate<V> isBoundary) {
 		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
 

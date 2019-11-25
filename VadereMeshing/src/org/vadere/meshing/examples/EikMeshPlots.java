@@ -69,7 +69,7 @@ public class EikMeshPlots {
 	public static void randomDelaunay() throws IOException, InterruptedException {
 		ArrayList<EikMeshPoint> points = new ArrayList<>();
 		Random random = new Random(1);
-		for (int i = 0; i < 30; i++) {
+		for (int i = 0; i < 100; i++) {
 			points.add(new EikMeshPoint(random.nextDouble() * 10, random.nextDouble() * 10));
 		}
 
