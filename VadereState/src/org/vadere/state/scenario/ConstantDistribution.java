@@ -30,14 +30,14 @@ public class ConstantDistribution extends ConstantRealDistribution implements Sp
     }
 
     @Override
-    public int getSpawnNumber(double simTimeInSec) {
+    public int getSpawnNumber(double timeCurrentEvent) {
         return spawnNumber;
     }
 
     @Override
-    public double getNextSpawnTime(double simTimeInSec) {
+    public double getNextSpawnTime(double timeCurrentEvent) {
         //always add a constant value to the 'value'
-        return simTimeInSec + this.sample();
+        return timeCurrentEvent + this.sample();
     }
 
 }

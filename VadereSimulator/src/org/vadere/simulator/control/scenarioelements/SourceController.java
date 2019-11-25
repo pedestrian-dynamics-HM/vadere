@@ -114,14 +114,22 @@ public abstract class SourceController {
 		return topography;
 	}
 
-	protected void createNextEvent(double simTimeInSec) {
+	protected void createNextEvent() {
 		if (isSourceWithOneSingleSpawnEvent()) {
 			timeOfNextEvent = NO_EVENT;
 			return;
 		}
 
-		// sample() could yield negative results. but that is a problem of the distribution.
-		timeOfNextEvent += distribution.getNextSpawnTime(simTimeInSec);
+		// Read: timeOfNextEvent == timeOfCurrentEvent for this call:
+		double newTimeOfNextEvent = distribution.getNextSpawnTime(timeOfNextEvent);
+
+		if(newTimeOfNextEvent > timeOfNextEvent){
+			timeOfNextEvent = newTimeOfNextEvent;
+		}else{
+			throw new RuntimeException("Bug: newTimeOfNextEvent is smaller or equal to timeOfNextEvent. The selected " +
+					"distribution " + distribution.getClass().getCanonicalName() + " has a bug. " +
+					"Please report error (with message) at gitlab issue.");
+		}
 
 		if (isAfterSourceEndTime(timeOfNextEvent)) {
 			timeOfNextEvent = NO_EVENT;

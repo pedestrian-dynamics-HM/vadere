@@ -239,7 +239,7 @@ public class GroupSourceController extends SourceController {
 	protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
 		while (timeOfNextEvent <= simTimeInSec) {
 			getNewGroupSizeFromModel();
-			createNextEvent(simTimeInSec);
+			createNextEvent();
 		}
 	}
 }
