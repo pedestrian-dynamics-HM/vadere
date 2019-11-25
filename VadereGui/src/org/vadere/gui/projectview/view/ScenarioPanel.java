@@ -219,7 +219,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	public void showVisualization() {
 		CardLayout cl = (CardLayout) this.getLayout();
 		cl.show(this, visualizationCardName);
-		onlineVisualization.getMainPanel().setVisible(true);
+		// [issue 280] set visibility and remove mouse listeners during setup. Will be added
+		// after setup of simulation run is complete.
+		onlineVisualization.showVisualization();
 	}
 
 	public void showEditScenario() {
