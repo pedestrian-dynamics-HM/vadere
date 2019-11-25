@@ -15,8 +15,12 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 	public TruncatedNormalDistribution(RandomGenerator rng, double mean, double standardDeviation, double min,
 			double max, int maxIterations) {
 		super(rng, mean, standardDeviation);
-		if (max <= min)
-			throw new IllegalArgumentException("Parameter min must be less than bound.");
+
+		if (min < 0 || max <= 0 || max <= min){
+			// min == 0 does not make to much sense either, but we allow this case for pedestrians that do not move
+			throw new IllegalArgumentException("Parameters 'min' and 'max' must be non-negative and 'min < max'.");
+		}
+
 		this.min = min;
 		this.max = max;
 		this.maxIterations = maxIterations;
