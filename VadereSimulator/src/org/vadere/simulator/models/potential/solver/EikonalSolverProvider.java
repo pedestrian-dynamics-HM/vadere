@@ -1,3 +1,4 @@
+
 package org.vadere.simulator.models.potential.solver;
 
 import org.vadere.meshing.mesh.gen.PFace;
@@ -30,6 +31,7 @@ import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -141,7 +143,14 @@ public abstract class EikonalSolverProvider  {
 			/*
 			 * (4) Compute or define a distance function which defines the geometry.
 			 */
-			DistanceFunctionApproxBF distanceFunctionApprox = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()));
+			Collection<VPolygon> holes = new ArrayList<>(pslg.getHoles());
+			holes.removeIf(p -> p.intersects(topography.getTarget(targetId).getShape()));
+			IDistanceFunction exactDistanceFunction = IDistanceFunction.create(
+					pslg.getSegmentBound(),
+					//holes,
+					pslg.getHoles(),
+					topography.getTargets().stream().map(t -> new VPolygon(t.getShape())).collect(Collectors.toList()));
+			DistanceFunctionApproxBF distanceFunctionApprox = new DistanceFunctionApproxBF(pslg, exactDistanceFunction);
 			//distanceFunctionApprox.printPython();
 
 			/*
@@ -171,6 +180,24 @@ public abstract class EikonalSolverProvider  {
 			}
 
 			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshImprover.getTriangulation();
+
+			var meshImprover2 = new PEikMesh(
+					p -> 2.0,
+					triangulation
+			);
+
+			while (!meshImprover2.isFinished()) {
+				synchronized (meshImprover2.getMesh()) {
+					meshImprover2.improve();
+				}
+				/*try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}*/
+				meshPanel.repaint();
+			}
+
 
 			ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 					attributesPotential.getTimeCostAttributes(),

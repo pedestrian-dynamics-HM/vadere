@@ -197,6 +197,10 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			if(vertexColorFunction != null) {
 				vc = vertexColorFunction.apply(vertex);
 			}
+
+			if(mesh.isAtBoundary(vertex)) {
+				vc = Color.RED;
+			}
 			graphics.setColor(vc);
 			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
@@ -242,13 +246,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 
 			//if(mesh.getNumberOfVertices() > 6) {
-				Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
-				graphics.fillRect(0, 0, width, height);
-				renderGraphics(graphics, width, height);
+			Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+			graphics.fillRect(0, 0, width, height);
+			renderGraphics(graphics, width, height);
 			//}
 
 			return bufferedImage;
 		}
 	}
-
 }

@@ -58,8 +58,8 @@ public class MovRecorder<P extends EikMeshPoint, CE, CF, V extends IVertex, E ex
 
 	public void record() throws IOException {
 		// record init
-		while (!eikMesh.initializationFinished()) {
-			eikMesh.initializeStep();
+		while (!eikMesh.isInitialized()) {
+			eikMesh.initialize();
 			BufferedImage bi = meshRenderer.renderImage(width, height, bound);
 			for(int i = 0; i < initImageCount; i++) {
 				enc.encodeImage(bi);

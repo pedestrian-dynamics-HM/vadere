@@ -52,4 +52,11 @@ public class MeshTxtCacheObject extends AbstractCacheObject implements IMeshCach
 			logger.errorf("cannot save cache %s", cacheLocation.getAbsolutePath());
 		}
 	}
+
+	@Override
+	public String getCacheLocation() {
+		return null;
+	}
 }
+
+

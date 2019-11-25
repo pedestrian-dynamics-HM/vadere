@@ -89,7 +89,7 @@ public class RecordTriangulationMovie {
 		while (nSteps < 300) {
 			nSteps++;
 
-			if(!meshImprover.initializationFinished()) {
+			if(!meshImprover.isInitialized()) {
 				addPictures(recorder, meshRenderer, 10, (int)bbound.getWidth()*1000, (int)bbound.getHeight()*1000);
 			}
 			else if(finished) {
@@ -106,7 +106,7 @@ public class RecordTriangulationMovie {
 				e.printStackTrace();
 			}*/
 			overAllTime.resume();
-			meshImprover.step();
+			meshImprover.improve();
 			overAllTime.suspend();
 			distmeshPanel.repaint();
 		}
@@ -128,5 +128,4 @@ public class RecordTriangulationMovie {
 		}
 
 	}
-
 }

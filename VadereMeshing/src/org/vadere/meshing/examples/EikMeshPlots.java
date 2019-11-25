@@ -20,6 +20,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -62,34 +63,40 @@ public class EikMeshPlots {
 		//cornerLFS();
 
 		//uniformRing(0.3);
+		randomDelaunay();
 	}
 
-	public static void randomDelaunay() throws IOException {
+	public static void randomDelaunay() throws IOException, InterruptedException {
 		ArrayList<EikMeshPoint> points = new ArrayList<>();
-		Random random = new Random(0);
-		for(int i = 0; i < 1000; i++) {
+		Random random = new Random(1);
+		for (int i = 0; i < 30; i++) {
 			points.add(new EikMeshPoint(random.nextDouble() * 10, random.nextDouble() * 10));
 		}
 
 		PDelaunayTriangulator dt = new PDelaunayTriangulator(points);
 		dt.generate();
-
-		write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_random_before");
+		write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_before");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
 		var meshImprover = new PEikMesh(
-				p -> 1.0 + Math.abs(bound.distance(p)),
+				p -> 1.0,
 				dt.getTriangulation()
 		);
-
-		// generate the mesh
-		meshImprover.generate();
-
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_random_after");
 
 		// display the mesh
 		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh(), 1000, 1000);
 		meshPanel.display("Random Delaunay triangulation");
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(10);
+			meshPanel.repaint();
+		}
+
+		meshImprover.finish();
+		meshPanel.repaint();
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_after");
+
+
 	}
 
 	public static void kaiserslautern() throws IOException, InterruptedException {
@@ -114,7 +121,7 @@ public class EikMeshPlots {
 
 		meshImprover.generate();
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_kaiserslautern_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -146,7 +153,7 @@ public class EikMeshPlots {
 		}
 		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_kaiserslautern_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -182,7 +189,7 @@ public class EikMeshPlots {
 		}
 		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_kaiserslautern_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -217,7 +224,7 @@ public class EikMeshPlots {
 		}
 		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "eikmesh_kaiserslautern_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_kaiserslautern_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -229,7 +236,7 @@ public class EikMeshPlots {
 
 		PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), h0, pslg.getHoles());
 		meshImprover.generate();
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_a_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_a_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
@@ -239,13 +246,13 @@ public class EikMeshPlots {
 	public static void distanceFuncCombination(double h0) throws IOException {
 		// define your holes
 		VRectangle rect = new VRectangle(-0.5, -0.5, 1, 1);
-		VRectangle boundary = new VRectangle(-1.5,-0.7,3,1.4);
+		VRectangle boundary = new VRectangle(-1.5, -0.7, 3, 1.4);
 		IDistanceFunction d1_c = IDistanceFunction.createDisc(-0.5, 0, 0.5);
 		IDistanceFunction d2_c = IDistanceFunction.createDisc(0.5, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d_b = IDistanceFunction.create(boundary);
 		IDistanceFunction d_union = IDistanceFunction.union(IDistanceFunction.union(d1_c, d_r), d2_c);
-		IDistanceFunction d = IDistanceFunction.substract(d_b,d_union);
+		IDistanceFunction d = IDistanceFunction.substract(d_b, d_union);
 		var meshImprover = new PEikMesh(
 				d,
 				p -> h0 + 0.3 * Math.abs(d.apply(p)),
@@ -261,7 +268,7 @@ public class EikMeshPlots {
 
 		// (optional) define the gui to display the mesh
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_d_combined_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_d_combined_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -270,7 +277,7 @@ public class EikMeshPlots {
 	public static void discSubtractRect(double h0) throws IOException {
 		// define your holes
 		VRectangle rect = new VRectangle(-0.25, -0.25, 0.5, 0.5);
-		VRectangle boundary = new VRectangle(-1.5,-0.7,3,1.4);
+		VRectangle boundary = new VRectangle(-1.5, -0.7, 3, 1.4);
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
@@ -289,7 +296,7 @@ public class EikMeshPlots {
 
 		// (optional) define the gui to display the mesh
 		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_disc_rect_non_uniform_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_disc_rect_non_uniform_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -298,7 +305,7 @@ public class EikMeshPlots {
 	public static void discSubtractRect2(double h0) throws IOException {
 		// define your holes
 		VRectangle rect = new VRectangle(0, 0, 0.5, 0.5);
-		VRectangle boundary = new VRectangle(-1.5,-0.7,3,1.4);
+		VRectangle boundary = new VRectangle(-1.5, -0.7, 3, 1.4);
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		IDistanceFunction d_r = IDistanceFunction.create(rect);
 		IDistanceFunction d = IDistanceFunction.substract(d_c, d_r);
@@ -317,7 +324,7 @@ public class EikMeshPlots {
 
 		// (optional) define the gui to display the mesh
 		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_disc_rect_sub_non_uniform_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_disc_rect_sub_non_uniform_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Combined distance functions " + h0);
@@ -328,7 +335,7 @@ public class EikMeshPlots {
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
 		// distance function that defines a disc with radius 1 at (1,1).
-		VPoint center = new VPoint(1,1);
+		VPoint center = new VPoint(1, 1);
 		IDistanceFunction d = IDistanceFunction.createRing(1, 1, 0.2, 1.0);
 
 		// define the EikMesh-Improver
@@ -344,11 +351,19 @@ public class EikMeshPlots {
 
 		// (optional) define the gui to display the mesh
 		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		meshPanel.display("Uniform ring " + h0);
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(10);
+			meshPanel.repaint();
+		}
 
+		meshImprover.finish();
+		meshPanel.repaint();
 		// generate the mesh
-		meshImprover.generate();
+		//meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_ring_uniform_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_ring_uniform_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Uniform ring " + h0);
@@ -359,11 +374,11 @@ public class EikMeshPlots {
 		VRectangle bound = new VRectangle(-0.1, -0.1, 2.2, 2.2);
 
 		// distance function that defines a ring with inner-radius 0.2 and outer-radius 1 at (1,1).
-		IDistanceFunction ringDistance = IDistanceFunction.createDisc(1, 1,  1.0);
+		IDistanceFunction ringDistance = IDistanceFunction.createDisc(1, 1, 1.0);
 
 
 		// define the EikMesh-Improver
-		IEdgeLengthFunction edgeLengthFunction = p -> h0 + 0.4 * Math.abs(p.getX()-1);
+		IEdgeLengthFunction edgeLengthFunction = p -> h0 + 0.4 * Math.abs(p.getX() - 1);
 		PEikMesh meshImprover = new PEikMesh(
 				ringDistance,
 				edgeLengthFunction,
@@ -376,7 +391,7 @@ public class EikMeshPlots {
 		// generate the mesh
 		meshImprover.generate();
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 10.0f)), "eikmesh_disc_xadaptive_"+ Double.toString(h0).replace('.', '_'));
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_disc_xadaptive_" + Double.toString(h0).replace('.', '_'));
 
 		// display the mesh
 		meshPanel.display("Adaptive disc");
@@ -433,9 +448,9 @@ public class EikMeshPlots {
 	}
 
 	private static void write(final String string, final String filename) throws IOException {
-		File outputFile = new File("./eikmesh/"+filename+".tex");
+		File outputFile = new File("./eikmesh/" + filename + ".tex");
 //		try(FileWriter fileWriter = new FileWriter(outputFile)) {
-			//fileWriter.write(string);
+		//fileWriter.write(string);
 //		}
 	}
 
@@ -451,7 +466,7 @@ public class EikMeshPlots {
 				"\\usepackage{xcolor}\n" +
 				"\n" +
 				"%\\clip (-0.200000,-0.100000) rectangle (1.2,0.8);\n" +
-				"\\begin{document}"+
+				"\\begin{document}" +
 				tikz
 				+
 				"\\end{document}";
