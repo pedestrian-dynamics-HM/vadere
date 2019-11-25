@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
+import org.vadere.state.scenario.ConstantDistribution;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -29,7 +30,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	@Test
 	public void testStartTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setDistributionClass(ConstantTestDistribution.class);
+				.setDistributionClass(ConstantDistribution.class);
 
 		try{
 			initialize(builder);

@@ -1,7 +1,7 @@
 package org.vadere.state.attributes.scenario;
 
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.scenario.SpawnDistribution;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -19,7 +19,7 @@ public class SourceTestAttributesBuilder {
 	private int spawnNumber = 1;
 	private boolean useFreeSpaceOnly = false;
 	private boolean spawnAtRandomPositions = false;
-	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
+	private Class<? extends SpawnDistribution> distributionClass = ConstantDistribution.class;
 	private double[] distributionParams = new double[]{1};
 	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
 	private Integer[] groupSizeDistributionMock = new Integer[]{};
@@ -75,7 +75,7 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setDistributionClass(Class<? extends RealDistribution> distributionClass) {
+	public SourceTestAttributesBuilder setDistributionClass(Class<? extends SpawnDistribution> distributionClass) {
 		this.distributionClass = distributionClass;
 		return this;
 	}

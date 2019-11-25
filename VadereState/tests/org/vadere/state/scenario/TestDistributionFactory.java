@@ -2,14 +2,16 @@ package org.vadere.state.scenario;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.state.scenario.ConstantDistribution;
-import org.vadere.state.scenario.DistributionFactory;
+import tech.tablesaw.api.DoubleColumn;
 
 public class TestDistributionFactory {
 
@@ -24,9 +26,10 @@ public class TestDistributionFactory {
 	public void testCreateConstantDistribution() {
 		try {
 			double param = 1;
-			RealDistribution expected = new ConstantDistribution(null, param);
-			DistributionFactory factory = new DistributionFactory(ConstantDistribution.class);
-			RealDistribution actual = factory.createDistribution(random, param);
+			int spawnNumber = 10;
+			RealDistribution expected = new ConstantDistributionLegacy(null, param);
+			DistributionFactory factory = new DistributionFactory(ConstantDistribution.class.getCanonicalName());
+			ConstantDistribution actual = (ConstantDistribution) factory.createDistribution(random, spawnNumber, new LinkedList<Double>(Arrays.asList(param)));
 
 			assertEquals(expected.getNumericalMean(), actual.getNumericalMean(), 0.000001);
 			assertEquals(expected.getNumericalVariance(), actual.getNumericalVariance(), 0.000001);
@@ -35,31 +38,15 @@ public class TestDistributionFactory {
 		}
 	}
 
-	@Test
-	public void testCreateExponentialDistribution() {
-		try {
-			double param1 = 1;
-			double param2 = 2;
-			RealDistribution expected = new ExponentialDistribution(param1, param2);
-			DistributionFactory factory = new DistributionFactory(ExponentialDistribution.class);
-			RealDistribution actual = factory.createDistribution(random, param1, param2);
-
-			assertEquals(expected.getNumericalMean(), actual.getNumericalMean(), 0.000001);
-			assertEquals(expected.getNumericalVariance(), actual.getNumericalVariance(), 0.000001);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-
-	@Test(expected = NoSuchMethodException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testFromDistributionWithNonDistribution() throws Exception {
-		DistributionFactory f = DistributionFactory.fromDistributionClassName(Double.class.getName());
-		f.createDistribution(random, 1.0);
+		DistributionFactory f = new DistributionFactory(Double.class.getName());
+		f.createDistribution(random, 10, new LinkedList<Double>(Arrays.asList(2.0)));
 	}
 
 	@Test(expected = ClassNotFoundException.class)
 	public void testFromDistributionWithNonExistingClass() throws Exception {
-		DistributionFactory.fromDistributionClassName("MyNonExistingClass");
+		new DistributionFactory("MyNonExistingClass");
 	}
 
 }
