@@ -24,3 +24,15 @@ class SimulationapiWrapper(ApiWrapper):
         response = self._apiObject.createWaitingArea(elementID, waitingAreaData)
         result = response.toString()
         return result
+
+    def createTargetChanger(self, elementID: str, reachDist: float, nextTargetIsPedestrian: int, nextTarget: str,
+                            prob: float, polyCorners: List[str]):
+        polyCornersJavaArrayList = self._gateway.jvm.ArrayList()
+        for x in polyCorners:
+            polyCornersJavaArrayList.add(x)
+        compoundObjectBuilder = self._gateway.jvm.CompoundObjectBuilder()
+        targetChangerData = compoundObjectBuilder.createTargetChanger(elementID, polyCornersJavaArrayList, reachDist,
+                                                                      nextTargetIsPedestrian, nextTarget, prob)
+        response = self._apiObject.createTargetChanger(elementID, targetChangerData)
+        result = response.toString()
+        return result

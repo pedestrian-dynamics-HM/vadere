@@ -10,7 +10,7 @@ class PersonapiWrapper(ApiWrapper):
 
         # imports
         java_import(self._gateway.jvm, "org.vadere.manager.traci.compoundobjects.*")
-        java_import(self._gateway.jvm, "org.vadere.util.geometry.shapes")
+        java_import(self._gateway.jvm, "org.vadere.util.geometry.shapes.*")
         java_import(self._gateway.jvm, "java.util.*")
 
         # java types
