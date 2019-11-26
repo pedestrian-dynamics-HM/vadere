@@ -39,7 +39,7 @@ public class GroupSetupCheck extends AbstractScenarioCheck {
                 // check if submodel was added
                 boolean contains_submodel = attr_osm.getSubmodels().stream().anyMatch(submodel -> submodel.equals(CentroidGroupModel.class.getName()));
                 if(!contains_submodel) {
-                    ret.add(msgBuilder.simulationAttrWarning()
+                    ret.add(msgBuilder.simulationAttrError()
                             .reason(ScenarioCheckerReason.GROUP_SETUP_IGNORED, "CentroidGroupModel has to be added to the submodels of the Optimal Steps Model in order to simulate groups. Group settings will be ignored!")
                             .build());
                 }
@@ -47,13 +47,13 @@ public class GroupSetupCheck extends AbstractScenarioCheck {
                 // check if CGM attributes were added
                 boolean contains_attr = scenario.getModelAttributes().stream().anyMatch(attr -> attr.getClass().equals(AttributesCGM.class));
                 if(!contains_attr){
-                    ret.add(msgBuilder.simulationAttrWarning()
+                    ret.add(msgBuilder.simulationAttrError()
                             .reason(ScenarioCheckerReason.GROUP_SETUP_IGNORED, "AttributesCGM need to be added to the models and configured in order to simulate groups. Group settings will be ignored!")
                             .build());
                 }
 
             }else{
-                ret.add(msgBuilder.simulationAttrWarning()
+                ret.add(msgBuilder.simulationAttrError()
                         .reason(ScenarioCheckerReason.GROUP_SETUP_IGNORED, "Group setup works currently only with the Optimal Steps Model. Group settings will be ignored! ")
                         .build());
             }
