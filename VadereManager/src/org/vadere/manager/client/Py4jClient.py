@@ -33,7 +33,6 @@ class Py4jClient():
 
     # todo remove this
     def __del__(self):
-
         self._manager.kill()
         self._entry.kill()
 
@@ -44,6 +43,8 @@ class Py4jClient():
 
 
 scenarioPath = "scenario002"
-client = Py4jClient()
-client.start(scenarioPath, interactive=True)
+cli = Py4jClient()
+cli.start(scenarioPath, interactive=True)
+#print(cli.sim.createWaitingArea("6", 0.0, 3.0, 1, 0.5, 10.0, ["6.0", "3.0", "8.0", "3.0", "8.0", "0.5", "6.0", "0.5"]))
+#print(client.pers.setTargetList("1", ["2", "3"]))
 #print(client.pers.getPosition2DList())

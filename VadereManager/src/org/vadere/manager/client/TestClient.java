@@ -391,8 +391,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void simulationapi_createWaitingArea(String[] args) throws IOException{
-		if(args.length < 3){
-			System.out.println("command needs argument time, list of polygon corners");
+		if(args.length < 13){
+			System.out.println("command needs argument id, time, startTime, endTime, repeat, wait time between repetitions, list of polygon corners");
 			return;
 		}
 

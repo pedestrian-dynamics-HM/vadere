@@ -11,6 +11,7 @@ class PersonapiWrapper(ApiWrapper):
         # imports
         java_import(self._gateway.jvm, "org.vadere.manager.traci.compoundobjects.*")
         java_import(self._gateway.jvm, "org.vadere.util.geometry.shapes")
+        java_import(self._gateway.jvm, "java.util.*")
 
         # java types
         self._stringClass = self._gateway.jvm.String
@@ -69,6 +70,13 @@ class PersonapiWrapper(ApiWrapper):
         result = response.getResponseData()
         return result
 
+    def setTargetList(self, personID, targets):
+        targetsJavaArrayList = self._gateway.jvm.ArrayList()
+        for t in targets:
+            targetsJavaArrayList.add(t)
+        response = self._apiObject.setTargetList(personID, targetsJavaArrayList)
+        result = response.toString()
+        return result
 
     def createNew(self, personID, x, y, targets):
         targetsJavaStringArray = self._gateway.new_array(self._stringClass, len(targets))
@@ -76,4 +84,6 @@ class PersonapiWrapper(ApiWrapper):
             targetsJavaStringArray[i] = t
         compoundObjectBuidler = self._gateway.jvm.CompoundObjectBuilder()
         personCreateData = compoundObjectBuidler.createPerson(personID, x, y, targetsJavaStringArray)
-        self._apiObject.createNew(personID, personCreateData)
+        response = self._apiObject.createNew(personID, personCreateData)
+        result = response.toString()
+        return result
