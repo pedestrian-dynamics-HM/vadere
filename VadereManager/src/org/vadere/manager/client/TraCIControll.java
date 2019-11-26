@@ -16,9 +16,9 @@ import java.nio.file.Paths;
 
 class TraCIControll{
 
-    TraCISocket socket;
-    String basePath = "";
-    String defaultScenario = "";
+    private TraCISocket socket;
+    private String basePath = "";
+    private String defaultScenario = "";
 
     TraCIControll(TraCISocket socket, String basePath, String defaultScenario){
         this.socket = socket;
@@ -83,22 +83,25 @@ class TraCIControll{
 
     public String sendFile(String scenarioPath) throws IOException {
 
-        String filePath;
+        String filePath = scenarioPath;
 
-        if (!scenarioPath.isEmpty()) {
-            if (!basePath.isEmpty()){
-                filePath = Paths.get(basePath, scenarioPath + ".scenario").toString();
-            } else {
-                filePath = scenarioPath;
-            }
-        } else {
-            if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-                filePath = Paths.get(basePath, defaultScenario).toString();
-                System.out.println("use default " + defaultScenario);
-            } else {
-                return "no default scenario set";
-            }
-        }
+        // todo change this such that basePath and scenarioPath are both used, only makes sense with additional other constructors.
+//        String filePath;
+//
+//        if (!scenarioPath.isEmpty()) {
+//            if (!basePath.isEmpty()){
+//                filePath = Paths.get(basePath, scenarioPath + ".scenario").toString();
+//            } else {
+//                filePath = scenarioPath;
+//            }
+//        } else {
+//            if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
+//                filePath = Paths.get(basePath, defaultScenario).toString();
+//                System.out.println("use default " + defaultScenario);
+//            } else {
+//                return "no default scenario set";
+//            }
+//        }
 
         return sendFileFromPath(filePath);
     }
