@@ -46,9 +46,12 @@ public enum ScenarioCheckerReason {
 
 	// AreaDensityVoronoiProcessor
 	AREAS_DENSITY_VORONOI_PROCESSOR_MISMATCH("ScenarioChecker.processor.checkAreasInAreaDensityVoronoiProcessor.mismatch"),
-	MEASUREMENT_AREA_NOT_RECTANGULAR("ScenarioChecker.processor.measurementArea.hasToBeRectangular");
+	MEASUREMENT_AREA_NOT_RECTANGULAR("ScenarioChecker.processor.measurementArea.hasToBeRectangular"),
 
-	private String msgId;
+	// Group attributes
+	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored");
+
+    private String msgId;
 
 	ScenarioCheckerReason(String msgId) {
 		this.msgId = msgId;
