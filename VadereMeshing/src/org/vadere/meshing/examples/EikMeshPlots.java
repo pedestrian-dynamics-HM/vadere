@@ -96,14 +96,14 @@ public class EikMeshPlots {
 		meshPanel.repaint();
 
 		var meshImprover2 = new PEikMesh(
-				p -> 0.1,
+				p -> 0.05 + 0.2 * Math.sqrt(p.getY() * p.getY() / 20.0 + p.getX() * p.getX() / 20.0),
 				dt.getTriangulation(),
 				true
 		);
 
 		while (!meshImprover2.isFinished()) {
 			meshImprover2.improve();
-			Thread.sleep(10);
+			Thread.sleep(1);
 			meshPanel.repaint();
 			System.out.println("imp");
 		}
