@@ -9,6 +9,9 @@ import java.util.Random;
  */
 public class AttributesSimulation extends Attributes {
 
+	/** Store the members of this class under this key in the JSON file. */
+	public static final String JSON_KEY = "attributesSimulation";
+
 	private double finishTime = 500;
 	/** Progress of simulation time between two simulation steps in a row. */
 	private double simTimeStepLength = 0.4;
@@ -20,9 +23,6 @@ public class AttributesSimulation extends Attributes {
 	private boolean useFixedSeed = true;
 	private long fixedSeed = new Random().nextLong();
 	private long simulationSeed;
-	/** Allows agent to change their behavior (e.g. from TARGET_ORIENTIED to COOPERATIVE if it is too dense) */
-	private boolean usePsychologyLayer = false;
-	private AttributesPsychology psychologyLayer = new AttributesPsychology();
 
 	// Getter...
 
@@ -65,12 +65,6 @@ public class AttributesSimulation extends Attributes {
 	public long getSimulationSeed() {
 		return simulationSeed;
 	}
-
-	public boolean isUsePsychologyLayer() {
-		return usePsychologyLayer;
-	}
-
-	public AttributesPsychology getPsychologyLayer() { return psychologyLayer; }
 
 	// Setters...
 
@@ -125,16 +119,6 @@ public class AttributesSimulation extends Attributes {
 		this.simulationSeed = simulationSeed;
 	}
 
-	public void setUsePsychologyLayer(boolean usePsychologyLayer) {
-		checkSealed();
-		this.usePsychologyLayer = usePsychologyLayer;
-	}
-
-	public void setPsychologyLayer(AttributesPsychology attributesPsychology) {
-		checkSealed();
-		this.psychologyLayer = attributesPsychology;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -149,13 +133,11 @@ public class AttributesSimulation extends Attributes {
 				digitsPerCoordinate == that.digitsPerCoordinate &&
 				useFixedSeed == that.useFixedSeed &&
 				fixedSeed == that.fixedSeed &&
-				simulationSeed == that.simulationSeed &&
-				usePsychologyLayer == that.usePsychologyLayer &&
-				psychologyLayer.equals(that.psychologyLayer);
+				simulationSeed == that.simulationSeed;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed, usePsychologyLayer, psychologyLayer);
+		return Objects.hash(finishTime, simTimeStepLength, realTimeSimTimeRatio, writeSimulationData, visualizationEnabled, printFPS, digitsPerCoordinate, useFixedSeed, fixedSeed, simulationSeed);
 	}
 }

@@ -393,7 +393,7 @@ public class Simulation {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 		perceptionModel.update(pedestrians, stimuli);
 
-		if (attributesSimulation.isUsePsychologyLayer()) {
+		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
 			cognitionModel.update(pedestrians);
 		}
 

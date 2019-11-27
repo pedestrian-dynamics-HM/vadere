@@ -1,65 +1,48 @@
 package org.vadere.state.attributes;
 
 import java.util.Objects;
+import java.util.Random;
 
 /**
- * This wrapper encapsulates psychology-related simulation parameters.
+ * This class encapsulates psychology-related simulation attributes.
  */
-public class AttributesPsychology {
+public class AttributesPsychology extends Attributes {
 
-    // Constants
-    // Watch out: Make sure these classes exist!
-    public static final String DEFAULT_PERCEPTION_MODEL = "SimplePerceptionModel";
-    public static final String DEFAULT_COGNITION_MODEL = "CooperativeCognitionModel";
+	/** Store the members of this class under this key in the JSON file. */
+	public static final String JSON_KEY = "attributesPsychology";
 
-    // Variables
-    // Both should reference to concrete "IPerception" and "ICognition"
-    // implementations! We do not reference them here to avoid cyclic
-    // dependencies between state and controller packages
-    private String perception;
-    private String cognition;
+	/** Allows agents to change their behavior (e.g. from TARGET_ORIENTIED to COOPERATIVE if it is too dense) */
+	private boolean usePsychologyLayer = false;
+	private AttributesPsychologyLayer psychologyLayer = new AttributesPsychologyLayer();
 
-    // Constructors
-    public AttributesPsychology() {
-        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL);
-    }
+	// Getter
+	public boolean isUsePsychologyLayer() {
+		return usePsychologyLayer;
+	}
+	public AttributesPsychologyLayer getPsychologyLayer() { return psychologyLayer; }
 
-    public AttributesPsychology(String perception, String cognition) {
-        this.perception = perception;
-        this.cognition = cognition;
-    }
+	// Setters
+	public void setUsePsychologyLayer(boolean usePsychologyLayer) {
+		checkSealed();
+		this.usePsychologyLayer = usePsychologyLayer;
+	}
 
-    // Getter
-    public String getPerception() {
-        return perception;
-    }
+	public void setPsychologyLayer(AttributesPsychologyLayer attributesPsychologyLayer) {
+		checkSealed();
+		this.psychologyLayer = attributesPsychologyLayer;
+	}
 
-    public String getCognition() {
-        return cognition;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		AttributesPsychology that = (AttributesPsychology) o;
+		return usePsychologyLayer == that.usePsychologyLayer &&
+				psychologyLayer.equals(that.psychologyLayer);
+	}
 
-    // Setter
-    public void setPerception(String perception) {
-        this.perception = perception;
-    }
-
-    public void setCognition(String cognition) {
-        this.cognition = cognition;
-    }
-
-    // Overridden Methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AttributesPsychology that = (AttributesPsychology) o;
-        return Objects.equals(perception, that.perception) &&
-                Objects.equals(cognition, that.cognition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(perception, cognition);
-    }
-
+	@Override
+	public int hashCode() {
+		return Objects.hash(usePsychologyLayer, psychologyLayer);
+	}
 }

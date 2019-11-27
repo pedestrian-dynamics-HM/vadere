@@ -20,7 +20,7 @@ public class PerceptionModelBuilder {
 	public static final String JAVA_PACKAGE_SEPARATOR = ".";
 
 	public static IPerceptionModel instantiateModel(ScenarioStore scenarioStore) {
-		String simpleClassName = scenarioStore.getAttributesSimulation().getPsychologyLayer().getPerception();
+		String simpleClassName = scenarioStore.getAttributesPsychology().getPsychologyLayer().getPerception();
 		String classSearchPath = IPerceptionModel.class.getPackageName();
 		String fullyQualifiedClassName = classSearchPath + JAVA_PACKAGE_SEPARATOR + simpleClassName;
 

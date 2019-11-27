@@ -176,27 +176,31 @@ public class TextView extends JPanel implements IJsonView {
 
 					try {
 						switch (attributeType) {
-						case MODEL:
-							ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
-							currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
-							currentScenario.setAttributesModel(modelDefinition.getAttributesList());
-							break;
-						case SIMULATION:
-							currentScenario
-									.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
-							break;
-						case OUTPUTPROCESSOR:
-							currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
-							break;
-						case TOPOGRAPHY:
-							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
-							break;
-						case STIMULUS:
-							StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
-							currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
-							break;
-						default:
-							throw new RuntimeException("attribute type not implemented.");
+							case MODEL:
+								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
+								currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
+								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
+								break;
+							case SIMULATION:
+								currentScenario
+										.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
+								break;
+							case PSYCHOLOGY:
+								currentScenario
+										.setAttributesPsychology(StateJsonConverter.deserializeAttributesPsychology(json));
+								break;
+							case OUTPUTPROCESSOR:
+								currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
+								break;
+							case TOPOGRAPHY:
+								currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
+								break;
+							case STIMULUS:
+								StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
+								currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
+								break;
+							default:
+								throw new RuntimeException("attribute type not implemented.");
 						}
 						currentScenario.updateCurrentStateSerialized();
 						ScenarioPanel.removeJsonParsingErrorMsg();
@@ -266,6 +270,10 @@ public class TextView extends JPanel implements IJsonView {
 		case SIMULATION:
 			textfileTextarea
 					.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
+			break;
+		case PSYCHOLOGY:
+			textfileTextarea
+					.setText(StateJsonConverter.serializeAttributesPsychology(scenario.getAttributesPsychology()));
 			break;
 		case OUTPUTPROCESSOR:
 			textfileTextarea.setText(scenario.getDataProcessingJsonManager().serialize());

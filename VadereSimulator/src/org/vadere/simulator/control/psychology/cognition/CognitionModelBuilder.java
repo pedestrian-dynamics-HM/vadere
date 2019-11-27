@@ -15,7 +15,7 @@ public class CognitionModelBuilder {
 	public static final String JAVA_PACKAGE_SEPARATOR = ".";
 
 	public static ICognitionModel instantiateModel(ScenarioStore scenarioStore) {
-		String simpleClassName = scenarioStore.getAttributesSimulation().getPsychologyLayer().getCognition();
+		String simpleClassName = scenarioStore.getAttributesPsychology().getPsychologyLayer().getCognition();
 		String classSearchPath = ICognitionModel.class.getPackageName();
 		String fullyQualifiedClassName = classSearchPath + JAVA_PACKAGE_SEPARATOR + simpleClassName;
 
