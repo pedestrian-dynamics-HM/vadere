@@ -93,7 +93,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 75000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -138,30 +138,13 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 4,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 1.9,
-          "y" : 7.4,
-          "width" : 0.3,
-          "height" : 0.3,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 3,
         "absorbing" : false,
         "shape" : {
           "x" : 0.9,
-          "y" : 7.293187347931873,
-          "width" : 0.2658556366585564,
-          "height" : 0.30681265206812647,
+          "y" : 7.517444981213098,
+          "width" : 0.2741814278046163,
+          "height" : 0.08255501878690197,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -175,10 +158,10 @@
         "id" : 2,
         "absorbing" : false,
         "shape" : {
-          "x" : 1.9,
+          "x" : 2.0443337359098233,
           "y" : 5.4,
-          "width" : 0.3,
-          "height" : 0.3,
+          "width" : 0.15566626409017648,
+          "height" : 0.16769808254309027,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -194,8 +177,178 @@
         "shape" : {
           "x" : 0.9,
           "y" : 5.4,
-          "width" : 0.2999999999999998,
-          "height" : 0.2999999999999998,
+          "width" : 0.15420058746346987,
+          "height" : 0.17352239518100987,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 6,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 2.0967525496511006,
+          "y" : 7.576154052603328,
+          "width" : 0.10324745034889915,
+          "height" : 0.12384594739667243,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 4,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.5,
+          "y" : 6.2,
+          "width" : 0.1308075386175227,
+          "height" : 0.1423316633864138,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 10,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.5,
+          "y" : 7.634863123993559,
+          "width" : 0.16062801932367154,
+          "height" : 0.1651368760064411,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 11,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 2.0548174986580783,
+          "y" : 7.072933440687064,
+          "width" : 0.11182680264805889,
+          "height" : 0.1197478678356294,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 12,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.6,
+          "y" : 7.0,
+          "width" : 0.07157772708296073,
+          "height" : 0.09949230631597761,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 13,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 7.1,
+          "width" : 0.08914646329098841,
+          "height" : 0.12180287171229232,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 14,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 6.7,
+          "width" : 0.1240923391185067,
+          "height" : 0.18399273871294763,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 7,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.7,
+          "y" : 5.863526570048309,
+          "width" : 0.22230273752012897,
+          "height" : 0.33647342995169094,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 8,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.5725644122383253,
+          "y" : 5.6,
+          "width" : 0.12743558776167463,
+          "height" : 0.10748158585316414,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 9,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 1.030903336911791,
+          "y" : 5.957927029283712,
+          "width" : 0.16909666308820892,
+          "height" : 0.14207297071628755,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -265,7 +418,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -308,7 +461,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -351,7 +504,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -394,7 +547,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -437,7 +590,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -480,7 +633,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -523,7 +676,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -566,7 +719,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -609,7 +762,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -652,7 +805,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -695,7 +848,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -738,7 +891,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
@@ -781,7 +934,7 @@
           "mostImportantStimulus" : null,
           "selfCategory" : null
         },
-        "groupIds" : [ ],
+        "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
