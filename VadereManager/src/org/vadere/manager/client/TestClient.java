@@ -387,6 +387,18 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void personapi_getHasNextTarget(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		TraCIGetResponse res = (TraCIGetResponse)personapi.getHasNextTarget(elementIdentifier);
+		System.out.println(res.getResponseData());
+	}
+
 	// simulationapi
 
 	@Override
