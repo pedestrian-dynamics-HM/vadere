@@ -437,9 +437,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		// Checkbox menu item to turn off result dialog of project run.
 		mnFile.addSeparator();
-		boolean showDialogDefault = VadereConfig.getConfig()
-				.getBoolean("Project.simulationResult.show", false);
-		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, showDialogDefault);
+		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, model.getShowSimulationResultDialog());
 		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
 		showResultDialogMenu.setAction(showResultDialogMenuAction);
 		mnFile.add(showResultDialogMenu);

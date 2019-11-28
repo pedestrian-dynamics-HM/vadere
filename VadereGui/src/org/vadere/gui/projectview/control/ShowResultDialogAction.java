@@ -22,7 +22,7 @@ public class ShowResultDialogAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		model.setShowSimulationResultDialog(item.getState());
 		VadereConfig.getConfig().setProperty("Project.simulationResult.show", item.getState());
+		model.setShowSimulationResultDialog(item.getState());
 	}
 }

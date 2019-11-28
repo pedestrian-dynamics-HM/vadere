@@ -48,7 +48,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private double visTime;
 
-	private double visTimeStepLength;
+	private double timeResolution;
 
 	private double simTimeStepLength;
 
@@ -75,7 +75,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.topographyId = 0;
 		this.potentialContainer = null;
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
-		this.visTimeStepLength = this.simTimeStepLength;
+		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
 		this.predicateColoringModel = new PredicateColoringModel();
 		this.outputChanged = false;
@@ -118,19 +118,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	private double stepToTime(final int step) {
-		return visTimeStepLength * (step - 1);
+		return timeResolution * (step - 1);
 	}
 
 	public synchronized PredicateColoringModel getPredicateColoringModel() {
 		return predicateColoringModel;
 	}
 
-	public synchronized double getVisTimeStepLength() {
-		return visTimeStepLength;
+	public synchronized double getTimeResolution() {
+		return timeResolution;
 	}
 
-	public synchronized void setVisTimeStepLength(final double visTimeStepLength) {
-		this.visTimeStepLength = visTimeStepLength;
+	public synchronized void setTimeResolution(final double visTimeStepLength) {
+		this.timeResolution = visTimeStepLength;
 	}
 
 	public synchronized double getSimTimeStepLength() {

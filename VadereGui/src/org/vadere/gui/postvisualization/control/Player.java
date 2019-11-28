@@ -87,7 +87,7 @@ public class Player implements Runnable {
 			switch (state) {
 				case RUNNING: {
 					if (isRunnable()) {
-						double newSimeTimeInSec = model.getSimTimeInSec() + model.getVisTimeStepLength();
+						double newSimeTimeInSec = model.getSimTimeInSec() + model.getTimeResolution();
 						if(model.getSimTimeInSec() >= model.getMaxSimTimeInSec()) {
 							newSimeTimeInSec = 0;
 						}

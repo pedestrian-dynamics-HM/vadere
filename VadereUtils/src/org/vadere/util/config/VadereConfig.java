@@ -245,7 +245,7 @@ public class VadereConfig {
         defaultConfig.put("PostVis.maxNumberOfSaveDirectories", "5");
         defaultConfig.put("PostVis.maxFramePerSecond", "40");
         defaultConfig.put("PostVis.framesPerSecond", "20");
-        defaultConfig.put("PostVis.visTimeStepLength", "0.1");
+        defaultConfig.put("PostVis.timeResolution", "0.4");
         defaultConfig.put("PostVis.cellWidth", "1.0");
         defaultConfig.put("PostVis.minCellWidth", "0.01");
         defaultConfig.put("PostVis.maxCellWidth", "10.0");
@@ -259,6 +259,7 @@ public class VadereConfig {
         defaultConfig.put("ProjectView.defaultDirectoryAttributes", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryScenarios", defaultSearchDirectory);
         defaultConfig.put("ProjectView.defaultDirectoryOutputProcessors", defaultSearchDirectory);
+        defaultConfig.put("Project.simulationResult.show", "true");
         defaultConfig.put("SettingsDialog.dataFormat", "yyyy_MM_dd_HH_mm_ss");
         defaultConfig.put("SettingsDialog.outputDirectory.path", ".");
         defaultConfig.put("SettingsDialog.snapshotDirectory.path", ".");
