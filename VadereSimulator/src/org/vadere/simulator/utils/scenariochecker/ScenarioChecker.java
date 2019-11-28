@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.CheckAreasInAreaDensityVoronoiProcessor;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.DataProcessorsLinkedToMeasurementArea;
+import org.vadere.simulator.utils.scenariochecker.checks.simulation.GroupSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.PedestrianSpeedSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.SourceMinRadiusCheck;
@@ -71,6 +72,7 @@ public class ScenarioChecker {
 		ret.addAll(runCheck(new TopographyOffsetCheck()));
 		ret.addAll(runCheck(new DataProcessorsLinkedToMeasurementArea()));
 		ret.addAll(runCheck(new CheckAreasInAreaDensityVoronoiProcessor()));
+		ret.addAll(runCheck(new GroupSetupCheck()));
 		return ret;
 	}
 
