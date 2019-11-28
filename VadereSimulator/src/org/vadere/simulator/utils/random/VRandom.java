@@ -1,7 +1,6 @@
 package org.vadere.simulator.utils.random;
 
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 
 import java.util.Random;
@@ -15,12 +14,16 @@ public interface VRandom {
 	 *
 	 * If the Random does not exist it will be created.
 	 *
-	 * @param clazz		class used as key to return Random object
-	 * @param id		id of the ScenarioElement
-	 * @return			Random object solly used for the {@link ScenarioElement}
-	 * 					with the given id.
+	 * @param metaSeedKey	Key to select dedicated MetaSeed
+	 * @param id		id used within MetaSeed to select the correct Random Object
+	 * @return			Random object
 	 */
-	Random get(Class<?> clazz, int id);
+
+	Random get(String metaSeedKey, int id);
+
+	default Random get(Class<?> clazz, int id){
+		return get(clazz.getCanonicalName(), id);
+	}
 
 	default Random getForPedestrian(int id){
 		return get(Pedestrian.class, id);

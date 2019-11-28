@@ -26,10 +26,10 @@ public class VaderRandom implements VRandom {
 	}
 
 	@Override
-	public Random get(Class<?> clazz, int id) {
-		MetaSeed metaSeed = metaSeeds.get(clazz.getCanonicalName());
+	public Random get(String metaSeedKey, int id) {
+		MetaSeed metaSeed = metaSeeds.get(metaSeedKey);
 		if (metaSeed == null){
-			throw new IllegalStateException("No metaSeed register for given class " + clazz.getCanonicalName());
+			throw new IllegalStateException("No metaSeed register for given key " + metaSeedKey);
 		}
 		return metaSeed.get(id);
 	}
