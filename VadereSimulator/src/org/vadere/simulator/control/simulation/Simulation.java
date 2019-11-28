@@ -243,9 +243,9 @@ public class Simulation {
 			}
 
 			preLoop();
+			logger.info("preLoop finished.");
 
 			while (isRunSimulation) {
-
 				synchronized (this) {
 					while (isPaused) {
 						try {
