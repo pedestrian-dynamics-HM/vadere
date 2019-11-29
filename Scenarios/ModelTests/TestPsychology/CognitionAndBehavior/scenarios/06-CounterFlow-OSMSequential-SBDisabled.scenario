@@ -1,7 +1,7 @@
 {
   "name" : "06-CounterFlow-OSMSequential-SBDisabled",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -108,8 +108,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 6138355022448163583,
-      "simulationSeed" : 6138355022448163583,
-      "usePsychologyLayer" : false
+      "simulationSeed" : 6138355022448163583
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {

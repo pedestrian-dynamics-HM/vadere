@@ -8,6 +8,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
@@ -48,14 +49,18 @@ public class JsonConverter {
 		String scenarioName = rootNode.get("name").asText();
 		String scenarioDescription = rootNode.get("description").asText();
 
-		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get("attributesSimulation"));
+		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get(AttributesSimulation.JSON_KEY));
+		AttributesPsychology attributesPsychology = StateJsonConverter.deserializeAttributesPsychologyFromNode(scenarioNode.get(AttributesPsychology.JSON_KEY));
 		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
 		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
 		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
 		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
 
-		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription, mainModel, attributesModel, attributesSimulation, topography, stimulusInfoStore);
+		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription,
+				mainModel, attributesModel,
+				attributesSimulation, attributesPsychology,
+				topography, stimulusInfoStore);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
@@ -103,18 +108,15 @@ public class JsonConverter {
 
 		vadereNode.put(StateJsonConverter.MAIN_MODEL_KEY, scenarioStore.getMainModel());
 
-		// vadere > attributesModel
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		vadereNode.set("attributesModel", attributesModelNode);
 
-		// vadere > attributesSimulation
-		vadereNode.set("attributesSimulation", StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class));
+		vadereNode.set(AttributesSimulation.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class));
+		vadereNode.set(AttributesPsychology.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class));
 
-		// vadere > topography
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		vadereNode.set("topography", topographyNode);
 
-		// vadere > eventInfos
 		// We get a complete tree here and not only a node. Therefore, use "setAll()" instead of "set()".
 		ObjectNode eventNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
 		vadereNode.setAll(eventNode);
@@ -129,6 +131,7 @@ public class JsonConverter {
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
+		JsonNode attributesPsychologyNode = StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class);
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		ObjectNode stimulusNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
@@ -141,6 +144,7 @@ public class JsonConverter {
 		return new ScenarioStore(scenarioStore.getName(), scenarioStore.getDescription(), scenarioStore.getMainModel(),
 				StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode),
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
+				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
 				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode));
 	}

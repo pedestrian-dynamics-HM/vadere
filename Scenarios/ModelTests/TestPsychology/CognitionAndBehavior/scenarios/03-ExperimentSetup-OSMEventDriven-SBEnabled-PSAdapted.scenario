@@ -1,7 +1,7 @@
 {
   "name" : "03-ExperimentSetup-OSMEventDriven-SBEnabled-PSAdapted",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -108,8 +108,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : false,
       "fixedSeed" : 6138355022448163583,
-      "simulationSeed" : 0,
-      "usePsychologyLayer" : true
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : true,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
