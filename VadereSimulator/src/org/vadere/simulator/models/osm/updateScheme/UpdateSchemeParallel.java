@@ -28,7 +28,7 @@ import org.vadere.util.logging.Logger;
  * will be performed in parallel on the bases of the situation (i.e. agents position) at <tt>currentTimeInSec</tt> - <tt>timeStepInSec</tt>.
  */
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
-
+	private static final int NUMBER_OF_THREADS = 8;
 	private static Logger logger = Logger.getLogger(UpdateSchemeParallel.class);
 	protected final ExecutorService executorService;
 	protected final Topography topography;
@@ -38,7 +38,11 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 */
 	protected final Set<Pedestrian> movePedestrians;
 
+	/**
+	 * marks an agent which shall move back because of conflicts.
+	 */
 	protected final Set<Pedestrian> undoPedestrians;
+
 	private final OSMBehaviorController osmBehaviorController;
 
 	static {
@@ -47,7 +51,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
-		this.executorService = Executors.newFixedThreadPool(1);
+		this.executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 		this.movePedestrians = new HashSet<>();
 		this.undoPedestrians = new HashSet<>();
 		this.osmBehaviorController = new OSMBehaviorController();
