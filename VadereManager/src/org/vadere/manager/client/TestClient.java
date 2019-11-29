@@ -149,7 +149,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	}
 
-
 	void close(String[] args) throws IOException {
 
 		traCISocket.sendExact(TraCICloseCommand.build());
@@ -160,7 +159,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println("Bye");
 		consoleReader.stop();
 	}
-
 
 	void nextSimTimeStep(String[] args) throws IOException{
 		double nextSimTime = -1.0;
