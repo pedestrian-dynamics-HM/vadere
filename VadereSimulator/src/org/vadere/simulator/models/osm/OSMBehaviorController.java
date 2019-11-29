@@ -67,12 +67,9 @@ public class OSMBehaviorController {
         assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
 
         if (nextPosition.equals(currentPosition)) {
-            pedestrian.setTimeCredit(0);
             pedestrian.setVelocity(new Vector2D(0, 0));
 
         } else {
-            pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep());
-
             pedestrian.setPosition(nextPosition);
             synchronized (topography) {
                 topography.moveElement(pedestrian, currentPosition);
@@ -91,10 +88,26 @@ public class OSMBehaviorController {
         pedestrian.getFootstepHistory().add(currentFootstep);
     }
 
+	/**
+	 * This operation undo the last foot step of an agent. This is required to resolve conflicts by the {@link org.vadere.simulator.models.osm.updateScheme.UpdateSchemeParallel}.
+	 *
+	 * @param pedestrian the agent
+	 * @param topography the topography
+	 */
+	public void undoStep(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
+	    FootStep footStep = pedestrian.getTrajectory().removeLast();
+	    pedestrian.getFootstepHistory().removeLast();
+
+	    pedestrian.setPosition(footStep.getStart());
+	    synchronized (topography) {
+		    topography.moveElement(pedestrian, footStep.getEnd());
+	    }
+	    pedestrian.setVelocity(new Vector2D(0, 0));
+    }
+
     public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
         // Satisfy event-driven and sequential update scheme.
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
-        pedestrian.setTimeCredit(0);
     }
 
     // Watch out: A bang event changes only the "CombinedPotentialStrategy".
@@ -319,12 +332,5 @@ public class OSMBehaviorController {
 
         pedestrian1.setTimeOfNextStep(endTimeStep);
         pedestrian2.setTimeOfNextStep(endTimeStep);
-
-        // TODO:
-        //  "makeStep()" already invokes
-        //  "pedestrian.setTimeCredit(pedestrian.getTimeCredit() - pedestrian.getDurationNextStep())"
-        //  => Ask BZ if is it really necessary to call it twice (and subtract duration twice)?
-        pedestrian1.setTimeCredit(pedestrian1.getTimeCredit() - durationStep);
-        pedestrian2.setTimeCredit(pedestrian1.getTimeCredit());
     }
 }
