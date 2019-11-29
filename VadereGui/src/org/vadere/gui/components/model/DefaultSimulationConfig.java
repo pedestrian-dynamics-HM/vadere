@@ -20,6 +20,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double densityStandardDerivation = CONFIG.getDouble("Density.standardDeviation");
 	private double pedestrianTorso = CONFIG.getDouble("Pedestrian.radius") * 2;
 
+	private boolean interpolatePositions = true;
 	private boolean showPedestrianIds = false;
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
@@ -293,7 +294,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return randomColors.get(pedId);
 	}
 
-	public void setGridWidth(double gridWidth) {
+	public void setGridWidth(final double gridWidth) {
 		this.gridWidth = gridWidth;
 	}
 
@@ -319,6 +320,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public boolean isShowFaydedPedestrians() {
 		return false;
+	}
+
+	public boolean isInterpolatePositions() {
+		return interpolatePositions;
+	}
+
+	public void setInterpolatePositions(final boolean interpolatePositions) {
+		this.interpolatePositions = interpolatePositions;
+		setChanged();
 	}
 
 }

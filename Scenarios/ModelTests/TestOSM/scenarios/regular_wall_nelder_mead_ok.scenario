@@ -1,7 +1,7 @@
 {
   "name" : "regular_wall_nelder_mead_ok",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -116,8 +116,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1,
-      "useSalientBehavior" : false
+      "simulationSeed" : 1
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
@@ -139,7 +145,7 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -157,7 +163,7 @@
             "y" : 0.5001
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -175,7 +181,7 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -193,7 +199,7 @@
             "y" : 9.4999
           } ]
         },
-        "id" : -1
+        "id" : 6
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -211,7 +217,7 @@
             "y" : 10.0001
           } ]
         },
-        "id" : -1
+        "id" : 7
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -242,9 +248,10 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.5,
           "y" : 2.5,
@@ -254,7 +261,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 50,
+        "spawnNumber" : 5,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -275,12 +282,12 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "angleCalculationType" : "USE_CENTER",
-        "targetOrientationAngleThreshold" : 45.0
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

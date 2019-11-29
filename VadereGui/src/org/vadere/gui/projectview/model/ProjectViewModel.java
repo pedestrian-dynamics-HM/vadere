@@ -251,6 +251,10 @@ public class ProjectViewModel implements IScenarioChecker {
 						.findAny().isPresent();
 	}
 
+	public boolean getShowSimulationResultDialog() {
+		return showSimulationResultDialog;
+	}
+
 	public void fireRefreshOutputStarted() {
 		outputRefreshListeners.forEach(l -> l.preRefresh());
 	}

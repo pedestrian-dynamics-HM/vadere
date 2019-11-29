@@ -1,7 +1,7 @@
 {
   "name" : "rimea_11_exit_selection_nelder_mead",
   "description" : "",
-  "release" : "1.4",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.0709316978693857,
-        "maxMeanDifferenceFuncValue" : 0.034637431592363405,
+        "maxMeanPointDistance" : 0.06642665170830378,
+        "maxMeanDifferenceFuncValue" : 0.038131134445867326,
         "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.326056350852655,
-        "infoMinFuncDifference" : -0.010140720593533104,
-        "infoMaxFuncDifference" : 2.113085584226426,
-        "infoStddevPointDistance" : 0.12198739340543781,
-        "infoStddevDifferenceFuncValue" : 0.09742478889202222
+        "infoMaxPointDistanceL2" : 1.0500643679096149,
+        "infoMinFuncDifference" : -0.0053311824072430625,
+        "infoMaxFuncDifference" : 3.112265864907295,
+        "infoStddevPointDistance" : 0.10963419080612646,
+        "infoStddevDifferenceFuncValue" : 0.14872546127402636
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -121,8 +121,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1,
-      "useSalientBehavior" : false
+      "simulationSeed" : 1
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
@@ -223,6 +229,7 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
+      "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 2,
@@ -256,12 +263,12 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "angleCalculationType" : "USE_CENTER",
-        "targetOrientationAngleThreshold" : 45.0
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,
       "attributesCar" : null
     },
-    "eventInfos" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

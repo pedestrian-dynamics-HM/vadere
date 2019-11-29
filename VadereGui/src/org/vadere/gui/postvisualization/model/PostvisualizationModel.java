@@ -7,6 +7,8 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
@@ -46,7 +48,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private double visTime;
 
-	private double visTimeStepLength;
+	private double timeResolution;
 
 	private double simTimeStepLength;
 
@@ -73,7 +75,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.topographyId = 0;
 		this.potentialContainer = null;
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
-		this.visTimeStepLength = this.simTimeStepLength;
+		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
 		this.predicateColoringModel = new PredicateColoringModel();
 		this.outputChanged = false;
@@ -116,19 +118,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	private double stepToTime(final int step) {
-		return visTimeStepLength * (step - 1);
+		return timeResolution * (step - 1);
 	}
 
 	public synchronized PredicateColoringModel getPredicateColoringModel() {
 		return predicateColoringModel;
 	}
 
-	public synchronized double getVisTimeStepLength() {
-		return visTimeStepLength;
+	public synchronized double getTimeResolution() {
+		return timeResolution;
 	}
 
-	public synchronized void setVisTimeStepLength(final double visTimeStepLength) {
-		this.visTimeStepLength = visTimeStepLength;
+	public synchronized void setTimeResolution(final double visTimeStepLength) {
+		this.timeResolution = visTimeStepLength;
 	}
 
 	public synchronized double getSimTimeStepLength() {
@@ -177,6 +179,16 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return agentList;
 	}
 
+	@Override
+	public Collection<Pedestrian> getPedestrians() {
+		Table agents = getAgentTable();
+		List<Pedestrian> agentList = new ArrayList<>(agents.rowCount());
+		for(Row agentRow : agents) {
+			agentList.add(toAgent(agentRow));
+		}
+		return agentList;
+	}
+
 	public synchronized TableTrajectoryFootStep getTrajectories() {
 		return trajectories;
 	}
@@ -193,7 +205,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.getAgentDataFrame();
 	}
 
-	private Agent toAgent(final Row row) {
+	private Pedestrian toAgent(final Row row) {
 		int pedId = row.getInt(trajectories.pedIdCol);
 		double startTime = row.getDouble(trajectories.startTimeCol);
 		double endTime = row.getDouble(trajectories.endTimeCol);
@@ -203,7 +215,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		double endY = row.getDouble(trajectories.endYCol);
 
 		VPoint position;
-		if(startTime <= getSimTimeInSec() && endTime >= getSimTimeInSec()) {
+		if(config.isInterpolatePositions() && (startTime <= getSimTimeInSec() && endTime >= getSimTimeInSec())) {
 			position = FootStep.interpolateFootStep(startX, startY, endX, endY, startTime, endTime, getSimTimeInSec());
 		} else {
 			position = new VPoint(endX, endY);
@@ -222,6 +234,16 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 		if(trajectories.groupSizeCol != -1) {
 			pedestrian.getGroupSizes().addLast(row.getInt(trajectories.groupSizeCol));
+		}
+
+		if(trajectories.mostImportantStimulusCol != -1) {
+			String mostImportantStimulusString = row.getString(trajectories.mostImportantStimulusCol);
+			pedestrian.setMostImportantStimulus(StimulusFactory.stringToStimulus(mostImportantStimulusString));
+		}
+
+		if(trajectories.selfCategoryCol != -1) {
+			String selfCategoryString = row.getString(trajectories.selfCategoryCol);
+			pedestrian.setSelfCategory(SelfCategory.valueOf(selfCategoryString));
 		}
 
 		return pedestrian;

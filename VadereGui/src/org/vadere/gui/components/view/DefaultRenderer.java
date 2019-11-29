@@ -109,32 +109,35 @@ public abstract class DefaultRenderer {
 		synchronized (defaultModel) {
 			graphics2D.setColor(Color.WHITE);
 			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-			fill(new VRectangle(
-					topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
-					topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
-					(defaultModel.getTopographyBound().getWidth() - defaultModel.getBoundingBoxWidth() * 2),
-					(defaultModel.getTopographyBound().getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
 
+			// Maybe, the simulation thread has not populated all required data yet,
+			// but the rendering process has already been triggered.
+			if (topographyBound != null) {
+				fill(new VRectangle(
+						topographyBound.getMinX() + defaultModel.getBoundingBoxWidth(),
+						topographyBound.getMinY() + defaultModel.getBoundingBoxWidth(),
+						(topographyBound.getWidth() - defaultModel.getBoundingBoxWidth() * 2),
+						(topographyBound.getHeight() - defaultModel.getBoundingBoxWidth() * 2)), graphics2D);
+			}
 		}
 	}
 
 	protected void transformGraphics(final Graphics2D graphics2D) {
 		synchronized (defaultModel) {
 			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
-			mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
-			graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
-
-
-			//graphics2D.translate(-topographyBound.getMinX(), -topographyBound.getMinY());
-
-			/*
-			 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
-			 */
 			Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
-			double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-			graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
-			// graphics2D.translate(+viewportBound.getX(), -Math.max((dy - viewportBound.getY()), 0));
+			// Maybe, the simulation thread has not populated all required data yet,
+			// but the rendering process has already been triggered.
+			if (topographyBound != null && viewportBound != null) {
+				mirrowHorizonzal(graphics2D, (int) (topographyBound.getHeight() * defaultModel.getScaleFactor()));
+				graphics2D.scale(defaultModel.getScaleFactor(), defaultModel.getScaleFactor());
+
+				// We need this calculation because maybe the viewport.y = 0 (i.e., the user scrolled to the bottom)
+				double dy = topographyBound.getHeight() - viewportBound.getHeight();
+
+				graphics2D.translate(-viewportBound.getX(), Math.max((dy - viewportBound.getY()), - viewportBound.getY()));
+			}
 		}
 	}
 
@@ -278,30 +281,36 @@ public abstract class DefaultRenderer {
 	}
 
 	protected void renderLogo(final Graphics2D graphics, double scale, double height) {
-		/*
-		 * This calculation we need since the viewport.y = 0 if the user scrolls to the bottom
-		 */
-		double dy = defaultModel.getTopographyBound().getHeight() - defaultModel.getViewportBound().getHeight();
+		Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
+		Rectangle2D.Double viewportBound = defaultModel.getViewportBound();
 
-		// undo the viewport translation
-		graphics.translate(defaultModel.getViewportBound().getX(),
-				-Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
-		graphics.scale(1.0 / scale, 1.0 / scale);
-		graphics.translate(0, +defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
-		graphics.scale(1.0, -1.0);
+		// Maybe, the simulation thread has not populated all required data yet,
+		// but the rendering process has already been triggered.
+		if (topographyBound != null && viewportBound != null) {
+			// We need this calculation because maybe the viewport.y = 0 (i.e., the user scrolled to the bottom)
+			double dy = topographyBound.getHeight() - viewportBound.getHeight();
 
-		graphics.translate(0, 2.0);
-		graphics.scale(0.25, 0.25);
 
-		graphics.drawImage(logo, 0, 0, null);
+			// undo the viewport translation
+			graphics.translate(viewportBound.getX(),
+					-Math.max((dy - viewportBound.getY()), -viewportBound.getY()));
+			graphics.scale(1.0 / scale, 1.0 / scale);
+			graphics.translate(0, +topographyBound.getHeight() * defaultModel.getScaleFactor());
+			graphics.scale(1.0, -1.0);
 
-		// undo all scaling and translation
-		graphics.scale(1.0/0.25, 1.0/0.25);
-		graphics.translate(0, 1.0/2.0);
-		graphics.scale(1.0, -1.0);
-		graphics.translate(0, -defaultModel.getTopographyBound().getHeight() * defaultModel.getScaleFactor());
-		graphics.translate(-defaultModel.getViewportBound().getX(),
-				Math.max((dy - defaultModel.getViewportBound().getY()), -defaultModel.getViewportBound().getY()));
+			graphics.translate(0, 2.0);
+			graphics.scale(0.25, 0.25);
+
+			graphics.drawImage(logo, 0, 0, null);
+
+			// undo all scaling and translation
+			graphics.scale(1.0 / 0.25, 1.0 / 0.25);
+			graphics.translate(0, 1.0 / 2.0);
+			graphics.scale(1.0, -1.0);
+			graphics.translate(0, -topographyBound.getHeight() * defaultModel.getScaleFactor());
+			graphics.translate(-viewportBound.getX(),
+					Math.max((dy - viewportBound.getY()), -viewportBound.getY()));
+		}
 	}
 
 	protected boolean hasLogo() {
@@ -352,16 +361,21 @@ public abstract class DefaultRenderer {
 		g.setColor(Color.LIGHT_GRAY);
 		g.setStroke(new BasicStroke(getGridLineWidth()));
 		Rectangle2D.Double bound = defaultModel.getTopographyBound();
-		for (double y = bound.getMinY(); y <= bound.getMaxY() + 0.01; y +=
-				defaultModel.getGridResolution()) {
-			for (double x = bound.getMinX(); x <= bound.getMaxX() + 0.01; x +=
+
+		// Maybe, the simulation thread has not populated all required data yet,
+		// but the rendering process has already been triggered.
+		if (bound != null) {
+			for (double y = bound.getMinY(); y <= bound.getMaxY() + 0.01; y +=
 					defaultModel.getGridResolution()) {
-				draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
-						x + defaultModel.getGridResolution()
-								* 0.2, y), g);
-				draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
-						y + defaultModel.getGridResolution()
-								* 0.2), g);
+				for (double x = bound.getMinX(); x <= bound.getMaxX() + 0.01; x +=
+						defaultModel.getGridResolution()) {
+					draw(new Line2D.Double(x - defaultModel.getGridResolution() * 0.2, y,
+							x + defaultModel.getGridResolution()
+									* 0.2, y), g);
+					draw(new Line2D.Double(x, y - defaultModel.getGridResolution() * 0.2, x,
+							y + defaultModel.getGridResolution()
+									* 0.2), g);
+				}
 			}
 		}
 	}

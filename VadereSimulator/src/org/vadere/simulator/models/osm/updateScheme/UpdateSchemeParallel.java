@@ -13,24 +13,32 @@ import java.util.concurrent.Future;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.state.events.types.ElapsedTimeEvent;
+import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 
 /**
- * TODO: should also use OSMBehaviorController.makeStep !
+ * The implementation of the parallel update scheme described in 'How update schemes influence crowd simulations' i.e. seitz-2014b.
+ * The implementation is not based on the time credit concept but on event times similar to the event driven update scheme.
+ * The difference is that all events which starts within a time span of <tt>currentTimeInSec</tt> - <tt>timeStepInSec</tt> and <tt>currentTimeInSec</tt>
+ * will be performed in parallel on the bases of the situation (i.e. agents position) at <tt>currentTimeInSec</tt> - <tt>timeStepInSec</tt>.
  */
 public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	private static Logger logger = Logger.getLogger(UpdateSchemeParallel.class);
 	protected final ExecutorService executorService;
 	protected final Topography topography;
-	protected final Set<Pedestrian> movedPedestrians;
-	protected final Set<Pedestrian> stepPedestrians;
+
+	/**
+	 * marks an agent that will move in the time span.
+	 */
+	protected final Set<Pedestrian> movePedestrians;
+
+	protected final Set<Pedestrian> undoPedestrians;
 	private final OSMBehaviorController osmBehaviorController;
 
 	static {
@@ -40,8 +48,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	public UpdateSchemeParallel(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.executorService = Executors.newFixedThreadPool(1);
-		this.movedPedestrians = new HashSet<>();
-		this.stepPedestrians = new HashSet<>();
+		this.movePedestrians = new HashSet<>();
+		this.undoPedestrians = new HashSet<>();
 		this.osmBehaviorController = new OSMBehaviorController();
 	}
 
@@ -50,8 +58,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		clearStrides(topography);
 
 		do {
-			movedPedestrians.clear();
-			stepPedestrians.clear();
+			movePedestrians.clear();
+			undoPedestrians.clear();
 			CallMethod[] callMethods = {CallMethod.SEEK, CallMethod.MOVE, CallMethod.CONFLICTS, CallMethod.STEPS};
 			List<Future<?>> futures;
 
@@ -74,7 +82,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 				}
 
 			}
-		} while (!movedPedestrians.isEmpty());
+		} while (!movePedestrians.isEmpty());
 	}
 
 	protected void collectFutures(final List<Future<?>> futures) {
@@ -94,7 +102,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec, CallMethod callMethod) {
 
 		// At the moment no other events are supported for the parallel update scheme!
-		assert pedestrian.getMostImportantEvent() instanceof ElapsedTimeEvent;
+		assert pedestrian.getMostImportantStimulus() instanceof ElapsedTime && pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED;
 		switch (callMethod) {
 			case SEEK:
 				updateParallelSeek(pedestrian, currentTimeInSec, timeStepInSec);
@@ -129,8 +137,8 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 		if (pedestrian.getTimeOfNextStep() < currentTimeInSec) {
 			pedestrian.updateNextPosition();
-			synchronized (movedPedestrians) {
-				movedPedestrians.add(pedestrian);
+			synchronized (movePedestrians) {
+				movePedestrians.add(pedestrian);
 			}
 		}
 	}
@@ -143,7 +151,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 * @param pedestrian the pedestrian
 	 */
 	private void  updateParallelMove(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec) {
-		if (movedPedestrians.contains(pedestrian)) {
+		if (movePedestrians.contains(pedestrian)) {
 			osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);
 		}
 	}
@@ -155,7 +163,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 	 * @param pedestrian the pedestrian for which a rollback might be performed.
 	 */
 	protected void updateParallelConflicts(@NotNull final PedestrianOSM pedestrian) {
-		if (movedPedestrians.contains(pedestrian)) {
+		if (movePedestrians.contains(pedestrian)) {
 			pedestrian.refreshRelevantPedestrians();
 			List<Agent> others = getCollisionPedestrians(pedestrian);
 
@@ -175,26 +183,22 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 			}
 
 			if (!undoStep) {
-				synchronized (stepPedestrians) {
-					stepPedestrians.add(pedestrian);
+				synchronized (undoPedestrians) {
+					undoPedestrians.add(pedestrian);
 				}
-			} else {
-				//osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}
 
 	protected void updateParallelSteps(@NotNull final PedestrianOSM pedestrian) {
-		if(movedPedestrians.contains(pedestrian)) {
-			if(stepPedestrians.contains(pedestrian)) {
+		if(movePedestrians.contains(pedestrian)) {
+			if(undoPedestrians.contains(pedestrian)) {
 				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-				//osmBehaviorController.undoStep(pedestrian, topography);
 			} else {
 				osmBehaviorController.undoStep(pedestrian, topography);
 			}
 		}
 	}
-
 
 	/**
 	 * Computes a {@link List<Agent>} of pedestrians overlapping / colliding with the pedestrian

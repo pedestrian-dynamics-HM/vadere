@@ -6,6 +6,7 @@ import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -70,7 +71,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			slice = model.getAlivePedestrians();
 		}
 
-		Collection<Agent> agents = model.getAgents();
+		Collection<Pedestrian> agents = model.getPedestrians();
 
 		Map<Integer, Color> agentColors = new HashMap<>();
 		agents.forEach(agent -> agentColors.put(agent.getId(),  getPedestrianColor(agent)));
@@ -85,7 +86,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				double endX = row.getDouble(trajectories.endXCol);
 				double endY = row.getDouble(trajectories.endYCol);
 
-				if(isLastStep) {
+				if(isLastStep && model.config.isInterpolatePositions()) {
 					VPoint interpolatedPos = FootStep.interpolateFootStep(startX, startY, endX, endY, row.getDouble(trajectories.startTimeCol), row.getDouble(trajectories.endTimeCol), model.getSimTimeInSec());
 					endX = interpolatedPos.getX();
 					endY = interpolatedPos.getY();
@@ -117,7 +118,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 		// render agents i.e. circles
 		if (model.config.isShowPedestrians()) {
-			for(Agent agent : agents) {
+			for(Pedestrian agent : agents) {
 				if (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId())) {
 					agentRender.render(agent, agentColors.get(agent.getId()), g);
 					if (model.config.isShowPedestrianIds()) {

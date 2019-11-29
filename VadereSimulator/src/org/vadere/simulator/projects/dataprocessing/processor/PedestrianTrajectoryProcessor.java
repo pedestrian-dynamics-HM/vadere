@@ -1,7 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.VTrajectory;
@@ -46,6 +46,6 @@ public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey
 
 	@Override
 	public String[] toStrings(PedestrianIdKey key) {
-		return new String[]{"[" + StateJsonConverter.serialidzeObject(getValue(key)) + "]"};
+		return new String[]{"[" + StateJsonConverter.serializeObject(getValue(key)) + "]"};
 	}
 }

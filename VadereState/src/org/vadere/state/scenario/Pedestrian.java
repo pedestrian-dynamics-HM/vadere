@@ -1,8 +1,9 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.Event;
+import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
@@ -24,9 +25,12 @@ public class Pedestrian extends Agent {
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
-	private Event mostImportantEvent; /** Evaluated in each time step in "EventCognition". */
-	private SalientBehavior salientBehavior;
+
+	private PsychologyStatus psychologyStatus;
+
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
+	private LinkedList<Integer> groupSizes;
+
 	/**
 	 * trajectory is a list of foot steps a pedestrian made during the duration of one time step.
 	 * For all non event driven models this is exactly one foot step. For the event driven update
@@ -38,7 +42,6 @@ public class Pedestrian extends Agent {
 	/** This list stores the last n footsteps. I.e., this list is NOT cleared after each simulation loop like "trajectory" variable. */
 	private transient FootstepHistory footstepHistory;
 
-	private LinkedList<Integer> groupSizes;
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
 
@@ -58,8 +61,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		mostImportantEvent = null;
-		salientBehavior = SalientBehavior.TARGET_ORIENTED;
+		psychologyStatus = new PsychologyStatus(null, SelfCategory.TARGET_ORIENTED);
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -67,14 +69,14 @@ public class Pedestrian extends Agent {
 		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
 	}
 
-	private Pedestrian(Pedestrian other) {
+	protected Pedestrian(Pedestrian other) {
 		super(other);
 
 		idAsTarget = other.idAsTarget;
 		isChild = other.isChild;
 		isLikelyInjured = other.isLikelyInjured;
-		mostImportantEvent = other.mostImportantEvent;
-		salientBehavior = other.salientBehavior;
+
+		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -99,8 +101,8 @@ public class Pedestrian extends Agent {
 	public boolean isLikelyInjured() {
 		return isLikelyInjured;
 	}
-	public Event getMostImportantEvent() { return mostImportantEvent; }
-	public SalientBehavior getSalientBehavior() { return salientBehavior; }
+	public Stimulus getMostImportantStimulus() { return psychologyStatus.getMostImportantStimulus(); }
+	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -147,8 +149,8 @@ public class Pedestrian extends Agent {
 	public void setLikelyInjured(boolean likelyInjured) {
 		this.isLikelyInjured = likelyInjured;
 	}
-	public void setMostImportantEvent(Event mostImportantEvent) { this.mostImportantEvent = mostImportantEvent; }
-	public void setSalientBehavior(SalientBehavior salientBehavior) { this.salientBehavior = salientBehavior; }
+	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychologyStatus.setMostImportantStimulus(mostImportantStimulus); }
+	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}

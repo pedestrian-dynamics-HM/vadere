@@ -11,8 +11,10 @@ public enum PersonVar {
 
 	ID_LIST(0x00, TraCIDataType.STRING_LIST), // get
 	COUNT(0x01, TraCIDataType.INTEGER), // get
+	NEXT_ID(0x02, TraCIDataType.INTEGER), // get
 	SPEED(0x40, TraCIDataType.DOUBLE), // get, set
-	POS_2D(0x42, TraCIDataType.POS_2D), // get
+	POS_2D(0x42, TraCIDataType.POS_2D), // get, set
+	POS_2D_LIST(0xff, TraCIDataType.POS_2D_LIST), // get
 	POS_3D(0x42, TraCIDataType.POS_3D), // get
 	ANGLE(0x43, TraCIDataType.DOUBLE), // get
 	SLOPE(0x36, TraCIDataType.DOUBLE), // get

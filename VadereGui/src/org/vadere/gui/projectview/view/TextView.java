@@ -15,8 +15,8 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.events.json.EventInfoStore;
-import org.vadere.state.events.presettings.EventPresettings;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
+import org.vadere.state.psychology.perception.presettings.StimulusPresettings;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.config.VadereConfig;
@@ -176,27 +176,31 @@ public class TextView extends JPanel implements IJsonView {
 
 					try {
 						switch (attributeType) {
-						case MODEL:
-							ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
-							currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
-							currentScenario.setAttributesModel(modelDefinition.getAttributesList());
-							break;
-						case SIMULATION:
-							currentScenario
-									.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
-							break;
-						case OUTPUTPROCESSOR:
-							currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
-							break;
-						case TOPOGRAPHY:
-							currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
-							break;
-						case EVENT:
-							EventInfoStore eventInfoStore = StateJsonConverter.deserializeEvents(json);
-							currentScenario.getScenarioStore().setEventInfoStore(eventInfoStore);
-							break;
-						default:
-							throw new RuntimeException("attribute type not implemented.");
+							case MODEL:
+								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
+								currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
+								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
+								break;
+							case SIMULATION:
+								currentScenario
+										.setAttributesSimulation(StateJsonConverter.deserializeAttributesSimulation(json));
+								break;
+							case PSYCHOLOGY:
+								currentScenario
+										.setAttributesPsychology(StateJsonConverter.deserializeAttributesPsychology(json));
+								break;
+							case OUTPUTPROCESSOR:
+								currentScenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserialize(json));
+								break;
+							case TOPOGRAPHY:
+								currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
+								break;
+							case STIMULUS:
+								StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
+								currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
+								break;
+							default:
+								throw new RuntimeException("attribute type not implemented.");
 						}
 						currentScenario.updateCurrentStateSerialized();
 						ScenarioPanel.removeJsonParsingErrorMsg();
@@ -218,12 +222,12 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	private void generatePresettingsMenu(final AttributeType attributeType) {
-		if (attributeType == AttributeType.EVENT) {
+		if (attributeType == AttributeType.STIMULUS) {
 			JMenuBar presetMenuBar = new JMenuBar();
 			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
 			presetMenuBar.add(mnPresetMenu);
 
-			EventPresettings.PRESETTINGS_MAP.forEach(
+			StimulusPresettings.PRESETTINGS_MAP.forEach(
 					(clazz, jsonString) -> mnPresetMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
 						private static final long serialVersionUID = 1L;
 
@@ -267,6 +271,10 @@ public class TextView extends JPanel implements IJsonView {
 			textfileTextarea
 					.setText(StateJsonConverter.serializeAttributesSimulation(scenario.getAttributesSimulation()));
 			break;
+		case PSYCHOLOGY:
+			textfileTextarea
+					.setText(StateJsonConverter.serializeAttributesPsychology(scenario.getAttributesPsychology()));
+			break;
 		case OUTPUTPROCESSOR:
 			textfileTextarea.setText(scenario.getDataProcessingJsonManager().serialize());
 			break;
@@ -275,9 +283,9 @@ public class TextView extends JPanel implements IJsonView {
 			topography.removeBoundary();
 			textfileTextarea.setText(StateJsonConverter.serializeTopography(topography));
 			break;
-		case EVENT:
-			EventInfoStore eventInfoStore = scenario.getScenarioStore().getEventInfoStore();
-			textfileTextarea.setText(StateJsonConverter.serializeEvents(eventInfoStore));
+		case STIMULUS:
+			StimulusInfoStore stimulusInfoStore = scenario.getScenarioStore().getStimulusInfoStore();
+			textfileTextarea.setText(StateJsonConverter.serializeStimuli(stimulusInfoStore));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

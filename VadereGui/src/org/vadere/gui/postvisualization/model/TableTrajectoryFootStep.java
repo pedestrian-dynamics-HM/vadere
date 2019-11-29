@@ -6,18 +6,15 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.behavior.SalientBehavior;
-import org.vadere.state.events.types.Event;
-import org.vadere.state.events.types.EventFactory;
+import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
@@ -57,8 +54,8 @@ public class TableTrajectoryFootStep {
 	public final int groupIdCol;
 	public final int groupSizeCol;
 
-	private final int mostImportantEventCol;
-	private final int salientBehaviorCol;
+	public final int mostImportantStimulusCol;
+	public final int selfCategoryCol;
 
 	public static final int agentDFPedIdCol = 0;
 	public static final int birthTimeCol = 1;
@@ -87,8 +84,8 @@ public class TableTrajectoryFootStep {
 		targetIdCol = columnNames.getTargetIdCol(dataFrame);
 		groupIdCol = columnNames.getGroupIdCol(dataFrame);
 		groupSizeCol = columnNames.getGroupSizeCol(dataFrame);
-		mostImportantEventCol = columnNames.getMostImportantEventCol(dataFrame);
-		salientBehaviorCol = columnNames.getSalientBehaviorCol(dataFrame);
+		mostImportantStimulusCol = columnNames.getMostImportantStimulusCol(dataFrame);
+		selfCategoryCol = columnNames.getSelfCategoryCol(dataFrame);
 
 
 		this.trajectoryDataFrame = dataFrame;
@@ -140,16 +137,16 @@ public class TableTrajectoryFootStep {
 			pedestrian.getGroupSizes().add(groupSize);
 		}
 
-		if(mostImportantEventCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			String mostImportantEventClassName = row.getString(mostImportantEventCol);
-			Event event = EventFactory.stringToEvent(mostImportantEventClassName);
-			pedestrian.setMostImportantEvent(event);
+		if(mostImportantStimulusCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			String mostImportantStimulusClassName = row.getString(mostImportantStimulusCol);
+			Stimulus stimulus = StimulusFactory.stringToStimulus(mostImportantStimulusClassName);
+			pedestrian.setMostImportantStimulus(stimulus);
 		}
 
-		if(salientBehaviorCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
-			String salientBehaviorEnumName = row.getString(mostImportantEventCol);
-			SalientBehavior salientBehavior = SalientBehavior.valueOf(salientBehaviorEnumName);
-			pedestrian.setSalientBehavior(salientBehavior);
+		if(selfCategoryCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			String selfCategoryEnumName = row.getString(selfCategoryCol);
+			SelfCategory selfCategory = SelfCategory.valueOf(selfCategoryEnumName);
+			pedestrian.setSelfCategory(selfCategory);
 		}
 
 		return pedestrian;

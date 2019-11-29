@@ -8,29 +8,30 @@ import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
-import org.vadere.util.logging.Logger;
-import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.PathFindingTag;
+import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.logging.Logger;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -356,7 +357,9 @@ public class TestFFMNonUniformTriangulation {
         int counter = 0;
         try {
             //System.out.println(getClass().getClassLoader().getResource("./potentialField.csv").getFile());
-            FileWriter writer = new FileWriter("./potentialField_reg_0_4.csv");
+            Path p = Paths.get("target/classes").toAbsolutePath();
+            p.toFile().mkdirs();
+            FileWriter writer = new FileWriter(p.resolve("./potentialField_reg_0_4.csv").toAbsolutePath().toString());
             for(double y = yMin; y < bbox.getMaxY()-2.1; y += 0.1) {
                 for(double x = xMin; x < bbox.getMaxX()-2.1; x += 0.1) {
                     double val = solver.getPotential(x ,y);

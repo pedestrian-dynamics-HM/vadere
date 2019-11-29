@@ -20,7 +20,7 @@ public class ClientHandler implements Runnable{
 
 	private final ServerSocket serverSocket;
 	private final TraCISocket traCISocket;
-	private final CommandExecutor cmdExecutor;
+	private CommandExecutor cmdExecutor;
 	private RemoteManager remoteManager;
 
 
@@ -44,7 +44,6 @@ public class ClientHandler implements Runnable{
 		} catch (Exception e){
 			logger.error("Error while handling TraCI Message", e);
 		}
-
 	}
 
 	private void handleClient() throws IOException{
@@ -59,7 +58,6 @@ public class ClientHandler implements Runnable{
 					TraCICommand cmd = traCIPacketBuffer.nextCommand();
 					while (cmd != null ){
 
-
 						TraCIPacket response = cmdExecutor.execute(cmd);
 						logger.debugf("send packet with %d byte", response.size());
 						traCISocket.sendExact(response);
@@ -72,6 +70,10 @@ public class ClientHandler implements Runnable{
 		} finally {
 			traCISocket.close();
 			remoteManager.stopSimulationIfRunning();
+			cmdExecutor = null;
+			remoteManager = null;
+			// hint VM to call garbage collection. The current simulation is done.
+			System.gc();
 		}
 
 	}

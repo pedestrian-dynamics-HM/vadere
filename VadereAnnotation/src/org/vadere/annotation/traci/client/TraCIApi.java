@@ -15,14 +15,18 @@ public @interface TraCIApi {
 			"org.vadere.manager.TraCISocket",
 			"org.vadere.manager.traci.commands.TraCIGetCommand",
 			"org.vadere.manager.traci.commands.TraCISetCommand",
+			"org.vadere.manager.traci.compoundobjects.CompoundObject",
 			"org.vadere.manager.traci.respons.TraCIGetResponse",
 			"org.vadere.manager.traci.writer.TraCIPacket",
 			"org.vadere.manager.traci.respons.TraCIResponse",
+
 			"java.io.IOException",
-			"java.util.ArrayList"
+			"java.util.ArrayList",
+			"org.vadere.util.geometry.shapes.VPoint"
 	};
 	String extendedClassName() default "TraCIClientApi";
 	String name();
+	String nameShort() default "";
 	Class singleAnnotation();
 	Class multipleAnnotation();
 	Class cmdEnum();

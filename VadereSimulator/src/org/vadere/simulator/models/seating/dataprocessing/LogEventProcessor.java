@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.vadere.simulator.control.SimulationState;
+import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.seating.SeatingModel;
 import org.vadere.simulator.models.seating.trainmodel.Compartment;
@@ -91,7 +91,7 @@ public class LogEventProcessor extends DataProcessor<IdDataKey, LogEventEntry> {
 	@Override
 	public void doUpdate(SimulationState state) {
 		updateTime(state);
-		// sit-down events are logged by a target listener registered in init()
+		// sit-down stimuli are logged by a target listener registered in init()
 	}
 
 	private TrainModel getTrainModelFromProcessorManager(ProcessorManager manager) {

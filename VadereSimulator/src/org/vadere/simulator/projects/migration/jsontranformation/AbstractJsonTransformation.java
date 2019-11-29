@@ -7,6 +7,8 @@ import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.MigrationException;
+import org.vadere.state.attributes.AttributesPsychology;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
 
@@ -131,13 +133,43 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
     // choose  sort order based on targetVersion.
     public JsonNode sort (JsonNode node) {
 
-        if (getTargetVersion().equalOrBigger(Version.V0_8)){
+        if (getTargetVersion().equalOrBigger(Version.V1_7)) {
+            node = sort_since_V1_7(node);
+        } else if (getTargetVersion().equalOrBigger(Version.V1_5)){
+            node = sort_since_V1_5(node);
+        } else if (getTargetVersion().equalOrBigger(Version.V0_8)){
             node = sort_since_V08(node);
         } else {
             node = sort_since_V01(node);
         }
 
         return  node;
+    }
+
+    private JsonNode sort_since_V1_7(JsonNode node) {
+        LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
+        LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
+        putObject(sortedRoot, source, "name");
+        putObject(sortedRoot, source, "description");
+        putObject(sortedRoot, source, "release");
+        putObject(sortedRoot, source, "commithash");
+        putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, AttributesPsychology.JSON_KEY, "topography", "stimulusInfos");
+
+        return  StateJsonConverter.deserializeToNode(sortedRoot);
+    }
+
+    private JsonNode sort_since_V1_5(JsonNode node) {
+        LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
+        LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
+        putObject(sortedRoot, source, "name");
+        putObject(sortedRoot, source, "description");
+        putObject(sortedRoot, source, "release");
+        putObject(sortedRoot, source, "commithash");
+        putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, "topography", "stimulusInfos");
+
+        return  StateJsonConverter.deserializeToNode(sortedRoot);
     }
 
     private JsonNode sort_since_V08(JsonNode node) {
@@ -148,7 +180,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         putObject(sortedRoot, source, "release");
         putObject(sortedRoot, source, "commithash");
         putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
-        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography", "eventInfos");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, "topography", "eventInfos");
 
         return  StateJsonConverter.deserializeToNode(sortedRoot);
     }
@@ -161,7 +193,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         putObject(sortedRoot, source, "release");
         putObject(sortedRoot, source, "commithash");
         putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped");
-        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", "attributesSimulation", "topography");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, "topography");
 
         return  StateJsonConverter.deserializeToNode(sortedRoot);
     }

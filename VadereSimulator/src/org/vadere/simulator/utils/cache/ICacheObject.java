@@ -28,6 +28,11 @@ public interface ICacheObject<T> {
 			}
 
 			@Override
+			public String getCacheLocation() {
+				return "";
+			}
+
+			@Override
 			public String getCacheIdentifier() {
 				return cacheIdentifier;
 			}
@@ -38,6 +43,7 @@ public interface ICacheObject<T> {
 	void persistObject(T object) throws CacheException;
 	boolean readable();
 	boolean writable();
+	String getCacheLocation();
 
 	String getCacheIdentifier();
 

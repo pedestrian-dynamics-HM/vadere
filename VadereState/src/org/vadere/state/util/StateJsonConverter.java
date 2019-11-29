@@ -3,7 +3,6 @@ package org.vadere.state.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -13,12 +12,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.*;
-import org.vadere.state.events.json.EventInfo;
-import org.vadere.state.events.json.EventInfoStore;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.logging.Logger;
@@ -121,7 +121,14 @@ public abstract class StateJsonConverter {
 		return mapper.treeToValue(node, AttributesSimulation.class);
 	}
 
-	
+	public static AttributesPsychology deserializeAttributesPsychology(String json) throws IOException  {
+		return deserializeObjectFromJson(json, AttributesPsychology.class);
+	}
+
+	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
+			throws JsonProcessingException {
+		return mapper.treeToValue(node, AttributesPsychology.class);
+	}
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
@@ -171,25 +178,25 @@ public abstract class StateJsonConverter {
 	}
 
 	/**
-	 * Pass a node representing an array of @see EventInfo objects.
+	 * Pass a node representing an array of @see StimulusInfo objects.
 	 *
 	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
-	 * an you call "get("eventInfos") on this @see JsonNode.
+	 * and you call "get("stimulusInfos") on this @see JsonNode.
 	 */
-	public static EventInfoStore deserializeEventsFromArrayNode(JsonNode node) throws IllegalArgumentException {
-		EventInfoStore eventInfoStore = new EventInfoStore();
+	public static StimulusInfoStore deserializeStimuliFromArrayNode(JsonNode node) throws IllegalArgumentException {
+		StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
 
 		if (node != null) {
-			List<EventInfo> eventInfoList = new ArrayList<>();
-			node.forEach(eventInfoNode -> eventInfoList.add(mapper.convertValue(eventInfoNode, EventInfo.class)));
-			eventInfoStore.setEventInfos(eventInfoList);
+			List<StimulusInfo> stimulusInfoList = new ArrayList<>();
+			node.forEach(stimulusInfoNode -> stimulusInfoList.add(mapper.convertValue(stimulusInfoNode, StimulusInfo.class)));
+			stimulusInfoStore.setStimulusInfos(stimulusInfoList);
 		}
 
-		return eventInfoStore;
+		return stimulusInfoStore;
 	}
 
-	public static EventInfoStore deserializeEvents(String json) throws IOException {
-		return mapper.readValue(json, EventInfoStore.class);
+	public static StimulusInfoStore deserializeStimuli(String json) throws IOException {
+		return mapper.readValue(json, StimulusInfoStore.class);
 	}
 
 	public static Pedestrian deserializePedestrian(String json) throws IOException {
@@ -339,6 +346,11 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
 	}
 
+	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
+			throws JsonProcessingException {
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
+	}
+
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {
 		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
@@ -351,13 +363,13 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(node);
 	}
 
-	public static String serializeEvents(EventInfoStore eventInfoStore)
+	public static String serializeStimuli(StimulusInfoStore stimulusInfoStore)
 			throws JsonProcessingException {
-		return prettyWriter.writeValueAsString(mapper.convertValue(eventInfoStore, JsonNode.class));
+		return prettyWriter.writeValueAsString(mapper.convertValue(stimulusInfoStore, JsonNode.class));
 	}
 
-	public static ObjectNode serializeEventsToNode(EventInfoStore eventInfoStore) {
-		return mapper.valueToTree(eventInfoStore);
+	public static ObjectNode serializeStimuliToNode(StimulusInfoStore stimulusInfoStore) {
+		return mapper.valueToTree(stimulusInfoStore);
 	}
 
 	public static String serializeObjectPretty(Object object) {
@@ -368,7 +380,7 @@ public abstract class StateJsonConverter {
 		}
 	}
 
-	public static String serialidzeObject(Object object) {
+	public static String serializeObject(Object object) {
 		try {
 			return writer.writeValueAsString(mapper.convertValue(object, JsonNode.class));
 		} catch (JsonProcessingException | IllegalArgumentException e) {
@@ -378,7 +390,7 @@ public abstract class StateJsonConverter {
 
 	public static String getScenarioStoreHash(Object object){
 		JsonNode jsonNode = mapper.convertValue(object, JsonNode.class);
-		JsonNode attrSimulation = jsonNode.findPath("attributesSimulation");
+		JsonNode attrSimulation = jsonNode.findPath(AttributesSimulation.JSON_KEY);
 		if (! attrSimulation.isMissingNode()){
 			((ObjectNode)attrSimulation).remove("simulationSeed");
 			((ObjectNode)attrSimulation).remove("useFixedSeed");

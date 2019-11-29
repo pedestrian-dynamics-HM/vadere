@@ -46,7 +46,7 @@ public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IP
     public Vector2D getTargetPotentialGradient(VPoint pos, Agent ped) {
         double[] gradient = { 0.0, 0.0 };
 
-        if (ped.getNextTargetId() > -1) {
+        if (ped.hasNextTarget()) {
             InterpolationUtil.getGradientMollified(getCellGrids().get(ped.getNextTargetId()), new double[]{pos.getX(), pos.getY()}, gradient, 0.1);
         }
 
