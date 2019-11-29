@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId", "reachablePointProvider"})
+@JsonIgnoreProperties(value = {"allOtherAttributes", "obstacleDistanceFunction", "contextId", "reachablePointProvider", "idProvider"})
 public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
@@ -112,7 +112,7 @@ public class Topography implements DynamicElementMover{
 	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
 	/** set dynamicElementIds to values bigger than the biggest initial element to ensure unique ids.**/
-	private AtomicInteger dynamicElementIdCounter;
+	private final AtomicInteger idProvider;
 
 	public Topography(
 			AttributesTopography attributes,
@@ -167,7 +167,7 @@ public class Topography implements DynamicElementMover{
 				new Random(42), getBounds(), obstacleDistanceFunction);
 
 
-		this.dynamicElementIdCounter = new AtomicInteger(1);
+		this.idProvider = new AtomicInteger(1);
 		this.contextId = "";
 	}
 
@@ -354,9 +354,12 @@ public class Topography implements DynamicElementMover{
 	 * @return next free Id for a pedestrian.
 	 */
 	public int getNextDynamicElementId(){
-		int nextId = this.dynamicElementIdCounter.get();
-		assert !checkDynamicElementIdExist(nextId): "Same dynamicElementId issued twice!";
-		dynamicElementIdCounter.incrementAndGet();
+		int nextId;
+		synchronized (idProvider){
+			nextId = this.idProvider.get();
+			assert !checkDynamicElementIdExist(nextId): "DynamicElementId issued twice!";
+			idProvider.incrementAndGet();
+		}
 		return nextId;
 	}
 
@@ -368,18 +371,21 @@ public class Topography implements DynamicElementMover{
 	 * @return				free Id. May be requestedId if it was free.
 	 */
 	public int getNextDynamicElementId(int fixedId){
-		assert !checkDynamicElementIdExist(fixedId): "Same dynamicElementId issued twice!";
+		assert !checkDynamicElementIdExist(fixedId): "DynamicElementId issued twice!";
+		synchronized (idProvider){
+			idProvider.set(fixedId + 1);
+		}
 		return fixedId;
 	}
 
-	/**
-	 * Initialize dynamicElementIdCounter based on initial pedestrians placed in the topography.
-	 * To prevent duplicated ids later on in the simulation.
-	 */
-	public void initializePedestrianCount() {
-		int maxIdUsed  = pedestrians.getElements().stream().mapToInt(Pedestrian::getId).max().orElse(0);
-		this.dynamicElementIdCounter.set(maxIdUsed + 1);
-		logger.info(String.format("Set PedestrianIdCount to start value: %d", this.dynamicElementIdCounter.get()));
+	public void initializeIdProvider() {
+		// getInitialElements() not needed here. At this point the initial elements are added.
+		ArrayList<ScenarioElement> all = getAllScenarioElements();
+		int maxIdUsed  = all.stream().map(ScenarioElement::getId).max(Integer::compareTo).orElse(0);
+		synchronized (idProvider){
+			this.idProvider.set(maxIdUsed + 1);
+			logger.info(String.format("IdProvider initialized. Id starts at value: %d", this.idProvider.get()));
+		}
 	}
 
 	public boolean isRecomputeCells() {
@@ -576,6 +582,9 @@ public class Topography implements DynamicElementMover{
 				s.addObstacle(obstacle.clone());
 		}
 
+		// ensure the clone has the same idProvider
+		s.idProvider.set(this.idProvider.get());
+
 		for (MeasurementArea measurementArea : this.getMeasurementAreas()){
 			s.addMeasurementArea(measurementArea);
 		}
@@ -676,67 +685,16 @@ public class Topography implements DynamicElementMover{
 	}
 
 	public void generateUniqueIdIfNotSet(){
-		Set<Integer> usedIds = sources.stream().map(Source::getId).collect(Collectors.toSet());
-		usedIds.addAll(targets.stream().map(Target::getId).collect(Collectors.toSet()));
-		usedIds.addAll(targetChangers.stream().map(TargetChanger::getId).collect(Collectors.toSet()));
-		usedIds.addAll(obstacles.stream().map(Obstacle::getId).collect(Collectors.toSet()));
-		usedIds.addAll(stairs.stream().map(Stairs::getId).collect(Collectors.toSet()));
-		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
-		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
-		usedIds.addAll(getInitialElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toSet()));
-
-		sources.stream()
+		ArrayList<ScenarioElement> all = getAllScenarioElements();
+		all.addAll(getInitialElements(Pedestrian.class)); // add initial pedestrians. At current point they may not be in the list.
+		AtomicInteger nextId = new AtomicInteger(all.stream().map(ScenarioElement::getId).max(Integer::compareTo).orElse(0));
+		all.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
-
-		targets.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
-
-		targetChangers.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
-
-		obstacles.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
-
-		stairs.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
-
-		measurementAreas.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
-
-		absorbingAreas.stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
-
-
-		getInitialElements(Pedestrian.class).stream()
-				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
-				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+				.forEach(s -> s.setId(nextId.incrementAndGet()));
 	}
-
-	private int nextIdNotInSet(Set<Integer> usedIDs){
-		int newId = 1;
-		while (usedIDs.contains(newId)){
-			newId++;
-		}
-		usedIDs.add(newId);
-		return newId;
-	}
-
 
 	public ArrayList<ScenarioElement> getAllScenarioElements(){
-		ArrayList<ScenarioElement> all = new ArrayList<>((obstacles.size()
-				+ stairs.size()
-				+ targets.size()
-				+ targetChangers.size()
-				+ sources.size()
-				+ boundaryObstacles.size()
-				+ absorbingAreas.size()));
+		Set<ScenarioElement> all = new HashSet<>();
 
 		all.addAll(obstacles);
 		all.addAll(stairs);
@@ -746,7 +704,12 @@ public class Topography implements DynamicElementMover{
 		all.addAll(boundaryObstacles);
 		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
-		return  all;
+		all.addAll(getPedestrianDynamicElements().getElements());
+		all.addAll(getPedestrianDynamicElements().getElements());
+		all.addAll(getInitialElements(Pedestrian.class));
+		all.addAll(getInitialElements(Car.class));
+
+		return new ArrayList<>(all);
 
 	}
 

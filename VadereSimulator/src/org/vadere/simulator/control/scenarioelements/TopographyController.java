@@ -66,7 +66,7 @@ public class TopographyController extends OfflineTopographyController {
 			}
 			topography.addElement(realPed);
 		}
-		topography.initializePedestrianCount();
+		topography.initializeIdProvider();
 	}
 
 	public void update(double simTimeInSec) {

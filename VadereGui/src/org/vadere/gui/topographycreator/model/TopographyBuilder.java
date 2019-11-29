@@ -48,8 +48,6 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
 
-	private AtomicInteger idProvider;
-
 	/**
 	 * Default-Constructor that initialize an empty TopographyBuilder.
 	 */
@@ -64,8 +62,6 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		absorbingAreas = new LinkedList<>();
 		topographyElements = new LinkedList<>();
 		attributes = new AttributesTopography();
-
-		idProvider = new AtomicInteger(1);
 	}
 
 	/**
@@ -104,21 +100,15 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		topographyElements.addAll(absorbingAreas);
 		topographyElements.addAll(pedestrians);
 
-		idProvider = new AtomicInteger(1);
 	}
 
 	private void setIds(){
 		Set<Integer> usedIds = topographyElements.stream().map(ScenarioElement::getId).filter(id-> id != Attributes.ID_NOT_SET).collect(Collectors.toSet());
+		AtomicInteger nextId = new AtomicInteger(usedIds.stream().max(Integer::compareTo).orElse(0) + 1);
 
 		topographyElements.stream()
 				.filter(e -> e.getId() == Attributes.ID_NOT_SET)
-				.forEach(e -> {
-					while (usedIds.contains(idProvider.get())){
-						idProvider.incrementAndGet();
-					}
-					usedIds.add(idProvider.get());
-					e.setId(idProvider.get());
-				});
+				.forEach(e -> e.setId(nextId.getAndIncrement()));
 	}
 
 	/**
