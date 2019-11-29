@@ -15,6 +15,7 @@ public class LinearInterpolationSpawnDistribution implements SpawnDistribution {
     private double spawnFrequency;
     private TruncatedNormalDistribution truncNormalDist;
     private RandomGenerator randomGenerator;
+    private int outstandingAgents = 0;
 
 
     public LinearInterpolationSpawnDistribution(RandomGenerator rng, List<Double> distributionParameters){
@@ -51,8 +52,19 @@ public class LinearInterpolationSpawnDistribution implements SpawnDistribution {
     }
 
     @Override
+    public int getOutstandingSpawnNumber(){
+        // Agents that could not be spawned (e.g. because the Source is too small) are not taken to the next update
+        return 0;
+    }
+
+    @Override
     public double getNextSpawnTime(double timeCurrentEvent) {
         return timeCurrentEvent + spawnFrequency;
     }
 
+
+
+    @Override
+    public void setOutstandingAgents(int outstandingAgents) {
+    }
 }

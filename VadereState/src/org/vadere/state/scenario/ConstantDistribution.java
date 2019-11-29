@@ -10,21 +10,33 @@ import java.util.List;
  * {@link org.vadere.state.attributes.scenario.AttributesSource}.
  *
  */
-public class ConstantDistribution extends ConstantRealDistribution implements SpawnDistribution {
+public class ConstantDistribution implements SpawnDistribution {
 
     private static final long serialVersionUID = 1L;
 
     private int spawnNumber;
+    private int outstandingAgents;
+    private double updateFrequency;
+
 
     /** Uniform constructor interface: RandomGenerator unusedRng, double... distributionParams */
     public ConstantDistribution(RandomGenerator rng, int spawnNumber, List<Double> distributionParameters) {
-        super(distributionParameters.get(0));
 
         //rng is not required, everything is deterministic
         this.spawnNumber = spawnNumber;
+        this.outstandingAgents = 0;
+        this.updateFrequency = distributionParameters.get(0);
 
         // Only a single parameter is required and read for ConstantDistributionLegacy
         assert distributionParameters.size() == 1;
+    }
+
+    public int getSpawnNumber() {
+        return spawnNumber;
+    }
+
+    public double getUpdateFrequency(){
+        return updateFrequency;
     }
 
     @Override
@@ -33,9 +45,19 @@ public class ConstantDistribution extends ConstantRealDistribution implements Sp
     }
 
     @Override
+    public int getOutstandingSpawnNumber() {
+        return this.outstandingAgents;
+    }
+
+    @Override
     public double getNextSpawnTime(double timeCurrentEvent) {
         //always add a constant value to the 'value'
-        return timeCurrentEvent + this.sample();
+        return timeCurrentEvent + this.updateFrequency;
     }
+
+    public void setOutstandingAgents(int outstandingAgents){
+        this.outstandingAgents = outstandingAgents;
+    }
+
 
 }

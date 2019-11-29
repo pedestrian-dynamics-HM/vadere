@@ -27,12 +27,13 @@ public class TestDistributionFactory {
 		try {
 			double param = 1;
 			int spawnNumber = 10;
-			RealDistribution expected = new ConstantDistributionLegacy(null, param);
+
+
 			DistributionFactory factory = new DistributionFactory(ConstantDistribution.class.getCanonicalName());
 			ConstantDistribution actual = (ConstantDistribution) factory.createDistribution(random, spawnNumber, new LinkedList<Double>(Arrays.asList(param)));
 
-			assertEquals(expected.getNumericalMean(), actual.getNumericalMean(), 0.000001);
-			assertEquals(expected.getNumericalVariance(), actual.getNumericalVariance(), 0.000001);
+			assertEquals(spawnNumber, actual.getSpawnNumber(0));
+			assertEquals(param, actual.getUpdateFrequency(), 1E-16);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
