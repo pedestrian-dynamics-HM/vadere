@@ -94,7 +94,7 @@ public class ScenarioRun implements Runnable {
 	private void initializeVadereContext(){
 		String scenarioName = scenario.getName();
 		this.scenarioStore.getTopography().setContextId(scenarioName);
-		VadereContext ctx = new VadereContext();
+		VadereContext ctx =  VadereContext.create(scenarioName);
 
 		if (scenarioCache.isNotEmpty())
 			ctx.setEikonalSolverProvider(new EikonalSolverCacheProvider(scenarioCache)); // cache found use CacheProvider if possible

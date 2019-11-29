@@ -1,6 +1,8 @@
 package org.vadere.simulator.models;
 
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.simulator.utils.random.VaderRandom;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
@@ -22,8 +24,7 @@ public class MainModelBuilder {
 		this.scenarioStore = scenarioStore;
 	}
 
-	public void createModelAndRandom()
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public void createModelAndRandom() {
 
 		final AttributesSimulation attributesSimulation = scenarioStore.getAttributesSimulation();
 		if (attributesSimulation.isUseFixedSeed()) {
@@ -35,6 +36,8 @@ public class MainModelBuilder {
 			attributesSimulation.setSimulationSeed(seed);
 			random = new Random(seed);
 		}
+
+		VadereContext.get(scenarioStore.getTopography()).setVRandom(new VaderRandom(random));
 
 		model = instantiateMainModel(random);
 
