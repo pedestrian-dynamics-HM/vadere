@@ -41,7 +41,7 @@ class Py4jClient():
         if interactive is True:
             embed()
 
-    def start(self, scenarioPath, scenFName, interactive=False):
-        self.ctr.sendFile(scenarioPath, scenFName)
-        if interactive is True:
-            embed()
+    # def start(self, scenarioPath, scenFName, interactive=False):
+    #     self.ctr.sendFile(scenarioPath, scenFName)
+    #     if interactive is True:
+    #         embed()

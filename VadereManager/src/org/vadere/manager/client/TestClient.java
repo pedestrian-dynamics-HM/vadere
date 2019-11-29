@@ -538,11 +538,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void polygonapi_getIDCount(String args[]) throws IOException{
-		if(args.length < 2){
-			System.out.println("command needs argument element id");
-			return;
-		}
-		String elementID = args[1];
 		TraCIResponse res = polygonapi.getIDCount();
 		System.out.println(res.toString());
 	}

@@ -5,8 +5,8 @@ from ._api_wrapper import ApiWrapper
 
 class ControllWrapper(ApiWrapper):
 
-    def sendFile(self, *args):
-        print(self._apiObject.sendFile(*args))
+    def sendFile(self, scenarioPath):
+        print(self._apiObject.sendFile(scenarioPath))
 
     def getVersion(self):
         print(self._apiObject.getVersion())

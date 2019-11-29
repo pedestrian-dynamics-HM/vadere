@@ -83,40 +83,23 @@ class TraCIControll{
 
     public String sendFile(String scenarioPath) throws IOException {
 
-        String filePath = scenarioPath;
-
-        // todo change this such that basePath and scenarioPath are both used, only makes sense with additional other constructors.
-//        String filePath;
-//
-//        if (!scenarioPath.isEmpty()) {
-//            if (!basePath.isEmpty()){
-//                filePath = Paths.get(basePath, scenarioPath + ".scenario").toString();
-//            } else {
-//                filePath = scenarioPath;
-//            }
-//        } else {
-//            if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-//                filePath = Paths.get(basePath, defaultScenario).toString();
-//                System.out.println("use default " + defaultScenario);
-//            } else {
-//                return "no default scenario set";
-//            }
-//        }
-
-        return sendFileFromPath(filePath);
-    }
-
-    public String sendFile() throws IOException {
-
         String filePath;
 
-        if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
-            filePath = Paths.get(basePath, defaultScenario).toString();
-            System.out.println("use default " + defaultScenario);
+        if (!scenarioPath.isEmpty()) {
+            if (!basePath.isEmpty()){
+                filePath = Paths.get(basePath, scenarioPath + ".scenario").toString();
+            } else {
+                filePath = scenarioPath;
+            }
         } else {
-            return "no default scenario set";
+            if (!basePath.isEmpty() && !defaultScenario.isEmpty()){
+                filePath = Paths.get(basePath, defaultScenario).toString();
+                System.out.println("use default " + defaultScenario);
+            } else {
+                System.out.println("no default scenario set");
+                return "";
+            }
         }
-
         return sendFileFromPath(filePath);
     }
 }
