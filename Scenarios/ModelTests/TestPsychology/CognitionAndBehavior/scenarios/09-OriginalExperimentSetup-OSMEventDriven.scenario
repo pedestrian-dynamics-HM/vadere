@@ -1,7 +1,7 @@
 {
   "name" : "09-OriginalExperimentSetup-OSMEventDriven",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -22,7 +22,11 @@
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 1
+      "id" : 1,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
       "id" : 2
@@ -139,8 +143,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : false,
       "fixedSeed" : -7548557034348592525,
-      "simulationSeed" : 0,
-      "usePsychologyLayer" : true
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : true,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {

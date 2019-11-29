@@ -40,12 +40,20 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 
 	private static final long serialVersionUID = 3522170593760789565L;
 	private static final Resources resources = Resources.getInstance("global");
-	private static final Configuration CONFIG = VadereConfig.getConfig();	private ScenarioElementView jsonPanel;
+	private static final Configuration CONFIG = VadereConfig.getConfig();
 
-	private JToolBar toolbar;
-	private SimulationInfoPanel infoPanel;
+
+	private JToolBar toolbar;				// top
+	private SimulationInfoPanel infoPanel;	// footer
+	private JScrollPane scenarioScrollPane; // left
+	private ScenarioElementView jsonPanel;  // right
+	private JSplitPane splitPaneForTopographyAndJsonPane; // container left/right
+	private MainPanel mainPanel;
+	private OnlineVisualizationModel model;
 
 	public OnlineVisualisationWindow(final MainPanel mainPanel, final OnlineVisualizationModel model) {
+		this.mainPanel = mainPanel;
+		this.model = model;
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		int windowHeight = screenSize.height - 250;
 
@@ -53,15 +61,15 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		FormLayout spiltLayout = new FormLayout("2dlu, default:grow(0.75), 2dlu, default:grow(0.25), 2dlu", // col
 				"2dlu, default, 2dlu, fill:default:grow, 2dlu, default, 2dlu"); // rows
 
-		JScrollPane scrollPane = new ScenarioScrollPane(mainPanel, model);
+		scenarioScrollPane = new ScenarioScrollPane(mainPanel, model);
 		model.addScaleChangeListener(mainPanel);
 		mainPanel.addComponentListener(new PanelResizeListener(model));
-		mainPanel.setScrollPane(scrollPane);
-		scrollPane.getViewport()
-				.addChangeListener(new JViewportChangeListener(model, scrollPane.getVerticalScrollBar()));
-		model.addScrollPane(scrollPane);
+		mainPanel.setScrollPane(scenarioScrollPane);
+		scenarioScrollPane.getViewport()
+				.addChangeListener(new JViewportChangeListener(model, scenarioScrollPane.getVerticalScrollBar()));
+		model.addScrollPane(scenarioScrollPane);
 
-		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(model, scrollPane);
+		IViewportChangeListener viewportChangeListener = new ViewportChangeListener(model, scenarioScrollPane);
 		model.addViewportChangeListener(viewportChangeListener);
 
 		jsonPanel = new ScenarioElementView(model);
@@ -256,13 +264,13 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog,
 				Messages.getString("ProjectView.btnSettings.tooltip"));
 
-		JSplitPane splitPaneForTopographyAndJsonPane = new JSplitPane();
+		splitPaneForTopographyAndJsonPane = new JSplitPane();
 		splitPaneForTopographyAndJsonPane.setResizeWeight(0.8);
 		splitPaneForTopographyAndJsonPane.resetToPreferredSizes();
-		splitPaneForTopographyAndJsonPane.setLeftComponent(scrollPane);
+		splitPaneForTopographyAndJsonPane.setLeftComponent(scenarioScrollPane);
 		splitPaneForTopographyAndJsonPane.setRightComponent(jsonPanel);
 
-		scrollPane.setPreferredSize(new Dimension(1, windowHeight));
+		scenarioScrollPane.setPreferredSize(new Dimension(1, windowHeight));
 
 		add(toolbar, cc.xyw(2, 2, 3));
 		add(splitPaneForTopographyAndJsonPane, cc.xywh(2, 4, 4, 1));

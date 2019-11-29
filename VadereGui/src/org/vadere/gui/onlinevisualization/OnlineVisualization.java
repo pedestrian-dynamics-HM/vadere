@@ -1,7 +1,5 @@
 package org.vadere.gui.onlinevisualization;
 
-import javax.swing.JPanel;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
@@ -93,6 +91,15 @@ public class OnlineVisualization implements PassiveCallback {
 
 	@Override
 	public void preLoop(double simTimeInSec) {
+		// [issue 280] ensure OnlineVisualisation model is completely setup before
+		// OnlineVisualisation renderer is initialized in window.preLoop()
+		// push pop DrawData once at the beginning. This will completely initialize the model
+		// (i.e. set Topography to correct value. Before this call it is null....)
+		pushDrawData(simTimeInSec);
+		model.popDrawData();
+
+		// [issue 280] activate mouse listeners to allow zoom action in OnlineVisualisation
+		window.addListener();
 		onlineVisualisationPanel.setVisible(this.enableVisualization);
 		window.preLoop();
 	}
@@ -101,6 +108,9 @@ public class OnlineVisualization implements PassiveCallback {
 	public void postLoop(double simTimeInSec) {
 		onlineVisualisationPanel.setVisible(false);
 		model.reset();
+
+		// [issue 280] deactivate mouse listeners because model is not valid anymore
+		window.removeListeners();
 	}
 
 	@Override
@@ -142,7 +152,17 @@ public class OnlineVisualization implements PassiveCallback {
 	}
 
 
-	public JPanel getVisualizationPanel() {
+	// [issue 280] show OnlineVisualization Window and remove mouse Listeners. This is necessary to ensure
+	// that no null pointer exception is thrown in the awt thread due to not completely
+	// initialized OnlineVisualisation model. A better fix would be to only initialize the
+	// OnlineVisualisation AFTER the model is loaded completely but this would need more changes
+	// in the gui setup.
+	public void showVisualization(){
+		window.setVisible(true);
+		window.removeListeners();
+	}
+
+	public OnlineVisualisationWindow getVisualizationPanel() {
 		return onlineVisualisationPanel;
 	}
 

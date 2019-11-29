@@ -2,29 +2,37 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The StimulusProcessor class should provide logic to prioritize {@link Stimulus}
- * for a pedestrian based on its current state/attributes (e.g., a {@link Bang}
- * is more important than a {@link Wait}.
+ * Use a very simple strategy to rank stimulus priority:
+ *
+ * ChangeTarget > Bang > Wait > WaitInArea
  */
-public class StimulusProcessor {
+public class SimplePerceptionModel implements IPerceptionModel {
 
-    public void prioritizeStimuliForPedestrians(List<Stimulus> stimuli, Collection<Pedestrian> pedestrians){
+    private Topography topography;
+
+    @Override
+    public void initialize(Topography topography) {
+        this.topography = topography;
+    }
+
+    @Override
+    public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
         for (Pedestrian pedestrian : pedestrians) {
-            // TODO: prioritize the stimuli for the current time step for each pedestrian individually.
-            //   by using a finite state machine, weight pedestrian's attributes or any other good mechanism.
-            Stimulus mostImportantStimulus = rankWaitHigherThanElapsedTime(stimuli, pedestrian);
+            Stimulus mostImportantStimulus = rankChangeTargetAndBangHigherThanWait(stimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
 
-    private Stimulus rankWaitHigherThanElapsedTime(List<Stimulus> stimuli, Pedestrian pedestrian) {
-        // TODO: replace dummy implementation here.
+    private Stimulus rankChangeTargetAndBangHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
+        // Assume the "ElapsedTime" is the most important stimulus
+        // unless there is something more important.
         Stimulus mostImportantStimulus = stimuli.stream()
                 .filter(stimulus -> stimulus instanceof ElapsedTime)
                 .collect(Collectors.toList())
@@ -55,5 +63,4 @@ public class StimulusProcessor {
 
         return mostImportantStimulus;
     }
-
 }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -120,7 +121,14 @@ public abstract class StateJsonConverter {
 		return mapper.treeToValue(node, AttributesSimulation.class);
 	}
 
-	
+	public static AttributesPsychology deserializeAttributesPsychology(String json) throws IOException  {
+		return deserializeObjectFromJson(json, AttributesPsychology.class);
+	}
+
+	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
+			throws JsonProcessingException {
+		return mapper.treeToValue(node, AttributesPsychology.class);
+	}
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
@@ -338,6 +346,11 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(mapper.convertValue(attributesSimulation, JsonNode.class));
 	}
 
+	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
+			throws JsonProcessingException {
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
+	}
+
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {
 		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
@@ -377,7 +390,7 @@ public abstract class StateJsonConverter {
 
 	public static String getScenarioStoreHash(Object object){
 		JsonNode jsonNode = mapper.convertValue(object, JsonNode.class);
-		JsonNode attrSimulation = jsonNode.findPath("attributesSimulation");
+		JsonNode attrSimulation = jsonNode.findPath(AttributesSimulation.JSON_KEY);
 		if (! attrSimulation.isMissingNode()){
 			((ObjectNode)attrSimulation).remove("simulationSeed");
 			((ObjectNode)attrSimulation).remove("useFixedSeed");

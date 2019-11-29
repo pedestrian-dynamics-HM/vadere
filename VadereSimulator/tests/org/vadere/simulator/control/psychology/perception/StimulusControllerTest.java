@@ -23,6 +23,7 @@ public class StimulusControllerTest {
                 null,
                 null,
                 null,
+                null,
                 store);
     }
 
@@ -30,6 +31,7 @@ public class StimulusControllerTest {
         return new ScenarioStore("name",
                 "description",
                 "mainModel",
+                null,
                 null,
                 null,
                 null,
@@ -112,6 +114,7 @@ public class StimulusControllerTest {
         ScenarioStore scenarioStoreContainingOneTimeAndRecurringStimulus = new ScenarioStore("name",
                 "description",
                 "mainModel",
+                null,
                 null,
                 null,
                 null,
