@@ -1,6 +1,7 @@
 package org.vadere.manager;
 
 import org.vadere.manager.traci.TraCIVersion;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
@@ -38,6 +39,11 @@ public class VadereServer implements Runnable{
 	public void run() {
 		try {
 			logger.infof("listening on port %d... (gui-mode: %s)", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
+			if (VadereConfig.getConfig().getBoolean("Vadere.cache.useGlobalCacheBaseDir")){
+				logger.infof("Cache location lookup searches at: %s",
+						VadereConfig.getConfig().getString("Vadere.cache.globalCacheBaseDir"));
+			}
+
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 
