@@ -272,7 +272,9 @@ public class Simulation {
 
 				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
-				updateWriters(simTimeInSec); // set SimulationState with Time!!!
+
+				step++;
+				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -345,17 +347,9 @@ public class Simulation {
 	}
 
 	private SimulationState initialSimulationState() {
-		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
+		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
 
 		return state;
-	}
-
-	private void updateWriters(double simTimeInSec) {
-		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
-
-		this.simulationState = simulationState;
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
@@ -387,7 +381,6 @@ public class Simulation {
 		}
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid
-		step++;
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 		perceptionModel.update(pedestrians, stimuli);

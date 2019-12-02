@@ -428,37 +428,6 @@ public class OSMBehaviorControllerTest {
     }
 
     @Test
-    public void swapPedestriansHandlesOSMTimeCreditParametersProperly() {
-        createSameDirectionTopography();
-
-        double timeOfNextStepPed1 = 1;
-        double timeOfNextStepPed2 = 1.5;
-        pedestrian1.setTimeOfNextStep(timeOfNextStepPed1);
-        pedestrian2.setTimeOfNextStep(timeOfNextStepPed2);
-
-        double timeCreditInSecPed1 = 1;
-        double timeCreditInSecPed2 = 1.5;
-        pedestrian1.setTimeCredit(timeCreditInSecPed1);
-        pedestrian2.setTimeCredit(timeCreditInSecPed2);
-
-        double maxStepDuration = Math.max(pedestrian1.getDurationNextStep(), pedestrian2.getDurationNextStep());
-        double stepDurationPed1 = pedestrian1.getDurationNextStep();
-
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-        controllerUnderTest.swapPedestrians(pedestrian1, pedestrian2, topography);
-
-        // For event-driven update scheme "timeOfNextStep" must be set properly.
-        double expectedTimeOfNextStep = timeOfNextStepPed1 + maxStepDuration;
-        assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(expectedTimeOfNextStep, pedestrian2.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
-
-        // For sequential update scheme "timeCredit" must be set properly.
-        double expectedTimeCredit = timeCreditInSecPed1 - (stepDurationPed1 + maxStepDuration);
-        assertEquals(expectedTimeCredit, pedestrian1.getTimeCredit(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(expectedTimeCredit, pedestrian2.getTimeCredit(), ALLOWED_DOUBLE_TOLERANCE);
-    }
-
-    @Test
     public void findSwapCandidateReturnsNullIfGivenPedestrianHasNotTarget() {
         createOppositeDirectionVariation2Topography();
 
@@ -652,21 +621,4 @@ public class OSMBehaviorControllerTest {
         double expectedTimeOfNextStep = currentSimTimeInSec + timeOfNextStep;
         assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
     }
-
-    @Test
-    public void waitSetsTimeCreditToZeroForSequentialUpdateScheme() {
-        createSameDirectionTopography();
-
-        double timeCredit = 1.0;
-        pedestrian1.setTimeCredit(timeCredit);
-        assertEquals(timeCredit, pedestrian1.getTimeCredit(), ALLOWED_DOUBLE_TOLERANCE);
-
-        double currentSimTimeInSec = 1.0;
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-        controllerUnderTest.wait(pedestrian1, currentSimTimeInSec);
-
-        double expectedTimeCredit = 0;
-        assertEquals(expectedTimeCredit, pedestrian1.getTimeCredit(), ALLOWED_DOUBLE_TOLERANCE);
-    }
-
 }
