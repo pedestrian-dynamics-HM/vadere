@@ -82,12 +82,13 @@ public class SingleSourceController extends SourceController {
 
 					}
 
-					// Report nr. of agents that could not be spawned -- it is up to the distribution if it
-					// stores this number to spawn the agents later.
-					int outstandingAgents = numberToSpawn - spawnPoints.size();
-					this.distribution.setOutstandingAgents(outstandingAgents);
-					assert (outstandingAgents >= 0);
 				}
+
+				// Report nr. of agents that could not be spawned -- it is up to SpawnDistribution if it
+				// wants to try to spawn the agents im the next update.
+				int outstandingAgents = numberToSpawn - spawnPoints.size();
+				assert (outstandingAgents >= 0);
+				this.distribution.setOutstandingAgents(outstandingAgents);
 
 				for (VPoint spawnPoint : spawnPoints) {
 					if (!isMaximumNumberOfSpawnedElementsReached()) {

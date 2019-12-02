@@ -40,13 +40,18 @@ public class ConstantDistribution implements SpawnDistribution {
     }
 
     @Override
-    public int getSpawnNumber(double timeCurrentEvent) {
-        return spawnNumber;
+    public int getOutstandingSpawnNumber() {
+        return this.outstandingAgents;
     }
 
     @Override
-    public int getOutstandingSpawnNumber() {
-        return this.outstandingAgents;
+    public void setOutstandingAgents(int outstandingAgents){
+        this.outstandingAgents = outstandingAgents;
+    }
+
+    @Override
+    public int getSpawnNumber(double timeCurrentEvent) {
+        return spawnNumber;
     }
 
     @Override
@@ -55,9 +60,7 @@ public class ConstantDistribution implements SpawnDistribution {
         return timeCurrentEvent + this.updateFrequency;
     }
 
-    public void setOutstandingAgents(int outstandingAgents){
-        this.outstandingAgents = outstandingAgents;
-    }
+
 
 
 }
