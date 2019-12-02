@@ -1,5 +1,6 @@
 package org.vadere.gui.onlinevisualization.model;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -140,8 +141,12 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 			if (topography == null) {
 				topography = observationAreaSnapshot.scenario;
-				fireChangeViewportEvent(new Rectangle2D.Double(topography.getBounds().x, topography.getBounds().y,
-						topography.getBounds().width, topography.getBounds().height));
+				// recalculate GUI (fireChangeViewportEvent will synchronize on model which is also
+				// needed by some awt event. Therefore do this in EDT (Event Dispatching Thread)
+				EventQueue.invokeLater(() -> {
+					fireChangeViewportEvent(new Rectangle2D.Double(topography.getBounds().x, topography.getBounds().y,
+							topography.getBounds().width, topography.getBounds().height));
+				});
 			} else {
 				topography = observationAreaSnapshot.scenario;
 			}
