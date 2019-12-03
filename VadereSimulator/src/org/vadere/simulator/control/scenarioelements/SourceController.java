@@ -120,7 +120,7 @@ public abstract class SourceController {
 			return;
 		}
 
-		// Read: timeOfNextEvent == timeOfCurrentEvent for this call:
+		// Read: timeOfNextEvent == timeOfCurrentEvent for this call
 		double newTimeOfNextEvent = distribution.getNextSpawnTime(timeOfNextEvent);
 
 		if(newTimeOfNextEvent > timeOfNextEvent){
