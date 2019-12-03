@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class PedestrianFlowProcessorTest extends ProcessorTest {
+public class PedestrianMeanFlowProcessorTest extends ProcessorTest {
 
 	@Override
 	@Before
