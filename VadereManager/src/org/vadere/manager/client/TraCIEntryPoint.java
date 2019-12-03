@@ -1,3 +1,7 @@
+/*
+ * Author: Philipp Schuegraf
+ */
+
 package org.vadere.manager.client;
 
 import org.vadere.manager.traci.commands.control.TraCICloseCommand;

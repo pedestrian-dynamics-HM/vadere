@@ -1,3 +1,5 @@
+# Author: Philipp Schuegraf
+
 from pythontraciwrapper.py4j_client import Py4jClient
 
 scenarioPath = "scenario002"

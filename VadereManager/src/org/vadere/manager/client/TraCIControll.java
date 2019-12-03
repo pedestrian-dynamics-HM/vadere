@@ -13,6 +13,9 @@ import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+/*
+ * Author: Philipp Schuegraf
+ */
 
 class TraCIControll{
 
