@@ -49,7 +49,11 @@ public enum ScenarioCheckerReason {
 	MEASUREMENT_AREA_NOT_RECTANGULAR("ScenarioChecker.processor.measurementArea.hasToBeRectangular"),
 
 	// Group attributes
-	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored");
+	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored"),
+
+
+	// Model reasons
+	CA_SPAWNING("ScenarioChecker.models.ca.spawning.setup.err");
 
     private String msgId;
 
