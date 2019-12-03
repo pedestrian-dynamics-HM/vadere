@@ -9,23 +9,13 @@ import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.bmm.BiomechanicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.simulator.models.osm.CellularAutomaton;
 import org.vadere.simulator.models.ovm.OptimalVelocityModel;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
 import org.vadere.simulator.models.sfm.SocialForceModel;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.ModelDefinition;
-import org.vadere.state.attributes.models.AttributesBHM;
-import org.vadere.state.attributes.models.AttributesBMM;
-import org.vadere.state.attributes.models.AttributesFloorField;
-import org.vadere.state.attributes.models.AttributesGNM;
-import org.vadere.state.attributes.models.AttributesOSM;
-import org.vadere.state.attributes.models.AttributesOVM;
-import org.vadere.state.attributes.models.AttributesPotentialCompact;
-import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
-import org.vadere.state.attributes.models.AttributesPotentialGNM;
-import org.vadere.state.attributes.models.AttributesPotentialSFM;
-import org.vadere.state.attributes.models.AttributesReynolds;
-import org.vadere.state.attributes.models.AttributesSFM;
+import org.vadere.state.attributes.models.*;
 
 /**
  * Singleton for model presets.
@@ -52,6 +42,12 @@ public class ModelPresets {
 		list.add(AttributesPotentialCompactSoftshell.class);
 		list.add(AttributesFloorField.class);
 		registerModelPreset(OptimalStepsModel.class, list);
+
+		// Cellular Automaton
+		list.clear();
+		list.add(AttributesCA.class);
+		list.add(AttributesFloorField.class);
+		registerModelPreset(CellularAutomaton.class, list);
 
 		// GNM
 		list.clear();
