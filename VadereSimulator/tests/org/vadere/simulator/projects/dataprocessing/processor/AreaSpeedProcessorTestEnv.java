@@ -115,7 +115,9 @@ public class AreaSpeedProcessorTestEnv extends ProcessorTestEnv<TimestepKey, Dou
 				when(state.getSimTimeInSec()).thenReturn(simTime);
 
 				int step = state.getStep();
-				addToExpectedOutput(new TimestepKey(step), 0.0);
+
+				// if no agent is in the area, then return NaN (see #287)
+				addToExpectedOutput(new TimestepKey(step), Double.NaN);
 			}
 		});
 	}
