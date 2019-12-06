@@ -12,6 +12,8 @@ import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIResponse;
 import org.vadere.manager.traci.respons.TraCISimTimeResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.state.attributes.scenario.AttributesTargetChanger;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
@@ -520,6 +522,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		String elementID = args[1];
 		TraCIResponse res = polygonapi.getShape(elementID);
 		System.out.println(res.toString());
+	}
+
+	public void foo(){
+		// Cient Side: client -> server (from Java POJO to JsonString)
+		AttributesTargetChanger at = null;
+		String stStr = StateJsonConverter.serializeObject(at);
+		CompoundObject objIn = CompoundObject.writeAsJson(stStr);
+
+		// Server
+		CompoundObject cObj = objIn; // << vom Client bekommen.
+		String data = CompoundObject.readAsJson(cObj);
+		try {
+			AttributesTargetChanger attServer = StateJsonConverter.convertValue(data, AttributesTargetChanger.class);
+		} catch (Exception e){
+			//todo: traci erro.
+		}
 	}
 
 	@Override
