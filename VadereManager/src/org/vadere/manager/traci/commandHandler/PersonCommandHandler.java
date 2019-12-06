@@ -16,6 +16,7 @@ import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -374,11 +375,37 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 		return null;
 	}
 
+//	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, ignoreElementId = true, name = "createNew", dataTypeStr = "CompoundObject")
+//	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
+//		PersonCreateData data = new PersonCreateData((CompoundObject) cmd.getVariableValue());
+//		VPoint pos = data.getPos();
+//		LinkedList<Integer> targets = data.getTargetsAsInt();
+//		String id =  cmd.getElementId();
+//
+//		remoteManager.accessState((manager, state) -> {
+//			List<String> idList = state.getTopography().getPedestrianDynamicElements()
+//					.getElements()
+//					.stream()
+//					.map(p -> Integer.toString(p.getId()))
+//					.collect(Collectors.toList());
+//			if(idList.contains(id)){
+//				// call it a failure
+//				cmd.setErr("id is not free");
+//			} else {
+//				Pedestrian oldPed = state.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(idList.get(0)));
+//				Pedestrian newDynamicElement = (Pedestrian) state.getMainModel().get().createElement(pos, Integer.parseInt(id), oldPed.getClass());
+//				newDynamicElement.setTargets(targets);
+//				state.getTopography().getPedestrianDynamicElements().addElement(newDynamicElement);
+//
+//				cmd.setOK();
+//			}
+//		});
+//
+//		return cmd;
+//	}
 	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.ADD, ignoreElementId = true, name = "createNew", dataTypeStr = "CompoundObject")
 	public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
-		PersonCreateData data = new PersonCreateData((CompoundObject) cmd.getVariableValue());
-		VPoint pos = data.getPos();
-		LinkedList<Integer> targets = data.getTargetsAsInt();
+		String data = CompoundObject.readAsJson((CompoundObject) cmd.getVariableValue());
 		String id =  cmd.getElementId();
 
 		remoteManager.accessState((manager, state) -> {
@@ -391,19 +418,18 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 				// call it a failure
 				cmd.setErr("id is not free");
 			} else {
-				Pedestrian oldPed = state.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(idList.get(0)));
-				Pedestrian newDynamicElement = (Pedestrian) state.getMainModel().get().createElement(pos, Integer.parseInt(id), oldPed.getClass());
-				newDynamicElement.setTargets(targets);
-				state.getTopography().getPedestrianDynamicElements().addElement(newDynamicElement);
-
-				cmd.setOK();
+				try {
+					Pedestrian newPed = StateJsonConverter.convertValue(data, Pedestrian.class);
+					state.getTopography().getPedestrianDynamicElements().addElement(newPed);
+					cmd.setOK();
+				} catch (Exception e) {
+					cmd.setErr(e.toString());
+				}
 			}
 		});
 
 		return cmd;
 	}
-
-
 
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.WAITING_TIME, name="getWaitingTime")
 	@PersonHandler(cmd=TraCICmd.GET_PERSON_VALUE, var= PersonVar.COLOR, name="getColor")

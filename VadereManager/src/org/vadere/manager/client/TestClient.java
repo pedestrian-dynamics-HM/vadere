@@ -17,6 +17,9 @@ import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -369,21 +372,40 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	@Override
 	public void personapi_setHeuristic(String[] args) throws IOException{}
 
+//	@Override
+//	public void personapi_createNew(String[] args) throws IOException {
+//		if(args.length < 5){
+//			System.out.println("command needs argument element id, x-coordinate, y-coordinate, list of targets");
+//			return;
+//		}
+//
+//		String elementIdentifier = args[1];
+//		String x = args[2];
+//		String y = args[3];
+//		String[] targets = Arrays.copyOfRange(args,4,args.length);
+//
+//
+//		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
+//		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
+//		System.out.println(res.toString());
+//	}
 	@Override
 	public void personapi_createNew(String[] args) throws IOException {
-		if(args.length < 5){
-			System.out.println("command needs argument element id, x-coordinate, y-coordinate, list of targets");
+		if(args.length < 3){
+			System.out.println("command needs argument element id, json file");
 			return;
 		}
 
 		String elementIdentifier = args[1];
-		String x = args[2];
-		String y = args[3];
-		String[] targets = Arrays.copyOfRange(args,4,args.length);
 
-
-		CompoundObject compoundObj = CompoundObjectBuilder.createPerson(elementIdentifier, x, y, targets);
-		TraCIResponse res =  personapi.createNew(elementIdentifier, compoundObj);
+		File file = new File(args[2]);
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		String st = "";
+		String line;
+		while ((line = br.readLine()) != null)
+			st += line;
+		CompoundObject compoundObj = CompoundObject.writeAsJson(st);
+		TraCIResponse res = personapi.createNew(elementIdentifier, compoundObj);
 		System.out.println(res.toString());
 	}
 
