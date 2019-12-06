@@ -3,7 +3,12 @@ package org.vadere.simulator.control.simulation;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.context.Context;
 import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
@@ -14,6 +19,8 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
@@ -123,10 +130,11 @@ public class ScenarioRun implements Runnable {
 			 * the GUI-Thread changes the scenarioStore object during a simulation run. Which can lead to any unexpected behaviour.
 			 */
 			synchronized (scenarioStore) {
-				logger.info(String.format("Initializing scenario. Start of scenario '%s'...", scenario.getName()));
+				logger.info(String.format("Initializing scenario: %s...", scenario.getName()));
+
 				scenarioStore.getTopography().reset();
-				logger.info("StartIt " + scenario.getName());
 				initializeVadereContext();
+
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
 				modelBuilder.createModelAndRandom();
 
@@ -146,15 +154,24 @@ public class ScenarioRun implements Runnable {
 					createAndSetOutputDirectory();
 					scenario.saveToOutputPath(outputPath);
 				}
+
+				IPerceptionModel perceptionModel = PerceptionModelBuilder.instantiateModel(scenarioStore);
+				ICognitionModel cognitionModel = CognitionModelBuilder.instantiateModel(scenarioStore);
+
 				// ensure all elements have unique id before attributes are sealed
 				scenario.getTopography().generateUniqueIdIfNotSet();
 				sealAllAttributes();
 
 				// Run simulation main loop from start time = 0 seconds
-				simulation = new Simulation(mainModel, 0.0,
-						scenarioStore.getName(), scenarioStore, passiveCallbacks, random,
-						processorManager, simulationResult, remoteRunListeners, singleStepMode, scenarioCache);
+				simulation = new Simulation(mainModel, perceptionModel,
+						cognitionModel, 0.0,
+						scenarioStore.getName(), scenarioStore,
+						passiveCallbacks, random,
+						processorManager, simulationResult,
+						remoteRunListeners, singleStepMode,
+						scenarioCache);
 			}
+
 			simulation.run();
 			simulationResult.setState("SimulationRun completed");
 
@@ -208,6 +225,10 @@ public class ScenarioRun implements Runnable {
 
 	public void addTargetChangeController(TargetChangerController controller){
 		simulation.addTargetChangeController(controller);
+	}
+
+	public void addWaitingArea(WaitInArea wia, Timeframe tf){
+		simulation.addWaitingArea(wia, tf);
 	}
 
 	public void pause() {

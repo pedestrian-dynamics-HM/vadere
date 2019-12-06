@@ -21,6 +21,7 @@ public class TraCIGetVersionResponse extends TraCIResponse{
 	// deserialize from buffer (wrap byte[])
 	public TraCIGetVersionResponse(StatusResponse statusResponse, TraCICommandBuffer buffer) {
 		super(statusResponse, TraCICmd.GET_VERSION);
+		byte cmdId = buffer.readByte(); // todo this is a workaround
 		this.versionId = buffer.readInt();
 		this.versionString = buffer.readString();
 	}

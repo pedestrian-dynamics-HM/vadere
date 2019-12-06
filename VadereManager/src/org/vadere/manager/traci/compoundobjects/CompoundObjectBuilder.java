@@ -88,12 +88,17 @@ public class CompoundObjectBuilder {
 				.build(id, p);
 	}
 
-	static public CompoundObject createWaitingArea(String id, ArrayList<String> points){
+	static public CompoundObject createWaitingArea(String elementID, double startTime, double endTime, int repeat, double waitTimeBetweenRepetition, double time, ArrayList<String> points){
 		return CompoundObjectBuilder.builder()
 				.rest()
-				.add(TraCIDataType.STRING)
+				.add(TraCIDataType.STRING) // dummy, because setters always need id
+				.add(TraCIDataType.DOUBLE)
+				.add(TraCIDataType.DOUBLE)
+				.add(TraCIDataType.INTEGER)
+				.add(TraCIDataType.DOUBLE)
+				.add(TraCIDataType.DOUBLE)
 				.add(TraCIDataType.STRING_LIST)
-				.build(id, points);
+				.build(elementID, startTime, endTime, repeat, waitTimeBetweenRepetition, time, points);
 	}
 
 

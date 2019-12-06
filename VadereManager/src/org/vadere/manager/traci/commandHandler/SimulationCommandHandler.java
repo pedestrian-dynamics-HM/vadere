@@ -20,6 +20,9 @@ import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
+import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.TargetChanger;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
@@ -188,12 +191,15 @@ public class SimulationCommandHandler  extends CommandHandler<SimulationVar>{
 	public TraCICommand process_addWaitingArea(TraCISetCommand cmd, RemoteManager remoteManager){
 		WaitingAreaData data = new WaitingAreaData((CompoundObject) cmd.getVariableValue());
 		remoteManager.accessState((manager, state) -> {
-			AttributesMeasurementArea attr = new AttributesMeasurementArea(
-					data.getIdAsInt(),
-					data.getPointsAsVPolygon()
-			);
+			WaitInArea wia = new WaitInArea(data.getTime(), data.getPointsAsVPolygon());
+			Timeframe tf = new Timeframe(data.getStartTime(), data.getEndTime(), data.getRepeatAsBool(), data.getWaitTimeBetweenRepetition());
+			manager.getRemoteSimulationRun().addWaitingArea(wia, tf);
+
+			// todo remove here, just to visualise
+			AttributesMeasurementArea attr = new AttributesMeasurementArea(data.getIdAsInt(), data.getPointsAsVPolygon());
 			MeasurementArea ma = new MeasurementArea(attr);
-			state.getTopography().getMeasurementAreas().add(ma);
+			state.getTopography().addMeasurementArea(ma);
+
 			cmd.setOK();
 		});
 

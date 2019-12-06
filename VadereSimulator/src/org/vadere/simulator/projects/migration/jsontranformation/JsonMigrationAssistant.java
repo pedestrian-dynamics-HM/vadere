@@ -274,14 +274,14 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 		JsonNode transformedNode = node;
 		// apply all transformation from current to latest version.
 		for (Version v : Version.listToLatest(version)) {
-			migrationLogger.info("<" + node.get("name").asText() + "> Start Transform to Version: " + v.label());
+			migrationLogger.info("<" + node.get("name").asText() + "> Transform to: " + v.label());
 			logger.debug(migrationLogger.last());
 			transformedNode = transform(transformedNode, v);
 		}
 		// will always be Version.latest()
 		transformedNode = AbstractJsonTransformation.addNewMembersWithDefaultValues(transformedNode);
 		if (legacyDir != null) {
-			migrationLogger.info("Scenario Migrated - OK. Move copy of old version to legacllyDir");
+			migrationLogger.info("Migration successful. Move copy of old version to \"legacy\" directory");
 			logger.debug(migrationLogger.last());
 			moveFileAddExtension(scenarioFilePath, legacyDir, migrationOptions.getLegacyExtension(), false);
 		}

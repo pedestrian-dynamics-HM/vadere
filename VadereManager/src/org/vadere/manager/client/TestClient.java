@@ -12,6 +12,8 @@ import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIResponse;
 import org.vadere.manager.traci.respons.TraCISimTimeResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.state.attributes.scenario.AttributesTargetChanger;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.io.IOUtils;
 
@@ -149,7 +151,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	}
 
-
 	void close(String[] args) throws IOException {
 
 		traCISocket.sendExact(TraCICloseCommand.build());
@@ -160,7 +161,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println("Bye");
 		consoleReader.stop();
 	}
-
 
 	void nextSimTimeStep(String[] args) throws IOException{
 		double nextSimTime = -1.0;
@@ -387,22 +387,39 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
-	// simulationapi
-
 	@Override
-	public void simulationapi_createWaitingArea(String[] args) throws IOException{
-		if(args.length < 3){
-			System.out.println("command needs argument element id, list of polygon corners");
+	public void personapi_getHasNextTarget(String[] args) throws IOException {
+		if(args.length < 2){
+			System.out.println("command needs argument element id");
 			return;
 		}
 
 		String elementIdentifier = args[1];
+		TraCIGetResponse res = (TraCIGetResponse)personapi.getHasNextTarget(elementIdentifier);
+		System.out.println(res.getResponseData());
+	}
+
+	// simulationapi
+
+	@Override
+	public void simulationapi_createWaitingArea(String[] args) throws IOException{
+		if(args.length < 13){
+			System.out.println("command needs argument id, time, startTime, endTime, repeat, wait time between repetitions, list of polygon corners");
+			return;
+		}
+
+		String elementIdentifier = args[1];
+		double startTime = Double.parseDouble(args[2]);
+		double endTime = Double.parseDouble(args[3]);
+		int repeat = Integer.parseInt(args[4]);
+		double waitTimeBetweenRepetition = Double.parseDouble(args[5]);
+		double time = Double.parseDouble(args[6]);
 		ArrayList<String> polyCorners = new ArrayList<String>();
-		for(int i = 2; i < args.length; i++){
+		for(int i = 7; i < args.length; i++){
 			polyCorners.add(args[i]);
 		}
 
-		CompoundObject compoundObject = CompoundObjectBuilder.createWaitingArea(elementIdentifier, polyCorners);
+		CompoundObject compoundObject = CompoundObjectBuilder.createWaitingArea(elementIdentifier, startTime, endTime, repeat, waitTimeBetweenRepetition, time, polyCorners);
 		TraCIResponse res = simulationapi.createWaitingArea(elementIdentifier, compoundObject);
 		System.out.println(res.toString());
 	}
@@ -507,6 +524,22 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	public void foo(){
+		// Cient Side: client -> server (from Java POJO to JsonString)
+		AttributesTargetChanger at = null;
+		String stStr = StateJsonConverter.serializeObject(at);
+		CompoundObject objIn = CompoundObject.writeAsJson(stStr);
+
+		// Server
+		CompoundObject cObj = objIn; // << vom Client bekommen.
+		String data = CompoundObject.readAsJson(cObj);
+		try {
+			AttributesTargetChanger attServer = StateJsonConverter.convertValue(data, AttributesTargetChanger.class);
+		} catch (Exception e){
+			//todo: traci erro.
+		}
+	}
+
 	@Override
 	public void polygonapi_getPosition2D(String[] args) throws IOException{
 		if(args.length < 2){
@@ -521,11 +554,6 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	@Override
 	public void polygonapi_getIDCount(String args[]) throws IOException{
-		if(args.length < 2){
-			System.out.println("command needs argument element id");
-			return;
-		}
-		String elementID = args[1];
 		TraCIResponse res = polygonapi.getIDCount();
 		System.out.println(res.toString());
 	}

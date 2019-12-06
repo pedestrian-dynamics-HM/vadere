@@ -40,7 +40,7 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
-			movedPedestrians.add(pedestrian);
+			movePedestrians.add(pedestrian);
 		}
 	 */
 
@@ -48,7 +48,7 @@ public class UpdateSchemeCLEventDriven extends UpdateSchemeParallel {
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		try {
 			clearStrides(topography);
-			movedPedestrians.clear();
+			movePedestrians.clear();
 
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 

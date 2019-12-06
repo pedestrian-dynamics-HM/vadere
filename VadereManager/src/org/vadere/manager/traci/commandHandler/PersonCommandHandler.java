@@ -21,6 +21,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
+import java.rmi.Remote;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -101,6 +102,24 @@ public class PersonCommandHandler extends CommandHandler<PersonVar>{
 	}
 
 	///////////////////////////// Handler /////////////////////////////
+
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.HAS_NEXT_TARGET, name = "getHasNextTarget")
+	public TraCICommand process_getNextTargetID(TraCIGetCommand cmd, RemoteManager remoteManager){
+		remoteManager.accessState((manager, state) -> {
+			int id = Integer.parseInt(cmd.getElementIdentifier());
+			boolean data = state.getTopography().getPedestrianDynamicElements().getElement(id).hasNextTarget();
+			logger.debugf("Has next target: ", state.getSimTimeInSec(), Integer.toString(id), Boolean.toString(data));
+			TraCIGetResponse res;
+			if(data){
+				res = responseOK(PersonVar.HAS_NEXT_TARGET.type, 1);
+			} else {
+				res = responseOK(PersonVar.HAS_NEXT_TARGET.type, 0);
+			}
+			cmd.setResponse(res);
+		});
+
+		return cmd;
+	}
 
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ID_LIST, name = "getIDList", ignoreElementId = true)
 	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager){

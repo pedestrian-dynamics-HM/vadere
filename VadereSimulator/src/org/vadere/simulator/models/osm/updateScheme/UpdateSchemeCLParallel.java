@@ -4,8 +4,6 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.opencl.CLParallelOSMLocalMem;
-import org.vadere.simulator.models.osm.opencl.CLParallelOptimalStepsModel;
-import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -14,9 +12,7 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.OpenCLException;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author Benedikt Zoennchen
@@ -39,7 +35,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 
 		if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 			pedestrian.updateNextPosition();
-			movedPedestrians.add(pedestrian);
+			movePedestrians.add(pedestrian);
 		}
 	 */
 
@@ -47,7 +43,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 	public void update(double timeStepInSec, double currentTimeInSec) {
 		try {
 			clearStrides(topography);
-			movedPedestrians.clear();
+			movePedestrians.clear();
 
 			List<PedestrianOSM> pedestrianOSMList = CollectionUtils.select(topography.getElements(Pedestrian.class), PedestrianOSM.class);
 
@@ -82,7 +78,7 @@ public class UpdateSchemeCLParallel extends UpdateSchemeParallel {
 				//if (pedestrian.getTimeCredit() > pedestrian.getDurationNextStep()) {
 					//pedestrian.setNextPosition(result.get(i));
 					movePedestrian(topography, pedestrian, pedestrian.getPosition(), result.get(i));
-					//movedPedestrians.add(pedestrian);
+					//movePedestrians.add(pedestrian);
 				//}
 			}
 

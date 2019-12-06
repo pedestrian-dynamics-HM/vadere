@@ -1,9 +1,0 @@
-# Marker-File for MigrationUtil
-
-The content of this file is ignored
-
-All scenario files in this directory will NOT be migrated.
-This Marker-File will allow traversal down the directory tree.
-
-Use DO_NOT_MIGRATE_TREE or .DO_NOT_MIGRATE_TREE to stop migration for
-the complete subtree of the current directory.
