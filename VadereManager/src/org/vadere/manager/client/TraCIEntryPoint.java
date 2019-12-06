@@ -1,26 +1,15 @@
 package org.vadere.manager.client;
 
-import org.vadere.manager.traci.commands.control.TraCICloseCommand;
-import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
-import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
-import org.vadere.manager.traci.reader.TraCIPacketBuffer;
-import org.vadere.manager.traci.respons.TraCIResponse;
-import org.vadere.manager.traci.respons.TraCISimTimeResponse;
-import org.vadere.manager.traci.writer.TraCIPacket;
-import org.vadere.util.io.IOUtils;
-import py4j.GatewayServer;
-
 import org.vadere.manager.TraCISocket;
 import org.vadere.manager.client.traci.PersonAPI;
 import org.vadere.manager.client.traci.PolygonAPI;
 import org.vadere.manager.client.traci.SimulationAPI;
+import py4j.GatewayServer;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.file.Paths;
 
 public class TraCIEntryPoint implements Runnable {
     protected org.vadere.manager.client.traci.SimulationAPI simulationapi;
@@ -41,6 +30,9 @@ public class TraCIEntryPoint implements Runnable {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         TraCIEntryPoint entryPoint = new TraCIEntryPoint(9999);
+        //todo start server new Manager()....
+        //Manager.createArgumentParser
+        //todo parser same as Manager.addOptionsToParser
         entryPoint.run();
     }
 
