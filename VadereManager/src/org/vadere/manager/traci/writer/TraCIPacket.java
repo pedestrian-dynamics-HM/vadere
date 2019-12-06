@@ -167,8 +167,8 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
-				.writeInt(res.getVersionId())
+		// todo find out what the idea behind this line is: cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+		cmdBuilder.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
 
 		addCommandWithoutLen(cmdBuilder.asByteArray());
