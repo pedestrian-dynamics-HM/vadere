@@ -123,6 +123,11 @@ public class VTrajectory implements Iterable<FootStep> {
 		return this;
 	}
 
+	public FootStep removeLast() {
+		assert !footSteps.isEmpty();
+		return footSteps.removeLast();
+	}
+
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
 		LinkedList<FootStep> newFootSteps = new LinkedList<>();
 		boolean inside = !footSteps.isEmpty() ? rectangle.contains(footSteps.peekFirst().getStart()) : false;

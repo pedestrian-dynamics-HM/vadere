@@ -17,6 +17,7 @@ import org.vadere.simulator.projects.migration.incident.incidents.RenameInArrayI
 import org.vadere.simulator.projects.migration.incident.incidents.RenameIncident;
 import org.vadere.simulator.projects.migration.incident.incidents.specialized.AttributesPotentialCompactVSosmIncident;
 import org.vadere.simulator.projects.migration.incident.incidents.specialized.MoveSpawnDelayIntoDistributionParametersIncident;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.util.StateJsonConverter;
 
 import static org.vadere.simulator.entrypoints.Version.*;
@@ -41,7 +42,7 @@ public class IncidentDatabase {
 		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"finishTime",
 				path("vadere", "topography", "attributes"),
-				path("vadere", "attributesSimulation")));
+				path("vadere", AttributesSimulation.JSON_KEY)));
 
 		addIncident(NOT_A_RELEASE, new RelocationIncident(
 				"attributesPedestrian",

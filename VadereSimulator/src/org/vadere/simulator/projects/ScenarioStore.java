@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
@@ -32,22 +33,23 @@ public class ScenarioStore {
 	private String mainModel;
 	private List<Attributes> attributesList;
 	private AttributesSimulation attributesSimulation;
+	private AttributesPsychology attributesPsychology;
 	private Topography topography;
 	private StimulusInfoStore stimulusInfoStore;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
 			final AttributesSimulation attributesSimulation, final Topography topography) {
-	    // Provide empty "StimulusInfoStore".
-		this(name, description, mainModel, attributesModel, attributesSimulation, topography, new StimulusInfoStore());
+		this(name, description, mainModel, attributesModel, attributesSimulation, new AttributesPsychology(), topography, new StimulusInfoStore());
 	}
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-						 final AttributesSimulation attributesSimulation, final Topography topography, final StimulusInfoStore stimulusInfoStore) {
+						 final AttributesSimulation attributesSimulation, final AttributesPsychology attributesPsychology, final Topography topography, final StimulusInfoStore stimulusInfoStore) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
+		this.attributesPsychology = attributesPsychology;
 		this.topography = topography;
 		this.stimulusInfoStore = stimulusInfoStore;
 	}
@@ -86,6 +88,7 @@ public class ScenarioStore {
 	public void sealAllAttributes() {
 		attributesList.forEach(a -> a.seal());
 		attributesSimulation.seal();
+		attributesPsychology.seal();
 		topography.sealAllAttributes();
 	}
 
@@ -99,6 +102,10 @@ public class ScenarioStore {
 
 	public void setAttributesSimulation(final AttributesSimulation attributesSimulation) {
 		this.attributesSimulation = attributesSimulation;
+	}
+
+	public void setAttributesPsychology(final AttributesPsychology attributesPsychology) {
+		this.attributesPsychology = attributesPsychology;
 	}
 
 	public void removeAttributesIf(@NotNull final Predicate<Attributes> predicate) {
@@ -126,6 +133,8 @@ public class ScenarioStore {
 	public AttributesSimulation getAttributesSimulation() {
 		return attributesSimulation;
 	}
+
+	public AttributesPsychology getAttributesPsychology() { return attributesPsychology; }
 
 	public List<Attributes> getAttributesList() {
 		return attributesList;

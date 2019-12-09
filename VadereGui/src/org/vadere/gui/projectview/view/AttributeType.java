@@ -1,10 +1,11 @@
 package org.vadere.gui.projectview.view;
 
 public enum AttributeType {
-	SIMULATION, MODEL, PEDESTRIAN, CAR, TOPOGRAPHY, OUTPUTPROCESSOR, STIMULUS;
+	SIMULATION, MODEL, PSYCHOLOGY, PEDESTRIAN, CAR, TOPOGRAPHY, OUTPUTPROCESSOR, STIMULUS;
 
 	public final static String simulationAttributes = "simulation attributes";
 	public final static String modelAttributes = "panelModel attributes";
+	public final static String psychologyAttributes = "psychology attributes";
 	public final static String pedestrianAttributes = "pedestrian attributes";
 	public final static String scenarioAttributes = "scenario attributes";
 	public final static String carAttributes = "car attributes";
@@ -16,6 +17,8 @@ public enum AttributeType {
 				return SIMULATION;
 			case modelAttributes:
 				return MODEL;
+			case psychologyAttributes:
+				return PSYCHOLOGY;
 			case pedestrianAttributes:
 				return PEDESTRIAN;
 			case scenarioAttributes:

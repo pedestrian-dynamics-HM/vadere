@@ -51,7 +51,7 @@ public enum ScenarioCheckerReason {
 	// Group attributes
 	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored");
 
-    private String msgId;
+	private String msgId;
 
 	ScenarioCheckerReason(String msgId) {
 		this.msgId = msgId;
