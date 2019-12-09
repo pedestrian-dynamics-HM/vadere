@@ -16,11 +16,10 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 			double max, int maxIterations) {
 		super(rng, mean, standardDeviation);
 
-		/** Handled by ScenarioChecker
-		 *  if (min < 0 || max <= 0 || max <= min){
-			// min == 0 does not make to much sense either, but we allow this case for pedestrians that do not move
-			throw new IllegalArgumentException("Parameters 'min' and 'max' must be non-negative and 'min < max'.");
-		}*/
+		if (max <= min){
+			// TODO: this check should actually go into the ScenarioChecker?
+			throw new IllegalArgumentException("Parameters 'min < max'.");
+		}
 
 		this.min = min;
 		this.max = max;

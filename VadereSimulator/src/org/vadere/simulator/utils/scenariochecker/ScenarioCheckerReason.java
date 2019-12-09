@@ -55,7 +55,7 @@ public enum ScenarioCheckerReason {
 	// Model reasons
 	CA_SPAWNING("ScenarioChecker.models.ca.spawning.setup.err");
 
-    private String msgId;
+	private String msgId;
 
 	ScenarioCheckerReason(String msgId) {
 		this.msgId = msgId;
