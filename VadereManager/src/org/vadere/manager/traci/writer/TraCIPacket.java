@@ -167,7 +167,8 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-		// todo find out what the idea behind this line is: cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+		// the command Identifier is written somewhere else, as it is already clear in here, that the command is a
+		// getVersion command
 		cmdBuilder.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
 
