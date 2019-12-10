@@ -26,9 +26,11 @@ public class CellularAutomatonSetupCheck extends AbstractScenarioCheck {
 
     @Override
     public PriorityQueue<ScenarioCheckerMessage> runScenarioCheckerTest(Scenario scenario) {
-        PriorityQueue<ScenarioCheckerMessage> ret = new PriorityQueue<>();
+        PriorityQueue<ScenarioCheckerMessage> messages = new PriorityQueue<>();
 
-        if(scenario.getScenarioStore().getMainModel().equals(CellularAutomaton.class.getName())) {
+        String mainModelstring = scenario.getScenarioStore().getMainModel();
+
+        if(mainModelstring != null && mainModelstring.equals(CellularAutomaton.class.getName())) {
 
             /* make sure that the CA spawning is activated */
             Topography topography = scenario.getTopography();
@@ -37,7 +39,7 @@ public class CellularAutomatonSetupCheck extends AbstractScenarioCheck {
 
             for (Source source : sourceList) {
                 if (!source.getAttributes().isSpawnAtGridPositionsCA()) {
-                    ret.add(msgBuilder.simulationAttrError().target(source)
+                    messages.add(msgBuilder.simulationAttrError().target(source)
                             .reason(ScenarioCheckerReason.CA_SPAWNING, "If the cellular automaton model is used, the CA spawning should be activated. Otherwise agents will not be placed on a well-defined grid.")
                             .build());
                 }
@@ -48,12 +50,12 @@ public class CellularAutomatonSetupCheck extends AbstractScenarioCheck {
             */
 
             if (scenario.getAttributesPedestrian().getSpeedDistributionStandardDeviation() > 0.0 || scenario.getAttributesPedestrian().getSpeedDistributionMean() != 1.0) {
-                ret.add(msgBuilder.simulationAttrError()
+                messages.add(msgBuilder.simulationAttrError()
                         .reason(ScenarioCheckerReason.CA_SPAWNING, "If the cellular automaton model is used, the free-flow speed should be set to 1.0 m/s and standard deviation to 0.0 m/s. At the moment, individual speeds through event-driven setup is not supported. If you want to change the speed of the pedestrians, adapt the parameter simTimeStepLength in Simulation.")
                         .build());
             }
 
         }
-        return ret;
+        return messages;
     }
 }
