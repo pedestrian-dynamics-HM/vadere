@@ -6,13 +6,16 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 
 public class SpawnArray {
 	private static Logger logger = Logger.getLogger(SpawnArray.class);
 	private static double SPAWN_BUFFER = 0.001;
+	private final double grid_resolution_ca = 0.4;
 
 	protected final VRectangle spawnElementBound;
 	protected final VRectangle bound;
@@ -46,8 +49,21 @@ public class SpawnArray {
 			SPAWN_BUFFER = 0;
 		}
 
-		xDim = (int) (bound.width / spawnElementBound.width);
-		yDim = (int) (bound.height / spawnElementBound.height);
+		/* cellular automaton */
+		double offset_x_low = 0;
+		double offset_y_low = 0;
+		double offset_x_high = 0;
+		double offset_y_high = 0;
+
+		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+			offset_x_low = calculateOffsetLow(bound.x);
+			offset_x_high = calculateOffsetHigh(bound.x+bound.width);
+			offset_y_low = calculateOffsetLow(bound.y);
+			offset_y_high = calculateOffsetHigh(bound.y+bound.height);
+		}
+
+		xDim = (int) ((bound.width - offset_x_low - offset_x_high)/ spawnElementBound.width);
+		yDim = (int) ((bound.height- offset_y_low - offset_y_high ) / spawnElementBound.height);
 
 		if (xDim * yDim <= 0) {
 			xDim = (xDim == 0) ? 1 : xDim;
@@ -68,29 +84,12 @@ public class SpawnArray {
 			eY = spawnElementBound.y + spawnElementBound.height / 2 + SPAWN_BUFFER;
 		}
 
-		// cellular automaton
-		double offset_x = 0;
-		double offset_y = 0;
-		if(sourceAttributes.isSpawnAtGridPositionsCA()){
-			double grid_resolution = 0.4;
-			double boundingBoxWidth = 0.5;
-			// calculate offset of boundary of source element compared to scenario
-			double tmp_offset = (boundingBoxWidth / grid_resolution) % 1;
-			double offset_topography_bound = tmp_offset * grid_resolution;
-
-			double tmp_x = (bound.x / grid_resolution) % 1;
-			offset_x = tmp_x * grid_resolution + offset_topography_bound;
-			double tmp_y = (bound.y / grid_resolution) % 1;
-			offset_y = tmp_y * grid_resolution + offset_topography_bound;
-					// defaultModel.getGridResolution()
-		}
-
-		firstSpawnPoint = new VPoint(bound.x + eX + offset_x, bound.y + eY + offset_y);
+		firstSpawnPoint = new VPoint(bound.x + eX + offset_x_low, bound.y + eY + offset_y_low);
 		validSpawnPointMapInBoundShape = new HashMap<>();
 		int validIndex = 0;
 
 		for (int i = 0; i < (xDim * yDim); i++) {
-			VPoint candidatePoint = firstSpawnPoint.add(new VPoint(2 * eX * (i % xDim) + offset_x, 2 * eY * (i / xDim) + offset_y));
+			VPoint candidatePoint = firstSpawnPoint.add(new VPoint(2 * eX * (i % xDim), 2 * eY * (i / xDim)));
 			VShape candidateShape = shapeProducer.apply(candidatePoint);
 			if (boundShape.containsShape(candidateShape)) {
 				validSpawnPointMapInBoundShape.put(i, validIndex);
@@ -98,14 +97,7 @@ public class SpawnArray {
 				validIndex++;
 			}
 		}
-		/*
-		if(sourceAttributes.isSpawnAtGridPositionsCA() && sourceAttributes.isSpawnAtRandomPositions()){
-			// choose a random selection from allowed points
-			// use random object for shuffeling! -> pass random element to shuffle
-			// todo call shuffleSpawnPoints instead (with random)
-			Collections.shuffle(allowedSpawnPoints); // shuffle list before trimming
-		}
-		*/
+
 		allowedSpawnPoints.trimToSize();
 
 		nextSpawnPoint = 0;
@@ -113,6 +105,22 @@ public class SpawnArray {
 
 	public List<VPoint> getAllowedSpawnPoints() {
 		return allowedSpawnPoints;
+	}
+
+	private double roundTo3DecimalPlaces(double toRound){
+		return Math.round(toRound*1000.0)/1000.0;
+	}
+
+	private double calculateOffsetLow (double bound_low){
+		double tmp_x = roundTo3DecimalPlaces((bound_low/ grid_resolution_ca) % 1);
+		double tmp_x_offset = roundTo3DecimalPlaces((1 - tmp_x) * grid_resolution_ca);
+		return tmp_x > 0 && tmp_x < 1? tmp_x_offset : 0.0 ;
+	}
+	private double calculateOffsetHigh (double bound_high) {
+
+		double tmp_y = roundTo3DecimalPlaces((bound_high / grid_resolution_ca) % 1);
+		double tmp_y_offset = roundTo3DecimalPlaces(tmp_y * grid_resolution_ca);
+		return tmp_y > 0 && tmp_y < 1 ? tmp_y_offset : 0.0;
 	}
 
 }
