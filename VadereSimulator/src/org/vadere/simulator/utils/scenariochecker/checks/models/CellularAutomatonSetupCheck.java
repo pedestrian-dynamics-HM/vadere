@@ -6,6 +6,8 @@ import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerReason;
 import org.vadere.simulator.utils.scenariochecker.checks.AbstractScenarioCheck;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.ScenarioElementType;
