@@ -56,10 +56,7 @@ public class AttributesCA extends AttributesOSM {
 
 
 
-	/**
-	 * todo: this should be changed to PARALLEL once issue #272 was resolved
-	 */
-	private UpdateType updateType = UpdateType.SEQUENTIAL;
+	private UpdateType updateType = UpdateType.PARALLEL;
 
 	/**
 	 * If <tt>true</tt> this avoids agent jumping over small walls. However, this does not fix the problem that
