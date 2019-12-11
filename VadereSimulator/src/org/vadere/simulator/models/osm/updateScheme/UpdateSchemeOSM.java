@@ -117,4 +117,8 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			topography.moveElement(pedestrian, from);
 		}
 	}
+
+	default void shutdown() {
+
+	}
 }
