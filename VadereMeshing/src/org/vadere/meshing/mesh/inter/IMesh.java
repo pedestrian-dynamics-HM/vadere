@@ -319,6 +319,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		setData(vertex, name, data);
 	}
 
+	default void setIntegerData(@NotNull final V vertex, @NotNull final String name, int data) {
+		setData(vertex, name, data);
+	}
+
 	//default void setBooleanNull(@NotNull final V vertex, @NotNull final String name, boolean nil) {}
 
 	//default void setDoubleNull(@NotNull final V vertex, @NotNull final String name, double nil) {}
@@ -341,6 +345,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(edge, name, Double.class).orElse(0.0);
 	}
 
+	default double getIntegerData(@NotNull E edge, @NotNull final String name) {
+		return getData(edge, name, Integer.class).orElse(0);
+	}
+
 	/**
 	 * Sets the data for a specific half-edge in O(1).
 	 *
@@ -355,6 +363,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	default void setDoubleData(@NotNull E edge, @NotNull final String name, double data) {
+		setData(edge, name, data);
+	}
+
+	default void setIntegerData(@NotNull E edge, @NotNull final String name, int data) {
 		setData(edge, name, data);
 	}
 
@@ -375,6 +387,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(face, name, Double.class).orElse(0.0);
 	}
 
+	default double getIntegerData(@NotNull F face, @NotNull final String name) {
+		return getData(face, name, Integer.class).orElse(0);
+	}
+
 	/**
 	 * Sets the data for a specific face in O(1).
 	 *
@@ -388,6 +404,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	default void setDoubleData(@NotNull F face, @NotNull final String name, final double data) {
+		setData(face, name, data);
+	}
+
+	default void setIntegerData(@NotNull F face, @NotNull final String name, final int data) {
 		setData(face, name, data);
 	}
 
