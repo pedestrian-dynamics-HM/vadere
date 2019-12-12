@@ -59,8 +59,4 @@ public class ConstantDistribution implements SpawnDistribution {
         //always add a constant value to the 'value'
         return timeCurrentEvent + this.updateFrequency;
     }
-
-
-
-
 }
