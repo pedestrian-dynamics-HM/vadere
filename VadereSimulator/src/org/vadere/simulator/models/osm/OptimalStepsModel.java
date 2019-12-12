@@ -279,6 +279,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public void postLoop(final double simTimeInSec) {
+		updateSchemeOSM.shutdown();
 	}
 
 	@Override
