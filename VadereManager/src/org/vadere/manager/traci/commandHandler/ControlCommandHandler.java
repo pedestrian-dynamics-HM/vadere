@@ -3,7 +3,7 @@ package org.vadere.manager.traci.commandHandler;
 
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
-import org.vadere.manager.VadereServer;
+import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;

@@ -65,7 +65,7 @@ public abstract class CommandHandler <VAR extends Enum> {
 
 	protected void init(Class<? extends Annotation> singleAnnotation, Class<? extends Annotation> multAnnotation){
 		for (Method m : this.getClass().getDeclaredMethods()){
-			logger.infof(m.getName());
+			logger.tracef(m.getName());
 			if (m.isAnnotationPresent(singleAnnotation)){
 				init_HandlerSingle(m);
 			}

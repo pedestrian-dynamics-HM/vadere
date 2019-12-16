@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.VadereServer;
+import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIVersion;
