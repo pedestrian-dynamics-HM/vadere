@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.mockito.Mockito;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.util.test.MockProvider;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,7 +13,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Stefan Schuhbäck
  */
-public abstract class SimulationStateMock {
+public abstract class SimulationStateMock implements MockProvider<SimulationState> {
 
 	protected SimulationState state;
 
@@ -27,10 +28,8 @@ public abstract class SimulationStateMock {
 		mockIt();
 	}
 
-	/**
-	 * Define a single {@link SimulationState} an what should be mocked within in. Use within {@link
-	 * ProcessorTestEnv#loadDefaultSimulationStateMocks()} to set a sequence of {@link
-	 * SimulationState} for a specific {@link DataProcessor} testcase
-	 */
-	public abstract void mockIt();
+	@Override
+	public SimulationState get() {
+		return state;
+	}
 }

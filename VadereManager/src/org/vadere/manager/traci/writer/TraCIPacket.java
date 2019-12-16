@@ -3,7 +3,10 @@ package org.vadere.manager.traci.writer;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
+import org.vadere.manager.traci.reader.TraCIByteBuffer;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
 import org.vadere.manager.traci.respons.StatusResponse;
 import org.vadere.manager.traci.respons.TraCIGetResponse;
 import org.vadere.manager.traci.respons.TraCIGetVersionResponse;
@@ -12,6 +15,8 @@ import org.vadere.manager.traci.respons.TraCIStatusResponse;
 import org.vadere.manager.traci.respons.TraCISubscriptionResponse;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  //todo comment
@@ -95,7 +100,17 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		} else {
 			return asByteArray();
 		}
+	}
 
+	public List<TraCICommand> getCommands(){
+		ByteBuffer buf = ByteBuffer.wrap(send());
+		buf.getInt(); // remove packet length.
+		TraCIPacketBuffer traciBuf = TraCIPacketBuffer.wrap(buf);
+		ArrayList<TraCICommand> commands = new ArrayList<>();
+		while (buf.hasRemaining()){
+			commands.add(traciBuf.nextCommand());
+		}
+		return commands;
 	}
 
 	private TraCIWriter getCmdBuilder(){
