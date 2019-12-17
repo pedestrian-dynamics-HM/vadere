@@ -114,7 +114,11 @@ class VadereRunner(threading.Thread):
             self.client_socket.close()
             server_socket.close()
 
-            self.vadere.wait(timeout=2)
+            try:
+                self.vadere.wait(timeout=2)
+            except subprocess.TimeoutExpired as e:
+                self.log.info(f"vadere server process (PID:{self.vadere.pid}) not terminated after timeout. Send SIGKILL")
+
             if self.vadere.returncode is None:
                 os.kill(self.vadere.pid, signal.SIGKLL)
                 time.sleep(0.5)
