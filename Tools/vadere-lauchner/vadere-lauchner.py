@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import socket
@@ -13,7 +13,7 @@ import logging
 
 """
 vadere-lauchner.py dispatches each client to a new (fresh) instance of a vadere server to ensure that no side effect
-of multiple runs within one java VM will influence the simulations. 
+of multiple runs within one java VM will influence the simulations.
 
 Script is based on (sumo-launchd.py)[https://github.com/sommer/veins/blob/master/sumo-launchd.py]
 
