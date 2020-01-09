@@ -63,7 +63,7 @@ public class PedestrianOSM extends Pedestrian {
 	private StairStepOptimizer stairStepOptimizer;
 
 	@SuppressWarnings("unchecked")
-	PedestrianOSM(AttributesOSM attributesOSM,
+	public PedestrianOSM(AttributesOSM attributesOSM,
 				  AttributesAgent attributesPedestrian, Topography topography,
 				  Random random, IPotentialFieldTarget potentialFieldTarget,
 				  PotentialFieldObstacle potentialFieldObstacle,

@@ -2,8 +2,13 @@ package org.vadere.simulator.models.osm.optimization;
 
 import java.awt.Shape;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
+import org.vadere.state.attributes.models.AttributesOSM;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.types.OptimizationType;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -76,4 +81,53 @@ public abstract class StepCircleOptimizer {
 	public void clearMetricValues(){
 		this.currentMetricValues = new ArrayList<>();
 	}
+
+	public static StepCircleOptimizer create(
+			AttributesOSM attributesOSM, Random random, Topography topography,
+			IPotentialFieldTargetGrid potentialFieldTarget) {
+
+		StepCircleOptimizer result;
+		double movementThreshold = attributesOSM.getMovementThreshold();
+
+		OptimizationType type = attributesOSM.getOptimizationType();
+		if (type == null) {
+			type = OptimizationType.DISCRETE;
+		}
+
+		switch (type) {
+			case BRENT:
+				result = new StepCircleOptimizerBrent(random);
+				break;
+			case EVOLUTION_STRATEGY:
+				result = new StepCircleOptimizerEvolStrat();
+				break;
+			case NELDER_MEAD:
+				result = new StepCircleOptimizerNelderMead(random);
+				break;
+			case NELDER_MEAD_CIRCLE:
+				result = new StepCircleOptimizerCircleNelderMead(random, attributesOSM);
+				break;
+			case POWELL:
+				result = new StepCircleOptimizerPowell(random);
+				break;
+			case PSO:
+				result = new ParticleSwarmOptimizer(movementThreshold, random);
+				break;
+			case PATTERN_SEARCH:
+				result = new PatternSearchOptimizer(movementThreshold, attributesOSM, random);
+				break;
+			case GRADIENT:
+				result = new StepCircleOptimizerGradient(topography,
+						potentialFieldTarget, attributesOSM);
+				break;
+			case DISCRETE:
+			case NONE:
+			default:
+				result = new StepCircleOptimizerDiscrete(movementThreshold, random);
+				break;
+		}
+
+		return result;
+	}
+
 }
