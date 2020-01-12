@@ -2,10 +2,15 @@ package org.vadere.gui.projectview.model;
 
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.control.ActionScenarioChecker;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
-import org.vadere.gui.projectview.view.*;
+import org.vadere.gui.projectview.view.ProjectView;
+import org.vadere.gui.projectview.view.ScenarioNamePanel;
+import org.vadere.gui.projectview.view.ScenarioPanel;
+import org.vadere.gui.projectview.view.VDialogManager;
+import org.vadere.gui.projectview.view.VTable;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.Scenario;
@@ -14,7 +19,6 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -23,10 +27,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import javax.swing.*;
 
 public class ProjectViewModel implements IScenarioChecker {
 	private static Logger logger = Logger.getLogger(ProjectViewModel.class);
@@ -36,7 +41,7 @@ public class ProjectViewModel implements IScenarioChecker {
 
 	private final OutputFileTableModel outputTableModel;
 	private final VadereScenarioTableModel scenarioTableModel;
-//	private String currentProjectPath;
+	//	private String currentProjectPath;
 	private ExecutorService refreshOutputExecutor;
 
 
@@ -46,7 +51,6 @@ public class ProjectViewModel implements IScenarioChecker {
 
 	private final Collection<IOutputFileRefreshListener> outputRefreshListeners;
 	private final Collection<IProjectChangeListener> projectChangeListeners;
-	private List<IScenarioChecker> scenarioCheckerListeners;
 	private ScenarioNamePanel scenarioNamePanel; // to add or remove the "*" to indicate unsaved changes and ScenarioChecker indicator
 	private boolean showSimulationResultDialog;
 
@@ -59,16 +63,15 @@ public class ProjectViewModel implements IScenarioChecker {
 		this.refreshOutputExecutor = Executors.newSingleThreadExecutor();
 		this.showSimulationResultDialog = VadereConfig.getConfig()
 				.getBoolean("Project.simulationResult.show", true);
-		this.scenarioCheckerListeners = new ArrayList<>();
 	}
 
 	public void deleteOutputFiles(final int[] rows) throws IOException {
 		// 1. delete output files on the hard disc
 		int j = 0;
-		for(int i = 0; i < rows.length; i++) {
-			File dir = getOutputTableModel().getValue(rows[i]-j);
+		for (int i = 0; i < rows.length; i++) {
+			File dir = getOutputTableModel().getValue(rows[i] - j);
 
-			if(IOOutput.deleteOutputDirectory(dir)) {
+			if (IOOutput.deleteOutputDirectory(dir)) {
 				j++;
 
 				// 2. remove output files information from the output file table
@@ -77,7 +80,7 @@ public class ProjectViewModel implements IScenarioChecker {
 				// 3. remove output files information from the project output
 				getProject().getProjectOutput().removeOutputDir(dir.getName());
 
-				logger.info("output dir "+ dir +" dir deleted.");
+				logger.info("output dir " + dir + " dir deleted.");
 			}
 		}
 	}
@@ -209,7 +212,7 @@ public class ProjectViewModel implements IScenarioChecker {
 		if (isProjectAvailable())
 			project.setProjectDirectory(Paths.get(currentProjectPath));
 		else
-			throw  new IllegalStateException();
+			throw new IllegalStateException();
 	}
 
 	public OutputBundle getSelectedOutputBundle() throws IOException {
@@ -247,8 +250,8 @@ public class ProjectViewModel implements IScenarioChecker {
 	public boolean isScenarioNameInConflict(final String name) {
 		return isProjectAvailable()
 				&& project.getScenarios().stream()
-						.filter(scenario -> scenario.getName().equals(name))
-						.findAny().isPresent();
+				.filter(scenario -> scenario.getName().equals(name))
+				.findAny().isPresent();
 	}
 
 	public boolean getShowSimulationResultDialog() {
@@ -303,7 +306,7 @@ public class ProjectViewModel implements IScenarioChecker {
 		private final Collection<String> outputDirectories;
 
 		public ScenarioBundle(final VadereProject project, final Scenario scenarioRM,
-				final Collection<String> outputDirectories) {
+							  final Collection<String> outputDirectories) {
 			this.project = project;
 			this.scenarioRM = scenarioRM;
 			this.outputDirectories = outputDirectories;
@@ -328,7 +331,7 @@ public class ProjectViewModel implements IScenarioChecker {
 		private final Collection<File> outputDirectories;
 
 		public OutputBundle(final File directory, final VadereProject project,
-				final Collection<File> outputDirectories) {
+							final Collection<File> outputDirectories) {
 			this.directory = directory;
 			this.project = project;
 			this.outputDirectories = outputDirectories;
@@ -346,7 +349,7 @@ public class ProjectViewModel implements IScenarioChecker {
 			return outputDirectories;
 		}
 
-		public Scenario getScenarioRM(){
+		public Scenario getScenarioRM() {
 			return project.getProjectOutput().getScenario(directory.getName());
 		}
 	}
@@ -363,24 +366,42 @@ public class ProjectViewModel implements IScenarioChecker {
 	}
 
 	/**
-	 * Set selection in scenario JTable. Why in this class? It is GUI stuff!
-	 * Because some Actions have use this method and Actions only have access to the model.
-	 * "actions only access the model" -- that seems pretty idealistic. We already break this
-	 * concept by using ProjectView's getMainWindow().
+	 * Set selection in scenario JTable. Why in this class? It is GUI stuff! Because some Actions
+	 * have use this method and Actions only have access to the model. "actions only access the
+	 * model" -- that seems pretty idealistic. We already break this concept by using ProjectView's
+	 * getMainWindow().
 	 */
 	public void setSelectedRowIndexInScenarioTable(final int rowIndex) {
 		if (scenarioTable.getRowCount() > 0)
 			scenarioTable.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
 	}
 
-	/** Set selection in scenario JTable. */
+	/**
+	 * Set selection in scenario JTable.
+	 */
 	public void selectScenario(Scenario scenarioRM) {
 		int i = scenarioTableModel.indexOfRow(scenarioRM);
 		setSelectedRowIndexInScenarioTable(i);
 	}
 
 	public boolean runScenarioIsOk() {
-		for (Scenario srm : getScenarios(scenarioTable.getSelectedRows())) {
+		return runScenarioIsOk(false);
+	}
+
+	public boolean runScenarioIsOk(boolean checkAll) {
+
+		List<Scenario> scenariosToCheck = new ArrayList<>();
+		if (checkAll) {
+			scenariosToCheck = Arrays.asList(getProject().getScenarios().toArray(Scenario[]::new));
+		} else {
+			scenariosToCheck.add(getCurrentScenario());
+		}
+
+		if (scenariosToCheck.size() < 1) {
+			throw new IllegalArgumentException("runScenarioIsOk expected at least one scenario");
+		}
+
+		for (Scenario srm : scenariosToCheck) {
 			String response = srm.readyToRunResponse();
 			if (response != null) {
 				VDialogManager.showMessageDialogWithBodyAndTextArea("Error",
@@ -399,13 +420,21 @@ public class ProjectViewModel implements IScenarioChecker {
 			return false;
 		}
 
-		JEditorPane errorPanel = ScenarioPanel.getActiveTopographyErrorMsg();
-		if (errorPanel != null) {
-			VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
-					Messages.getString("RunScenarioTopographyCheckerErrors.title"),
-					Messages.getString("RunScenarioTopographyCheckerErrors.text"),
-					errorPanel, JOptionPane.ERROR_MESSAGE);
-			return false;
+		JEditorPane errorPanel = null;
+		for (Scenario s : scenariosToCheck) {
+			// always rerun the ScenarioChecker before running any simulations. This ensures
+			// that all scenarios which will be run are checked before any Scenario is stared
+			// to allow fixing any errors.
+			// This check will be executed even if the ScnearioChecker is deactivated in the GUI.
+			ActionScenarioChecker.performManualCheck(s);
+			errorPanel = ScenarioPanel.getActiveTopographyErrorMsg();
+			if (errorPanel != null) {
+				VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
+						Messages.getString("RunScenarioTopographyCheckerErrors.title"),
+						Messages.getString("RunScenarioTopographyCheckerErrors.text"),
+						errorPanel, JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
 		}
 
 		return true;
@@ -434,15 +463,15 @@ public class ProjectViewModel implements IScenarioChecker {
 		this.showSimulationResultDialog = showSimulationResultDialog;
 	}
 
-	public void scenarioCheckerStopObserve(){
+	public void scenarioCheckerStopObserve() {
 		scenarioNamePanel.stopObserver();
 	}
 
-	public void scenarioCheckerStartObserve(IDrawPanelModel model){
+	public void scenarioCheckerStartObserve(IDrawPanelModel model) {
 		scenarioNamePanel.observerIDrawPanelModel(model);
 	}
 
-	public void scenarioCheckerCheck(final Scenario scenario){
+	public void scenarioCheckerCheck(final Scenario scenario) {
 		scenarioNamePanel.check(scenario);
 	}
 
