@@ -21,7 +21,7 @@ public class FootStepTargetIDProcessor extends DataProcessor<EventtimePedestrian
 	protected void doUpdate(SimulationState state) {
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 		peds.forEach(p -> p.getTrajectory().getFootSteps().forEach(fs -> {
-					this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), p.getTargets().isEmpty() ? -1 : p.getTargets().getFirst());
+					this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), !p.hasNextTarget() ? -1 : p.getNextTargetId());
 		}));
 	}
 }

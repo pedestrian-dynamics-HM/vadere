@@ -5,6 +5,9 @@
 ## In Progress:
 
 ### Added
+
+- Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
+- Added "Psychology" tab in GUI which shows all psychology-related attributes of a scenario (which are stored in JSON node "attributesPsychology").
 - Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.
 - Add `AttributesPedestrianPositionProcessor` to the `PedestrianPositionProcessor` such that the user can disable interpolation (using the default it is enabled), making it more flexible.
 - Positions can now be interpolated i.e. Agents offer two methods: `getPosition` and `getInterpolatedPosition`. `getPosition` returns the Position the model is working with and `getInterpolatedPosition` the position the agent is approximatily at. For ODE-based models both methods return the same position but for footstep based models like the OSM the position is interpolated assuming that an agent performs his current step with a constant speed. This gives more accurate positions for visualizing and computing measures like the density.
@@ -39,6 +42,7 @@
 
 ### Changed
 
+- The "Time" slider in the PostVis uses the resolution of the "Res." slider instead of using a fixed step size of 0.4 seconds.
 - The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
 Was previously known as `PedestrianFootStepProcessor`

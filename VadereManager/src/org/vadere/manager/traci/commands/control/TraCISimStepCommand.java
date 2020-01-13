@@ -1,17 +1,17 @@
 package org.vadere.manager.traci.commands.control;
 
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
-import org.vadere.manager.traci.respons.TraCISimTimeResponse;
+import org.vadere.manager.traci.response.TraCISimTimeResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 public class TraCISimStepCommand extends TraCICommand {
 
 	private double targetTime;
 	private TraCISimTimeResponse response;
 
-	public static TraCIPacket build(double targetTime){
+	public static TraCIPacket build(double targetTime) {
 		TraCIPacket packet = TraCIPacket.create(14); // 4
 		packet.writeUnsignedByte(10) // 1
 				.writeUnsignedByte(TraCICmd.SIM_STEP.id) // 1

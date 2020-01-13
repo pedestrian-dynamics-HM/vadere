@@ -1,5 +1,6 @@
 package org.vadere.gui.components.control;
 
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ScenarioNamePanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -7,6 +8,7 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
+import org.vadere.util.config.VadereConfig;
 
 import java.awt.event.ActionEvent;
 import java.util.Observable;
@@ -23,8 +25,7 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 	private IDrawPanelModel model;
 	private ScenarioNamePanel view;
 
-	public
-	ActionScenarioChecker(String name, ScenarioNamePanel view) {
+	public ActionScenarioChecker(String name, ScenarioNamePanel view) {
 		super(name);
 		this.messages = new PriorityQueue<>();
 		this.view = view;
@@ -36,15 +37,25 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
-				"Topography Checker",
-				"The following problems where found",
-				msgDocument,
-				JOptionPane.INFORMATION_MESSAGE
-		);
+		if (!VadereConfig.getConfig().getBoolean("Project.ScenarioChecker.active")) {
+			VDialogManager.showMessageDialogWithTextArea(
+					Messages.getString("ProjectView.ScenarioChecker.title"),
+					Messages.getString("ProjectView.ScenarioChecker.deactive.text"),
+					JOptionPane.INFORMATION_MESSAGE
+			);
+		} else {
+			VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
+					Messages.getString("ProjectView.ScenarioChecker.title"),
+					Messages.getString("ProjectView.ScenarioChecker.active.text"),
+					msgDocument,
+					JOptionPane.INFORMATION_MESSAGE
+			);
+		}
+
+
 	}
 
-	public void observerModel(IDrawPanelModel model){
+	public void observerModel(IDrawPanelModel model) {
 		model.addObserver(this);
 		this.model = model;
 	}
@@ -57,24 +68,27 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		if(model != null){
+		if (model != null) {
 			check(model.getScenario());
 		}
 	}
 
-	public void check(final Scenario scenario){
-		ScenarioChecker checker = new ScenarioChecker(scenario);
-		messages.clear();
-		ScenarioPanel.setActiveTopographyErrorMsg(null);
-		messages = checker.checkBuildingStep();
-		msgDocument = new ScenarioCheckerMessageDocumentView(model);
-		msgDocument.setMessages(messages);
+
+	//		VadereConfig.getConfig().setProperty("Project.ScenarioChecker.active", item.getState());
+
+	public void check(final Scenario scenario) {
+		if (!VadereConfig.getConfig().getBoolean("Project.ScenarioChecker.active")) {
+			// ScenarioChecker is deactivated.
+			view.setDeactivate();
+			return;
+		}
+		run_check(scenario);
 
 		view.setGreen();
 
-		if (messages.size() > 0){
+		if (!messages.isEmpty()) {
 
-			if(messages.peek().getMsgType().isWarnMsg()) {
+			if (messages.peek().getMsgType().isWarnMsg()) {
 				view.setYellow();
 			}
 
@@ -82,6 +96,25 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 				view.setRed();
 				ScenarioPanel.setActiveTopographyErrorMsg(msgDocument);
 			}
+		}
+	}
+
+	private void run_check(final Scenario scenario) {
+		ScenarioChecker checker = new ScenarioChecker(scenario);
+		messages.clear();
+		ScenarioPanel.setActiveTopographyErrorMsg(null);
+		messages = checker.checkBuildingStep();
+		msgDocument = new ScenarioCheckerMessageDocumentView(model);
+		msgDocument.setMessages(messages);
+	}
+
+	public static void performManualCheck(final Scenario scenario) {
+		ActionScenarioChecker action = new ActionScenarioChecker("", null);
+		action.run_check(scenario);
+		if (!action.messages.isEmpty() && action.messages.peek().getMsgType().isErrorMsg()) {
+			ScenarioPanel.setActiveTopographyErrorMsg(action.msgDocument);
+		} else {
+			ScenarioPanel.setActiveTopographyErrorMsg(null);
 		}
 	}
 }

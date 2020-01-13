@@ -2,7 +2,7 @@ package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
-import org.vadere.manager.traci.respons.TraCISubscriptionResponse;
+import org.vadere.manager.traci.response.TraCISubscriptionResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
 
 import java.util.ArrayList;

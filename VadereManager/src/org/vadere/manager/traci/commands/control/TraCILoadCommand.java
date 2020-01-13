@@ -1,9 +1,9 @@
 package org.vadere.manager.traci.commands.control;
 
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 import java.util.List;
 
@@ -11,9 +11,8 @@ public class TraCILoadCommand extends TraCICommand {
 
 	private List<String> optionList;
 
-	public static TraCIPacket build(List<String> optionList){
-		TraCIPacket packet = TraCIPacket.create();
-		return packet;
+	public static TraCIPacket build(List<String> optionList) {
+		return TraCIPacket.create();
 	}
 
 	public TraCILoadCommand(TraCICommandBuffer cmdBuffer) {

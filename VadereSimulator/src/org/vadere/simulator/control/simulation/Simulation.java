@@ -1,9 +1,9 @@
 package org.vadere.simulator.control.simulation;
 
-import org.vadere.simulator.control.psychology.cognition.SelfCategoryProcessor;
-import org.vadere.simulator.control.psychology.perception.StimulusProcessor;
-import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -19,15 +19,15 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation {
@@ -74,23 +74,29 @@ public class Simulation {
 	private String name;
 	private final ScenarioStore scenarioStore;
 	private final MainModel mainModel;
+	private final IPerceptionModel perceptionModel;
+	private final ICognitionModel cognitionModel;
+
 	/** Hold the topography in an extra field for convenience. */
 	private final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
-	private final StimulusProcessor stimulusProcessor;
-	private final SelfCategoryProcessor selfCategoryProcessor;
 	private final ScenarioCache scenarioCache;
 
-	public Simulation(MainModel mainModel, double startTimeInSec, final String name, ScenarioStore scenarioStore,
-					  List<PassiveCallback> passiveCallbacks, Random random, ProcessorManager processorManager,
-					  SimulationResult simulationResult, List<RemoteRunListener> remoteRunListeners,
-					  boolean singleStepMode, ScenarioCache scenarioCache) {
+	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
+					  ICognitionModel cognitionModel, double startTimeInSec,
+					  final String name, ScenarioStore scenarioStore,
+					  List<PassiveCallback> passiveCallbacks, Random random,
+					  ProcessorManager processorManager, SimulationResult simulationResult,
+					  List<RemoteRunListener> remoteRunListeners, boolean singleStepMode,
+					  ScenarioCache scenarioCache) {
 
 		this.name = name;
 		this.mainModel = mainModel;
+		this.perceptionModel = perceptionModel;
+		this.cognitionModel = cognitionModel;
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
@@ -118,8 +124,6 @@ public class Simulation {
 
 		// "stimulusController" is final. Therefore, create object here and not in helper method.
 		this.stimulusController = new StimulusController(scenarioStore);
-		this.stimulusProcessor = new StimulusProcessor();
-		this.selfCategoryProcessor = new SelfCategoryProcessor(topography);
 
 		createControllers(topography, mainModel, random);
 
@@ -243,9 +247,9 @@ public class Simulation {
 			}
 
 			preLoop();
+			logger.info("preLoop finished.");
 
 			while (isRunSimulation) {
-
 				synchronized (this) {
 					while (isPaused) {
 						try {
@@ -268,7 +272,9 @@ public class Simulation {
 
 				assert assertAllPedestrianInBounds(): "Pedestrians are outside of topography bound.";
 				updateCallbacks(simTimeInSec);
-				updateWriters(simTimeInSec); // set SimulationState with Time!!!
+
+				step++;
+				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -342,17 +348,9 @@ public class Simulation {
 	}
 
 	private SimulationState initialSimulationState() {
-		SimulationState state =
-				new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
+		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
 
 		return state;
-	}
-
-	private void updateWriters(double simTimeInSec) {
-		SimulationState simulationState =
-				new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
-
-		this.simulationState = simulationState;
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
@@ -384,14 +382,12 @@ public class Simulation {
 		}
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid
-		step++;
 
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		perceptionModel.update(pedestrians, stimuli);
 
-		stimulusProcessor.prioritizeStimuliForPedestrians(stimuli, pedestrians);
-
-		if (attributesSimulation.isUsePsychologyLayer()) {
-			selfCategoryProcessor.setSelfCategoryOfPedestrian(pedestrians, simTimeInSec);
+		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
+			cognitionModel.update(pedestrians);
 		}
 
 		for (Model m : models) {
@@ -454,6 +450,23 @@ public class Simulation {
 		notify();
 	}
 
+	synchronized void addTargetChangerController(TargetChangerController controller){
+		targetChangerControllers.add(controller);
+	}
+
+	synchronized void addStimulusInfo(StimulusInfo si){
+		boolean isRecurring = si.getTimeframe().isRepeat();
+		if(isRecurring){
+			List<StimulusInfo> lrsi = stimulusController.getRecurringStimuli();
+			lrsi.add(si);
+			stimulusController.setRecurringStimuli(lrsi);
+		} else {
+			List<StimulusInfo> losi = stimulusController.getOneTimeStimuli();
+			losi.add(si);
+			stimulusController.setOneTimeStimuli(losi);
+		}
+	}
+
 	synchronized SimulationState getSimulationState(){
 		return simulationState;
 	}
@@ -491,6 +504,10 @@ public class Simulation {
 
 	public void setStartTimeInSec(double startTimeInSec) {
 		this.startTimeInSec = startTimeInSec;
+	}
+
+	public StimulusController getStimulusController(){
+		return stimulusController;
 	}
 
 }

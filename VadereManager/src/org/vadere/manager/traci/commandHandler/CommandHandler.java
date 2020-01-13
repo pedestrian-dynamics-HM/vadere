@@ -8,9 +8,9 @@ import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCIValueSubscriptionCommand;
-import org.vadere.manager.traci.respons.StatusResponse;
-import org.vadere.manager.traci.respons.TraCIGetResponse;
-import org.vadere.manager.traci.respons.TraCIStatusResponse;
+import org.vadere.manager.traci.response.StatusResponse;
+import org.vadere.manager.traci.response.TraCIGetResponse;
+import org.vadere.manager.traci.response.TraCIStatusResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.util.logging.Logger;
 
@@ -28,21 +28,26 @@ import java.util.List;
  * See {@link CommandExecutor} on how commands are dispatched to the correct {@link CommandHandler}
  * subclass. These classes implement methods which adhere to the TraCICmdHandler Interface. These
  * methods are used by the {@link CommandExecutor} for dispatching.
- *
  */
-public abstract class CommandHandler <VAR extends Enum> {
+public abstract class CommandHandler<VAR extends Enum> {
 
 	private static Logger logger = Logger.getLogger(CommandHandler.class);
 
 	public static final String ELEMENT_ID_NOT_FOUND = "No element found with given object id ";
+	public static final String ELEMENT_ID_NOT_FREE = "There is already an element with the given object id ";
+	public static final String FILE_NOT_FOUND = "No file with given path ";
+	public static final String COULD_NOT_PARSE_OBJECT_FROM_JSON = "Could not parse object from given json ";
+	public static final String COULD_NOT_MAP_OBJECT_FROM_JSON = "Could not map object from given json ";
+	public static final String COULD_NOT_SERIALIZE_OBJECT = "Could not serialize object ";
+	public static final String NO_MAIN_MODEL = "Main Model is not present.";
 	protected HashMap<Pair<TraCICmd, VAR>, Method> handler;
 	private final Method processNotImplemented;
 
 	public CommandHandler() {
 		handler = new HashMap<>();
 		Method tmp = null;
-		for (Method m : CommandHandler.class.getMethods()){
-			if (m.getName().equals("process_NotImplemented")){
+		for (Method m : CommandHandler.class.getMethods()) {
+			if (m.getName().equals("process_NotImplemented")) {
 				tmp = m;
 				break;
 			}
@@ -51,31 +56,32 @@ public abstract class CommandHandler <VAR extends Enum> {
 		processNotImplemented = tmp;
 	}
 
-	protected Method getHandler(TraCICmd cmd, VAR var){
+	protected Method getHandler(TraCICmd cmd, VAR var) {
 		return handler.getOrDefault(Pair.of(cmd, var), processNotImplemented);
 	}
 
 	protected abstract void init_HandlerSingle(Method m);
+
 	protected abstract void init_HandlerMult(Method m);
 
-	protected void putHandler(TraCICmd cmd, VAR var, Method m){
+	protected void putHandler(TraCICmd cmd, VAR var, Method m) {
 		logger.debugf("Pair: %s | %s Method: %s", cmd.name(), var.name(), m.getName());
 		handler.put(Pair.of(cmd, var), m);
 	}
 
-	protected void init(Class<? extends Annotation> singleAnnotation, Class<? extends Annotation> multAnnotation){
-		for (Method m : this.getClass().getDeclaredMethods()){
-			logger.infof(m.getName());
-			if (m.isAnnotationPresent(singleAnnotation)){
+	protected void init(Class<? extends Annotation> singleAnnotation, Class<? extends Annotation> multAnnotation) {
+		for (Method m : this.getClass().getDeclaredMethods()) {
+			logger.tracef(m.getName());
+			if (m.isAnnotationPresent(singleAnnotation)) {
 				init_HandlerSingle(m);
 			}
-			if (m.isAnnotationPresent(multAnnotation)){
+			if (m.isAnnotationPresent(multAnnotation)) {
 				init_HandlerMult(m);
 			}
 		}
 	}
 
-	protected TraCICommand invokeHandler(Method m, Object obj, TraCICommand cmd, RemoteManager manager){
+	protected TraCICommand invokeHandler(Method m, Object obj, TraCICommand cmd, RemoteManager manager) {
 		try {
 			return (TraCICommand) m.invoke(obj, cmd, manager);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -85,19 +91,19 @@ public abstract class CommandHandler <VAR extends Enum> {
 	}
 
 
-	public TraCICommand process_NotImplemented(TraCICommand cmd, RemoteManager remoteManager){
+	public TraCICommand process_NotImplemented(TraCICommand cmd, RemoteManager remoteManager) {
 		return cmd.setNOK_response(TraCIPacket.sendStatus(cmd.getTraCICmd(),
 				TraCIStatusResponse.NOT_IMPLEMENTED,
 				"Command " + cmd.getCmdType().toString() + "not Implemented"));
 	}
 
-	public TraCICommand process_UnknownCommand(TraCICommand cmd, RemoteManager remoteManager){
+	public TraCICommand process_UnknownCommand(TraCICommand cmd, RemoteManager remoteManager) {
 		return cmd.setNOK_response(TraCIPacket.sendStatus(cmd.getTraCICmd(),
 				TraCIStatusResponse.ERR,
 				"Command " + cmd.getCmdType().toString() + "Unknown"));
 	}
 
-	public TraCIGetResponse responseOK(TraCIDataType responseDataType, Object responseData, TraCICmd apiCmd, TraCICmd apiCmdResponse){
+	public TraCIGetResponse responseOK(TraCIDataType responseDataType, Object responseData, TraCICmd apiCmd, TraCICmd apiCmdResponse) {
 		TraCIGetResponse res = new TraCIGetResponse(
 				new StatusResponse(apiCmd, TraCIStatusResponse.OK, ""),
 				apiCmdResponse);
@@ -106,17 +112,14 @@ public abstract class CommandHandler <VAR extends Enum> {
 		return res;
 	}
 
-	public TraCIGetResponse responseERR(String err, TraCICmd apiCmd, TraCICmd apiCmdResponse){
-		TraCIGetResponse res = new TraCIGetResponse(
-				new StatusResponse(apiCmd, TraCIStatusResponse.ERR, err),
-				apiCmdResponse);
-		return res;
+	public TraCIGetResponse responseERR(String err, TraCICmd apiCmd, TraCICmd apiCmdResponse) {
+		return new TraCIGetResponse(new StatusResponse(apiCmd, TraCIStatusResponse.ERR, err), apiCmdResponse);
 	}
 
 
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager,
-										TraCICmdHandler traCICmdHandler, TraCICmd getCommand, TraCICmd apiCmdResponse){
-		TraCIValueSubscriptionCommand cmd = (TraCIValueSubscriptionCommand)rawCmd;
+										TraCICmdHandler traCICmdHandler, TraCICmd getCommand, TraCICmd apiCmdResponse) {
+		TraCIValueSubscriptionCommand cmd = (TraCIValueSubscriptionCommand) rawCmd;
 
 		List<TraCIGetCommand> getCommands = new ArrayList<>();
 
@@ -131,7 +134,7 @@ public abstract class CommandHandler <VAR extends Enum> {
 		// TraCIValueSubscriptionCommand implementation to translate the TraCIGetResponses
 		// into a single TraCISubscriptionResponse.
 		Subscription sub = new Subscription(traCICmdHandler, apiCmdResponse, cmd);
-		remoteManager.addValueSubscription(sub );
+		remoteManager.addValueSubscription(sub);
 
 		// process the current subscription to return the initial response for the given subscription
 		// return value not needed. The result is directly saved in getCmd.setResponse(...)
