@@ -2,8 +2,7 @@ package org.vadere.manager.server;
 
 import org.vadere.manager.ClientHandler;
 import org.vadere.manager.TraCISocket;
-import org.vadere.manager.traci.TraCIVersion;
-import org.vadere.util.logging.Logger;
+import org.vadere.util.config.VadereConfig;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,7 +11,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class VadereServer extends AbstractVadereServer{
+public class VadereServer extends AbstractVadereServer {
 
 	private final ExecutorService handlerPool;
 
@@ -25,6 +24,11 @@ public class VadereServer extends AbstractVadereServer{
 	public void run() {
 		try {
 			logger.infof("listening on port %d... (gui-mode: %s)", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
+			if (VadereConfig.getConfig().getBoolean("Vadere.cache.useGlobalCacheBaseDir")) {
+				logger.infof("Cache location lookup searches at: %s",
+						VadereConfig.getConfig().getString("Vadere.cache.globalCacheBaseDir"));
+			}
+
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
 				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
@@ -37,7 +41,7 @@ public class VadereServer extends AbstractVadereServer{
 			handlerPool.shutdown();
 			try {
 				handlerPool.awaitTermination(4L, TimeUnit.SECONDS);
-				if (!serverSocket.isClosed()){
+				if (!serverSocket.isClosed()) {
 					serverSocket.close();
 				}
 			} catch (InterruptedException | IOException e) {

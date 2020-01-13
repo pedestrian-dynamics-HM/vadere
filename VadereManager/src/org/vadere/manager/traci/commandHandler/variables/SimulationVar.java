@@ -18,7 +18,7 @@ public enum SimulationVar {
 	VEHICLES_STOP_PARKING_IDS(0x6f, TraCIDataType.STRING_LIST),
 	//
 	NETWORK_BOUNDING_BOX_2D(0x7c, TraCIDataType.POLYGON),
-	CACHE_HASH(0x7d, TraCIDataType.STRING)
+	CACHE_HASH(0x7d, TraCIDataType.STRING),
 	;
 
 	public int id;
@@ -29,8 +29,8 @@ public enum SimulationVar {
 		this.type = retVal;
 	}
 
-	public static SimulationVar fromId(int id){
-		for(SimulationVar var : values()){
+	public static SimulationVar fromId(int id) {
+		for (SimulationVar var : values()) {
 			if (var.id == id)
 				return var;
 		}

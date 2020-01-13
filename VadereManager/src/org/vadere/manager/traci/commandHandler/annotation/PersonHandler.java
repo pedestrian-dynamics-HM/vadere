@@ -11,11 +11,11 @@ import java.lang.annotation.Target;
 
 /**
  * Experimental annotation interface which removes long manually create switch statements by
- * creating a dynamic HashMap connecting commands(using variableIDs) to the corresponding
- * handler methods.
+ * creating a dynamic HashMap connecting commands(using variableIDs) to the corresponding handler
+ * methods.
  *
- * Reflection is minimized to a single startup routine at object creation. At runtime only
- * HashMap access is performed.
+ * Reflection is minimized to a single startup routine at object creation. At runtime only HashMap
+ * access is performed.
  */
 
 @Target(ElementType.METHOD)
@@ -23,8 +23,12 @@ import java.lang.annotation.Target;
 @Repeatable(PersonHandlers.class)
 public @interface PersonHandler {
 	TraCICmd cmd();
-	PersonVar var() ;
+
+	PersonVar var();
+
 	String name(); // name of client function.
+
 	boolean ignoreElementId() default false;
+
 	String dataTypeStr() default "";
 }

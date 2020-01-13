@@ -2,7 +2,6 @@ package org.vadere.manager;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
@@ -33,7 +32,7 @@ public class Manager {
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
 			AbstractVadereServer server;
-			if (ns.getBoolean("singleClient")){
+			if (ns.getBoolean("singleClient")) {
 				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
 			} else {
 				ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));

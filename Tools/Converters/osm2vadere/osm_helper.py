@@ -347,6 +347,16 @@ class OsmLookup:
                     print(f"{msg} continue ...")
             self.latlon_to_node.setdefault(latlon_point, node_id)
 
+    def convert_latlon_to_utm(self, latlon):
+        latlon_point = (float(latlon[0]), float(latlon[1]))
+        x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(float(latlon_point[0]),
+                                                                          float(latlon_point[1]))
+        utm_point = (x, y)
+        self.zone_map.setdefault((zone_number, zone_letter), None)
+        if len(self.zone_map) > 1:
+            raise RuntimeError(f"OSM map contains multiple UTM-Zones. This does not work here. {self.zone_map}")
+        return utm_point
+
     def add(self, node_id, latlon, utm):
         # todo add test before adding
         self.node_to_latlon.setdefault(node_id, latlon)

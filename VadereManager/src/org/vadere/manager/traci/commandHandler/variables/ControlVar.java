@@ -15,8 +15,8 @@ public enum ControlVar {
 	}
 
 
-	public static ControlVar fromId(int id){
-		for(ControlVar var : values()){
+	public static ControlVar fromId(int id) {
+		for (ControlVar var : values()) {
 			if (var.id == id)
 				return var;
 		}

@@ -49,20 +49,20 @@ public class ServerView extends JFrame implements SingleScenarioFinishedListener
 		ServerView.mainWindow = this;
 
 		setTitle("Vadere GUI - Server");
-		setBounds(100, 100, 1000,  600);
+		setBounds(100, 100, 1000, 600);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 	}
 
 
-	public static void close(){
+	public static void close() {
 		EventQueue.invokeLater(() -> {
 			mainWindow.setVisible(false);
 			mainWindow.dispose();
 		});
 	}
 
-	public static void startServerGui(OnlineVisualization onlineVisualization){
+	public static void startServerGui(OnlineVisualization onlineVisualization) {
 		EventQueue.invokeLater(() -> {
 
 			ServerView frame = new ServerView();

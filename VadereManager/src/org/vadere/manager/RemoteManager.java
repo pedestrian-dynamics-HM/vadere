@@ -18,15 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  This class acts as interface between the TraCI handling and the actual simulation.
- *  All synchronization is handled by the {@link RemoteScenarioRun} class. All access to
- *  the simulation state must be wrapped within a {@link StateAccessHandler} to decouple
- *  the {@link SimulationState} from the command handing.
+ * This class acts as interface between the TraCI handling and the actual simulation. All
+ * synchronization is handled by the {@link RemoteScenarioRun} class. All access to the simulation
+ * state must be wrapped within a {@link StateAccessHandler} to decouple the {@link SimulationState}
+ * from the command handing.
  *
- *  Within the {@link StateAccessHandler#execute(RemoteManager, SimulationState)} method
- *  the {@link SimulationState} is save to access and change. Be really careful what you
- *  change!
- *
+ * Within the {@link StateAccessHandler#execute(RemoteManager, SimulationState)} method the {@link
+ * SimulationState} is save to access and change. Be really careful what you change!
  */
 public class RemoteManager implements RunnableFinishedListener {
 
@@ -50,7 +48,7 @@ public class RemoteManager implements RunnableFinishedListener {
 		this.clientCloseCommandReceived = false;
 	}
 
-	public void loadScenario(String scenarioString, Map<String, ByteArrayInputStream> cacheData){
+	public void loadScenario(String scenarioString, Map<String, ByteArrayInputStream> cacheData) {
 
 		Scenario scenario;
 		ScenarioCache scenarioCache;
@@ -63,7 +61,7 @@ public class RemoteManager implements RunnableFinishedListener {
 		} catch (IOException e) {
 			throw new TraCIException("Cannot create Scenario from given file.");
 		}
-		currentSimulationRun = new RemoteScenarioRun(scenario, baseDir,this, scenarioPath, scenarioCache);
+		currentSimulationRun = new RemoteScenarioRun(scenario, baseDir, this, scenarioPath, scenarioCache);
 	}
 
 	public void loadScenario(String scenarioString) {
@@ -71,10 +69,10 @@ public class RemoteManager implements RunnableFinishedListener {
 		loadScenario(scenarioString, null);
 	}
 
-	private ScenarioCache buildScenarioCache(final Scenario scenario, Map<String, ByteArrayInputStream> cacheData){
+	private ScenarioCache buildScenarioCache(final Scenario scenario, Map<String, ByteArrayInputStream> cacheData) {
 		ScenarioCache scenarioCache = ScenarioCache.load(scenario, baseDir);
-		if (scenarioCache.isEmpty()){
-			if (cacheData != null){
+		if (scenarioCache.isEmpty()) {
+			if (cacheData != null) {
 				logger.warnf("received cache data but given Scenario has cache deactivated. Received cache will be ignored");
 				cacheData.clear();
 			}
@@ -82,7 +80,7 @@ public class RemoteManager implements RunnableFinishedListener {
 		}
 
 
-		if (cacheData != null){
+		if (cacheData != null) {
 			logger.info("received cache data");
 			cacheData.forEach(scenarioCache::addReadOnlyCache);
 		}
@@ -90,8 +88,8 @@ public class RemoteManager implements RunnableFinishedListener {
 		return scenarioCache;
 	}
 
-	public boolean stopSimulationIfRunning(){
-		if (currentSimulationThread != null && currentSimulationThread.isAlive()){
+	public boolean stopSimulationIfRunning() {
+		if (currentSimulationThread != null && currentSimulationThread.isAlive()) {
 			currentSimulationThread.interrupt();
 			return true;
 		}
@@ -99,15 +97,15 @@ public class RemoteManager implements RunnableFinishedListener {
 		return false;
 	}
 
-	public void addValueSubscription(Subscription sub){
+	public void addValueSubscription(Subscription sub) {
 		subscriptions.add(sub);
 	}
 
-	public List<Subscription> getSubscriptions(){
+	public List<Subscription> getSubscriptions() {
 		return subscriptions;
 	}
 
-	public boolean accessState(StateAccessHandler stateAccessHandler){
+	public boolean accessState(StateAccessHandler stateAccessHandler) {
 		if (currentSimulationRun == null)
 			return false;
 
@@ -116,7 +114,12 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
-	public boolean nextStep(double simTime){
+	public RemoteScenarioRun getRemoteSimulationRun() {
+		return currentSimulationRun;
+	}
+
+
+	public boolean nextStep(double simTime) {
 		if (simulationFinished)
 			return false;
 
@@ -140,12 +143,12 @@ public class RemoteManager implements RunnableFinishedListener {
 			ServerView.close();
 	}
 
-	public void startSimulation(){
+	public void startSimulation() {
 		if (currentSimulationRun == null)
 			throw new IllegalStateException("RemoteScenarioRun object must not be null");
 
 		if (currentSimulationThread != null && currentSimulationThread.isAlive())
-			throw  new IllegalStateException("A simulation is already running. Stop current simulation before starting new one.");
+			throw new IllegalStateException("A simulation is already running. Stop current simulation before starting new one.");
 
 		simulationFinished = false;
 		currentSimulationThread = new Thread(currentSimulationRun);
@@ -153,7 +156,7 @@ public class RemoteManager implements RunnableFinishedListener {
 			currentSimulationRun.simulationFailed(ex);
 		});
 
-		if (guiSupport){
+		if (guiSupport) {
 			OnlineVisualization onlineVisualization = new OnlineVisualization(true);
 			currentSimulationRun.addPassiveCallback(onlineVisualization);
 			ServerView.startServerGui(onlineVisualization);

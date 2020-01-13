@@ -34,6 +34,7 @@ import org.vadere.gui.projectview.control.ActionToClipboard;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.control.ShowResultDialogAction;
+import org.vadere.gui.projectview.control.ToggleScenarioManagerAction;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -59,7 +60,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -73,8 +73,6 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 /**
  * Main view of the Vadere GUI.
- *
- *
  */
 public class ProjectView extends JFrame implements ProjectFinishedListener, SingleScenarioFinishedListener,
 		IOutputFileRefreshListener, IProjectChangeListener {
@@ -83,7 +81,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 */
 	private static final long serialVersionUID = -2081363246241235943L;
 	private static Logger logger = Logger.getLogger(ProjectView.class);
-	/** Store a reference to the main window as "owner" parameter for dialogs. */
+	/**
+	 * Store a reference to the main window as "owner" parameter for dialogs.
+	 */
 	private static ProjectView mainWindow;
 
 	/**
@@ -93,10 +93,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	/**
 	 * GUI elements (part of the view) of the {@link ProjectView}
-	 * 
-	 * TODO [priority=medium] [task=refactoring] do the actions have to be stored in member variables
-	 * or could it be better to store them locally where they are needed?
-	 * Some are used in different methods, maybe only store these as members?
+	 *
+	 * TODO [priority=medium] [task=refactoring] do the actions have to be stored in member
+	 * variables or could it be better to store them locally where they are needed? Some are used in
+	 * different methods, maybe only store these as members?
 	 */
 	private JPanel contentPane = new JPanel();
 	private JPanel controlPanel = new JPanel();
@@ -134,7 +134,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private void selectCurrentScenarioRunManager() {
 		int index = model.getProject().getScenarioIndexByName(model.getProject().getCurrentScenario());
 
-		if(index != -1) {
+		if (index != -1) {
 			scenarioTable.setRowSelectionInterval(index, index);
 		}
 	}
@@ -283,7 +283,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private static void checkDependencies(@NotNull final JFrame frame) {
 		try {
-			if(!CLUtils.isOpenCLSupported()) {
+			if (!CLUtils.isOpenCLSupported()) {
 				JOptionPane.showMessageDialog(frame,
 						Messages.getString("ProjectView.warning.opencl.text"),
 						Messages.getString("ProjectView.warning.opencl.title"),
@@ -378,16 +378,16 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	private void buildKeyboardShortcuts(ActionPauseScenario pauseScenarioAction, Action interruptScenariosAction) {
-	    addKeyboardShortcut("SPACE", "Typed Space", btnPauseRunningScenarios.getAction());
-	    addKeyboardShortcut("BACK_SPACE", "Typed Backspace", btnStopRunningScenarios.getAction());
+		addKeyboardShortcut("SPACE", "Typed Space", btnPauseRunningScenarios.getAction());
+		addKeyboardShortcut("BACK_SPACE", "Typed Backspace", btnStopRunningScenarios.getAction());
 	}
 
-    private void addKeyboardShortcut(String key, String actionKey, Action action) {
-	    controlPanel.getInputMap().put(KeyStroke.getKeyStroke(key), actionKey);
-	    controlPanel.getActionMap().put(actionKey, action);
-    }
+	private void addKeyboardShortcut(String key, String actionKey, Action action) {
+		controlPanel.getInputMap().put(KeyStroke.getKeyStroke(key), actionKey);
+		controlPanel.getActionMap().put(actionKey, action);
+	}
 
-    private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
+	private void buildMenuBar(ActionCloseApplication closeApplicationAction, ActionAddScenario addScenarioAction) {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -442,6 +442,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		showResultDialogMenu.setAction(showResultDialogMenuAction);
 		mnFile.add(showResultDialogMenu);
 
+		// Checkbox menu item to turn off Scenario Checker during  topography creation
+		JCheckBoxMenuItem toggleScenarioCheckerDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.btnToggleScenarioChecker.text"), null, model.getShowSimulationResultDialog());
+		Action toggleScenarioCheckerMenuAction = new ToggleScenarioManagerAction(Messages.getString("ProjectView.btnToggleScenarioChecker.text"), model, toggleScenarioCheckerDialogMenu);
+		toggleScenarioCheckerDialogMenu.setAction(toggleScenarioCheckerMenuAction);
+		mnFile.add(toggleScenarioCheckerDialogMenu);
+
+
 		JMenuItem mntmExit = new JMenuItem(closeApplicationAction);
 		mnFile.addSeparator();
 		mnFile.add(mntmExit);
@@ -474,6 +481,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JRadioButtonMenuItem mntmEnglishLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmEnglishLocale.text")) {
 					private static final long serialVersionUID = 1L;
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.ENGLISH);
@@ -483,6 +491,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JRadioButtonMenuItem mntmGermanLocale =
 				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmGermanLocale.text")) {
 					private static final long serialVersionUID = 1L;
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						Messages.changeLanguage(Locale.GERMAN);
@@ -499,6 +508,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmReapplyMigration.text")) {
 			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				(new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
@@ -561,7 +571,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		((BasicSplitPaneUI) mainSplitPanel.getUI()).getDivider().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 2){
+				if (e.getClickCount() == 2) {
 					mainSplitPanel.setDividerLocation(scenarioTable.getSize().width + 5);
 				}
 			}
@@ -570,7 +580,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
 		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		panel_1.setMinimumSize(new Dimension(1,1));
+		panel_1.setMinimumSize(new Dimension(1, 1));
 		panel_2.setMinimumSize(new Dimension(1, 1));
 		mainSplitPanel.setLeftComponent(panel_1_scroll);
 		mainSplitPanel.setRightComponent(panel_2);
@@ -590,13 +600,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				ScenarioBundle bundle = model.getSelectedScenarioBundle();
 
 				model.setCurrentScenario(bundle.getScenario());
-                logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
+				logger.info(String.format("selected scenario '%s'", bundle.getScenario().getName()));
 
-                scenarioJPanel.setScenario(bundle.getScenario(), true);
+				scenarioJPanel.setScenario(bundle.getScenario(), true);
 
 				outputTableRenderer.setMarkedOutputFiles(bundle.getOutputDirectories());
 				outputTable.repaint(); // make cell renderer mark associated outputs
-                logger.info("repainted output table");
+				logger.info("repainted output table");
 			}
 		});
 		scenarioTable.setDefaultRenderer(Object.class, new ScenarioTableRenderer(model));
@@ -668,7 +678,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 							new ActionToClipboard(outDir.getName() + "/", outDir.getAbsolutePath()))
 					);
 					File[] children = outDir.listFiles();
-					if (children != null){
+					if (children != null) {
 						for (File file : children) {
 							String name = file.isDirectory() ? "---*" + file.getName() + "/" : "---*" + file.getName();
 							copyPath.add(new JMenuItem(
@@ -683,7 +693,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			}
 		});
 
-				outputListPopupMenu.add(copyPath);
+		outputListPopupMenu.add(copyPath);
 
 		JPopupMenu outputListPopupMenuMultiSelect = new JPopupMenu();
 		outputListPopupMenuMultiSelect.add(new JMenuItem(deleteOutputFileAction));
@@ -849,7 +859,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	public void validate() {
 		int max_div = scenarioTable.getSize().width + 25;
 		super.validate();
-		if (mainSplitPanel.getDividerLocation() > max_div){
+		if (mainSplitPanel.getDividerLocation() > max_div) {
 			mainSplitPanel.setDividerLocation(max_div);
 		}
 	}

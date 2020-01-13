@@ -1,6 +1,5 @@
 package org.vadere.manager.traci.writer;
 
-import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
@@ -24,17 +23,23 @@ public interface TraCIWriter {
 	TraCIWriter writeObjectWithId(TraCIDataType dataType, Object data);
 
 	TraCIWriter writeUnsignedByteWithId(int val);
+
 	TraCIWriter writeByteWithId(byte val);
+
 	TraCIWriter writeIntWithId(int val);
+
 	TraCIWriter writeDoubleWithId(double val);
+
 	TraCIWriter writeStringWithId(String val);
+
 	TraCIWriter writeStringListWithId(List<String> val);
+
 	TraCIWriter write2DPositionListWithId(Map<String, VPoint> data); // new
 
 	TraCIWriter writeByte(int val);
 
-	default TraCIWriter writeUnsignedByte(int val){
-		if (val>= 0 && val<=255){
+	default TraCIWriter writeUnsignedByte(int val) {
+		if (val >= 0 && val <= 255) {
 			writeByte(val);
 		} else {
 			throw new IllegalArgumentException(
@@ -44,23 +49,25 @@ public interface TraCIWriter {
 	}
 
 	TraCIWriter writeBytes(byte[] buf);
+
 	TraCIWriter writeBytes(byte[] buf, int offset, int len);
 
-	default TraCIWriter writeBytes(ByteBuffer buf, int offset, int len){
+	default TraCIWriter writeBytes(ByteBuffer buf, int offset, int len) {
 		writeBytes(buf.array(), offset, len);
 		return this;
 	}
-	default TraCIWriter writeBytes(ByteBuffer buf){
+
+	default TraCIWriter writeBytes(ByteBuffer buf) {
 		writeBytes(buf, 0, buf.array().length);
 		return this;
 	}
 
-	default TraCIWriter writeInt(int val){
+	default TraCIWriter writeInt(int val) {
 		writeBytes(ByteBuffer.allocate(4).putInt(val).array());
 		return this;
 	}
 
-	default TraCIWriter writeDouble(double val){
+	default TraCIWriter writeDouble(double val) {
 		writeBytes(ByteBuffer.allocate(8).putDouble(val).array());
 		return this;
 	}
@@ -89,13 +96,14 @@ public interface TraCIWriter {
 
 	TraCIWriter writeColor(Color color);
 
-	TraCIWriter writeCompoundObject(CompoundObject compoundObject);
+	TraCIWriter writeNull();
 
 	TraCIWriter writeCommandLength(int cmdLen);
 
 	int stringByteCount(String str);
 
 	int size();
+
 	int getStringByteCount(String val);
 
 }

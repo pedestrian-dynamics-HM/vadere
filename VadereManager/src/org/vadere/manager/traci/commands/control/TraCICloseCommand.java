@@ -1,17 +1,17 @@
 package org.vadere.manager.traci.commands.control;
 
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.commands.TraCICommand;
-import org.vadere.manager.traci.respons.StatusResponse;
-import org.vadere.manager.traci.respons.TraCIResponse;
-import org.vadere.manager.traci.respons.TraCIStatusResponse;
+import org.vadere.manager.traci.response.StatusResponse;
+import org.vadere.manager.traci.response.TraCIResponse;
+import org.vadere.manager.traci.response.TraCIStatusResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 public class TraCICloseCommand extends TraCICommand {
 
 	private TraCIResponse response;
 
-	public static TraCIPacket build(){
+	public static TraCIPacket build() {
 
 		TraCIPacket packet = TraCIPacket.create(6); // 4
 		packet.writeUnsignedByte(2) // 1

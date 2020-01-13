@@ -16,7 +16,7 @@ public class TraCISendFileCommandV20_0_1 extends TraCISendFileCommand {
 	public TraCISendFileCommandV20_0_1(TraCICommandBuffer cmdBuffer) {
 		super(cmdBuffer);
 		cacheData = new HashMap<>();
-		if (cmdBuffer.hasRemaining()){
+		if (cmdBuffer.hasRemaining()) {
 			int numberOfCaches = cmdBuffer.readInt();
 			for (int i = 0; i < numberOfCaches; i++) {
 				String cacheIdentifier = cmdBuffer.readString();

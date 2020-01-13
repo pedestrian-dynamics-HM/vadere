@@ -137,23 +137,6 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 1,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 36.0,
-          "y" : 10.5,
-          "width" : 2.5,
-          "height" : 4.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 2,
         "absorbing" : true,
         "shape" : {
@@ -170,8 +153,38 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 36.0,
+          "y" : 10.5,
+          "width" : 2.5,
+          "height" : 4.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 3,
+        "shape" : {
+          "x" : 6.1,
+          "y" : 0.7,
+          "width" : 4.2,
+          "height" : 6.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : 1,
+        "probabilityToChangeTarget" : 1.0
+      } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 1,

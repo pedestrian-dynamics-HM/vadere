@@ -19,16 +19,18 @@ Script is based on (sumo-launchd.py)[https://github.com/sommer/veins/blob/master
 
 """
 
+
 class VadereRunner(threading.Thread):
 
     def __init__(self, client_socket, server_port, options):
         threading.Thread.__init__(self)
-        self.client_socket : socket.socket = client_socket
+        self.client_socket: socket.socket = client_socket
         self.server_port = server_port
         self.options = options
         self.stop = False
         self.vadere = ''
-        self.log = logging.getLogger(f"vadere-runner-{self.client_socket.getpeername()[1]}:{server_port}")
+        self.log = logging.getLogger(
+            f"vadere-runner-{self.client_socket.getpeername()[1]}:{server_port}")
 
     def stop_tread(self):
         self.stop = True
@@ -37,16 +39,18 @@ class VadereRunner(threading.Thread):
         return f"subprocess: pid: {self.vadere.pid} returncode: {self.returncode}"
 
     def forward_connection(self, server_socket: socket.socket):
-        self.client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.client_socket.setsockopt(
+            socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-        self.log.debug(f"start forwarding {self.client_socket.getpeername()[0]}:{self.client_socket.getpeername()[1]} "
-                       f"<----->"
-                       f" {server_socket.getpeername()[0]}:{server_socket.getpeername()[1]}")
+        self.log.debug(
+            f"start forwarding {self.client_socket.getpeername()[0]}:{self.client_socket.getpeername()[1]} "
+            f"<----->"
+            f" {server_socket.getpeername()[0]}:{server_socket.getpeername()[1]}")
 
         while not self.stop:
-            (read, write, exp) = select.select([self.client_socket, server_socket], [], [self.client_socket, server_socket],
-                                               1)
+            (read, write, exp) = select.select(
+                [self.client_socket, server_socket], [], [self.client_socket, server_socket], 1)
             if len(exp) != 0:
                 self.stop = True
             if self.client_socket in read:
@@ -71,12 +75,14 @@ class VadereRunner(threading.Thread):
                     self.log.debug(f"server>client: {len(data)} Bytes...")
                     self.client_socket.send(data)
 
-        self.log.debug(f"stop forwarding {self.client_socket.getpeername()[0]}:{self.client_socket.getpeername()[1]} "
-                       f"<----->"
-                       f" {server_socket.getpeername()[0]}:{server_socket.getpeername()[1]}")
+        self.log.debug(
+            f"stop forwarding {self.client_socket.getpeername()[0]}:{self.client_socket.getpeername()[1]} "
+            f"<----->"
+            f" {server_socket.getpeername()[0]}:{server_socket.getpeername()[1]}")
 
     def run(self):
-        cmd = ['java', '-jar', self.options.jar, '--port', str(self.server_port), '--single-client']
+        cmd = ['java', '-jar', self.options.jar, '--port',
+               str(self.server_port), '--single-client']
 
         if self.options.gui:
             cmd.append('--gui-mode')
@@ -88,16 +94,20 @@ class VadereRunner(threading.Thread):
                 log_file_name = os.devnull
 
             log_file = open(log_file_name, 'w')
-            self.vadere = subprocess.Popen(cmd, cwd=os.path.curdir, shell=False,
-                                           stdin=None,
-                                           stdout=log_file,
-                                           stderr=log_file)
+            self.vadere = subprocess.Popen(
+                cmd,
+                cwd=os.path.curdir,
+                shell=False,
+                stdin=None,
+                stdout=log_file,
+                stderr=log_file)
 
             connected = False
             tries = 1
             while not connected:
                 try:
-                    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    server_socket = socket.socket(
+                        socket.AF_INET, socket.SOCK_STREAM)
                     server_socket.connect(('127.0.0.1', self.server_port))
                     connected = True
                 except socket.error as e:
@@ -108,7 +118,8 @@ class VadereRunner(threading.Thread):
                     tries += 1
             self.log.debug(f"connection attempt {tries} : OK")
 
-            self.log.info(f"started vadere server process (PID:{self.vadere.pid}) at port {self.server_port}")
+            self.log.info(
+                f"started vadere server process (PID:{self.vadere.pid}) at port {self.server_port}")
 
             self.forward_connection(server_socket)
             self.client_socket.close()
@@ -117,22 +128,25 @@ class VadereRunner(threading.Thread):
             try:
                 self.vadere.wait(timeout=2)
             except subprocess.TimeoutExpired as e:
-                self.log.info(f"vadere server process (PID:{self.vadere.pid}) not terminated after timeout. Send SIGKILL")
+                self.log.info(
+                    f"vadere server process (PID:{self.vadere.pid}) not terminated after timeout. Send SIGKILL")
 
             if self.vadere.returncode is None:
                 os.kill(self.vadere.pid, signal.SIGKLL)
                 time.sleep(0.5)
                 if self.vadere.returncode is None:
-                    self.log.error(f"vadere server process (PID:{self.vadere.pid}) still not dead.")
+                    self.log.error(
+                        f"vadere server process (PID:{self.vadere.pid}) still not dead.")
                     raise
 
             if log_file_name == os.devnull:
-                self.log.info(f"vadere server process (PID:{self.vadere.pid}) exited with returncode: {self.vadere.returncode}")
+                self.log.info(
+                    f"vadere server process (PID:{self.vadere.pid}) exited with returncode: {self.vadere.returncode}")
             else:
-                self.log.info(f"vadere server process (PID:{self.vadere.pid}) exited with returncode: {self.vadere.returncode}  log for details: {os.path.abspath(log_file_name)} ")
+                self.log.info(
+                    f"vadere server process (PID:{self.vadere.pid}) exited with returncode: {self.vadere.returncode}  log for details: {os.path.abspath(log_file_name)} ")
         finally:
-             log_file.close()
-
+            log_file.close()
 
 
 def get_port(bind):
@@ -156,7 +170,8 @@ def wait_for_client(options):
         while True:
             conn, addr = s.accept()
             port = get_port(options.bind)
-            logging.info(f"client connected start vadere runner at port {port}...")
+            logging.info(
+                f"client connected start vadere runner at port {port}...")
             thread = VadereRunner(conn, port, options)
             thread.start()
             threads.append(thread)
@@ -176,18 +191,50 @@ def wait_for_client(options):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--port", dest="port", default=9998, type=int, help="listen on port for incoming requests. [default= 9998]")
-    parser.add_argument("-b", "--bind", dest="bind", default='127.0.0.1', help="bind to address. [default= 127.0.0.1]")
-    parser.add_argument("-g", "--gui-mode", dest="gui", default=False, action='store_true',
-                        help="show graphical userinterface if client connects. [default= false]")
-    parser.add_argument("--jar", dest="jar", default='', help="JAR file to execute. If not given use default location.")
-    parser.add_argument("--vadere-log", dest="vadere_log", default=False, action='store_true',
-                        help="If set create log file with client:server port in file name. [default= False]")
-    parser.add_argument("--log", dest="log", default=logging.INFO, choices=list(logging._nameToLevel.keys()), help="write log files for each vadere"
-                                                                                            " instance. [default= INFO]")
+    parser.add_argument(
+        "-p",
+        "--port",
+        dest="port",
+        default=9998,
+        type=int,
+        help="listen on port for incoming requests. [default= 9998]")
+    parser.add_argument(
+        "-b",
+        "--bind",
+        dest="bind",
+        default='127.0.0.1',
+        help="bind to address. [default= 127.0.0.1]")
+    parser.add_argument(
+        "-g",
+        "--gui-mode",
+        dest="gui",
+        default=False,
+        action='store_true',
+        help="show graphical userinterface if client connects. [default= false]")
+    parser.add_argument(
+        "--jar",
+        dest="jar",
+        default='',
+        help="JAR file to execute. If not given use default location.")
+    parser.add_argument(
+        "--vadere-log",
+        dest="vadere_log",
+        default=False,
+        action='store_true',
+        help="If set create log file with client:server port in file name. [default= False]")
+    parser.add_argument(
+        "--log",
+        dest="log",
+        default=logging.INFO,
+        choices=list(
+            logging._nameToLevel.keys()),
+        help="write log files for each vadere"
+        " instance. [default= INFO]")
     options = parser.parse_args()
 
-    logging.basicConfig(level=options.log, format="%(levelname)s:%(name)s> %(message)s")
+    logging.basicConfig(
+        level=options.log,
+        format="%(levelname)s:%(name)s> %(message)s")
 
     if options.jar == '':
         vadere_home = os.getenv("VADERE_HOME")
@@ -195,7 +242,8 @@ def main():
             logging.error("JAR file not given and VADERE_HOME not set.")
             sys.exit(-1)
         else:
-            options.jar = os.path.join(vadere_home, 'VadereManager/target/vadere-server.jar')
+            options.jar = os.path.join(
+                vadere_home, 'VadereManager/target/vadere-server.jar')
 
     wait_for_client(options)
 
