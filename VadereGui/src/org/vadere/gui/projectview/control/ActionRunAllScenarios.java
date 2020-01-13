@@ -1,10 +1,10 @@
 package org.vadere.gui.projectview.control;
 
-import javax.swing.*;
-
 import org.vadere.gui.projectview.model.ProjectViewModel;
 
 import java.awt.event.ActionEvent;
+
+import javax.swing.*;
 
 public class ActionRunAllScenarios extends AbstractAction {
 
@@ -17,7 +17,7 @@ public class ActionRunAllScenarios extends AbstractAction {
 
 	@Override
 	public void actionPerformed(final ActionEvent e) {
-		if (model.runScenarioIsOk())
+		if (model.runScenarioIsOk(true))
 			model.getProject().runAllScenarios();
 	}
 }
