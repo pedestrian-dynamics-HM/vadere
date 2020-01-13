@@ -15,8 +15,8 @@ public enum VehicleVar {
 	}
 
 
-	public static VehicleVar fromId(int id){
-		for(VehicleVar var : values()){
+	public static VehicleVar fromId(int id) {
+		for (VehicleVar var : values()) {
 			if (var.id == id)
 				return var;
 		}

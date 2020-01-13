@@ -109,6 +109,7 @@ class OsmConverter:
         self.osm = OsmData(self.osm_file)
         self.use_osm_id = use_osm_id
         self.wall_thickness = wall_thickness
+        self.aoi = None
 
         # self.xml_tree = etree.parse(self.osm_file)
         # self.node_dict = OsmConverter.extract_latitude_and_longitude_for_each_xml_node(self.xml_tree)
@@ -136,15 +137,30 @@ class OsmConverter:
         for f in self.osm.measurement_selectors:
             self.measurement.extend(f())
 
-
     def filter_area_of_interest(self):
         aoi = self.osm.get_area_of_intrest()
 
         if aoi:
+            self.aoi = aoi
             self.obstacles = [o for o in self.obstacles if self.osm.contained_in_area_of_intrest(aoi, o)]
             self.targets = [o for o in self.targets if self.osm.contained_in_area_of_intrest(aoi, o)]
             self.sources = [o for o in self.sources if self.osm.contained_in_area_of_intrest(aoi, o)]
             self.measurement = [o for o in self.measurement if self.osm.contained_in_area_of_intrest(aoi, o)]
+
+    def get_base_point_from_aoi(self):
+        assert self.aoi is not None
+        lonlat = (min(self.aoi[0]), min(self.aoi[1]))
+        return self.osm.lookup.convert_latlon_to_utm(lonlat)
+
+    def find_width_height_from_aoi(self, base):
+        assert self.aoi is not None
+
+        max_point = self.osm.lookup.convert_latlon_to_utm((max(self.aoi[0]), max(self.aoi[1])))
+
+        shift_in_x = -base[0]
+        shift_in_y = -base[1]
+        max_point_shifted = (max_point[0] + shift_in_x, max_point[1] + shift_in_y)
+        return max_point_shifted # width and height
 
 
     @classmethod
@@ -334,7 +350,7 @@ class OsmConverter:
         :param poly_object:
         :return: Vadere json representation of an obstacle
         """
-        vadere_point_string = f"{'    '*indent_level}" + '  { "x" : $x, "y" : $y }'
+        vadere_point_string = f"{'    ' * indent_level}" + '  { "x" : $x, "y" : $y }'
 
         obstacle_string_template = Template(template_string)
         point_string_template = Template(vadere_point_string)
@@ -517,7 +533,6 @@ def parse_command_line_arguments():
 
 
 def random_source_target_match(sources: List[PolyObjectWidthId], targets: List[PolyObjectWidthId]):
-
     target_ids = [t.template_data.get('id') for t in targets]
 
     for source in sources:
@@ -539,7 +554,13 @@ def main_convert(cmd_args):
 
     print(cmd_args)
     converter = OsmConverter.from_args(cmd_args)
-    obstacles_as_utm, base_point_utm, zone_string = converter.convert_to_utm_poly_object(data=converter.obstacles)
+
+    if converter.aoi:
+        base = converter.get_base_point_from_aoi()
+        obstacles_as_utm, base_point_utm, zone_string = converter.convert_to_utm_poly_object(data=converter.obstacles, base_point=base)
+    else:
+        obstacles_as_utm, base_point_utm, zone_string = converter.convert_to_utm_poly_object(data=converter.obstacles)
+
     sources_as_utm, _, _ = converter.convert_to_utm_poly_object(data=converter.sources,
                                                                 base_point=base_point_utm,
                                                                 tag_name_space="rover:source:")
@@ -554,7 +575,10 @@ def main_convert(cmd_args):
     # random_source_target_match(sources_as_utm, targets_as_utm)
 
     # make sure everything lies within the topography
-    width_topography, height_topography = OsmConverter.find_width_and_height(obstacles_as_utm)
+    if converter.aoi:
+        width_topography, height_topography = converter.find_width_height_from_aoi(base_point_utm)
+    else:
+        width_topography, height_topography = OsmConverter.find_width_and_height(obstacles_as_utm)
 
     list_of_vadere_obstacles_as_strings = OsmConverter.to_vadere_obstacles(obstacles_as_utm)
     list_of_vadere_sources_as_strings = OsmConverter.to_vadere_sources(sources_as_utm)

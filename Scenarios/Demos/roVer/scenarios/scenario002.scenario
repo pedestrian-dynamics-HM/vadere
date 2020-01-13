@@ -1,7 +1,7 @@
 {
   "name" : "scenario002",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,8 +102,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 183115877309837713,
-      "simulationSeed" : 0,
-      "usePsychologyLayer" : false
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
@@ -238,8 +244,8 @@
       "sources" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 4.2,
-          "y" : 8.457142857142857,
+          "x" : 4.0,
+          "y" : 8.457142857142856,
           "width" : 2.0095238095238095,
           "height" : 0.9428571428571431,
           "type" : "RECTANGLE"

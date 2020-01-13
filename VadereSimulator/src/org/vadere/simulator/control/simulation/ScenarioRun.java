@@ -1,11 +1,19 @@
 package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.context.Context;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
 import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
@@ -16,6 +24,9 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
@@ -135,6 +146,8 @@ public class ScenarioRun implements Runnable {
 
 				final MainModel mainModel = modelBuilder.getModel();
 				final Random random = modelBuilder.getRandom();
+				//todo[random]: place the Random object in the context for now. This should be replaced by the meta seed.
+				VadereContext.get(scenarioStore.getTopography()).put("random", random);
 
 				// prepare processors and simulation data writer
 				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
@@ -214,6 +227,18 @@ public class ScenarioRun implements Runnable {
 			throw new IllegalStateException("Simulation is not in 'remoteControl' state");
 
 		simulation.nextSimCommand(simulateUntilInSec);
+	}
+
+	public void addTargetChangerController(TargetChangerController controller){
+		simulation.addTargetChangerController(controller);
+	}
+
+	public void addStimulusInfo(StimulusInfo si){
+		simulation.addStimulusInfo(si);
+	}
+
+	public void addTargetChangeController(TargetChangerController controller){
+		simulation.addTargetChangerController(controller);
 	}
 
 	public void pause() {
@@ -298,6 +323,10 @@ public class ScenarioRun implements Runnable {
 
 	public Scenario getScenario() {
 		return scenario;
+	}
+
+	public StimulusController getStimulusController() {
+		return simulation.getStimulusController();
 	}
 
 	public SimulationResult getSimulationResult() {

@@ -12,9 +12,9 @@ import java.net.ServerSocket;
 import java.nio.file.Path;
 
 /**
- *  //todo comment
+ * //todo comment
  */
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
 
 	private static Logger logger = Logger.getLogger(ClientHandler.class);
 
@@ -36,27 +36,27 @@ public class ClientHandler implements Runnable{
 	public void run() {
 		try {
 			handleClient();
-		} catch (EOFException eof){
+		} catch (EOFException eof) {
 			logger.infof("EOF. Client closed socket");
 		} catch (IOException io) {
 			logger.error("Exception caught when trying to listen on port "
 					+ 9999 + " or listening for a connection", io);
-		} catch (Exception e){
+		} catch (Exception e) {
 			logger.error("Error while handling TraCI Message", e);
 		}
 	}
 
-	private void handleClient() throws IOException{
-		try{
+	private void handleClient() throws IOException {
+		try {
 			logger.info("client connected...");
 
-			while (true){
+			while (true) {
 
 				TraCIPacketBuffer traCIPacketBuffer = traCISocket.receiveExact();
 
-				if (traCIPacketBuffer.hasRemaining()){
+				if (traCIPacketBuffer.hasRemaining()) {
 					TraCICommand cmd = traCIPacketBuffer.nextCommand();
-					while (cmd != null ){
+					while (cmd != null) {
 
 						TraCIPacket response = cmdExecutor.execute(cmd);
 						logger.debugf("send packet with %d byte", response.size());
