@@ -9,39 +9,39 @@ import java.net.Socket;
 import java.nio.file.Path;
 
 /**
- * Open socket and wait for one client. After the simulation is finished do not accept new scenario files and stop
- * gracefully.
+ * Open socket and wait for one client. After the simulation is finished do not accept new scenario
+ * files and stop gracefully.
  */
 public class VadereSingleClientServer extends AbstractVadereServer {
 
 
-    public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport) {
-        super(serverSocket, baseDir, guiSupport);
-    }
+	public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport) {
+		super(serverSocket, baseDir, guiSupport);
+	}
 
-    @Override
-    public void run() {
-        try {
-            logger.infof("listening on port %d... (gui-mode: %s) Single Simulation", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
-            Socket clientSocket = serverSocket.accept();
-            Thread t = new Thread(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
-            t.start();
-            t.join();
+	@Override
+	public void run() {
+		try {
+			logger.infof("listening on port %d... (gui-mode: %s) Single Simulation", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
+			Socket clientSocket = serverSocket.accept();
+			Thread t = new Thread(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
+			t.start();
+			t.join();
 
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            logger.warn("Interrupt Vadere Server");
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			logger.warn("Interrupt Vadere Server");
 
-        } finally {
-            logger.info("Shutdown Vadere Server ...");
-            if (!serverSocket.isClosed()) {
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+		} finally {
+			logger.info("Shutdown Vadere Server ...");
+			if (!serverSocket.isClosed()) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
-    }
+	}
 }

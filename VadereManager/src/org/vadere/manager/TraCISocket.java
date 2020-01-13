@@ -1,8 +1,8 @@
 package org.vadere.manager;
 
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;
-import org.vadere.manager.traci.respons.TraCIResponse;
+import org.vadere.manager.traci.response.TraCIResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 /**
- *  //todo comment
+ * //todo comment
  */
 public class TraCISocket implements Closeable {
 
@@ -32,15 +32,15 @@ public class TraCISocket implements Closeable {
 		this.inStream = new DataInputStream(socket.getInputStream());
 	}
 
-	public int getPort(){
+	public int getPort() {
 		return port;
 	}
 
-	public String getHost(){
+	public String getHost() {
 		return host;
 	}
 
-	public boolean hasClientConnection(){
+	public boolean hasClientConnection() {
 		return socket.isConnected();
 	}
 
@@ -54,7 +54,7 @@ public class TraCISocket implements Closeable {
 		outStream.write(buf.array(), buf.arrayOffset(), buf.array().length);
 	}
 
-	public void sendExact(final TraCIPacket packet) throws IOException{
+	public void sendExact(final TraCIPacket packet) throws IOException {
 		send(packet.send());
 	}
 
@@ -65,23 +65,23 @@ public class TraCISocket implements Closeable {
 		inStream.readFully(buf, 0, len);
 	}
 
-	public byte[] receive (int bufSize) throws IOException{
+	public byte[] receive(int bufSize) throws IOException {
 		byte[] buf = new byte[bufSize];
 		receiveComplete(buf, bufSize);
 		return buf;
 	}
 
-	public TraCIPacketBuffer receiveExact() throws IOException{
+	public TraCIPacketBuffer receiveExact() throws IOException {
 
 		// read first 4 bytes (containing TracCI packet length)
 		ByteBuffer msgLength = ByteBuffer.wrap(receive(TRACI_LEN_LENGTH));
 		int data_length = msgLength.getInt() - TRACI_LEN_LENGTH;
 
-		if (data_length <=0){
+		if (data_length <= 0) {
 			return TraCIPacketBuffer.empty();
 		} else {
 			byte[] data = receive(data_length);
-			return  TraCIPacketBuffer.wrap(data);
+			return TraCIPacketBuffer.wrap(data);
 		}
 	}
 

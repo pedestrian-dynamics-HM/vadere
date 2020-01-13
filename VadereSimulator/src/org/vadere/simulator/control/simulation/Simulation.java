@@ -19,15 +19,15 @@ import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation {
@@ -450,6 +450,23 @@ public class Simulation {
 		notify();
 	}
 
+	synchronized void addTargetChangerController(TargetChangerController controller){
+		targetChangerControllers.add(controller);
+	}
+
+	synchronized void addStimulusInfo(StimulusInfo si){
+		boolean isRecurring = si.getTimeframe().isRepeat();
+		if(isRecurring){
+			List<StimulusInfo> lrsi = stimulusController.getRecurringStimuli();
+			lrsi.add(si);
+			stimulusController.setRecurringStimuli(lrsi);
+		} else {
+			List<StimulusInfo> losi = stimulusController.getOneTimeStimuli();
+			losi.add(si);
+			stimulusController.setOneTimeStimuli(losi);
+		}
+	}
+
 	synchronized SimulationState getSimulationState(){
 		return simulationState;
 	}
@@ -487,6 +504,10 @@ public class Simulation {
 
 	public void setStartTimeInSec(double startTimeInSec) {
 		this.startTimeInSec = startTimeInSec;
+	}
+
+	public StimulusController getStimulusController(){
+		return stimulusController;
 	}
 
 }

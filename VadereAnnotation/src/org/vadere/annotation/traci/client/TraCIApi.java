@@ -15,10 +15,9 @@ public @interface TraCIApi {
 			"org.vadere.manager.TraCISocket",
 			"org.vadere.manager.traci.commands.TraCIGetCommand",
 			"org.vadere.manager.traci.commands.TraCISetCommand",
-			"org.vadere.manager.traci.compoundobjects.CompoundObject",
-			"org.vadere.manager.traci.respons.TraCIGetResponse",
+			"org.vadere.manager.traci.response.TraCIGetResponse",
 			"org.vadere.manager.traci.writer.TraCIPacket",
-			"org.vadere.manager.traci.respons.TraCIResponse",
+			"org.vadere.manager.traci.response.TraCIResponse",
 
 			"java.io.IOException",
 			"java.util.ArrayList",

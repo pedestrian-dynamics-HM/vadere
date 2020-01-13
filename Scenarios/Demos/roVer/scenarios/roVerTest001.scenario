@@ -1,7 +1,7 @@
 {
   "name" : "roVerTest001",
   "description" : "",
-  "release" : "1.6",
+  "release" : "1.7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,8 +102,14 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : -359668230868604320,
-      "simulationSeed" : 0,
-      "usePsychologyLayer" : false
+      "simulationSeed" : 0
+    },
+    "attributesPsychology" : {
+      "usePsychologyLayer" : false,
+      "psychologyLayer" : {
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "CooperativeCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
@@ -251,8 +257,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -271,7 +277,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -294,8 +300,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -314,7 +320,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -337,8 +343,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -357,7 +363,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -380,8 +386,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -400,7 +406,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -423,8 +429,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -443,7 +449,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -466,8 +472,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -486,7 +492,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -509,8 +515,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -529,7 +535,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -552,8 +558,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -572,7 +578,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -595,8 +601,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -615,7 +621,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -638,8 +644,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -658,7 +664,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -681,8 +687,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -701,7 +707,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -724,8 +730,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -744,7 +750,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -767,8 +773,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -787,7 +793,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -810,8 +816,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -830,7 +836,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -853,8 +859,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -873,7 +879,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -896,8 +902,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -916,7 +922,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -939,8 +945,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -959,7 +965,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -982,8 +988,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1002,7 +1008,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1025,8 +1031,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1045,7 +1051,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1068,8 +1074,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1088,7 +1094,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1111,8 +1117,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1131,7 +1137,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1154,8 +1160,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1174,7 +1180,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1197,8 +1203,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1217,7 +1223,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1240,8 +1246,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1260,7 +1266,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1283,8 +1289,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1303,7 +1309,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1326,8 +1332,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1346,7 +1352,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1369,8 +1375,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1389,7 +1395,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1412,8 +1418,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1432,7 +1438,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1455,8 +1461,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1475,7 +1481,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1498,8 +1504,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1518,7 +1524,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1541,8 +1547,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1561,7 +1567,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1584,8 +1590,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1604,7 +1610,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1627,8 +1633,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1647,7 +1653,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1670,8 +1676,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1690,7 +1696,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1713,8 +1719,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1733,7 +1739,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1756,8 +1762,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1776,7 +1782,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1799,8 +1805,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1819,7 +1825,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1842,8 +1848,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1862,7 +1868,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1885,8 +1891,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1905,7 +1911,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1928,8 +1934,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1948,7 +1954,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -1971,8 +1977,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -1991,7 +1997,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2014,8 +2020,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2034,7 +2040,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2057,8 +2063,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2077,7 +2083,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2100,8 +2106,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2120,7 +2126,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2143,8 +2149,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2163,7 +2169,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2186,8 +2192,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2206,7 +2212,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2229,8 +2235,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2249,7 +2255,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2272,8 +2278,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2292,7 +2298,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2315,8 +2321,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2335,7 +2341,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2358,8 +2364,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2378,7 +2384,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2401,8 +2407,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2421,7 +2427,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2444,8 +2450,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2464,7 +2470,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2487,8 +2493,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2507,7 +2513,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2530,8 +2536,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2550,7 +2556,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2573,8 +2579,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2593,7 +2599,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2616,8 +2622,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2636,7 +2642,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2659,8 +2665,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2679,7 +2685,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2702,8 +2708,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2722,7 +2728,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2745,8 +2751,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2765,7 +2771,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2788,8 +2794,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2808,7 +2814,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2831,8 +2837,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2851,7 +2857,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2874,8 +2880,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2894,7 +2900,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2917,8 +2923,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2937,7 +2943,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -2960,8 +2966,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -2980,7 +2986,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3003,8 +3009,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3023,7 +3029,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3046,8 +3052,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3066,7 +3072,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3089,8 +3095,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3109,7 +3115,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3132,8 +3138,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3152,7 +3158,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3175,8 +3181,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3195,7 +3201,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3218,8 +3224,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3238,7 +3244,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3261,8 +3267,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3281,7 +3287,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3304,8 +3310,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3324,7 +3330,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3347,8 +3353,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3367,7 +3373,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3390,8 +3396,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3410,7 +3416,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3433,8 +3439,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3453,7 +3459,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3476,8 +3482,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3496,7 +3502,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3519,8 +3525,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3539,7 +3545,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3562,8 +3568,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3582,7 +3588,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3605,8 +3611,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3625,7 +3631,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3648,8 +3654,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3668,7 +3674,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3691,8 +3697,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3711,7 +3717,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3734,8 +3740,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3754,7 +3760,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3777,8 +3783,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3797,7 +3803,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3820,8 +3826,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3840,7 +3846,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3863,8 +3869,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3883,7 +3889,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3906,8 +3912,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3926,7 +3932,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3949,8 +3955,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -3969,7 +3975,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -3992,8 +3998,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4012,7 +4018,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4035,8 +4041,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4055,7 +4061,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4078,8 +4084,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4098,7 +4104,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4121,8 +4127,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4141,7 +4147,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4164,8 +4170,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4184,7 +4190,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4207,8 +4213,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4227,7 +4233,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4250,8 +4256,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4270,7 +4276,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4293,8 +4299,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4313,7 +4319,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4336,8 +4342,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4356,7 +4362,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4379,8 +4385,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4399,7 +4405,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4422,8 +4428,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4442,7 +4448,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4465,8 +4471,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4485,7 +4491,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4508,8 +4514,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4528,7 +4534,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4551,8 +4557,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4571,7 +4577,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4594,8 +4600,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4614,7 +4620,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4637,8 +4643,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4657,7 +4663,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4680,8 +4686,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4700,7 +4706,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4723,8 +4729,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4743,7 +4749,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4766,8 +4772,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4786,7 +4792,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4809,8 +4815,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4829,7 +4835,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4852,8 +4858,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4872,7 +4878,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4895,8 +4901,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4915,7 +4921,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4938,8 +4944,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -4958,7 +4964,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -4981,8 +4987,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5001,7 +5007,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5024,8 +5030,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5044,7 +5050,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5067,8 +5073,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5087,7 +5093,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5110,8 +5116,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5130,7 +5136,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5153,8 +5159,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5173,7 +5179,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5196,8 +5202,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5216,7 +5222,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5239,8 +5245,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5259,7 +5265,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5282,8 +5288,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5302,7 +5308,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5325,8 +5331,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5345,7 +5351,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5368,8 +5374,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5388,7 +5394,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5411,8 +5417,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5431,7 +5437,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5454,8 +5460,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5474,7 +5480,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5497,8 +5503,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5517,7 +5523,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5540,8 +5546,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5560,7 +5566,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5583,8 +5589,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5603,7 +5609,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5626,8 +5632,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5646,7 +5652,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5669,8 +5675,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5689,7 +5695,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5712,8 +5718,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5732,7 +5738,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5755,8 +5761,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5775,7 +5781,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5798,8 +5804,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5818,7 +5824,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5841,8 +5847,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5861,7 +5867,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5884,8 +5890,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5904,7 +5910,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5927,8 +5933,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5947,7 +5953,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -5970,8 +5976,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -5990,7 +5996,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6013,8 +6019,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6033,7 +6039,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6056,8 +6062,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6076,7 +6082,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6099,8 +6105,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6119,7 +6125,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6142,8 +6148,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6162,7 +6168,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6185,8 +6191,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6205,7 +6211,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6228,8 +6234,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6248,7 +6254,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6271,8 +6277,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6291,7 +6297,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6314,8 +6320,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6334,7 +6340,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6357,8 +6363,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6377,7 +6383,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6400,8 +6406,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6420,7 +6426,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6443,8 +6449,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6463,7 +6469,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6486,8 +6492,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6506,7 +6512,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6529,8 +6535,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6549,7 +6555,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6572,8 +6578,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6592,7 +6598,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6615,8 +6621,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6635,7 +6641,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6658,8 +6664,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6678,7 +6684,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6701,8 +6707,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6721,7 +6727,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6744,8 +6750,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6764,7 +6770,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6787,8 +6793,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6807,7 +6813,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6830,8 +6836,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6850,7 +6856,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6873,8 +6879,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6893,7 +6899,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6916,8 +6922,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6936,7 +6942,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -6959,8 +6965,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -6979,7 +6985,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7002,8 +7008,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7022,7 +7028,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7045,8 +7051,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7065,7 +7071,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7088,8 +7094,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7108,7 +7114,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7131,8 +7137,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7151,7 +7157,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7174,8 +7180,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7194,7 +7200,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7217,8 +7223,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7237,7 +7243,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7260,8 +7266,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7280,7 +7286,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7303,8 +7309,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7323,7 +7329,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7346,8 +7352,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7366,7 +7372,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7389,8 +7395,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7409,7 +7415,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7432,8 +7438,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7452,7 +7458,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7475,8 +7481,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7495,7 +7501,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7518,8 +7524,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7538,7 +7544,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7561,8 +7567,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7581,7 +7587,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7604,8 +7610,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7624,7 +7630,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7647,8 +7653,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7667,7 +7673,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7690,8 +7696,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7710,7 +7716,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7733,8 +7739,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7753,7 +7759,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7776,8 +7782,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7796,7 +7802,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7819,8 +7825,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7839,7 +7845,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7862,8 +7868,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7882,7 +7888,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7905,8 +7911,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7925,7 +7931,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7948,8 +7954,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -7968,7 +7974,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -7991,8 +7997,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8011,7 +8017,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8034,8 +8040,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8054,7 +8060,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8077,8 +8083,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8097,7 +8103,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8120,8 +8126,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8140,7 +8146,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8163,8 +8169,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8183,7 +8189,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8206,8 +8212,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8226,7 +8232,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8249,8 +8255,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8269,7 +8275,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8292,8 +8298,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8312,7 +8318,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8335,8 +8341,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8355,7 +8361,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8378,8 +8384,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8398,7 +8404,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8421,8 +8427,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8441,7 +8447,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8464,8 +8470,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8484,7 +8490,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8507,8 +8513,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8527,7 +8533,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8550,8 +8556,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8570,7 +8576,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8593,8 +8599,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8613,7 +8619,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8636,8 +8642,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8656,7 +8662,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8679,8 +8685,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8699,7 +8705,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8722,8 +8728,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8742,7 +8748,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8765,8 +8771,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8785,7 +8791,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8808,8 +8814,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "angleCalculationType" : "USE_CENTER",
-          "targetOrientationAngleThreshold" : 45.0
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
         },
         "source" : null,
         "targetIds" : [ 2 ],
@@ -8828,7 +8834,7 @@
         "idAsTarget" : -1,
         "isChild" : false,
         "isLikelyInjured" : false,
-        "psychology" : {
+        "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "selfCategory" : "TARGET_ORIENTED"
         },
@@ -8850,8 +8856,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionCalculation" : null,
+        "walkingDirectionSameIfAngleLessOrEqual" : 0.0
       },
       "teleporter" : null,
       "attributesCar" : null

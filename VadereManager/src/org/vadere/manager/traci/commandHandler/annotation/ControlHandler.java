@@ -15,6 +15,8 @@ import java.lang.annotation.Target;
 
 public @interface ControlHandler {
 	TraCICmd cmd();
+
 	ControlVar var() default ControlVar.NONE;
+
 	String name(); // name of client function.
 }
