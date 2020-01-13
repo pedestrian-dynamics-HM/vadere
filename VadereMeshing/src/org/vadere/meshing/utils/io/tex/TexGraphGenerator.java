@@ -139,6 +139,30 @@ public class TexGraphGenerator {
 			@Nullable final Function<E, Color> edgeColorFunction,
 			final float scaling,
 			final boolean drawVertices) {
+		return toTikz(mesh, coloring, edgeColorFunction, null, scaling, drawVertices);
+	}
+
+	/**
+	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
+	 * of the mesh is filled by the color defined by the coloring-function.
+	 *
+	 * @param mesh      the mesh
+	 * @param coloring  the coloring function
+	 * @param scaling   the scaling of the tikz graphics
+	 *
+	 * @param <V> the type of the vertices
+	 * @param <E> the type of the half-edges
+	 * @param <F> the type of the faces
+	 *
+	 * @return a string representing a tikz graphics
+	 */
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toTikz(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Function<F, Color> coloring,
+			@Nullable final Function<E, Color> edgeColorFunction,
+			@Nullable final Function<V, Color> vertexColorFunction,
+			final float scaling,
+			final boolean drawVertices) {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
@@ -168,8 +192,10 @@ public class TexGraphGenerator {
 		}
 		double pt = 1.5;
 		if(drawVertices) {
-			for(IPoint point : mesh.getPoints()) {
-				builder.append("\\draw[color=black, fill=black]("+toString(point.getX())+","+toString(point.getY())+") circle ("+pt+"pt);\n");
+			for(V vertex : mesh.getVertices()) {
+				Color c = vertexColorFunction != null ? vertexColorFunction.apply(vertex) : Color.BLACK;
+				String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+				builder.append("\\draw[color="+tikzColor+", fill="+tikzColor+"]("+toString(vertex.getX())+","+toString(vertex.getY())+") circle ("+pt+"pt);\n");
 			}
 		}
 

@@ -3,14 +3,11 @@ package org.vadere.meshing.examples;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.math.IDistanceFunction;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +21,7 @@ public class RuppertExamples {
 
 	public static void rupperts(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();

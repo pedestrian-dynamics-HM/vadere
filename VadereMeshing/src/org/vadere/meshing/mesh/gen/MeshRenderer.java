@@ -92,6 +92,21 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		this.edgeColorFunction = edgeColorFunction;
 	}
 
+	public MeshRenderer(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			@Nullable final Function<F, Color> faceColorFunction,
+			@Nullable final Function<E, Color> edgeColorFunction,
+			@Nullable final Function<V, Color> vertexColorFunction) {
+		this.mesh = mesh;
+		this.alertPred = alertPred;
+		this.faces = new ArrayList<>();
+		this.edges = new ArrayList<>();
+		this.faceColorFunction = faceColorFunction;
+		this.edgeColorFunction = edgeColorFunction;
+		this.vertexColorFunction = vertexColorFunction;
+	}
+
 	/**
 	 * Construct a mesh renderer which will not fill the faces.
 	 *
@@ -196,9 +211,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			Color vc = Color.BLACK;
 			if(vertexColorFunction != null) {
 				vc = vertexColorFunction.apply(vertex);
-			}
-
-			if(mesh.isAtBoundary(vertex)) {
+			} else if(mesh.isAtBoundary(vertex)) {
 				vc = Color.RED;
 			}
 			graphics.setColor(vc);

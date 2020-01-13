@@ -20,9 +20,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -115,7 +113,7 @@ public class EikMeshPlots {
 
 	public static void kaiserslautern() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
@@ -143,7 +141,7 @@ public class EikMeshPlots {
 
 	public static void bridge() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/bridge.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
@@ -175,7 +173,7 @@ public class EikMeshPlots {
 
 	public static void roomLFS() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/room.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> 2.0);
 		edgeLengthFunctionApprox.printPython();
 
@@ -211,7 +209,7 @@ public class EikMeshPlots {
 
 	public static void cornerLFS() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/corner.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> 1.0);
 		edgeLengthFunctionApprox.printPython();
 
@@ -246,7 +244,7 @@ public class EikMeshPlots {
 
 	public static void eikMeshA(double h0) throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 
 		PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), h0, pslg.getHoles());
 		meshImprover.generate();
@@ -413,7 +411,7 @@ public class EikMeshPlots {
 
 	public static void ruppertsAndEikMeshKaiserslautern() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();

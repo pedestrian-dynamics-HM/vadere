@@ -1376,6 +1376,23 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	/**
+	 * <p>This method collapses a four degree vertex which is not at the boundary</p>
+	 *
+	 * @param vertex
+	 * @param deleteIsolatededVertex
+	 */
+	default void collapse4DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+		assert getMesh().degree(vertex) == 4;
+
+		E edge = getMesh().getEdge(vertex);
+		E opp = getMesh().getNext(getMesh().getTwin(getMesh().getNext(edge)));
+
+		F f1 = removeSimpleLink(edge);
+		F f2 = removeSimpleLink(opp);
+		remove2DVertex(vertex, deleteIsolatededVertex);
+	}
+
+	/**
 	 * <p>Removes a two degree vertex by removing its two collapsing its two neighbouring edges which
 	 * will remove two half-edges which is one full-edge in O(1)</p>
 	 *
@@ -1386,7 +1403,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param vertex                    the 2-degree vertex which will be removed
 	 * @param deleteIsolatededVertex    if true the vertex will be removed from the mesh data structure
 	 */
-	default void remove2DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+	default E remove2DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
 		assert getMesh().degree(vertex) == 2;
 
 		E survivor = getMesh().getEdge(vertex);
@@ -1417,6 +1434,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		if(deleteIsolatededVertex) {
 			getMesh().destroyVertex(vertex);
 		}
+
+		return survivor;
 	}
 
 	/**
@@ -2024,6 +2043,45 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		smoothHoles(null);
 	}
 
+	default void collapseBoundaryFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		collapseBorderFaces(collapsePredicate, edgeCollapsePredicate, action);
+		collapseHoleFaces(collapsePredicate, edgeCollapsePredicate, action);
+	}
+
+	default void collapseHoleFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		for(F hole : getMesh().getHoles()) {
+			for(E edge : getMesh().getEdges(hole)) {
+				E twin = getMesh().getTwin(edge);
+				F face = getMesh().getFace(twin);
+
+				assert !getMesh().isBoundary(face);
+
+				/*
+				 * to avoid duplicated smoothing
+				 */
+				if(getMesh().getFace(edge).equals(hole) &&
+						!getMesh().isAtBoundary(getMesh().getNext(twin)) && !getMesh().isAtBoundary(getMesh().getPrev(twin)) &&
+						collapsePredicate.test(face)) {
+
+					V vr = getMesh().getVertex(getMesh().getPrev(edge));
+					V vp = getMesh().getVertex(getMesh().getNext(twin));
+					V vq = getMesh().getVertex(edge);
+
+
+					if(edgeCollapsePredicate.test(getMesh().getNext(twin))) {
+						VPoint r = getMesh().toPoint(vr);
+						VPoint q = getMesh().toPoint(vq);
+
+						VPoint midPoint = new VLine(r, q).midPoint();
+						removeFaceAtBoundary(face, hole,true);
+						getMesh().setPoint(vp, midPoint);
+						action.accept(vp);
+					}
+				}
+			}
+		}
+	}
+
 	default void collapseBorderFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
 		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
 			E twin = getMesh().getTwin(edge);
@@ -2048,7 +2106,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 					VPoint q = getMesh().toPoint(vq);
 
 					VPoint midPoint = new VLine(r, q).midPoint();
-					removeFaceAtBorder(face, true);
+					removeFaceAtBoundary(face, getMesh().getBorder(), true);
 					getMesh().setPoint(vp, midPoint);
 					action.accept(vp);
 				}

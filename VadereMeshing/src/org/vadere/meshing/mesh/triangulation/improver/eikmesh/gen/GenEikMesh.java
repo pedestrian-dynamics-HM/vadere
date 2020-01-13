@@ -88,12 +88,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private LinkedList<F> poorFaces;*/
 
 	// different options
-	private boolean allowEdgeSplits = true;
+	private boolean allowEdgeSplits = false;
 	private boolean allowVertexCollapse = true;
-	private boolean allowEdgeCollapse = true;
+	private boolean allowEdgeCollapse = false;
 	private boolean allowFaceCollapse = true;
 	private boolean removeLowBoundaryTriangles = false;
-	private boolean useVirtualEdges = false;
+	private boolean useVirtualEdges = true;
 
 	// if no PSLG set this to be true
 	private boolean smoothBorder;
@@ -264,7 +264,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.nonEmptyBaseMode = false;
 		this.fixPoints = fixPoints;
 		this.pointToSlidingLine = new HashMap<>();
-		this.useSlidingLines = false;
+		this.useSlidingLines = true;
 		this.smoothBorder = true;
 		this.refiner = new GenUniformRefinementTriangulatorSFC(
 				meshSupplier,
@@ -321,6 +321,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			initialEdgeLen = getTriangulation().getMesh().streamEdges().map(e -> getMesh().toLine(e).length()).min(Double::compareTo).orElse(Double.POSITIVE_INFINITY);
 			//deps = 2.22e-16 * initialEdgeLen;
 			deps = 0.0001 * initialEdgeLen;
+
+			computeFixPoints();
+
 			if(useSlidingLines) {
 				computeSlidingLines();
 			}
@@ -358,7 +361,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 	@Override
 	public IIncrementalTriangulation<V, E, F> generate(boolean finalize) {
-		if(!isInitialized()) {
+		while (!isInitialized()) {
 			initialize();
 		}
 
@@ -420,7 +423,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 				}
 
 				if(allowFaceCollapse) {
-					getTriangulation().collapseBorderFaces(
+					getTriangulation().collapseBoundaryFaces(
 							f -> true,
 							e -> !isFixPoint(getMesh().getVertex(e)) && getTriangulation().isLargeAngle(e, Parameters.MAX_COLLAPSE_ANGLE),
 							v -> pointToSlidingLine.put(v, getMesh().toLine(getMesh().getBoundaryEdge(v).get())));
@@ -690,7 +693,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 *
 	 * @return true if and only if the vertex is a sliding point
 	 */
-	private boolean isSlidePoint(@NotNull V vertex) {
+	public boolean isSlidePoint(@NotNull V vertex) {
 		return /*getMesh().isAtBoundary(vertex) &&*/ !isFixPoint(vertex) && pointToSlidingLine.containsKey(vertex);
 	}
 
@@ -1011,6 +1014,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		return refiner != null;
 	}
 
+	private void computeFixPoints() {
+		if(hasRefiner()) {
+			refiner.getFixPoints().forEach(v -> setFixPoint(v, true));
+		}
+	}
+
 	/**
 	 * This method can be used if the input for EikMesh is a valid triangulation and there is no
 	 * distance function available. By default, the distance function is required to project points onto
@@ -1032,9 +1041,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 				}
 			}
 		} else {*/
-			/*
-			 *
-			 */
 			pointToSlidingLine = new HashMap<>();
 			for (F boundaryFace : getMesh().getBoundaryAndHoles()) {
 				List<V> slicePoints = new ArrayList<>();
@@ -1055,7 +1061,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 							VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(vertex));
 							for(V slicePoint : slicePoints) {
 								pointToSlidingLine.put(slicePoint, line);
-								setFixPoint(slicePoint, true);
+								//setFixPoint(slicePoint, true);
 							}
 							startFixPoint = vertex;
 							slicePoints.clear();
@@ -1068,7 +1074,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 						VLine line = new VLine(getMesh().toPoint(startFixPoint), getMesh().toPoint(sf));
 						for(V slicePoint : slicePoints) {
 							pointToSlidingLine.put(slicePoint, line);
-							setFixPoint(slicePoint, true);
+							//setFixPoint(slicePoint, true);
 						}
 					}
 				}
@@ -1475,7 +1481,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		getMesh().setBooleanData(vertex, propFixPoint, fixPoint);
 	}
 
-	private boolean isFixPoint(V vertex) {
+	public boolean isFixPoint(V vertex) {
 		return getMesh().getBooleanData(vertex, propFixPoint);
 	}
 

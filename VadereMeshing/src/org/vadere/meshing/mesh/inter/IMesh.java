@@ -345,8 +345,12 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(edge, name, Double.class).orElse(0.0);
 	}
 
-	default double getIntegerData(@NotNull E edge, @NotNull final String name) {
+	default int getIntegerData(@NotNull E edge, @NotNull final String name) {
 		return getData(edge, name, Integer.class).orElse(0);
+	}
+
+	default int getIntegerData(@NotNull V vertex, @NotNull final String name) {
+		return getData(vertex, name, Integer.class).orElse(0);
 	}
 
 	/**
@@ -387,7 +391,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(face, name, Double.class).orElse(0.0);
 	}
 
-	default double getIntegerData(@NotNull F face, @NotNull final String name) {
+	default int getIntegerData(@NotNull F face, @NotNull final String name) {
 		return getData(face, name, Integer.class).orElse(0);
 	}
 
@@ -1447,6 +1451,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return () -> new AdjacentVertexIterator<>(this, vertex);
 	}
 
+	default List<V> getAdjacentVertices(@NotNull final V vertex) {
+		return Lists.newArrayList(new AdjacentVertexIterator<>(this, vertex));
+	}
+
 	/**
 	 * Returns an Iterable {@link Iterable} which can be used to iterate over all edges of a face.
 	 *
@@ -1499,6 +1507,17 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 */
 	default Stream<E> streamEdges(@NotNull final F face) {
 		Iterable<E> iterable = getEdgeIt(face);
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	/**
+	 * Returns a Stream {@link Stream} of all adjacent vertices of the vertex.
+	 *
+	 * @param v the vertex
+	 * @return a Stream {@link Stream} of all adjacent vertices
+	 */
+	default Stream<V> streamVertices(@NotNull final V v) {
+		Iterable<V> iterable = getAdjacentVertexIt(v);
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 

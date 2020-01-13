@@ -12,10 +12,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
-import org.vadere.meshing.utils.io.poly.MeshPSLGWriter;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
@@ -86,7 +83,7 @@ public class TestFMMEikMesh {
 	private void testTriangulationFMM(@NotNull final String file, @NotNull final VPoint targetPoint, final double h0) throws IOException {
 		// 1. read the base PSLG-file
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(file);
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 
 		// 2. generate the unstructured mesh using EikMesh
 		Collection<VPoint> fixPoints = new ArrayList<>();

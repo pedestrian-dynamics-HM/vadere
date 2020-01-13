@@ -21,7 +21,7 @@ import javax.swing.*;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Canvas {
+public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends JPanel {
 
 	private MeshRenderer<V, E, F> meshRenderer;
 	public static Function defaultFaceColors = f -> new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);

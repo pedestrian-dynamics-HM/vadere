@@ -784,6 +784,8 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @return the remaining face
 	 */
 	default F removeSimpleLink(@NotNull final E edge) {
+		/*V vertex = getMesh().getVertex(edge);
+		System.out.println("before = " + getMesh().degree(vertex));*/
 		assert isSimpleLink(edge) && !getMesh().isDestroyed(edge);
 		E twin = getMesh().getTwin(edge);
 		F delFace = getMesh().getFace(edge);
@@ -833,7 +835,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 		getMesh().destroyEdge(edge);
 		getMesh().destroyEdge(twin);
 		getMesh().destroyFace(delFace);
-
+		//System.out.println("after = " + getMesh().degree(vertex));
 		return remFace;
 	}
 

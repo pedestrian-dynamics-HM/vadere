@@ -43,18 +43,19 @@ public class RegularRefinement {
 		);
 
 		// display the mesh
-		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh(), 800, 800);
-		meshPanel.display("Random Delaunay triangulation");
+
 		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
-			Thread.sleep(10);
-			meshPanel.repaint();
+			//Thread.sleep(10);
+		//	meshPanel.repaint();
 		}
 
 		meshImprover.finish();
-		meshPanel.repaint();
+		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh().clone(), 800, 800);
+		meshPanel.display("Random Delaunay triangulation");
+		//meshPanel.repaint();
 
-		GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(triangulation, f -> triangulation.getMesh().toLine(triangulation.getLongestHalfEdge(f)).length() > 0.3);
+		GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(triangulation, e -> triangulation.getMesh().toLine(e).length() > 0.5);
 
 		//while (!refinement.isFinished()) {
 			//Thread.sleep(2000);
@@ -64,6 +65,22 @@ public class RegularRefinement {
 			//meshPanel.repaint();
 		//}
 		//meshPanel.repaint();
+
+		PMeshPanel meshPanel3 = new PMeshPanel(dt.getMesh().clone(), 800, 800);
+		meshPanel3.display("Refined mesh");
+
+		//Thread.sleep(2000);
+
+		refinement.coarse();
+
+		PMeshPanel meshPanel2 = new PMeshPanel(dt.getMesh().clone(), 800, 800);
+		meshPanel2.display("Coarsen mesh");
+
+
+		//meshPanel.repaint();
+
+		//Thread.sleep(2000);
+
 	}
 
 }

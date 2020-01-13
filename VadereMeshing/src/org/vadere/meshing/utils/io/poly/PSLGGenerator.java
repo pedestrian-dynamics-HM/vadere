@@ -180,7 +180,7 @@ public class PSLGGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public static PSLG toPSLGtoVShapes(@NotNull final InputStream inputStream) throws IOException {
+	public static PSLG toPSLG(@NotNull final InputStream inputStream) throws IOException {
 		// (1) read input file
 		Map<Integer, VPoint> vertices = new HashMap<>();
 		Map<Integer, VPoint> holes = new HashMap<>();
