@@ -2,8 +2,6 @@ package org.vadere.meshing.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
-import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -69,12 +67,16 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param y y-coordinate of the location point
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(final double x, final double y) {
+	default Optional<F> locate(final double x, final double y) {
+		return getMesh().locate(x, y);
+	}
+
+	default Optional<F> locate(final double x, final double y, final Object caller) {
 		return getMesh().locate(x, y);
 	}
 
 	default Optional<V> locatePoint(final double x, final double y) {
-		Optional<F> optFace = locateFace(x, y);
+		Optional<F> optFace = locate(x, y);
 		if(optFace.isPresent()) {
 			for(V v : getMesh().getVertexIt(optFace.get())) {
 				if(v.getX() == x && v.getY() == y) {
@@ -94,8 +96,12 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param point the location point
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(@NotNull final IPoint point) {
-		return locateFace(point.getX(), point.getY());
+	default Optional<F> locate(@NotNull final IPoint point) {
+		return locate(point.getX(), point.getY());
+	}
+
+	default Optional<F> locate(@NotNull final IPoint point, final Object caller) {
+		return locate(point.getX(), point.getY());
 	}
 
 
@@ -243,7 +249,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param vertex the vertex which spilts the face which triangleContains the vertex. It has to be contained any face.
 	 */
 	default void split(@NotNull final V vertex) {
-		Optional<F> optFace = locateFace(getMesh().getPoint(vertex));
+		Optional<F> optFace = locate(getMesh().getPoint(vertex));
 		if(!optFace.isPresent()) {
 			throw new IllegalArgumentException(vertex + " is not contained in any face. Therefore, no face found to split into faces.");
 		} else {
@@ -263,7 +269,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param vertex    the vertex which spilts the face. It has to be contained in the face
 	 */
 	default void split(@NotNull final F face, @NotNull final V vertex) {
-		assert locateFace(getMesh().getPoint(vertex)).get().equals(face);
+		assert locate(getMesh().getPoint(vertex)).get().equals(face);
 
 		E hend = getMesh().getEdge(face);
 		E hh = getMesh().getNext(hend);
@@ -667,6 +673,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && removeCondition.test(neighbouringFace)) {
 					for(F face : getMesh().getFaceIt(neighbouringFace)) {
+						if(!(getMesh().isBorder(face) || !getMesh().isBoundary(face))) {
+							System.out.println("wtf");
+						}
 						assert getMesh().isBorder(face) || !getMesh().isBoundary(face);
 						if(!getMesh().isBorder(face)) {
 							nextNeighbouringFaces.add(face);
@@ -1217,6 +1226,8 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 						if(getMesh().getEdges(boundary).size() == delEdges.size()) {
 							log.warn(face + " is the last remaining face which will be deletes as well, therefore the mesh will be emoty!");
 							assert getMesh().getNumberOfFaces() == 1;
+							getMesh().destroyFace(face);
+							getMesh().destroyFace(getMesh().getBorder());
 							getMesh().clear();
 							return;
 						}

@@ -299,6 +299,20 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
+	public void enableCache() {
+		if(!pointLocator.isCached()) {
+			pointLocator = new CachedPointLocator<>(pointLocator, this);
+		}
+	}
+
+	@Override
+	public void disableCache() {
+		if(pointLocator.isCached()) {
+			pointLocator = pointLocator.getUncachedLocator();
+		}
+	}
+
+	@Override
 	public void init() {
 		if(!initialized) {
 
@@ -670,6 +684,11 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	@Override
 	public Optional<F> locateFace(final IPoint point) {
 		return pointLocator.locate(point);
+	}
+
+	@Override
+	public Optional<F> locateFace(@NotNull final IPoint point, final Object caller) {
+		return pointLocator.locate(point, caller);
 	}
 
 	@Override

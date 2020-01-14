@@ -9,7 +9,6 @@ import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -32,10 +31,8 @@ import org.vadere.util.data.cellgrid.FloorDiscretizer;
 import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
-import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -211,7 +208,7 @@ public abstract class EikonalSolverProvider  {
 			List<PVertex> targetVertices = new ArrayList<>();
 			for(VShape shape : targetShapes) {
 				VPoint point = shape.getCentroid();
-				PFace targetFace = triangulation.locateFace(point.getX(), point.getY()).get();
+				PFace targetFace = triangulation.locate(point.getX(), point.getY()).get();
 				targetVertices.addAll(triangulation.getMesh().getVertices(targetFace));
 			}
 

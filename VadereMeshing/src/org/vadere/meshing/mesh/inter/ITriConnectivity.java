@@ -5,10 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
-import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.util.data.Node;
 import org.vadere.util.data.NodeLinkedList;
 import org.vadere.util.geometry.GeometryUtils;
@@ -19,14 +15,12 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -1157,7 +1151,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	default E splitTriangle(@NotNull F face, @NotNull final V p, boolean legalize) {
-		//assert isTriangle(face) && locateFace(point).get().equals(face);
+		//assert isTriangle(face) && locate(point).get().equals(face);
 
 		getMesh().insertVertex(p);
 		IMesh<V, E, F> mesh = getMesh();
@@ -1719,10 +1713,10 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	@Override
-	default Optional<F> locateFace(final double x, final double y) {
+	default Optional<F> locate(final double x, final double y) {
 		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
-			optFace = locateFace(x, y, getMesh().getFace());
+			optFace = locateMarch(x, y, getMesh().getFace());
 		}
 		else if(getMesh().getNumberOfFaces() == 1) {
 			optFace = Optional.of(getMesh().getFace());
@@ -1749,7 +1743,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face at which the search starts
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(final double x, final double y, @NotNull final F startFace) {
+	default Optional<F> locateMarch(final double x, final double y, @NotNull final F startFace) {
 		// there is no face.
 		if(getDimension() <= 0 ){
 			return Optional.empty();
@@ -1775,8 +1769,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face at which the search starts
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(@NotNull final IPoint point, F startFace) {
-		return locateFace(point.getX(), point.getY(), startFace);
+	default Optional<F> locateMarch(@NotNull final IPoint point, F startFace) {
+		return locateMarch(point.getX(), point.getY(), startFace);
 	}
 
 	/**
@@ -2951,7 +2945,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y) {
-		Optional<F> optFace = locateFace(x, y);
+		Optional<F> optFace = locate(x, y);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestEdge(optFace.get(), x, y));
@@ -2978,7 +2972,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y, final F startFace) {
-		Optional<F> optFace = locateFace(x, y, startFace);
+		Optional<F> optFace = locateMarch(x, y, startFace);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestEdge(optFace.get(), x, y));
@@ -3004,7 +2998,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y) {
-		Optional<F> optFace = locateFace(x, y);
+		Optional<F> optFace = locate(x, y);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestVertex(optFace.get(), x, y));
@@ -3032,7 +3026,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y, final F startFace) {
-		Optional<F> optFace = locateFace(x, y, startFace);
+		Optional<F> optFace = locateMarch(x, y, startFace);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestVertex(optFace.get(), x, y));

@@ -155,7 +155,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		}
 
 		EikonalSolver eikonalSolver = optEikonalSolver.get();
-		return eikonalSolver.getPotential(pos);
+		return eikonalSolver.getPotential(pos, agent);
 	}
 
 	/**

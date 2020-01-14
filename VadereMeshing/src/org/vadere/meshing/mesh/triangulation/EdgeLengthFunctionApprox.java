@@ -3,13 +3,10 @@ package org.vadere.meshing.mesh.triangulation;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -108,7 +105,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	@Override
 	public Double apply(@NotNull final IPoint p) {
-		var face = triangulation.locateFace(p.getX(), p.getY()).get();
+		var face = triangulation.locate(p.getX(), p.getY()).get();
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {

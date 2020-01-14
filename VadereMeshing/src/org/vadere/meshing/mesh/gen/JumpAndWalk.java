@@ -58,14 +58,14 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 	}
 
 	@Override
-	public Optional<F> locate(IPoint point) {
+	public Optional<F> locate(@NotNull final IPoint point) {
 		Optional<F> startFace = getStartFace(point);
 		if(startFace.isPresent()) {
 
-			Optional<F> result = triangulation.locateFace(point.getX(), point.getY(), startFace.get());
+			Optional<F> result = triangulation.locateMarch(point.getX(), point.getY(), startFace.get());
 
 			/*if(!triangulation.contains(point.getX(), point.getY(), result.get())) {
-				result = triangulation.locateFace(point.getX(), point.getY(), startFace.get());
+				result = triangulation.locate(point.getX(), point.getY(), startFace.get());
 				List<F> visitedFaces = triangulation.straightGatherWalk2D(point.getX(), point.getY(), startFace.get(), e -> !triangulation.isRightOf(point.getX(), point.getY(), e))
 						.stream().map(e -> triangulation.getMesh().getFace(e)).collect(Collectors.toList());
 				Function<F, Color> colorFunction = f -> visitedFaces.contains(f) ? Color.GREEN : Color.WHITE;
@@ -76,7 +76,7 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 			return result;
 		}
 		else {
-			return triangulation.locateFace(point.getX(), point.getY());
+			return triangulation.locate(point.getX(), point.getY());
 		}
 	}
 
@@ -84,10 +84,10 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 	public Optional<F> locate(double x, double y) {
 		Optional<F> startFace = getStartFace(new VPoint(x, y));
 		if(startFace.isPresent()) {
-			return triangulation.locateFace(x, y, startFace.get());
+			return triangulation.locateMarch(x, y, startFace.get());
 		}
 		else {
-			return triangulation.locateFace(x, y);
+			return triangulation.locate(x, y);
 		}
 	}
 

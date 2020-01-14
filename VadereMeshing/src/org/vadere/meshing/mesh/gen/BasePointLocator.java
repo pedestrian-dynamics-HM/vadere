@@ -45,12 +45,12 @@ public class BasePointLocator<V extends IVertex, E extends IHalfEdge, F extends 
 	@Override
 	public F locatePoint(@NotNull final IPoint point) {
 		//return triConnectivity.getMesh().getFace(triConnectivity.locateNearestNeighbour(point));
-		return triConnectivity.locateFace(point.getX(), point.getY()).get();
+		return triConnectivity.locate(point.getX(), point.getY()).get();
 		/*if(insertion) {
 			return triConnectivity.getClosestEdge(point.getX(), point.getY());
 		}
 		else {
-			Optional<F> optFace = triConnectivity.locateFace(point.getX(), point.getY());
+			Optional<F> optFace = triConnectivity.locate(point.getX(), point.getY());
 			return optFace.isPresent() ? Collections.singleton(optFace.get()) : Collections.emptyList();
 		}*/
 	}
@@ -67,6 +67,6 @@ public class BasePointLocator<V extends IVertex, E extends IHalfEdge, F extends 
 
 	@Override
 	public Optional<F> locate(@NotNull final IPoint point) {
-		return triConnectivity.locateFace(point.getX(), point.getY());
+		return triConnectivity.locate(point.getX(), point.getY());
 	}
 }

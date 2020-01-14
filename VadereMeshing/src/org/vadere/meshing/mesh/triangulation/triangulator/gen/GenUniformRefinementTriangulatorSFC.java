@@ -564,7 +564,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	/*private Map<V, VPoint> insertFixPoints(@NotNull final Collection<VPoint> fixPoints) {
 		Map<V, VPoint> fixPointRelation = new HashMap<>();
 		for(VPoint fixPoint : fixPoints) {
-			Optional<F> optFace = triangulation.locateFace(fixPoint.getX(), fixPoint.getY());
+			Optional<F> optFace = triangulation.locate(fixPoint.getX(), fixPoint.getY());
 			if(optFace.isPresent()) {
 				assert triangulation.contains(fixPoint.getX(), fixPoint.getY(), optFace.get());
 				F face = optFace.get();

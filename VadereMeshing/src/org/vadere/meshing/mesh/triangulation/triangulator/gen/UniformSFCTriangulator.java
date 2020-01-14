@@ -194,7 +194,7 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 			// 1. find a triangle inside the boundary
 			VPoint centroid = shape.getPolygonCentroid();
 
-			Optional<F> optFace = triangulation.locateFace(centroid.getX(), centroid.getY());
+			Optional<F> optFace = triangulation.locate(centroid.getX(), centroid.getY());
 
 			if(optFace.isPresent()) {
 				LinkedList<F> candidates = new LinkedList<>();

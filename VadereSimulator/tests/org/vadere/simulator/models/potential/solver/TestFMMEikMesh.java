@@ -88,11 +88,16 @@ public class TestFMMEikMesh {
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
 				triangulation);
+		solver.initialize();
+		solver.initialize();
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
 		solver.initialize();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
+
+		solver.getPotential(10, 10, this);
+		solver.getPotential(10, 10, this);
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 

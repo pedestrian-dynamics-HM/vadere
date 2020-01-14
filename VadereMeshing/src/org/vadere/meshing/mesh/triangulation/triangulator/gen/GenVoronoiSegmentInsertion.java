@@ -164,7 +164,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		}
 
 		VPoint x = placementStrategy.computePlacement(shortestEdge, triangles.get(face));
-		Optional<F> optionalF = getTriangulation().locateFace(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
+		Optional<F> optionalF = getTriangulation().locateMarch(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
 
 		if(optionalF.isPresent() && !getMesh().isBoundary(optionalF.get())) {
 			V v = getMesh().createVertex(x.getX(), x.getY());

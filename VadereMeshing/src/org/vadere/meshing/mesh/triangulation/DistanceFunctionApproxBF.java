@@ -52,7 +52,7 @@ public class DistanceFunctionApproxBF implements IDistanceFunction {
 
 	@Override
 	public Double apply(@NotNull final IPoint p) {
-		var face = triangulation.locateFace(p.getX(), p.getY()).get();
+		var face = triangulation.locate(p.getX(), p.getY()).get();
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {

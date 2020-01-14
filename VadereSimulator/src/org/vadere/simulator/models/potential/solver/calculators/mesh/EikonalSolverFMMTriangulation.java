@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -236,6 +237,7 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 	@Override
 	public void initialize() {
 		reset();
+		triangulation.enableCache();
 		if (!calculationFinished) {
 			while (narrowBand.size() > 0) {
 				V vertex = narrowBand.poll();
@@ -288,6 +290,11 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 	}
 
 	@Override
+	public double getPotential(IPoint pos, double unknownPenalty, double weight, final Object caller) {
+		return weight * getPotential(pos.getX(), pos.getY(), caller);
+	}
+
+	@Override
 	public Function<IPoint, Double> getPotentialField() {
 		IIncrementalTriangulation<V, E, F> clone = triangulation.clone();
 		return p -> getPotential(clone, p.getX(), p.getY());
@@ -296,6 +303,11 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 	@Override
 	public double getPotential(final double x, final double y) {
 		return getPotential(triangulation, x, y);
+	}
+
+	@Override
+	public double getPotential(double x, double y, final Object caller) {
+		return getPotential(triangulation, x, y, caller);
 	}
 
 	@Override
@@ -311,18 +323,21 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 	 * @param x             the x-coordinate of the point
 	 * @param y             the y-coordinate of the point
 	 *
-	 * @param <V>   the type of the vertices of the triangulation
-	 * @param <E>   the type of the half-edges of the triangulation
-	 * @param <F>   the type of the faces of the triangulation
 	 *
 	 * @return the interpolated value of the traveling time T at (x, y)
 	 */
-	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> double getPotential(
+	private double getPotential(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			final double x,
-			final double y) {
+			final double y,
+			@Nullable final Object caller) {
 
-		Optional<F> optFace = triangulation.locateFace(x, y);
+		Optional<F> optFace;
+		if(caller != null) {
+			optFace = triangulation.locateFace(new VPoint(x, y), caller);
+		} else {
+			optFace = triangulation.locateFace(new VPoint(x, y));
+		}
 
 		double result = Double.MAX_VALUE;
 		if(!optFace.isPresent()) {
@@ -339,6 +354,13 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 			result = InterpolationUtil.barycentricInterpolation(v1, v2, v3, v -> triangulation.getMesh().getDoubleData(v, namePotential), x, y);
 		}
 		return result;
+	}
+
+	private double getPotential(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			final double x,
+			final double y) {
+		return getPotential(triangulation, x, y, null);
 	}
 
 	private IMesh<V, E, F> getMesh() {
