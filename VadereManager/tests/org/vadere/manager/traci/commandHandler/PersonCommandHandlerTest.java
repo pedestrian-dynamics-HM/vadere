@@ -520,6 +520,134 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 		testGetValue(ret, varID, null, elementID, null);
 	}
 
+	@Test
+	public void process_getLength() {
+		PersonVar var = PersonVar.LENGTH;
+		int varID = var.id;
+		TraCIDataType varType = var.type;
+		String elementID = "1";
+		double retVal = 0.4;
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+				Pedestrian ped = mock(Pedestrian.class, Mockito.RETURNS_DEEP_STUBS);
+				when(ped.getRadius()).thenReturn(retVal / 2);
+				when(simState.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(elementID)))
+						.thenReturn(ped);
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getLength(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_OK(ret);
+		testGetValue(ret, varID, varType, elementID, retVal);
+	}
+
+	@Test
+	public void process_getLength2() {
+		PersonVar var = PersonVar.LENGTH;
+		int varID = var.id;
+		String elementID = "10";
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+				when(simState.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(elementID)))
+						.thenReturn(null);
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getLength(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_Err(ret);
+		testGetValue(ret, varID, null, elementID, null);
+	}
+
+	@Test
+	public void process_getWidth() {
+		PersonVar var = PersonVar.WIDTH;
+		int varID = var.id;
+		TraCIDataType varType = var.type;
+		String elementID = "1";
+		double retVal = 0.4;
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+				Pedestrian ped = mock(Pedestrian.class, Mockito.RETURNS_DEEP_STUBS);
+				when(ped.getRadius()).thenReturn(retVal / 2);
+				when(simState.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(elementID)))
+						.thenReturn(ped);
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getWidth(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_OK(ret);
+		testGetValue(ret, varID, varType, elementID, retVal);
+	}
+
+	@Test
+	public void process_getWidth2() {
+		PersonVar var = PersonVar.WIDTH;
+		int varID = var.id;
+		String elementID = "10";
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+				when(simState.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(elementID)))
+						.thenReturn(null);
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getWidth(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_Err(ret);
+		testGetValue(ret, varID, null, elementID, null);
+	}
+
+	@Test
+	public void process_getRoadId() {
+		PersonVar var = PersonVar.ROAD_ID;
+		int varID = var.id;
+		TraCIDataType varType = var.type;
+		String elementID = "-1";
+		String retVal = "road000";
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getRoadId(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_OK(ret);
+		testGetValue(ret, varID, varType, elementID, retVal);
+	}
+
+	@Test
+	public void process_getAngle() {
+		PersonVar var = PersonVar.ANGLE;
+		int varID = var.id;
+		TraCIDataType varType = var.type;
+		String elementID = "-1";
+		double retVal = 0.0;
+		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
+				TraCICmd.GET_PERSON_VALUE, varID, elementID));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+			}
+		};
+		TraCICommand ret = persCmdHandler.process_getAngle(cmd, rm);
+		testTraCICommand(ret, TraCICmd.GET_PERSON_VALUE, CmdType.VALUE_GET);
+		checkGET_OK(ret);
+		testGetValue(ret, varID, varType, elementID, retVal);
+	}
+
 
 
 	// Set

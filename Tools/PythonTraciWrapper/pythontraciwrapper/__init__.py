@@ -1,4 +1,4 @@
-from ._controll_wrapper import ControllWrapper
+from ._control_wrapper import ControlWrapper
 from ._personapi_wrapper import PersonapiWrapper
 from ._polygonapi_wrapper import PolygonapiWrapper
 from ._simulationapi_wrapper import SimulationapiWrapper
