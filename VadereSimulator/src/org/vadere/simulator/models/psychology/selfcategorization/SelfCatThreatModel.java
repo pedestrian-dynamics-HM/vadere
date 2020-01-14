@@ -5,13 +5,13 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
-import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.models.psychology.selfcategorization.locomotion.UpdateSchemeEventDriven;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesSelfCatThreat;
@@ -69,7 +69,7 @@ public class SelfCatThreatModel implements MainModel {
     private PotentialFieldObstacle potentialFieldObstacle;
     private PotentialFieldAgent potentialFieldPedestrian;
     private StepCircleOptimizer stepCircleOptimizer;
-    private UpdateSchemeOSM updateSchemeOSM;
+    private UpdateSchemeEventDriven updateSchemeEventDriven;
 
     // These models are updated in actual simulation loop.
     private List<Model> models = new LinkedList<>();
@@ -122,8 +122,8 @@ public class SelfCatThreatModel implements MainModel {
 
         initializeLocomotionLayer(attributesList, topography, attributesPedestrian, random);
 
-        this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-        this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+        this.topography.addElementAddedListener(Pedestrian.class, updateSchemeEventDriven);
+        this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeEventDriven);
 
         models.add(potentialFieldTarget);
         models.add(this);
@@ -148,11 +148,11 @@ public class SelfCatThreatModel implements MainModel {
             // this.speedAdjusters.add(new SpeedAdjusterWeidmann());
         }
 
-        if (attributesLocomotion.getUpdateType() == UpdateType.PARALLEL) {
-           throw new IllegalArgumentException("\"UpdateType.PARALLEL\" not supported!");
+        if (attributesLocomotion.getUpdateType() != UpdateType.EVENT_DRIVEN) {
+           throw new IllegalArgumentException("Only \"UpdateType.EVENT_DRIVEN\" supported!");
         }
 
-        this.updateSchemeOSM = UpdateSchemeOSM.create(attributesLocomotion.getUpdateType(), topography, random);
+        this.updateSchemeEventDriven = new UpdateSchemeEventDriven(topography);
     }
 
     @Override
@@ -161,16 +161,12 @@ public class SelfCatThreatModel implements MainModel {
     }
 
     @Override
-    public void postLoop(final double simTimeInSec) {
-        updateSchemeOSM.shutdown();
-    }
+    public void postLoop(final double simTimeInSec) { }
 
     @Override
     public void update(final double simTimeInSec) {
         double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
-        // TODO: Copy "UpdateSchemeEventDriven" as default locomotion model
-        //  and implement specific behavior there by using behavior repertoire from "OSMBehaviorController":
-        updateSchemeOSM.update(timeStepInSec, simTimeInSec);
+        updateSchemeEventDriven.update(timeStepInSec, simTimeInSec);
         lastSimTimeInSec = simTimeInSec;
     }
 }
