@@ -163,7 +163,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-			faces = mesh.clone().getFaces();
+			faces = mesh/*.clone()*/.getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
 		}
@@ -189,11 +189,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 
 			if(alertPred.test(face)) {
 				graphics.setColor(new Color(200, 0, 0));
-			}
-			else if(faceColorFunction != null) {
-				graphics.setColor(faceColorFunction.apply(face));
 			} else {
-				graphics.setColor(Color.GRAY);
+				if(faceColorFunction != null) {
+					graphics.setColor(faceColorFunction.apply(face));
+				} else {
+					graphics.setColor(Color.GRAY);
+				}
 			}
 			graphics.fill(polygon);
 		}
@@ -211,11 +212,11 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			Color vc = Color.BLACK;
 			if(vertexColorFunction != null) {
 				vc = vertexColorFunction.apply(vertex);
-			} else if(mesh.isAtBoundary(vertex)) {
+			} /*else if(mesh.isAtBoundary(vertex)) {
 				vc = Color.RED;
-			}
-			graphics.setColor(vc);
-			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
+			}*/
+			//graphics.setColor(vc);
+			//graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
 
 		graphics.setColor(c);

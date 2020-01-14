@@ -318,7 +318,7 @@ public class PSLGGenerator {
 			} while (from != start && segments.containsKey(from));
 
 			// defines a polygon
-			if(polyIndices.size() > 3 && polyIndices.get(0) == polyIndices.get(polyIndices.size()-1)) {
+			if(polyIndices.size() > 3 && polyIndices.get(0).equals(polyIndices.get(polyIndices.size()-1))) {
 				polyIndices.remove(polyIndices.size()-1);
 				List<VPoint> pointList = polyIndices.stream().map(index -> vertices.get(index)).collect(Collectors.toList());
 				VPolygon polygon = GeometryUtils.toPolygon(pointList);

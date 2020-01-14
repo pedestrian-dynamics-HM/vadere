@@ -639,6 +639,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 			return remainingFace;
 		}
 		else {
+		//	if(!getMesh().isDestroyed(face) && !mergeCondition.test(face)) {
+		//		System.out.println("could not delete it!");
+		//	}
 			return Optional.of(face);
 		}
 	}

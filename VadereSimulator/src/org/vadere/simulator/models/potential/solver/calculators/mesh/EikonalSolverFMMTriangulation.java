@@ -114,7 +114,9 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 		this.distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
 
 		for(IPoint point : targetPoints) {
-			F face = triangulation.locateFace(point.getX(), point.getY()).get();
+			F face = triangulation.locateFace(point).get();
+			assert !getMesh().isBoundary(face);
+
 			if(!getMesh().isBoundary(face)) {
 				targetVertices.addAll(getMesh().getVertices(face));
 				for(F neighbourFace : getMesh().getFaceIt(face)) {

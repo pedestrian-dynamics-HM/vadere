@@ -8,6 +8,7 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
@@ -19,6 +20,7 @@ import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -30,10 +32,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class EikMeshPoly {
 	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
-
 
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
@@ -57,7 +59,8 @@ public class EikMeshPoly {
 
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
-		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes, singleTarget);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction);
 
 		var ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -67,13 +70,14 @@ public class EikMeshPoly {
 		);
 		ruppert.generate();
 
+
 		Collection<VPolygon> polygons = pslg.getAllPolygons();
 		//polygons.add(targetShape);
 
 		// (3) use EikMesh to improve the mesh
 		double h0 = 0.5;
 		var meshImprover = new PEikMesh(
-				distanceFunction,
+				distanceFunctionApproximation,
 				p -> edgeLengthFunctionApprox.apply(p),
 				h0,
 				pslg.getBoundingBox(),
@@ -90,7 +94,11 @@ public class EikMeshPoly {
 			}
 		};
 
-		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
+		Predicate<PFace> alertPredicate = f ->{
+			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
+		};
+
+		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), alertPredicate, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
 		var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
 		meshPanel.display("Combined distance functions " + h0);
 		meshImprover.improve();

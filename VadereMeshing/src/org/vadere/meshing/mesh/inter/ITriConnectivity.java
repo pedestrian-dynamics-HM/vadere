@@ -5,6 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
+import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.gen.MeshRenderer;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.util.data.Node;
 import org.vadere.util.data.NodeLinkedList;
 import org.vadere.util.geometry.GeometryUtils;
@@ -15,12 +19,14 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -1960,6 +1966,31 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
         VPoint q = getMesh().toTriangle(startFace).midPoint(); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
+        /*LinkedList<E> walkResult = straightGatherWalk2D(q, p, face, stopCondition);
+	    List<F> faces = walkResult.stream().map(e -> getMesh().getFace(e)).collect(Collectors.toList());
+
+		Runnable run = () -> {
+	        Predicate<F> alertPredicate = f ->{
+		        return faces.contains(f);
+	        };
+
+	        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 1500, 1500);
+	        meshPanel.display("Random walk");
+        };
+
+        new Thread(run).start();
+
+        int count = 0;
+
+	    while (count < 100) {
+		    count++;
+	    	try {
+			    Thread.sleep(1000);
+		    } catch (InterruptedException e) {
+			    e.printStackTrace();
+		    }
+	    }*/
+
         return straightGatherWalk2D(q, p, face, stopCondition);
     }
 
@@ -2336,7 +2367,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		/**
 		 * Get the half-edges e which intersects (q, p).
 		 */
-		for(E e : getMesh().getEdgeIt(face)) {
+		for(E e : getMesh().getEdgeIt(getMesh().getNext(inEdge))) {
 			if(!e.equals(inEdge) && intersects(q, p, e)) {
 				outEdge = e;
 				break;

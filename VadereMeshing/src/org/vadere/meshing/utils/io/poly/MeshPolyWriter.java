@@ -119,13 +119,9 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 		// 1 boundary
 		appender.append("# nBorders\n");
 		appender.append(1+"\n");
-		appender.append(mesh.getPoints(mesh.getBorder()).size() + SEPARATOR);
-		boolean first = true;
+		appender.append(mesh.getPoints(mesh.getBorder()).size() + "");
 		for(V v : mesh.getVertices(mesh.getBorder())) {
-			if(!first) {
-				appender.append(SEPARATOR);
-			}
-			appender.append(map.get(v).toString());
+			appender.append(SEPARATOR + map.get(v).toString());
 		}
 		appender.append("\n");
 
