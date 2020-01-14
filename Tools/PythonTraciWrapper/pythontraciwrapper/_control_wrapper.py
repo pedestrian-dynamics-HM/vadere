@@ -1,7 +1,7 @@
 from ._api_wrapper import ApiWrapper
 
 
-class ControllWrapper(ApiWrapper):
+class ControlWrapper(ApiWrapper):
 
     def sendFile(self, scenarioPath):
         return self._apiObject.sendFile(scenarioPath)

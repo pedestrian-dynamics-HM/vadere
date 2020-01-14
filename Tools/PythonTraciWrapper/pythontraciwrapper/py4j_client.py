@@ -7,7 +7,7 @@ from typing import List
 
 from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
 
-from pythontraciwrapper import ControllWrapper
+from pythontraciwrapper import ControlWrapper
 from pythontraciwrapper import PersonapiWrapper, SimulationapiWrapper, PolygonapiWrapper, VadereapiWrapper
 
 
@@ -20,7 +20,7 @@ class Py4jClient:
         if isinstance(args, List):
             self._argParser = argparse.ArgumentParser(description='Py4jClient.')
             self._addArgs()
-            self._traciEntrypointArgs = self._buildTraciEntrypointArgString(args)
+            self._traciEntrypointArgs = self._buildTraciEntrypointArgs(args)
         else:
             raise ValueError("args must be of type List")
 
@@ -52,12 +52,12 @@ class Py4jClient:
                 control = entryPoint.getTraciControl()
                 connected = True
                 print("Python client connected to java via py4j")
-            except Exception as e:
+            except Exception:
                 print("TraciEntryPoint not ready after " + str(round(time() - startTime, 2)) + " seconds, wait..")
                 sleep(0.1)
 
         # wrap api
-        self.ctr = ControllWrapper(control, gateway)
+        self.ctr = ControlWrapper(control, gateway)
         self.pers = PersonapiWrapper(personapi, gateway)
         self.sim = SimulationapiWrapper(simulationapi, gateway)
         self.va = VadereapiWrapper(vadereapi, gateway)
@@ -70,9 +70,9 @@ class Py4jClient:
     def _killProcessAtExit(self):
         self._entrypointProcess.kill()
 
-    def _buildTraciEntrypointArgString(self, argString):
+    def _buildTraciEntrypointArgs(self, argList):
 
-        self.args = self._argParser.parse_args(argString)
+        self.args = self._argParser.parse_args(argList)
         arg_list = list()
         arg_list.extend(["--loglevel", self.args.loglevel])
         if self.args.logname is not None:
