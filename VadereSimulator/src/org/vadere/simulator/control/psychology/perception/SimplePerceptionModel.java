@@ -55,14 +55,10 @@ public class SimplePerceptionModel implements IPerceptionModel {
         } else if (waitStimuli.size() >= 1) {
             mostImportantStimulus = waitStimuli.get(0);
         } else if (waitInAreaStimuli.size() >= 1) {
-            for (Stimulus stimulus : waitInAreaStimuli) {
-                WaitInArea waitInArea = (WaitInArea) stimulus;
+            Stimulus selectedWaitInArea = selectWaitInAreaContainingPedestrian(pedestrian, waitInAreaStimuli);
 
-                boolean pedInArea = waitInArea.getArea().contains(pedestrian.getPosition());
-
-                if (pedInArea) {
-                    mostImportantStimulus = waitInArea;
-                }
+            if (selectedWaitInArea != null) {
+                mostImportantStimulus = selectedWaitInArea;
             }
         }
 
@@ -93,5 +89,20 @@ public class SimplePerceptionModel implements IPerceptionModel {
         }
 
         return closestAndPerceptibleBang;
+    }
+
+    private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {
+        WaitInArea selectedWaitInArea = null;
+
+        for (Stimulus stimulus : waitInAreaStimuli) {
+            WaitInArea waitInArea = (WaitInArea) stimulus;
+            boolean pedInArea = waitInArea.getArea().contains(pedestrian.getPosition());
+
+            if (pedInArea) {
+                selectedWaitInArea = waitInArea;
+            }
+        }
+
+        return selectedWaitInArea;
     }
 }
