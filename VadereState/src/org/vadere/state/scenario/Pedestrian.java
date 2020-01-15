@@ -63,7 +63,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		psychologyStatus = new PsychologyStatus(null, SelfCategory.TARGET_ORIENTED);
+		psychologyStatus = new PsychologyStatus(null, null, SelfCategory.TARGET_ORIENTED);
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -104,6 +104,7 @@ public class Pedestrian extends Agent {
 		return isLikelyInjured;
 	}
 	public Stimulus getMostImportantStimulus() { return psychologyStatus.getMostImportantStimulus(); }
+	public Stimulus getPerceivedThreat() { return psychologyStatus.getPerceivedThreat(); }
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
@@ -153,6 +154,7 @@ public class Pedestrian extends Agent {
 	}
 	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychologyStatus.setMostImportantStimulus(mostImportantStimulus); }
 	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
+	public void setPerceivedThreat(Stimulus perceivedThreat) { psychologyStatus.setPerceivedThreat(perceivedThreat); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}

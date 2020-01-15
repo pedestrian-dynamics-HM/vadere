@@ -9,14 +9,14 @@ import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Collection;
 
 /**
- * Combine potential so that agents get distracted by targets.
+ * Combine potential so that agents are repelled by targets.
  */
-public class TargetDistractionStrategy implements ICombinedPotentialStrategy {
+public class TargetRepulsionStrategy implements ICombinedPotentialStrategy {
     private IPotentialFieldTarget potentialFieldTarget;
     private PotentialFieldObstacle potentialFieldObstacle;
     private PotentialFieldAgent potentialFieldAgent;
 
-    public TargetDistractionStrategy(IPotentialFieldTarget potentialFieldTarget, PotentialFieldObstacle potentialFieldObstacle, PotentialFieldAgent potentialFieldAgent) {
+    public TargetRepulsionStrategy(IPotentialFieldTarget potentialFieldTarget, PotentialFieldObstacle potentialFieldObstacle, PotentialFieldAgent potentialFieldAgent) {
         this.potentialFieldTarget = potentialFieldTarget;
         this.potentialFieldObstacle = potentialFieldObstacle;
         this.potentialFieldAgent = potentialFieldAgent;

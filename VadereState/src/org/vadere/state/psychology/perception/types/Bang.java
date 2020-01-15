@@ -8,6 +8,8 @@ package org.vadere.state.psychology.perception.types;
  */
 public class Bang extends Stimulus {
 
+    // TODO: Maybe, rename "Bang" to general term "Threat".
+
     // Member Variables
     private int originAsTargetId = -1;
     private double loudness = 1;

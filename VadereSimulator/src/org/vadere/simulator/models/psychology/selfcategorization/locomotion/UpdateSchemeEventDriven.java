@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.psychology.selfcategorization.PedestrianSelfCatThreat;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.*;
 
 import java.util.Comparator;
@@ -52,31 +51,28 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			return;
 		}
 
-		Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
-
-		if (mostImportantStimulus instanceof ElapsedTime) {
-			if (pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED) {
-				osmBehaviorController.makeStepToTarget(pedestrian, topography);
-			} else if (pedestrian.getSelfCategory() == SelfCategory.COOPERATIVE) {
-				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-
-				if(candidate != null) {
-					pedestrianEventsQueue.remove(candidate);
-					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-					pedestrianEventsQueue.add((PedestrianSelfCatThreat)candidate);
-				} else {
-					osmBehaviorController.makeStepToTarget(pedestrian, topography);
-				}
-				// TODO: else if (pedestrian.getSelfCategory() == SelfCategory.LEFT_BANG_AREA)
-				//  Change target to safe zone and "makeStepToTarget()".
-			}
-		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
-			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantStimulus instanceof Bang) {
-			// TODO: Increase pedestrians free-flow velocity by a fixed factor of 1.5 or 2.
-			osmBehaviorController.reactToBang(pedestrian, topography);
+		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
+		if (pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED) {
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (mostImportantStimulus instanceof ChangeTarget) {
+		} else if (pedestrian.getSelfCategory() == SelfCategory.COOPERATIVE) {
+			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+
+			if (candidate != null) {
+				pedestrianEventsQueue.remove(candidate);
+				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+				pedestrianEventsQueue.add((PedestrianSelfCatThreat) candidate);
+			} else {
+				osmBehaviorController.makeStepToTarget(pedestrian, topography);
+			}
+		} else if (pedestrian.getSelfCategory() == SelfCategory.OUTSIDE_THREAT_AREA) {
+			// TODO: Change target to safe zone (i.e., use closest target) and "makeStepToTarget()".
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (pedestrian.getSelfCategory() == SelfCategory.WAIT) {
+			osmBehaviorController.wait(pedestrian, timeStepInSec);
+		} else if (pedestrian.getSelfCategory() == SelfCategory.INSIDE_THREAT_AREA) {
+			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (pedestrian.getSelfCategory() == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.reactToTargetChange(pedestrian, topography);
 			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());

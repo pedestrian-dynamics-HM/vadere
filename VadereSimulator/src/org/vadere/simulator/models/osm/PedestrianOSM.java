@@ -7,7 +7,7 @@ import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetDistractionStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -28,7 +28,6 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PedestrianOSM extends Pedestrian {
 
@@ -339,8 +338,8 @@ public class PedestrianOSM extends Pedestrian {
 			this.combinedPotentialStrategy = new TargetAttractionStrategy(this.potentialFieldTarget,
 						this.potentialFieldObstacle,
 						this.potentialFieldPedestrian);
-		} else if (newStrategy == CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY) {
-			this.combinedPotentialStrategy = new TargetDistractionStrategy(this.potentialFieldTarget,
+		} else if (newStrategy == CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY) {
+			this.combinedPotentialStrategy = new TargetRepulsionStrategy(this.potentialFieldTarget,
 					this.potentialFieldObstacle,
 					this.potentialFieldPedestrian);
 		} else {

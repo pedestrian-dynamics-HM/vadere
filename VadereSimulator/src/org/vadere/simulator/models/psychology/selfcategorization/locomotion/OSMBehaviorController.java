@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Bang;
@@ -123,23 +124,27 @@ public class OSMBehaviorController {
     // I.e., a new target is set for the agent. The agent does not move here!
     // Therefore, trigger only a single bang event and then use "ElapsedTime" afterwards
     // to let the agent walk.
-    public void reactToBang(PedestrianOSM pedestrian, Topography topography) {
-        Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
+    public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
+        Stimulus perceivedThreat = pedestrian.getPerceivedThreat();
 
-        // TODO: Change only if "pedestrian.getCombinedPotentialStrategy != TARGET_DISTRACTION_STRATEGY".
-        if (mostImportantStimulus instanceof Bang) {
-            Bang bang = (Bang) pedestrian.getMostImportantStimulus();
+        if (perceivedThreat instanceof Bang && pedestrian.getCombinedPotentialStrategy() instanceof TargetAttractionStrategy) {
+            Bang bang = (Bang) perceivedThreat;
             Target bangOrigin = topography.getTarget(bang.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
             nextTarget.add(bangOrigin.getId());
 
             pedestrian.setTargets(nextTarget);
-            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
+            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
+
+            // TODO: Maybe, sample speed-up from a distribution or define it as a configurable attribute.
+            double escapeSpeed = pedestrian.getFreeFlowSpeed() * 2.0;
+            pedestrian.setFreeFlowSpeed(escapeSpeed);
+
         } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
+            logger.debug(String.format("Expected: %s, Received: %s",
                     Bang.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+                    perceivedThreat.getClass().getSimpleName()));
         }
     }
 
@@ -151,9 +156,9 @@ public class OSMBehaviorController {
             pedestrian.setTargets(changeTarget.getNewTargetIds());
             pedestrian.setNextTargetListIndex(0);
         } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
+            logger.debug(String.format("Expected: %s, Received: %s",
                     ChangeTarget.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+                    mostImportantStimulus.getClass().getSimpleName()));
         }
     }
 

@@ -13,5 +13,10 @@ package org.vadere.state.psychology.cognition;
  * Watch out: The self category of an agent can change during a simulation.
  */
 public enum SelfCategory {
-    TARGET_ORIENTED, COOPERATIVE
+    TARGET_ORIENTED,
+    COOPERATIVE,
+    INSIDE_THREAT_AREA,
+    OUTSIDE_THREAT_AREA,
+    WAIT,
+    CHANGE_TARGET
 }

@@ -125,11 +125,11 @@ public class OSMBehaviorController {
             nextTarget.add(bangOrigin.getId());
 
             pedestrian.setTargets(nextTarget);
-            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
+            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
         } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
+            logger.debug(String.format("Expected: %s, Received: %s",
                     Bang.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+                    mostImportantStimulus.getClass().getSimpleName()));
         }
     }
 
@@ -141,9 +141,9 @@ public class OSMBehaviorController {
             pedestrian.setTargets(changeTarget.getNewTargetIds());
 
         } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
+            logger.debug(String.format("Expected: %s, Received: %s",
                     ChangeTarget.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+                    mostImportantStimulus.getClass().getSimpleName()));
         }
     }
 
