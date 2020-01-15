@@ -2,7 +2,6 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -48,8 +47,11 @@ public class SimplePerceptionModel implements IPerceptionModel {
         if (changeTargetStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetStimuli.get(0);
         } else if (bangStimuli.size() >= 1) {
-            // TODO: Select closest bang where pedestrian is within bang radius as most important stimulus.
-            mostImportantStimulus = bangStimuli.get(0);
+            Stimulus closestBang = selectClosestAndPerceptibleBang(pedestrian, bangStimuli);
+
+            if (closestBang != null) {
+                mostImportantStimulus = closestBang;
+            }
         } else if (waitStimuli.size() >= 1) {
             mostImportantStimulus = waitStimuli.get(0);
         } else if (waitInAreaStimuli.size() >= 1) {
@@ -65,5 +67,31 @@ public class SimplePerceptionModel implements IPerceptionModel {
         }
 
         return mostImportantStimulus;
+    }
+
+    private Stimulus selectClosestAndPerceptibleBang(Pedestrian pedestrian, List<Stimulus> bangStimuli) {
+        Bang closestAndPerceptibleBang = null;
+        double distanceToClosestBang = -1;
+
+        for (Stimulus stimulus : bangStimuli) {
+            Bang currentBang = (Bang) stimulus;
+
+            VPoint bangOrigin = topography.getTarget(currentBang.getOriginAsTargetId()).getShape().getCentroid();
+            double distanceToBang = bangOrigin.distance(pedestrian.getPosition());
+
+            if (distanceToBang <= currentBang.getRadius()) {
+                if (closestAndPerceptibleBang == null) {
+                    closestAndPerceptibleBang = currentBang;
+                    distanceToClosestBang = distanceToBang;
+                } else {
+                    if (distanceToBang < distanceToClosestBang) {
+                        closestAndPerceptibleBang = currentBang;
+                        distanceToClosestBang = distanceToBang;
+                    }
+                }
+            }
+        }
+
+        return closestAndPerceptibleBang;
     }
 }
