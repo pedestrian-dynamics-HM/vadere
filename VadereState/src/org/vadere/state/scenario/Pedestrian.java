@@ -26,6 +26,8 @@ public class Pedestrian extends Agent {
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
+	// TODO: Save also "Stimulus perceivedThreat" and "SelfCategory ingroup".
+	//   Maybe here, or in "PsychologyStatus".
 	private PsychologyStatus psychologyStatus;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass

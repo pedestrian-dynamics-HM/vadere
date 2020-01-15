@@ -2,7 +2,9 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +48,7 @@ public class SimplePerceptionModel implements IPerceptionModel {
         if (changeTargetStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetStimuli.get(0);
         } else if (bangStimuli.size() >= 1) {
+            // TODO: Select closest bang where pedestrian is within bang radius as most important stimulus.
             mostImportantStimulus = bangStimuli.get(0);
         } else if (waitStimuli.size() >= 1) {
             mostImportantStimulus = waitStimuli.get(0);
