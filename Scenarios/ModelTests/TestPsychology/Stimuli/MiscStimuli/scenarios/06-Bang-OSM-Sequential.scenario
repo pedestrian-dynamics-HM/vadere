@@ -131,7 +131,7 @@
       "simulationSeed" : 1
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : false,
+      "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
