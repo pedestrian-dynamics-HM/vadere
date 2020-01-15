@@ -275,7 +275,8 @@
       "stimuli" : [ {
         "type" : "Bang",
         "originAsTargetId" : 0,
-        "loudness" : 1.0
+        "loudness" : 1.0,
+        "radius" : 10.0
       } ]
     } ]
   }
