@@ -13,7 +13,10 @@ import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -22,7 +25,6 @@ import org.vadere.util.logging.Logger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
@@ -148,6 +150,9 @@ public class OSMBehaviorController {
      * In dangerous situation humans tend to escape to familiar places (safe zones).
      * A pedestrian selects the target which is closest to its source as safe zone.
      * Or if pedestrian has no target, select closest target as safe zone.
+     *
+     * TODO: Clarify with Gerta if this is really a plausible assumption for safe zones.
+     *   An easier approach is to just use the closest target as safe zone.
      */
     public void changeTargetToSafeZone(PedestrianOSM pedestrian, Topography topography) {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {

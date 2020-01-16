@@ -5,7 +5,6 @@ import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
@@ -35,10 +34,8 @@ public class ThreatCognitionModel implements ICognitionModel {
         for (Pedestrian pedestrian : pedestrians) {
             if (pedestrian.getMostImportantStimulus() instanceof Bang) {
 
-                // I.e., pedestrian is inside bang radius.
                 pedestrian.setPerceivedThreat(pedestrian.getMostImportantStimulus());
                 pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
-
             } else if (pedestrian.getMostImportantStimulus() instanceof ElapsedTime) {
 
                 if (pedestrian.getPerceivedThreat() != null) {
