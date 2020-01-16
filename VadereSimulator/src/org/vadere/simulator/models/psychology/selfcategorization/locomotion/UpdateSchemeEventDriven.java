@@ -65,7 +65,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 				osmBehaviorController.makeStepToTarget(pedestrian, topography);
 			}
 		} else if (pedestrian.getSelfCategory() == SelfCategory.OUTSIDE_THREAT_AREA) {
-			// TODO: Change target to safe zone (i.e., use closest target) and "makeStepToTarget()".
+			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (pedestrian.getSelfCategory() == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
@@ -73,7 +73,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (pedestrian.getSelfCategory() == SelfCategory.CHANGE_TARGET) {
-			osmBehaviorController.reactToTargetChange(pedestrian, topography);
+			osmBehaviorController.changeTarget(pedestrian, topography);
 			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}

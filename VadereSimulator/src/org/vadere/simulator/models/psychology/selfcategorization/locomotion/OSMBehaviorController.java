@@ -7,14 +7,13 @@ import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -23,6 +22,7 @@ import org.vadere.util.logging.Logger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
@@ -120,10 +120,6 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
 
-    // Watch out: A bang event changes only the "CombinedPotentialStrategy".
-    // I.e., a new target is set for the agent. The agent does not move here!
-    // Therefore, trigger only a single bang event and then use "ElapsedTime" afterwards
-    // to let the agent walk.
     public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
         Stimulus perceivedThreat = pedestrian.getPerceivedThreat();
 
@@ -148,7 +144,43 @@ public class OSMBehaviorController {
         }
     }
 
-    public void reactToTargetChange(PedestrianOSM pedestrian, Topography topography) {
+    /**
+     * In dangerous situation humans tend to escape to familiar places (safe zones).
+     * A pedestrian selects the target which is closest to its source as safe zone.
+     * Or if pedestrian has no target, select closest target as safe zone.
+     */
+    public void changeTargetToSafeZone(PedestrianOSM pedestrian, Topography topography) {
+        if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
+
+            ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
+            Target closestTarget = findClosestTarget(topography, searchPosition, (Bang) pedestrian.getPerceivedThreat());
+
+            assert closestTarget != null;
+
+            if (closestTarget != null) {
+                pedestrian.setSingleTarget(closestTarget.getId(), false);
+            }
+
+            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
+        }
+    }
+
+    private Target findClosestTarget(Topography topography, ScenarioElement scenarioElement, Bang bang) {
+        VPoint sourceCentroid = scenarioElement.getShape().getCentroid();
+
+        List<Target> sortedTargets = topography.getTargets().stream()
+                .filter(target -> target.getId() != bang.getOriginAsTargetId())
+                .sorted((target1, target2) -> Double.compare(
+                        sourceCentroid.distance(target1.getShape().getCentroid()),
+                        sourceCentroid.distance(target2.getShape().getCentroid())))
+                .collect(Collectors.toList());
+
+        Target closestTarget = (sortedTargets.isEmpty()) ? null : sortedTargets.get(0);
+
+        return closestTarget;
+    }
+
+    public void changeTarget(PedestrianOSM pedestrian, Topography topography) {
         Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
         if (mostImportantStimulus instanceof ChangeTarget) {
