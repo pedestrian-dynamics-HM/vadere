@@ -4,3 +4,4 @@ scipy
 lxml
 utm
 numpy
+gitpython
