@@ -102,6 +102,9 @@ public class SelfCatThreatModel implements MainModel {
                 noSpeedAdjusters, stepCircleOptimizer.clone());
         pedestrian.setPosition(position);
 
+        // TODO: Call "pedestrian.setGroupMembership()" based on a (binomial?) distribution
+        //   which can be configured in JSON file (similar to "TargetChanger").
+
         return pedestrian;
     }
 

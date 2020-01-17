@@ -59,14 +59,12 @@ public class ThreatCognitionModel implements ICognitionModel {
             testIfInsideOrOutsideThreatArea(pedestrian);
         } else { // These agents did not perceive a threat but are aware of other threatened agents.
 
-            // TODO: Pedestrians must be spawned with a random "GroupMembership".
             if (pedestrian.getGroupMembership() == GroupMembership.OUT_GROUP) {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             } else if (pedestrian.getGroupMembership() == GroupMembership.IN_GROUP) {
                 imitateThreatenedPedestrianIfPresent(pedestrian);
-
             } else {
-                throw new IllegalArgumentException("Can only process \"OUT_GROUP\" and \"IN_GROUP\" group membership!");
+                throw new IllegalArgumentException("Can only process \"IN_GROUP\" and \"OUT_GROUP\" group membership!");
             }
         }
     }
