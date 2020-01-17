@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Use a very simple strategy to rank stimulus priority:
  *
- * ChangeTarget > Bang > Wait > WaitInArea
+ * ChangeTarget > Threat > Wait > WaitInArea
  */
 public class SimplePerceptionModel implements IPerceptionModel {
 
@@ -26,12 +26,12 @@ public class SimplePerceptionModel implements IPerceptionModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
         for (Pedestrian pedestrian : pedestrians) {
-            Stimulus mostImportantStimulus = rankChangeTargetAndBangHigherThanWait(stimuli, pedestrian);
+            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(stimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
 
-    private Stimulus rankChangeTargetAndBangHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
+    private Stimulus rankChangeTargetAndThreatHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
         // Assume the "ElapsedTime" is the most important stimulus
         // unless there is something more important.
         Stimulus mostImportantStimulus = stimuli.stream()
@@ -41,16 +41,16 @@ public class SimplePerceptionModel implements IPerceptionModel {
 
         List<Stimulus> waitStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList());
         List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
-        List<Stimulus> bangStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Bang).collect(Collectors.toList());
+        List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
 
         if (changeTargetStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetStimuli.get(0);
-        } else if (bangStimuli.size() >= 1) {
-            Stimulus closestBang = selectClosestAndPerceptibleBang(pedestrian, bangStimuli);
+        } else if (threatStimuli.size() >= 1) {
+            Stimulus closestThreat = selectClosestAndPerceptibleThreat(pedestrian, threatStimuli);
 
-            if (closestBang != null) {
-                mostImportantStimulus = closestBang;
+            if (closestThreat != null) {
+                mostImportantStimulus = closestThreat;
             }
         } else if (waitStimuli.size() >= 1) {
             mostImportantStimulus = waitStimuli.get(0);
@@ -65,30 +65,30 @@ public class SimplePerceptionModel implements IPerceptionModel {
         return mostImportantStimulus;
     }
 
-    private Stimulus selectClosestAndPerceptibleBang(Pedestrian pedestrian, List<Stimulus> bangStimuli) {
-        Bang closestAndPerceptibleBang = null;
-        double distanceToClosestBang = -1;
+    private Stimulus selectClosestAndPerceptibleThreat(Pedestrian pedestrian, List<Stimulus> threatStimuli) {
+        Threat closestAndPerceptibleThreat = null;
+        double distanceToClosestThreat = -1;
 
-        for (Stimulus stimulus : bangStimuli) {
-            Bang currentBang = (Bang) stimulus;
+        for (Stimulus stimulus : threatStimuli) {
+            Threat currentThreat = (Threat) stimulus;
 
-            VPoint bangOrigin = topography.getTarget(currentBang.getOriginAsTargetId()).getShape().getCentroid();
-            double distanceToBang = bangOrigin.distance(pedestrian.getPosition());
+            VPoint threatOrigin = topography.getTarget(currentThreat.getOriginAsTargetId()).getShape().getCentroid();
+            double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
-            if (distanceToBang <= currentBang.getRadius()) {
-                if (closestAndPerceptibleBang == null) {
-                    closestAndPerceptibleBang = currentBang;
-                    distanceToClosestBang = distanceToBang;
+            if (distanceToThreat <= currentThreat.getRadius()) {
+                if (closestAndPerceptibleThreat == null) {
+                    closestAndPerceptibleThreat = currentThreat;
+                    distanceToClosestThreat = distanceToThreat;
                 } else {
-                    if (distanceToBang < distanceToClosestBang) {
-                        closestAndPerceptibleBang = currentBang;
-                        distanceToClosestBang = distanceToBang;
+                    if (distanceToThreat < distanceToClosestThreat) {
+                        closestAndPerceptibleThreat = currentThreat;
+                        distanceToClosestThreat = distanceToThreat;
                     }
                 }
             }
         }
 
-        return closestAndPerceptibleBang;
+        return closestAndPerceptibleThreat;
     }
 
     private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {

@@ -1,14 +1,12 @@
 package org.vadere.state.psychology.perception.types;
 
 /**
- * Class signals agents a bang - for instance something exploded.
+ * Class signals agents a threat. For instance that something exploded.
  *
  * This stimulus holds one additional information: a target id
- * which represents the origin of the bang.
+ * which represents the origin of the threat.
  */
-public class Bang extends Stimulus {
-
-    // TODO: Maybe, rename "Bang" to general term "Threat".
+public class Threat extends Stimulus {
 
     // Member Variables
     private int originAsTargetId = -1;
@@ -17,19 +15,19 @@ public class Bang extends Stimulus {
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
-    public Bang() { super(); }
+    public Threat() { super(); }
 
-    public Bang(double time) {
+    public Threat(double time) {
         super(time);
     }
 
-    public Bang(double time, int originAsTargetId) {
+    public Threat(double time, int originAsTargetId) {
         super(time);
 
         this.originAsTargetId = originAsTargetId;
     }
 
-    public Bang(Bang other) {
+    public Threat(Threat other) {
         super(other);
 
         this.originAsTargetId = other.getOriginAsTargetId();
@@ -48,7 +46,7 @@ public class Bang extends Stimulus {
     public void setRadius(double radius) { this.radius = radius; }
 
     @Override
-    public Bang clone() {
-        return new Bang(this);
+    public Threat clone() {
+        return new Threat(this);
     }
 }

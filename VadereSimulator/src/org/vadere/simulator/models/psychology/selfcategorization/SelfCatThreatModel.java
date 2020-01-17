@@ -18,7 +18,7 @@ import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesSelfCatThreat;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.GroupMembership;
-import org.vadere.state.psychology.perception.types.Bang;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * This class models how agents react to a perceived threat (a loud bang) while considering the
+ * This class models how agents react to a perceived threat (e.g., a loud bang) while considering the
  * self-categorization theory ("reicher-2010").
  *
  * Please, note:
  * <ul>
- *     <li>A {@link Bang} has a loudness and a radius.</li>
+ *     <li>A {@link Threat} has a loudness and a radius.</li>
  *     <li>We use the self-categorization theory to divide the agents into in- and out-group members.
  *     In-group members imitate the behavior of other in-group members. Out-group members ignore the
  *     behavior of in-group members.</li>
@@ -46,9 +46,9 @@ import java.util.Random;
  * Implement following behavior:
  *
  * <ol>
- *     <li>If agent A is within the bang radius, escape (i.e., first maximize distance to the bang and then
+ *     <li>If agent A is within the threat radius, escape (i.e., first maximize distance to the threat and then
  *     go to a safe zone).</li>
- *     <li>If agent A is outside bang radius, check if "searchRadius" contains an escaping in-group member.
+ *     <li>If agent A is outside threat radius, check if "searchRadius" contains an escaping in-group member.
  *     If yes, escape also. Otherwise, go to original target.</li>
  *     <li>Out-group members use the locomotion layer to go to a target (i.e., keep their original behavior).</li>
  * </ol>

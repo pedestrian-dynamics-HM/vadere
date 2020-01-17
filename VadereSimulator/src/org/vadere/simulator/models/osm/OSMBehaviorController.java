@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Bang;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
@@ -110,16 +110,16 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
 
-    // Watch out: A bang event changes only the "CombinedPotentialStrategy".
+    // Watch out: A threat stimulus changes only the "CombinedPotentialStrategy".
     // I.e., a new target is set for the agent. The agent does not move here!
-    // Therefore, trigger only a single bang event and then use "ElapsedTime" afterwards
-    // to let the agent walk.
+    // Therefore, trigger only a single threat stimulus and then use "ElapsedTime"
+    // afterwards to let the agent walk.
     public void reactToBang(PedestrianOSM pedestrian, Topography topography) {
         Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
-        if (mostImportantStimulus instanceof Bang) {
-            Bang bang = (Bang) pedestrian.getMostImportantStimulus();
-            Target bangOrigin = topography.getTarget(bang.getOriginAsTargetId());
+        if (mostImportantStimulus instanceof Threat) {
+            Threat threat = (Threat) pedestrian.getMostImportantStimulus();
+            Target bangOrigin = topography.getTarget(threat.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
             nextTarget.add(bangOrigin.getId());
@@ -128,7 +128,7 @@ public class OSMBehaviorController {
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
         } else {
             logger.debug(String.format("Expected: %s, Received: %s",
-                    Bang.class.getSimpleName(),
+                    Threat.class.getSimpleName(),
                     mostImportantStimulus.getClass().getSimpleName()));
         }
     }

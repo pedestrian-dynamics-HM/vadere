@@ -118,13 +118,13 @@ public class SimplePerceptionModelTest {
     }
 
     @Test
-    public void updateRanksBangHigherThanElapsedTime() {
+    public void updateRanksThreatHigherThanElapsedTime() {
         Topography topography = createTopography();
         Target target = createTarget(new VPoint(0, 0), 5, 1);
         topography.addTarget(target);
 
         double expectedTime = 0.123;
-        Stimulus expectedStimulus = new Bang(expectedTime, target.getId());
+        Stimulus expectedStimulus = new Threat(expectedTime, target.getId());
 
         List<Pedestrian> pedestrians = createPedestrians(2);
         List<Stimulus> stimuli = new ArrayList<>();
@@ -143,8 +143,8 @@ public class SimplePerceptionModelTest {
     }
 
     @Test
-    public void updateUsesClosestBangForPedestrian() {
-        // Place bangs at (0,0) and (5,0) with radii 5 and
+    public void updateUsesClosestThreatForPedestrian() {
+        // Place threat at (0,0) and (5,0) with radii 5 and
         // place pedestrians at (1,0) and (4,0) and check result.
 
         Topography topography = createTopography();
@@ -153,8 +153,8 @@ public class SimplePerceptionModelTest {
 
         double expectedTime1 = 0.1;
         double expectedTime2 = 0.2;
-        Stimulus expectedStimulusPed1 = new Bang(expectedTime1, targets.get(0).getId());
-        Stimulus expectedStimulusPed2 = new Bang(expectedTime2, targets.get(1).getId());
+        Stimulus expectedStimulusPed1 = new Threat(expectedTime1, targets.get(0).getId());
+        Stimulus expectedStimulusPed2 = new Threat(expectedTime2, targets.get(1).getId());
 
         List<Pedestrian> pedestrians = createPedestrians(2);
         pedestrians.get(0).setPosition(new VPoint(1, 0));

@@ -10,7 +10,7 @@ import org.vadere.simulator.models.potential.combinedPotentials.TargetAttraction
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Bang;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
@@ -125,12 +125,12 @@ public class OSMBehaviorController {
     public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
         Stimulus perceivedThreat = pedestrian.getPerceivedThreat();
 
-        if (perceivedThreat instanceof Bang && pedestrian.getCombinedPotentialStrategy() instanceof TargetAttractionStrategy) {
-            Bang bang = (Bang) perceivedThreat;
-            Target bangOrigin = topography.getTarget(bang.getOriginAsTargetId());
+        if (perceivedThreat instanceof Threat && pedestrian.getCombinedPotentialStrategy() instanceof TargetAttractionStrategy) {
+            Threat threat = (Threat) perceivedThreat;
+            Target threatOrigin = topography.getTarget(threat.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
-            nextTarget.add(bangOrigin.getId());
+            nextTarget.add(threatOrigin.getId());
 
             pedestrian.setTargets(nextTarget);
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
@@ -141,7 +141,7 @@ public class OSMBehaviorController {
 
         } else {
             logger.debug(String.format("Expected: %s, Received: %s",
-                    Bang.class.getSimpleName(),
+                    Threat.class.getSimpleName(),
                     perceivedThreat.getClass().getSimpleName()));
         }
     }
@@ -158,7 +158,7 @@ public class OSMBehaviorController {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
 
             ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
-            Target closestTarget = findClosestTarget(topography, searchPosition, (Bang) pedestrian.getPerceivedThreat());
+            Target closestTarget = findClosestTarget(topography, searchPosition, (Threat) pedestrian.getPerceivedThreat());
 
             assert closestTarget != null;
 
@@ -170,11 +170,11 @@ public class OSMBehaviorController {
         }
     }
 
-    private Target findClosestTarget(Topography topography, ScenarioElement scenarioElement, Bang bang) {
+    private Target findClosestTarget(Topography topography, ScenarioElement scenarioElement, Threat threat) {
         VPoint sourceCentroid = scenarioElement.getShape().getCentroid();
 
         List<Target> sortedTargets = topography.getTargets().stream()
-                .filter(target -> target.getId() != bang.getOriginAsTargetId())
+                .filter(target -> target.getId() != threat.getOriginAsTargetId())
                 .sorted((target1, target2) -> Double.compare(
                         sourceCentroid.distance(target1.getShape().getCentroid()),
                         sourceCentroid.distance(target2.getShape().getCentroid())))

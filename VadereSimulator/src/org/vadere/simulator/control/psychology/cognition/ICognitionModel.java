@@ -2,14 +2,11 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Bang;
-import org.vadere.state.psychology.perception.types.ElapsedTime;
-import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Interface for a cognition model.
@@ -30,7 +27,7 @@ import java.util.List;
  *
  * Watch out: The perception phase should be finished before using
  * methods in this class because, usually, first a stimulus is processed and
- * then pedestrians decide which behavior to follow. E.g., first a {@link Bang}
+ * then pedestrians decide which behavior to follow. E.g., first a {@link Threat}
  * occurs and then a pedestrian decides to follow a {@link SelfCategory#TARGET_ORIENTED}
  * behavior.
  */

@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * An area with an arbitrary shape that absorbs agents event if they have not reached their target.
- * This can be useful when agents run away from targets (e.g., after a bang event).
+ * This can be useful when agents run away from targets (e.g., after a threat stimulus).
  */
 public class AbsorbingArea extends ScenarioElement implements Comparable<AbsorbingArea> {
 

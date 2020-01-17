@@ -64,7 +64,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			}
 		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantStimulus instanceof Bang) {
+		} else if (mostImportantStimulus instanceof Threat) {
 			osmBehaviorController.reactToBang(pedestrian, topography);
 		} else if (mostImportantStimulus instanceof ChangeTarget) {
 			osmBehaviorController.reactToTargetChange(pedestrian, topography);

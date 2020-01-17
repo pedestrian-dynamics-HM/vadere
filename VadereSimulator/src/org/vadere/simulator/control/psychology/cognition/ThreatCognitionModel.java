@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Bang;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Suppose a threat (a {@link Bang}) occurred.
+ * Suppose a threat (a {@link Threat}) occurred.
  *
  * Check following conditions for a pedestrian:
  * <ol>
@@ -37,12 +37,12 @@ public class ThreatCognitionModel implements ICognitionModel {
     // TODO: Maybe, use also use cooperative behavior from "CooperativeCognitionModel".
     public void update(Collection<Pedestrian> pedestrians) {
         for (Pedestrian pedestrian : pedestrians) {
-            if (pedestrian.getMostImportantStimulus() instanceof Bang) {
+            if (pedestrian.getMostImportantStimulus() instanceof Threat) {
                 handleThreat(pedestrian, pedestrian.getMostImportantStimulus());
             } else if (pedestrian.getMostImportantStimulus() instanceof ElapsedTime) {
                 handleElapsedTime(pedestrian);
             } else {
-                throw new IllegalArgumentException("Can only process \"Bang\" and \"ElapsedTime\" stimuli!");
+                throw new IllegalArgumentException("Can only process \"Threat\" and \"ElapsedTime\" stimuli!");
             }
         }
     }
@@ -69,7 +69,7 @@ public class ThreatCognitionModel implements ICognitionModel {
     }
 
     private void testIfInsideOrOutsideThreatArea(Pedestrian pedestrian) {
-        Bang threat = (Bang) pedestrian.getPerceivedThreat();
+        Threat threat = (Threat) pedestrian.getPerceivedThreat();
 
         VPoint threatOrigin = topography.getTarget(threat.getOriginAsTargetId()).getShape().getCentroid();
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
