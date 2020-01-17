@@ -35,7 +35,6 @@ public class ThreatCognitionModel implements ICognitionModel {
 
     @Override
     // TODO: Maybe, use also use cooperative behavior from "CooperativeCognitionModel".
-    //   Refactor this long if-else cascade so that it is easier to read.
     public void update(Collection<Pedestrian> pedestrians) {
         for (Pedestrian pedestrian : pedestrians) {
             if (pedestrian.getMostImportantStimulus() instanceof Bang) {

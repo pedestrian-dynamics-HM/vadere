@@ -92,7 +92,8 @@
           "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
           "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
           "submodels" : [ ]
-        }
+        },
+        "probabilityInGroupMembership" : 0.0
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -308,7 +309,8 @@
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
           "perceivedThreat" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

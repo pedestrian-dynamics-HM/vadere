@@ -1,12 +1,13 @@
 package org.vadere.simulator.models.psychology.selfcategorization;
 
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
@@ -16,6 +17,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesSelfCatThreat;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -56,6 +58,7 @@ public class SelfCatThreatModel implements MainModel {
 
     // Static Variables
     private final static Logger logger = Logger.getLogger(SelfCatThreatModel.class);
+    private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
     // Variables
     private AttributesSelfCatThreat attributesSelfCatThreat;
@@ -71,9 +74,12 @@ public class SelfCatThreatModel implements MainModel {
     private StepCircleOptimizer stepCircleOptimizer;
     private UpdateSchemeEventDriven updateSchemeEventDriven;
 
-    // These models are updated in actual simulation loop.
+    // These models are updated in the actual simulation loop.
     private List<Model> models = new LinkedList<>();
     private double lastSimTimeInSec;
+
+    // Distribution to assign pedestrians as IN_GROUP or OUT_GROUP members.
+    BinomialDistribution binomialDistribution;
 
     @Override
     public List<Model> getSubmodels() {
@@ -100,12 +106,22 @@ public class SelfCatThreatModel implements MainModel {
                 attributesAgent, topography, random, potentialFieldTarget,
                 potentialFieldObstacle.copy(), potentialFieldPedestrian,
                 noSpeedAdjusters, stepCircleOptimizer.clone());
+
         pedestrian.setPosition(position);
 
-        // TODO: Call "pedestrian.setGroupMembership()" based on a (binomial?) distribution
-        //   which can be configured in JSON file (similar to "TargetChanger").
+        GroupMembership groupMembership = drawGroupMembershipFromDistribution();
+        pedestrian.setGroupMembership(groupMembership);
 
         return pedestrian;
+    }
+
+    private GroupMembership drawGroupMembershipFromDistribution() {
+        int binomialDistributionSample = binomialDistribution.sample();
+        boolean inGroupMember = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
+
+        GroupMembership groupMembership = (inGroupMember) ? GroupMembership.IN_GROUP : GroupMembership.OUT_GROUP;
+
+        return groupMembership;
     }
 
     @Override
@@ -130,6 +146,9 @@ public class SelfCatThreatModel implements MainModel {
 
         models.add(potentialFieldTarget);
         models.add(this);
+
+        int seed = random.nextInt();
+        this.binomialDistribution = createBinomialDistribution(seed, attributesSelfCatThreat.getProbabilityInGroupMembership());
     }
 
     private void initializeLocomotionLayer(List<Attributes> attributesList, Topography topography, AttributesAgent attributesPedestrian, Random random) {
@@ -156,6 +175,14 @@ public class SelfCatThreatModel implements MainModel {
         }
 
         this.updateSchemeEventDriven = new UpdateSchemeEventDriven(topography);
+    }
+
+    private BinomialDistribution createBinomialDistribution(int seed, double probabilityForInGroupMembership) {
+        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+        randomGenerator.setSeed(seed);
+        int trials = BINOMIAL_DISTRIBUTION_SUCCESS_VALUE; // I.e., possible outcomes are 0 and 1 when calling "sample()".
+
+        return new BinomialDistribution(randomGenerator, trials, probabilityForInGroupMembership);
     }
 
     @Override
