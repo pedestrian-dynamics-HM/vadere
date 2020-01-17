@@ -2,7 +2,7 @@ package org.vadere.state.psychology.cognition;
 
 /**
  * According to the self-categorization theory ("reicher-2010"), people define
- * themselves as member of social categories (see{@link SelfCategory}). When
+ * themselves as a member of social categories (see{@link SelfCategory}). When
  * people share the same {@link SelfCategory}, they often act collectively
  * if they feel as in-group member to this category.
  *

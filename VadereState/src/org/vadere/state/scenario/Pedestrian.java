@@ -2,6 +2,7 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
@@ -22,12 +23,13 @@ public class Pedestrian extends Agent {
 	public static final double INVALID_NEXT_EVENT_TIME = -1.0;
 
 	// Variables
+	// TODO: All these variables belong to Isabella's "social identity" branch
+	//   which was never merged with "master". On "master", these variables should be unused.
+	//   Therefore, delete them.
 	private int idAsTarget; // TODO should actually be an attribute or a member of a subclass
 	private boolean isChild; // TODO should actually be an attribute or a member of a subclass
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
-	// TODO: Save also "Stimulus perceivedThreat" and "SelfCategory ingroup".
-	//   Maybe here, or in "PsychologyStatus".
 	private PsychologyStatus psychologyStatus;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
@@ -63,7 +65,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		psychologyStatus = new PsychologyStatus(null, null, SelfCategory.TARGET_ORIENTED);
+		psychologyStatus = new PsychologyStatus(null, null, SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -106,6 +108,7 @@ public class Pedestrian extends Agent {
 	public Stimulus getMostImportantStimulus() { return psychologyStatus.getMostImportantStimulus(); }
 	public Stimulus getPerceivedThreat() { return psychologyStatus.getPerceivedThreat(); }
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
+	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -153,8 +156,9 @@ public class Pedestrian extends Agent {
 		this.isLikelyInjured = likelyInjured;
 	}
 	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychologyStatus.setMostImportantStimulus(mostImportantStimulus); }
-	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setPerceivedThreat(Stimulus perceivedThreat) { psychologyStatus.setPerceivedThreat(perceivedThreat); }
+	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
+	public void setGroupMembership(GroupMembership groupMembership) { psychologyStatus.setGroupMembership(groupMembership); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
@@ -180,10 +184,7 @@ public class Pedestrian extends Agent {
 	}
 
 	public void clearFootSteps() {
-		// getLast() is always the most recent (made sure in VTrajectory.add)
-		// This statement is for security and should mostly have no effect (only if someone did not use method
-		// "addFootStepToTrajectory" to add another foot step to the trajectory)
-		if(!trajectory.isEmpty()){
+		if (!trajectory.isEmpty()){
 			trajectory.clear();
 		}
 	}
