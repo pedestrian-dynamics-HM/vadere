@@ -47,11 +47,15 @@ public class ThreatCognitionModel implements ICognitionModel {
                 } else {
                     // TODO: Imitate behavior if recognizing an in-group member.
                     //   Maybe, use also cooperative behavior from "CooperativeCognitionModel".
+                    // TODO: A pedestrian needs boolean variable "isInGroup" or another enum
+                    //   "Member { IN_GROUP, OUT_GROUP, OUT_GROUP_FRIENDLY, OUT_GROUP_NEUTRAL_ OUT_GROUP_HOSTILE }"
+                    //    if (pedestrian.getPerceivedThreat() != null) => These peds perceived a threat!
+                    //    else checkIfSearchRadiusContainsAThreatedPed
                     pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
                 }
 
             } else {
-                throw new IllegalArgumentException("Use only \"Bang\" and \"ElapsedTime\" stimuli!");
+                throw new IllegalArgumentException("Can only process \"Bang\" and \"ElapsedTime\" stimuli!");
             }
         }
     }
