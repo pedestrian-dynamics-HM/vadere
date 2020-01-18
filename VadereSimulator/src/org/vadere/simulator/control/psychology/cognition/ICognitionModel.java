@@ -20,7 +20,7 @@ import java.util.Collection;
  * different scenarios (by specifying in the JSON file).
  *
  * The <code>initialize</code> method must be called before usage!
- * This interface defines a callbacks for the simulation loop.
+ * This interface defines callbacks for the simulation loop.
  * It's implementations define the major part of the simulation model's logic.
  *
  * This approach is similar to the {@link Model} interface for locomotion models.
@@ -28,8 +28,8 @@ import java.util.Collection;
  * Watch out: The perception phase should be finished before using
  * methods in this class because, usually, first a stimulus is processed and
  * then pedestrians decide which behavior to follow. E.g., first a {@link Threat}
- * occurs and then a pedestrian decides to follow a {@link SelfCategory#TARGET_ORIENTED}
- * behavior.
+ * is recognized and then a pedestrian decides to follow a
+ * {@link SelfCategory#INSIDE_THREAT_AREA} behavior.
  */
 public interface ICognitionModel {
 

@@ -2,9 +2,9 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * <ol>
  *     <li>Is pedestrian inside threat area.</li>
  *     <li>Is pedestrian outside threat area.</li>
- *     <li>If pedestrian outside threat area, test if other pedestrians are nearby
+ *     <li>If pedestrian is outside threat area, test if other pedestrians are nearby
  *     who have perceived the threat. If so, imitate their behavior if they are in-group members.</li>
  * </ol>
  */
