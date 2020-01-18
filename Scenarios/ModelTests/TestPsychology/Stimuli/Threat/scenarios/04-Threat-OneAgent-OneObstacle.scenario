@@ -1,5 +1,5 @@
 {
-  "name" : "04_bang_event_one_agent_one_obstacle",
+  "name" : "04-Threat-OneAgent-OneObstacle",
   "description" : "",
   "release" : "1.8",
   "processWriters" : {
