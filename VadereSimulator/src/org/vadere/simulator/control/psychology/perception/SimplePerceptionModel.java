@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Use a very simple strategy to rank stimulus priority:
  *
- * ChangeTarget > Threat > Wait > WaitInArea
+ * ChangeTarget > Threat > Wait > WaitInArea > ElapsedTime
  */
 public class SimplePerceptionModel implements IPerceptionModel {
 
