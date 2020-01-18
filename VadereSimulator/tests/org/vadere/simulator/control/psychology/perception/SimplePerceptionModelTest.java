@@ -144,7 +144,7 @@ public class SimplePerceptionModelTest {
 
     @Test
     public void updateUsesClosestThreatForPedestrian() {
-        // Place threat at (0,0) and (5,0) with radii 5 and
+        // Place threats at (0,0) and (5,0) with radius 5 and
         // place pedestrians at (1,0) and (4,0) and check result.
 
         Topography topography = createTopography();
