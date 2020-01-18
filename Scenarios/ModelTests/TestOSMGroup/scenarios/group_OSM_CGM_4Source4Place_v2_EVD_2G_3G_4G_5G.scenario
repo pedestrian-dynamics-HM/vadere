@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_4Source4Place_v2_EVD_2G_3G_4G_5G",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

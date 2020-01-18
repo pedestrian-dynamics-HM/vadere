@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_gnm1_050_h",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.8",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
