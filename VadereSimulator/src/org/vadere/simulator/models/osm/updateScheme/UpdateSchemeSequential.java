@@ -31,6 +31,8 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double currentTimeInSec, final double timeStepInSec) {
+		// TODO: Clarify with Bene if we can call "clearStrides()" here directly like in "UpdateSchemeEventDriven"
+		//   and omit in in invoked "update()".
 		for (Pedestrian pedestrian : pedestrianOSMS) {
 			if(!skipUdate.contains(pedestrian)) {
 				update((PedestrianOSM) pedestrian, currentTimeInSec, timeStepInSec);
@@ -48,26 +50,34 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
 		}
 
-		if (mostImportantStimulus instanceof ElapsedTime) {
+		SelfCategory selfCategory = pedestrian.getSelfCategory();
+
+		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
 			pedestrian.clearStrides();
-			if (pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED) {
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
+		} else if (selfCategory == SelfCategory.COOPERATIVE) {
+			pedestrian.clearStrides();
+			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+
+			if(candidate != null) {
+				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+				// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
+				skipUdate.add(candidate);
+			} else {
 				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-			} else if (pedestrian.getSelfCategory() == SelfCategory.COOPERATIVE) {
-				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-				if(candidate != null) {
-					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-					// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
-					skipUdate.add(candidate);
-				} else {
-					stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-				}
 			}
-		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
+		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantStimulus instanceof Threat) {
-			osmBehaviorController.reactToBang(pedestrian, topography);
-		} else if (mostImportantStimulus instanceof ChangeTarget) {
-			osmBehaviorController.reactToTargetChange(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
+			osmBehaviorController.changeTarget(pedestrian, topography);
+			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 
