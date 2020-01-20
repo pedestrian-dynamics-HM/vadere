@@ -134,7 +134,7 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "ThreatCognitionModel"
       }
     },
     "topography" : {

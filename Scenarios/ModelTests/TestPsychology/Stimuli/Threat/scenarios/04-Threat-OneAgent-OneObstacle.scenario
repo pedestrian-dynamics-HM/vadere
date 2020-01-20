@@ -108,7 +108,7 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "ThreatCognitionModel"
       }
     },
     "topography" : {
@@ -131,12 +131,12 @@
           "height" : 1.2,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 1,
+        "id" : 0,
         "absorbing" : true,
         "shape" : {
           "radius" : 1.0,
@@ -153,13 +153,30 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 0.7,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 3,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,

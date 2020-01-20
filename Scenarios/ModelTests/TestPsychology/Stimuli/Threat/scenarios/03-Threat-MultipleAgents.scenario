@@ -108,7 +108,7 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "ThreatCognitionModel"
       }
     },
     "topography" : {
@@ -127,7 +127,7 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 1,
+        "id" : 0,
         "absorbing" : true,
         "shape" : {
           "radius" : 1.0,
@@ -136,6 +136,23 @@
             "y" : 2.5
           },
           "type" : "CIRCLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 0.7,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
