@@ -1,13 +1,14 @@
-from lxml import etree
-from lxml.etree import Element, ElementTree
+import itertools
+import logging
 import random
-from typing import List, Tuple, Any, Set
-import yaml
-from scipy.spatial import ConvexHull
+from typing import Any, List, Set, Tuple
+
 import numpy as np
 import utm as utm_latlog_converter
-import itertools
-import argparse
+from lxml import etree
+from lxml.etree import Element, ElementTree
+from scipy.spatial import ConvexHull
+
 
 """
 rover:id  (will mimic osm id)
@@ -28,7 +29,6 @@ tag(building, *) -> this are polygons ==> obstacles
 
 
 class Node:
-
     def __init__(self):
         self.id = -1
         self.action = "modify"
@@ -41,7 +41,7 @@ class Node:
     def create_node(cls, node_id, lat, lon):
         n = cls()
         n.id = node_id
-        n.add_tag('rover:id', np.abs(n.id))
+        n.add_tag("rover:id", np.abs(n.id))
         n.lat = lat
         n.lon = lon
         return n
@@ -62,12 +62,17 @@ class Node:
         return element
 
     def __eq__(self, other):
-        return self.id == other.id and self.action == other.action and self.visible == other.visible and \
-               self.lat == other.lat and self.lon == other.lon and sorted(self.tags) == sorted(other.tags)
+        return (
+            self.id == other.id
+            and self.action == other.action
+            and self.visible == other.visible
+            and self.lat == other.lat
+            and self.lon == other.lon
+            and sorted(self.tags) == sorted(other.tags)
+        )
 
 
 class Nd:
-
     def __init__(self, ref_id):
         self.id = ref_id
 
@@ -81,7 +86,6 @@ class Nd:
 
 
 class Tag:
-
     def __init__(self, k, v):
         self.k = k
         self.v = v
@@ -97,7 +101,6 @@ class Tag:
 
 
 class Way:
-
     def __init__(self):
         self.id = -1
         self.action = "modify"
@@ -107,10 +110,12 @@ class Way:
         self.tags = []
 
     @classmethod
-    def create_with_refs(cls, way_id, refs: List[int],  att: dict = None, tags: dict = None):
+    def create_with_refs(
+        cls, way_id, refs: List[int], att: dict = None, tags: dict = None
+    ):
         w = cls()
         w.id = way_id
-        w.add_tag('rover:id', np.abs(w.id))
+        w.add_tag("rover:id", np.abs(w.id))
         for ref_id in refs:
             w.nds.append(Nd(ref_id))
         if tags is not None:
@@ -124,7 +129,7 @@ class Way:
     def create(cls, way_id, nodes: List[Node], att: dict = None, tags: dict = None):
         w = cls()
         w.id = way_id
-        w.add_tag('rover:id', np.abs(w.id))
+        w.add_tag("rover:id", np.abs(w.id))
         for n in nodes:
             w.nds.append(Nd(n.id))
         if tags is not None:
@@ -156,7 +161,6 @@ class Way:
 
 
 class PathToPolygon:
-
     def __init__(self, list_of_tuples, dist):
         self.points = [np.array([p[0], p[1]]) for p in list_of_tuples]
         self.dist = dist
@@ -252,7 +256,7 @@ class PolyObjectWidthId:
         self.points = utm_points  # [ (x, y), (x, y), ...]
         self.base = None
         self.template_data = {}
-        self.template_data.setdefault('id', self.id)
+        self.template_data.setdefault("id", self.id)
 
     @classmethod
     def create_closed(cls, poly_id, utm_points: List[Tuple[float, float]]):
@@ -272,16 +276,21 @@ class PolyObjectWidthId:
     def to_latlon(cls, poly_id, utm_points, zone_number=32, zone_letter="U"):
         latlon_points = []
         for p in utm_points:
-            lat, lon = utm_latlog_converter.to_latlon(easting=p[0], northing=p[1],
-                                                      zone_number=zone_number,
-                                                      zone_letter=zone_letter)
+            lat, lon = utm_latlog_converter.to_latlon(
+                easting=p[0],
+                northing=p[1],
+                zone_number=zone_number,
+                zone_letter=zone_letter,
+            )
             latlon_points.append((lat, lon))
         return cls(poly_id, latlon_points)
 
     def shift_points(self, base: list):
         shift_in_x = -base[0]
         shift_in_y = -base[1]
-        self.points = [(point[0] + shift_in_x, point[1] + shift_in_y) for point in self.points]
+        self.points = [
+            (point[0] + shift_in_x, point[1] + shift_in_y) for point in self.points
+        ]
         self.base = base
 
     def closed(self) -> bool:
@@ -291,12 +300,15 @@ class PolyObjectWidthId:
         self.template_data.setdefault(key, str(value))
 
     def __eq__(self, other):
-        return self.id == other.id and self.points == other.points and self.base == other.base \
-               and self.template_data == other.template_data
+        return (
+            self.id == other.id
+            and self.points == other.points
+            and self.base == other.base
+            and self.template_data == other.template_data
+        )
 
 
 class OsmLookup:
-
     def __init__(self, strict=True):
         self.strict = strict
         self.node_to_latlon = {}
@@ -313,14 +325,17 @@ class OsmLookup:
         self.latlon_to_node_errors = {}
 
         for node in nodes:
-            latlon_point = (float(node.get('lat')), float(node.get('lon')))
-            node_id = int(node.get('id'))
-            x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(float(latlon_point[0]),
-                                                                              float(latlon_point[1]))
+            latlon_point = (float(node.get("lat")), float(node.get("lon")))
+            node_id = int(node.get("id"))
+            x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(
+                float(latlon_point[0]), float(latlon_point[1])
+            )
             utm_point = (x, y)
             self.zone_map.setdefault((zone_number, zone_letter), None)
             if len(self.zone_map) > 1:
-                raise RuntimeError(f"OSM map contains multiple UTM-Zones. This does not work here. {self.zone_map}")
+                raise RuntimeError(
+                    f"OSM map contains multiple UTM-Zones. This does not work here. {self.zone_map}"
+                )
 
             if node_id in self.node_to_latlon:
                 msg = f"node[id: {node_id} lonlat:[{latlon_point} utm:[{utm_point}] already exist."
@@ -336,11 +351,15 @@ class OsmLookup:
                 error_set.add(node_id)
                 error_set.add(self.latlon_to_node.get(latlon_point))
                 self.latlon_to_node_errors.setdefault(latlon_point, error_set)
-                msg = f"node[id: {node_id} lonlat:[{latlon_point} utm:[{utm_point}] already exist in " \
+                msg = (
+                    f"node[id: {node_id} lonlat:[{latlon_point} utm:[{utm_point}] already exist in "
                     f"latlon->node: {error_set}"
+                )
                 if self.strict:
                     if node_id > 0:
-                        print(f"found node ids [{error_set}] which point to the same lonlat coordinates. continue because these points belong to osm ... ")
+                        print(
+                            f"found node ids [{error_set}] which point to the same lonlat coordinates. continue because these points belong to osm ... "
+                        )
                     else:
                         raise OsmLookupError(msg)
                 else:
@@ -349,12 +368,15 @@ class OsmLookup:
 
     def convert_latlon_to_utm(self, latlon):
         latlon_point = (float(latlon[0]), float(latlon[1]))
-        x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(float(latlon_point[0]),
-                                                                          float(latlon_point[1]))
+        x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(
+            float(latlon_point[0]), float(latlon_point[1])
+        )
         utm_point = (x, y)
         self.zone_map.setdefault((zone_number, zone_letter), None)
         if len(self.zone_map) > 1:
-            raise RuntimeError(f"OSM map contains multiple UTM-Zones. This does not work here. {self.zone_map}")
+            raise RuntimeError(
+                f"OSM map contains multiple UTM-Zones. This does not work here. {self.zone_map}"
+            )
         return utm_point
 
     def add(self, node_id, latlon, utm):
@@ -380,39 +402,50 @@ class OsmLookupError(LookupError):
 
 
 class OsmData:
-
     def __init__(self, input_file, output_file=None, strict=True):
         parser = etree.XMLParser(remove_blank_text=True)
         self.input_file = input_file
         self.output_file = output_file if output_file is not None else input_file
         self.xml: ElementTree = etree.parse(self.input_file, parser).getroot()
-        self.osm_root: Element = self.xml.xpath('/osm')[0]
+        self.osm_root: Element = self.xml.xpath("/osm")[0]
 
         nodes = self.osm_root.xpath("/osm/node")
         self.lookup = OsmLookup(strict=strict)
         self.lookup.load(nodes)
 
         self.obstacle_selectors = [
-            lambda: self.filter_for_buildings(ignore=[('rover:obstacle:ignore', 'yes')]),
-            lambda: self.filter_for_buildings_in_relations(ignore=[('rover:obstacle:ignore', 'yes')]),
-            lambda: self.filter_tag(include=[('rover:obstacle',)],
-                                    exclude=[('rover:obstacle:ignore', 'yes')])
+            lambda: self.filter_for_buildings(
+                ignore=[("rover:obstacle:ignore", "yes")]
+            ),
+            lambda: self.filter_for_buildings_in_relations(
+                ignore=[("rover:obstacle:ignore", "yes")]
+            ),
+            lambda: self.filter_tag(
+                include=[("rover:obstacle",)],
+                exclude=[("rover:obstacle:ignore", "yes")],
+            ),
         ]
         self.source_selectors = [
-            lambda: self.filter_tag(include=[('rover:source',)],
-                                    exclude=[('rover:source:ignore', 'yes')])
+            lambda: self.filter_tag(
+                include=[("rover:source",)], exclude=[("rover:source:ignore", "yes")]
+            )
         ]
         self.target_selectors = [
-            lambda: self.filter_tag(include=[('rover:target',)],
-                                    exclude=[('rover:target:ignore', 'yes')])
+            lambda: self.filter_tag(
+                include=[("rover:target",)], exclude=[("rover:target:ignore", "yes")]
+            )
         ]
 
         self.measurement_selectors = [
-            lambda: self.filter_tag(include=[('rover:measurementArea',)],
-                                    exclude=[('rover:measurementArea:ignore', 'yes')])
+            lambda: self.filter_tag(
+                include=[("rover:measurementArea",)],
+                exclude=[("rover:measurementArea:ignore", "yes")],
+            )
         ]
 
-        print(f"loaded {input_file} with {len(self.nodes)} nodes and {len(self.ways)} ways.")
+        print(
+            f"loaded {input_file} with {len(self.nodes)} nodes and {len(self.ways)} ways."
+        )
 
     @property
     def base_point(self):
@@ -453,14 +486,21 @@ class OsmData:
             return f" and not {OsmData._xpath_k_v_tags(ignore)}"
 
     @staticmethod
-    def _tag_matcher(inc: List[Tuple], exc: List[Tuple], truth_operator: Tuple[str, str]) -> Tuple[str, str]:
+    def _tag_matcher(
+        inc: List[Tuple], exc: List[Tuple], truth_operator: Tuple[str, str]
+    ) -> Tuple[str, str]:
 
         include = []
         if inc is not None:
             include_tag_key = [element[0] for element in inc if len(element) == 1]
             inc_1 = [f"./tag[@k='{k}']" for k in include_tag_key]
-            include_tag_key_value_pair = [element for element in inc if len(element) == 2]
-            inc_2 = [f"./tag[@k='{e[0]}' and @v='{e[1]}']" for e in include_tag_key_value_pair]
+            include_tag_key_value_pair = [
+                element for element in inc if len(element) == 2
+            ]
+            inc_2 = [
+                f"./tag[@k='{e[0]}' and @v='{e[1]}']"
+                for e in include_tag_key_value_pair
+            ]
             include.extend(inc_1)
             include.extend(inc_2)
 
@@ -468,17 +508,27 @@ class OsmData:
         if exc is not None:
             exclude_tag_key = [element[0] for element in exc if len(element) == 1]
             exc_1 = [f"./tag[@k='{k}']" for k in exclude_tag_key]
-            exclude_tag_key_value_pair = [element for element in exc if len(element) == 2]
-            exc_2 = [f"./tag[@k='{e[0]}' and @v='{e[1]}']" for e in exclude_tag_key_value_pair]
+            exclude_tag_key_value_pair = [
+                element for element in exc if len(element) == 2
+            ]
+            exc_2 = [
+                f"./tag[@k='{e[0]}' and @v='{e[1]}']"
+                for e in exclude_tag_key_value_pair
+            ]
             exclude.extend(exc_1)
             exclude.extend(exc_2)
 
-        return f" {truth_operator[0]} ".join(include), f" {truth_operator[1]} ".join(exclude)
+        return (
+            f" {truth_operator[0]} ".join(include),
+            f" {truth_operator[1]} ".join(exclude),
+        )
 
-    def filter_tag(self,
-                   include: List[Tuple] = None,
-                   exclude: List[Tuple] = None,
-                   truth_operator: Tuple[str, str] = ("and", "and")) -> List[Element]:
+    def filter_tag(
+        self,
+        include: List[Tuple] = None,
+        exclude: List[Tuple] = None,
+        truth_operator: Tuple[str, str] = ("and", "and"),
+    ) -> List[Element]:
         """
         creates xpath string which will return all elements contains tags with a specific key (e.g ('key2') without
         checking the value or in the case of ('key1', 'val2') the value will be checked. All elements in the include or
@@ -489,7 +539,9 @@ class OsmData:
         :return:
         """
 
-        include_xpath, exclude_xpath = OsmData._tag_matcher(include, exclude, truth_operator)
+        include_xpath, exclude_xpath = OsmData._tag_matcher(
+            include, exclude, truth_operator
+        )
 
         if include_xpath == "" and exclude_xpath != "":
             xpath = f"/osm/way[not ({exclude_xpath}) ]"
@@ -518,15 +570,19 @@ class OsmData:
         buildings = self.xml.xpath(xpath)
 
         # We only want the shapes and only the outer parts. role='inner' is for "cutting holes" in the shape.
-        members_in_the_relations = [building.xpath("./member[./@type='way' and ./@role='outer']") for building in
-                                    buildings]
+        members_in_the_relations = [
+            building.xpath("./member[./@type='way' and ./@role='outer']")
+            for building in buildings
+        ]
         way_ids = []
         for element in members_in_the_relations:
             for way in element:
                 way_ids.append(way.get("ref"))
         ways = self.xml.xpath("/osm/way")
         ways_as_dict_with_id_key = {way.get("id"): way for way in ways}
-        buildings_from_relations = [ways_as_dict_with_id_key[way_id] for way_id in way_ids]
+        buildings_from_relations = [
+            ways_as_dict_with_id_key[way_id] for way_id in way_ids
+        ]
         return buildings_from_relations
 
     @staticmethod
@@ -542,7 +598,7 @@ class OsmData:
                     tag_dic.setdefault(key_value[0], key_value[1])
                 else:
                     if key_value[0].startswith(namespace):
-                        key = key_value[0][len(namespace):]
+                        key = key_value[0][len(namespace) :]
                         tag_dic.setdefault(key, key_value[1])
 
         return tag_dic
@@ -585,7 +641,9 @@ class OsmData:
         if len(ret_list) == 1:
             return ret_list[0]
         else:
-            raise OsmLookupError(f"no or to many matches for xpath '{xpath}' (found '{len(ret_list)}' matches)")
+            raise OsmLookupError(
+                f"no or to many matches for xpath '{xpath}' (found '{len(ret_list)}' matches)"
+            )
 
     def elements(self, xpath: str) -> List[Element]:
         ret_list = self.xml.xpath(xpath)
@@ -603,7 +661,7 @@ class OsmData:
 
     def node(self, node_id, rover_id: bool = False) -> Element:
         if rover_id:
-            ret_list = self.nodes_find_with_tags(inc_tag=[('rover:id', node_id)])
+            ret_list = self.nodes_find_with_tags(inc_tag=[("rover:id", node_id)])
             msg = f"cannot find node element for rover:id = '{node_id}'"
         else:
             ret_list = self.osm_root.xpath(f"/osm/node[@id={node_id}]")
@@ -627,16 +685,22 @@ class OsmData:
 
         next_id = self.next_id()
         node = Node.create_node(next_id, latlon_point[0], latlon_point[1])
-        x, y, z_number, z_letter = utm_latlog_converter.from_latlon(float(node.lat), float(node.lon))
+        x, y, z_number, z_letter = utm_latlog_converter.from_latlon(
+            float(node.lat), float(node.lon)
+        )
 
         if self.utm_zone != (z_number, z_letter):
-            raise RuntimeError(f"given latlon coordinate {latlon_point} is in wrong utm zone {(z_number, z_letter)} != {self.utm_zone} ")
+            raise RuntimeError(
+                f"given latlon coordinate {latlon_point} is in wrong utm zone {(z_number, z_letter)} != {self.utm_zone} "
+            )
 
         self.osm_root.append(node.to_xml())
         try:
             _ = self.node(node.id)
         except OsmLookupError:
-            raise OsmLookupError(f"error finding added node element {etree.tostring(node.to_xml())}")
+            raise OsmLookupError(
+                f"error finding added node element {etree.tostring(node.to_xml())}"
+            )
         # add new node to lookup
         self.lookup.add(node.id, latlon=(node.lat, node.lon), utm=(x, y))
         return next_id
@@ -646,10 +710,12 @@ class OsmData:
         element.getparent().remove(element)
         self.lookup.remove(node_id)
 
-    def nodes_find_with_tags(self,
-                             inc_tag: List[Tuple] = None,
-                             exc_tag: List[Tuple] = None,
-                             truth_operator=("and", "or")) -> List[Element]:
+    def nodes_find_with_tags(
+        self,
+        inc_tag: List[Tuple] = None,
+        exc_tag: List[Tuple] = None,
+        truth_operator=("and", "or"),
+    ) -> List[Element]:
         inc, exc = OsmData._tag_matcher(inc_tag, exc_tag, truth_operator)
         if len(inc) > 0 and len(exc) > 0:
             xpath = f"/osm/node[{inc} and not ({exc})]"
@@ -675,7 +741,7 @@ class OsmData:
 
     def way(self, way_id: int, rover_id: bool = False) -> Element:
         if rover_id:
-            ret_list = self.ways_find_with_tags(inc_tag=[('rover:id', way_id)])
+            ret_list = self.ways_find_with_tags(inc_tag=[("rover:id", way_id)])
             msg = f"cannot find way element for rover:id = '{way_id}'"
         else:
             ret_list = self.osm_root.xpath(f"/osm/way[@id='{way_id}']")
@@ -700,14 +766,18 @@ class OsmData:
 
         for n in new_way.nds:
             if not self.node_exists(n.id):
-                raise OsmLookupError(f"way contains reference to non existing nodes ref:{n.id}")
+                raise OsmLookupError(
+                    f"way contains reference to non existing nodes ref:{n.id}"
+                )
 
         self.osm_root.append(new_way.to_xml())
         try:
             _ = self.way(new_way.id)
             return new_way.id
         except OsmLookupError as e:
-            raise OsmLookupError(f"error finding added way element {etree.tostring(new_way.to_xml())} source:{str(e)}")
+            raise OsmLookupError(
+                f"error finding added way element {etree.tostring(new_way.to_xml())} source:{str(e)}"
+            )
 
     def way_create_from_polyline(self, line_utm, dist=0.25):
         """
@@ -743,7 +813,9 @@ class OsmData:
         if len(ret_list) > 1:
             return [int(i) for i in ret_list]
         else:
-            raise OsmLookupError(f"way needs at least two referenced nodes id: {way_id}")
+            raise OsmLookupError(
+                f"way needs at least two referenced nodes id: {way_id}"
+            )
 
     def way_remove(self, way_id):
         element: Element = self.way(way_id)
@@ -758,7 +830,12 @@ class OsmData:
         element = self.way(way_id)
         OsmData.tag_update_or_create(element, key, value)
 
-    def ways_find_with_tags(self, inc_tag: List[Tuple] = None, exc_tag: list = None, truth_operator=("and", "or")):
+    def ways_find_with_tags(
+        self,
+        inc_tag: List[Tuple] = None,
+        exc_tag: list = None,
+        truth_operator=("and", "or"),
+    ):
         inc, exc = OsmData._tag_matcher(inc_tag, exc_tag, truth_operator)
         if len(inc) > 0 and len(exc) > 0:
             xpath = f"/osm/way[{inc} and not ({exc})]"
@@ -781,7 +858,11 @@ class OsmData:
         hull_point_ids.append(hull_point_ids[0])
 
         # create way with convex hull
-        hull_way = Way.create_with_refs(self.next_id(), hull_point_ids, tags={'rover:obstacle:hull': '-1', 'rover:obstacle': 'convex-hull'})
+        hull_way = Way.create_with_refs(
+            self.next_id(),
+            hull_point_ids,
+            tags={"rover:obstacle:hull": "-1", "rover:obstacle": "convex-hull"},
+        )
         self.way_add(hull_way)
 
         # ignore ways incorporated in hull_way
@@ -791,7 +872,6 @@ class OsmData:
 
         print(f"created new hull-way (id:{hull_way.id}) containing {way_ids}")
         return hull_way.id
-
 
     def contained_in_area_of_intrest(self, aoi, way: Element):
         min_lat = aoi[0][0]
@@ -806,46 +886,61 @@ class OsmData:
 
         return True
 
-
     def get_area_of_intrest(self):
-        '''
+        """
         Return lat/lon min/max values for element within area of intrest
         :return:
-        '''
+        """
         self.xml.xpath("/osm/way/tag[@k='vadere:area-of-intrest']")
 
-        lat = [0,0]
-        lon = [0,0]
-        nodes = [self.lookup.node_to_latlon[int(id)] for id in self.xml.xpath("/osm/way[./tag/@k='vadere:area-of-intrest']/nd/@ref")][:-1]
+        lat = [0, 0]
+        lon = [0, 0]
+        nodes = [
+            self.lookup.node_to_latlon[int(id)]
+            for id in self.xml.xpath(
+                "/osm/way[./tag/@k='vadere:area-of-intrest']/nd/@ref"
+            )
+        ][:-1]
 
         if len(nodes) == 0:
-            raise RuntimeError(f"No area of interst found. Map does not contain a way with the tag 'vadere:area-of-intrest'")
+            raise RuntimeError(
+                f"No area of interst found. Map does not contain a way with the tag 'vadere:area-of-intrest'"
+            )
         elif len(nodes) < 2:
-            raise RuntimeError(f"area-of-intrest path contains only '{len(nodes)}' nodes. Need at least 3 nodes to "
-                               f"create area of interest.")
+            raise RuntimeError(
+                f"area-of-intrest path contains only '{len(nodes)}' nodes. Need at least 3 nodes to "
+                f"create area of interest."
+            )
 
         node_lat = [n[0] for n in nodes]
         node_lon = [n[1] for n in nodes]
 
         return ([min(node_lat), max(node_lat)], [min(node_lon), max(node_lon)])
 
-
     def lint_add_ids(self, dry_run=False):
-        ways_without_id: List[Element] = self.xml.xpath("/osm/way[@id < 0 and not (./tag[@k='rover:id'])]")
+        ways_without_id: List[Element] = self.xml.xpath(
+            "/osm/way[@id < 0 and not (./tag[@k='rover:id'])]"
+        )
         print(f"found {len(ways_without_id)} way elements without id")
         for idx, e in enumerate(ways_without_id):
-            way_id = e.get('id')
-            print(f" *** ({idx}/{len(ways_without_id)}) add tag: <tag k='rover:id' v='{np.abs(int(way_id))}'/> to way {way_id} ")
+            way_id = e.get("id")
+            print(
+                f" *** ({idx}/{len(ways_without_id)}) add tag: <tag k='rover:id' v='{np.abs(int(way_id))}'/> to way {way_id} "
+            )
             if not dry_run:
-                self.way_add_tag(way_id, 'rover:id', np.abs(int(way_id)))
+                self.way_add_tag(way_id, "rover:id", np.abs(int(way_id)))
 
-        nodes_without_id: List[Element] = self.xml.xpath("/osm/node[@id < 0 and not (./tag[@k='rover:id'])]")
+        nodes_without_id: List[Element] = self.xml.xpath(
+            "/osm/node[@id < 0 and not (./tag[@k='rover:id'])]"
+        )
         print(f"found {len(nodes_without_id)} node elements without id")
         for idx, n in enumerate(nodes_without_id):
-            node_id = n.get('id')
-            print(f" *** ({idx}/{len(nodes_without_id)}) add tag: <tag k='rover:id' v='{np.abs(int(node_id))}'/> to node {node_id} ")
+            node_id = n.get("id")
+            print(
+                f" *** ({idx}/{len(nodes_without_id)}) add tag: <tag k='rover:id' v='{np.abs(int(node_id))}'/> to node {node_id} "
+            )
             if not dry_run:
-                self.node_add_tag(node_id, 'rover:id', np.abs(int(node_id)))
+                self.node_add_tag(node_id, "rover:id", np.abs(int(node_id)))
 
     def lint_unique_ids(self):
         way_ids = self.xml.xpath("/osm/way/@id")
@@ -868,7 +963,9 @@ class OsmData:
         if len(duplicate_ways) == len(duplicate_nodes) == 0:
             print("no duplicate ways or nodes found")
         else:
-            print(f"duplicate ways: {duplicate_ways}, duplicate nodes: {duplicate_nodes}")
+            print(
+                f"duplicate ways: {duplicate_ways}, duplicate nodes: {duplicate_nodes}"
+            )
 
         return duplicate_ways, duplicate_nodes
 
@@ -877,17 +974,24 @@ class OsmData:
         invalid_obstacles = dict()
         for selector in self.obstacle_selectors:
             obstacle_elements.extend(selector())
-        node_refs = {way.get('id'): self.way_node_refs(way.get('id')) for way in obstacle_elements}
+        node_refs = {
+            way.get("id"): self.way_node_refs(way.get("id"))
+            for way in obstacle_elements
+        }
 
         for way_id, nodes in node_refs.items():
             if len(nodes) < 3:
                 invalid_obstacles.setdefault(way_id, nodes)
-                print(f"invalid polygons found. Way contains less than 3 nodes. way-id: {way_id}")
+                print(
+                    f"invalid polygons found. Way contains less than 3 nodes. way-id: {way_id}"
+                )
             elif nodes[0] == nodes[-1]:
                 node_refs[way_id] = nodes[:-1]
             else:
                 invalid_obstacles.setdefault(way_id, nodes)
-                print(f"invalid polygon found. First and last node ref do not match. way-id: {way_id}")
+                print(
+                    f"invalid polygon found. First and last node ref do not match. way-id: {way_id}"
+                )
 
         way_refs = {}
         for way_key, node_list in node_refs.items():
@@ -898,7 +1002,9 @@ class OsmData:
 
         multiple_used_nodes = {k: v for k, v in way_refs.items() if len(v) > 1}
         if len(multiple_used_nodes) > 0:
-            print(f"some nodes ware used by multiple polygons. This is a problem for mesching...")
+            print(
+                f"some nodes ware used by multiple polygons. This is a problem for mesching..."
+            )
             print(f"   {multiple_used_nodes}")
         else:
             print(f"no multiple used node found")
@@ -921,55 +1027,246 @@ class OsmData:
                 self.node_remove(int(node_id))
 
     def save(self):
-        with open(self.output_file, 'wb') as f:
-            f.write(etree.tostring(self.xml, encoding='utf8', pretty_print=True, xml_declaration=True))
+        with open(self.output_file, "wb") as f:
+            f.write(
+                etree.tostring(
+                    self.xml, encoding="utf8", pretty_print=True, xml_declaration=True
+                )
+            )
 
         print(f"saved in {self.output_file}")
 
 
-class Cfg:
+class OsmCfgParser:
+    def __init__(self, data: dict):
+        self.data = data
 
-    def __init__(self, cfg_path):
-        self.path = cfg_path
-        with open(self.path, 'r') as f:
-            self.cfg = yaml.safe_load(f)
+    def pre_group(self, group: str, curr_line: int):
+        return
 
-    def hull_obstacles_no_id(self):
-        return [obs for obs in self.cfg['convexhull_obstacles'] if obs['id'] is None]
+    def post_group(self, group: str, curr_line: int):
+        return
 
+    def parse_line(self, active_group: str, striped_line: str, curr_line: int):
+        if striped_line == "":
+            return
 
-def make_convex_hull(cfg: Cfg, osm: OsmData):
-    # list of hull obstacle which do not have an id
-    obs_without_hull = cfg.hull_obstacles_no_id()
-    print(f"found {len(obs_without_hull)} candidates in configuration")
-    hull_exists = False
-    for idx, obs in enumerate(obs_without_hull):
-        # list of all way ids within the hull-obstacle
-        print(f"{idx}/{len(obs_without_hull)} checking if hull already exists... ", end='')
-        way_ids = obs['ways']
-        for way_id in way_ids:
-            _w = osm.way(way_id)
-            hull_exists = len(_w.xpath("./tag[@k='rover:obstacle:hull'] "))
-            if hull_exists:
-                break
-
-        if hull_exists:
-            print(f"Yes. move to next element")
+        if self._is_key_value_pair(striped_line):
+            kv_dict = self._get_key_value_pair(striped_line)
+            self.data[active_group].update(kv_dict)
         else:
-            print(f"No. crate new hull")
-            osm.create_convex_hull(way_ids)
+            logging.warning(
+                f"line{curr_line} not an key-value pair. (ignore) '{striped_line}' "
+            )
+
+    def _add_to_group(self, group_name, key_value_pair: dict):
+        self.data[group_name].update(key_value_pair)
+
+    @staticmethod
+    def _parse_scalar(value: str):
+        try:
+            return float(value)
+        except ValueError:
+            if value in ["true", "True"]:
+                return True
+            if value in ["false", "False"]:
+                return False
+            return value
+
+    @staticmethod
+    def _get_key_value_pair(line: str, default: dict = None):
+        if OsmCfgParser._is_key_value_pair(line):
+            ret = line.strip().split("=")
+            if len(ret) != 2:
+                raise ValueError("A key value pair must contain only one '=' ")
+
+            key = ret[0].strip()
+            val = ret[1].strip()
+            # scalar or list
+            if OsmCfgParser._is_scalar_value(val):
+                kv_pair = {key: OsmCfgParser._parse_scalar(val)}
+            else:
+                # list value
+                val = [
+                    item.strip() for item in val.split(";")
+                ]  # remove all whitespaces and split on ";"
+                if "" in val:
+                    val.remove("")  # remove empty elements
+                kv_pair = {key: val}
+
+            return kv_pair
+        elif default is not None:
+            return default
+        else:
+            raise ValueError(f"Line does not contain a key value pair: '{line}'")
+
+    @staticmethod
+    def _is_key_value_pair(line: str):
+        return "=" in line
+
+    @staticmethod
+    def _is_scalar_value(val: str):
+        return ";" not in val
+
+    @staticmethod
+    def _is_list_value(val: str):
+        return ";" in val
+
+
+class OsmConfigTextGroupParser(OsmCfgParser):
+    def __init__(self, data: dict):
+        super().__init__(data)
+        self._simple_group_id = 0
+        self._simple_group = []
+
+    def pre_group(self, group: str, curr_line: int):
+        """
+        Ensure clean startup state.
+        """
+        self._simple_group_id = 0
+        self._simple_group = []
+
+    def post_group(self, group: str, curr_line: int):
+        """
+        In the case  the last group of way id's did not end with a new line write the data in #_simple_group to data.
+        """
+        if len(self._simple_group) > 0:
+            self._add_to_group(group, {str(self._simple_group_id): self._simple_group})
+            self._simple_group_id += 1
+
+    def parse_line(self, active_group: str, striped_line: str, curr_line: int):
+        if striped_line == "":
+            # group ended (or first group)
+            self._write_simple_group_as_list(active_group)
+            self._simple_group = []
+            if self._key_used(active_group, str(self._simple_group_id)):
+                self._simple_group_id += 1
+        else:
+            if striped_line.startswith("way "):
+                self._simple_group.append(striped_line[4:].strip())
+            else:
+                self._simple_group.append(striped_line)
+
+    def _write_simple_group_as_list(self, group_name):
+        if (len(self._simple_group)) == 0:
+            return
+
+        self._add_to_group(group_name, {str(self._simple_group_id): self._simple_group})
+
+    def _key_used(self, group_key, key: str):
+        return key in self.data[group_key]
+
+
+class OsmConfig(dict):
+    def __init__(self, cfg_path, **kwargs):
+        super().__init__(**kwargs)
+        self.cfg_path = cfg_path
+        # self.configGroups = dict()
+        self.parser_map = {
+            "convex-hull:way-list": OsmConfigTextGroupParser(self),
+            "wall:way-list": OsmConfigTextGroupParser(self),
+            "default": OsmCfgParser(self),
+        }
+        self._current_line_num = 0
+        self._previous_group = ""
+        self._active_group = ""
+
+        self._parse_config()
+
+    def _parse_config(self):
+
+        with open(self.cfg_path, "r") as cfg_f:
+            for line in cfg_f:
+                self._current_line_num += 1
+                if line.strip().startswith("#"):
+                    line = ""
+
+                # check for new group. If yes handle post and pre calls to parser
+                # if not do nothing. As long as we dont have any group (start of parsing)
+                # continue reading lines until we have a group.
+                new_group = self._new_group(line)
+                if self._active_group == "":
+                    continue
+
+                # handle pre and post parse_line calls.
+                if new_group:
+                    if self._previous_group != "":
+                        old_parser = self._select_parser(self._previous_group)
+                        old_parser.post_group(
+                            self._previous_group, self._current_line_num
+                        )
+                    new_parser = self._select_parser(self._active_group)
+                    new_parser.pre_group(self._active_group, self._current_line_num)
+                    continue
+
+                # select parser based on active group.
+                parser = self._select_parser(self._active_group)
+
+                parser.parse_line(
+                    self._active_group, line.strip(), self._current_line_num
+                )
+
+        # EOF reached. Call post parse_line on last active parser
+        last_parser = self._select_parser(self._active_group)
+        last_parser.post_group(self._active_group, self._current_line_num)
+
+    def _select_parser(self, configGroup: str):
+        if configGroup in self.parser_map:
+            parser = self.parser_map[configGroup]
+        else:
+            parser = self.parser_map["default"]
+
+        return parser
+
+    def _new_group(self, val: str):
+        g = val.strip()
+        if g.startswith("[") and g.endswith("]") and len(g) > 2:
+            self._previous_group = self._active_group
+            self._active_group = g[1:-1]
+            self[self._active_group] = {}
+            return True
+        else:
+            return False
+
+    def print_config(self):
+        for k, v in self.items():
+            print(k)
+            for kk, vv in v.items():
+                print(f"\t{kk}: {vv}")
+
+    def get_way_list(self, cmd):
+        if f"{cmd}:way-list" not in self:
+            return []
+        else:
+            return list(self[f"{cmd}:way-list"].values())
+
+    def get_convex_hull_list(self):
+        if "convex-hull:way-list" not in self:
+            return []
+        else:
+            return list(self["convex-hull:way-list"].values())
+
+    def get_wall_list(self):
+        if "wall:way-list" not in self:
+            return []
+        else:
+            return list(self["convex-hull:way-list"].values())
 
 
 def convert_walls(osm: OsmData):
     way_elements = osm.ways_find_with_tags(
-        inc_tag=[('barrier', 'wall')],  # select line based ways.
-        exc_tag=[('rover:obstacle:line:hull',), ('rover:obstacle.ignore', 'yes')],
-        truth_operator=("and", "or"))  # ignore already transformed ones.
+        inc_tag=[("barrier", "wall")],  # select line based ways.
+        exc_tag=[("rover:obstacle:line:hull",), ("rover:obstacle.ignore", "yes")],
+        truth_operator=("and", "or"),
+    )  # ignore already transformed ones.
 
-    way_elements.extend(osm.ways_find_with_tags(
-        inc_tag=[('rover:obstacle:type', 'line')],
-        exc_tag=[('rover:obstacle:line:hull',), ('rover:obstacle.ignore', 'yes')],
-        truth_operator=("and", "or")))
+    way_elements.extend(
+        osm.ways_find_with_tags(
+            inc_tag=[("rover:obstacle:type", "line")],
+            exc_tag=[("rover:obstacle:line:hull",), ("rover:obstacle.ignore", "yes")],
+            truth_operator=("and", "or"),
+        )
+    )
 
     print(f"found {len(way_elements)} lines. Start converting ...")
     for line_element in way_elements:
@@ -980,213 +1277,29 @@ def convert_walls(osm: OsmData):
 
             # add tags to new polygon
             new_way_id = new_way.id
-            osm.way_add_tag(new_way_id, 'rover:obstacle', 'wall')
-            osm.way_add_tag(new_way_id, 'rover:obstacle:line:ref', line_id)
-            osm.way_add_tag(new_way_id, 'rover:obstacle:line:hull', '-1')
+            osm.way_add_tag(new_way_id, "rover:obstacle", "wall")
+            osm.way_add_tag(new_way_id, "rover:obstacle:line:ref", line_id)
+            osm.way_add_tag(new_way_id, "rover:obstacle:line:hull", "-1")
 
             # add tags to existing line
-            osm.way_add_tag(line_id, 'rover:obstacle:line:hull', new_way_id)
-            osm.way_add_tag(line_id, 'rover:obstacle.ignore', 'yes')
-            print(f"Created new way (id: {new_way_id}) ignore id: {line_id} from now on.")
+            osm.way_add_tag(line_id, "rover:obstacle:line:hull", new_way_id)
+            osm.way_add_tag(line_id, "rover:obstacle.ignore", "yes")
+            print(
+                f"Created new way (id: {new_way_id}) ignore id: {line_id} from now on."
+            )
 
 
-config_template = \
-    """
-####
-#
-# Configuration for OSM util.
-#
-# This configuration file allows to execute multiple commands from the osm util script.
-# The keys resemble the associated commands from the command line interface. If 
-# no output file is specified the input file will be overwritten. 
-#
-# 'commands': Object containing each command (at most once) with all necessary 
-# configuration options. With 'command-order' the execution order of the commands 
-# given under 'commands' can be changed. If nothing is given the order is undefined.
-#
-###
+class OsmArg(dict):
+    def __init__(self, data):
+        super().__init__(data)
 
-input: map_mf_small_2.osm     # relative to this file.
-output:                       # if empty input is overwritten
-command-order:
-  - convex-hull
-  - wall
-  - lint
-commands:
-  lint:
-    all: true
-    dry-run: true
-    add-ids: false
-    unique-ids: false
-    check-obstacles: false
-  wall:
-##   convert all wall barriers (comment out one of those. Take Care of correct indention! ) ##
-#    include: null
-##   or define each barrier using its way. (Each way will be a single obstacle) ##
-#    include:
-#      - way_id1
-#      - way_id2
-#      - ...
-  convex-hull:
-    obstacles:
-#          - ways:
-#              - way_id1
-#              - way_id2
-#              - ...
-#          - ways:
-#              - ...
-#          ...
-"""
+    def __setattr__(self, name: str, value: Any) -> None:
+        try:
+            self[name.replace("_", "-")] = value
+        except KeyError:
+            raise AttributeError(f"class has no Attribute {name.replace('_','-')}")
 
-
-class HullAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        if not hasattr(namespace, self.dest):
-            raise argparse.ArgumentError(f"namespace should contain {self.dest}")
-
-        attr = getattr(namespace, self.dest)
-        attr.append(values)
-
-
-def main_convex_hull(args):
-    if args.output is None:
-        args.output = args.input
-
-    osm = OsmData(args.input, args.output)
-    for way_ids in args.hulls:
-        osm.create_convex_hull(way_ids)
-
-    osm.save()
-
-
-def main_walls(args):
-    if args.output is None:
-        args.output = args.input
-
-    osm = OsmData(args.input, args.output)
-    for way_id in args.walls:
-        utm_points = osm.nodes_to_utm(osm.way_node_refs(way_id))
-        osm.way_create_from_polyline(utm_points, dist=args.dist)
-
-    osm.save()
-
-
-def main_lint(args):
-    if args.output is None:
-        args.output = args.input
-    osm = OsmData(args.input, args.output, strict=False)
-    if args.all:
-        dup_way, dup_node = osm.lint_unique_ids()
-        if len(dup_way) > 0 or len(dup_node) > 0:
-            print("error")
-            exit(-1)
-        osm.lint_check_obstacles()
-        osm.lint_cleanup_unused_nodes(args.dry_run)
-
-    osm.save()
-
-
-def parse_command_line_arguments():
-    main = argparse.ArgumentParser(prog="OpenStreetMap (OSM) Util for (Vadere, OMNeT++)",
-                                   description="Collection of small commands to manipulate an OSM xml file to "
-                                               "preparer it for conversion to Vadere or OMNeT++ structures")
-
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument("-i", "--input",
-                               dest="input",
-                               nargs="?",
-                               required=True,
-                               help="OSM input file")
-
-    parent_parser.add_argument("-o", "--output",
-                               dest="output",
-                               nargs="?",
-                               required=False,
-                               help="OSM output. If not set the input file is overwritten")
-
-    subparsers = main.add_subparsers(title="Commands")
-
-    hull_parser = subparsers.add_parser("convex-hull",
-                                        parents=[parent_parser],
-                                        description="Create a convex hull around each list of given way ids.")
-    hull_parser.set_defaults(main_func=main_convex_hull)
-
-    hull_parser.add_argument("-w", "--ways",
-                             dest="hulls",
-                             default=[],
-                             action=HullAction,
-                             nargs="+",
-                             help="list of way ids which span the convex hull"
-                             )
-
-    wall_parser = subparsers.add_parser("wall",
-                                        parents=[parent_parser],
-                                        description="Create obstacles around a line segment list.")
-    wall_parser.set_defaults(main_func=main_walls)
-
-    wall_parser.add_argument("-w", "--ways",
-                             dest="walls",
-                             default=[],
-                             nargs="+",
-                             help="list of way ids which define a line segment list"
-                             )
-
-    wall_parser.add_argument("-d", "--dist",
-                             dest="dist",
-                             default=0.25,
-                             nargs="?",
-                             help='The perpendicular distance between the line defined by the way element and the '
-                                  'parallel line used to build the polygon. The width of the polygon will thus be '
-                                  '2*dist')
-
-    lint_parser = subparsers.add_parser("lint",
-                                        parents=[parent_parser],
-                                        description="Check for unique ids, add id-tag if missing, check for non  "
-                                                    "normalized obstacles")
-    lint_parser.set_defaults(main_func=main_lint)
-
-    lint_parser.add_argument("-a", "--all",
-                             dest='all',
-                             action="store_true",
-                             help="execute all test")
-
-    lint_parser.add_argument("--dry-run",
-                             dest="dry_run",
-                             action="store_true",
-                             help="only print what would be done but do not change anything")
-
-    lint_parser.add_argument("--add-ids",
-                             dest="add_ids",
-                             action="store_true",
-                             help="Ensure all manually added elements contain an id tag")
-
-    lint_parser.add_argument("--unique-ids",
-                             dest="unique_ids",
-                             action="store_true",
-                             help="Check for unique ids")
-
-    lint_parser.add_argument("--check-obstacles",
-                             dest="check_obstacles",
-                             action="store_true",
-                             help="check if file contains any touching obstacles")
-
-    config_parser = subparsers.add_parser("use-config")
-
-    config_parser.add_argument("-c", "--config",
-                               dest="config",
-                               nargs="?",
-                               help="Execute commands in configuration file.")
-
-    config_parser.add_argument("-n", "--new-config-file",
-                               dest="new_config",
-                               default="osm.config",
-                               nargs="?",
-                               help="create a default config file including all possible commands. If -c is used this"
-                                    "option is ignored")
-
-    return main.parse_args()
-
-
-if __name__ == "__main__":
-    args = parse_command_line_arguments()
-    args.main_func(args)
+    def __getattribute__(self, name: str) -> Any:
+        if name.replace("_", "-") not in self:
+            raise AttributeError(f"class has no Attribute {name.replace('_','-')}")
+        return self[name.replace("_", "-")]
