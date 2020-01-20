@@ -1,0 +1,91 @@
+# This is a default configuration file read by osm_helper.py
+# The syntax is based on .desktop config files.
+# All lines with a '#' are comments and will be ignored
+#
+# Syntax
+#
+# [XXXX]  <-- XXXX a Config block
+# foo=bar <-- simple key value pair with a scalar value. No white spaces
+#             in key value. Inner whitespaces in the value part will be
+#             kept. Trailing spaces will be removed. Semicolons are not
+#             allowed.
+# baz=foo1;foo2;  foo4 foo5 <-- key value pair with list value
+#                               seperated by ";". Space within one
+#                               tem will be kept.
+#                               (Resutl: baz=['foo1','foo2','foo4 foo5']
+# baf=foo1;                <-- for list with one element trailing ';' needed.
+#                               (Result: baf=['foo1'])
+#
+# [CMD:options] <-- Config block for options for given CMD
+#
+# Syntax for Config block [convex-hull:way-list]
+#
+# List of way ids (optionally prefixed with way) seperated by one or more empty
+# lines. Each continous block of ID's will be collecetd into one convex-hull
+#
+# [convex-hull:way-list]
+#
+# way 145673023
+# way 123123123
+# way  112954052
+#
+# 12345
+# 12334
+# 34566
+#
+# Result: { '0': ['145673023', '123123123', '112954052'],
+#           '1': ['12345', '12334', '34566'] }
+###############################################################################
+
+###############################################################################
+#       Options for all Commands. (Can be overwritten for each Command        #
+###############################################################################
+
+[Config]
+input=
+output=
+command-order=
+
+# Convert #####################################################################
+#[convert:options]
+#input=
+#output=
+#use-osm-id=True
+#use-aoi=False
+
+# Convex-Hull (way-list at end of file)########################################
+#[convex-hull:options]
+#input=
+#output=
+
+# Walls (way-list at end of file)########################################
+#[wall:options]
+#input=
+#output=
+#dist=0.25
+
+# Lint (Clenup OSM file)#######################################################
+#[lint:options]
+#input=
+#output=
+#all=True
+#dry-run=True
+#add-ids=True
+#unique-ids=True
+#check-obstacles=True
+
+###############################################################################
+#       List of ways which should be combinde to walls or convex hulls        #
+###############################################################################
+
+#[convex-hull:way-list]
+
+# way 1
+# way 2
+# way 3
+
+#[wall:way-list]
+
+# way 1
+# way 2
+# way 3
