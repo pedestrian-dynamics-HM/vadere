@@ -181,9 +181,9 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-		// the command Identifier is written somewhere else, as it is already clear in here, that the command is a
-		// getVersion command
-		cmdBuilder.writeInt(res.getVersionId())
+        // ResponseIdentifier needed by implementation in Veins/OMNeT++
+		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
+				.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
 
 		addCommandWithoutLen(cmdBuilder.asByteArray());
