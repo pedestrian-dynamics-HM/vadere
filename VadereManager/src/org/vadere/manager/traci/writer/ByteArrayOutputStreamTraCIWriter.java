@@ -1,7 +1,9 @@
 package org.vadere.manager.traci.writer;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -14,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,8 +72,8 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 			case POS_2D:
 				write2DPosition((VPoint) data);
 				break;
-			case POS_2D_LIST:                                        // new
-				write2DPositionListWithId((Map<String, VPoint>) data);     // new
+			case POS_2D_LIST:
+				write2DPositionListWithId((Map<String, VPoint>) data);
 				break;
 			case POS_3D:
 				write3DPosition((Vector3D) data);
@@ -93,12 +96,13 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 			case COLOR:
 				writeColor((Color) data);
 				break;
+			case COMPOUND_OBJECT:
+				writeCompoundObject((CompoundObject) data);
 			case NULL:
 				writeNull();
 				break;
 			default:
 				logger.errorf("cannot write %s", dataType.toString());
-
 		}
 
 		return this;
@@ -227,7 +231,6 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		return this;
 	}
 
-
 	@Override
 	public TraCIWriter writeRoadMapPosition(RoadMapPosition val) {
 		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.id);
@@ -264,7 +267,8 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	public TraCIWriter writePolygon(List<VPoint> points) {
 		writeUnsignedByte(TraCIDataType.POLYGON.id);
 		if (points.size() > 255)
-			throw new TraCIException("Polygon to big. TraCI only supports polygon up to 255 points.");
+			throw new TraCIException("Polygon to big. " +
+					"TraCI only supports polygon up to 255 points.");
 		writeUnsignedByte(points.size());
 		points.forEach(p -> {
 			writeDouble(p.getX());
@@ -277,7 +281,8 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	public TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases) {
 		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.id);
 		if (phases.size() > 255)
-			throw new TraCIException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
+			throw new TraCIException("Traffic Light Phase List to big. " +
+					"TraCI only supports list up to 255 elements.");
 		writeUnsignedByte(phases.size());
 		phases.forEach(phase -> {
 			writeString(phase.getPrecRoad());
@@ -294,6 +299,20 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		writeUnsignedByte(color.getGreen());
 		writeUnsignedByte(color.getBlue());
 		writeUnsignedByte(color.getAlpha());
+		return this;
+	}
+
+	@Override
+	public TraCIWriter writeCompoundObject(CompoundObject compoundObject) {
+		writeUnsignedByte(TraCIDataType.COMPOUND_OBJECT.id);
+		writeInt(compoundObject.size());
+		Iterator<Pair<TraCIDataType, Object>> iter = compoundObject.itemIterator();
+		while (iter.hasNext()) {
+			Pair<TraCIDataType, Object> p = iter.next();
+			if (p.getLeft().equals(TraCIDataType.COMPOUND_OBJECT))
+				throw new TraCIException("Recursive CompoundObject are not allowed.");
+			writeObjectWithId(p.getLeft(), p.getRight());
+		}
 		return this;
 	}
 

@@ -19,6 +19,7 @@ public enum SimulationVar {
 	//
 	NETWORK_BOUNDING_BOX_2D(0x7c, TraCIDataType.POLYGON),
 	CACHE_HASH(0x7d, TraCIDataType.STRING),
+	SIM_CONFIG(0x7e, TraCIDataType.COMPOUND_OBJECT),
 	;
 
 	public int id;

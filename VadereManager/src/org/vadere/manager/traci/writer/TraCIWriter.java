@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.writer;
 
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -34,7 +35,7 @@ public interface TraCIWriter {
 
 	TraCIWriter writeStringListWithId(List<String> val);
 
-	TraCIWriter write2DPositionListWithId(Map<String, VPoint> data); // new
+	TraCIWriter write2DPositionListWithId(Map<String, VPoint> data);
 
 	TraCIWriter writeByte(int val);
 
@@ -78,7 +79,7 @@ public interface TraCIWriter {
 
 	TraCIWriter write2DPosition(VPoint val);
 
-	TraCIWriter write2DPositionList(Map<String, VPoint> data); // new
+	TraCIWriter write2DPositionList(Map<String, VPoint> data);
 
 	TraCIWriter write3DPosition(Vector3D val);
 
@@ -95,6 +96,8 @@ public interface TraCIWriter {
 	TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases);
 
 	TraCIWriter writeColor(Color color);
+
+	TraCIWriter writeCompoundObject(CompoundObject compoundObject);
 
 	TraCIWriter writeNull();
 

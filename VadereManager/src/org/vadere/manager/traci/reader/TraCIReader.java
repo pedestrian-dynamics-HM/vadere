@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.reader;
 
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -65,6 +66,8 @@ public interface TraCIReader {
 	Object readTypeValue(TraCIDataType type);
 
 	Color readColor();
+
+	CompoundObject readCompoundObject();
 
 	boolean hasRemaining();
 
