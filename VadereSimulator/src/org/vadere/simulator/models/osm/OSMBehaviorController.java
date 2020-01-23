@@ -123,6 +123,9 @@ public class OSMBehaviorController {
     public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
         Stimulus perceivedThreat = pedestrian.getPerceivedThreat();
 
+        // FIXME: This test (if we have already seen a bang) is wrong!
+        //   Assume, the pedestrian leaves the bang radius and re-enters it.
+        //   Therefore, introduce a flag or another more robust test.
         if (perceivedThreat instanceof Threat && pedestrian.getCombinedPotentialStrategy() instanceof TargetAttractionStrategy) {
             Threat threat = (Threat) perceivedThreat;
             Target threatOrigin = topography.getTarget(threat.getOriginAsTargetId());

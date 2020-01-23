@@ -31,20 +31,15 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	}
 
 	protected void update(@NotNull final Collection<Pedestrian> pedestrianOSMS, final double currentTimeInSec, final double timeStepInSec) {
-		// TODO: Clarify with Bene if we can call "clearStrides()" here directly like in "UpdateSchemeEventDriven"
-		//   and omit in in invoked "update()".
 		for (Pedestrian pedestrian : pedestrianOSMS) {
 			if(!skipUdate.contains(pedestrian)) {
 				update((PedestrianOSM) pedestrian, currentTimeInSec, timeStepInSec);
 			}
-			//pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
 		}
 		skipUdate.clear();
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec, final double timeStepInSec) {
-		Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
-
 		// for the first step after creation, timeOfNextStep has to be initialized
 		if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
@@ -53,25 +48,23 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		SelfCategory selfCategory = pedestrian.getSelfCategory();
 
 		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
-			pedestrian.clearStrides();
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.COOPERATIVE) {
-			pedestrian.clearStrides();
 			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
 
 			if(candidate != null) {
 				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-				// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
+				// We update "this" pedestrian and "candidate" here. Therefore, candidate is already treated and will be skipped.
 				skipUdate.add(candidate);
 			} else {
 				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 			}
 		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
 			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
