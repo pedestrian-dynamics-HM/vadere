@@ -2,6 +2,7 @@ package org.vadere.manager;
 
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
+import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
@@ -13,6 +14,7 @@ import org.vadere.util.logging.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,17 +37,19 @@ public class RemoteManager implements RunnableFinishedListener {
 	private Thread currentSimulationThread;
 	private boolean simulationFinished;
 	private boolean clientCloseCommandReceived;
-	private Path baseDir;
+	private Path defaultOutputdir;    // defined by command line parameter. May be overwritten by simCfg
 	private boolean guiSupport;
+	private SimulationCfg simCfg;    // received from traci client.
 
 	private List<Subscription> subscriptions;
 
 
-	public RemoteManager(Path baseDir, boolean guiSupport) {
-		this.baseDir = baseDir;
+	public RemoteManager(Path defaultOutputdir, boolean guiSupport) {
+		this.defaultOutputdir = defaultOutputdir;
 		this.guiSupport = guiSupport;
 		this.subscriptions = new ArrayList<>();
 		this.clientCloseCommandReceived = false;
+		this.simCfg = null;
 	}
 
 	public void loadScenario(String scenarioString, Map<String, ByteArrayInputStream> cacheData) {
@@ -54,23 +58,35 @@ public class RemoteManager implements RunnableFinishedListener {
 		ScenarioCache scenarioCache;
 		Path scenarioPath;
 		Path outputDir;
+		if (simCfg != null) {
+			outputDir = Paths.get(simCfg.outputPath());
+			logger.infof("received output directory from traci client '%s'", simCfg.outputPath());
+		} else {
+			outputDir = defaultOutputdir;
+		}
+
 		try {
 			scenario = ScenarioFactory.createScenarioWithScenarioJson(scenarioString);
-			scenarioPath = baseDir.resolve(IOUtils.SCENARIO_DIR).resolve(scenario.getName() + IOUtils.SCENARIO_FILE_EXTENSION);
+			scenarioPath = defaultOutputdir.resolve(IOUtils.SCENARIO_DIR).resolve(scenario.getName()
+					+ IOUtils.SCENARIO_FILE_EXTENSION);
 			scenarioCache = buildScenarioCache(scenario, cacheData);
 		} catch (IOException e) {
 			throw new TraCIException("Cannot create Scenario from given file.");
 		}
-		currentSimulationRun = new RemoteScenarioRun(scenario, baseDir, this, scenarioPath, scenarioCache);
+		if (simCfg != null) {
+			scenario.getAttributesSimulation().setFixedSeed(simCfg.getSeed());
+			scenario.getAttributesSimulation().setUseFixedSeed(true);
+			logger.infof("received seed from traci client '%s'", Long.toString(simCfg.getSeed()));
+		}
+		currentSimulationRun = new RemoteScenarioRun(scenario, outputDir, this, scenarioPath, scenarioCache);
 	}
 
 	public void loadScenario(String scenarioString) {
-
 		loadScenario(scenarioString, null);
 	}
 
 	private ScenarioCache buildScenarioCache(final Scenario scenario, Map<String, ByteArrayInputStream> cacheData) {
-		ScenarioCache scenarioCache = ScenarioCache.load(scenario, baseDir);
+		ScenarioCache scenarioCache = ScenarioCache.load(scenario, defaultOutputdir);
 		if (scenarioCache.isEmpty()) {
 			if (cacheData != null) {
 				logger.warnf("received cache data but given Scenario has cache deactivated. Received cache will be ignored");
@@ -164,5 +180,13 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		logger.infof("Start Scenario %s with remote control...", currentSimulationRun.getScenario().getName());
 		currentSimulationThread.start();
+	}
+
+	public SimulationCfg getSimCfg() {
+		return simCfg;
+	}
+
+	public void setSimCfg(SimulationCfg simCfg) {
+		this.simCfg = simCfg;
 	}
 }

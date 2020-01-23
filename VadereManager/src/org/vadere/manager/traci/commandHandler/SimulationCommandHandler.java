@@ -3,6 +3,7 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.TraCICommandCreationException;
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
@@ -12,11 +13,14 @@ import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
+import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -39,6 +43,7 @@ import java.util.ArrayList;
 )
 public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
+	private static Logger logger = Logger.getLogger(SimulationCommandHandler.class);
 	public static SimulationCommandHandler instance;
 
 	static {
@@ -92,7 +97,8 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CURR_SIM_TIME, name = "getTime", ignoreElementId = true)
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CURR_SIM_TIME,
+			name = "getTime", ignoreElementId = true)
 	public TraCICommand process_getSimTime(TraCIGetCommand cmd, RemoteManager remoteManager, SimulationVar traCIVar) {
 
 		remoteManager.accessState((manager, state) -> {
@@ -104,7 +110,23 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CACHE_HASH, name = "getHash", dataTypeStr = "String", ignoreElementId = true)
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.SIM_CONFIG,
+			name = "setSimConfig", ignoreElementId = true)
+	public TraCICommand process_setSimConfig(TraCISetCommand cmd, RemoteManager remoteManager) {
+		try {
+			SimulationCfg cfg = new SimulationCfg((CompoundObject) cmd.getVariableValue());
+			remoteManager.setSimCfg(cfg);
+			cmd.setOK();
+
+		} catch (TraCIException ex) {
+			logger.errorf("cannot parse setSimConfig object. Err: %s", ex.getMessage());
+			cmd.setErr(String.format("cannot parse setSimConfig object. Err: %s", ex.getMessage()));
+		}
+		return cmd;
+	}
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CACHE_HASH,
+			name = "getHash", dataTypeStr = "String", ignoreElementId = true)
 	public TraCICommand process_getCacheHash(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
 
 		try {
@@ -185,7 +207,8 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		TraCISetCommand cmd = (TraCISetCommand) rawCmd;
 		SimulationVar var = SimulationVar.fromId(cmd.getVariableId());
 		switch (var) {
-			case CACHE_HASH:
+			case SIM_CONFIG:
+				return process_setSimConfig(cmd, remoteManager);
 			default:
 				return process_NotImplemented(cmd, remoteManager);
 		}

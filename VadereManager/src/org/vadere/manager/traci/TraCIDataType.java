@@ -13,6 +13,7 @@ public enum TraCIDataType {
 	DOUBLE(0x0B, 8, true),
 	STRING(0x0C, -1, true),
 	STRING_LIST(0x0E, -1, true),
+	COMPOUND_OBJECT(0x0F, -1, true),
 	POS_2D(0x01, 17, false),
 	POS_2D_LIST(0x10, -1, true),
 	POS_3D(0x03, 25, false),
