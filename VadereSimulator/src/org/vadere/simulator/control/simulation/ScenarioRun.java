@@ -1,6 +1,13 @@
 package org.vadere.simulator.control.simulation;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+
 import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.simulator.context.Context;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
@@ -17,6 +24,7 @@ import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
@@ -30,6 +38,8 @@ import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -40,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -141,11 +152,12 @@ public class ScenarioRun implements Runnable {
 				scenarioStore.getTopography().reset();
 				initializeVadereContext();
 
-				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore);
+				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, loadBackgroundMesh().orElse(null));
 				modelBuilder.createModelAndRandom();
 
 				final MainModel mainModel = modelBuilder.getModel();
 				final Random random = modelBuilder.getRandom();
+				final Domain domain = modelBuilder.getDomain();
 				//todo[random]: place the Random object in the context for now. This should be replaced by the meta seed.
 				VadereContext.get(scenarioStore.getTopography()).put("random", random);
 
@@ -171,7 +183,7 @@ public class ScenarioRun implements Runnable {
 				// Run simulation main loop from start time = 0 seconds
 				simulation = new Simulation(mainModel, perceptionModel,
 						cognitionModel, 0.0,
-						scenarioStore.getName(), scenarioStore,
+						scenarioStore.getName(), scenarioStore, domain,
 						passiveCallbacks, random,
 						processorManager, simulationResult,
 						remoteRunListeners, singleStepMode,
@@ -189,6 +201,22 @@ public class ScenarioRun implements Runnable {
 			doAfterSimulation();
 			VadereContext.remove(scenarioStore.getTopography().getContextId());
 		}
+	}
+
+	private Optional<PMesh> loadBackgroundMesh() {
+		// TODO: Refactor this code and place it somewhere else.
+		PMesh mesh = null;
+		try {
+			var meshReader = new MeshPolyReader<>(() -> new PMesh());
+			Path path = scenarioFilePath.getParent().resolve(IOUtils.MESH_DIR + "/" + scenario.getName()+".poly");
+			mesh = (PMesh) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return Optional.ofNullable(mesh);
 	}
 
 	public void simulationFailed(Throwable e) {

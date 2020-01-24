@@ -29,7 +29,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -74,16 +74,16 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 
 		logger.debug("initialize OSM");
 		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
-		this.topography = topography;
+		this.topography = domain.getTopography();
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
-		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
+		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, domain,
 				attributesPedestrian, random);
 		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
@@ -91,15 +91,15 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();

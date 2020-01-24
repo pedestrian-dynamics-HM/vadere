@@ -3,13 +3,13 @@ package org.vadere.simulator.models.groups.cgm;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -131,8 +131,8 @@ public class CentroidGroupPotential implements PotentialFieldAgent {
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		// TODO [priority=medium] [task=refactoring] should be used to initialize the Model
 	}
 

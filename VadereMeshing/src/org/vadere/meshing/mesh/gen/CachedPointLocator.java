@@ -32,13 +32,13 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	@Override
 	public F locatePoint(@NotNull final IPoint point, @NotNull final Object caller) {
 		F face;
-		if(cache.containsKey(caller)) {
+		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
 			face = triConnectivity.locateMarch(point.getX(), point.getY(), cache.get(caller)).orElse(null);
 		} else {
 			face = pointLocator.locatePoint(point);
 		}
 
-		if(face != null) {
+		if(face != null && !triConnectivity.getMesh().isBoundary(face)) {
 			cache.put(caller, face);
 		}
 
@@ -53,13 +53,13 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	@Override
 	public Optional<F> locate(@NotNull final IPoint point, final @NotNull Object caller) {
 		Optional<F> optFace;
-		if(cache.containsKey(caller)) {
+		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
 			optFace = triConnectivity.locateMarch(point.getX(), point.getY(), cache.get(caller));
 		} else {
 			optFace = pointLocator.locate(point);
 		}
 
-		if(optFace.isPresent()) {
+		if(optFace.isPresent() && !triConnectivity.getMesh().isBoundary(optFace.get())) {
 			cache.put(caller, optFace.get());
 		}
 
@@ -74,13 +74,13 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	@Override
 	public Optional<F> locate(double x, double y, Object caller) {
 		Optional<F> optFace;
-		if(cache.containsKey(caller)) {
+		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
 			optFace = triConnectivity.locateMarch(x, y, cache.get(caller));
 		} else {
 			optFace = pointLocator.locate(x, y);
 		}
 
-		if(optFace.isPresent()) {
+		if(optFace.isPresent() && !triConnectivity.getMesh().isBoundary(optFace.get())) {
 			cache.put(caller, optFace.get());
 		}
 

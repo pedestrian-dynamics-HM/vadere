@@ -1345,6 +1345,25 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	/**
+	 * Returns the midpoint {@link VPoint} of a triangle defined by the face.
+	 * Assumption: The face represents a triangle, i.e. it has exactly 3 distinct points. This
+	 * requires O(1) time.
+	 *
+	 * @param face the face.
+	 * @return the midpoint {@link VPoint} of a triangle defined by the face.
+	 */
+	default VPoint getTriangleMidPoint(@NotNull final F face) {
+		assert getVertices(face).size() == 3 : "number of vertices of " + face + " is " + getVertices(face).size();
+		E e1 = getEdge(face);
+		E e2 = getNext(e1);
+		E e3 = getNext(e2);
+		V v1 = getVertex(e1);
+		V v2 = getVertex(e2);
+		V v3 = getVertex(e3);
+		return GeometryUtils.getTriangleMidpoint(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
+	}
+
+	/**
 	 * Returns a triple {@link Triple} which represents a triangle by transforming the face to a triangle.
 	 * Assumption: The face represents a triangle, i.e. it has exactly 3 distinct points. This requires O(1) time.
 	 *

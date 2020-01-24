@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.scenario.Et423Geometry;
@@ -47,7 +48,7 @@ public class TestTopographyAndModelBuilder {
 	public SeatingModel getSeatingModel() {
 		final SeatingModel model = new SeatingModel();
 		final List<Attributes> attributes = Collections.singletonList(new AttributesSeating());
-		model.initialize(attributes, topography, null, new Random());
+		model.initialize(attributes, new Domain(topography), null, new Random());
 		return model;
 	}
 

@@ -1,9 +1,13 @@
 package org.vadere.simulator.models.potential.fields;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.solver.EikonalSolverProvider;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -41,7 +45,7 @@ public interface IPotentialField {
      * Factory method to construct an EikonalSolver for agents of target defined by targetShapes and targetId.
      * This method will also generate the underlying mesh/grid which discretise the spacial domain.
      *
-     * @param topography            the topography
+     * @param domain                the spatial domain
      * @param targetId              the
      * @param targetShapes          the area where T = 0
      * @param attributesPedestrian  pedestrian configuration
@@ -49,7 +53,7 @@ public interface IPotentialField {
 	 * @return an EikonalSolver for a specific target
      */
     static EikonalSolver create(
-            final Topography topography,
+            final Domain domain,
             final int targetId,
             final List<VShape> targetShapes,
             final AttributesAgent attributesPedestrian,
@@ -57,10 +61,21 @@ public interface IPotentialField {
 		logger.debug("create EikonalSolver");
 
 		// retrieve EikonalSolverProvider from context object.
-		EikonalSolverProvider provider = VadereContext.get(topography).getEikonalSolverProvider();
+		EikonalSolverProvider provider = VadereContext.get(domain.getTopography()).getEikonalSolverProvider();
 
-        return provider.provide(topography, targetId, targetShapes, attributesPedestrian, attributesPotential);
+        return provider.provide(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
     }
+
+	static EikonalSolver create(final Domain domain,
+	                            final Topography topography,
+	                            final int targetId,
+	                            final List<VShape> targetShapes,
+	                            final AttributesAgent attributesPedestrian,
+	                            final AttributesFloorField attributesPotential)
+	{
+		EikonalSolverProvider provider = VadereContext.get(topography).getEikonalSolverProvider();
+		return provider.provide(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
+	}
 
 
 	static IPotentialField copyAgentField(

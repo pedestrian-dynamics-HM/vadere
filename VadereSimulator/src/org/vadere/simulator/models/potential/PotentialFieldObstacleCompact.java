@@ -3,13 +3,13 @@ package org.vadere.simulator.models.potential;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -27,22 +27,22 @@ public class PotentialFieldObstacleCompact implements PotentialFieldObstacle {
 	private double width;
 	private double height;
 	private Collection<Obstacle> obstacles;
-	private Topography topography;
+	private Domain domain;
 
 	public PotentialFieldObstacleCompact() {
 
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
-		init(Model.findAttributes(attributesList, AttributesPotentialCompact.class), topography, random);
+	public void initialize(List<Attributes> attributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		init(Model.findAttributes(attributesList, AttributesPotentialCompact.class), domain, random);
 	}
 
-	private void init(final AttributesPotentialCompact attributes, final Topography topography, final Random random) {
+	private void init(final AttributesPotentialCompact attributes, final Domain domain, final Random random) {
 		this.attributes = attributes;
-		this.topography = topography;
-		this.obstacles = new ArrayList<>(topography.getObstacles());
+		this.domain = domain;
+		this.obstacles = new ArrayList<>(domain.getTopography().getObstacles());
 		this.random = random;
 		this.width = attributes.getObstPotentialWidth() +
 				attributes.getObstDistanceDeviation() * (random.nextDouble() * 2 - 1);
@@ -56,7 +56,7 @@ public class PotentialFieldObstacleCompact implements PotentialFieldObstacle {
 		//for (Obstacle obstacle : obstacles) {
 
 			//double distance = obstacle.getShape().distance(pos);
-			double distance = topography.distanceToObstacle(pos);
+			double distance = domain.getTopography().distanceToObstacle(pos);
 
 			if (attributes.isUseHardBodyShell()) {
 				distance = distance - pedestrian.getRadius();
@@ -132,7 +132,7 @@ public class PotentialFieldObstacleCompact implements PotentialFieldObstacle {
 	@Override
 	public PotentialFieldObstacle copy() {
 		PotentialFieldObstacleCompact potentialFieldObstacleCompact = new PotentialFieldObstacleCompact();
-		potentialFieldObstacleCompact.init(attributes, topography, random);
+		potentialFieldObstacleCompact.init(attributes, domain, random);
 		return potentialFieldObstacleCompact;
 	}
 

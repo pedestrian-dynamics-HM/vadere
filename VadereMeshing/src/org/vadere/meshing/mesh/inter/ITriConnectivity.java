@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.util.data.Node;
 import org.vadere.util.data.NodeLinkedList;
 import org.vadere.util.geometry.GeometryUtils;
@@ -1957,7 +1958,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
         // initialize
         F face = startFace;
         // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getPolygonCentroid();
-        VPoint q = getMesh().toTriangle(startFace).midPoint(); // walk from q to p
+        VPoint q = getMesh().getTriangleMidPoint(startFace); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
         /*LinkedList<E> walkResult = straightGatherWalk2D(q, p, face, stopCondition);
@@ -1968,7 +1969,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		        return faces.contains(f);
 	        };
 
-	        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 1500, 1500);
+	        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 800, 800);
 	        meshPanel.display("Random walk");
         };
 
@@ -1976,7 +1977,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
         int count = 0;
 
-	    while (count < 100) {
+	    while (count < 10) {
 		    count++;
 	    	try {
 			    Thread.sleep(1000);
@@ -2322,6 +2323,44 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		throw new IllegalArgumentException("no intersection point found " + q + " -> " + p);
 	}
 
+	//Ray casting
+
+	default E rayCastingPolygon(@NotNull final E inEdge,
+	                            @NotNull final VPoint q,
+	                            @NotNull final VPoint p,
+	                            @NotNull final Predicate<E> stopCondition,
+	                            @NotNull final LinkedList<E> visitedEdges) {
+
+		E outEdge = null;
+		E outIfInside = null;
+		F face = getMesh().getFace(inEdge);
+
+		// TODO: this seems to be expensive
+		int count = 0;
+		double distance = Double.MAX_VALUE;
+		for(E e : getMesh().getEdgeIt(inEdge)) {
+			if(intersectsDirectional(p, q, e)) {
+				count++;
+				//if((!stopCondition.test(e) && !getMesh().isBorder(face)) || (stopCondition.test(e) && getMesh().isBorder(face))) {
+				V v1 = getMesh().getVertex(e);
+				V v2 = getMesh().getTwinVertex(e);
+				VPoint iPoint = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+				double dist = p.distance(iPoint);
+				if(dist < distance) {
+					outEdge = e;
+					distance = dist;
+				}
+				//} else {
+				//	outIfInside = e;
+				//}
+			}
+		}
+
+		boolean isInside = count % 2 == 1;
+
+		return (isInside && !getMesh().isBorder(face) || !isInside && getMesh().isBorder(face)) ? null : outEdge;
+	}
+
 	/**
 	 * Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
 	 * from q to p. This is done be walking from an in-edge through the face to the out-edge. Both the in-edge and
@@ -2359,12 +2398,24 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		F face = getMesh().getFace(inEdge);
 
 		/**
-		 * Get the half-edges e which intersects (q, p).
+		 * Special case: the face is a hole or the border!
 		 */
-		for(E e : getMesh().getEdgeIt(getMesh().getNext(inEdge))) {
-			if(!e.equals(inEdge) && intersects(q, p, e)) {
-				outEdge = e;
-				break;
+		if(getMesh().isBoundary(face)) {
+			outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			if(outEdge == null) {
+				return Optional.empty();
+			} else {
+				return Optional.of(getMesh().getTwin(outEdge));
+			}
+		} else {
+			/**
+			 * Get the half-edges e which intersects (q, p).
+			 */
+			for(E e : getMesh().getEdgeIt(getMesh().getNext(inEdge))) {
+				if(!e.equals(inEdge) && intersects(q, p, e)) {
+					outEdge = e;
+					break;
+				}
 			}
 		}
 
@@ -2373,6 +2424,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 */
 		if(outEdge != null) {
 			//log.debug("straight walk: general case");
+			boolean stop = stopCondition.test(outEdge);
 			if(!stopCondition.test(outEdge)) {
 				return Optional.of(getMesh().getTwin(outEdge));
 			}
@@ -2553,6 +2605,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 */
 		else {
 			p = pDirection;
+			// if this is true we are already done
 			if(contains(pDirection.getX(), pDirection.getY(), startFace)) {
 				visitedEdges.add(getMesh().getEdge(startFace));
 				return visitedEdges;
@@ -2587,6 +2640,36 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 * (2) find all other in-edges.
 		 */
 		do {
+
+			/*if(visitedEdges.size() > 400) {
+				System.out.println("startFace: " + startFace);
+				System.out.println(pDirection);
+				System.out.println(getMesh().toTriangle(startFace).midPoint());
+
+			    List<F> faces = visitedEdges.stream().map(e -> getMesh().getFace(e)).collect(Collectors.toList());
+
+				Runnable run = () -> {
+			        Predicate<F> alertPredicate = f ->{
+				        return faces.contains(f);
+			        };
+
+			        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 1500, 1500);
+			        meshPanel.display("Random walk");
+		        };
+
+		        new Thread(run).start();
+
+		        int count = 0;
+
+			    while (count < 10000) {
+				    count++;
+			        try {
+					    Thread.sleep(1000);
+				    } catch (InterruptedException e) {
+					    e.printStackTrace();
+				    }
+			    }
+			}*/
 
         	/*if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
 		        DebugGui.showAndWait(WalkCanvas.getDefault(
@@ -2628,7 +2711,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 					//log.debug("walked towards the border!");
 					// return the border
 					// log.debug(getMesh().toPath(face));
-					break;
+					//break;
 				}
 				else if(getMesh().isHole(inEdge)) {
 					//log.debug("walked towards a hole!");
@@ -2644,7 +2727,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 		}*/
 
-
+		//log.debug("visited faces for location: " + visitedEdges.size());
 		return visitedEdges;
     }
 

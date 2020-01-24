@@ -85,8 +85,7 @@ public class VTriangle extends VPolygon {
     }
 
     public VPoint midPoint() {
-        return new VPoint((p1.getX() + p2.getX() + p3.getX()) / 3.0,
-                (p1.getY() + p2.getY() + p3.getY()) / 3.0);
+    	return GeometryUtils.getTriangleMidpoint(p1.getX(), p2.getX(), p3.getX(), p1.getY(), p2.getY(), p3.getY());
     }
 
     public boolean isLine() {

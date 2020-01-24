@@ -8,6 +8,7 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -15,8 +16,6 @@ import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
@@ -63,22 +62,22 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
-
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		this.domain = domain;
 		this.attributesOVM = Model.findAttributes(modelAttributesList, AttributesOVM.class);
-		this.elementAttributes = topography.getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);
+		this.elementAttributes = domain.getTopography().getAttributesCar();// Model.findAttributes(modelAttributesList, AttributesCar.class);
 
 		this.ovmEquations = new OVMEquations();
 
 		super.initializeODEModel(Car.class,
 				IntegratorFactory.createFirstOrderIntegrator(
 						attributesOVM.getAttributesODEIntegrator()),
-				ovmEquations, elementAttributes, topography, random);
+				ovmEquations, elementAttributes, domain, random);
 
 		ovmEquations.setPedestrianInteraction(false);
 		ovmEquations.setModelAttributes(attributesOVM);
-		ovmEquations.setGradients(null, null, null, topography);
+		ovmEquations.setGradients(null, null, null, domain.getTopography());
 
 		models = Collections.singletonList(this);
 	}
@@ -93,7 +92,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	public <T extends DynamicElement> Agent createElement(VPoint position, int id, Class<T> type) {
 		if (!Car.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OVM cannot initialize " + type.getCanonicalName());
-		AttributesCar carAttributes = new AttributesCar(elementAttributes, registerDynamicElementId(topography, id));
+		AttributesCar carAttributes = new AttributesCar(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
 		Car result = new Car(carAttributes, random);
 		result.setPosition(position);
 		// result.setVelocity(result.getCarAttrributes().getDirection());
@@ -122,7 +121,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	@Override
 	public void update(final double simTimeInSec) {
 		// Get all cars in the topography
-		Collection<Car> cars = topography.getElements(Car.class);
+		Collection<Car> cars = domain.getTopography().getElements(Car.class);
 		// Give cars to the OVMEquations-Object
 		ovmEquations.setElements(cars);
 		super.update(simTimeInSec);

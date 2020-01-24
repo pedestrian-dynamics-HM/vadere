@@ -242,6 +242,11 @@ public class GeometryUtils {
 		return circumcenter.distance(q) < circumcenter.distance(p1);
 	}
 
+	public static VPoint getTriangleMidpoint(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
+		return new VPoint((x1 + x2 + x3) / 3.0,
+				(y1 + y2 + y3) / 3.0);
+	}
+
 	public static List<VPoint> getDiscDiscretizationPoints(
 			@NotNull final VCircle circle,
 			final int numberOfCircles,

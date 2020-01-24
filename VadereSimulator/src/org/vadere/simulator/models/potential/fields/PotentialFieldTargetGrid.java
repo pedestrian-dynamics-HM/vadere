@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.fields;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -20,10 +21,10 @@ import java.util.Map;
  */
 public class PotentialFieldTargetGrid extends PotentialFieldTarget implements IPotentialFieldTargetGrid {
 
-    public PotentialFieldTargetGrid(@NotNull final Topography topography,
+    public PotentialFieldTargetGrid(@NotNull final Domain domain,
                                     @NotNull final AttributesAgent attributesPedestrian,
                                     @NotNull final AttributesFloorField attributesPotential) {
-        super(topography, attributesPedestrian, attributesPotential);
+        super(domain, attributesPedestrian, attributesPotential);
     }
 
     @Override

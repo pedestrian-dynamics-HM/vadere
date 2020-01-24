@@ -13,6 +13,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -88,6 +89,7 @@ public class Simulation {
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
 					  ICognitionModel cognitionModel, double startTimeInSec,
 					  final String name, ScenarioStore scenarioStore,
+					  final Domain domain,
 					  List<PassiveCallback> passiveCallbacks, Random random,
 					  ProcessorManager processorManager, SimulationResult simulationResult,
 					  List<RemoteRunListener> remoteRunListeners, boolean singleStepMode,
@@ -125,7 +127,7 @@ public class Simulation {
 		// "stimulusController" is final. Therefore, create object here and not in helper method.
 		this.stimulusController = new StimulusController(scenarioStore);
 
-		createControllers(topography, mainModel, random);
+		createControllers(domain, mainModel, random);
 
 		// this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
@@ -137,8 +139,8 @@ public class Simulation {
 		}
 	}
 
-	private void createControllers(Topography topography, MainModel mainModel, Random random) {
-		this.topographyController = new TopographyController(topography, mainModel, random);
+	private void createControllers(Domain domain, MainModel mainModel, Random random) {
+		this.topographyController = new TopographyController(domain, mainModel, random);
 
 		for (Source source : topography.getSources()) {
 			SourceController sc = this.sourceControllerFactory

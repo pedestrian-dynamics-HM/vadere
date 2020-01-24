@@ -9,12 +9,14 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunctionCached;
 import org.vadere.util.math.InterpolationUtil;
 import java.util.function.Function;
 
-public class DistanceFunctionApproxBF implements IDistanceFunction {
+public class DistanceFunctionApproxBF implements IDistanceFunctionCached {
 	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 
 	private static final String propName = "distObs";
@@ -52,23 +54,8 @@ public class DistanceFunctionApproxBF implements IDistanceFunction {
 
 	@Override
 	public Double apply(@NotNull final IPoint p) {
-		var face = triangulation.locate(p.getX(), p.getY()).get();
-		var mesh = triangulation.getMesh();
-
-		if(mesh.isBoundary(face)) {
-			return Double.POSITIVE_INFINITY;
-		}
-		else {
-			double x[] = new double[3];
-			double y[] = new double[3];
-			double z[] = new double[3];
-
-			triangulation.getTriPoints(face, x, y, z, propName);
-
-			double totalArea = GeometryUtils.areaOfPolygon(x, y);
-
-			return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
-		}
+		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY())).get();
+		return apply(p, face);
 	}
 
 	public void printPython() {
@@ -85,5 +72,30 @@ public class DistanceFunctionApproxBF implements IDistanceFunction {
 			System.out.print(dataPoint.getData()+",");
 		}
 		System.out.println("]");*/
+	}
+
+	@Override
+	public double apply(@NotNull IPoint p, Object caller) {
+		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY()), caller).get();
+		return apply(p, face);
+	}
+
+	private double apply(@NotNull final IPoint p, @NotNull final PFace face) {
+		var mesh = triangulation.getMesh();
+
+		if(mesh.isBoundary(face)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		else {
+			double x[] = new double[3];
+			double y[] = new double[3];
+			double z[] = new double[3];
+
+			triangulation.getTriPoints(face, x, y, z, propName);
+
+			double totalArea = GeometryUtils.areaOfPolygon(x, y);
+
+			return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
+		}
 	}
 }

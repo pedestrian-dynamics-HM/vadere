@@ -9,6 +9,7 @@ import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -16,7 +17,6 @@ import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusExce
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -43,12 +43,12 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 
 	@Deprecated
-	public SocialForceModel(Topography scenario, AttributesSFM attributes,
+	public SocialForceModel(Domain domain, AttributesSFM attributes,
 			PotentialFieldObstacle potentialFieldObstacle,
 			PotentialFieldAgent potentialFieldPedestrian,
 			IPotentialFieldTargetGrid potentialFieldTarget,
 			AttributesAgent attributesPedestrian, Random random) {
-		super(Pedestrian.class, scenario, IntegratorFactory.createFirstOrderIntegrator(attributes
+		super(Pedestrian.class, domain, IntegratorFactory.createFirstOrderIntegrator(attributes
 				.getAttributesODEIntegrator()), new SFMEquations(),
 				attributesPedestrian, random);
 		this.attributes = attributes;
@@ -56,7 +56,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		this.floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
 						attributes.getFloorGradientProviderType(),
-						scenario, targets, potentialFieldTarget);
+						domain, targets, potentialFieldTarget);
 
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
@@ -68,32 +68,32 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 
 		this.attributes = Model.findAttributes(modelAttributesList, AttributesSFM.class);
 
 		super.initializeODEModel(Pedestrian.class,
 				IntegratorFactory.createFirstOrderIntegrator(
 						attributes.getAttributesODEIntegrator()),
-				new SFMEquations(), attributesPedestrian, topography, random);
+				new SFMEquations(), attributesPedestrian, domain, random);
 
 		this.floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
 						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
-						topography, targets, null);
+						domain, targets, null);
 
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributes.getObstaclePotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributes.getObstaclePotentialModel());
 
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributes.getPedestrianPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributes.getPedestrianPotentialModel());
 
 		models.add(this);
 	}
@@ -102,9 +102,9 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 		// build list of current targets
 		Map<Integer, Target> targets = new HashMap<>();
-		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
+		for (Pedestrian pedestrian : domain.getTopography().getElements(Pedestrian.class)) {
 			if (pedestrian.hasNextTarget()) {
-				Target t = topography.getTarget(pedestrian.getNextTargetId());
+				Target t = domain.getTopography().getTarget(pedestrian.getNextTargetId());
 				if (t != null) {
 					targets.put(t.getId(), t);
 				}
@@ -123,7 +123,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 		floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
-						attributes.getFloorGradientProviderType(), topography,
+						attributes.getFloorGradientProviderType(), domain,
 						targets, this.potentialFieldTarget);
 	}
 
@@ -137,7 +137,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 		rebuildFloorField(simTimeInSec);
 
-		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		Collection<Pedestrian> pedestrians = domain.getTopography().getElements(Pedestrian.class);
 
 		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
 
@@ -145,7 +145,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		equations.setElements(pedestrians);
 
 		equations.setGradients(floorGradient, potentialFieldObstacle,
-				potentialFieldPedestrian, topography);
+				potentialFieldPedestrian, domain.getTopography());
 
 		super.update(simTimeInSec);
 	}
@@ -155,7 +155,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("SFM cannot initialize " + type.getCanonicalName());
 
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(topography, id));
+		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

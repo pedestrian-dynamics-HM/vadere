@@ -43,11 +43,12 @@ import java.util.function.Predicate;
 public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> implements EikonalSolver {
 
 	private static Logger logger = Logger.getLogger(EikonalSolverFMMTriangulation.class);
-	private Set<F> nonAccuteTris = new HashSet<>();
 
 	public static final String namePotential = "potential";
 	public static final String namePathFindingTag = "pathFindingTag";
 	public static final String nameNonAccuteFace = "nonAccuteFace";
+
+	private final String identifier;
 
 	static {
 		logger.setInfo();
@@ -98,15 +99,17 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 
 	/**
 	 * Constructor for certain target points.
-	 *
+	 * @param identifier        a unique identifier (required if the underlying mesh saves more than 1 potential)
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param targetPoints      Points where the propagating wave starts i.e. points that are part of the target area.
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 */
-	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	public EikonalSolverFMMTriangulation(@NotNull final String identifier,
+	                                     @NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final Collection<IPoint> targetPoints,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
+		this.identifier = identifier;
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
 		this.timeCostFunction = timeCostFunction;
@@ -130,17 +133,27 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 		}
 	}
 
+	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final Collection<IPoint> targetPoints,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	) {
+		this("", timeCostFunction, targetPoints, triangulation);
+	}
+
 	/**
 	 * Constructor for certain target points.
 	 *
+	 * @param identifier        a unique identifier (required if the underlying mesh saves more than 1 potential)
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 * @param targetVertices    Points where the propagating wave starts i.e. points that are part of the target area.
 	 */
-	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	public EikonalSolverFMMTriangulation(@NotNull final String identifier,
+										 @NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                                     @NotNull final Collection<V> targetVertices
 	) {
+		this.identifier = identifier;
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
 		this.timeCostFunction = timeCostFunction;
@@ -156,17 +169,27 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 		}
 	}
 
+	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                                     @NotNull final Collection<V> targetVertices
+	) {
+		this("", timeCostFunction, triangulation, targetVertices);
+	}
+
 	/**
 	 * Constructor for certain target shapes.
 	 *
+	 * @param identifier        a unique identifier (required if the underlying mesh saves more than 1 potential).
 	 * @param targetShapes      shapes that define the whole target area.
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 */
-	public EikonalSolverFMMTriangulation(@NotNull final Collection<VShape> targetShapes,
+	public EikonalSolverFMMTriangulation(@NotNull final String identifier,
+										 @NotNull final Collection<VShape> targetShapes,
 	                                     @NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
+		this.identifier = identifier;
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
 		this.timeCostFunction = timeCostFunction;
@@ -181,19 +204,29 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 		}
 	}
 
+	public EikonalSolverFMMTriangulation(@NotNull final Collection<VShape> targetShapes,
+	                                     @NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	) {
+		this("", targetShapes, timeCostFunction, triangulation);
+	}
+
 	/**
 	 * Constructor for certain vertices of the triangulation.
 	 *
+	 * @param identifier        a unique identifier (required if the underlying mesh saves more than 1 potential).
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 * @param targetVertices    vertices which are part of the triangulation where the propagating wave starts i.e. points that are part of the target area.
 	 * @param distFunc          the distance function (distance to the target) which is negative inside and positive outside the area of interest
 	 */
-	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	public EikonalSolverFMMTriangulation(@NotNull final String identifier,
+										 @NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                                     @NotNull final Collection<V> targetVertices,
 	                                     @NotNull final IDistanceFunction distFunc
 	) {
+		this.identifier = identifier;
 		this.triangulation = triangulation;
 		this.calculationFinished = false;
 		this.timeCostFunction = timeCostFunction;
@@ -206,6 +239,14 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 				setNoneAccuteFace(face);
 			}
 		}
+	}
+
+	public EikonalSolverFMMTriangulation(@NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                                     @NotNull final Collection<V> targetVertices,
+	                                     @NotNull final IDistanceFunction distFunc
+	) {
+		this("", timeCostFunction, triangulation, targetVertices, distFunc);
 	}
 
 	private void setNoneAccuteFace(@NotNull final F face) {
@@ -351,7 +392,7 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 			V v1 = triangulation.getMesh().getVertex(edge);
 			V v2 = triangulation.getMesh().getVertex(triangulation.getMesh().getNext(edge));
 			V v3 = triangulation.getMesh().getVertex(triangulation.getMesh().getPrev(edge));
-			result = InterpolationUtil.barycentricInterpolation(v1, v2, v3, v -> triangulation.getMesh().getDoubleData(v, namePotential), x, y);
+			result = InterpolationUtil.barycentricInterpolation(v1, v2, v3, v -> getPotential(v), x, y);
 		}
 		return result;
 	}
@@ -636,19 +677,19 @@ public class EikonalSolverFMMTriangulation<V extends IVertex, E extends IHalfEdg
 	}
 
 	private PathFindingTag getPathFindingTag(@NotNull final V vertex) {
-		return triangulation.getMesh().getData(vertex, namePathFindingTag, PathFindingTag.class).get();
+		return triangulation.getMesh().getData(vertex, identifier + "_" + namePathFindingTag, PathFindingTag.class).get();
 	}
 
 	private void setPathFindingTag(@NotNull final V vertex, final PathFindingTag tag) {
-		triangulation.getMesh().setData(vertex, namePathFindingTag, tag);
+		triangulation.getMesh().setData(vertex, identifier + "_" + namePathFindingTag, tag);
 	}
 
 	private double getPotential(@NotNull final V vertex) {
-		return triangulation.getMesh().getDoubleData(vertex, namePotential);
+		return triangulation.getMesh().getDoubleData(vertex, identifier + "_" + namePotential);
 	}
 
 	private void setPotential(@NotNull final V vertex, final double potential) {
-		triangulation.getMesh().setDoubleData(vertex, namePotential, potential);
+		triangulation.getMesh().setDoubleData(vertex, identifier + "_" + namePotential, potential);
 	}
 
 	/**

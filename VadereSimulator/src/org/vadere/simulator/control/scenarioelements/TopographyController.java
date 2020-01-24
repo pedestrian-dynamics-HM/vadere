@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
@@ -10,17 +11,17 @@ import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
 
-	private final Topography topography;
+	private final Domain domain;
 	private final DynamicElementFactory dynamicElementFactory;
 
-	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory, final Random random) {
-		super(topography, random);
-		this.topography = topography;
+	public TopographyController(Domain domain, DynamicElementFactory dynamicElementFactory, final Random random) {
+		super(domain, random);
+		this.domain = domain;
 		this.dynamicElementFactory = dynamicElementFactory;
 	}
 
 	public Topography getTopography() {
-		return this.topography;
+		return this.domain.getTopography();
 	}
 
 	public void preLoop(double simTimeInSec) {
@@ -30,13 +31,13 @@ public class TopographyController extends OfflineTopographyController {
 		// TODO [priority=medium] [task=feature] create initial cars
 
 		// create initial pedestrians
-		for (Pedestrian initialValues : topography
+		for (Pedestrian initialValues : domain.getTopography()
 				.getInitialElements(Pedestrian.class)) {
 			Pedestrian realPed = (Pedestrian) dynamicElementFactory.createElement(initialValues.getPosition(),
 					initialValues.getId(), Pedestrian.class);
 			realPed.setIdAsTarget(initialValues.getIdAsTarget());
 			if (realPed.getIdAsTarget() != -1) {
-				topography.addTarget(new TargetPedestrian(realPed));
+				domain.getTopography().addTarget(new TargetPedestrian(realPed));
 			}
 
 			// set the closest target as default, which can be a problem if no target should be used
@@ -64,9 +65,9 @@ public class TopographyController extends OfflineTopographyController {
 			if (!Double.isNaN(initialValues.getVelocity().x) && !Double.isNaN(initialValues.getVelocity().y)) {
 				realPed.setVelocity(initialValues.getVelocity());
 			}
-			topography.addElement(realPed);
+			domain.getTopography().addElement(realPed);
 		}
-		topography.initializePedestrianCount();
+		domain.getTopography().initializePedestrianCount();
 	}
 
 	public void update(double simTimeInSec) {
@@ -74,6 +75,6 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	public void postLoop(double simTimeInSec) {
-		topography.reset();
+		domain.getTopography().reset();
 	}
 }

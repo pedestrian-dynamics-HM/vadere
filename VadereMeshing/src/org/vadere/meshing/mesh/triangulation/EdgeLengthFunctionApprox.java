@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.InterpolationUtil;
 
@@ -105,7 +106,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	@Override
 	public Double apply(@NotNull final IPoint p) {
-		var face = triangulation.locate(p.getX(), p.getY()).get();
+		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY())).get();
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {

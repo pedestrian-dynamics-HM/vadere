@@ -2,12 +2,12 @@ package org.vadere.simulator.models.potential;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -121,8 +121,8 @@ public class PedestrianRepulsionPotentialCycle implements
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
-		potentialFieldPedestrian.initialize(attributesList, topography, attributesPedestrian, random);
+	public void initialize(List<Attributes> attributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		potentialFieldPedestrian.initialize(attributesList, domain, attributesPedestrian, random);
 	}
 }

@@ -12,6 +12,7 @@ import org.vadere.simulator.models.groups.GroupModel;
 import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.simulator.models.groups.GroupSizeDeterminatorRandom;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -61,7 +62,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		m = new CentroidGroupModel();
 		ArrayList<Attributes> attrs = new ArrayList<>();
 		attrs.add(new AttributesCGM());
-		m.initialize(attrs, d.topography, d.attributesPedestrian, d.random);
+		m.initialize(attrs, new Domain(d.topography), d.attributesPedestrian, d.random);
 
 		return getTestGroupFactory(m, gsd);
 	}
@@ -70,7 +71,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		m = new CentroidGroupModel();
 		ArrayList<Attributes> attrs = new ArrayList<>();
 		attrs.add(new AttributesCGM());
-		m.initialize(attrs, d.topography, d.attributesPedestrian, d.random);
+		m.initialize(attrs, new Domain(d.topography), d.attributesPedestrian, d.random);
 
 		return new GroupSourceControllerFactory(m);
 	}

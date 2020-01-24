@@ -40,7 +40,7 @@ public class EikMeshPoly {
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		meshPoly("/poly/kaiserslautern_1.poly");
+		meshPoly("/poly/Small.poly");
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");

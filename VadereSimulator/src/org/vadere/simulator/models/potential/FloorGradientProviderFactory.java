@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
@@ -32,7 +33,7 @@ public class FloorGradientProviderFactory {
 	 * @return an appropriate floor gradient provider, or null
 	 */
 	public static GradientProvider createFloorGradientProvider(
-			GradientProviderType type, Topography scenario,
+			GradientProviderType type, Domain domain,
 			Map<Integer, Target> targets, IPotentialFieldTargetGrid potentialField) {
 		GradientProvider result = null;
 
@@ -46,7 +47,7 @@ public class FloorGradientProviderFactory {
 			targetShapesWithId.put(target.getId(), target.getShape());
 		}
 		List<VShape> obstacles = new LinkedList<>();
-		for (Obstacle obstacle : scenario.getObstacles()) {
+		for (Obstacle obstacle : domain.getTopography().getObstacles()) {
 			obstacles.add(obstacle.getShape());
 		}
 
@@ -58,7 +59,7 @@ public class FloorGradientProviderFactory {
 			case FLOOR_EIKONAL_DISCRETE:
 				result = new FloorGradientProviderDiscrete(
 						potentialField.getCellGrids(),
-						scenario.getBounds(), targetIds);
+						domain.getTopography().getBounds(), targetIds);
 				break;
 			case FLOOR_EUCLIDEAN_CONTINUOUS:
 				result = new FloorGradientProviderEuclidean(targetShapesWithId);

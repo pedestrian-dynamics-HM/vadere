@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesSeating;
@@ -30,17 +31,17 @@ public class TestSeatingModel {
 		attributes.add(new AttributesSeating());
 		attributesPedestrian = new AttributesAgent();
 		seatingModel = new SeatingModel();
-		seatingModel.initialize(attributes, topography, attributesPedestrian, random);
+		seatingModel.initialize(attributes, new Domain(topography), attributesPedestrian, random);
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void testInitializeWithWrongTopography() {
-		new SeatingModel().initialize(attributes, new Topography(), attributesPedestrian, random);
+		new SeatingModel().initialize(attributes, new Domain(new Topography()), attributesPedestrian, random);
 	}
 
 	@Test(expected=AttributesNotFoundException.class)
 	public void testInitializeWithNoAttributes() {
-		new SeatingModel().initialize(new ArrayList<>(0), topography, attributesPedestrian, random);
+		new SeatingModel().initialize(new ArrayList<>(0), new Domain(topography), attributesPedestrian, random);
 	}
 
 	@Test

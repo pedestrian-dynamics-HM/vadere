@@ -82,22 +82,31 @@ public class TestFMMEikMesh {
 		double w = 10;
 
 		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
-		VPoint targetPoint = new VPoint(10, 10);
+		VPoint targetPoint = new VPoint(40, 40);
 
 		EikonalSolver solver = new EikonalSolverFMMTriangulation(
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
 				triangulation);
-		solver.initialize();
-		solver.initialize();
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
 		solver.initialize();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
+
+
+		ms = System.currentTimeMillis();
+		log.info("start walk");
 		solver.getPotential(10, 10, this);
+		log.info("walk finished");
+		log.info("time: " + (System.currentTimeMillis() - ms));
+
+		ms = System.currentTimeMillis();
+		log.info("start cached walk");
 		solver.getPotential(10, 10, this);
+		log.info("walk finished");
+		log.info("time: " + (System.currentTimeMillis() - ms));
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 

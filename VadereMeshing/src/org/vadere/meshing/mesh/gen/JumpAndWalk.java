@@ -24,7 +24,7 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 
 	public JumpAndWalk(@NotNull final IIncrementalTriangulation<V, E, F> triangulation) {
 		this.triangulation = triangulation;
-		this.random = new Random();
+		this.random = new Random(0);
 	}
 
 	private Optional<F> getStartFace(final IPoint endPoint) {

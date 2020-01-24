@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.queuing.PotentialFieldTargetQueuingGrid;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
@@ -16,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A static (needsUpdate returns always false) or dynamic target potential field which uses a
- * Cartesian grid for discretization.
+ * A static (needsUpdate returns always false) or dynamic target potential field which offers
+ * a {@link CellGrid} sampling.
  *
  * @author Benedikt Zoennchen
  */
@@ -36,13 +37,13 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
      * A factory method to create different target potential fields which use a Cartesian grid.
      *
      * @param modelAttributesList   list of model attributes (models pick their attributes themselves)
-     * @param topography            the topography
+     * @param domain                the spatial domain of the scenario
      * @param attributesPedestrian  the attributes of pedestrians
      * @param className             the name of the class of the field which will be created
 	 * @return target potential fields which use a Cartesian grid
      */
 	static IPotentialFieldTargetGrid createPotentialField(final List<Attributes> modelAttributesList,
-                                                          final Topography topography,
+                                                          final Domain domain,
                                                           final AttributesAgent attributesPedestrian,
 														  String className) {
 
@@ -55,11 +56,11 @@ public interface IPotentialFieldTargetGrid extends IPotentialFieldTarget {
 		if (type == PotentialFieldTargetGrid.class) {
 			AttributesFloorField attributesFloorField =
 					Model.findAttributes(modelAttributesList, AttributesFloorField.class);
-			result = new PotentialFieldTargetGrid(topography, attributesPedestrian, attributesFloorField);
+			result = new PotentialFieldTargetGrid(domain, attributesPedestrian, attributesFloorField);
 		} else if (type == PotentialFieldTargetQueuingGrid.class) {
 			AttributesQueuingGame attributesQueuingGame =
 					Model.findAttributes(modelAttributesList, AttributesQueuingGame.class);
-			result = new PotentialFieldTargetQueuingGrid(topography, attributesPedestrian, attributesQueuingGame);
+			result = new PotentialFieldTargetQueuingGrid(domain, attributesPedestrian, attributesQueuingGame);
 		} else if (type == PotentialFieldTargetRingExperiment.class) {
 			AttributesPotentialRingExperiment attributesPotentialRingExperiment =
 					Model.findAttributes(modelAttributesList, AttributesPotentialRingExperiment.class);

@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.potential.solver;
 
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.utils.cache.ICacheObject;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -22,9 +23,13 @@ public class EikonalSolverCacheProvider extends EikonalSolverProvider {
 	}
 
 	@Override
-	public EikonalSolver provide(Topography topography, int targetId, List<VShape> targetShapes, AttributesAgent attributesPedestrian, AttributesFloorField attributesPotential) {
-		EikonalSolver eikonalSolver = buildBase(topography, targetId, targetShapes, attributesPedestrian, attributesPotential);
+	public EikonalSolver provide(Domain domain, int targetId, List<VShape> targetShapes, AttributesAgent attributesPedestrian, AttributesFloorField attributesPotential) {
+		EikonalSolver eikonalSolver = buildBase(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
+		initSolver(eikonalSolver, targetId, targetShapes, attributesPedestrian, attributesPotential);
+		return eikonalSolver;
+	}
 
+	private void initSolver(EikonalSolver eikonalSolver, int targetId, List<VShape> targetShapes, AttributesAgent attributesPedestrian, AttributesFloorField attributesPotential) {
 		/*
 		   Initialize floor field. If caching is activate try to read cached version. If no
 		   cache is present or the cache loading does not work fall back to standard
@@ -57,7 +62,5 @@ public class EikonalSolverCacheProvider extends EikonalSolverProvider {
 			eikonalSolver.initialize();
 			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 		}
-
-		return eikonalSolver;
 	}
 }

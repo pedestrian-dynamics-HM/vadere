@@ -1,8 +1,13 @@
 
 package org.vadere.simulator.models.potential.solver;
 
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+
+import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
@@ -10,6 +15,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
+import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
@@ -18,7 +24,10 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.simulator.projects.Domain;
+import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.pslg.PSLGConverter;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -37,6 +46,11 @@ import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,20 +59,45 @@ import java.util.stream.Collectors;
 public abstract class EikonalSolverProvider  {
 	private  static Logger logger = Logger.getLogger(IPotentialField.class);
 
+
 	public abstract EikonalSolver provide(
-			final Topography topography,
+			final Domain domain,
 			final int targetId,
 			final List<VShape> targetShapes,
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential);
 
+	protected EikonalSolver buildBase(final Domain domain, @NotNull final List<VShape> targetShapes) {
+		var triangulation = new IncrementalTriangulation<>(domain.getBackgroundMesh());
+
+		ITimeCostFunction timeCost = new UnitTimeCostFunction();
+		EikonalSolver eikonalSolver = new EikonalSolverFMMTriangulation(
+				targetShapes,
+				timeCost,
+				triangulation);
+
+		return eikonalSolver;
+	}
+
+	/**
+	 * Returns a new {@link EikonalSolver} which can be used to compute the eikonal equation.
+	 *
+	 * @param domain                    representation of the spatial domain containing the topography
+	 * @param targetId                  the target for which the solver solves the eikonal equation for
+	 * @param targetShapes              the target shapes i.e. all points for which T = 0.
+	 * @param attributesPedestrian
+	 * @param attributesPotential
+	 *
+	 * @return a new {@link EikonalSolver} which can be used to compute the eikonal equation
+	 */
 	protected EikonalSolver buildBase(
-			final Topography topography,
+			final Domain domain,
 			final int targetId,
 			final List<VShape> targetShapes,
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential){
 		logger.debug("create EikonalSolver");
+		Topography topography = domain.getTopography();
 		EikonalSolverType createMethod = attributesPotential.getCreateMethod();
 
 		Rectangle2D.Double bounds = topography.getBounds();
@@ -114,109 +153,14 @@ public abstract class EikonalSolverProvider  {
 				default:
 					eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 			}
-		}
-		/**
-		 * Use a mesh based method.
-		 */
-		else {
-
-			/*
-			 * (1) Build a valid PSLG from the topography.
-			 */
-			PSLG pslg = new PSLGConverter().toPSLG(topography, targetId);
-
-			/*
-			 * (2) choose a minimal edge length h0
-			 */
-			double h0 = 3.0;
-
-			/*
-			 * (3) Construct an edge length function which depends on the geometry i.e. the PSLG.
-			 */
-			EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> Double.POSITIVE_INFINITY, p -> Double.POSITIVE_INFINITY);
-			edgeLengthFunctionApprox.smooth(0.4);
-			//edgeLengthFunctionApprox.printPython();
-
-			/*
-			 * (4) Compute or define a distance function which defines the geometry.
-			 */
-			Collection<VPolygon> holes = new ArrayList<>(pslg.getHoles());
-			holes.removeIf(p -> p.intersects(topography.getTarget(targetId).getShape()));
-			IDistanceFunction exactDistanceFunction = IDistanceFunction.create(
-					pslg.getSegmentBound(),
-					//holes,
-					pslg.getHoles(),
-					topography.getTargets().stream().map(t -> new VPolygon(t.getShape())).collect(Collectors.toList()));
-			DistanceFunctionApproxBF distanceFunctionApprox = new DistanceFunctionApproxBF(pslg, exactDistanceFunction);
-			//distanceFunctionApprox.printPython();
-
-			/*
-			 * (5) use EikMesh to construct a mesh
-			 */
-			var meshImprover = new PEikMesh(
-					distanceFunctionApprox,
-					edgeLengthFunctionApprox,
-					h0,
-					pslg.getBoundingBox(),
-					pslg.getAllPolygons()
-			);
-
-			var meshPanel = new PMeshPanel(meshImprover.getMesh(), f -> meshImprover.getMesh().getBooleanData(f, "frozen"), 1000, 800);
-			meshPanel.display("Combined distance functions " + h0);
-			meshImprover.improve();
-			while (!meshImprover.isFinished()) {
-				synchronized (meshImprover.getMesh()) {
-					meshImprover.improve();
-				}
-				/*try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}*/
-				meshPanel.repaint();
-			}
-
-			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = meshImprover.getTriangulation();
-
-			var meshImprover2 = new PEikMesh(
-					p -> 2.0,
-					triangulation
-			);
-
-			while (!meshImprover2.isFinished()) {
-				synchronized (meshImprover2.getMesh()) {
-					meshImprover2.improve();
-				}
-				/*try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}*/
-				meshPanel.repaint();
-			}
-
-
-			ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
-					attributesPotential.getTimeCostAttributes(),
-					attributesPedestrian,
-					topography,
-					targetId,
-					//TODO [refactoring]: this attribute value is used in an not intuitive way, we should introduce an extra attribute value!
-					1.0 / attributesPotential.getPotentialFieldResolution());
-
-			// TODO: here we assume the shapes are convex!
-			List<PVertex> targetVertices = new ArrayList<>();
-			for(VShape shape : targetShapes) {
-				VPoint point = shape.getCentroid();
-				PFace targetFace = triangulation.locate(point.getX(), point.getY()).get();
-				targetVertices.addAll(triangulation.getMesh().getVertices(targetFace));
-			}
-
-			eikonalSolver = new EikonalSolverFMMTriangulation(
-					topography.getTargets().stream().map(target -> target.getShape()).collect(Collectors.toList()),
-					timeCost,
-					triangulation);
-
+		} else if(domain.getBackgroundMesh() != null) {
+			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(domain.getBackgroundMesh());
+			eikonalSolver = new EikonalSolverFMMTriangulation<>("target_" + targetId, targetShapes, new UnitTimeCostFunction(), triangulation);
+			//eikonalSolver.initialize();
+			//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "target_"+targetId+"_potential")));
+			//System.out.println();
+		} else {
+			throw new UnsupportedOperationException("potential field has to be grid based.");
 		}
 		return eikonalSolver;
 	}

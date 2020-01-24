@@ -3,6 +3,7 @@ package org.vadere.simulator.models.ode;
 import org.apache.commons.math3.exception.MathIllegalNumberException;
 import org.apache.commons.math3.ode.FirstOrderIntegrator;
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
@@ -29,19 +30,19 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 	protected double lastSimTimeInSec;
 	private FirstOrderIntegrator integrator;
 	protected AbstractModelEquations<T> equations;
-	protected Topography topography;
+	protected Domain domain;
 	protected TAttributes elementAttributes;
 
 	private Logger logger = Logger.getLogger(ODEModel.class);
 	private Class<T> type;
 
 	@Deprecated
-	public ODEModel(Class<T> type, Topography scenario, FirstOrderIntegrator integrator,
+	public ODEModel(Class<T> type, Domain domain, FirstOrderIntegrator integrator,
 			AbstractModelEquations<T> equations, TAttributes elementAttributes, Random random) {
 		super();
 		this.type = type;
 		this.random = random;
-		this.topography = scenario;
+		this.domain = domain;
 		this.integrator = integrator;
 		this.equations = equations;
 		this.elementAttributes = elementAttributes;
@@ -51,10 +52,10 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 
 	public void initializeODEModel(Class<T> type, FirstOrderIntegrator integrator,
 			AbstractModelEquations<T> equations, TAttributes elementAttributes,
-			Topography topography, Random random) {
+			Domain domain, Random random) {
 		this.type = type;
 		this.random = random;
-		this.topography = topography;
+		this.domain = domain;
 		this.integrator = integrator;
 		this.equations = equations;
 		this.elementAttributes = elementAttributes;
@@ -69,12 +70,12 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 	public void postLoop(final double state) {}
 
 	@Override
-	public void update(final double simTimeInSec) {
+	public void update(final double simTimeInSec){
 
 		// get pedestrian and car data
-		Collection<T> dynamicElements = topography.getElements(type);
+		Collection<T> dynamicElements = domain.getTopography().getElements(type);
 
-		List<T> orderedDynamicElements = topography.getElements(type).stream().collect(Collectors.toList());
+		List<T> orderedDynamicElements = domain.getTopography().getElements(type).stream().collect(Collectors.toList());
 		List<VPoint> positions = orderedDynamicElements.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
 
 		double[] y;
@@ -121,7 +122,7 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 				}
 			}
 
-			updateElementPositions(type, simTimeInSec, topography, equations, y);
+			updateElementPositions(type, simTimeInSec, domain.getTopography(), equations, y);
 
 			for(int i = 0; i < orderedDynamicElements.size(); i++) {
 				DynamicElement element = orderedDynamicElements.get(i);

@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.models.groups.Group;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.utils.CentroidGroupListBuilder;
 import org.vadere.simulator.utils.PedestrianListBuilder;
 import org.vadere.state.attributes.Attributes;
@@ -56,7 +57,7 @@ public class CentroidGroupModelTest {
 
 
 	private void simpleInitialize() {
-		cgm.initialize(attributesList, topography, attributesAgent, rnd);
+		cgm.initialize(attributesList, new Domain(topography), attributesAgent, rnd);
 	}
 
 	private List<Pedestrian> getDummies(int n, int sourceId) {
