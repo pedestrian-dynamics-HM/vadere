@@ -198,6 +198,9 @@ public class OSMBehaviorController {
                     ChangeTarget.class.getSimpleName(),
                     mostImportantStimulus.getClass().getSimpleName()));
         }
+
+        // Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
     }
 
     @Nullable
