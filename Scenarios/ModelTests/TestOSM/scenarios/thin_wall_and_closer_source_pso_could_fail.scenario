@@ -1,7 +1,7 @@
 {
   "name" : "thin_wall_and_closer_source_pso_could_fail",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

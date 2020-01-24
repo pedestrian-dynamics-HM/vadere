@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_ok",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -377,7 +377,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
@@ -422,7 +425,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },

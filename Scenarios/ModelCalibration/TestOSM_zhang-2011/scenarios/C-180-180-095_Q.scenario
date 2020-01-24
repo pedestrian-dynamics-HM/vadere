@@ -1,7 +1,7 @@
 {
   "name" : "C-180-180-095_Q",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

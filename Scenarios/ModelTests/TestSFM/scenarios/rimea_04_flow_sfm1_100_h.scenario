@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_sfm1_100_h",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

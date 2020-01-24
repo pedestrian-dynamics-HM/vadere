@@ -1,7 +1,7 @@
 {
   "name" : "chicken_floorfield_displaced_ok",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

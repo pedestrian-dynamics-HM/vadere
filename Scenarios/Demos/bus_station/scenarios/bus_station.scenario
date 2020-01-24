@@ -1,7 +1,7 @@
 {
   "name" : "bus_station",
   "description" : "Scenario used for TGF19 contribution",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",

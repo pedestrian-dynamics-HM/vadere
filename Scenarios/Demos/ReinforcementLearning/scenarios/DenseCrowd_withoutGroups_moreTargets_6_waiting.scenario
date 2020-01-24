@@ -1,7 +1,7 @@
 {
   "name" : "DenseCrowd_withoutGroups_moreTargets_6_waiting",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -398,7 +398,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },
@@ -443,7 +446,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },
@@ -488,7 +494,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },
@@ -533,7 +542,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },
@@ -578,7 +590,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },
@@ -623,7 +638,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatHandled" : true
+          },
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP"
         },

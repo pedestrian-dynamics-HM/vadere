@@ -1,7 +1,7 @@
 {
   "name" : "2_bridge_coordinates_kai_navigation_random_pos_without_offset",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
