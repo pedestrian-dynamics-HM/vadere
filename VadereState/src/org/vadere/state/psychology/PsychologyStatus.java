@@ -2,38 +2,39 @@ package org.vadere.state.psychology;
 
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 
 public class PsychologyStatus {
 
     // Member Variables
     private Stimulus mostImportantStimulus;
-    private Stimulus perceivedThreat; // TODO: Maybe, implement some kind of memory instead of just a perceived threat.
+    private ThreatMemory threatMemory;
     private SelfCategory selfCategory;
     private GroupMembership groupMembership;
 
     // Constructors
     public PsychologyStatus() {
-        this(null, null, SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
+        this(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
     }
 
-    public PsychologyStatus(Stimulus mostImportantStimulus, Stimulus perceivedThreat, SelfCategory selfCategory, GroupMembership groupMembership) {
+    public PsychologyStatus(Stimulus mostImportantStimulus, ThreatMemory threatMemory, SelfCategory selfCategory, GroupMembership groupMembership) {
         this.mostImportantStimulus = mostImportantStimulus;
-        this.perceivedThreat = perceivedThreat;
+        this.threatMemory = threatMemory;
         this.selfCategory = selfCategory;
         this.groupMembership = groupMembership;
     }
 
     public PsychologyStatus(PsychologyStatus other) {
         this.mostImportantStimulus = other.getMostImportantStimulus() != null ? other.getMostImportantStimulus().clone() : null;
-        this.perceivedThreat = other.getPerceivedThreat() != null ? other.getPerceivedThreat().clone() : null;
+        this.threatMemory = other.getThreatMemory() != null ? other.getThreatMemory().clone() : null;
         this.selfCategory = other.getSelfCategory();
         this.groupMembership = other.getGroupMembership();
     }
 
     // Getter
     public Stimulus getMostImportantStimulus() { return mostImportantStimulus; }
-    public Stimulus getPerceivedThreat() { return perceivedThreat; }
+    public ThreatMemory getThreatMemory() { return threatMemory; }
     public SelfCategory getSelfCategory() { return selfCategory; }
     public GroupMembership getGroupMembership() { return groupMembership; }
 
@@ -42,9 +43,7 @@ public class PsychologyStatus {
         this.mostImportantStimulus = mostImportantStimulus;
     }
 
-    public void setPerceivedThreat(Stimulus perceivedThreat) {
-        this.perceivedThreat = perceivedThreat;
-    }
+    public void setThreatMemory(ThreatMemory threatMemory) { this.threatMemory = threatMemory; }
 
     public void setSelfCategory(SelfCategory selfCategory) {
         this.selfCategory = selfCategory;
