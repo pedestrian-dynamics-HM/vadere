@@ -1,7 +1,7 @@
 {
   "name" : "rimea_13_stairs_long_nelder_mead",
   "description" : "",
-  "release" : "1.9",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

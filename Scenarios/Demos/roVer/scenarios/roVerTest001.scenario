@@ -1,7 +1,7 @@
 {
   "name" : "roVerTest001",
   "description" : "",
-  "release" : "1.9",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -281,7 +281,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -329,7 +329,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -377,7 +377,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -425,7 +425,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -473,7 +473,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -521,7 +521,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -569,7 +569,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -617,7 +617,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -665,7 +665,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -713,7 +713,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -761,7 +761,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -809,7 +809,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -857,7 +857,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -905,7 +905,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -953,7 +953,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1001,7 +1001,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1049,7 +1049,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1097,7 +1097,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1145,7 +1145,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1193,7 +1193,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1241,7 +1241,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1289,7 +1289,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1337,7 +1337,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1385,7 +1385,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1433,7 +1433,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1481,7 +1481,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1529,7 +1529,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1577,7 +1577,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1625,7 +1625,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1673,7 +1673,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1721,7 +1721,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1769,7 +1769,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1817,7 +1817,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1865,7 +1865,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1913,7 +1913,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -1961,7 +1961,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2009,7 +2009,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2057,7 +2057,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2105,7 +2105,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2153,7 +2153,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2201,7 +2201,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2249,7 +2249,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2297,7 +2297,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2345,7 +2345,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2393,7 +2393,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2441,7 +2441,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2489,7 +2489,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2537,7 +2537,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2585,7 +2585,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2633,7 +2633,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2681,7 +2681,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2729,7 +2729,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2777,7 +2777,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2825,7 +2825,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2873,7 +2873,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2921,7 +2921,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -2969,7 +2969,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3017,7 +3017,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3065,7 +3065,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3113,7 +3113,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3161,7 +3161,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3209,7 +3209,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3257,7 +3257,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3305,7 +3305,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3353,7 +3353,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3401,7 +3401,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3449,7 +3449,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3497,7 +3497,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3545,7 +3545,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3593,7 +3593,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3641,7 +3641,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3689,7 +3689,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3737,7 +3737,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3785,7 +3785,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3833,7 +3833,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3881,7 +3881,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3929,7 +3929,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -3977,7 +3977,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4025,7 +4025,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4073,7 +4073,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4121,7 +4121,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4169,7 +4169,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4217,7 +4217,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4265,7 +4265,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4313,7 +4313,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4361,7 +4361,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4409,7 +4409,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4457,7 +4457,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4505,7 +4505,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4553,7 +4553,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4601,7 +4601,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4649,7 +4649,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4697,7 +4697,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4745,7 +4745,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4793,7 +4793,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4841,7 +4841,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4889,7 +4889,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4937,7 +4937,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -4985,7 +4985,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5033,7 +5033,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5081,7 +5081,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5129,7 +5129,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5177,7 +5177,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5225,7 +5225,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5273,7 +5273,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5321,7 +5321,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5369,7 +5369,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5417,7 +5417,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5465,7 +5465,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5513,7 +5513,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5561,7 +5561,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5609,7 +5609,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5657,7 +5657,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5705,7 +5705,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5753,7 +5753,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5801,7 +5801,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5849,7 +5849,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5897,7 +5897,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5945,7 +5945,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -5993,7 +5993,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6041,7 +6041,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6089,7 +6089,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6137,7 +6137,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6185,7 +6185,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6233,7 +6233,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6281,7 +6281,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6329,7 +6329,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6377,7 +6377,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6425,7 +6425,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6473,7 +6473,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6521,7 +6521,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6569,7 +6569,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6617,7 +6617,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6665,7 +6665,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6713,7 +6713,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6761,7 +6761,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6809,7 +6809,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6857,7 +6857,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6905,7 +6905,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -6953,7 +6953,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7001,7 +7001,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7049,7 +7049,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7097,7 +7097,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7145,7 +7145,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7193,7 +7193,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7241,7 +7241,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7289,7 +7289,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7337,7 +7337,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7385,7 +7385,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7433,7 +7433,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7481,7 +7481,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7529,7 +7529,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7577,7 +7577,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7625,7 +7625,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7673,7 +7673,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7721,7 +7721,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7769,7 +7769,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7817,7 +7817,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7865,7 +7865,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7913,7 +7913,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -7961,7 +7961,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8009,7 +8009,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8057,7 +8057,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8105,7 +8105,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8153,7 +8153,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8201,7 +8201,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8249,7 +8249,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8297,7 +8297,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8345,7 +8345,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8393,7 +8393,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8441,7 +8441,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8489,7 +8489,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8537,7 +8537,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8585,7 +8585,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8633,7 +8633,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8681,7 +8681,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8729,7 +8729,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8777,7 +8777,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8825,7 +8825,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8873,7 +8873,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8921,7 +8921,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -8969,7 +8969,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9017,7 +9017,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9065,7 +9065,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9113,7 +9113,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9161,7 +9161,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9209,7 +9209,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9257,7 +9257,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9305,7 +9305,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9353,7 +9353,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9401,7 +9401,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9449,7 +9449,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9497,7 +9497,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9545,7 +9545,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9593,7 +9593,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9641,7 +9641,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9689,7 +9689,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9737,7 +9737,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9785,7 +9785,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
@@ -9833,7 +9833,7 @@
           "mostImportantStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
-            "latestThreatHandled" : true
+            "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"

@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_gnm2",
   "description" : "",
-  "release" : "1.9",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

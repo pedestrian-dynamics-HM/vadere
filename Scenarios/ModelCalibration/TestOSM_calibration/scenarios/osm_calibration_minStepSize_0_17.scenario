@@ -1,7 +1,7 @@
 {
   "name" : "osm_calibration_minStepSize_0_17",
   "description" : "",
-  "release" : "1.9",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
