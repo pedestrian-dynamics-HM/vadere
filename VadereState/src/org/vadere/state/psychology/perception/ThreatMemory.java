@@ -18,18 +18,21 @@ import java.util.List;
  *
  * Therefore, provide a {@link ThreatMemory} with a boolean flag included which
  * indicates if latest {@link Threat} was already handled by the locomotion layer.
+ *
+ * Note: Maybe, this memory could also be implemented as a stack. I.e., cognition layer
+ * pushes {@link Threat}s to the stack while the locomotion layer pops off the {@link Threat}s.
+ * But, this is ot a real "memory"!
  */
 public class ThreatMemory {
 
     // Member Variables
     List<Threat> allThreats;
-    // TODO: Rename to threatUnhandled.
-    boolean latestThreatHandled;
+    boolean latestThreatUnhandled;
 
     // Constructors
     public ThreatMemory() {
         this.allThreats = new ArrayList<>();
-        this.latestThreatHandled = true;
+        this.latestThreatUnhandled = false;
     }
 
     public ThreatMemory(ThreatMemory other) {
@@ -39,16 +42,16 @@ public class ThreatMemory {
             other.getAllThreats().stream().forEach(threat -> this.allThreats.add(threat.clone()));
         }
 
-        this.latestThreatHandled = other.isLatestThreatHandled();
+        this.latestThreatUnhandled = other.isLatestThreatUnhandled();
     }
 
     // Getter
     public List<Threat> getAllThreats() { return allThreats; }
-    public boolean isLatestThreatHandled() { return latestThreatHandled; }
+    public boolean isLatestThreatUnhandled() { return latestThreatUnhandled; }
 
     // Setter
-    public void setLatestThreatHandled(boolean latestThreatHandled) {
-        this.latestThreatHandled = latestThreatHandled;
+    public void setLatestThreatUnhandled(boolean latestThreatUnhandled) {
+        this.latestThreatUnhandled = latestThreatUnhandled;
     }
 
     // Methods

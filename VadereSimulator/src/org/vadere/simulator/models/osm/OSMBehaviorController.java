@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -120,8 +119,8 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
 
-    public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
-        if (pedestrian.getThreatMemory().isLatestThreatHandled() == false) {
+    public void changeToTargetRepulsionStrategyAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
+        if (pedestrian.getThreatMemory().isLatestThreatUnhandled()) {
             Threat threat = pedestrian.getThreatMemory().getLatestThreat();
             Target threatOrigin = topography.getTarget(threat.getOriginAsTargetId());
 
@@ -135,7 +134,7 @@ public class OSMBehaviorController {
             double escapeSpeed = pedestrian.getFreeFlowSpeed() * 2.0;
             pedestrian.setFreeFlowSpeed(escapeSpeed);
 
-            pedestrian.getThreatMemory().setLatestThreatHandled(true);
+            pedestrian.getThreatMemory().setLatestThreatUnhandled(false);
         }
     }
 
@@ -151,7 +150,7 @@ public class OSMBehaviorController {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
 
             ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
-            Target closestTarget = findClosestTarget(topography, searchPosition, (Threat) pedestrian.getThreatMemory().getLatestThreat());
+            Target closestTarget = findClosestTarget(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
 
             assert closestTarget != null;
 

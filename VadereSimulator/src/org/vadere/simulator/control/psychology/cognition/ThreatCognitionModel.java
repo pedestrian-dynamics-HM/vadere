@@ -9,7 +9,6 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,19 +49,8 @@ public class ThreatCognitionModel implements ICognitionModel {
     }
 
     private void handleThreat(Pedestrian pedestrian, Stimulus stimulus) {
-        // TODO: Make code more readable.
-        if (pedestrian.getThreatMemory().isEmpty()) {
-            pedestrian.getThreatMemory().setLatestThreatHandled(false);
-        } else {
-            // Check if pedestrian re-entered the same threat area.
-            Threat oldThreat = pedestrian.getThreatMemory().getLatestThreat();
-            Threat newThreat = (Threat) stimulus;
-
-            boolean isNewThreat = oldThreat.getOriginAsTargetId() != newThreat.getOriginAsTargetId();
-
-            if (isNewThreat) {
-                pedestrian.getThreatMemory().setLatestThreatHandled(false);
-            }
+        if (isNewThreatForPedestrian(pedestrian, (Threat) stimulus)) {
+            pedestrian.getThreatMemory().setLatestThreatUnhandled(true);
         }
 
         // Current stimulus is a threat => store it and make clear that pedestrian is inside threat area.
@@ -70,9 +58,26 @@ public class ThreatCognitionModel implements ICognitionModel {
         pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
     }
 
+    private boolean isNewThreatForPedestrian(Pedestrian pedestrian, Threat threat) {
+        boolean isNewThreat = false;
+
+        if (pedestrian.getThreatMemory().isEmpty()) {
+            isNewThreat = true;
+        } else {
+            // Check if pedestrian re-entered the same threat area.
+            Threat oldThreat = pedestrian.getThreatMemory().getLatestThreat();
+
+            isNewThreat = oldThreat.getOriginAsTargetId() != threat.getOriginAsTargetId();
+        }
+
+        return isNewThreat;
+    }
+
     private void handleElapsedTime(Pedestrian pedestrian) {
-        if (pedestrian.getThreatMemory().getLatestThreat() != null) {
-            testIfInsideOrOutsideThreatArea(pedestrian);
+        Threat latestThreat = pedestrian.getThreatMemory().getLatestThreat();
+
+        if (latestThreat != null) {
+            testIfInsideOrOutsideThreatArea(pedestrian, latestThreat);
         } else { // These agents did not perceive a threat but are aware of other threatened agents.
 
             if (pedestrian.getGroupMembership() == GroupMembership.OUT_GROUP) {
@@ -85,13 +90,11 @@ public class ThreatCognitionModel implements ICognitionModel {
         }
     }
 
-    private void testIfInsideOrOutsideThreatArea(Pedestrian pedestrian) {
-        Threat threat = pedestrian.getThreatMemory().getLatestThreat();
-
-        VPoint threatOrigin = topography.getTarget(threat.getOriginAsTargetId()).getShape().getCentroid();
+    private void testIfInsideOrOutsideThreatArea(Pedestrian pedestrian, Threat latestThreat) {
+        VPoint threatOrigin = topography.getTarget(latestThreat.getOriginAsTargetId()).getShape().getCentroid();
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
-        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= threat.getRadius());
+        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
 
         if (pedestrianIsInsideThreatArea) {
             pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
