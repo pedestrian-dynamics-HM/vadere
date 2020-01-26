@@ -32,6 +32,10 @@ public class TopographyController extends OfflineTopographyController {
 		// create initial pedestrians
 		for (Pedestrian initialValues : topography
 				.getInitialElements(Pedestrian.class)) {
+
+			// FIXME: "initialValues" are "AgentWrappers". I.e., calling "createElement" from locomotion layer
+			//   overwrites attributes which were configured in GUI! I.e., extend method by flag "isAgentWrapper"
+			//   or something like this.
 			Pedestrian realPed = (Pedestrian) dynamicElementFactory.createElement(initialValues.getPosition(),
 					initialValues.getId(), Pedestrian.class);
 			realPed.setIdAsTarget(initialValues.getIdAsTarget());
