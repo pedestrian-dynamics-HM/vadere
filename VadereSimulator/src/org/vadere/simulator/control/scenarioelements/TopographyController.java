@@ -2,10 +2,8 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 
-import java.util.LinkedList;
 import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
@@ -24,53 +22,45 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	public void preLoop(double simTimeInSec) {
-		// add bounding box
 		prepareTopography();
+		createAgentWrapperPedestrians();
+	}
 
-		// TODO [priority=medium] [task=feature] create initial cars
+	private void createAgentWrapperPedestrians() {
+		for (Pedestrian agentWrapper : topography .getInitialElements(Pedestrian.class)) {
+			// TODO: Maybe, pass "attributesAgent" to "createElement()" so that this is not overwritten.
+			Pedestrian createdPedestrian = (Pedestrian) dynamicElementFactory.createElement(agentWrapper.getPosition(),
+					agentWrapper.getId(), Pedestrian.class);
 
-		// create initial pedestrians
-		for (Pedestrian initialValues : topography
-				.getInitialElements(Pedestrian.class)) {
-
-			// FIXME: "initialValues" are "AgentWrappers". I.e., calling "createElement" from locomotion layer
-			//   overwrites attributes which were configured in GUI! I.e., extend method by flag "isAgentWrapper"
-			//   or something like this.
-			Pedestrian realPed = (Pedestrian) dynamicElementFactory.createElement(initialValues.getPosition(),
-					initialValues.getId(), Pedestrian.class);
-			realPed.setIdAsTarget(initialValues.getIdAsTarget());
-			if (realPed.getIdAsTarget() != -1) {
-				topography.addTarget(new TargetPedestrian(realPed));
-			}
-
-			// set the closest target as default, which can be a problem if no target should be used
-			/*
-			 * if (pedStore.getTargets().size() == 0){
-			 * LinkedList<Integer> tmp = new LinkedList<Integer>();
-			 * tmp.add(topography.getNearestTarget(pedStore.getPosition()));
-			 * realPed.setTargets(tmp);
-			 * }
-			 * else {
-			 * realPed.setTargets(new LinkedList<>(pedStore.getTargets()));
-			 * }
-			 */
-			realPed.setSource(null); // must be null to indicate this pedestrian is an initial ped.
-			realPed.setTargets(new LinkedList<>(initialValues.getTargets()));
-			realPed.setGroupIds(new LinkedList<>(initialValues.getGroupIds()));
-			realPed.setGroupSizes(new LinkedList<>(initialValues.getGroupSizes()));
-			realPed.setChild(initialValues.isChild());
-			realPed.setLikelyInjured(initialValues.isLikelyInjured());
-
-			if (initialValues.getFreeFlowSpeed() > 0) {
-				realPed.setFreeFlowSpeed(initialValues.getFreeFlowSpeed());
-			}
-
-			if (!Double.isNaN(initialValues.getVelocity().x) && !Double.isNaN(initialValues.getVelocity().y)) {
-				realPed.setVelocity(initialValues.getVelocity());
-			}
-			topography.addElement(realPed);
+			applyAttributesFromAgentWrapper(agentWrapper, createdPedestrian);
+			topography.addElement(createdPedestrian);
 		}
 		topography.initializePedestrianCount();
+	}
+
+	private void applyAttributesFromAgentWrapper(Pedestrian agentWrapper, Pedestrian newPedestrian) {
+		newPedestrian.setAttributes(agentWrapper.getAttributes());
+
+		newPedestrian.setChild(agentWrapper.isChild());
+		newPedestrian.setLikelyInjured(agentWrapper.isLikelyInjured());
+		newPedestrian.setFollowers(agentWrapper.getFollowers());
+		newPedestrian.setIsCurrentTargetAnAgent(agentWrapper.isCurrentTargetAnAgent());
+
+		newPedestrian.setGroupMembership(agentWrapper.getGroupMembership());
+		newPedestrian.setMostImportantStimulus(agentWrapper.getMostImportantStimulus());
+		newPedestrian.setSelfCategory(agentWrapper.getSelfCategory());
+		newPedestrian.setThreatMemory(agentWrapper.getThreatMemory());
+
+		newPedestrian.setIdAsTarget(agentWrapper.getIdAsTarget());
+		newPedestrian.setTargets(agentWrapper.getTargets());
+
+		newPedestrian.setGroupIds(agentWrapper.getGroupIds());
+		newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
+
+		newPedestrian.setFreeFlowSpeed(agentWrapper.getFreeFlowSpeed());
+		if (!Double.isNaN(agentWrapper.getVelocity().x) && !Double.isNaN(agentWrapper.getVelocity().y)) {
+			newPedestrian.setVelocity(agentWrapper.getVelocity());
+		}
 	}
 
 	public void update(double simTimeInSec) {
