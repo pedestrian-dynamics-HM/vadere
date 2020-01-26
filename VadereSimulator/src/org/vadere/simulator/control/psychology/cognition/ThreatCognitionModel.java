@@ -109,6 +109,7 @@ public class ThreatCognitionModel implements ICognitionModel {
      * accelerate and search for a safe zone.
      */
     private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
+        // TODO: Maybe, alse look for "SelfCategory.INSIDE_THREAT_AREA".
         List<Pedestrian> threatenedPedestrians = getClosestPedestriansWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA);
 
         if (threatenedPedestrians.isEmpty() == false) {
@@ -129,10 +130,10 @@ public class ThreatCognitionModel implements ICognitionModel {
         List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
                 .getObjects(positionOfPedestrian, pedestrian.getAttributes().getSearchRadius());
 
-        // Filter out "me" and pedestrians which are further away from target than "me".
+        // Filter out "me" and pedestrians with unexpected "selfCategory".
         closestPedestrians = closestPedestrians.stream()
                 .filter(candidate -> pedestrian.getId() != candidate.getId())
-                .filter(candidate -> pedestrian.getSelfCategory() == expectedSelfCategory)
+                .filter(candidate -> candidate.getSelfCategory() == expectedSelfCategory)
                 .collect(Collectors.toList());
 
         // Sort by distance away from "me".
