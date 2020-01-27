@@ -13,6 +13,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.psychology.selfcategorization.locomotion.UpdateSchemeEventDriven;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesSelfCatThreat;
@@ -65,7 +66,7 @@ public class SelfCatThreatModel implements MainModel {
     private AttributesOSM attributesLocomotion;
     AttributesAgent attributesPedestrian;
 
-    private Topography topography;
+    private Domain domain;
     private Random random;
 
     private IPotentialFieldTarget potentialFieldTarget;
@@ -92,7 +93,7 @@ public class SelfCatThreatModel implements MainModel {
             throw new IllegalArgumentException("cannot initialize " + type.getCanonicalName());
 
         AttributesAgent pedAttributes = new AttributesAgent(
-                this.attributesPedestrian, registerDynamicElementId(topography, id));
+                this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
 
         PedestrianSelfCatThreat pedestrian = createElement(position, pedAttributes);
 
@@ -103,7 +104,7 @@ public class SelfCatThreatModel implements MainModel {
         List<SpeedAdjuster> noSpeedAdjusters = new LinkedList<>();
 
         PedestrianSelfCatThreat pedestrian = new PedestrianSelfCatThreat(attributesLocomotion,
-                attributesAgent, topography, random, potentialFieldTarget,
+                attributesAgent, domain.getTopography(), random, potentialFieldTarget,
                 potentialFieldObstacle.copy(), potentialFieldPedestrian,
                 noSpeedAdjusters, stepCircleOptimizer.clone());
 
@@ -130,19 +131,19 @@ public class SelfCatThreatModel implements MainModel {
     }
 
     @Override
-    public void initialize(List<Attributes> attributesList, Topography topography, AttributesAgent attributesPedestrian, Random random) {
+    public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         logger.debug("initialize " + getClass().getSimpleName());
 
         this.attributesSelfCatThreat = Model.findAttributes(attributesList, AttributesSelfCatThreat.class);
         this.attributesLocomotion = attributesSelfCatThreat.getAttributesLocomotion();
-        this.topography = topography;
+        this.domain = domain;
         this.random = random;
         this.attributesPedestrian = attributesPedestrian;
 
-        initializeLocomotionLayer(attributesList, topography, attributesPedestrian, random);
+        initializeLocomotionLayer(attributesList, domain, attributesPedestrian, random);
 
-        this.topography.addElementAddedListener(Pedestrian.class, updateSchemeEventDriven);
-        this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeEventDriven);
+        this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeEventDriven);
+        this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeEventDriven);
 
         models.add(potentialFieldTarget);
         models.add(this);
@@ -151,19 +152,19 @@ public class SelfCatThreatModel implements MainModel {
         this.binomialDistribution = createBinomialDistribution(seed, attributesSelfCatThreat.getProbabilityInGroupMembership());
     }
 
-    private void initializeLocomotionLayer(List<Attributes> attributesList, Topography topography, AttributesAgent attributesPedestrian, Random random) {
+    private void initializeLocomotionLayer(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         IPotentialFieldTargetGrid potentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-                attributesList, topography, attributesPedestrian, attributesLocomotion.getTargetPotentialModel());
+                attributesList, domain, attributesPedestrian, attributesLocomotion.getTargetPotentialModel());
 
         this.potentialFieldTarget = potentialTargetGrid;
 
         this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-                attributesList, topography, attributesPedestrian, random, attributesLocomotion.getObstaclePotentialModel());
+                attributesList, domain, attributesPedestrian, random, attributesLocomotion.getObstaclePotentialModel());
         this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-                attributesList, topography, attributesPedestrian, random, attributesLocomotion.getPedestrianPotentialModel());
+                attributesList, domain, attributesPedestrian, random, attributesLocomotion.getPedestrianPotentialModel());
 
         this.stepCircleOptimizer = StepCircleOptimizer.create(
-                attributesLocomotion, random, topography, potentialTargetGrid);
+                attributesLocomotion, random, domain.getTopography(), potentialTargetGrid);
 
         if (attributesPedestrian.isDensityDependentSpeed()) {
             throw new UnsupportedOperationException("densityDependentSpeed not yet implemented.");
@@ -174,7 +175,7 @@ public class SelfCatThreatModel implements MainModel {
            throw new IllegalArgumentException("Only \"UpdateType.EVENT_DRIVEN\" supported!");
         }
 
-        this.updateSchemeEventDriven = new UpdateSchemeEventDriven(topography);
+        this.updateSchemeEventDriven = new UpdateSchemeEventDriven(domain.getTopography());
     }
 
     private BinomialDistribution createBinomialDistribution(int seed, double probabilityForInGroupMembership) {
