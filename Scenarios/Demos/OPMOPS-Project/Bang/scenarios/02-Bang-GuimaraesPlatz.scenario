@@ -1,7 +1,7 @@
 {
   "name" : "02-Bang-GuimaraesPlatz",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -1217,9 +1217,10 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "Bang",
+        "type" : "Threat",
         "originAsTargetId" : 0,
-        "loudness" : 1.0
+        "loudness" : 1.0,
+        "radius" : 5.0
       } ]
     } ]
   }

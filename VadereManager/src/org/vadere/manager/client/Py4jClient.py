@@ -7,12 +7,6 @@ from IPython import embed
 from pythontraciwrapper.py4j_client import Py4jClient
 
 
-def check_port(port):
-    import socket
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('localhost', port)) == 1
-
-
 if __name__ == '__main__':
     baseArgs = sys.argv[1:]
     args1 = baseArgs + ["--port", "9997", "--java-port", "10001", "--python-port", "10002"]

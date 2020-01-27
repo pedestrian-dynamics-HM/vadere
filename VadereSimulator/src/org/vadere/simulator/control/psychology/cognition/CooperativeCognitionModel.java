@@ -7,6 +7,15 @@ import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 
+/**
+ * The {@link CooperativeCognitionModel} makes a pedestrian cooperative if its
+ * average speed falls below a certain threshold. I.e., usually the agent
+ * could not move for some time steps. For example, in case of other
+ * counter-flowing agents.
+ *
+ * {@link SelfCategory#COOPERATIVE} should motivate pedestrians to swap places
+ * instead of blindly walking to a target and colliding with other pedestrians.
+ */
 public class CooperativeCognitionModel implements ICognitionModel {
 
     private Topography topography;
@@ -19,7 +28,7 @@ public class CooperativeCognitionModel implements ICognitionModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians) {
         for (Pedestrian pedestrian : pedestrians) {
-            // TODO: Maybe, add following variables as attribute to new class "AttributesCognition".
+            // TODO: Maybe, add following variables as attributes to new class "AttributesCognition".
             int requiredFootSteps = 2;
             double requiredSpeedInMetersPerSecondToBeCooperative = 0.05;
 

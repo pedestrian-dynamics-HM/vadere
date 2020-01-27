@@ -7,32 +7,25 @@ import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
-import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
@@ -146,7 +139,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 
 		Collection<Pedestrian> pedestrians = domain.getTopography().getElements(Pedestrian.class);
 
-		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+		UnsupportedSelfCategoryException.throwIfPedestriansNotTargetOrientied(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);

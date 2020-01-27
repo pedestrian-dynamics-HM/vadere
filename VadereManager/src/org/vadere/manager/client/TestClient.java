@@ -463,6 +463,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void simulationapi_setSimConfig(String[] args) throws IOException {
+		System.out.println("not implemented");
+	}
+
 	// polygonapi
 	@Override
 	public void polygonapi_getTopographyBounds(String[] args) throws IOException {

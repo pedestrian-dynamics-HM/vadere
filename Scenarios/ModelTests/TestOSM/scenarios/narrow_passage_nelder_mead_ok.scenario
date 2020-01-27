@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_nelder_mead_ok",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -321,7 +321,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "perceivedThreat" : null,
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -364,7 +366,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "perceivedThreat" : null,
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

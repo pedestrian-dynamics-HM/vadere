@@ -21,14 +21,16 @@ import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.psychology.perception.types.Timeframe;
-import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Simulation {
@@ -356,8 +358,18 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
-		List<Stimulus> stimuli = stimulusController.getStimuliForTime(simTimeInSec);
+		updateScenarioElements(simTimeInSec);
 
+		updatePsychologyLayer(simTimeInSec);
+
+		updateLocomotionLayer(simTimeInSec);
+
+		if (topographyController.getTopography().hasTeleporter()) {
+			teleporterController.update(simTimeInSec);
+		}
+	}
+
+	private void updateScenarioElements(double simTimeInSec) {
 		// "TargetControllers" are populated in each simulation loop because
 		// pedestrians can be declared as targets in each simulation loop.
 		// Therefore, create the necessary controller wrappers here for these
@@ -384,18 +396,26 @@ public class Simulation {
 		}
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid
+	}
 
+	private void updatePsychologyLayer(double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
-		perceptionModel.update(pedestrians, stimuli);
 
 		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
+			List<Stimulus> stimuli = stimulusController.getStimuliForTime(simTimeInSec);
+			perceptionModel.update(pedestrians, stimuli);
 			cognitionModel.update(pedestrians);
+		} else {
+			ElapsedTime elapsedTime = new ElapsedTime(simTimeInSec);
+			pedestrians.stream().forEach(pedestrian -> pedestrian.setMostImportantStimulus(elapsedTime));
 		}
+	}
 
+	private void updateLocomotionLayer(double simTimeInSec) {
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
 			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
-			
+
 			// Only update until there are pedestrians in the scenario or pedestrian to spawn
 			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 ) {
 				m.update(simTimeInSec);
@@ -405,10 +425,6 @@ public class Simulation {
 					topographyController.update(simTimeInSec); //rebuild CellGrid
 				}
 			}
-		}
-
-		if (topographyController.getTopography().hasTeleporter()) {
-			teleporterController.update(simTimeInSec);
 		}
 	}
 

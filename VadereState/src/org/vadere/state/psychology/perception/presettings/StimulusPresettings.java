@@ -19,7 +19,7 @@ import java.util.Map;
  * This class can be used as helper for GUI elements.
  */
 public class StimulusPresettings {
-    /** Map an event class (e.g., Bang) to a JSON string. */
+    /** Map an event class (e.g., Threat) to a JSON string. */
     public static Map<Class, String> PRESETTINGS_MAP;
 
     // Static initializer for "PRESETTINGS_MAP".
@@ -27,7 +27,7 @@ public class StimulusPresettings {
         PRESETTINGS_MAP = new HashMap<>();
 
         Stimulus[] stimuliToUse = new Stimulus[] {
-                new Bang(),
+                new Threat(),
                 new Wait(),
                 new WaitInArea(0, new VRectangle(0, 0, 10, 10)),
         };

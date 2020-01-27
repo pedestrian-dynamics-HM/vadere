@@ -12,8 +12,8 @@ public class StimulusFactory {
     public static Stimulus stringToStimulus(@NotNull String stimulusAsString) {
         Stimulus stimulusObject = null;
 
-        if (stimulusAsString.matches(Bang.class.getSimpleName())) {
-            stimulusObject = new Bang();
+        if (stimulusAsString.matches(Threat.class.getSimpleName())) {
+            stimulusObject = new Threat();
         } else if (stimulusAsString.matches(ElapsedTime.class.getSimpleName())) {
             stimulusObject = new ElapsedTime();
         } else if (stimulusAsString.matches(Wait.class.getSimpleName())) {

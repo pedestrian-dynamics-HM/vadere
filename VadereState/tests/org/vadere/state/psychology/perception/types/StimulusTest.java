@@ -14,19 +14,19 @@ public class StimulusTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
 
     @Test
-    public void testBangClone() {
+    public void testThreatClone() {
         double expectedTime = 1;
         int expectedOriginAsTargetId = 2;
 
-        Bang bangOriginal = new Bang(expectedTime, expectedOriginAsTargetId);
+        Threat threatOriginal = new Threat(expectedTime, expectedOriginAsTargetId);
 
-        Bang bangClone = bangOriginal.clone();
-        bangClone.setTime(3);
-        bangClone.setOriginAsTargetId(4);
+        Threat threatClone = threatOriginal.clone();
+        threatClone.setTime(3);
+        threatClone.setOriginAsTargetId(4);
 
-        assertEquals(expectedTime, bangOriginal.getTime(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(expectedOriginAsTargetId, bangOriginal.getOriginAsTargetId());
-        assertEquals(bangOriginal.getLoudness(), bangClone.getLoudness(), ALLOWED_DOUBLE_TOLERANCE);
+        assertEquals(expectedTime, threatOriginal.getTime(), ALLOWED_DOUBLE_TOLERANCE);
+        assertEquals(expectedOriginAsTargetId, threatOriginal.getOriginAsTargetId());
+        assertEquals(threatOriginal.getLoudness(), threatClone.getLoudness(), ALLOWED_DOUBLE_TOLERANCE);
     }
 
     @Test

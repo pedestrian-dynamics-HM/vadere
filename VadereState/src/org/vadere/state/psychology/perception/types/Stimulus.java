@@ -14,8 +14,8 @@ import java.util.List;
  *
  * The additional information depend on the type of the stimulus and should be
  * added by subclasses. For instance, a stimulus "ElapsedTime" can provide
- * the current time. A stimulus "Bang" can have a loudness and a polygon
- * which describes where the bang can be perceived.
+ * the current time. A stimulus "Threat" can have a loudness and a polygon
+ * which describes where the threat can be perceived.
  *
  * This class and its subclasses should be de-/serialized as JSON. Therefore,
  * provide some annotations so that serialized objects do not reveal Java
@@ -31,13 +31,13 @@ import java.util.List;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 @JsonSubTypes({
-        @Type(value = Bang.class, name = "Bang"),
+        @Type(value = Threat.class, name = "Threat"),
         @Type(value = ElapsedTime.class, name = "ElapsedTime"),
         @Type(value = Wait.class, name = "Wait"),
         @Type(value = WaitInArea.class, name = "WaitInArea"),
         @Type(value = ChangeTarget.class, name = "ChangeTarget")
 })
-// "time" is set when the stimulus is actually into the simulation and must not be de-/serialized.
+// "time" is set when the stimulus is injected into the simulation run and must not be de-/serialized.
 @JsonIgnoreProperties({ "time" })
 public abstract class Stimulus implements Cloneable {
 

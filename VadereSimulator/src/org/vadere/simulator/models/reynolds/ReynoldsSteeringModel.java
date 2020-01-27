@@ -14,7 +14,7 @@ import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -22,11 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class ReynoldsSteeringModel implements MainModel {
@@ -76,7 +72,7 @@ public class ReynoldsSteeringModel implements MainModel {
 	public void update(final double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = domain.getTopography().getElements(Pedestrian.class);
 
-		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+		UnsupportedSelfCategoryException.throwIfPedestriansNotTargetOrientied(pedestrians, this.getClass());
 
 		Iterator<Pedestrian> it = pedestrians.iterator();
 		double maxSpeed = 3;

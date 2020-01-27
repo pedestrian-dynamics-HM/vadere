@@ -1,7 +1,7 @@
 {
   "name" : "DenseCrowd_withoutGroups_moreTargets",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -389,7 +389,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -432,7 +434,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -475,7 +479,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -518,7 +524,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -561,7 +569,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -604,7 +614,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -647,7 +659,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -690,7 +704,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -733,7 +749,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -776,7 +794,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -819,7 +839,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -862,7 +884,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -905,7 +929,9 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : null
+          "perceivedThreat" : null,
+          "selfCategory" : null,
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
