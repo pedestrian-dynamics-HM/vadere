@@ -138,12 +138,18 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 			return 0.0;
 		}
 
-		// the agent is inside an obstacle
-		/*for (ScenarioElement b : domain.getTopography().getObstacles()) {
-			if (b.getShape().contains(pos)) {
-				return Double.MAX_VALUE;
+		// the agent is inside an obstacle, if we use a mesh instead of a cell grid
+		// the mesh will align with obstacles i.e. this is not required.
+		// Since we iterate over ALL obstacle shapes which might be complex polygons
+		// this loop can be very computational expensive.
+		// TODO: introduce a data structure such that we only have to check one or a view shapes.
+		if(attributes.getCreateMethod().isUsingCellGrid()) {
+			for (ScenarioElement b : domain.getTopography().getObstacles()) {
+				if (b.getShape().contains(pos)) {
+					return Double.MAX_VALUE;
+				}
 			}
-		}*/
+		}
 
 		/* Find minimal potential of given targets. */
 		Optional<EikonalSolver> optEikonalSolver = getSolver(targetId);

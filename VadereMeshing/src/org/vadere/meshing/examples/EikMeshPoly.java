@@ -40,7 +40,7 @@ public class EikMeshPoly {
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		meshPoly("/poly/Small.poly");
+		meshPoly("/poly/kaiserslautern_tri.poly");
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
@@ -75,7 +75,7 @@ public class EikMeshPoly {
 		//polygons.add(targetShape);
 
 		// (3) use EikMesh to improve the mesh
-		double h0 = 0.5;
+		double h0 = 5.0;
 		var meshImprover = new PEikMesh(
 				distanceFunctionApproximation,
 				p -> edgeLengthFunctionApprox.apply(p),
@@ -98,7 +98,7 @@ public class EikMeshPoly {
 			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
 		};
 
-		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), alertPredicate, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
+		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
 		var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
 		meshPanel.display("Combined distance functions " + h0);
 		meshImprover.improve();

@@ -211,7 +211,7 @@ public class ScenarioRun implements Runnable {
 			Path path = scenarioFilePath.getParent().resolve(IOUtils.MESH_DIR + "/" + scenario.getName()+".poly");
 			mesh = (PMesh) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.info("no background mesh " + scenario.getName() + ".poly was found.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

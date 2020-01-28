@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -50,7 +52,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private final Collection<VLine> constrains;
 	private final Collection<Pair<V, V>> vConstrains;
-	private final Collection<E> eConstrains;
+	private final Set<E> eConstrains;
 	private final Collection<IPoint> points;
 	private final Map<V, VLine> projectionMap;
 	private boolean generated;
@@ -79,7 +81,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		this.constrains = constrains;
 		this.points = Collections.EMPTY_LIST;
 		this.vConstrains = new ArrayList<>(constrains.size());
-		this.eConstrains = new ArrayList<>(constrains.size());
+		this.eConstrains = new HashSet<>(constrains.size());
 		this.projectionMap = new HashMap<>();
 
 		/**
@@ -140,6 +142,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 		Optional<E> nonConformingEdge;
 		do {
+			// TODO this seems expensive!
 			nonConformingEdge = eConstrains.stream()
 					.filter(edge -> !getMesh().isAtBoundary(edge))
 					.filter(edge -> getTriangulation().isDelaunayIllegal(edge))
