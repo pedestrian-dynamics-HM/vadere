@@ -211,7 +211,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -259,7 +259,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -307,7 +307,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -355,7 +355,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -403,7 +403,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -451,7 +451,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -499,7 +499,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -547,7 +547,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -595,7 +595,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -643,7 +643,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -691,7 +691,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -739,7 +739,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -787,7 +787,7 @@
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
           },
-          "selfCategory" : null,
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
