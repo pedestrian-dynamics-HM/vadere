@@ -184,7 +184,7 @@
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 2,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,

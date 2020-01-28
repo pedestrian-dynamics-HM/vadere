@@ -145,7 +145,7 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -163,7 +163,7 @@
             "y" : 0.5001
           } ]
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -181,7 +181,7 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -199,7 +199,7 @@
             "y" : 9.4999
           } ]
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -217,7 +217,7 @@
             "y" : 10.0001
           } ]
         },
-        "id" : -1
+        "id" : 6
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -251,7 +251,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 7,
         "shape" : {
           "x" : 2.5,
           "y" : 2.5,

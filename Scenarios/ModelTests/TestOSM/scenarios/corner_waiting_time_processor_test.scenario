@@ -214,7 +214,7 @@
       } ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 5,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,

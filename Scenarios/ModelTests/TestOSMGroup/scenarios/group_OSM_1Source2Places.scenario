@@ -120,7 +120,7 @@
           "height" : 3.6,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 15.0,
@@ -129,7 +129,7 @@
           "height" : 3.8,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 21.6,
@@ -138,7 +138,7 @@
           "height" : 4.3,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 21.6,
@@ -147,7 +147,7 @@
           "height" : 4.2,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

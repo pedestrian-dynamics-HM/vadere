@@ -169,7 +169,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 10.0,
@@ -178,7 +178,7 @@
           "height" : 9.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -212,7 +212,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 4,
         "shape" : {
           "x" : 1.2,
           "y" : 1.2,
@@ -234,7 +234,7 @@
       } ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 5,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -282,7 +282,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 6,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,

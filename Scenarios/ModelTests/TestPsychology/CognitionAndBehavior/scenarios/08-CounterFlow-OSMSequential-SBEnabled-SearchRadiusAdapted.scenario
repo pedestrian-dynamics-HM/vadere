@@ -170,7 +170,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 1.6,
           "y" : 0.5,
@@ -190,7 +190,7 @@
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
       }, {
-        "id" : -1,
+        "id" : 4,
         "shape" : {
           "x" : 17.4,
           "y" : 0.5,

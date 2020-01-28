@@ -52,6 +52,7 @@ public class TopographyController extends OfflineTopographyController {
 		newPedestrian.setSelfCategory(agentWrapper.getSelfCategory());
 		newPedestrian.setThreatMemory(agentWrapper.getThreatMemory());
 
+		newPedestrian.setSource((agentWrapper.getSource()));
 		newPedestrian.setIdAsTarget(agentWrapper.getIdAsTarget());
 		newPedestrian.setTargets(agentWrapper.getTargets());
 

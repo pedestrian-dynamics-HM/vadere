@@ -137,7 +137,7 @@
           "height" : 19.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 0.4,
@@ -146,7 +146,7 @@
           "height" : 6.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 18.0,
@@ -155,7 +155,7 @@
           "height" : 26.8,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 0.0,
@@ -164,7 +164,7 @@
           "height" : 19.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 5.6,
@@ -173,7 +173,7 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       }, {
         "shape" : {
           "x" : 7.0,
@@ -182,7 +182,7 @@
           "height" : 4.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 7
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ {
@@ -235,7 +235,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 8,
         "shape" : {
           "x" : 1.0,
           "y" : 29.0,

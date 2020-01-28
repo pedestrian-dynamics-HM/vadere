@@ -145,7 +145,7 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -179,7 +179,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 2.5,
           "y" : 2.5,
