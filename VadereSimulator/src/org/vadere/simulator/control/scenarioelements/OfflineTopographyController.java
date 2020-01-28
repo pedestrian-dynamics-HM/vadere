@@ -58,9 +58,7 @@ public class OfflineTopographyController {
 	}
 
 	/**
-	 * Recomputes the {@link org.vadere.util.geometry.LinkedCellsGrid} for fast access to pedestrian
-	 * and car
-	 * neighbors.
+	 * Recomputes the {@link org.vadere.util.geometry.LinkedCellsGrid} for fast access to pedestrian neighbors.
 	 */
 	protected void recomputeCells() {
 		this.topography.getSpatialMap(Pedestrian.class).clear();

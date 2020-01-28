@@ -27,8 +27,9 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	private void createAgentWrapperPedestrians() {
-		for (Pedestrian agentWrapper : topography .getInitialElements(Pedestrian.class)) {
-			// TODO: Maybe, pass "attributesAgent" to "createElement()" so that this is not overwritten.
+		for (Pedestrian agentWrapper : topography.getInitialElements(Pedestrian.class)) {
+			// Maybe, pass "attributesAgent" to "createElement()" so that attributes,
+			// which are configure in GUI, are not overwritten by "createElement()" method
 			Pedestrian createdPedestrian = (Pedestrian) dynamicElementFactory.createElement(agentWrapper.getPosition(),
 					agentWrapper.getId(), Pedestrian.class);
 
