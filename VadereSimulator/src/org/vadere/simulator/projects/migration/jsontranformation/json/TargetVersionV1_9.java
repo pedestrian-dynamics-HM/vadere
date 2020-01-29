@@ -33,7 +33,7 @@ public class TargetVersionV1_9 extends SimpleJsonTransformation {
 			for (JsonNode dynamicElementNode : dynamicElementsNode) {
 				JsonNode psychologyStatusNode = path(dynamicElementNode, "psychologyStatus");
 
-				remove(psychologyStatusNode, nodeNameToRemove);
+				removeIfExists(psychologyStatusNode, nodeNameToRemove);
 			}
 		}
 
