@@ -42,27 +42,30 @@ public class TopographyController extends OfflineTopographyController {
 	private void applyAttributesFromAgentWrapper(Pedestrian agentWrapper, Pedestrian newPedestrian) {
 		newPedestrian.setAttributes(agentWrapper.getAttributes());
 
-		newPedestrian.setChild(agentWrapper.isChild());
-		newPedestrian.setLikelyInjured(agentWrapper.isLikelyInjured());
-		newPedestrian.setFollowers(agentWrapper.getFollowers());
-		newPedestrian.setIsCurrentTargetAnAgent(agentWrapper.isCurrentTargetAnAgent());
-
-		newPedestrian.setGroupMembership(agentWrapper.getGroupMembership());
-		newPedestrian.setMostImportantStimulus(agentWrapper.getMostImportantStimulus());
-		newPedestrian.setSelfCategory(agentWrapper.getSelfCategory());
-		newPedestrian.setThreatMemory(agentWrapper.getThreatMemory());
-
 		newPedestrian.setSource((agentWrapper.getSource()));
-		newPedestrian.setIdAsTarget(agentWrapper.getIdAsTarget());
 		newPedestrian.setTargets(agentWrapper.getTargets());
-
-		newPedestrian.setGroupIds(agentWrapper.getGroupIds());
-		newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
+		newPedestrian.setNextTargetListIndex(agentWrapper.getNextTargetListIndex());
+		newPedestrian.setIsCurrentTargetAnAgent(agentWrapper.isCurrentTargetAnAgent());
 
 		newPedestrian.setFreeFlowSpeed(agentWrapper.getFreeFlowSpeed());
 		if (!Double.isNaN(agentWrapper.getVelocity().x) && !Double.isNaN(agentWrapper.getVelocity().y)) {
 			newPedestrian.setVelocity(agentWrapper.getVelocity());
 		}
+
+		newPedestrian.setFollowers(agentWrapper.getFollowers());
+		newPedestrian.setIdAsTarget(agentWrapper.getIdAsTarget());
+		newPedestrian.setChild(agentWrapper.isChild());
+		newPedestrian.setLikelyInjured(agentWrapper.isLikelyInjured());
+
+		newPedestrian.setMostImportantStimulus(agentWrapper.getMostImportantStimulus());
+		newPedestrian.setThreatMemory(agentWrapper.getThreatMemory());
+		newPedestrian.setSelfCategory(agentWrapper.getSelfCategory());
+		newPedestrian.setGroupMembership(agentWrapper.getGroupMembership());
+
+		newPedestrian.setGroupIds(agentWrapper.getGroupIds());
+		newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
+
+		agentWrapper.getTrajectory().getFootSteps().forEach(footStep -> newPedestrian.addFootStepToTrajectory(footStep));
 	}
 
 	public void update(double simTimeInSec) {
