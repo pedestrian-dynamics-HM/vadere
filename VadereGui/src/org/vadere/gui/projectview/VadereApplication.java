@@ -3,6 +3,8 @@ package org.vadere.gui.projectview;
 
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.util.io.VadereArgumentParser;
@@ -24,9 +26,18 @@ public class VadereApplication {
 
 		VadereArgumentParser vadereArgumentParser = new VadereArgumentParser();
 		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
+		argumentParser.addArgument("--project")
+				.required(false)
+				.type(String.class)
+				.dest("project-path")
+				.setDefault("")
+				.help("Path to project to open");
 
+		Namespace ns;
 		try {
-			vadereArgumentParser.parseArgsAndProcessOptions(args);
+			ns = vadereArgumentParser.parseArgsAndProcessOptions(args);
+			Messages.loadLanguageFromPreferences(VadereApplication.class);
+			ProjectView.start(ns.getString("project-path"));
 		} catch (UnsatisfiedLinkError linkError) {
 			System.err.println("[LWJGL]: " + linkError.getMessage());
 		} catch (ArgumentParserException e) {
@@ -38,9 +49,9 @@ public class VadereApplication {
 			System.exit(1);
 		}
 
-		Messages.loadLanguageFromPreferences(VadereApplication.class);
 
-		ProjectView.start();
+
+
 	}
 
 }
