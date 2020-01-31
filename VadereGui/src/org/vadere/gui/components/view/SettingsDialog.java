@@ -35,8 +35,6 @@ public class SettingsDialog extends JDialog {
 	private JLayeredPane colorSettingsPane;
 	protected JLayeredPane agentColorSettingsPane;
 	private JLayeredPane otherSettingsPane;
-	private JComboBox<Integer> jComboTargetIds;
-	private JComboBox<SelfCategory> jComboSelfCategories;
 	protected ButtonGroup group;
 
 	public SettingsDialog(final SimulationModel<? extends DefaultSimulationConfig> model) {
@@ -160,131 +158,6 @@ public class SettingsDialog extends JDialog {
 		createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
 	}
 
-	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
-		CellConstraints cc = new CellConstraints();
-
-		FormLayout pedColorLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu",
-				createCellsWithSeparators(8));
-
-		colorSettingsPane.setLayout(pedColorLayout);
-		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.pedcolors.border.text")));
-
-		jComboTargetIds = createTargetIdsComboBoxAndAddIds();
-		jComboTargetIds.setSelectedIndex(0);
-
-		final JButton bChangeTargetColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
-		final JPanel pByTargetId = new JPanel();
-
-		Integer selectedTargetIdOuter = jComboTargetIds.getItemAt(jComboTargetIds.getSelectedIndex());
-		if (selectedTargetIdOuter == null) {
-			selectedTargetIdOuter = 1;
-		}
-
-		JRadioButton targetColoring = new JRadioButton(Messages.getString("SettingsDialog.lblTargetColoring.text")+ ":");
-		targetColoring.setSelected(true);
-		model.setAgentColoring(AgentColoring.TARGET);
-		targetColoring.addItemListener(e -> {
-			model.setAgentColoring(AgentColoring.TARGET);
-			model.notifyObservers();
-		});
-
-		JRadioButton randomColoring = new JRadioButton(Messages.getString("SettingsDialog.chbUseRandomColors.text"));
-		randomColoring.addItemListener(e -> {
-			model.setAgentColoring(AgentColoring.RANDOM);
-			model.notifyObservers();
-		});
-
-		JRadioButton groupColoring = new JRadioButton(Messages.getString("SettingsDialog.chbGroupColors.text"));
-		groupColoring.addItemListener(e -> {
-			model.setAgentColoring(AgentColoring.GROUP);
-			model.notifyObservers();
-		});
-
-		JRadioButton selfCategoryColoring = new JRadioButton(Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
-		model.setAgentColoring(AgentColoring.SELF_CATEGORY);
-		selfCategoryColoring.addItemListener(e -> {
-			model.setAgentColoring(AgentColoring.SELF_CATEGORY);
-			model.notifyObservers();
-		});
-
-		jComboSelfCategories = createSelfCategoriesComboBox();
-		jComboSelfCategories.setSelectedIndex(0);
-
-		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
-
-		final JPanel pBySelfCategory = new JPanel();
-		SelfCategory selectedSelfCategory = jComboSelfCategories.getItemAt(jComboTargetIds.getSelectedIndex());
-		Color colorBySelfCategory = model.config.getSelfCategoryColor(selectedSelfCategory);
-		pBySelfCategory.setBackground(colorBySelfCategory);
-		pBySelfCategory.setPreferredSize(new Dimension(130, 20));
-		// When user changes a color, save it in the model.
-		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pBySelfCategory,
-				jComboSelfCategories));
-
-		// Retrieve configured color from "model" or use default color.
-		jComboSelfCategories.addActionListener(e -> {
-			SelfCategory selectedSelfCategoryInner = jComboSelfCategories.getItemAt(jComboSelfCategories.getSelectedIndex());
-			pBySelfCategory.setBackground(model.config.getSelfCategoryColor(selectedSelfCategoryInner));
-		});
-
-		group = new ButtonGroup();
-		group.add(targetColoring);
-		group.add(randomColoring);
-		group.add(groupColoring);
-		group.add(selfCategoryColoring);
-
-		Optional<Color> colorByTargetId = model.config.getColorByTargetId(selectedTargetIdOuter);
-		pByTargetId.setBackground(colorByTargetId.orElseGet(() -> model.config.getPedestrianDefaultColor()));
-		pByTargetId.setPreferredSize(new Dimension(130, 20));
-		// When user changes a color, save it in the model.
-		bChangeTargetColor.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pByTargetId,
-				jComboTargetIds));
-
-		// Retrieve configured color from "model" or use default color.
-		jComboTargetIds.addActionListener(e -> {
-			Integer selectedTargetIdInner = jComboTargetIds.getItemAt(jComboTargetIds.getSelectedIndex());
-			if (selectedTargetIdInner == null) {
-				selectedTargetIdInner = 1;
-			}
-
-			Optional<Color> colorByTarget = config.getColorByTargetId(selectedTargetIdInner);
-			pByTargetId.setBackground(colorByTarget.orElseGet(() -> model.config.getPedestrianDefaultColor()));
-		});
-
-		final JButton bPedestrianNoTarget = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
-		final JPanel pPedestrianNoTarget = new JPanel();
-		Optional<Color> notTargetPedCol = config.getColorByTargetId((-1));
-		pPedestrianNoTarget.setBackground(notTargetPedCol.orElseGet(() -> model.config.getPedestrianDefaultColor()));
-		pPedestrianNoTarget.setPreferredSize(new Dimension(130, 20));
-		bPedestrianNoTarget.addActionListener(new ActionSetPedestrianWithoutTargetColor(
-				"Set Pedestrian without Target Color", model, pPedestrianNoTarget));
-
-		int row = 0;
-		int column = 2;
-
-		row += NEXT_CELL;
-
-		colorSettingsPane.add(targetColoring, cc.xy(2, 2));
-		colorSettingsPane.add(jComboTargetIds, cc.xy(4, 2));
-		colorSettingsPane.add(pByTargetId, cc.xy(6, 2));
-		colorSettingsPane.add(bChangeTargetColor, cc.xy(8, 2));
-
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(4, 4));
-		colorSettingsPane.add(pPedestrianNoTarget, cc.xy(6, 4));
-		colorSettingsPane.add(bPedestrianNoTarget, cc.xy(8, 4));
-
-		colorSettingsPane.add(randomColoring, cc.xyw(2, 6, 9));
-		colorSettingsPane.add(groupColoring, cc.xyw(2, 8, 9));
-
-		row = 10;
-		colorSettingsPane.add(selfCategoryColoring, cc.xy(2, row));
-		colorSettingsPane.add(jComboSelfCategories, cc.xy(4, row));
-		colorSettingsPane.add(pBySelfCategory, cc.xy(6, row));
-		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(8, row));
-
-		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java"
-	}
-
 	private void createColorCanvasesAndChangeButtonsOnPane(JLayeredPane colorSettingsPane) {
 		int row = 0;
 		int column2 = 4;
@@ -348,6 +221,79 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(bTargetChangerColor, cc.xy(column3, row));
 	}
 
+	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
+		FormLayout pedColorLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu",
+				createCellsWithSeparators(8));
+
+		colorSettingsPane.setLayout(pedColorLayout);
+		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.pedcolors.border.text")));
+
+		JRadioButton rbTargetColoring = createRadioButtonWithListener(AgentColoring.TARGET, Messages.getString("SettingsDialog.lblTargetColoring.text")+ ":");
+		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
+		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
+		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
+
+		rbTargetColoring.setSelected(true);
+		model.setAgentColoring(AgentColoring.TARGET);
+
+		group = new ButtonGroup();
+		group.add(rbTargetColoring);
+		group.add(rbRandomColoring);
+		group.add(rbGroupColoring);
+		group.add(rbSelfCategoryColoring);
+
+		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
+		final JPanel pTargetColor = new JPanel();
+		final JButton bChangeTargetColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pPedestrianColorNoTarget = new JPanel();
+		final JButton bChangePedestrianColorNoTarget = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringByTargetId(cbTargetIds, pTargetColor, bChangeTargetColor, bChangePedestrianColorNoTarget, pPedestrianColorNoTarget);
+
+		JComboBox<SelfCategory> cbSelfCategories = createSelfCategoriesComboBox();
+		final JPanel pSelfCategoryColor = new JPanel();
+		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
+
+		int row = 0;
+		int column1 = 2;
+		int column2 = 4;
+		int column3 = 6;
+		int column4 = 8;
+
+		CellConstraints cc = new CellConstraints();
+
+		colorSettingsPane.add(rbTargetColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbTargetIds, cc.xy(column2, row));
+		colorSettingsPane.add(pTargetColor, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeTargetColor, cc.xy(column4, row));
+
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column3, row));
+		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column4, row));
+
+		colorSettingsPane.add(rbRandomColoring, cc.xyw(column1, row += NEXT_CELL, 9));
+		colorSettingsPane.add(rbGroupColoring, cc.xyw(column1, row += NEXT_CELL, 9));
+
+		colorSettingsPane.add(rbSelfCategoryColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbSelfCategories, cc.xy(column2, row));
+		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column4, row));
+
+		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
+	}
+
+	private JRadioButton createRadioButtonWithListener(AgentColoring colorScheme, String buttonText) {
+		JRadioButton radioButton = new JRadioButton(buttonText);
+		radioButton.addItemListener(e -> {
+			model.setAgentColoring(colorScheme);
+			model.notifyObservers();
+		});
+
+		return radioButton;
+	}
+
 	private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
 		java.util.List<Target> targets = model.getTopography().getTargets();
 		Integer[] selectableTargets = new Integer[targets.size()];
@@ -365,6 +311,60 @@ public class SettingsDialog extends JDialog {
 		JComboBox<SelfCategory> comboBox = new JComboBox<>(SelfCategory.values());
 
 		return comboBox;
+	}
+
+	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
+		cbTargetIds.setSelectedIndex(0);
+
+		Integer selectedTargetIdOuter = cbTargetIds.getItemAt(cbTargetIds.getSelectedIndex());
+		if (selectedTargetIdOuter == null) {
+			selectedTargetIdOuter = 1;
+		}
+
+		Optional<Color> colorByTargetId = model.config.getColorByTargetId(selectedTargetIdOuter);
+		pTargetColor.setBackground(colorByTargetId.orElseGet(() -> model.config.getPedestrianDefaultColor()));
+		pTargetColor.setPreferredSize(new Dimension(130, 20));
+
+		// When user changes a color, save it in the model.
+		bChangeTargetColor.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pTargetColor,
+				cbTargetIds));
+
+		// Retrieve configured color from "model" or use default color.
+		cbTargetIds.addActionListener(e -> {
+			Integer selectedTargetIdInner = cbTargetIds.getItemAt(cbTargetIds.getSelectedIndex());
+			if (selectedTargetIdInner == null) {
+				selectedTargetIdInner = 1;
+			}
+
+			Optional<Color> colorByTarget = config.getColorByTargetId(selectedTargetIdInner);
+			pTargetColor.setBackground(colorByTarget.orElseGet(() -> model.config.getPedestrianDefaultColor()));
+		});
+
+		Optional<Color> notTargetPedCol = config.getColorByTargetId((-1));
+		pPedestrianColorNoTarget.setBackground(notTargetPedCol.orElseGet(() -> model.config.getPedestrianDefaultColor()));
+		pPedestrianColorNoTarget.setPreferredSize(new Dimension(130, 20));
+		bChangePedestrianColorNoTarget.addActionListener(new ActionSetPedestrianWithoutTargetColor(
+				"Set Pedestrian without Target Color", model, pPedestrianColorNoTarget));
+	}
+
+	private void initColoringBySelfCategory(JComboBox<SelfCategory> cbSelfCategories, JPanel pSelfCategoryColor, JButton bChangeSelfCategoryColor) {
+		cbSelfCategories.setSelectedIndex(0);
+
+		SelfCategory selectedSelfCategory = cbSelfCategories.getItemAt(cbSelfCategories.getSelectedIndex());
+		Color selfCategoryColor = model.config.getSelfCategoryColor(selectedSelfCategory);
+
+		pSelfCategoryColor.setBackground(selfCategoryColor);
+		pSelfCategoryColor.setPreferredSize(new Dimension(130, 20));
+
+		// When user changes a color, save it in the model.
+		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pSelfCategoryColor,
+				cbSelfCategories));
+
+		// Retrieve configured color from "model".
+		cbSelfCategories.addActionListener(e -> {
+			SelfCategory selectedSelfCategoryInner = cbSelfCategories.getItemAt(cbSelfCategories.getSelectedIndex());
+			pSelfCategoryColor.setBackground(model.config.getSelfCategoryColor(selectedSelfCategoryInner));
+		});
 	}
 
 	private void initOtherSettingsPane(JLayeredPane otherSettingsPane) {
