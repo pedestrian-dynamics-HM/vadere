@@ -230,4 +230,9 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 
 	@Override
 	public void elementRemoved(Pedestrian element) {}
+
+	@Override
+	public void shutdown() {
+		executorService.shutdown();
+	}
 }

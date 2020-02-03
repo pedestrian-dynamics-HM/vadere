@@ -3,10 +3,10 @@ package org.vadere.simulator.models.potential.combinedPotentials;
 /**
  * All available potential strategies.
  *
- * Use these enum values to create objects imlementing {@link org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy}
+ * Use these enum values to create objects implementing {@link org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy}
  * by using the factory pattern.
  */
 public enum CombinedPotentialStrategy {
     TARGET_ATTRACTION_STRATEGY,
-    TARGET_DISTRACTION_STRATEGY
+    TARGET_REPULSION_STRATEGY
 }

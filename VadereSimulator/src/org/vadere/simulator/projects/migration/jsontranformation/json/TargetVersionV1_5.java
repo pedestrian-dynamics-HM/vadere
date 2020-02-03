@@ -49,7 +49,7 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
  * - "salientBehavior" to "selfCategory" in "dynamicElement" nodes
  *
  * After renaming, encapsulate two psychology-related attributes into
- * a new "psychlogy" node in "dynamicElement" nodes:
+ * a new "psychology" node in "dynamicElement" nodes:
  * - mostImportantStimulus
  * - selfCategory
  *

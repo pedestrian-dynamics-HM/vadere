@@ -8,9 +8,9 @@ import org.vadere.manager.TraCIException;
 public enum TraCICmd {
 	// TraCI/Control-related commands
 	GET_VERSION(0x00, CmdType.CTRL),
-	SIM_STEP(0x02,CmdType.CTRL),
+	SIM_STEP(0x02, CmdType.CTRL),
 	CLOSE(0x7F, CmdType.CTRL),
-	LOAD(0x01,CmdType.CTRL),
+	LOAD(0x01, CmdType.CTRL),
 	SET_ORDER(0x03, CmdType.CTRL),
 	SEND_FILE(0x75, CmdType.CTRL),
 	// Value Retrieval
@@ -21,7 +21,7 @@ public enum TraCICmd {
 	GET_TRAFFIC_LIGHT_VALUE(0xa2, CmdType.VALUE_GET),
 	RESPONSE_GET_TRAFFIC_LIGHT_VALUE(0xb2, CmdType.RESPONSE),
 	GET_LANE_VALUE(0xa3, CmdType.VALUE_GET),
-	RESPONSE_GET_LANE_VALUE(0xb3,CmdType.RESPONSE),
+	RESPONSE_GET_LANE_VALUE(0xb3, CmdType.RESPONSE),
 	GET_VEHICLE_VALUE(0xa4, CmdType.VALUE_GET),
 	RESPONSE_GET_VEHICLE_VALUE(0xb4, CmdType.RESPONSE),
 	GET_VEHICLE_TYPE_VALUE(0xa5, CmdType.VALUE_GET),
@@ -44,17 +44,20 @@ public enum TraCICmd {
 	RESPONSE_GET_LANEAREA_DETECTOR(0xbd, CmdType.RESPONSE),
 	GET_PERSON_VALUE(0xae, CmdType.VALUE_GET),
 	RESPONSE_GET_PERSON_VALUE(0xbe, CmdType.RESPONSE),
+	GET_VADERE_VALUE(0xaf, CmdType.VALUE_GET),
+	RESPONSE_GET_VADERE_VALUE(0xbf, CmdType.RESPONSE),
 	// State Changing
 	SET_TRAFFIC_LIGHT_STATE(0xc2, CmdType.VALUE_SET),
-	SET_LANE_STATE(0xc3,CmdType.VALUE_SET),
+	SET_LANE_STATE(0xc3, CmdType.VALUE_SET),
 	SET_VEHICLE_STATE(0xc4, CmdType.VALUE_SET),
 	SET_PERSON_STATE(0xce, CmdType.VALUE_SET),
+	SET_VADERE_STATE(0xcf, CmdType.VALUE_SET),
 	SET_VEHICLE_TYPE_STATE(0xc5, CmdType.VALUE_SET),
 	SET_ROUTE_STATE(0xc6, CmdType.VALUE_SET),
 	SET_POT_STATE(0xc7, CmdType.VALUE_SET),
 	SET_POLYGON_STATE(0xc8, CmdType.VALUE_SET),
 	SET_EDGE_STATE(0xca, CmdType.VALUE_SET),
-	SET_SIMULATION_STATE(0xcc, CmdType.VALUE_SET),
+	SET_SIMULATION_STATE(0xcb, CmdType.VALUE_SET), // changed: 0xcc -> 0xcb to match sumo/tools/traci
 	SET_GUI_STATE(0xcc, CmdType.VALUE_SET),
 	// TraCI/Object Variable Subscription
 	SUB_INDUCTION_LOOP_VALUE(0xd0, CmdType.VALUE_SUB),
@@ -83,6 +86,8 @@ public enum TraCICmd {
 	RESPONSE_SUB_SIMULATION_VALUE(0xeb, CmdType.RESPONSE),
 	SUB_PERSON_VARIABLE(0xde, CmdType.VALUE_SUB),
 	RESPONSE_SUB_PERSON_VARIABLE(0xee, CmdType.RESPONSE),
+	SUB_VADERE_VARIABLE(0xdf, CmdType.VALUE_SUB),
+	RESPONSE_SUB_VADERE_VALUE(0xef, CmdType.RESPONSE),
 	// TraCI/Object Context Subscription
 	;
 
@@ -95,8 +100,8 @@ public enum TraCICmd {
 
 	}
 
-	public static TraCICmd fromId(int id){
-		for(TraCICmd traCICmd : values()){
+	public static TraCICmd fromId(int id) {
+		for (TraCICmd traCICmd : values()) {
 			if (traCICmd.id == id)
 				return traCICmd;
 		}
@@ -106,6 +111,6 @@ public enum TraCICmd {
 	@Override
 	public String toString() {
 
-		return String.format("TraCICmd{%s: id=0x%02X, type=%s}", name(), id, type );
+		return String.format("TraCICmd{%s: id=0x%02X, type=%s}", name(), id, type);
 	}
 }

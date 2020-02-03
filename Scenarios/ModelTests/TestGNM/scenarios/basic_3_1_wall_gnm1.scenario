@@ -1,7 +1,7 @@
 {
   "name" : "basic_3_1_wall_gnm1",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

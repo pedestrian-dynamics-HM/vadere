@@ -6,6 +6,9 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
 
+import org.vadere.manager.server.AbstractVadereServer;
+import org.vadere.manager.server.VadereServer;
+import org.vadere.manager.server.VadereSingleClientServer;
 import org.vadere.util.logging.Logger;
 
 import java.net.ServerSocket;
@@ -25,10 +28,16 @@ public class Manager {
 
 		try {
 			ns = p.parseArgs(args);
-			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
+
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
-			VadereServer server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
+			AbstractVadereServer server;
+			if (ns.getBoolean("singleClient")) {
+				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
+			} else {
+				ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
+				server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
+			}
 			server.run();
 
 		} catch (HelpScreenException ignored) {
@@ -81,6 +90,13 @@ public class Manager {
 				.setDefault(4)
 				.dest("clientNum")
 				.help("Set number of clients to manager. Important: Each client has a separate simulation. No communication between clients");
+
+		parser.addArgument("--single-client")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.type(Boolean.class)
+				.dest("singleClient")
+				.help("Use server which only accepts one client and terminates after one simulation run.");
 
 		// boolean switch to tell server to start in gui mode.
 		parser.addArgument("--gui-mode")

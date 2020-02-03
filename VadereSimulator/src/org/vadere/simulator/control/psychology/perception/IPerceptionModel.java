@@ -19,7 +19,7 @@ import java.util.List;
  * JSON file).
  *
  * The <code>initialize</code> method must be called before usage!
- * This interface defines a callbacks for the simulation loop.
+ * This interface defines callbacks for the simulation loop.
  * It's implementations define the major part of the simulation model's logic.
  *
  * This approach is similar to the {@link Model} interface for locomotion models.

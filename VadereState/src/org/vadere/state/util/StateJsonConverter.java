@@ -157,9 +157,12 @@ public abstract class StateJsonConverter {
 		store.absorbingAreas.forEach(absorbingArea -> topography.addAbsorbingArea(new AbsorbingArea(absorbingArea)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
 		store.measurementAreas.forEach(area -> topography.addMeasurementArea(new MeasurementArea(area)));
+
 		store.dynamicElements.forEach(topography::addInitialElement);
+
 		if (store.teleporter != null)
 			topography.setTeleporter(new Teleporter(store.teleporter));
+
 		return topography;
 	}
 

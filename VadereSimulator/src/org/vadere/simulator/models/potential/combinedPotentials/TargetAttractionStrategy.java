@@ -9,7 +9,7 @@ import org.vadere.util.geometry.shapes.IPoint;
 import java.util.Collection;
 
 /**
- * Combine potential so that agents get attracted by targets.
+ * Combine potential so that agents are attracted by targets.
  */
 public class TargetAttractionStrategy implements ICombinedPotentialStrategy {
     private IPotentialFieldTarget potentialFieldTarget;

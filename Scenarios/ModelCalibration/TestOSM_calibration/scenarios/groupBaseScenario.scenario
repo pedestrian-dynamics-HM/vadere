@@ -1,7 +1,7 @@
 {
   "name" : "g2_osm_calibration_minStepSize_0_11",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

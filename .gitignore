@@ -5,6 +5,8 @@
 bin/
 swing-inspector-linux-1.2.3/
 target/
+javac.*.args
+
 
 # C extensions
 *.so

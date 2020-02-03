@@ -4,12 +4,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
+import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.Bang;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
@@ -40,6 +42,13 @@ import java.util.stream.Collectors;
 public class OSMBehaviorController {
 
     private static Logger logger = Logger.getLogger(OSMBehaviorController.class);
+
+    public void makeStepToTarget(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
+        // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
+        pedestrian.updateNextPosition();
+        makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+    }
 
     /**
      * Prepare move of pedestrian inside the topography. The pedestrian object already has the new
@@ -110,41 +119,79 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
 
-    // Watch out: A bang event changes only the "CombinedPotentialStrategy".
-    // I.e., a new target is set for the agent. The agent does not move here!
-    // Therefore, trigger only a single bang event and then use "ElapsedTime" afterwards
-    // to let the agent walk.
-    public void reactToBang(PedestrianOSM pedestrian, Topography topography) {
-        Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
-
-        if (mostImportantStimulus instanceof Bang) {
-            Bang bang = (Bang) pedestrian.getMostImportantStimulus();
-            Target bangOrigin = topography.getTarget(bang.getOriginAsTargetId());
+    public void changeToTargetRepulsionStrategyAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
+        if (pedestrian.getThreatMemory().isLatestThreatUnhandled()) {
+            Threat threat = pedestrian.getThreatMemory().getLatestThreat();
+            Target threatOrigin = topography.getTarget(threat.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
-            nextTarget.add(bangOrigin.getId());
+            nextTarget.add(threatOrigin.getId());
 
             pedestrian.setTargets(nextTarget);
-            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_DISTRACTION_STRATEGY);
-        } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
-                    Bang.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
+
+            // TODO: Maybe, sample speed-up from a distribution or define it as a configurable attribute.
+            double escapeSpeed = pedestrian.getFreeFlowSpeed() * 2.0;
+            pedestrian.setFreeFlowSpeed(escapeSpeed);
+
+            pedestrian.getThreatMemory().setLatestThreatUnhandled(false);
         }
     }
 
-    public void reactToTargetChange(PedestrianOSM pedestrian, Topography topography) {
+    /**
+     * In dangerous situation humans tend to escape to familiar places (safe zones).
+     * A pedestrian selects the target which is closest to its source as safe zone.
+     * Or if pedestrian has no target, select closest target as safe zone.
+     *
+     * TODO: Clarify with Gerta if this is really a plausible assumption for safe zones.
+     *   An easier approach is to just use the closest target as safe zone.
+     */
+    public void changeTargetToSafeZone(PedestrianOSM pedestrian, Topography topography) {
+        if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
+
+            ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
+            Target closestTarget = findClosestTarget(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
+
+            assert closestTarget != null;
+
+            if (closestTarget != null) {
+                pedestrian.setSingleTarget(closestTarget.getId(), false);
+            }
+
+            pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
+        }
+    }
+
+    private Target findClosestTarget(Topography topography, ScenarioElement scenarioElement, Threat threat) {
+        VPoint sourceCentroid = scenarioElement.getShape().getCentroid();
+
+        List<Target> sortedTargets = topography.getTargets().stream()
+                .filter(target -> target.getId() != threat.getOriginAsTargetId())
+                .sorted((target1, target2) -> Double.compare(
+                        sourceCentroid.distance(target1.getShape().getCentroid()),
+                        sourceCentroid.distance(target2.getShape().getCentroid())))
+                .collect(Collectors.toList());
+
+        Target closestTarget = (sortedTargets.isEmpty()) ? null : sortedTargets.get(0);
+
+        return closestTarget;
+    }
+
+    public void changeTarget(PedestrianOSM pedestrian, Topography topography) {
         Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
 
         if (mostImportantStimulus instanceof ChangeTarget) {
             ChangeTarget changeTarget = (ChangeTarget) pedestrian.getMostImportantStimulus();
             pedestrian.setTargets(changeTarget.getNewTargetIds());
-
+            pedestrian.setNextTargetListIndex(0);
         } else {
-            logger.debug(String.format("Expected: %s, Received: %s"),
+            logger.debug(String.format("Expected: %s, Received: %s",
                     ChangeTarget.class.getSimpleName(),
-                    mostImportantStimulus.getClass().getSimpleName());
+                    mostImportantStimulus.getClass().getSimpleName()));
         }
+
+        // Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
     }
 
     @Nullable

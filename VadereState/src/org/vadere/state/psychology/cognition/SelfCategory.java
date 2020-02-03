@@ -2,16 +2,22 @@ package org.vadere.state.psychology.cognition;
 
 /**
  * According to the self-categorization theory ("reicher-2010"), people define
- * themselves as member of a social category. Often, people act collectively
- * when being in the same category. E.g., protesters - which define themselves
- * as protesers - walk together during a demonstration.
+ * themselves as a member of social categories. People can have multiple
+ * categories, e.g., father, football fan, colleague. At a specific point in
+ * time, only one category is salient.
  *
- * Our agents can use these categorizations to to derive a specific behavior.
- * E.g., if an agents is "COOPERATIVE", the pedestrian swaps places
- * with other "COOPERATIVE" pedestrians.
+ * Our agents use these categorizations to derive a specific behavior.
+ * E.g., if an agents is "COOPERATIVE" (category), the pedestrian swaps places
+ * (behavior) with other "COOPERATIVE" pedestrians (only if both feel committed
+ * to this category as in-group member, see {@łink GroupMembership}.
  *
- * Watch out: The self category of an agent can change during a simulation.
+ * Usually, the self category of an agent changes during a simulation.
  */
 public enum SelfCategory {
-    TARGET_ORIENTED, COOPERATIVE
+    TARGET_ORIENTED,
+    COOPERATIVE,
+    INSIDE_THREAT_AREA,
+    OUTSIDE_THREAT_AREA,
+    WAIT,
+    CHANGE_TARGET
 }

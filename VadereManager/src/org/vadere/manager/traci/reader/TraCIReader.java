@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.reader;
 
-import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -15,27 +15,30 @@ import java.util.Map;
 
 
 /**
- * Definition of read methods used to deserialize TraCICommands / TraCIResponses received
- * over a socket.
+ * Definition of read methods used to deserialize TraCICommands / TraCIResponses received over a
+ * socket.
  */
 public interface TraCIReader {
 
 
 	byte readByte();
-	default int readUnsignedByte(){
+
+	default int readUnsignedByte() {
 		// (signed)byte --cast--> (signed)int --(& 0xff)--> cut highest three bytes.
 		// This result represents the an unsigned byte value (0..255) as an int.
-		return (int)readByte() & 0xff;
+		return (int) readByte() & 0xff;
 	}
 
 	byte[] readBytes(int num);
-	default ByteBuffer readByteBuffer(int num){
+
+	default ByteBuffer readByteBuffer(int num) {
 		return ByteBuffer.wrap(readBytes(num));
 	}
 
 	void readBytes(byte[] data);
 
 	int readInt();
+
 	double readDouble();
 
 	String readString(int numOfBytes);

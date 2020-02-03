@@ -1,7 +1,7 @@
 {
   "name" : "see_small_wall_pso_fail",
   "description" : "The particle swarm optimizer does not use the attribute seeSmallWalls.",
-  "release" : "1.7",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -155,7 +155,7 @@
           "height" : 8.55,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -189,7 +189,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 4.7,
           "y" : 2.5,

@@ -3,41 +3,45 @@ package org.vadere.manager.traci.writer;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.traci.respons.StatusResponse;
-import org.vadere.manager.traci.respons.TraCIGetResponse;
-import org.vadere.manager.traci.respons.TraCIGetVersionResponse;
-import org.vadere.manager.traci.respons.TraCISimTimeResponse;
-import org.vadere.manager.traci.respons.TraCIStatusResponse;
-import org.vadere.manager.traci.respons.TraCISubscriptionResponse;
+import org.vadere.manager.traci.reader.TraCIPacketBuffer;
+import org.vadere.manager.traci.response.StatusResponse;
+import org.vadere.manager.traci.response.TraCIGetResponse;
+import org.vadere.manager.traci.response.TraCIGetVersionResponse;
+import org.vadere.manager.traci.response.TraCISimTimeResponse;
+import org.vadere.manager.traci.response.TraCIStatusResponse;
+import org.vadere.manager.traci.response.TraCISubscriptionResponse;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *  //todo comment
+ * //todo comment
  */
-public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
+public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 
-//	private TraCIWriter writer;
+	//	private TraCIWriter writer;
 	private boolean emptyLengthField;
 	private boolean finalized; //
 
 
-	public static TraCIPacket create(){
+	public static TraCIPacket create() {
 		return new TraCIPacket().addEmptyLengthField();
 	}
 
-	public static TraCIPacket create(int packetSize){
+	public static TraCIPacket create(int packetSize) {
 		TraCIPacket packet = new TraCIPacket();
 		packet.writeInt(packetSize);
 		return packet;
 	}
 
-	public static TraCIPacket sendStatus(TraCICmd cmd, TraCIStatusResponse status, String description){
+	public static TraCIPacket sendStatus(TraCICmd cmd, TraCIStatusResponse status, String description) {
 		TraCIPacket response = new TraCIPacket();
 		int cmdLen = 7 + response.getStringByteCount(description);
 
-		if (cmdLen > 255){
+		if (cmdLen > 255) {
 			//extended CMD
 			cmdLen += 4; // add int field
 			response.writeInt(4 + cmdLen); // packet limit (4 + cmdLen) [4]
@@ -54,12 +58,12 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return response;
 	}
 
-	public TraCIPacket finalizePacket(){
+	public TraCIPacket finalizePacket() {
 		finalized = true;
 		return this;
 	}
 
-	private void throwIfFinalized(){
+	private void throwIfFinalized() {
 		if (finalized)
 			throw new TraCIException("Cannot change finalized TraCIPacket");
 	}
@@ -71,9 +75,9 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 	}
 
 
-	private TraCIPacket addEmptyLengthField(){
-		if(emptyLengthField)
-			throw  new IllegalStateException("Should only be called at most once.");
+	private TraCIPacket addEmptyLengthField() {
+		if (emptyLengthField)
+			throw new IllegalStateException("Should only be called at most once.");
 		writeInt(-1);
 		emptyLengthField = true;
 		return this;
@@ -87,7 +91,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 			return asByteArray();
 
 		// packet limit must be set to correct value
-		if (emptyLengthField){
+		if (emptyLengthField) {
 			ByteBuffer packet = asByteBuffer();
 			packet.putInt(packet.capacity());
 			packet.position(0);
@@ -95,15 +99,25 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		} else {
 			return asByteArray();
 		}
-
 	}
 
-	private TraCIWriter getCmdBuilder(){
+	public List<TraCICommand> getCommands() {
+		ByteBuffer buf = ByteBuffer.wrap(send());
+		buf.getInt(); // remove packet length.
+		TraCIPacketBuffer traciBuf = TraCIPacketBuffer.wrap(buf);
+		ArrayList<TraCICommand> commands = new ArrayList<>();
+		while (buf.hasRemaining()) {
+			commands.add(traciBuf.nextCommand());
+		}
+		return commands;
+	}
+
+	private TraCIWriter getCmdBuilder() {
 		return new ByteArrayOutputStreamTraCIWriter();
 	}
 
 	public TraCIPacket wrapCommand(TraCICmd commandIdentifier, String elementIdentifier,
-								   int variableIdentifier, TraCIDataType dataType, Object data){
+								   int variableIdentifier, TraCIDataType dataType, Object data) {
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
 		cmdBuilder.writeUnsignedByte(commandIdentifier.id)
@@ -116,7 +130,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public TraCIPacket wrapGetResponse(TraCIGetResponse res){
+	public TraCIPacket wrapGetResponse(TraCIGetResponse res) {
 		addStatusResponse(res.getStatusResponse());
 
 		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
@@ -133,7 +147,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public TraCIPacket wrapValueSubscriptionCommand(TraCISubscriptionResponse res){
+	public TraCIPacket wrapValueSubscriptionCommand(TraCISubscriptionResponse res) {
 		addStatusResponse(res.getStatusResponse());
 
 		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
@@ -144,12 +158,12 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	private void wrapSubscription(TraCISubscriptionResponse res){
+	private void wrapSubscription(TraCISubscriptionResponse res) {
 		TraCIWriter cmdBuilder = getCmdBuilder();
 		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id) // (i.e. TraCICmd.RESPONSE_SUB_PERSON_VARIABLE)
 				.writeString(res.getElementId())
 				.writeUnsignedByte(res.getNumberOfVariables());
-		res.getResponses().forEach( var -> {
+		res.getResponses().forEach(var -> {
 			cmdBuilder.writeUnsignedByte(var.getVariableId())
 					.writeUnsignedByte(var.getStatus().id)
 					.writeObjectWithId(var.getVariableDataType(), var.getVariableValue());
@@ -158,15 +172,16 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		addCommandWithExtendedLenField(cmdBuilder.asByteArray());
 	}
 
-	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd){
+	public TraCIPacket wrapGetVersionCommand(TraCIGetVersionCommand cmd) {
 		TraCIGetVersionResponse res = cmd.getResponse();
 
-		if(res.isOKResponseStatus())
+		if (res.isOKResponseStatus())
 			add_OK_StatusResponse(cmd.getTraCICmd());
 		else
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
+        // ResponseIdentifier needed by implementation in Veins/OMNeT++
 		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
 				.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
@@ -176,7 +191,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public TraCIPacket wrapSimTimeStepCommand(TraCISimTimeResponse res){
+	public TraCIPacket wrapSimTimeStepCommand(TraCISimTimeResponse res) {
 		addStatusResponse(res.getStatusResponse());
 
 		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
@@ -193,15 +208,15 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public void addCommandWithExtendedLenField(byte[] buffer){
+	public void addCommandWithExtendedLenField(byte[] buffer) {
 		writeUnsignedByte(0);
 		writeInt(buffer.length + 5); // 1 + 4 length field
 		writeBytes(buffer);
 	}
 
 
-	public void addCommandWithoutLen(byte[] buffer){
-		if (buffer.length > 255){
+	public void addCommandWithoutLen(byte[] buffer) {
+		if (buffer.length > 255) {
 			writeUnsignedByte(0);
 			writeInt(buffer.length + 5); // 1 + 4 length field
 			writeBytes(buffer);
@@ -212,17 +227,17 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 	}
 
 
-	public TraCIPacket add_Err_StatusResponse(int cmdIdentifier, String description){
+	public TraCIPacket add_Err_StatusResponse(int cmdIdentifier, String description) {
 		throwIfFinalized();
 		return addStatusResponse(cmdIdentifier, TraCIStatusResponse.ERR, description);
 	}
 
-	public TraCIPacket add_OK_StatusResponse(TraCICmd traCICmd){
+	public TraCIPacket add_OK_StatusResponse(TraCICmd traCICmd) {
 		throwIfFinalized();
 		return add_OK_StatusResponse(traCICmd.id);
 	}
 
-	public TraCIPacket add_OK_StatusResponse(int cmdIdentifier){
+	public TraCIPacket add_OK_StatusResponse(int cmdIdentifier) {
 		throwIfFinalized();
 		// simple OK Status without description.
 		writeUnsignedByte(7);
@@ -237,7 +252,7 @@ public class TraCIPacket  extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public TraCIPacket addStatusResponse(int cmdIdentifier, TraCIStatusResponse response, String description){
+	public TraCIPacket addStatusResponse(int cmdIdentifier, TraCIStatusResponse response, String description) {
 		throwIfFinalized();
 		// expect single byte cmdLenField.
 		// cmdLenField + cmdIdentifier + cmdResult + strLen + str

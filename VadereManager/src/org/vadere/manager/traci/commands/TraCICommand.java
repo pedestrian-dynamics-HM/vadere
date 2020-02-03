@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.VadereServer;
+import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIVersion;
@@ -19,33 +19,31 @@ import java.nio.ByteBuffer;
 /**
  * Abstract Class for TraCICommands.
  *
- * Object of this Class only hold the state (input parameters, response data) for each
- * command. The execution is handed by {@link org.vadere.manager.traci.commandHandler.CommandHandler}
- * classes.
+ * Object of this Class only hold the state (input parameters, response data) for each command. The
+ * execution is handed by {@link org.vadere.manager.traci.commandHandler.CommandHandler} classes.
  *
- * Each command has an Id managed as an enum {@link TraCICmd}. This enum also contains
- * the type of the command (i.e. GET, SET, Control). Depending on the type (and sometimes on
- * the var queried) different sub classes are used to manage the command.
+ * Each command has an Id managed as an enum {@link TraCICmd}. This enum also contains the type of
+ * the command (i.e. GET, SET, Control). Depending on the type (and sometimes on the var queried)
+ * different sub classes are used to manage the command.
  *
- * Construction Methods: (compare with {@link org.vadere.manager.traci.respons.TraCIResponse})
+ * Construction Methods: (compare with {@link org.vadere.manager.traci.response.TraCIResponse})
  *
  * 1) created from serialized data (byte[] / {@link ByteBuffer} / {@link TraCICommandBuffer})
  *
  * 2) created from simple static factories which are used by clients.
- *
  */
 public abstract class TraCICommand {
 
 	protected TraCICmd traCICmd;
 	protected TraCIPacket NOK_response = null;
 
-	public static TraCICommand create(ByteBuffer rawCmd){
+	public static TraCICommand create(ByteBuffer rawCmd) {
 		TraCICommandBuffer cmdBuffer = TraCICommandBuffer.wrap(rawCmd);
 
 		int identifier = cmdBuffer.readCmdIdentifier();
 		TraCICmd cmd = TraCICmd.fromId(identifier);
 
-		switch (cmd.type){
+		switch (cmd.type) {
 			case CTRL:
 				return createControlCommand(cmd, cmdBuffer);
 			case VALUE_GET:
@@ -62,9 +60,9 @@ public abstract class TraCICommand {
 
 	}
 
-	private static TraCICommand createControlCommand(TraCICmd cmd, TraCICommandBuffer cmdBuffer){
+	private static TraCICommand createControlCommand(TraCICmd cmd, TraCICommandBuffer cmdBuffer) {
 
-		switch (cmd){
+		switch (cmd) {
 			case GET_VERSION:
 				return new TraCIGetVersionCommand();
 			case SIM_STEP:
@@ -79,13 +77,13 @@ public abstract class TraCICommand {
 			case LOAD:
 				return new TraCILoadCommand(cmdBuffer);
 			default:
-				throw  new IllegalStateException(String.format("Should not be reached. Only TraCI control commands expected: %0X", cmd.id));
+				throw new IllegalStateException(String.format("Should not be reached. Only TraCI control commands expected: %0X", cmd.id));
 		}
 
 	}
 
 
-	protected TraCICommand(TraCICmd traCICmd){
+	protected TraCICommand(TraCICmd traCICmd) {
 		this.traCICmd = traCICmd;
 	}
 
@@ -93,7 +91,7 @@ public abstract class TraCICommand {
 		return traCICmd;
 	}
 
-	public CmdType getCmdType(){
+	public CmdType getCmdType() {
 		return traCICmd.type;
 	}
 

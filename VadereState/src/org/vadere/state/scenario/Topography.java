@@ -163,6 +163,7 @@ public class Topography implements DynamicElementMover{
 
 		// some meaningful default value if used before simulation is started.
 		// will be replaced in the preeLoop like the obstacleDistanceFunction
+		//todo[random]: this should be drawn from a meta seed.
 		this.reachablePointProvider = SimpleReachablePointProvider.uniform(
 				new Random(42), getBounds(), obstacleDistanceFunction);
 

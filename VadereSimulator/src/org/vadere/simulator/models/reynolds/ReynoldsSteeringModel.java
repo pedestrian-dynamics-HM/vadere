@@ -4,16 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.reynolds.behaviour.CollisionAvoidance;
-import org.vadere.simulator.models.reynolds.behaviour.Containment;
-import org.vadere.simulator.models.reynolds.behaviour.Seek;
-import org.vadere.simulator.models.reynolds.behaviour.Separation;
-import org.vadere.simulator.models.reynolds.behaviour.WallAvoidance;
-import org.vadere.simulator.models.reynolds.behaviour.Wander;
+import org.vadere.simulator.models.reynolds.behaviour.*;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -21,11 +16,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class ReynoldsSteeringModel implements MainModel {
@@ -75,7 +66,7 @@ public class ReynoldsSteeringModel implements MainModel {
 	public void update(final double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
-		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+		UnsupportedSelfCategoryException.throwIfPedestriansNotTargetOrientied(pedestrians, this.getClass());
 
 		Iterator<Pedestrian> it = pedestrians.iterator();
 		double maxSpeed = 3;
