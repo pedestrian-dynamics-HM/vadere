@@ -165,9 +165,9 @@ public class TikzGenerator {
 		tikzStyles += "trajectory/.style={line width=1},\n";
 		tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", model.getConfig().getPedestrianTorso());
 		tikzStyles += "walkdirection/.style={},\n";
-		tikzStyles += String.format("selected/.style={circle, draw=magenta, minimum size=%f cm}\n", model.getConfig().getPedestrianTorso());
+		tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
 		tikzStyles += "group/.style={},\n";
-		tikzStyles += "voronoi/.style={black, line width=1},\n";
+		tikzStyles += "voronoi/.style={black, line width=1}\n";
 
 		return tikzStyles;
 	}
@@ -312,6 +312,7 @@ public class TikzGenerator {
 		}
 
         if (!topography.hasBoundary()){
+			generatedCode += "% Topography Boundary\n";
         	int id=1;
 			for(Obstacle obstacle : Topography.createObstacleBoundary(topography)) {
 				VPoint centroid = obstacle.getShape().getCentroid();
@@ -319,6 +320,11 @@ public class TikzGenerator {
 				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
 				id++;
 			}
+		}
+
+		if (model.getSelectedElement() != null) {
+			generatedCode += "% Selected Elements\n";
+			generatedCode += String.format(Locale.US, "\\draw[selected] %s;\n", generatePathForScenarioElement(model.getSelectedElement()));
 		}
 
         return generatedCode;
@@ -439,7 +445,7 @@ public class TikzGenerator {
 
 
         for (Agent agent : model.getAgents()) {
-        	if(agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
+        	if (agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
 
 				if(config.isShowWalkdirection() && model instanceof PostvisualizationModel){
 					generatedCode += drawWalkingDirection(agent);
@@ -475,11 +481,6 @@ public class TikzGenerator {
 						String agentTextPattern = "\\node[pedestrian, fill=%s] (Pedestrian%d) at (%f,%f) {};\n";
 						generatedCode += String.format(Locale.US, agentTextPattern, colorString,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
 					}
-		        }
-
-		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-			        String agentTextPattern = "\\draw[selected] (Pedestrian%d) at (%f,%f) {};\n";
-			        generatedCode += String.format(Locale.US, agentTextPattern,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
 		        }
 	        }
         }
