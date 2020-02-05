@@ -1,7 +1,7 @@
 {
   "name" : "VadereSimulation-GroupBehavior",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -127,7 +127,7 @@
           "height" : 5.6,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 23.7,
@@ -136,7 +136,7 @@
           "height" : 6.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 4.5,
@@ -145,7 +145,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 37.1,
@@ -154,7 +154,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

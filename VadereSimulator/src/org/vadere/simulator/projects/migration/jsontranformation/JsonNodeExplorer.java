@@ -33,6 +33,12 @@ public interface JsonNodeExplorer {
 		}
 	}
 
+	default void removeIfExists(JsonNode root, String childName) throws MigrationException {
+		if (hasChild(root, childName)){
+			remove(root, childName);
+		}
+	}
+
 	default JsonNode setVersionFromTo(JsonNode scenarioFile, Version from, Version to) throws MigrationException {
 		JsonNode version = pathMustExist(scenarioFile, "release");
 		if (!version.asText().equals(from.label()))
@@ -89,6 +95,16 @@ public interface JsonNodeExplorer {
 			ret = ret.path(item);
 		}
 		return ret;
+	}
+
+	/**
+	 * Test if Node has a child with the given name.
+	 * @param root			ParentNode
+	 * @param childName		Name of child
+	 * @return				True if Parent has a *direct* child named 'childName'
+	 */
+	default boolean hasChild(JsonNode root, String childName){
+		return !path(root, childName).isMissingNode();
 	}
 
 	default boolean nodeIsArray(JsonNode node) {

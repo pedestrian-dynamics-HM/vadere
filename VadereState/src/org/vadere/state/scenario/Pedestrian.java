@@ -4,6 +4,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
@@ -65,7 +66,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		psychologyStatus = new PsychologyStatus(null, null, SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
+		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -106,7 +107,7 @@ public class Pedestrian extends Agent {
 		return isLikelyInjured;
 	}
 	public Stimulus getMostImportantStimulus() { return psychologyStatus.getMostImportantStimulus(); }
-	public Stimulus getPerceivedThreat() { return psychologyStatus.getPerceivedThreat(); }
+	public ThreatMemory getThreatMemory() { return psychologyStatus.getThreatMemory(); }
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
@@ -156,7 +157,7 @@ public class Pedestrian extends Agent {
 		this.isLikelyInjured = likelyInjured;
 	}
 	public void setMostImportantStimulus(Stimulus mostImportantStimulus) { psychologyStatus.setMostImportantStimulus(mostImportantStimulus); }
-	public void setPerceivedThreat(Stimulus perceivedThreat) { psychologyStatus.setPerceivedThreat(perceivedThreat); }
+	public void setThreatMemory(ThreatMemory threatMemory) { psychologyStatus.setThreatMemory(threatMemory); }
 	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setGroupMembership(GroupMembership groupMembership) { psychologyStatus.setGroupMembership(groupMembership); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {

@@ -290,16 +290,25 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
 
 	    switch (model.config.getAgentColoring()) {
-		    case TARGET: return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
-		    case RANDOM: return model.config.getRandomColor(agent.getId());
+		    case TARGET:
+		        return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
+		    case RANDOM:
+		        return model.config.getRandomColor(agent.getId());
+            case SELF_CATEGORY:
+                if (agent instanceof Pedestrian) {
+                    Pedestrian pedestrian = (Pedestrian) agent;
+                    return model.config.getSelfCategoryColor(pedestrian.getSelfCategory());
+                }
 		    case PREDICATE: {
-		    	if(model instanceof PostvisualizationModel) {
-				    return ((PostvisualizationModel)model).getPredicateColoringModel().getColorByPredicate(agent)
+		    	if (model instanceof PostvisualizationModel) {
+				    return ((PostvisualizationModel) model)
+                            .getPredicateColoringModel()
+                            .getColorByPredicate(agent)
 						    .orElse(model.config.getPedestrianColor());
 			    }
 		    }
 		    case GROUP: {
-			    if(agent instanceof Pedestrian) {
+			    if (agent instanceof Pedestrian) {
 				    return model.getGroupColor((Pedestrian)agent);
 			    }
 		    }

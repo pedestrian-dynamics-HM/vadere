@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
@@ -60,7 +59,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 			}
 		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
-			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
+			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
@@ -69,8 +68,6 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
-			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 

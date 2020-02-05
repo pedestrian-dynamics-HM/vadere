@@ -59,11 +59,18 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public void initialize(List<Attributes> modelAttributesList, Domain domain,
-	                       AttributesAgent attributesPedestrian, Random random) {
-
+						   AttributesAgent attributesPedestrian, Random random) {
 		logger.debug("initialize OSM");
-		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
-		this.topography = domain.getTopography();
+		initialize(modelAttributesList, domain, attributesPedestrian, random,
+				Model.findAttributes(modelAttributesList, AttributesOSM.class), logger);
+	}
+
+
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+						   AttributesAgent attributesPedestrian, Random random, AttributesOSM atm, Logger logger) {
+
+		this.attributesOSM = atm;
+		this.topography = topography;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 

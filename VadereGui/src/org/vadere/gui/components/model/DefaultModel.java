@@ -38,7 +38,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	protected static final double MAX_SCALE_FACTOR = 1000;
 
-	protected static final double MIN_SCALE_FACTOR = 1.0;
+	protected static final double MIN_SCALE_FACTOR = 0.01;
 
 	protected double scaleFactor;
 

@@ -1,7 +1,7 @@
 {
   "name" : "s2ucre",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

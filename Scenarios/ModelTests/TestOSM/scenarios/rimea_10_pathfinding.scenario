@@ -1,7 +1,7 @@
 {
   "name" : "rimea_10_pathfinding",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -168,7 +168,7 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 13
       }, {
         "shape" : {
           "x" : 4.0,
@@ -177,7 +177,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 14
       }, {
         "shape" : {
           "x" : 7.0,
@@ -186,7 +186,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 15
       }, {
         "shape" : {
           "x" : 11.0,
@@ -195,7 +195,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 16
       }, {
         "shape" : {
           "x" : 7.0,
@@ -204,7 +204,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 17
       }, {
         "shape" : {
           "x" : 11.0,
@@ -213,7 +213,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 18
       }, {
         "shape" : {
           "x" : 4.0,
@@ -222,7 +222,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 19
       }, {
         "shape" : {
           "x" : 4.0,
@@ -231,7 +231,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 20
       }, {
         "shape" : {
           "x" : 5.95,
@@ -240,7 +240,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 21
       }, {
         "shape" : {
           "x" : 8.0,
@@ -249,7 +249,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 22
       }, {
         "shape" : {
           "x" : 4.0,
@@ -258,7 +258,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 23
       }, {
         "shape" : {
           "x" : 8.0,
@@ -267,7 +267,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 24
       }, {
         "shape" : {
           "x" : 12.0,
@@ -276,7 +276,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 25
       }, {
         "shape" : {
           "x" : 5.95,
@@ -285,7 +285,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 26
       }, {
         "shape" : {
           "x" : 9.95,
@@ -294,7 +294,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 27
       }, {
         "shape" : {
           "x" : 13.95,
@@ -303,7 +303,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 28
       }, {
         "shape" : {
           "x" : 13.2,
@@ -312,7 +312,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 29
       }, {
         "shape" : {
           "x" : 16.0,
@@ -321,7 +321,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 30
       }, {
         "shape" : {
           "x" : 24.0,
@@ -330,7 +330,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 31
       }, {
         "shape" : {
           "x" : 20.0,
@@ -339,7 +339,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 32
       }, {
         "shape" : {
           "x" : 28.0,
@@ -348,7 +348,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 33
       }, {
         "shape" : {
           "x" : 28.0,
@@ -357,7 +357,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 34
       }, {
         "shape" : {
           "x" : 24.0,
@@ -366,7 +366,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 35
       }, {
         "shape" : {
           "x" : 20.0,
@@ -375,7 +375,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 36
       }, {
         "shape" : {
           "x" : 15.0,
@@ -384,7 +384,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 37
       }, {
         "shape" : {
           "x" : 15.2,
@@ -393,7 +393,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 38
       }, {
         "shape" : {
           "x" : 17.0,
@@ -402,7 +402,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 39
       }, {
         "shape" : {
           "x" : 21.0,
@@ -411,7 +411,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 40
       }, {
         "shape" : {
           "x" : 25.0,
@@ -420,7 +420,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 41
       }, {
         "shape" : {
           "x" : 18.95,
@@ -429,7 +429,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 42
       }, {
         "shape" : {
           "x" : 22.95,
@@ -438,7 +438,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 43
       }, {
         "shape" : {
           "x" : 26.95,
@@ -447,7 +447,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 44
       }, {
         "shape" : {
           "x" : 26.95,
@@ -456,7 +456,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 45
       }, {
         "shape" : {
           "x" : 22.95,
@@ -465,7 +465,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 46
       }, {
         "shape" : {
           "x" : 18.95,
@@ -474,7 +474,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 47
       }, {
         "shape" : {
           "x" : 17.0,
@@ -483,7 +483,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 48
       }, {
         "shape" : {
           "x" : 21.0,
@@ -492,7 +492,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 49
       }, {
         "shape" : {
           "x" : 25.0,
@@ -501,7 +501,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 50
       }, {
         "shape" : {
           "x" : 9.95,
@@ -510,7 +510,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 51
       }, {
         "shape" : {
           "x" : 13.2,
@@ -519,7 +519,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 52
       }, {
         "shape" : {
           "x" : 14.2,
@@ -528,7 +528,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 53
       }, {
         "shape" : {
           "x" : 15.55,
@@ -537,7 +537,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 54
       }, {
         "shape" : {
           "x" : 29.0,
@@ -546,7 +546,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 55
       }, {
         "shape" : {
           "x" : 33.3,
@@ -555,7 +555,7 @@
           "height" : 7.4,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 56
       }, {
         "shape" : {
           "x" : 29.0,
@@ -564,7 +564,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 57
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

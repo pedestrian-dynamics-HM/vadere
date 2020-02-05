@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -58,8 +59,9 @@ public class GroupSpawnArray extends SpawnArray {
 	public GroupSpawnArray(final VShape boundShape,
 						   final VRectangle spawnElementBound,
 						   Function<VPoint, VShape> shapeProducer,
-						   SpawnOverlapCheck testFreeSpace) {
-		super(boundShape, spawnElementBound, shapeProducer, testFreeSpace);
+						   SpawnOverlapCheck testFreeSpace,
+						   AttributesSource sourceAttributes) {
+		super(boundShape, spawnElementBound, shapeProducer, testFreeSpace, sourceAttributes);
 
 		nextGroupPos = new HashMap<>();
 		groupPlacementHelpers = new HashMap<>();

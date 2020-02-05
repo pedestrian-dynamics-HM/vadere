@@ -1,7 +1,7 @@
 {
   "name" : "02-ExperimentSetup-OSMEventDriven-SBEnabled",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -153,7 +153,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 0.5,
           "y" : 0.75,
@@ -175,7 +175,7 @@
       } ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 3,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -207,8 +207,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -220,7 +223,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 4,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -252,8 +255,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -265,7 +271,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 5,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -297,8 +303,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -310,7 +319,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 6,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -342,8 +351,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -355,7 +367,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 7,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -387,8 +399,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -400,7 +415,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 8,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -432,8 +447,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -445,7 +463,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 9,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -477,8 +495,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -490,7 +511,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 10,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -522,8 +543,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -535,7 +559,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 11,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -567,8 +591,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -580,7 +607,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 12,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -612,8 +639,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -625,7 +655,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 13,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -657,8 +687,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -670,7 +703,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 14,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -702,8 +735,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
@@ -715,7 +751,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 15,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -747,8 +783,11 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
-          "selfCategory" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],

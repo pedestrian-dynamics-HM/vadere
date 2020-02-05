@@ -257,7 +257,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	/**
 	 * Launch the application.
 	 */
-	public static void start() {
+	public static void start(String projectPath){
 		EventQueue.invokeLater(() -> {
 			try {
 				// Set Java L&F from system
@@ -275,8 +275,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 			frame.setIconImage(Toolkit.getDefaultToolkit()
 					.getImage(ProjectView.class.getResource("/icons/vadere-icon.png")));
-
-			frame.openLastUsedProject(model);
+			if (projectPath.equals("")){
+				frame.openLastUsedProject(model);
+			} else {
+				frame.openProject(model, projectPath);
+			}
 			checkDependencies(frame);
 		});
 	}
@@ -304,6 +307,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
 			}
+		}
+	}
+
+	private void openProject(final  ProjectViewModel model, String projectPath) {
+		if (Files.exists(Paths.get(projectPath))) {
+			ActionLoadProject.loadProjectByPath(model, projectPath);
+		} else {
+			IOUtils.errorBox("No project under "+ projectPath, "Project not found");
 		}
 	}
 

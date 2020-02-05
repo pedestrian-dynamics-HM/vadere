@@ -44,18 +44,40 @@ public class ThreatCognitionModel implements ICognitionModel {
             } else {
                 throw new IllegalArgumentException("Can only process \"Threat\" and \"ElapsedTime\" stimuli!");
             }
+
         }
     }
 
     private void handleThreat(Pedestrian pedestrian, Stimulus stimulus) {
+        if (isNewThreatForPedestrian(pedestrian, (Threat) stimulus)) {
+            pedestrian.getThreatMemory().setLatestThreatUnhandled(true);
+        }
+
         // Current stimulus is a threat => store it and make clear that pedestrian is inside threat area.
-        pedestrian.setPerceivedThreat(stimulus);
+        pedestrian.getThreatMemory().add((Threat) stimulus);
         pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
     }
 
+    private boolean isNewThreatForPedestrian(Pedestrian pedestrian, Threat threat) {
+        boolean isNewThreat = false;
+
+        if (pedestrian.getThreatMemory().isEmpty()) {
+            isNewThreat = true;
+        } else {
+            // Check if pedestrian re-entered the same threat area.
+            Threat oldThreat = pedestrian.getThreatMemory().getLatestThreat();
+
+            isNewThreat = oldThreat.getOriginAsTargetId() != threat.getOriginAsTargetId();
+        }
+
+        return isNewThreat;
+    }
+
     private void handleElapsedTime(Pedestrian pedestrian) {
-        if (pedestrian.getPerceivedThreat() != null) {
-            testIfInsideOrOutsideThreatArea(pedestrian);
+        Threat latestThreat = pedestrian.getThreatMemory().getLatestThreat();
+
+        if (latestThreat != null) {
+            testIfInsideOrOutsideThreatArea(pedestrian, latestThreat);
         } else { // These agents did not perceive a threat but are aware of other threatened agents.
 
             if (pedestrian.getGroupMembership() == GroupMembership.OUT_GROUP) {
@@ -68,13 +90,11 @@ public class ThreatCognitionModel implements ICognitionModel {
         }
     }
 
-    private void testIfInsideOrOutsideThreatArea(Pedestrian pedestrian) {
-        Threat threat = (Threat) pedestrian.getPerceivedThreat();
-
-        VPoint threatOrigin = topography.getTarget(threat.getOriginAsTargetId()).getShape().getCentroid();
+    private void testIfInsideOrOutsideThreatArea(Pedestrian pedestrian, Threat latestThreat) {
+        VPoint threatOrigin = topography.getTarget(latestThreat.getOriginAsTargetId()).getShape().getCentroid();
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
-        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= threat.getRadius());
+        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
 
         if (pedestrianIsInsideThreatArea) {
             pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
@@ -89,14 +109,16 @@ public class ThreatCognitionModel implements ICognitionModel {
      * accelerate and search for a safe zone.
      */
     private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
+        // TODO: Maybe, alse look for "SelfCategory.INSIDE_THREAT_AREA".
         List<Pedestrian> threatenedPedestrians = getClosestPedestriansWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA);
 
         if (threatenedPedestrians.isEmpty() == false) {
             Pedestrian threatenedPedestrian = threatenedPedestrians.get(0);
+            Threat latestThreat = threatenedPedestrian.getThreatMemory().getLatestThreat();
 
-            assert threatenedPedestrian.getPerceivedThreat() != null;
+            assert  latestThreat != null;
 
-            handleThreat(pedestrian, threatenedPedestrian.getPerceivedThreat());
+            handleThreat(pedestrian, latestThreat);
         } else {
             pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
         }
@@ -108,10 +130,10 @@ public class ThreatCognitionModel implements ICognitionModel {
         List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
                 .getObjects(positionOfPedestrian, pedestrian.getAttributes().getSearchRadius());
 
-        // Filter out "me" and pedestrians which are further away from target than "me".
+        // Filter out "me" and pedestrians with unexpected "selfCategory".
         closestPedestrians = closestPedestrians.stream()
                 .filter(candidate -> pedestrian.getId() != candidate.getId())
-                .filter(candidate -> pedestrian.getSelfCategory() == expectedSelfCategory)
+                .filter(candidate -> candidate.getSelfCategory() == expectedSelfCategory)
                 .collect(Collectors.toList());
 
         // Sort by distance away from "me".

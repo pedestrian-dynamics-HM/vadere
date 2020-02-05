@@ -1,7 +1,7 @@
 {
   "name" : "01-NarrowedStreet-Pollichstrasse-Narrowed-GNM",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

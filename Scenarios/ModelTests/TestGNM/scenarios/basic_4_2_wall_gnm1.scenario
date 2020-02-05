@@ -1,7 +1,7 @@
 {
   "name" : "basic_4_2_wall_gnm1",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

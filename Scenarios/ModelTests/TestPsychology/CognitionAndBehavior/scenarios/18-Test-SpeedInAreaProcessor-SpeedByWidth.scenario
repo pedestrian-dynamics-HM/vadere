@@ -1,7 +1,7 @@
 {
   "name" : "18-Test-SpeedInAreaProcessor-SpeedByWidth",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -184,7 +184,7 @@
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 2,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -216,7 +216,10 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "perceivedThreat" : null,
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP"
         },

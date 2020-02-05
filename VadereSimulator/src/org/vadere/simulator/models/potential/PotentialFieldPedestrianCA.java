@@ -21,7 +21,7 @@ import java.util.Random;
 @ModelClass
 public class PotentialFieldPedestrianCA implements PotentialFieldAgent {
 
-	private final double GRID_BUFFER = 10E-5;
+	private final double GRID_BUFFER = 2E-1;
 	private final double height_potential = 1000;
 	public PotentialFieldPedestrianCA() {}
 
@@ -44,11 +44,13 @@ public class PotentialFieldPedestrianCA implements PotentialFieldAgent {
 	                                Agent otherPedestrian) {
 
 		double radii = pedestrian.getRadius() + otherPedestrian.getRadius(); // 2* r_p (sivers-2016b)
-		double potential = 0;
+		double potential;
 
 		double distance = otherPedestrian.getPosition().distance(pos); // Euclidean distance d_j(x) between agent j and position x
 		if(radii - distance > GRID_BUFFER) {// do not add high potential value for touching agents (BUFFER)
-			potential += height_potential;
+			potential = height_potential;
+		}else{
+			potential = 0;
 		}
 		return potential;
 

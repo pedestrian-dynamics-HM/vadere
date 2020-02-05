@@ -1,7 +1,7 @@
 {
   "name" : "rimea_13_stairs_nelder_mead",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -137,7 +137,7 @@
           "height" : 3.1,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 5.5,
@@ -146,7 +146,7 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ {
@@ -157,7 +157,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1,
+        "id" : 4,
         "treadCount" : 9,
         "upwardDirection" : {
           "x" : 1.0,
@@ -185,7 +185,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 5,
         "shape" : {
           "x" : 0.5,
           "y" : 0.5,

@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_4Source4Place_v2_EVD_2G_3G_4G_5G",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -130,7 +130,7 @@
           "height" : 39.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 9
       }, {
         "shape" : {
           "x" : 12.0,
@@ -139,7 +139,7 @@
           "height" : 39.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 10
       }, {
         "shape" : {
           "x" : 18.0,
@@ -148,7 +148,7 @@
           "height" : 39.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 11
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],

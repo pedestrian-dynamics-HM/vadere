@@ -63,7 +63,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 				osmBehaviorController.makeStepToTarget(pedestrian, topography);
 			}
 		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
-			osmBehaviorController.maximizeDistanceToThreatAndIncreaseSpeed(pedestrian, topography);
+			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
@@ -72,8 +72,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.wait(pedestrian, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
-			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
 

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -120,14 +119,9 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
 
-    public void maximizeDistanceToThreatAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
-        Stimulus perceivedThreat = pedestrian.getPerceivedThreat();
-
-        // FIXME: This test (if we have already seen a bang) is wrong!
-        //   Assume, the pedestrian leaves the bang radius and re-enters it.
-        //   Therefore, introduce a flag or another more robust test.
-        if (perceivedThreat instanceof Threat && pedestrian.getCombinedPotentialStrategy() instanceof TargetAttractionStrategy) {
-            Threat threat = (Threat) perceivedThreat;
+    public void changeToTargetRepulsionStrategyAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
+        if (pedestrian.getThreatMemory().isLatestThreatUnhandled()) {
+            Threat threat = pedestrian.getThreatMemory().getLatestThreat();
             Target threatOrigin = topography.getTarget(threat.getOriginAsTargetId());
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
@@ -140,10 +134,7 @@ public class OSMBehaviorController {
             double escapeSpeed = pedestrian.getFreeFlowSpeed() * 2.0;
             pedestrian.setFreeFlowSpeed(escapeSpeed);
 
-        } else {
-            logger.debug(String.format("Expected: %s, Received: %s",
-                    Threat.class.getSimpleName(),
-                    perceivedThreat.getClass().getSimpleName()));
+            pedestrian.getThreatMemory().setLatestThreatUnhandled(false);
         }
     }
 
@@ -159,7 +150,7 @@ public class OSMBehaviorController {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
 
             ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
-            Target closestTarget = findClosestTarget(topography, searchPosition, (Threat) pedestrian.getPerceivedThreat());
+            Target closestTarget = findClosestTarget(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
 
             assert closestTarget != null;
 
@@ -198,6 +189,9 @@ public class OSMBehaviorController {
                     ChangeTarget.class.getSimpleName(),
                     mostImportantStimulus.getClass().getSimpleName()));
         }
+
+        // Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
     }
 
     @Nullable

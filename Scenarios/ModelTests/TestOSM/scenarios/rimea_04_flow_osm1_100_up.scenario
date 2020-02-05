@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_100_up",
   "description" : "",
-  "release" : "1.8",
+  "release" : "1.10",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -122,7 +122,7 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1,
+        "id" : 2,
         "treadCount" : 100,
         "upwardDirection" : {
           "x" : 1.0,
@@ -150,7 +150,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 3,
         "shape" : {
           "x" : 1.0,
           "y" : 1.0,
