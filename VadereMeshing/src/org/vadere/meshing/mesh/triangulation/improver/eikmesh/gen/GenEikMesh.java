@@ -89,10 +89,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 	// different options
 	private boolean allowEdgeSplits = false;
-	private boolean allowVertexCollapse = true;
 	private boolean allowEdgeCollapse = false;
+
+	private boolean allowVertexCollapse = true;
 	private boolean allowFaceCollapse = true;
 	private boolean removeLowBoundaryTriangles = false;
+	private boolean removeOutsideTriangles = false;
 	private boolean useVirtualEdges = true;
 
 	// if no PSLG set this to be true
@@ -266,6 +268,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.pointToSlidingLine = new HashMap<>();
 		this.useSlidingLines = true;
 		this.smoothBorder = true;
+		this.removeOutsideTriangles = true;
 		this.refiner = new GenUniformRefinementTriangulatorSFC(
 				meshSupplier,
 				bound,
@@ -416,6 +419,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 				// geometry is defined by a PSLG
 				if(removeLowBoundaryTriangles) {
 					removeFacesAtBoundary();
+				} else if(removeOutsideTriangles) {
+					shrinkBoundary();
 				}
 
 				if(hasDistanceFunction() && smoothBorder) {
@@ -676,14 +681,16 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @param newX      the new x-coordinate
 	 * @param newY      the new y-coordinate
 	 */
-	private void move(@NotNull final V vertex, double newX, double newY) {
+	private boolean move(@NotNull final V vertex, double newX, double newY) {
 		if(isLegalMove(vertex, newX, newY)) {
 			double distance = GeometryUtils.length(vertex.getX() - newX, vertex.getY() - newY);
 			getMesh().setCoords(vertex, newX, newY);
 			if(maxMovement < distance) {
 				maxMovement = distance;
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -991,6 +998,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			double dGradPY = (distanceFunc.apply(position.add(new VPoint(0, deps))) - distance) / deps;
 
 			// TODO: maybe a softer projection * deltaT
+			//double scale = Math.abs(distance) > initialEdgeLen * 0.7 ? 0.7 : 1.0;
 			double projX = dGradPX * distance;
 			double projY = dGradPY * distance;
 
@@ -1361,6 +1369,13 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		});
 	}
 
+	/**
+	 * <p>Shrinks the boundary such that there are no more triangles outside the boundary i.e. where the distance is positive.</p>
+	 */
+	private void shrinkBoundary() {
+		Predicate<F> removePredicate = face -> distanceFunc.apply(getTriangulation().getMesh().toTriangle(face).midPoint()) > 0;
+		getTriangulation().shrinkBoundary(removePredicate, true);
+	}
 
 	/**
 	 * <p>Shrinks the border such that there are no more triangles outside the boundary i.e. where the distance is positive.
@@ -1456,11 +1471,11 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			createHoles();
 			//removeTrianglesOutsideBBox();
 			//removeTrianglesInsideObstacles();
-			try {
+			/*try {
 				removeFacesOutside(distanceFunc);
 			} catch (IllegalMeshException e) {
 				log.error("error!");
-			}
+			}*/
 		}
 	}
 

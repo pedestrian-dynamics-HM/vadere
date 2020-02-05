@@ -8,6 +8,9 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.simulator.utils.cache.CacheException;
+import org.vadere.simulator.utils.cache.ICellGridCacheObject;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.data.cellgrid.CellGrid;
@@ -34,15 +37,58 @@ import java.util.Collection;
 public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 
 	private static Logger logger = Logger.getLogger(PotentialFieldDistanceEikonalEq.class);
-	private final EikonalSolver eikonalSolver;
+	private EikonalSolver eikonalSolver;
+	private final CellGrid cellGrid;
 
 	public PotentialFieldDistanceEikonalEq(@NotNull final Collection<VShape> obstacles,
 										   @NotNull final VRectangle bounds,
-										   @NotNull final AttributesFloorField attributesFloorField) {
-		CellGrid cellGrid = new CellGrid(bounds.getWidth(),
+										   @NotNull final AttributesFloorField attributesFloorField,
+										   @NotNull final ScenarioCache cache) {
+		cellGrid = new CellGrid(bounds.getWidth(),
 				bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
+		boolean isInitialized = false;
+		logger.info("initialize floor field (PotentialFieldDistanceEikonalEq)");
+		if (cache.isNotEmpty()){
+			double ms = System.currentTimeMillis();
+			String cacheIdentifier = cache.distToIdentifier("BruteForce");
+			ICellGridCacheObject cacheObject = (ICellGridCacheObject) cache.getCache(cacheIdentifier); // todo allow user setting in scenario.
+			if(cacheObject.readable()){
+				// cache found
+				try{
+					cacheObject.initializeObjectFromCache(cellGrid);
+					isInitialized = true;
+					logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
+				} catch (CacheException e){
+					logger.errorf("Error loading cache initialize manually. " + e);
+				}
+			} else if(cacheObject.writable()) {
+				// no cache found
+				ms = System.currentTimeMillis();
+				logger.infof("No cache found for scenario initialize floor field");
+				compute(obstacles, attributesFloorField);
+				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				isInitialized = true;
+				try{
+					ms = System.currentTimeMillis();
+					logger.info("save floor field cache:");
+					cacheObject.persistObject(cellGrid);
+					logger.info("save floor field cache time:" + (System.currentTimeMillis() - ms + "[ms]"));
+				} catch (CacheException e){
+					logger.errorf("Error saving cache.", e);
+				}
+			}
+		}
 
+		if (!isInitialized){
+			long ms = System.currentTimeMillis();
+			compute(obstacles, attributesFloorField);
+			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
+		}
+	}
+
+	private void compute(@NotNull final Collection<VShape> obstacles,
+	                     @NotNull final AttributesFloorField attributesFloorField) {
 		for (VShape shape : obstacles) {
 			FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
 					new CellState(0.0, PathFindingTag.Target));
@@ -77,10 +123,8 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 	}
 
 	@Override
-	public double getPotential(@NotNull IPoint pos, @Nullable Agent agent) {
-		// unknownPenalty = 0.0 since there will be no unknowns such as values at obstacles
-		// the fmm can cause an topographyError mostly an underestimation of 20% near the source which are exactly the points we are interested
-		return eikonalSolver.getPotential(pos, 0.0, 1.2);
+	public double getPotential(@NotNull final IPoint pos, @Nullable final Agent agent) {
+		return eikonalSolver.getPotential(pos);
 	}
 
 	public EikonalSolver getEikonalSolver() {

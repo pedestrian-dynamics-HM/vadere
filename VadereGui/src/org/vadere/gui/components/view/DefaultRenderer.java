@@ -8,6 +8,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -39,6 +40,8 @@ public abstract class DefaultRenderer {
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
+	private boolean renderNodes = true;
+	private double nodeRadius = 0.3;
 
 	/**
 	 * <p>Default constructor.</p>
@@ -146,10 +149,17 @@ public abstract class DefaultRenderer {
 	protected void renderScenarioElement(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
 			final Color color) {
 		final Color tmpColor = g.getColor();
-		g.setColor(color);
 
 		for (ScenarioElement element : elements) {
-			fill(element.getShape(), g);
+			VShape shape = element.getShape();
+			g.setColor(color);
+			fill(shape, g);
+			if(renderNodes) {
+				for(VPoint node : shape.getPath()) {
+					g.setColor(Color.RED);
+					g.fill(new VCircle(node, nodeRadius));
+				}
+			}
 		}
 
 		g.setColor(tmpColor);
@@ -243,6 +253,12 @@ public abstract class DefaultRenderer {
 		final Color tmpColor = graphics.getColor();
 		graphics.setColor(color);
 		fill(element.getShape(), graphics);
+		if(renderNodes) {
+			for(VPoint node : element.getShape().getPath()) {
+				graphics.setColor(Color.RED);
+				graphics.fill(new VCircle(node, nodeRadius));
+			}
+		}
 		graphics.setColor(tmpColor);
 	}
 

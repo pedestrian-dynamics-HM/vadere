@@ -636,7 +636,20 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 *          or empty if due to the creation of the hole all faces will be removed!
 	 */
 	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
+
 		if(mergeCondition.test(face)) {
+			getMesh().toHole(face);
+			shrinkBoundary(face, mergeCondition, deleteIsoletedVertices);
+			return Optional.of(face);
+		}
+		else {
+			//	if(!getMesh().isDestroyed(face) && !mergeCondition.test(face)) {
+			//		System.out.println("could not delete it!");
+			//	}
+			return Optional.empty();
+		}
+
+		/*if(mergeCondition.test(face)) {
 			Optional<F> remainingFace = mergeFaces(face, mergeCondition, deleteIsoletedVertices);
 			if(remainingFace.isPresent()) {
 				getMesh().toHole(remainingFace.get());
@@ -649,7 +662,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 		//		System.out.println("could not delete it!");
 		//	}
 			return Optional.of(face);
-		}
+		}*/
 	}
 
 	/**
@@ -664,8 +677,32 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
 	 */
 	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
-		List<F> borderFaces = getMesh().getFaces(getMesh().getBorder());
-		List<F> neighbouringFaces = borderFaces;
+		shrinkBoundary(getMesh().getBorder(), removeCondition, deleteIsolatedVertices);
+	}
+
+	default void shrinkBoundary(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
+		shrinkBoundary(getMesh().getBorder(), removeCondition, deleteIsolatedVertices);
+		for(F hole : getMesh().getHoles()) {
+			shrinkBoundary(hole, removeCondition, deleteIsolatedVertices);
+		}
+	}
+
+	/**
+	 * Shrinks the border as long as the removeCondition is satisfied i.e. a face will be removed if
+	 * it is at the border (during the shrinking process) and satisfies the condition. Like a virus this
+	 * algorithms removes faces from outside, i.e. the border, towards inside. This requires O(n)
+	 * where n is the number of edges of all involved faces (the border and the removed ones).
+	 *
+	 * Changes the connectivity.
+	 *
+	 * @param removeCondition           the remove condition
+	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
+	 */
+	default void shrinkBoundary(@NotNull final F boundary, final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
+		assert getMesh().isBoundary(boundary);
+
+		List<F> boundaryFaces = getMesh().getFaces(boundary);
+		List<F> neighbouringFaces = boundaryFaces;
 
 		do {
 			List<F> nextNeighbouringFaces = new ArrayList<>();
@@ -673,15 +710,12 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 				// the face might be destroyed by an operation before
 				if(!getMesh().isDestroyed(neighbouringFace) && removeCondition.test(neighbouringFace)) {
 					for(F face : getMesh().getFaceIt(neighbouringFace)) {
-						if(!(getMesh().isBorder(face) || !getMesh().isBoundary(face))) {
-							System.out.println("wtf");
-						}
-						assert getMesh().isBorder(face) || !getMesh().isBoundary(face);
-						if(!getMesh().isBorder(face)) {
+						assert face.equals(boundary) || !getMesh().isBoundary(face);
+						if(!face.equals(boundary)) {
 							nextNeighbouringFaces.add(face);
 						}
 					}
-					removeFaceAtBorder(neighbouringFace, deleteIsolatedVertices);
+					removeFaceAtBoundary(neighbouringFace, boundary, deleteIsolatedVertices);
 				}
 			}
 			neighbouringFaces = nextNeighbouringFaces;
@@ -1139,7 +1173,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 				remainingFace = removeEdges(remainingFace, nFace, deleteIsolatedVertices).orElse(remainingFace);
 			}
 
-			removeFaceAtBorder(remainingFace, deleteIsolatedVertices);
+			removeFaceAtBoundary(remainingFace, deleteIsolatedVertices);
 		}*/
 	}
 
@@ -1315,7 +1349,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 
 
 	/**
-	 * Removes a face from the mesh by removing all border edges of the face.
+	 * Removes a face from the mesh by removing all boundary edges of the face.
 	 * If there is no border edge this method will not change the mesh topology.
 	 *
 	 * Changes the connectivity.
@@ -1328,6 +1362,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	default void removeFaceAtBorder(@NotNull final F face, final boolean deleteIsolatedVertices) {
 		removeFaceAtBoundary(face, getMesh().getBorder(), deleteIsolatedVertices);
 	}
+
 
 	/**
 	 * Tests whether the vertex has degree smaller or equals 2.

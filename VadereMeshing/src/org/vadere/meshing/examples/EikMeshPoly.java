@@ -40,7 +40,7 @@ public class EikMeshPoly {
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		meshPoly("/poly/kaiserslautern_tri.poly");
+		meshPoly("/poly/07-BarrierPositions_base.poly");
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
@@ -75,7 +75,7 @@ public class EikMeshPoly {
 		//polygons.add(targetShape);
 
 		// (3) use EikMesh to improve the mesh
-		double h0 = 5.0;
+		double h0 = 0.1;
 		var meshImprover = new PEikMesh(
 				distanceFunctionApproximation,
 				p -> edgeLengthFunctionApprox.apply(p),
@@ -116,7 +116,8 @@ public class EikMeshPoly {
 		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "muenchner_freiheit.poly");
+		String[] splitName = fileName.split("\\.");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "07-BarrierPositions_base"+ "_tri.poly");
 
 	}
 

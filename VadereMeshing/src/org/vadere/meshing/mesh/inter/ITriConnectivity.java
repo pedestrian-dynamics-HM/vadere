@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.util.data.Node;
 import org.vadere.util.data.NodeLinkedList;
 import org.vadere.util.geometry.GeometryUtils;

@@ -208,7 +208,7 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 						mesh.streamFaces(face)
 								//.filter(f -> !face.equals(f)).distinct()
 								.forEach(candidate -> candidates.addFirst(candidate));
-						triangulation.removeFaceAtBorder(face, true);
+						triangulation.removeFaceAtBoundary(face, true);
 					}
 				}
 			}
