@@ -47,7 +47,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
 	private List<StepSizeAdjuster> stepSizeAdjusters;
-	private Topography topography;
+	private Domain domain;
 	private double lastSimTimeInSec;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
@@ -70,7 +70,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 						   AttributesAgent attributesPedestrian, Random random, AttributesOSM atm, Logger logger) {
 
 		this.attributesOSM = atm;
-		this.topography = topography;
+		this.domain = domain;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
@@ -109,7 +109,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		}
 
 		this.stepCircleOptimizer = StepCircleOptimizer.create(
-				attributesOSM, random, topography, iPotentialTargetGrid);
+				attributesOSM, random, domain.getTopography(), iPotentialTargetGrid);
 
 		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
@@ -123,9 +123,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			this.executorService = null;
 		}
 
-		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
-		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, domain.getTopography(), attributesOSM);
+		this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+		this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
 		models.add(this);
 	}
@@ -241,7 +241,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, registerDynamicElementId(topography, id));
+				this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;
@@ -254,7 +254,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				attributesAgent, topography, random, potentialFieldTarget,
+				attributesAgent, domain.getTopography(), random, potentialFieldTarget,
 				potentialFieldObstacle.copy(), potentialFieldPedestrian,
 				speedAdjusters, stepCircleOptimizer.clone());
 		pedestrian.setPosition(position);
