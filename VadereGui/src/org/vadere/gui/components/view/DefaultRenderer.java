@@ -8,6 +8,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Stairs;
+import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -40,8 +41,8 @@ public abstract class DefaultRenderer {
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
-	private boolean renderNodes = true;
-	private double nodeRadius = 0.3;
+	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
+	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
 
 	/**
 	 * <p>Default constructor.</p>
