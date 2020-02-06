@@ -11,6 +11,7 @@ import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.server.VadereSingleClientServer;
 import org.vadere.util.logging.Logger;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +30,7 @@ public class Manager {
 		try {
 			ns = p.parseArgs(args);
 
-			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
+			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"), 50, InetAddress.getByName(ns.getString("bind")));
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
 			AbstractVadereServer server;
 			if (ns.getBoolean("singleClient")) {
@@ -82,6 +83,13 @@ public class Manager {
 				.setDefault(9999)
 				.dest("port")
 				.help("Set port number.");
+
+		parser.addArgument("--bind")
+				.required(false)
+				.type(String.class)
+				.setDefault("127.0.0.1")
+				.dest("bind")
+				.help("Set ip number.");
 
 		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--clientNum")

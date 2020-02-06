@@ -66,11 +66,11 @@ public class TraCIEntryPoint implements Runnable {
 
 		try {
 			ns = p.parseArgs(args);
-			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
-			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
-			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
-			Thread serverThread = new Thread(new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode")));
-			serverThread.start();
+//			ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
+//			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"));
+//			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
+//			Thread serverThread = new Thread(new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode")));
+//			serverThread.start();
 			TraCIEntryPoint entryPoint = new TraCIEntryPoint(ns.getInt("port"), ns.getString("bind"), ns.getInt("javaPort"), ns.getInt("pythonPort"));
 			entryPoint.basePath = ns.getString("basePath");
 			entryPoint.defaultScenario = ns.getString("defaultScenario");
@@ -102,7 +102,6 @@ public class TraCIEntryPoint implements Runnable {
 				.setDefault("INFO")
 				.help("Set Log Level.");
 
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--logname")
 				.required(false)
 				.type(String.class)
@@ -110,16 +109,14 @@ public class TraCIEntryPoint implements Runnable {
 				.help("Write log to given file.");
 
 
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-		parser.addArgument("--port")
+		parser.addArgument("--server-port")
 				.required(false)
 				.type(Integer.class)
-				.setDefault(9999)
+				.setDefault(9998)
 				.dest("port")
 				.help("Set port number.");
 
 
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--bind")
 				.required(false)
 				.type(String.class)
@@ -128,7 +125,6 @@ public class TraCIEntryPoint implements Runnable {
 				.help("Set ip number.");
 
 
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--java-port")
 				.required(false)
 				.type(Integer.class)
@@ -137,36 +133,12 @@ public class TraCIEntryPoint implements Runnable {
 				.help("Set port number of gateway server for java.");
 
 
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
 		parser.addArgument("--python-port")
 				.required(false)
 				.type(Integer.class)
 				.setDefault(10002)
 				.dest("pythonPort")
 				.help("Set port number of gateway server for python.");
-
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-		parser.addArgument("--clientNum")
-				.required(false)
-				.type(Integer.class)
-				.setDefault(4)
-				.dest("clientNum")
-				.help("Set number of clients to manager. Important: Each client has a separate simulation. No communication between clients");
-
-		// boolean switch to tell server to start in gui mode.
-		parser.addArgument("--gui-mode")
-				.required(false)
-				.action(Arguments.storeTrue())
-				.type(Boolean.class)
-				.dest("guiMode")
-				.help("Start server with GUI support. If a scenario is received show the current state of the scenario");
-
-		parser.addArgument("--output-dir", "-o")
-				.required(false)
-				.setDefault("./vadere-server-output")
-				.dest("output-dir") // set name in namespace
-				.type(String.class)
-				.help("Supply output directory as base directory for received scenarios.");
 
 		parser.addArgument("--base-path")
 				.required(true)
