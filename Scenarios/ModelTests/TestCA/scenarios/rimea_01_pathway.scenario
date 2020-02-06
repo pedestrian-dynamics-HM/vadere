@@ -6,15 +6,19 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "evacuationTime.txt",
-      "processors" : [ 1 ]
+      "processors" : [ 1, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "tests.txt",
-      "processors" : [ 4 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 8, 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "speeds.txt",
+      "processors" : [ 13 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
@@ -26,16 +30,6 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 2
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.tests.TestPedestrianEvacuationTimeProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesTestPedestrianEvacuationTimeProcessor",
-      "attributes" : {
-        "expectedResult" : "SUCCESS",
-        "pedestrianEvacuationTimeProcessorId" : 1,
-        "maximalEvacuationTime" : 34.0,
-        "minimalEvacuationTime" : 26.0
-      }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 5
@@ -59,6 +53,28 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 9
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianWaitingTimeProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianWaitingTimeProcessor",
+      "attributes" : {
+        "waitingAreaId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianVelocityProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianVelocityProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 12,
+        "backSteps" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -111,7 +127,7 @@
     },
     "attributesSimulation" : {
       "finishTime" : 1300.0,
-      "simTimeStepLength" : 0.4,
+      "simTimeStepLength" : 0.1,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
@@ -134,21 +150,30 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 45.0,
-          "height" : 3.2
+          "height" : 2.8
         },
         "boundingBoxWidth" : 0.4,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 2.3,
+          "y" : 0.4,
+          "width" : 40.0,
+          "height" : 2.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 42.0,
-          "y" : 0.8,
+          "x" : 42.6,
+          "y" : 0.6,
           "width" : 1.6,
           "height" : 1.6,
           "type" : "RECTANGLE"
@@ -166,8 +191,8 @@
       "sources" : [ {
         "id" : 10,
         "shape" : {
-          "x" : 1.2,
-          "y" : 0.8,
+          "x" : 0.6,
+          "y" : 0.6,
           "width" : 1.2,
           "height" : 1.6,
           "type" : "RECTANGLE"
@@ -189,7 +214,7 @@
       "attributesPedestrian" : {
         "radius" : 0.2,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.0,
+        "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.0,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
