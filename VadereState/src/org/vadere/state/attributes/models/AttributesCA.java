@@ -36,6 +36,7 @@ public class AttributesCA extends AttributesOSM {
 
 
 	// this should be equivalent to the cell size that is used with the CA
+	// todo: fix this to the pedestrian's radius?
 	private double stepLengthIntercept = 0.4;
 
 	private double stepLengthSlopeSpeed = 0.0;

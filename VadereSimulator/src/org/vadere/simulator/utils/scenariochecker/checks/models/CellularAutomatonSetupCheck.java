@@ -48,7 +48,7 @@ public class CellularAutomatonSetupCheck extends AbstractScenarioCheck {
             (agent's speed in CA can only be varied by changing the simulationTimeStep)
             */
 
-            if (scenario.getAttributesPedestrian().getSpeedDistributionStandardDeviation() > 0.0 || scenario.getAttributesPedestrian().getSpeedDistributionMean() != 1.0) {
+            if (scenario.getAttributesPedestrian().getSpeedDistributionStandardDeviation() > 0.0) { // || scenario.getAttributesPedestrian().getSpeedDistributionMean() != 1.0) {
                 messages.add(msgBuilder.simulationAttrError()
                         .reason(ScenarioCheckerReason.CA_SPAWNING, "If the cellular automaton model is used, the free-flow speed should be set to 1.0 m/s and standard deviation to 0.0 m/s. At the moment, individual speeds through event-driven setup is not supported. If you want to change the speed of the pedestrians, adapt the parameter simTimeStepLength in Simulation.")
                         .build());
