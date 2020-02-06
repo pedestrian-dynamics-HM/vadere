@@ -97,7 +97,9 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		if(!generated) {
 			computeDelaunayTriangulation(false);
 			for(Pair<V, V> constrain : vConstrains) {
+				//System.out.println("force constrains for " + constrain.getLeft() + ", " + constrain.getRight());
 				LinkedList<E> newEdges = forceConstrain(constrain);
+				//System.out.println("reinforce Delaunay criteria " + constrain.getLeft() + ", " + constrain.getRight());
 				reinforceDelaunayCriteria(constrain, newEdges);
 			}
 			generated = true;

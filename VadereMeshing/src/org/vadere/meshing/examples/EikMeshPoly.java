@@ -75,7 +75,7 @@ public class EikMeshPoly {
 		//polygons.add(targetShape);
 
 		// (3) use EikMesh to improve the mesh
-		double h0 = 0.1;
+		double h0 = 5.0;
 		var meshImprover = new PEikMesh(
 				distanceFunctionApproximation,
 				p -> edgeLengthFunctionApprox.apply(p),
