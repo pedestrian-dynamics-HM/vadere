@@ -1,5 +1,5 @@
 {
-  "name" : "03-ExperimentSetup-OSMEventDriven-SBEnabled-PSAdapted",
+  "name" : "01-SimplifiedExperiment-OSMEventDriven-PsychDisabled",
   "description" : "",
   "release" : "1.10",
   "processWriters" : {
@@ -67,8 +67,8 @@
         "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.2,
-        "pedPotentialPersonalSpaceWidth" : 0.4,
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
         "pedPotentialHeight" : 50.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
@@ -106,12 +106,12 @@
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : false,
+      "useFixedSeed" : true,
       "fixedSeed" : 6138355022448163583,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : true,
+      "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
@@ -167,7 +167,8 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

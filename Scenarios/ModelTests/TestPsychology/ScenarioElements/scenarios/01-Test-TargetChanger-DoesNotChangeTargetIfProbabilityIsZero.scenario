@@ -1,5 +1,5 @@
 {
-  "name" : "15-Test-TargetChanger-ChangesTargetIfProbabilityIsAHalf",
+  "name" : "01-Test-TargetChanger-DoesNotChangeTargetIfProbabilityIsZero",
   "description" : "",
   "release" : "1.10",
   "processWriters" : {
@@ -190,7 +190,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
         "nextTarget" : 3,
-        "probabilityToChangeTarget" : 0.5
+        "probabilityToChangeTarget" : 0.0
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -209,6 +209,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -229,6 +230,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],

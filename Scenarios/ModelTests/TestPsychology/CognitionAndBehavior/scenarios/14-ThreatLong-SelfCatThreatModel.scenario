@@ -1,5 +1,5 @@
 {
-  "name" : "08-ThreatShort-SelfCatThreatModel",
+  "name" : "14-ThreatLong-SelfCatThreatModel",
   "description" : "",
   "release" : "1.10",
   "processWriters" : {
@@ -249,6 +249,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -269,6 +270,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -342,7 +344,7 @@
     "stimulusInfos" : [ {
       "timeframe" : {
         "startTime" : 15.0,
-        "endTime" : 15.4,
+        "endTime" : 17.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
