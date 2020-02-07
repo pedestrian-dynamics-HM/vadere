@@ -11,16 +11,21 @@ import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incident.helper.JsonFilterIterator;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 public interface JsonNodeExplorer {
 
 
+	default ObjectMapper getMapper(){
+		return StateJsonConverter.getMapper();
+	}
 
 	default void addToObjectNode(JsonNode node, String key, String value) {
 		((ObjectNode) node).put(key, value);
@@ -111,6 +116,15 @@ public interface JsonNodeExplorer {
 		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.ARRAY);
 	}
 
+	default boolean nodeIsString(JsonNode node){
+		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.STRING);
+	}
+
+	default boolean nodeIsNumber(JsonNode node){
+		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.NUMBER);
+	}
+
+
 	default boolean nodeNotEmptyAnd(JsonNode node, Predicate<JsonNode> predicate) {
 		return !node.isMissingNode() && predicate.test(node);
 	}
@@ -143,6 +157,21 @@ public interface JsonNodeExplorer {
 			String type = path(n, "type").asText();
 			return type.equals(processorType);
 		});
+	}
+
+	default Iterator<JsonNode> iteratorTargetChangers(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/targetChangers");
+		return new JsonFilterIterator(tChanger, n->true);
+	}
+
+	default Iterator<JsonNode> iteratorMeasurementAreas(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/measurementAreas");
+		return new JsonFilterIterator(tChanger, n->true);
+	}
+
+	default Iterator<JsonNode> iteratorSources(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/measurementAreas");
+		return new JsonFilterIterator(tChanger, n->true);
 	}
 
 	default  Iterator<JsonNode> iteratorMeasurementArea(JsonNode node, int id) throws MigrationException {
@@ -192,6 +221,12 @@ public interface JsonNodeExplorer {
 			ObjectNode topographyJson = (ObjectNode)pathMustExist(scenarioFile, relPath);
 			topographyJson.putArray(fieldName);
 		}
+	}
+
+	default void addArrayField(JsonNode node, String fieldName,Object data){
+		ObjectNode objNode = (ObjectNode)node;
+		ArrayNode dataNode = getMapper().valueToTree(data);
+		objNode.putArray(fieldName).addAll(dataNode);
 	}
 
 	/**
