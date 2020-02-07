@@ -1,7 +1,7 @@
 {
   "name" : "rimea_13_stairs_long_pso",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -200,6 +200,7 @@
         "startTime" : 0.0,
         "endTime" : 100.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

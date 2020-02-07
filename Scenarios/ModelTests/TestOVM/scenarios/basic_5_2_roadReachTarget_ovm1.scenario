@@ -1,7 +1,7 @@
 {
   "name" : "basic_5_2_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -136,6 +136,7 @@
         "startTime" : 0.0,
         "endTime" : 60.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1, 2 ],
         "groupSizeDistribution" : [ 1.0 ],

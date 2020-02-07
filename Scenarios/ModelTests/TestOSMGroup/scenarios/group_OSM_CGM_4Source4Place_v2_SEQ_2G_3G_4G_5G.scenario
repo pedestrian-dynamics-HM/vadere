@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_4Source4Place_v2_SEQ_2G_3G_4G_5G",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -239,6 +239,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 5 ],
         "groupSizeDistribution" : [ 0.0, 1.0 ],
@@ -259,6 +260,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
@@ -279,6 +281,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 7 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
@@ -299,6 +302,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 8 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 0.0, 1.0 ],

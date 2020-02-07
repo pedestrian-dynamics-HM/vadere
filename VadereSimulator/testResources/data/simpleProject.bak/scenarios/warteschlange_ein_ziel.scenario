@@ -1,7 +1,7 @@
 {
   "name" : "warteschlange_ein_ziel",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -194,6 +194,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
