@@ -195,7 +195,7 @@ public class TextView extends JPanel implements IJsonView {
 							case TOPOGRAPHY:
 								currentScenario.setTopography(StateJsonConverter.deserializeTopography(json));
 								break;
-							case STIMULUS:
+							case PERCEPTION:
 								StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
 								currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
 								break;
@@ -222,7 +222,7 @@ public class TextView extends JPanel implements IJsonView {
 	}
 
 	private void generatePresettingsMenu(final AttributeType attributeType) {
-		if (attributeType == AttributeType.STIMULUS) {
+		if (attributeType == AttributeType.PERCEPTION) {
 			JMenuBar presetMenuBar = new JMenuBar();
 			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
 			presetMenuBar.add(mnPresetMenu);
@@ -283,7 +283,7 @@ public class TextView extends JPanel implements IJsonView {
 			topography.removeBoundary();
 			textfileTextarea.setText(StateJsonConverter.serializeTopography(topography));
 			break;
-		case STIMULUS:
+		case PERCEPTION:
 			StimulusInfoStore stimulusInfoStore = scenario.getScenarioStore().getStimulusInfoStore();
 			textfileTextarea.setText(StateJsonConverter.serializeStimuli(stimulusInfoStore));
 			break;
