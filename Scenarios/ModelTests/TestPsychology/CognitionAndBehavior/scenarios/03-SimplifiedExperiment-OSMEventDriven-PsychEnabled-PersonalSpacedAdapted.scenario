@@ -67,8 +67,8 @@
         "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.2,
-        "pedPotentialPersonalSpaceWidth" : 0.4,
+        "pedPotentialIntimateSpaceWidth" : 0.15,
+        "pedPotentialPersonalSpaceWidth" : 0.3,
         "pedPotentialHeight" : 50.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
