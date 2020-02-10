@@ -1,7 +1,7 @@
 {
   "name" : "rimea_11_exit_selection",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

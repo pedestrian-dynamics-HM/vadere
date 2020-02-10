@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_075_up",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -165,6 +165,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
