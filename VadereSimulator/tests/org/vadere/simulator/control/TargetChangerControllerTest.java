@@ -65,12 +65,12 @@ public class TargetChangerControllerTest {
         }
     }
 
-    private LinkedList<Integer> intList(Integer... ints){
-        LinkedList<Integer> ret = new LinkedList<>();
-        for (Integer anInt : ints) {
-            ret.add(anInt);
+    private LinkedList<Integer> createIntegerList(Integer... integers){
+        LinkedList<Integer> integerList = new LinkedList<>();
+        for (Integer integer : integers) {
+            integerList.add(integer);
         }
-        return ret;
+        return integerList;
     }
 
     private List<Pedestrian> createTwoPedestrianWithTargetT1(int startId) {
@@ -158,7 +158,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateChangesTargetListOfAffectedPedestrianIfProbabilityIsOne() {
-        LinkedList<Integer> nextTarget = intList(2);
+        LinkedList<Integer> nextTarget = createIntegerList(2);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -186,7 +186,7 @@ public class TargetChangerControllerTest {
         pedestrians.get(1).setTargets(currentTargets);
         pedestrians.get(1).setNextTargetListIndex(nextTargetIndex);
 
-        LinkedList<Integer> nextTarget = intList(2);
+        LinkedList<Integer> nextTarget = createIntegerList(2);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -206,7 +206,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateDoesNotChangeTargetListOfAffectedPedestrianIfProbabilityIsZero() {
-        LinkedList<Integer> nextTarget = intList(2);
+        LinkedList<Integer> nextTarget = createIntegerList(2);
         double probability = 0.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -228,9 +228,9 @@ public class TargetChangerControllerTest {
 
     @Test
     public void targetChangerWithListOfTargetsAndStaticTargets() {
-        LinkedList<Integer> nextTarget = intList(2, 1);
+        LinkedList<Integer> nextTarget = createIntegerList(2, 1);
         double probability = 1.0;
-        pedestrians.forEach(p -> p.setTargets(intList(1)));
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
@@ -239,20 +239,20 @@ public class TargetChangerControllerTest {
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
 
-        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), intList(1));
-        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), intList(1));
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
 
         controllerUnderTest.update(simTimeInSec);
 
-        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), intList(1));
-        assertListEqual(pedestrians.get(1).getTargets(), intList(2, 1));
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListEqual(pedestrians.get(1).getTargets(), createIntegerList(2, 1));
     }
 
     @Test
     public void targetChangerWithListOfTargetsAndDynamicTargets() { //must choose first element
-        LinkedList<Integer> nextTarget = intList(1, 2);
+        LinkedList<Integer> nextTarget = createIntegerList(1, 2);
         double probability = 1.0;
-        pedestrians.forEach(p -> p.setTargets(intList(1)));
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
@@ -262,18 +262,18 @@ public class TargetChangerControllerTest {
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
 
-        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), intList(1));
-        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), intList(1));
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
 
         controllerUnderTest.update(simTimeInSec);
 
-        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), intList(1));
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
         assertListContainsSingleTarget(pedestrians.get(1).getTargets(), 1 + TargetPedestrian.UNIQUE_ID_OFFSET);
     }
 
     @Test
     public void updateAddsTargetPedestrianToTopographyIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = intList(1);
+        LinkedList<Integer> nextTarget = createIntegerList(1);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -295,7 +295,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateChangesTargetListOfAffectedPedestrianIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = intList(1);
+        LinkedList<Integer> nextTarget = createIntegerList(1);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -319,7 +319,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateModifiesFollowersIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = intList(1);
+        LinkedList<Integer> nextTarget = createIntegerList(1);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -341,7 +341,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateModifiesPedestrianWithExistingFollwersIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = intList(1);
+        LinkedList<Integer> nextTarget = createIntegerList(1);
         double probability = 1.0;
 
         // Add two new agents were one follows the other.
@@ -376,7 +376,7 @@ public class TargetChangerControllerTest {
 
     @Test
     public void updateUseStaticTargetAsFallbackIfNoPedestrianIsFoundIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = intList(3);
+        LinkedList<Integer> nextTarget = createIntegerList(3);
         double probability = 1.0;
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -400,16 +400,19 @@ public class TargetChangerControllerTest {
         assertEquals(0, targetPedestrians.size());
     }
 
-    private void assertListContainsSingleTarget(LinkedList<Integer> targetList, LinkedList<Integer> targetId) {
-        assertEquals(1, targetList.size());
-        assertEquals(targetList.getFirst(), targetId.getFirst());
-    }
-    private void assertListEqual(LinkedList<Integer> targetList, LinkedList<Integer> targetId) {
-        assertEquals(targetList, targetId);
-    }
     private void assertListContainsSingleTarget(LinkedList<Integer> targetList, Integer targetId) {
         assertEquals(1, targetList.size());
         assertEquals(targetList.getFirst(), targetId);
     }
+
+    private void assertListContainsSingleTarget(LinkedList<Integer> targetList, LinkedList<Integer> targetId) {
+        assertEquals(1, targetList.size());
+        assertEquals(targetList.getFirst(), targetId.getFirst());
+    }
+
+    private void assertListEqual(LinkedList<Integer> targetList, LinkedList<Integer> targetId) {
+        assertEquals(targetList, targetId);
+    }
+
 
 }
