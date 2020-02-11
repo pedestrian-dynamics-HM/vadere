@@ -28,6 +28,17 @@ public class TraCIByteBuffer implements TraCIReader {
 
 	private ByteBuffer byteBuffer;
 
+	protected TraCIByteBuffer() {
+	}
+
+	protected TraCIByteBuffer(byte[] buffer) {
+		byteBuffer = ByteBuffer.wrap(buffer);
+	}
+
+	protected TraCIByteBuffer(ByteBuffer buffer) {
+		byteBuffer = buffer;
+	}
+
 	public static TraCIByteBuffer wrap(byte[] data) {
 		TraCIByteBuffer traCIByteBuffer = new TraCIByteBuffer();
 		traCIByteBuffer.byteBuffer = ByteBuffer.wrap(data);
@@ -38,17 +49,6 @@ public class TraCIByteBuffer implements TraCIReader {
 		TraCIByteBuffer traCIByteBuffer = new TraCIByteBuffer();
 		traCIByteBuffer.byteBuffer = buffer;
 		return traCIByteBuffer;
-	}
-
-	protected TraCIByteBuffer() {
-	}
-
-	protected TraCIByteBuffer(byte[] buffer) {
-		byteBuffer = ByteBuffer.wrap(buffer);
-	}
-
-	protected TraCIByteBuffer(ByteBuffer buffer) {
-		byteBuffer = buffer;
 	}
 
 	@Override

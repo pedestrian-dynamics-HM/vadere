@@ -38,7 +38,7 @@ public class TraCIException extends RuntimeException {
 				+ "not supported in API: " + cmd.getTraCICmd().toString());
 	}
 
-	public String getMessageForClient(){
+	public String getMessageForClient() {
 		return getMessage();
 	}
 

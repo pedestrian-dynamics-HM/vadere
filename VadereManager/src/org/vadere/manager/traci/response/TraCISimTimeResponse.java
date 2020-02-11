@@ -18,11 +18,6 @@ public class TraCISimTimeResponse extends TraCIResponse {
 	private List<TraCISubscriptionResponse> subscriptionResponses;
 
 
-	public static TraCISimTimeResponse simEndReached() {
-		return new TraCISimTimeResponse(
-				new StatusResponse(TraCICmd.SIM_STEP, TraCIStatusResponse.ERR, "Simulation end reached."));
-	}
-
 	public TraCISimTimeResponse(StatusResponse statusResponse, TraCICommandBuffer buffer) {
 		this(statusResponse);
 		int numberOfSubscriptions = buffer.readInt();
@@ -37,6 +32,11 @@ public class TraCISimTimeResponse extends TraCIResponse {
 	public TraCISimTimeResponse(StatusResponse statusResponse) {
 		super(statusResponse, TraCICmd.SIM_STEP);
 		subscriptionResponses = new ArrayList<>();
+	}
+
+	public static TraCISimTimeResponse simEndReached() {
+		return new TraCISimTimeResponse(
+				new StatusResponse(TraCICmd.SIM_STEP, TraCIStatusResponse.ERR, "Simulation end reached."));
 	}
 
 	public int getNumberOfSubscriptions() {

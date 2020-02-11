@@ -1,7 +1,6 @@
 package org.vadere.manager.traci.writer;
 
 import org.apache.commons.codec.binary.Hex;
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.TraCIExceptionInternal;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
@@ -23,13 +22,19 @@ import java.util.List;
 /**
  * //todo comment
  */
-public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter{
+public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 	private static Logger logger = Logger.getLogger(TraCIPacket.class);
 
 	//	private TraCIWriter writer;
 	private boolean emptyLengthField;
 	private boolean finalized; //
 
+
+	private TraCIPacket() {
+		super();
+		finalized = false;
+		emptyLengthField = false;
+	}
 
 	public static TraCIPacket create() {
 		return new TraCIPacket().addEmptyLengthField();
@@ -75,13 +80,6 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter{
 		if (finalized)
 			throw new TraCIExceptionInternal("Cannot change finalized TraCIPacket");
 	}
-
-	private TraCIPacket() {
-		super();
-		finalized = false;
-		emptyLengthField = false;
-	}
-
 
 	private TraCIPacket addEmptyLengthField() {
 		if (emptyLengthField)
@@ -190,7 +188,7 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter{
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-        // ResponseIdentifier needed by implementation in Veins/OMNeT++
+		// ResponseIdentifier needed by implementation in Veins/OMNeT++
 		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
 				.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
@@ -276,8 +274,8 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter{
 		return this;
 	}
 
-	public String asHexString(){
-		return  Hex.encodeHexString(this.data.toByteArray());
+	public String asHexString() {
+		return Hex.encodeHexString(this.data.toByteArray());
 	}
 
 }

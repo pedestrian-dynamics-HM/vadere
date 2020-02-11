@@ -5,7 +5,6 @@
 package org.vadere.manager.traci.py4j;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
@@ -16,18 +15,13 @@ import org.vadere.manager.client.traci.PersonAPI;
 import org.vadere.manager.client.traci.PolygonAPI;
 import org.vadere.manager.client.traci.SimulationAPI;
 import org.vadere.manager.client.traci.VadereAPI;
-import org.vadere.manager.server.VadereServer;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Paths;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import py4j.GatewayServer;
 

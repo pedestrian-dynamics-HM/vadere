@@ -18,15 +18,15 @@ public enum TraCIStatusResponse {
 
 	public int id;
 
+	TraCIStatusResponse(int id) {
+		this.id = id;
+	}
+
 	public static TraCIStatusResponse fromId(int id) {
 		for (TraCIStatusResponse status : values()) {
 			if (status.id == id)
 				return status;
 		}
 		throw new TraCIException(String.format("No status id found with id: %02X", id));
-	}
-
-	TraCIStatusResponse(int id) {
-		this.id = id;
 	}
 }

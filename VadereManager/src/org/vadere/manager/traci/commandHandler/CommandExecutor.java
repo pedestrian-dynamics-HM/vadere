@@ -53,7 +53,7 @@ public class CommandExecutor {
 		try {
 			logger.debugf("execute cmd: %s", cmd.getTraCICmd().logShort());
 			cmd = handler.handel(cmd, remoteManager);
-		}catch (TraCIException e){
+		} catch (TraCIException e) {
 			logger.errorf("Error handling cmd: %s", cmd.getTraCICmd().logShort());
 			e.printStackTrace();
 			return TraCIPacket.createErr(cmd.getTraCICmd().id, e.getMessageForClient());
@@ -61,7 +61,7 @@ public class CommandExecutor {
 		try {
 			logger.debugf("build response for: %s", cmd.getTraCICmd().logShort());
 			response = cmd.buildResponsePacket();
-		} catch (TraCIException e){
+		} catch (TraCIException e) {
 			logger.errorf("error building response for: %s", cmd.getTraCICmd().logShort());
 			e.printStackTrace();
 			return TraCIPacket.createErr(cmd.getTraCICmd().id, e.getMessageForClient());

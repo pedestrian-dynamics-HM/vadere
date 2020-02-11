@@ -23,6 +23,21 @@ public class SimulationCfg {
 	private String outputVecFile;
 	private long seed;
 
+	public SimulationCfg(CompoundObject obj) {
+		if (obj.size() != 9) {
+			throw new TraCIException("Expected at least 9 elements");
+		}
+		configName = (String) obj.getData(0, TraCIDataType.STRING);
+		experiment = (String) obj.getData(1, TraCIDataType.STRING);
+		dateTime = (String) obj.getData(2, TraCIDataType.STRING);
+		resultRootDir = (String) obj.getData(3, TraCIDataType.STRING);
+		iterationVariables = (String) obj.getData(4, TraCIDataType.STRING);
+		repetition = (String) obj.getData(5, TraCIDataType.STRING);
+		outputScalarFile = (String) obj.getData(6, TraCIDataType.STRING);
+		outputVecFile = (String) obj.getData(7, TraCIDataType.STRING);
+		seed = Long.valueOf((int) obj.getData(8, TraCIDataType.INTEGER));
+	}
+
 	public static CompoundObject asCompoundObject(String configName,
 												  String experiment,
 												  String dateTime,
@@ -45,21 +60,6 @@ public class SimulationCfg {
 						outputScalarFile,
 						outputVecFile,
 						seed);
-	}
-
-	public SimulationCfg(CompoundObject obj) {
-		if (obj.size() != 9) {
-			throw new TraCIException("Expected at least 9 elements");
-		}
-		configName = (String) obj.getData(0, TraCIDataType.STRING);
-		experiment = (String) obj.getData(1, TraCIDataType.STRING);
-		dateTime = (String) obj.getData(2, TraCIDataType.STRING);
-		resultRootDir = (String) obj.getData(3, TraCIDataType.STRING);
-		iterationVariables = (String) obj.getData(4, TraCIDataType.STRING);
-		repetition = (String) obj.getData(5, TraCIDataType.STRING);
-		outputScalarFile = (String) obj.getData(6, TraCIDataType.STRING);
-		outputVecFile = (String) obj.getData(7, TraCIDataType.STRING);
-		seed = Long.valueOf((int) obj.getData(8, TraCIDataType.INTEGER));
 	}
 
 	public String outputPath() {

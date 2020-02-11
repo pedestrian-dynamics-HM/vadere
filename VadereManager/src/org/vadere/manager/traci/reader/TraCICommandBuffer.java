@@ -14,6 +14,16 @@ public class TraCICommandBuffer extends TraCIByteBuffer {
 
 	private boolean cmdIdentifierRead;
 
+	private TraCICommandBuffer(byte[] buf) {
+		super(buf);
+		cmdIdentifierRead = false;
+	}
+
+	private TraCICommandBuffer(ByteBuffer buf) {
+		super(buf);
+		cmdIdentifierRead = false;
+	}
+
 	public static TraCICommandBuffer wrap(byte[] buf) {
 		return new TraCICommandBuffer(buf);
 	}
@@ -25,18 +35,6 @@ public class TraCICommandBuffer extends TraCIByteBuffer {
 	public static TraCICommandBuffer empty() {
 		return new TraCICommandBuffer(new byte[0]);
 	}
-
-
-	private TraCICommandBuffer(byte[] buf) {
-		super(buf);
-		cmdIdentifierRead = false;
-	}
-
-	private TraCICommandBuffer(ByteBuffer buf) {
-		super(buf);
-		cmdIdentifierRead = false;
-	}
-
 
 	public int readCmdIdentifier() {
 		if (cmdIdentifierRead)

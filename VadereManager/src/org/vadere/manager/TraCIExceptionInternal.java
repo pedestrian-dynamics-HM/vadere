@@ -1,8 +1,8 @@
 package org.vadere.manager;
 
 /**
- *  Use this Exception if the message produces has no mean for a TraCI client.
- *  The stacktrace is printed but the client gets a static response.
+ * Use this Exception if the message produces has no mean for a TraCI client. The stacktrace is
+ * printed but the client gets a static response.
  */
 public class TraCIExceptionInternal extends TraCIException {
 

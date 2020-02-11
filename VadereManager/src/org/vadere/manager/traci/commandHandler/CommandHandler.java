@@ -31,8 +31,6 @@ import java.util.List;
  */
 public abstract class CommandHandler<VAR extends Enum> {
 
-	private static Logger logger = Logger.getLogger(CommandHandler.class);
-
 	public static final String ELEMENT_ID_NOT_FOUND = "No element found with given object id ";
 	public static final String ELEMENT_ID_NOT_FREE = "There is already an element with the given object id ";
 	public static final String FILE_NOT_FOUND = "No file with given path ";
@@ -40,8 +38,9 @@ public abstract class CommandHandler<VAR extends Enum> {
 	public static final String COULD_NOT_MAP_OBJECT_FROM_JSON = "Could not map object from given json ";
 	public static final String COULD_NOT_SERIALIZE_OBJECT = "Could not serialize object ";
 	public static final String NO_MAIN_MODEL = "Main Model is not present.";
-	protected HashMap<Pair<TraCICmd, VAR>, Method> handler;
+	private static Logger logger = Logger.getLogger(CommandHandler.class);
 	private final Method processNotImplemented;
+	protected HashMap<Pair<TraCICmd, VAR>, Method> handler;
 
 	public CommandHandler() {
 		handler = new HashMap<>();

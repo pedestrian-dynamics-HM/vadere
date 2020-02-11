@@ -11,6 +11,13 @@ public class TraCICloseCommand extends TraCICommand {
 
 	private TraCIResponse response;
 
+	public TraCICloseCommand() {
+		super(TraCICmd.CLOSE);
+		this.response = new TraCIResponse(
+				new StatusResponse(TraCICmd.CLOSE, TraCIStatusResponse.OK, ""),
+				TraCICmd.CLOSE);
+	}
+
 	public static TraCIPacket build() {
 
 		TraCIPacket packet = TraCIPacket.create(6); // 4
@@ -18,13 +25,6 @@ public class TraCICloseCommand extends TraCICommand {
 				.writeUnsignedByte(TraCICmd.CLOSE.id); // 1
 
 		return packet;
-	}
-
-	public TraCICloseCommand() {
-		super(TraCICmd.CLOSE);
-		this.response = new TraCIResponse(
-				new StatusResponse(TraCICmd.CLOSE, TraCIStatusResponse.OK, ""),
-				TraCICmd.CLOSE);
 	}
 
 	public TraCIResponse getResponse() {

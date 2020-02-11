@@ -38,6 +38,10 @@ public abstract class TraCICommand {
 	protected TraCICmd traCICmd;
 	protected TraCIPacket NOK_response = null;
 
+	protected TraCICommand(TraCICmd traCICmd) {
+		this.traCICmd = traCICmd;
+	}
+
 	public static TraCICommand create(ByteBuffer rawCmd) {
 		TraCICommandBuffer cmdBuffer = TraCICommandBuffer.wrap(rawCmd);
 
@@ -81,11 +85,6 @@ public abstract class TraCICommand {
 				throw new TraCIExceptionInternal(String.format("Should not be reached. Only TraCI control commands expected: 0x%02X", cmd.id));
 		}
 
-	}
-
-
-	protected TraCICommand(TraCICmd traCICmd) {
-		this.traCICmd = traCICmd;
 	}
 
 	public TraCICmd getTraCICmd() {

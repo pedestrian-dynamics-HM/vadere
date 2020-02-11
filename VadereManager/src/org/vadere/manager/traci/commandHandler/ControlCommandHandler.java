@@ -28,9 +28,8 @@ import java.lang.reflect.Method;
  */
 public class ControlCommandHandler extends CommandHandler<ControlVar> {
 
-	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
-
 	public static ControlCommandHandler instance;
+	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
 
 	static {
 		instance = new ControlCommandHandler();

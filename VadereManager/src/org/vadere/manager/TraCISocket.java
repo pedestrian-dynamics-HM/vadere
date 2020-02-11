@@ -17,9 +17,8 @@ import java.nio.ByteBuffer;
  */
 public class TraCISocket implements Closeable {
 
-	private static Logger logger = Logger.getLogger(TraCISocket.class);
 	private final static int TRACI_LEN_LENGTH = 4;
-
+	private static Logger logger = Logger.getLogger(TraCISocket.class);
 	private final Socket socket;
 	private final DataOutputStream outStream;
 	private final DataInputStream inStream;
@@ -27,7 +26,7 @@ public class TraCISocket implements Closeable {
 	private String host;
 	private int port;
 
-	public TraCISocket(Socket socket, boolean tracePackets) throws IOException{
+	public TraCISocket(Socket socket, boolean tracePackets) throws IOException {
 		this.socket = socket;
 		this.host = this.socket.getInetAddress().toString();
 		this.port = this.socket.getPort();
