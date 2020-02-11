@@ -4,6 +4,7 @@ package org.vadere.manager.traci.commandHandler;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
 import org.vadere.manager.server.VadereServer;
+import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;
@@ -74,15 +75,16 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
 		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
-		logger.debugf("Simulate to: %f", cmd.getTargetTime());
-//		remoteManager.nextStep(cmd.getTargetTime());
+		logger.debugf("%s: Simulate until=%f", TraCICmd.SIM_STEP.name(), cmd.getTargetTime());
 		if (!remoteManager.nextStep(cmd.getTargetTime())) {
 			//simulation finished;
 			cmd.setResponse(TraCISimTimeResponse.simEndReached());
 			return cmd;
 		}
 		// execute all
-		logger.debug("execute subscriptions");
+		logger.debugf("%s: execute %d subscriptions",
+				TraCICmd.SIM_STEP.name(),
+				remoteManager.getSubscriptions().size());
 		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
 		// remove subscriptions no longer valid

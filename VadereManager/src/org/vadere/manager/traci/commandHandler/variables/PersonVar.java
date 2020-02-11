@@ -64,4 +64,8 @@ public enum PersonVar {
 				", type=" + type +
 				'}';
 	}
+
+	public String logShort(){
+		return String.format("{%s:0x%02X}", name(), id);
+	}
 }

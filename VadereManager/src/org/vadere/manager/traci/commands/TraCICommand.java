@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.TraCIExceptionInternal;
 import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
@@ -55,7 +56,7 @@ public abstract class TraCICommand {
 			case CONTEXT_SUB:
 				throw new TraCIException("Subscription not implement. Command: 0x%02X", cmd.id);
 			default:
-				throw new IllegalStateException("Should not be reached. All CmdType enums are tested in switch statement");
+				throw new TraCIExceptionInternal("Should not be reached. All CmdType enums are tested in switch statement");
 		}
 
 	}
@@ -77,7 +78,7 @@ public abstract class TraCICommand {
 			case LOAD:
 				return new TraCILoadCommand(cmdBuffer);
 			default:
-				throw new IllegalStateException(String.format("Should not be reached. Only TraCI control commands expected: %0X", cmd.id));
+				throw new TraCIExceptionInternal(String.format("Should not be reached. Only TraCI control commands expected: 0x%02X", cmd.id));
 		}
 
 	}

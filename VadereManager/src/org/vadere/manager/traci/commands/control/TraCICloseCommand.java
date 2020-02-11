@@ -36,6 +36,11 @@ public class TraCICloseCommand extends TraCICommand {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("[ %s | %s ]", traCICmd.toString(), response.toString());
+	}
+
+	@Override
 	public TraCIPacket buildResponsePacket() {
 		if (NOK_response != null)
 			return NOK_response;

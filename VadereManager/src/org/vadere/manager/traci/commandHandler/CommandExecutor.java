@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.vadere.manager.RemoteManager;
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
@@ -45,10 +46,27 @@ public class CommandExecutor {
 	public TraCIPacket execute(TraCICommand cmd) {
 		TraCICmdHandler handler = cmdMap.get(cmd.getTraCICmd().id);
 		if (handler == null) {
-			logger.errorf("No CommandHandler found for command: %02X", cmd.getTraCICmd().id);
+			logger.errorf("No CommandHandler found for command: %s", cmd.getTraCICmd().logShort());
 			return TraCIPacket.create().add_Err_StatusResponse(cmd.getTraCICmd().id, "ID not found.");
 		}
+		TraCIPacket response;
+		try {
+			logger.debugf("execute cmd: %s", cmd.getTraCICmd().logShort());
+			cmd = handler.handel(cmd, remoteManager);
+		}catch (TraCIException e){
+			logger.errorf("Error handling cmd: %s", cmd.getTraCICmd().logShort());
+			e.printStackTrace();
+			return TraCIPacket.createErr(cmd.getTraCICmd().id, e.getMessageForClient());
+		}
+		try {
+			logger.debugf("build response for: %s", cmd.getTraCICmd().logShort());
+			response = cmd.buildResponsePacket();
+		} catch (TraCIException e){
+			logger.errorf("error building response for: %s", cmd.getTraCICmd().logShort());
+			e.printStackTrace();
+			return TraCIPacket.createErr(cmd.getTraCICmd().id, e.getMessageForClient());
+		}
 
-		return handler.handel(cmd, remoteManager).buildResponsePacket();
+		return response;
 	}
 }

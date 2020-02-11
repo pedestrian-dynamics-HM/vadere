@@ -59,7 +59,7 @@ public class ClientHandler implements Runnable {
 					while (cmd != null) {
 
 						TraCIPacket response = cmdExecutor.execute(cmd);
-						logger.debugf("send packet with %d byte", response.size());
+						logger.debugf("send packet [%d byte]", response.size());
 						traCISocket.sendExact(response);
 
 						cmd = traCIPacketBuffer.nextCommand();

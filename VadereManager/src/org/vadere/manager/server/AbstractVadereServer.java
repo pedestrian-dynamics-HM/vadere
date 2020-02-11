@@ -17,10 +17,12 @@ public abstract class AbstractVadereServer implements Runnable {
 	protected final ServerSocket serverSocket;
 	protected final Path baseDir;
 	protected final boolean guiSupport;
+	protected final boolean trace;
 
-	public AbstractVadereServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport) {
+	public AbstractVadereServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport, boolean trace) {
 		this.serverSocket = serverSocket;
 		this.baseDir = baseDir;
 		this.guiSupport = guiSupport;
+		this.trace = trace;
 	}
 }

@@ -1,5 +1,7 @@
 package org.vadere.manager.traci.reader;
 
+import org.vadere.manager.TraCIExceptionInternal;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -38,7 +40,7 @@ public class TraCICommandBuffer extends TraCIByteBuffer {
 
 	public int readCmdIdentifier() {
 		if (cmdIdentifierRead)
-			throw new IllegalStateException("TraCI Command Identifier already consumed. readCmdIdentifier() must only be called once. Something went wrong in the TraCI message handling.");
+			throw new TraCIExceptionInternal("TraCI Command Identifier already consumed. readCmdIdentifier() must only be called once. Something went wrong in the TraCI message handling.");
 
 		cmdIdentifierRead = true;
 		return readUnsignedByte();
