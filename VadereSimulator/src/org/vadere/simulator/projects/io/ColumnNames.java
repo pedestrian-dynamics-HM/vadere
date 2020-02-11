@@ -22,6 +22,7 @@ public final class ColumnNames {
 	private Set<String> endTimeKeys;
 	private Set<String> mostImportantStimulusKeys;
 	private Set<String> selfCategoryKeys;
+	private Set<String> groupMembershipKeys;
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -47,6 +48,7 @@ public final class ColumnNames {
 		groupSizeKeys = new HashSet<>();
 		mostImportantStimulusKeys = new HashSet<>();
 		selfCategoryKeys = new HashSet<>();
+		groupMembershipKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 
@@ -69,6 +71,7 @@ public final class ColumnNames {
 		groupSizeKeys.add("groupSize");
 		mostImportantStimulusKeys.add("mostImportantStimulus");
 		selfCategoryKeys.add("selfCategory");
+		groupMembershipKeys.add("groupMembership");
 
 		keys.add(pedestrianIdKeys);
 		keys.add(startX);
@@ -80,17 +83,23 @@ public final class ColumnNames {
 		keys.add(groupSizeKeys);
 		keys.add(mostImportantStimulusKeys);
 		keys.add(selfCategoryKeys);
+		keys.add(groupMembershipKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
+	}
+
+	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, mostImportantStimulusKeys);
 	}
 
 	public int getSelfCategoryCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, selfCategoryKeys);
 	}
 
-	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, mostImportantStimulusKeys);
+	public int getGroupMembershipCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, groupMembershipKeys);
 	}
+
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, pedestrianIdKeys);
