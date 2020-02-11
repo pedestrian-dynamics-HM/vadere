@@ -13,9 +13,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener {
 
-	private List<Subscription> subscriptions;
 	private final Object waitForLoopEnd;
 	private final ReentrantLock lock;
+	private List<Subscription> subscriptions;
 	private boolean lastSimulationStep;
 
 

@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.writer;
 
-import org.vadere.manager.TraCIException;
+import org.apache.commons.codec.binary.Hex;
+import org.vadere.manager.TraCIExceptionInternal;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
@@ -12,6 +13,7 @@ import org.vadere.manager.traci.response.TraCIGetVersionResponse;
 import org.vadere.manager.traci.response.TraCISimTimeResponse;
 import org.vadere.manager.traci.response.TraCIStatusResponse;
 import org.vadere.manager.traci.response.TraCISubscriptionResponse;
+import org.vadere.util.logging.Logger;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -21,14 +23,25 @@ import java.util.List;
  * //todo comment
  */
 public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
+	private static Logger logger = Logger.getLogger(TraCIPacket.class);
 
 	//	private TraCIWriter writer;
 	private boolean emptyLengthField;
 	private boolean finalized; //
 
 
+	private TraCIPacket() {
+		super();
+		finalized = false;
+		emptyLengthField = false;
+	}
+
 	public static TraCIPacket create() {
 		return new TraCIPacket().addEmptyLengthField();
+	}
+
+	public static TraCIPacket createErr(int cmdIdentifier, String description) {
+		return new TraCIPacket().addEmptyLengthField().add_Err_StatusResponse(cmdIdentifier, description);
 	}
 
 	public static TraCIPacket create(int packetSize) {
@@ -65,19 +78,12 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 
 	private void throwIfFinalized() {
 		if (finalized)
-			throw new TraCIException("Cannot change finalized TraCIPacket");
+			throw new TraCIExceptionInternal("Cannot change finalized TraCIPacket");
 	}
-
-	private TraCIPacket() {
-		super();
-		finalized = false;
-		emptyLengthField = false;
-	}
-
 
 	private TraCIPacket addEmptyLengthField() {
 		if (emptyLengthField)
-			throw new IllegalStateException("Should only be called at most once.");
+			throw new TraCIExceptionInternal("Should only be called at most once.");
 		writeInt(-1);
 		emptyLengthField = true;
 		return this;
@@ -131,6 +137,7 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 	}
 
 	public TraCIPacket wrapGetResponse(TraCIGetResponse res) {
+//		logger.tracef("wrap GetResponse: %s", res.toString());
 		addStatusResponse(res.getStatusResponse());
 
 		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
@@ -181,7 +188,7 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 			addStatusResponse(res.getStatusResponse());
 
 		TraCIWriter cmdBuilder = getCmdBuilder();
-        // ResponseIdentifier needed by implementation in Veins/OMNeT++
+		// ResponseIdentifier needed by implementation in Veins/OMNeT++
 		cmdBuilder.writeUnsignedByte(res.getResponseIdentifier().id)
 				.writeInt(res.getVersionId())
 				.writeString(res.getVersionString());
@@ -216,7 +223,7 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 
 
 	public void addCommandWithoutLen(byte[] buffer) {
-		if (buffer.length > 255) {
+		if (buffer.length > 254) {
 			writeUnsignedByte(0);
 			writeInt(buffer.length + 5); // 1 + 4 length field
 			writeBytes(buffer);
@@ -265,6 +272,10 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 		writeString(description); // 4b + X
 
 		return this;
+	}
+
+	public String asHexString() {
+		return Hex.encodeHexString(this.data.toByteArray());
 	}
 
 }

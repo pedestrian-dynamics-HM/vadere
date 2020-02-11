@@ -38,9 +38,8 @@ import java.util.stream.Collectors;
 
 public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
 
-	private static Logger logger = Logger.getLogger(PersonCommandHandler.class);
-
 	public static PolygonCommandHandler instance;
+	private static Logger logger = Logger.getLogger(PersonCommandHandler.class);
 
 	static {
 		instance = new PolygonCommandHandler();

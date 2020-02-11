@@ -161,10 +161,10 @@ public class RemoteManager implements RunnableFinishedListener {
 
 	public void startSimulation() {
 		if (currentSimulationRun == null)
-			throw new IllegalStateException("RemoteScenarioRun object must not be null");
+			throw new TraCIExceptionInternal("RemoteScenarioRun object must not be null");
 
 		if (currentSimulationThread != null && currentSimulationThread.isAlive())
-			throw new IllegalStateException("A simulation is already running. Stop current simulation before starting new one.");
+			throw new TraCIExceptionInternal("A simulation is already running. Stop current simulation before starting new one.");
 
 		simulationFinished = false;
 		currentSimulationThread = new Thread(currentSimulationRun);
