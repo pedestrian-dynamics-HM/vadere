@@ -115,12 +115,27 @@ public class OSMBehaviorController {
     }
 
     public void wait(PedestrianOSM pedestrian, Topography topography, double timeStepInSec) {
-	    // Force a "FootStep" so that output processor can log psychology status even if pedestrian did not change position.
-        // TODO: Maybe, "getDurationNextStep()" must be adapted to avoid that
-        //   start time of this step <= end time previous step
-        makeStep(pedestrian, topography, timeStepInSec);
-        // Satisfy event-driven and sequential update scheme.
-        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
+        double stepStartTime = pedestrian.getTimeOfNextStep();
+        double stepEndTime = stepStartTime + timeStepInSec;
+
+        /* TODO: Discuss with Bene how to create a "correct footstep to avoid an interpolation exception
+            and to get the psychology status logged.
+        System.out.println(String.format("Ped[%d]: startTime[%.2f], endTime[%.2f], time[%.2f]", pedestrian.getId(), stepStartTime, stepEndTime, pedestrian.getMostImportantStimulus().getTime()));
+
+        assert stepEndTime >= stepStartTime && stepEndTime >= 0.0 && stepStartTime >= 0.0 : stepEndTime + "<" + stepStartTime;
+
+        VPoint currentPosition = pedestrian.getPosition();
+        VPoint nextPosition = currentPosition;
+
+        pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
+
+        // Force a "FootStep" so that output processor is able to write out current "PsychologyStatus".
+        FootStep currentFootstep = new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime);
+        pedestrian.getTrajectory().add(currentFootstep);
+        pedestrian.getFootstepHistory().add(currentFootstep);
+        */
+
+        pedestrian.setTimeOfNextStep(stepEndTime);
     }
 
     public void changeToTargetRepulsionStrategyAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
