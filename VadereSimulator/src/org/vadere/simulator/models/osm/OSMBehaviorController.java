@@ -114,7 +114,11 @@ public class OSMBehaviorController {
 	    pedestrian.setVelocity(new Vector2D(0, 0));
     }
 
-    public void wait(PedestrianOSM pedestrian, double timeStepInSec) {
+    public void wait(PedestrianOSM pedestrian, Topography topography, double timeStepInSec) {
+	    // Force a "FootStep" so that output processor can log psychology status even if pedestrian did not change position.
+        // TODO: Maybe, "getDurationNextStep()" must be adapted to avoid that
+        //   start time of this step <= end time previous step
+        makeStep(pedestrian, topography, timeStepInSec);
         // Satisfy event-driven and sequential update scheme.
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + timeStepInSec);
     }
