@@ -18,17 +18,6 @@ public class StatusResponse {
 	private TraCIStatusResponse response;
 	private String description;
 
-	public static StatusResponse createFromByteBuffer(ByteBuffer rawCmd) {
-		StatusResponse ret = new StatusResponse();
-		TraCICommandBuffer buf = TraCICommandBuffer.wrap(rawCmd);
-		ret.cmdIdentifier = TraCICmd.fromId(buf.readCmdIdentifier());
-		ret.response = TraCIStatusResponse.fromId(buf.readUnsignedByte());
-
-		ret.description = buf.readString();
-
-		return ret;
-	}
-
 	private StatusResponse() {
 
 	}
@@ -39,6 +28,16 @@ public class StatusResponse {
 		this.description = description;
 	}
 
+	public static StatusResponse createFromByteBuffer(ByteBuffer rawCmd) {
+		StatusResponse ret = new StatusResponse();
+		TraCICommandBuffer buf = TraCICommandBuffer.wrap(rawCmd);
+		ret.cmdIdentifier = TraCICmd.fromId(buf.readCmdIdentifier());
+		ret.response = TraCIStatusResponse.fromId(buf.readUnsignedByte());
+
+		ret.description = buf.readString();
+
+		return ret;
+	}
 
 	public TraCICmd getCmdIdentifier() {
 		return cmdIdentifier;

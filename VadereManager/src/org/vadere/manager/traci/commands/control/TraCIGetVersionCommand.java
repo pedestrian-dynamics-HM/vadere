@@ -9,18 +9,17 @@ public class TraCIGetVersionCommand extends TraCICommand {
 
 	private TraCIGetVersionResponse response;
 
+	public TraCIGetVersionCommand() {
+		super(TraCICmd.GET_VERSION);
+		response = new TraCIGetVersionResponse();
+	}
+
 	public static TraCIPacket build() {
 		TraCIPacket packet = TraCIPacket.create(6); // 4
 		packet.writeCommandLength(2) // 1
 				.writeUnsignedByte(TraCICmd.GET_VERSION.id); // 1
 		return packet;
 	}
-
-	public TraCIGetVersionCommand() {
-		super(TraCICmd.GET_VERSION);
-		response = new TraCIGetVersionResponse();
-	}
-
 
 	public TraCIGetVersionResponse getResponse() {
 		return response;

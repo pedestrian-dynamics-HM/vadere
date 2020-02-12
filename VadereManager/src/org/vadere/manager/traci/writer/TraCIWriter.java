@@ -1,5 +1,6 @@
 package org.vadere.manager.traci.writer;
 
+import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
@@ -43,7 +44,7 @@ public interface TraCIWriter {
 		if (val >= 0 && val <= 255) {
 			writeByte(val);
 		} else {
-			throw new IllegalArgumentException(
+			throw new TraCIException(
 					"unsignedByte must be within (including) 0..255 but was: " + val);
 		}
 		return this;

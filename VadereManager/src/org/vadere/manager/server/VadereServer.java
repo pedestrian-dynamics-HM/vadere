@@ -15,8 +15,8 @@ public class VadereServer extends AbstractVadereServer {
 
 	private final ExecutorService handlerPool;
 
-	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool, Path baseDir, boolean guiSupport) {
-		super(serverSocket, baseDir, guiSupport);
+	public VadereServer(ServerSocket serverSocket, ExecutorService handlerPool, Path baseDir, boolean guiSupport, boolean trace) {
+		super(serverSocket, baseDir, guiSupport, trace);
 		this.handlerPool = handlerPool;
 	}
 
@@ -31,7 +31,7 @@ public class VadereServer extends AbstractVadereServer {
 
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
-				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
+				handlerPool.execute(new ClientHandler(serverSocket, new TraCISocket(clientSocket, trace), baseDir, guiSupport));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

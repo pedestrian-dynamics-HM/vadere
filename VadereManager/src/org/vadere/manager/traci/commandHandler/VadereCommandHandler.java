@@ -81,7 +81,7 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 	@VadereHandler(cmd = TraCICmd.SET_VADERE_STATE, var = VadereVar.ADD_TARGET_CHANGER, dataTypeStr = "String", name = "createTargetChanger", ignoreElementId = true)
 	public TraCICommand process_addTargetChanger(TraCISetCommand cmd, RemoteManager remoteManager) {
 		String data = (String) cmd.getVariableValue();
-        AttributesTargetChanger atc;
+		AttributesTargetChanger atc;
 		try {
 			atc = (AttributesTargetChanger) StateJsonConverter.deserializeScenarioElementType(data, ScenarioElementType.TARGET_CHANGER);
 			remoteManager.accessState((manager, state) -> {
@@ -105,7 +105,7 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 	@VadereHandler(cmd = TraCICmd.SET_VADERE_STATE, var = VadereVar.ADD_STIMULUS_INFOS, dataTypeStr = "String", name = "addStimulusInfos", ignoreElementId = true)
 	public TraCICommand process_addStimulusInfos(TraCISetCommand cmd, RemoteManager remoteManager) {
 		String data = (String) cmd.getVariableValue();
-        StimulusInfoStore sis;
+		StimulusInfoStore sis;
 		try {
 			sis = StateJsonConverter.deserializeStimuli(data);
 		} catch (IOException e) {

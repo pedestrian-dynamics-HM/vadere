@@ -76,7 +76,7 @@ public class ByteArrayOutputStreamTraCIWriterTest {
 		assertThat((int)buf[2] & 0xff, equalTo(0));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = TraCIException.class)
 	public void writeUnsignedByte1() {
 		writer.writeUnsignedByte(999);
 	}

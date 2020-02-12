@@ -16,6 +16,14 @@ import java.nio.ByteBuffer;
  */
 public class TraCIPacketBuffer extends TraCIByteBuffer {
 
+	protected TraCIPacketBuffer(byte[] buf) {
+		super(buf);
+	}
+
+	protected TraCIPacketBuffer(ByteBuffer buf) {
+		super(buf);
+	}
+
 	public static TraCIPacketBuffer wrap(byte[] buf) {
 		return new TraCIPacketBuffer(buf);
 	}
@@ -26,14 +34,6 @@ public class TraCIPacketBuffer extends TraCIByteBuffer {
 
 	public static TraCIPacketBuffer empty() {
 		return new TraCIPacketBuffer(new byte[0]);
-	}
-
-	protected TraCIPacketBuffer(byte[] buf) {
-		super(buf);
-	}
-
-	protected TraCIPacketBuffer(ByteBuffer buf) {
-		super(buf);
 	}
 
 	public TraCICommand nextCommand() {

@@ -34,10 +34,10 @@ public class Manager {
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
 			AbstractVadereServer server;
 			if (ns.getBoolean("singleClient")) {
-				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
+				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"));
 			} else {
 				ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
-				server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"));
+				server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"));
 			}
 			server.run();
 
@@ -98,6 +98,15 @@ public class Manager {
 				.setDefault(4)
 				.dest("clientNum")
 				.help("Set number of clients to manager. Important: Each client has a separate simulation. No communication between clients");
+
+		parser.addArgument("--trace")
+				.required(false)
+				.action(Arguments.storeTrue())
+				.setDefault(false)
+				.type(Boolean.class)
+				.dest("trace")
+				.help("Activate additional TRACE information in low level components. Ensure correct --loglevel setting to see additional information");
+
 
 		parser.addArgument("--single-client")
 				.required(false)

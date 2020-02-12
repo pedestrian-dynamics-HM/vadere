@@ -34,6 +34,20 @@ public class TraCIGetCommand extends TraCICommand {
 	private TraCIGetResponse response;
 
 
+	public TraCIGetCommand(TraCICmd traCICmd, int variableIdentifier, String elementIdentifier) {
+		super(traCICmd);
+		this.variableIdentifier = variableIdentifier;
+		this.elementIdentifier = elementIdentifier;
+		this.cmdBuffer = TraCICommandBuffer.empty();
+	}
+
+	public TraCIGetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
+		super(traCICmd);
+		this.variableIdentifier = cmdBuffer.readUnsignedByte();
+		this.elementIdentifier = cmdBuffer.readString();
+		this.cmdBuffer = cmdBuffer;
+	}
+
 	public static TraCIPacket build(TraCICmd commandIdentifier, int variableIdentifier, String elementIdentifier) {
 		int cmdLen = 1 + 1 + 1 + 4 + elementIdentifier.getBytes(StandardCharsets.US_ASCII).length;
 		TraCIPacket packet = TraCIPacket.create();
@@ -49,21 +63,6 @@ public class TraCIGetCommand extends TraCICommand {
 		return TraCIPacket.create()
 				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
 						dataType, data);
-	}
-
-
-	public TraCIGetCommand(TraCICmd traCICmd, int variableIdentifier, String elementIdentifier) {
-		super(traCICmd);
-		this.variableIdentifier = variableIdentifier;
-		this.elementIdentifier = elementIdentifier;
-		this.cmdBuffer = TraCICommandBuffer.empty();
-	}
-
-	public TraCIGetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
-		super(traCICmd);
-		this.variableIdentifier = cmdBuffer.readUnsignedByte();
-		this.elementIdentifier = cmdBuffer.readString();
-		this.cmdBuffer = cmdBuffer;
 	}
 
 	public int getVariableIdentifier() {

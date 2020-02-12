@@ -15,8 +15,8 @@ import java.nio.file.Path;
 public class VadereSingleClientServer extends AbstractVadereServer {
 
 
-	public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport) {
-		super(serverSocket, baseDir, guiSupport);
+	public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport, boolean trace) {
+		super(serverSocket, baseDir, guiSupport, trace);
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class VadereSingleClientServer extends AbstractVadereServer {
 		try {
 			logger.infof("listening on port %d... (gui-mode: %s) Single Simulation", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
 			Socket clientSocket = serverSocket.accept();
-			Thread t = new Thread(new ClientHandler(serverSocket, new TraCISocket(clientSocket), baseDir, guiSupport));
+			Thread t = new Thread(new ClientHandler(serverSocket, new TraCISocket(clientSocket, trace), baseDir, guiSupport));
 			t.start();
 			t.join();
 

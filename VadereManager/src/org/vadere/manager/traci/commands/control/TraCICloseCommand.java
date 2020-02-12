@@ -11,6 +11,13 @@ public class TraCICloseCommand extends TraCICommand {
 
 	private TraCIResponse response;
 
+	public TraCICloseCommand() {
+		super(TraCICmd.CLOSE);
+		this.response = new TraCIResponse(
+				new StatusResponse(TraCICmd.CLOSE, TraCIStatusResponse.OK, ""),
+				TraCICmd.CLOSE);
+	}
+
 	public static TraCIPacket build() {
 
 		TraCIPacket packet = TraCIPacket.create(6); // 4
@@ -20,19 +27,17 @@ public class TraCICloseCommand extends TraCICommand {
 		return packet;
 	}
 
-	public TraCICloseCommand() {
-		super(TraCICmd.CLOSE);
-		this.response = new TraCIResponse(
-				new StatusResponse(TraCICmd.CLOSE, TraCIStatusResponse.OK, ""),
-				TraCICmd.CLOSE);
-	}
-
 	public TraCIResponse getResponse() {
 		return response;
 	}
 
 	public void setResponse(TraCIResponse response) {
 		this.response = response;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("[ %s | %s ]", traCICmd.toString(), response.toString());
 	}
 
 	@Override

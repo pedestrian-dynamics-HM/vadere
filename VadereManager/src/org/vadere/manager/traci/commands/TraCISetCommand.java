@@ -33,12 +33,6 @@ public class TraCISetCommand extends TraCICommand {
 
 	private StatusResponse statusResponse;
 
-	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data) {
-		return TraCIPacket.create()
-				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
-						dataType, data);
-	}
-
 	public TraCISetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
 		variableId = cmdBuffer.readUnsignedByte();
@@ -46,6 +40,12 @@ public class TraCISetCommand extends TraCICommand {
 		returnDataType = TraCIDataType.fromId(cmdBuffer.readUnsignedByte());
 		variableValue = cmdBuffer.readTypeValue(returnDataType);
 
+	}
+
+	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data) {
+		return TraCIPacket.create()
+				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+						dataType, data);
 	}
 
 	public Object getVariableValue() {

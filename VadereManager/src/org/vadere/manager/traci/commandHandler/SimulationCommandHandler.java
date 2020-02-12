@@ -43,8 +43,8 @@ import java.util.ArrayList;
 )
 public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
-	private static Logger logger = Logger.getLogger(SimulationCommandHandler.class);
 	public static SimulationCommandHandler instance;
+	private static Logger logger = Logger.getLogger(SimulationCommandHandler.class);
 
 	static {
 		instance = new SimulationCommandHandler();

@@ -11,17 +11,17 @@ public class TraCISimStepCommand extends TraCICommand {
 	private double targetTime;
 	private TraCISimTimeResponse response;
 
+	public TraCISimStepCommand(TraCICommandBuffer cmdBuffer) {
+		super(TraCICmd.SIM_STEP);
+		this.targetTime = cmdBuffer.readDouble();
+	}
+
 	public static TraCIPacket build(double targetTime) {
 		TraCIPacket packet = TraCIPacket.create(14); // 4
 		packet.writeUnsignedByte(10) // 1
 				.writeUnsignedByte(TraCICmd.SIM_STEP.id) // 1
 				.writeDouble(targetTime); // 8
 		return packet;
-	}
-
-	public TraCISimStepCommand(TraCICommandBuffer cmdBuffer) {
-		super(TraCICmd.SIM_STEP);
-		this.targetTime = cmdBuffer.readDouble();
 	}
 
 	public double getTargetTime() {
