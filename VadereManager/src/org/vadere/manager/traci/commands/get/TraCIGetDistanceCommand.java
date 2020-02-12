@@ -40,12 +40,12 @@ public class TraCIGetDistanceCommand extends TraCIGetCommand {
 		}
 	}
 
-	public void setPoint(ArrayList<String> point) {
-		this.point = point;
-	}
-
 	public ArrayList<String> getPoint() {
 		return point;
+	}
+
+	public void setPoint(ArrayList<String> point) {
+		this.point = point;
 	}
 
 }

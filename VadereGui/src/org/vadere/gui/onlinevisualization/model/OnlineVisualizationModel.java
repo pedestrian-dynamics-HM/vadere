@@ -252,8 +252,12 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		switch (agentColoring) {
 			case TARGET:
 			case GROUP:
-			case RANDOM: config.setAgentColoring(agentColoring); break;
-			default: throw new IllegalArgumentException(agentColoring + " is not supported for the online simulation.");
+			case RANDOM:
+			case SELF_CATEGORY:
+				config.setAgentColoring(agentColoring);
+				break;
+			default:
+				throw new IllegalArgumentException(agentColoring + " is not supported for the online simulation.");
 		}
 	}
 

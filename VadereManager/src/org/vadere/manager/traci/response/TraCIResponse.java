@@ -25,6 +25,17 @@ public class TraCIResponse {
 	protected TraCICmd responseIdentifier;
 
 
+	public TraCIResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {
+		this.statusResponse = statusResponse;
+		this.responseIdentifier = responseIdentifier;
+	}
+
+	public TraCIResponse(TraCICmd responseIdentifier) {
+
+	}
+
+	// factory methods
+
 	public static TraCIResponse create(StatusResponse statusResponse) {
 		return new TraCIResponse(statusResponse, statusResponse.getCmdIdentifier());
 	}
@@ -54,7 +65,7 @@ public class TraCIResponse {
 		}
 	}
 
-	// factory methods
+	// instance methods
 
 	private static TraCIResponse createControlResponse(TraCICmd commandIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse) {
 		switch (commandIdentifier) {
@@ -66,20 +77,8 @@ public class TraCIResponse {
 		return null;
 	}
 
-
 	private static TraCIResponse createSetResponse(TraCICmd commandIdentifier, TraCICmd responseIdentifier, TraCICommandBuffer cmdResponseBuffer, StatusResponse statusResponse) {
 		return null;
-	}
-
-	// instance methods
-
-	public TraCIResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {
-		this.statusResponse = statusResponse;
-		this.responseIdentifier = responseIdentifier;
-	}
-
-	public TraCIResponse(TraCICmd responseIdentifier) {
-
 	}
 
 	public StatusResponse getStatusResponse() {

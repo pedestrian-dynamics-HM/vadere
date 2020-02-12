@@ -9,6 +9,6 @@
   },
   "reachDistance" : 0.0,
   "nextTargetIsPedestrian" : false,
-  "nextTarget" : -1,
+  "nextTarget" : [-1],
   "probabilityToChangeTarget" : 0.0
 }

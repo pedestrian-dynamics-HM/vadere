@@ -18,13 +18,6 @@ public class TraCISubscriptionResponse extends TraCIResponse {
 	private List<SingeVarResponse> responses;
 
 
-	public static TraCISubscriptionResponse removeResponse(TraCIValueSubscriptionCommand cmd, TraCICmd res) {
-		return new TraCISubscriptionResponse(
-				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.ERR, SUB_REMOVED),
-				res, cmd.getElementIdentifier(), cmd.getNumberOfVariables());
-	}
-
-
 	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, TraCICommandBuffer buffer) {
 		this(statusResponse, responseIdentifier);
 
@@ -35,6 +28,7 @@ public class TraCISubscriptionResponse extends TraCIResponse {
 		}
 	}
 
+
 	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, String elementId, int numberOfVariables) {
 		this(statusResponse, responseIdentifier);
 		this.elementId = elementId;
@@ -44,6 +38,12 @@ public class TraCISubscriptionResponse extends TraCIResponse {
 	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {
 		super(statusResponse, responseIdentifier);
 		responses = new ArrayList<>();
+	}
+
+	public static TraCISubscriptionResponse removeResponse(TraCIValueSubscriptionCommand cmd, TraCICmd res) {
+		return new TraCISubscriptionResponse(
+				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.ERR, SUB_REMOVED),
+				res, cmd.getElementIdentifier(), cmd.getNumberOfVariables());
 	}
 
 	public void addVariableResponse(int variableId, TraCIStatusResponse status, TraCIDataType dataType, Object value) {

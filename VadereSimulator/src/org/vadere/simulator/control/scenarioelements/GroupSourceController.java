@@ -46,7 +46,8 @@ public class GroupSourceController extends SourceController {
 		this.spawnArray = new GroupSpawnArray(source.getShape(),
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				dynamicElementFactory::getDynamicElementRequiredPlace,
-				this::testFreeSpace);
+				this::testFreeSpace,
+				source.getAttributes());
 
 	}
 

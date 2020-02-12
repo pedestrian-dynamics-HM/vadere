@@ -9,6 +9,7 @@ import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.bmm.BiomechanicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.simulator.models.osm.CellularAutomaton;
 import org.vadere.simulator.models.ovm.OptimalVelocityModel;
 import org.vadere.simulator.models.psychology.selfcategorization.SelfCatThreatModel;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
@@ -42,6 +43,12 @@ public class ModelPresets {
 		list.add(AttributesPotentialCompactSoftshell.class);
 		list.add(AttributesFloorField.class);
 		registerModelPreset(OptimalStepsModel.class, list);
+
+		// Cellular Automaton
+		list.clear();
+		list.add(AttributesCA.class);
+		list.add(AttributesFloorField.class);
+		registerModelPreset(CellularAutomaton.class, list);
 
 		// GNM
 		list.clear();

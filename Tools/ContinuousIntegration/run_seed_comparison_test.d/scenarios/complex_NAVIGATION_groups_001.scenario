@@ -1,7 +1,7 @@
 {
   "name" : "complex_NAVIGATION_groups_001",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -392,6 +392,7 @@
         "startTime" : 0.0,
         "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 8 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -412,6 +413,7 @@
         "startTime" : 0.0,
         "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 15, 8 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -432,6 +434,7 @@
         "startTime" : 0.0,
         "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6, 7 ],
         "groupSizeDistribution" : [ 1.0 ],
@@ -452,6 +455,7 @@
         "startTime" : 0.0,
         "endTime" : 25.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 13, 6, 7 ],
         "groupSizeDistribution" : [ 0.3, 0.4, 0.3 ],

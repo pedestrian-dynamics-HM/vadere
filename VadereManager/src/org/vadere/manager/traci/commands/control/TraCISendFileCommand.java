@@ -12,6 +12,17 @@ public class TraCISendFileCommand extends TraCICommand {
 	private String fileName;
 	private String file; // file content
 
+	public TraCISendFileCommand(TraCICommandBuffer cmdBuffer) {
+		super(TraCICmd.SEND_FILE);
+		this.fileName = cmdBuffer.readString();
+		this.file = cmdBuffer.readString();
+
+	}
+
+	protected TraCISendFileCommand(TraCICmd traCICmd) {
+		super(traCICmd);
+	}
+
 	public static TraCIPacket TraCISendFileCommand(String fileName, String file) {
 		int strLen = file.getBytes(StandardCharsets.US_ASCII).length;
 		strLen += fileName.getBytes(StandardCharsets.US_ASCII).length;
@@ -21,18 +32,6 @@ public class TraCISendFileCommand extends TraCICommand {
 				.writeString(fileName)
 				.writeString(file); // 4+strLen
 		return packet;
-	}
-
-	public TraCISendFileCommand(TraCICommandBuffer cmdBuffer) {
-		super(TraCICmd.SEND_FILE);
-		this.fileName = cmdBuffer.readString();
-		this.file = cmdBuffer.readString();
-
-	}
-
-
-	protected TraCISendFileCommand(TraCICmd traCICmd) {
-		super(traCICmd);
 	}
 
 	public String getFile() {

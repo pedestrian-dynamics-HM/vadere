@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.CheckAreasInAreaDensityVoronoiProcessor;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.DataProcessorsLinkedToMeasurementArea;
+import org.vadere.simulator.utils.scenariochecker.checks.models.CellularAutomatonSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.GroupSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.*;
@@ -65,6 +66,7 @@ public class ScenarioChecker {
 		ret.addAll(runCheck(new DataProcessorsLinkedToMeasurementArea()));
 		ret.addAll(runCheck(new CheckAreasInAreaDensityVoronoiProcessor()));
 		ret.addAll(runCheck(new GroupSetupCheck()));
+		ret.addAll(runCheck(new CellularAutomatonSetupCheck()));
 		return ret;
 	}
 
@@ -102,10 +104,6 @@ public class ScenarioChecker {
 
 	public PriorityQueue<ScenarioCheckerMessage> checkUniqueSourceId() {
 		return runCheck(new UniqueSourceIdCheck());
-	}
-
-	public PriorityQueue<ScenarioCheckerMessage> checkGroupSetup() {
-		return runCheck(new GroupSetupCheck());
 	}
 
 

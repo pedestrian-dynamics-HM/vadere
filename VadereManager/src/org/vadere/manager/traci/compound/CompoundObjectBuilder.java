@@ -18,6 +18,18 @@ public class CompoundObjectBuilder {
 		this.types = new LinkedList<>();
 	}
 
+	static public CompoundObjectBuilder builder() {
+		return new CompoundObjectBuilder();
+	}
+
+	static public CompoundObject json(String json) {
+
+		return CompoundObjectBuilder.builder()
+				.rest()
+				.add(TraCIDataType.STRING)
+				.build(json);
+	}
+
 	public CompoundObjectBuilder rest() {
 		types.clear();
 		return this;
@@ -50,19 +62,6 @@ public class CompoundObjectBuilder {
 		}
 
 		return obj;
-	}
-
-
-	static public CompoundObjectBuilder builder() {
-		return new CompoundObjectBuilder();
-	}
-
-	static public CompoundObject json(String json) {
-
-		return CompoundObjectBuilder.builder()
-				.rest()
-				.add(TraCIDataType.STRING)
-				.build(json);
 	}
 
 

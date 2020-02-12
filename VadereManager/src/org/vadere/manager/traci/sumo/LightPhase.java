@@ -1,5 +1,7 @@
 package org.vadere.manager.traci.sumo;
 
+import org.vadere.manager.TraCIException;
+
 public enum LightPhase {
 
 	RED(0x01),
@@ -20,7 +22,7 @@ public enum LightPhase {
 			if (value.id == id)
 				return value;
 		}
-		throw new IllegalArgumentException("No LightPhase for traCICmd: " + id);
+		throw new TraCIException("No LightPhase for traCICmd: " + id);
 	}
 
 }
