@@ -48,7 +48,8 @@ public class VadereConfig {
 	private static final String DEFAULT_CONFIG_DIR = ".config";
 
 	// Both variables must not be "final" so that we are able
-	// to inject another config file from CLI argument "--config-file myconfig.conf".
+	// to inject another config file from CLI argument "--config-file myconfig.conf"
+	// via static method "setConfigPath()".
 	private static String CONFIG_FILENAME = "vadere.conf";
 	private static Path CONFIG_PATH = Path.of(DEFAULT_HOME_DIR, DEFAULT_CONFIG_DIR, CONFIG_FILENAME);
 
@@ -208,7 +209,7 @@ public class VadereConfig {
 		CONFIG_FILENAME = CONFIG_PATH.getFileName().toString();
 	}
 
-	// Static setters
+	// Static getters
 
 	/**
 	 * Use Apache Common Configuration API on the returned object to retrieve Vadere's config
