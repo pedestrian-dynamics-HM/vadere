@@ -617,7 +617,7 @@ public class OSMBehaviorControllerTest {
         assertEquals(timeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
 
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-        controllerUnderTest.wait(pedestrian1, currentSimTimeInSec);
+        controllerUnderTest.wait(pedestrian1, topography, currentSimTimeInSec);
 
         double expectedTimeOfNextStep = currentSimTimeInSec + timeOfNextStep;
         assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);

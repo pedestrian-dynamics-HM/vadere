@@ -172,7 +172,12 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 					.stream()
 					.map(p -> Integer.toString(p.getId()))
 					.collect(Collectors.toList());
-			logger.debugf("time: %f ID's: %s", state.getSimTimeInSec(), Arrays.toString(data.toArray(String[]::new)));
+			logger.debugf("%s.%s: t=%f pedIds(#%d)=%s",
+					TraCICmd.GET_PERSON_VALUE.logShort(),
+					PersonVar.ID_LIST.logShort(),
+					state.getSimTimeInSec(),
+					data.size(),
+					Arrays.toString(data.toArray(String[]::new)));
 			cmd.setResponse(responseOK(PersonVar.ID_LIST.type, data));
 		});
 		return cmd;
@@ -233,7 +238,9 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 
 			if (checkIfPedestrianExists(ped, cmd)) {
 				cmd.setResponse(responseOK(PersonVar.POS_2D.type, ped.getPosition()));
-				logger.debugf("time: %f Pedestrian: %s Position: %s",
+				logger.tracef("%s.%s: t=%f pedId=%s pos2d=%s",
+						TraCICmd.GET_PERSON_VALUE.logShort(),
+						PersonVar.POS_2D.logShort(),
 						state.getSimTimeInSec(),
 						cmd.getElementIdentifier(),
 						ped.getPosition().toString());

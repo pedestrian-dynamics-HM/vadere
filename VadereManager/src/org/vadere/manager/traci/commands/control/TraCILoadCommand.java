@@ -11,13 +11,13 @@ public class TraCILoadCommand extends TraCICommand {
 
 	private List<String> optionList;
 
-	public static TraCIPacket build(List<String> optionList) {
-		return TraCIPacket.create();
-	}
-
 	public TraCILoadCommand(TraCICommandBuffer cmdBuffer) {
 		super(TraCICmd.LOAD);
 		this.optionList = cmdBuffer.readStringList();
+	}
+
+	public static TraCIPacket build(List<String> optionList) {
+		return TraCIPacket.create();
 	}
 
 	@Override

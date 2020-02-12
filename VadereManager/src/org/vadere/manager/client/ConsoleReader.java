@@ -27,6 +27,25 @@ public class ConsoleReader implements Runnable {
 		addCommand("help", "Print this Help", this::cmd_help);
 	}
 
+	public static void main(String[] args) {
+		ConsoleReader r = new ConsoleReader();
+		r.addCommand("do-shit", "guess..",
+				args1 -> System.out.println("do-shit with " + Arrays.toString(args1)));
+
+		Thread thread = new Thread(r);
+
+		System.out.println("start..");
+
+		thread.start();
+
+		try {
+			thread.join();
+			System.out.println("joined");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void cmd_help(String[] args) {
 		if (!args[0].equals("help"))
 			System.out.println("Unknown command: " + args[0]);
@@ -79,25 +98,6 @@ public class ConsoleReader implements Runnable {
 
 	synchronized public void stop() {
 		running = false;
-	}
-
-	public static void main(String[] args) {
-		ConsoleReader r = new ConsoleReader();
-		r.addCommand("do-shit", "guess..",
-				args1 -> System.out.println("do-shit with " + Arrays.toString(args1)));
-
-		Thread thread = new Thread(r);
-
-		System.out.println("start..");
-
-		thread.start();
-
-		try {
-			thread.join();
-			System.out.println("joined");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override

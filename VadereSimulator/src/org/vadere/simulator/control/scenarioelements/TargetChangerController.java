@@ -2,6 +2,7 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -126,7 +127,9 @@ public class TargetChangerController {
     }
 
     private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent) {
-        int nextTarget = targetChanger.getAttributes().getNextTarget();
+        int nextTarget = (targetChanger.getAttributes().getNextTarget().size() > 0)
+                ? targetChanger.getAttributes().getNextTarget().get(0)
+                : Attributes.ID_NOT_SET;
 
         Collection<Pedestrian> allPedestrians = topography.getElements(Pedestrian.class);
         List<Pedestrian> pedsWithCorrectTargetId = allPedestrians.stream()
@@ -160,7 +163,9 @@ public class TargetChangerController {
     }
 
     private void useStaticTargetForAgent(Agent agent) {
-        agent.setSingleTarget(targetChanger.getAttributes().getNextTarget(), false);
+        agent.setTargets(targetChanger.getAttributes().getNextTarget());
+        agent.setNextTargetListIndex(0);
+        agent.setIsCurrentTargetAnAgent(false);
     }
 
     private void notifyListenersTargetChangerAreaReached(final Agent agent) {

@@ -1,5 +1,7 @@
 package org.vadere.manager.traci;
 
+import org.vadere.manager.TraCIException;
+
 public enum TraCIVersion {
 	V20_0_1(20, 0, 1),
 	V20_0_2(20, 0, 2); // allow cache transfer
@@ -18,7 +20,7 @@ public enum TraCIVersion {
 
 	public static TraCIVersion valueOf(int ordinalId) {
 		if (ordinalId < 0 || ordinalId >= values().length)
-			throw new IllegalArgumentException("given ordinalId is outside of this Enum.");
+			throw new TraCIException("given ordinalId is outside of this Enum.");
 		return values()[ordinalId];
 	}
 

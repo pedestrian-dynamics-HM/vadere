@@ -31,18 +31,13 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	private String defaultScenario;
 	private boolean running;
 
-	public static void main(String[] args) throws IOException, InterruptedException {
-		TestClient testClient = new TestClient(9999, args);
-		testClient.run();
-	}
-
-
 	public TestClient(int port, String basePath, String defaultScenario) {
 		this.port = port;
 		this.running = false;
 		this.basePath = basePath;
 		this.defaultScenario = defaultScenario;
 	}
+
 
 	public TestClient(int port, String[] args) {
 		this.port = port;
@@ -61,6 +56,10 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		}
 	}
 
+	public static void main(String[] args) throws IOException, InterruptedException {
+		TestClient testClient = new TestClient(9999, args);
+		testClient.run();
+	}
 
 	private void addCommands(ConsoleReader consoleReader) {
 		consoleReader.addCommand("ctr.getVersion", "", this::getVersion);

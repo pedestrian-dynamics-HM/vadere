@@ -1,7 +1,7 @@
 {
   "name" : "rimea_08_parameter_variation_part1",
   "description" : "",
-  "release" : "1.10",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

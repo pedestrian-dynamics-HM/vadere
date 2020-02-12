@@ -2,10 +2,10 @@ from py4j.java_gateway import java_import
 
 
 class ApiWrapper(object):
-
-    def __init__(self, apiObject, gateway):
+    def __init__(self, apiObject, gateway, client):
         self._apiObject = apiObject
         self._gateway = gateway
+        self._client = client
 
         # imports
         java_import(self._gateway.jvm, "org.vadere.manager.traci.compoundobjects.*")
