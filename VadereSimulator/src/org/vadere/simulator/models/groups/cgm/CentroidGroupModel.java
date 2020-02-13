@@ -7,13 +7,13 @@ import org.vadere.simulator.models.groups.AbstractGroupModel;
 import org.vadere.simulator.models.groups.Group;
 import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElementContainer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -57,10 +57,10 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributesCGM = Model.findAttributes(attributesList, AttributesCGM.class);
-		this.topography = topography;
+		this.topography = domain.getTopography();
 		this.random = random;
 
 	}

@@ -29,7 +29,7 @@ public class TestSimplePointLocation {
 	@Test
 	public void testLocateAllVertices() {
 		assertTrue(triangulation.getMesh().getVertices().size() > numberOfPoints * 0.1);
-		triangulation.getMesh().getVertices().forEach(p -> assertTrue(triangulation.locateFace(p.getX(), p.getY()).isPresent()));
+		triangulation.getMesh().getVertices().forEach(p -> assertTrue(triangulation.locate(p.getX(), p.getY()).isPresent()));
 	}
 
 

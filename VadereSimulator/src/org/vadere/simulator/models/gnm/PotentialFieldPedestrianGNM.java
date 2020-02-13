@@ -3,13 +3,13 @@ package org.vadere.simulator.models.gnm;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -28,8 +28,8 @@ public class PotentialFieldPedestrianGNM implements PotentialFieldAgent {
 	public PotentialFieldPedestrianGNM() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialGNM.class);
 	}
 

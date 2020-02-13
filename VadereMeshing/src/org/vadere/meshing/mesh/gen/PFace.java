@@ -102,7 +102,7 @@ public class PFace implements IFace, Cloneable {
 		StringBuilder builder = new StringBuilder();
 		int count = 0;
 		while (count <= MAX_FACE_PRINT_LEN && !edge.equals(next)) {
-			builder.append(current + " ");
+			builder.append(current + ",");
 			current = next;
 			next = current.getNext();
 			count++;

@@ -1,5 +1,9 @@
 package org.vadere.simulator.models;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.util.reflection.DynamicClassInstantiator;
@@ -16,10 +20,12 @@ public class MainModelBuilder {
 
 	private ScenarioStore scenarioStore;
 	private MainModel model;
+	private Domain domain;
 	private Random random;
 
-	public MainModelBuilder(ScenarioStore scenarioStore) {
+	public MainModelBuilder(@NotNull final ScenarioStore scenarioStore, @Nullable final PMesh mesh) {
 		this.scenarioStore = scenarioStore;
+		this.domain = new Domain(mesh, scenarioStore.getTopography());
 	}
 
 	public void createModelAndRandom()
@@ -48,11 +54,15 @@ public class MainModelBuilder {
 		return random;
 	}
 
+	public Domain getDomain() {
+		return domain;
+	}
+
 	private MainModel instantiateMainModel(Random random) {
 		String mainModelName = scenarioStore.getMainModel();
 		DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
 		MainModel mainModel = instantiator.createObject(mainModelName);
-		mainModel.initialize(scenarioStore.getAttributesList(), scenarioStore.getTopography(),
+		mainModel.initialize(scenarioStore.getAttributesList(), getDomain(),
 				scenarioStore.getTopography().getAttributesPedestrian(), random);
 		return mainModel;
 	}

@@ -2,7 +2,6 @@ package org.vadere.meshing.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PMeshSuppliert;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
@@ -46,7 +45,7 @@ public interface IMeshDistanceFunction extends IDistanceFunction {
 		IDistanceFunction approxDistance = p -> {
 
 			// (4.1) locate the face containing the point
-			var optFace = backgroundGrid.locateFace(p.getX(), p.getY());
+			var optFace = backgroundGrid.locate(p.getX(), p.getY());
 			var face = optFace.get();
 
 			// point lies outside the boundary

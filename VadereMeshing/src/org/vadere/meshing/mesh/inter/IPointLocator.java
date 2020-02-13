@@ -33,6 +33,10 @@ public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends
 	 */
 	F locatePoint(@NotNull final IPoint point);
 
+	default F locatePoint(@NotNull final IPoint point, final Object caller) {
+		return locatePoint(point);
+	}
+
 	/**
 	 * Starts the point location of the point and returns the face which is found.
 	 *
@@ -40,6 +44,10 @@ public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the face containing the point
 	 */
 	Optional<F> locate(@NotNull final IPoint point);
+
+	default Optional<F> locate(@NotNull final IPoint point, final Object caller) {
+		return locate(point);
+	}
 
 	/**
 	 * Starts the point (x,y) location of the point and returns the face which is found.
@@ -49,6 +57,10 @@ public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the face containing the point
 	 */
 	Optional<F> locate(final double x, final double y);
+
+	default Optional<F> locate(final double x, final double y, final Object caller) {
+		return locate(x, y);
+	}
 
 	/**
 	 * Returns its type.
@@ -65,5 +77,14 @@ public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends
 		DELAUNAY_HIERARCHY,
 		JUMP_AND_WALK,      // preferable!
 		BASE
+	}
+
+	//TODO: this seems a little dirty
+	default IPointLocator<V, E, F> getUncachedLocator() {
+		return this;
+	}
+
+	default boolean isCached() {
+		return false;
 	}
 }

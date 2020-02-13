@@ -49,7 +49,7 @@ public class TestMeshManipulations {
 		int numberOfFaces = triangulation.getMesh().getNumberOfFaces();
 
 		// locate a face / triangle containing (4, 5)
-		PFace face = triangulation.locateFace(6, 6).get();
+		PFace face = triangulation.locate(6, 6).get();
 
 		// merge faces until infinity, therefore consumes all faces!
 		Predicate<PFace> mergePredicate = f -> true;
@@ -66,7 +66,7 @@ public class TestMeshManipulations {
 	@Test
 	public void testRemoveAllFaces() {
 		// locate a face / triangle containing (4, 5)
-		PFace face = triangulation.locateFace(4, 5).get();
+		PFace face = triangulation.locate(4, 5).get();
 
 		// merge faces until infinity, therefore consumes all faces!
 		Predicate<PFace> shrinkCondition = f -> true;

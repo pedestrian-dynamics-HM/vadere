@@ -40,7 +40,7 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		var mesh = triangulation.getMesh();
 
 		IEdgeLengthFunction edgeLengthFunction = p -> {
-			var face = triangulation.locateFace(p.getX(), p.getY()).get();
+			var face = triangulation.locate(p.getX(), p.getY()).get();
 			if(mesh.isBoundary(face)) {
 				return Double.POSITIVE_INFINITY;
 			}

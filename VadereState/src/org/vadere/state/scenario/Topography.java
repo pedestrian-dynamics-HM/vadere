@@ -18,6 +18,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.math.IDistanceFunctionCached;
 import org.vadere.util.random.IReachablePointProvider;
 import org.vadere.util.random.SimpleReachablePointProvider;
 
@@ -44,6 +45,7 @@ public class Topography implements DynamicElementMover{
 
 	private IDistanceFunction obstacleDistanceFunction;
 	private IReachablePointProvider reachablePointProvider;
+
 	/** A possible empty string identifying a context object. */
 	private String contextId;
 
@@ -221,6 +223,14 @@ public class Topography implements DynamicElementMover{
 
 	public double distanceToObstacle(@NotNull IPoint point) {
 		return this.obstacleDistanceFunction.apply(point);
+	}
+
+	public double distanceToObstacle(@NotNull final IPoint point, final Agent caller) {
+		if(obstacleDistanceFunction instanceof IDistanceFunctionCached) {
+			return ((IDistanceFunctionCached)obstacleDistanceFunction).apply(point, caller);
+		} else {
+			return distanceToObstacle(point);
+		}
 	}
 
 	public IDistanceFunction getObstacleDistanceFunction() {
@@ -409,6 +419,10 @@ public class Topography implements DynamicElementMover{
 
 	public List<Obstacle> getObstacles() {
 		return obstacles;
+	}
+
+	public List<VShape> getObstacleShapes() {
+		return obstacles.stream().map(obs -> obs.getShape()).collect(Collectors.toList());
 	}
 
 	public List<Stairs> getStairs() {

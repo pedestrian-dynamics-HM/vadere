@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
@@ -8,17 +9,17 @@ import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
 
-	private final Topography topography;
+	private final Domain domain;
 	private final DynamicElementFactory dynamicElementFactory;
 
-	public TopographyController(Topography topography, DynamicElementFactory dynamicElementFactory, final Random random) {
-		super(topography, random);
-		this.topography = topography;
+	public TopographyController(Domain domain, DynamicElementFactory dynamicElementFactory, final Random random) {
+		super(domain, random);
+		this.domain = domain;
 		this.dynamicElementFactory = dynamicElementFactory;
 	}
 
 	public Topography getTopography() {
-		return this.topography;
+		return this.domain.getTopography();
 	}
 
 	public void preLoop(double simTimeInSec) {
@@ -27,16 +28,16 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	private void createAgentWrapperPedestrians() {
-		for (Pedestrian agentWrapper : topography.getInitialElements(Pedestrian.class)) {
+		for (Pedestrian agentWrapper : domain.getTopography().getInitialElements(Pedestrian.class)) {
 			// Maybe, pass "attributesAgent" to "createElement()" so that attributes,
 			// which are configure in GUI, are not overwritten by "createElement()" method
 			Pedestrian createdPedestrian = (Pedestrian) dynamicElementFactory.createElement(agentWrapper.getPosition(),
 					agentWrapper.getId(), Pedestrian.class);
 
 			applyAttributesFromAgentWrapper(agentWrapper, createdPedestrian);
-			topography.addElement(createdPedestrian);
+			domain.getTopography().addElement(createdPedestrian);
 		}
-		topography.initializePedestrianCount();
+		domain.getTopography().initializePedestrianCount();
 	}
 
 	private void applyAttributesFromAgentWrapper(Pedestrian agentWrapper, Pedestrian newPedestrian) {
@@ -73,6 +74,6 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	public void postLoop(double simTimeInSec) {
-		topography.reset();
+		domain.getTopography().reset();
 	}
 }

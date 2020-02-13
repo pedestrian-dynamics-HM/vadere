@@ -1,5 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.inter;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
@@ -49,7 +50,7 @@ public interface ITriangulator<V extends IVertex, E extends IHalfEdge, F extends
 	IMesh<V, E, F> getMesh();
 
 	//TODO this should be in an abstract class and it might be slow!
-	default void split(@NotNull final E segment, @NotNull final Collection<E> segments) {
+	default V split(@NotNull final E segment, @NotNull final Collection<E> segments) {
 		segments.remove(segment);
 		segments.remove(getMesh().getTwin(segment));
 
@@ -75,5 +76,7 @@ public interface ITriangulator<V extends IVertex, E extends IHalfEdge, F extends
 		for(E e : toLegalize) {
 			getTriangulation().legalize(e, vertex);
 		}
+
+		return vertex;
 	}
 }

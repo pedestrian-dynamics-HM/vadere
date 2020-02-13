@@ -237,6 +237,8 @@ public class VadereConfig {
 		defaultConfig.put("Density.measurementScale", "10.0");
 		defaultConfig.put("Density.measurementRadius", "15");
 		defaultConfig.put("Density.standardDeviation", "0.5");
+		defaultConfig.put("Gui.showNodes", "false");
+		defaultConfig.put("Gui.node.radius", "0.3");
 		defaultConfig.put("Gui.dataProcessingViewMode", "gui");
 		defaultConfig.put("Gui.toolbar.size", "40");
 		defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);

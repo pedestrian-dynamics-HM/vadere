@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -65,7 +66,17 @@ public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F exten
 		double mc = new VLine(c, midpoint).length();
 		double rmax = (pq * pq + mc * mc) / (2 * mc);
 		r = Math.min(Math.max(r, pq), rmax);
-		double d = Math.sqrt(r * r - pq * pq) + r;
+
+		// to prevent numerical errors:
+		double tmp = r * r - pq * pq;
+
+		if(tmp < GeometryUtils.DOUBLE_EPS) {
+			tmp = 0;
+		} else {
+			tmp = Math.sqrt(tmp);
+		}
+
+		double d = tmp + r;
 		/*VPoint e;
 		VPoint x;
 		if(!getMesh().isBoundary(getMesh().getTwinFace(shortestEdge))) {
@@ -100,6 +111,7 @@ public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F exten
 
 		e = c.subtract(cc).norm();
 		x = midpoint.add(e.scalarMultiply(d));
+		assert !Double.isNaN(x.getX()) && !Double.isNaN(x.getY());
 		return x;
 	}
 

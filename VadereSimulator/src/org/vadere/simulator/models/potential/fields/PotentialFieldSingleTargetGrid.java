@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -39,11 +40,11 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
      */
     private final int targetId;
 
-	public PotentialFieldSingleTargetGrid(final Topography topography,
+	public PotentialFieldSingleTargetGrid(final Domain domain,
 			final AttributesAgent attributesPedestrian,
 			final AttributesFloorField attributesPotential,
 			final int targetId) {
-		super(topography, attributesPedestrian, attributesPotential);
+		super(domain, attributesPedestrian, attributesPotential);
 		this.attributesFloorField = attributesPotential;
 		this.attributesPedestrian = attributesPedestrian;
 		this.targetId = targetId;
@@ -62,7 +63,7 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
     @Override
 	public void preLoop(double simTimeInSec) {
 		if (!getSolver(targetId).isPresent()) {
-			List<Target> targets = topography.getTargets(targetId);
+			List<Target> targets = domain.getTopography().getTargets(targetId);
 			List<VShape> shapes = targets.stream().map(t -> t.getShape()).collect(Collectors.toList());
 			addEikonalSolver(targetId, shapes);
 		}
@@ -71,7 +72,7 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 	@Override
 	protected void addEikonalSolver(final int targetId, final List<VShape> shapes) {
 		if (targetId == this.targetId) {
-			EikonalSolver eikonalSolver = IPotentialField.create(topography, targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
+			EikonalSolver eikonalSolver = IPotentialField.create(domain, targetId, shapes, this.attributesPedestrian, this.attributesFloorField);
 			eikonalSolvers.put(targetId, eikonalSolver);
 		}
 	}
@@ -80,8 +81,8 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
 	public void postLoop(double simTimeInSec) {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
 

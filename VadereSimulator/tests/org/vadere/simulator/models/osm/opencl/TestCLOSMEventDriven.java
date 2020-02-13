@@ -5,6 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistanceEikonalEq;
 import org.vadere.simulator.models.potential.fields.PotentialFieldSingleTargetGrid;
+import org.vadere.simulator.projects.Domain;
+import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -159,8 +161,8 @@ public class TestCLOSMEventDriven {
 		bound = new VRectangle(topography.getBounds());
 		obstacleDistancePotential = new PotentialFieldDistanceEikonalEq(
 				topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				bound, attributesFloorField);
-		targetPotentialField = new PotentialFieldSingleTargetGrid(topography, attributesAgent, attributesFloorField, 1);
+				bound, attributesFloorField, ScenarioCache.empty());
+		targetPotentialField = new PotentialFieldSingleTargetGrid(new Domain(topography), attributesAgent, attributesFloorField, 1);
 		targetPotentialField.preLoop(0.4f);
 		pedestrians = new ArrayList<>();
 

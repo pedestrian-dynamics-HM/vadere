@@ -305,7 +305,7 @@ public class DelaunayHierarchy<V extends IVertex, E extends IHalfEdge, F extends
                     face = tri.straightWalk2D(point.getX(), point.getY(), getStartFace(point, tri));
                 }
                 else {
-                    face = tri.locateFace(point.getX(), point.getY(), getStartFace(point, tri)).get();
+                    face = tri.locateMarch(point.getX(), point.getY(), getStartFace(point, tri)).get();
                 }
 
                 v = tri.getMesh().closestVertex(face, point.getX(), point.getY());
@@ -321,7 +321,7 @@ public class DelaunayHierarchy<V extends IVertex, E extends IHalfEdge, F extends
                     face = tri.straightWalk2D(point.getX(), point.getY(), tri.getMesh().getFace(v));
                 }
                 else {
-                    face = tri.locateFace(point.getX(), point.getY(), tri.getMesh().getFace(v)).get();
+                    face = tri.locateMarch(point.getX(), point.getY(), tri.getMesh().getFace(v)).get();
 
                 }
 

@@ -1151,7 +1151,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	default E splitTriangle(@NotNull F face, @NotNull final V p, boolean legalize) {
-		//assert isTriangle(face) && locateFace(point).get().equals(face);
+		//assert isTriangle(face) && locate(point).get().equals(face);
 
 		getMesh().insertVertex(p);
 		IMesh<V, E, F> mesh = getMesh();
@@ -1376,6 +1376,23 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	/**
+	 * <p>This method collapses a four degree vertex which is not at the boundary</p>
+	 *
+	 * @param vertex
+	 * @param deleteIsolatededVertex
+	 */
+	default void collapse4DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+		assert getMesh().degree(vertex) == 4;
+
+		E edge = getMesh().getEdge(vertex);
+		E opp = getMesh().getNext(getMesh().getTwin(getMesh().getNext(edge)));
+
+		F f1 = removeSimpleLink(edge);
+		F f2 = removeSimpleLink(opp);
+		remove2DVertex(vertex, deleteIsolatededVertex);
+	}
+
+	/**
 	 * <p>Removes a two degree vertex by removing its two collapsing its two neighbouring edges which
 	 * will remove two half-edges which is one full-edge in O(1)</p>
 	 *
@@ -1386,7 +1403,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param vertex                    the 2-degree vertex which will be removed
 	 * @param deleteIsolatededVertex    if true the vertex will be removed from the mesh data structure
 	 */
-	default void remove2DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
+	default E remove2DVertex(@NotNull final V vertex, final boolean deleteIsolatededVertex) {
 		assert getMesh().degree(vertex) == 2;
 
 		E survivor = getMesh().getEdge(vertex);
@@ -1417,6 +1434,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		if(deleteIsolatededVertex) {
 			getMesh().destroyVertex(vertex);
 		}
+
+		return survivor;
 	}
 
 	/**
@@ -1694,10 +1713,10 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	@Override
-	default Optional<F> locateFace(final double x, final double y) {
+	default Optional<F> locate(final double x, final double y) {
 		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
-			optFace = locateFace(x, y, getMesh().getFace());
+			optFace = locateMarch(x, y, getMesh().getFace());
 		}
 		else if(getMesh().getNumberOfFaces() == 1) {
 			optFace = Optional.of(getMesh().getFace());
@@ -1724,7 +1743,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face at which the search starts
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(final double x, final double y, @NotNull final F startFace) {
+	default Optional<F> locateMarch(final double x, final double y, @NotNull final F startFace) {
 		// there is no face.
 		if(getDimension() <= 0 ){
 			return Optional.empty();
@@ -1750,8 +1769,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face at which the search starts
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateFace(@NotNull final IPoint point, F startFace) {
-		return locateFace(point.getX(), point.getY(), startFace);
+	default Optional<F> locateMarch(@NotNull final IPoint point, F startFace) {
+		return locateMarch(point.getX(), point.getY(), startFace);
 	}
 
 	/**
@@ -1938,8 +1957,33 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
         // initialize
         F face = startFace;
         // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getPolygonCentroid();
-        VPoint q = getMesh().toTriangle(startFace).midPoint(); // walk from q to p
+        VPoint q = getMesh().getTriangleMidPoint(startFace); // walk from q to p
         VPoint p = new VPoint(x1, y1);
+
+        /*LinkedList<E> walkResult = straightGatherWalk2D(q, p, face, stopCondition);
+	    List<F> faces = walkResult.stream().map(e -> getMesh().getFace(e)).collect(Collectors.toList());
+
+		Runnable run = () -> {
+	        Predicate<F> alertPredicate = f ->{
+		        return faces.contains(f);
+	        };
+
+	        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 800, 800);
+	        meshPanel.display("Random walk");
+        };
+
+        new Thread(run).start();
+
+        int count = 0;
+
+	    while (count < 10) {
+		    count++;
+	    	try {
+			    Thread.sleep(1000);
+		    } catch (InterruptedException e) {
+			    e.printStackTrace();
+		    }
+	    }*/
 
         return straightGatherWalk2D(q, p, face, stopCondition);
     }
@@ -2022,6 +2066,95 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	default void smoothBoundary() {
 		smoothBorder(null);
 		smoothHoles(null);
+	}
+
+	default void collapseBoundaryFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		collapseBorderFaces(collapsePredicate, edgeCollapsePredicate, action);
+		collapseHoleFaces(collapsePredicate, edgeCollapsePredicate, action);
+	}
+
+	default void collapseHoleFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		for(F hole : getMesh().getHoles()) {
+			for(E edge : getMesh().getEdges(hole)) {
+				E twin = getMesh().getTwin(edge);
+				F face = getMesh().getFace(twin);
+
+				assert !getMesh().isBoundary(face);
+
+				/*
+				 * to avoid duplicated smoothing
+				 */
+				if(getMesh().getFace(edge).equals(hole) &&
+						!getMesh().isAtBoundary(getMesh().getNext(twin)) && !getMesh().isAtBoundary(getMesh().getPrev(twin)) &&
+						collapsePredicate.test(face)) {
+
+					V vr = getMesh().getVertex(getMesh().getPrev(edge));
+					V vp = getMesh().getVertex(getMesh().getNext(twin));
+					V vq = getMesh().getVertex(edge);
+
+
+					if(edgeCollapsePredicate.test(getMesh().getNext(twin))) {
+						VPoint r = getMesh().toPoint(vr);
+						VPoint q = getMesh().toPoint(vq);
+
+						VPoint midPoint = new VLine(r, q).midPoint();
+						removeFaceAtBoundary(face, hole,true);
+						getMesh().setPoint(vp, midPoint);
+						action.accept(vp);
+					}
+				}
+			}
+		}
+	}
+
+	default void collapseBorderFaces(@NotNull final Predicate<F> collapsePredicate, @NotNull final Predicate<E> edgeCollapsePredicate, @NotNull final Consumer<V> action) {
+		for(E edge : getMesh().getEdges(getMesh().getBorder())) {
+			E twin = getMesh().getTwin(edge);
+			F face = getMesh().getFace(twin);
+
+			assert !getMesh().isBoundary(face);
+
+			/*
+			 * to avoid duplicated smoothing
+			 */
+			if(getMesh().getFace(edge).equals(getMesh().getBorder()) &&
+					!getMesh().isAtBoundary(getMesh().getNext(twin)) && !getMesh().isAtBoundary(getMesh().getPrev(twin)) &&
+					collapsePredicate.test(face)) {
+
+				V vr = getMesh().getVertex(getMesh().getPrev(edge));
+				V vp = getMesh().getVertex(getMesh().getNext(twin));
+				V vq = getMesh().getVertex(edge);
+
+
+				if(edgeCollapsePredicate.test(getMesh().getNext(twin))) {
+					VPoint r = getMesh().toPoint(vr);
+					VPoint q = getMesh().toPoint(vq);
+
+					VPoint midPoint = new VLine(r, q).midPoint();
+					removeFaceAtBoundary(face, getMesh().getBorder(), true);
+					getMesh().setPoint(vp, midPoint);
+					action.accept(vp);
+				}
+			}
+		}
+	}
+
+	default boolean isLargeAngle(@NotNull final E edge, double minAngle) {
+		assert !getMesh().isBoundary(getMesh().getFace(edge));
+		V vp = getMesh().getVertex(edge);
+		V vq = getMesh().getVertex(getMesh().getNext(edge));
+		V vr = getMesh().getVertex(getMesh().getPrev(edge));
+
+		VPoint r = getMesh().toPoint(vr);
+		VPoint p = getMesh().toPoint(vp);
+		VPoint q = getMesh().toPoint(vq);
+
+		if(GeometryUtils.isCCW(r, p, q)) {
+			double angle = GeometryUtils.angle(r, p, q);
+			return angle > minAngle;
+		}
+
+		return false;
 	}
 
 	default void smoothBorder(@Nullable final IDistanceFunction distanceFunction, @NotNull final Predicate<V> isBoundary) {
@@ -2189,6 +2322,44 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		throw new IllegalArgumentException("no intersection point found " + q + " -> " + p);
 	}
 
+	//Ray casting
+
+	default E rayCastingPolygon(@NotNull final E inEdge,
+	                            @NotNull final VPoint q,
+	                            @NotNull final VPoint p,
+	                            @NotNull final Predicate<E> stopCondition,
+	                            @NotNull final LinkedList<E> visitedEdges) {
+
+		E outEdge = null;
+		E outIfInside = null;
+		F face = getMesh().getFace(inEdge);
+
+		// TODO: this seems to be expensive
+		int count = 0;
+		double distance = Double.MAX_VALUE;
+		for(E e : getMesh().getEdgeIt(inEdge)) {
+			if(intersectsDirectional(p, q, e)) {
+				count++;
+				//if((!stopCondition.test(e) && !getMesh().isBorder(face)) || (stopCondition.test(e) && getMesh().isBorder(face))) {
+				V v1 = getMesh().getVertex(e);
+				V v2 = getMesh().getTwinVertex(e);
+				VPoint iPoint = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+				double dist = p.distance(iPoint);
+				if(dist < distance) {
+					outEdge = e;
+					distance = dist;
+				}
+				//} else {
+				//	outIfInside = e;
+				//}
+			}
+		}
+
+		boolean isInside = count % 2 == 1;
+
+		return (isInside && !getMesh().isBorder(face) || !isInside && getMesh().isBorder(face)) ? null : outEdge;
+	}
+
 	/**
 	 * Walks one step i.e. from a face to immediate / neighbouring next face along the line defined by q and p
 	 * from q to p. This is done be walking from an in-edge through the face to the out-edge. Both the in-edge and
@@ -2226,12 +2397,24 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		F face = getMesh().getFace(inEdge);
 
 		/**
-		 * Get the half-edges e which intersects (q, p).
+		 * Special case: the face is a hole or the border!
 		 */
-		for(E e : getMesh().getEdgeIt(face)) {
-			if(!e.equals(inEdge) && intersects(q, p, e)) {
-				outEdge = e;
-				break;
+		if(getMesh().isBoundary(face)) {
+			outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			if(outEdge == null) {
+				return Optional.empty();
+			} else {
+				return Optional.of(getMesh().getTwin(outEdge));
+			}
+		} else {
+			/**
+			 * Get the half-edges e which intersects (q, p).
+			 */
+			for(E e : getMesh().getEdgeIt(getMesh().getNext(inEdge))) {
+				if(!e.equals(inEdge) && intersects(q, p, e)) {
+					outEdge = e;
+					break;
+				}
 			}
 		}
 
@@ -2240,6 +2423,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 */
 		if(outEdge != null) {
 			//log.debug("straight walk: general case");
+			boolean stop = stopCondition.test(outEdge);
 			if(!stopCondition.test(outEdge)) {
 				return Optional.of(getMesh().getTwin(outEdge));
 			}
@@ -2420,6 +2604,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 */
 		else {
 			p = pDirection;
+			// if this is true we are already done
 			if(contains(pDirection.getX(), pDirection.getY(), startFace)) {
 				visitedEdges.add(getMesh().getEdge(startFace));
 				return visitedEdges;
@@ -2454,6 +2639,36 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 * (2) find all other in-edges.
 		 */
 		do {
+
+			/*if(visitedEdges.size() > 400) {
+				System.out.println("startFace: " + startFace);
+				System.out.println(pDirection);
+				System.out.println(getMesh().toTriangle(startFace).midPoint());
+
+			    List<F> faces = visitedEdges.stream().map(e -> getMesh().getFace(e)).collect(Collectors.toList());
+
+				Runnable run = () -> {
+			        Predicate<F> alertPredicate = f ->{
+				        return faces.contains(f);
+			        };
+
+			        var meshPanel = new MeshPanel(getMesh(), alertPredicate, 1500, 1500);
+			        meshPanel.display("Random walk");
+		        };
+
+		        new Thread(run).start();
+
+		        int count = 0;
+
+			    while (count < 10000) {
+				    count++;
+			        try {
+					    Thread.sleep(1000);
+				    } catch (InterruptedException e) {
+					    e.printStackTrace();
+				    }
+			    }
+			}*/
 
         	/*if (DebugGui.isDebugOn() && getMesh().getFacesWithHoles().size() >= 5) {
 		        DebugGui.showAndWait(WalkCanvas.getDefault(
@@ -2495,7 +2710,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 					//log.debug("walked towards the border!");
 					// return the border
 					// log.debug(getMesh().toPath(face));
-					break;
+					//break;
 				}
 				else if(getMesh().isHole(inEdge)) {
 					//log.debug("walked towards a hole!");
@@ -2511,7 +2726,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 		}*/
 
-
+		//log.debug("visited faces for location: " + visitedEdges.size());
 		return visitedEdges;
     }
 
@@ -2812,7 +3027,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y) {
-		Optional<F> optFace = locateFace(x, y);
+		Optional<F> optFace = locate(x, y);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestEdge(optFace.get(), x, y));
@@ -2839,7 +3054,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y, final F startFace) {
-		Optional<F> optFace = locateFace(x, y, startFace);
+		Optional<F> optFace = locateMarch(x, y, startFace);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestEdge(optFace.get(), x, y));
@@ -2865,7 +3080,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y) {
-		Optional<F> optFace = locateFace(x, y);
+		Optional<F> optFace = locate(x, y);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestVertex(optFace.get(), x, y));
@@ -2893,7 +3108,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<V> getClosestVertex(final double x, final double y, final F startFace) {
-		Optional<F> optFace = locateFace(x, y, startFace);
+		Optional<F> optFace = locateMarch(x, y, startFace);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestVertex(optFace.get(), x, y));

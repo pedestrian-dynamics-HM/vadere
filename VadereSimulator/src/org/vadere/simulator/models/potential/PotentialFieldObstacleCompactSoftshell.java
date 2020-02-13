@@ -3,13 +3,13 @@ package org.vadere.simulator.models.potential;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -29,23 +29,23 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 	private double width;
 	private double height;
 	private Collection<Obstacle> obstacles;
-	private Topography topography;
+	private Domain domain;
 
 	public PotentialFieldObstacleCompactSoftshell() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
-		init(Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class), topography, random);
+	public void initialize(List<Attributes> attributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
+		init(Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class), domain, random);
 	}
 
-	private void init(AttributesPotentialCompactSoftshell attributes, Topography topography, Random random){
+	private void init(AttributesPotentialCompactSoftshell attributes, Domain domain, Random random){
 		this.attributes = attributes;
 		this.width = attributes.getObstPotentialWidth();
 		this.height = attributes.getObstPotentialHeight();
 		this.random = random;
-		this.obstacles = new ArrayList<>(topography.getObstacles());
-		this.topography = topography;
+		this.obstacles = new ArrayList<>(domain.getTopography().getObstacles());
+		this.domain = domain;
 	}
 
 
@@ -56,7 +56,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 		//for (Obstacle obstacle : obstacles) {
 
 			//double distance = obstacle.getShape().distance(pos);
-			double distance = topography.distanceToObstacle(pos);
+			double distance = domain.getTopography().distanceToObstacle(pos, pedestrian);
 
 			/*if(distance > 0) {
 				log.info("distance: " + distance);
@@ -96,7 +96,7 @@ public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObs
 	@Override
 	public PotentialFieldObstacle copy() {
 		PotentialFieldObstacleCompactSoftshell potentialFieldObstacle = new PotentialFieldObstacleCompactSoftshell();
-		potentialFieldObstacle.init(attributes, topography, random);
+		potentialFieldObstacle.init(attributes, domain, random);
 		return potentialFieldObstacle;
 	}
 }

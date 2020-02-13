@@ -1,3 +1,5 @@
+
+
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,9 +20,13 @@ import org.vadere.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -46,8 +52,9 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private final Collection<VLine> constrains;
 	private final Collection<Pair<V, V>> vConstrains;
-	private final Collection<E> eConstrains;
+	private final Set<E> eConstrains;
 	private final Collection<IPoint> points;
+	private final Map<V, VLine> projectionMap;
 	private boolean generated;
 	private boolean conforming;
 
@@ -74,7 +81,8 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		this.constrains = constrains;
 		this.points = Collections.EMPTY_LIST;
 		this.vConstrains = new ArrayList<>(constrains.size());
-		this.eConstrains = new ArrayList<>(constrains.size());
+		this.eConstrains = new HashSet<>(constrains.size());
+		this.projectionMap = new HashMap<>();
 
 		/**
 		 * This prevent the flipping of constrained edges
@@ -89,7 +97,9 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		if(!generated) {
 			computeDelaunayTriangulation(false);
 			for(Pair<V, V> constrain : vConstrains) {
+				//System.out.println("force constrains for " + constrain.getLeft() + ", " + constrain.getRight());
 				LinkedList<E> newEdges = forceConstrain(constrain);
+				//System.out.println("reinforce Delaunay criteria " + constrain.getLeft() + ", " + constrain.getRight());
 				reinforceDelaunayCriteria(constrain, newEdges);
 			}
 			generated = true;
@@ -120,15 +130,34 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 	// TODO: this is slow!
 	private void reinforceConformingCriteria() {
+		/*
+		 * TODO: remember the 2 vertices and connect them to all created vertices by splitting!
+		 *
+		 * corner vertices have 2 possible split lines!
+		 */
+		Map<E, VLine> projectionLines = new HashMap<>();
+		for(E constrain : eConstrains) {
+			VLine projectionLine = new VLine(getMesh().toPoint(getMesh().getVertex(constrain)), getMesh().toPoint(getMesh().getTwinVertex(constrain)));
+			projectionLines.put(constrain, projectionLine);
+		}
+
+
 		Optional<E> nonConformingEdge;
 		do {
+			// TODO this seems expensive!
 			nonConformingEdge = eConstrains.stream()
 					.filter(edge -> !getMesh().isAtBoundary(edge))
 					.filter(edge -> getTriangulation().isDelaunayIllegal(edge))
 					.findAny();
 
 			if(nonConformingEdge.isPresent()) {
-				split(nonConformingEdge.get(), eConstrains);
+				// this call will remove 2 element from eConstrains and will add 4 new ones
+				VLine line = projectionLines.get(nonConformingEdge.get());
+				if(line == null) {
+					line = projectionMap.get(getMesh().getVertex(nonConformingEdge.get()));
+				}
+				V splitVertex = split(nonConformingEdge.get(), eConstrains);
+				projectionMap.put(splitVertex, line);
 			}
 		} while (nonConformingEdge.isPresent());
 	}
@@ -167,6 +196,10 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 	public Collection<E> getConstrains() {
 		return eConstrains;
+	}
+
+	public Map<V, VLine> getProjections() {
+		return projectionMap;
 	}
 
 	@Override
