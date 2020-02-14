@@ -2,6 +2,7 @@ package org.vadere.meshing.mesh.triangulation;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.ITriangulation;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
 @Deprecated
-public class BowyerWatsonSlow implements ITriangulation {
+public class BowyerWatsonSlow {
 
 	/**
 	 * a {@link List} of triples {@link Triple} each defining a triangle.
@@ -100,6 +101,13 @@ public class BowyerWatsonSlow implements ITriangulation {
 			execute();
 		}
 	    return streamTriangles().collect(Collectors.toList());
+    }
+
+    public Stream<VTriangle> streamTriangles() {
+	    return streamTriples().map(tripple -> new VTriangle(
+			    new VPoint(tripple.getLeft()),
+			    new VPoint(tripple.getMiddle()),
+			    new VPoint(tripple.getRight())));
     }
 
     public Set<VLine> getEdges() {
@@ -181,7 +189,6 @@ public class BowyerWatsonSlow implements ITriangulation {
 			    new VPoint(points.getRight().getX(), points.getRight().getY()));
     }
 
-	@Override
 	public Stream<Triple<IPoint, IPoint, IPoint>> streamTriples() {
 		if(!finished) {
 			execute();
@@ -189,7 +196,6 @@ public class BowyerWatsonSlow implements ITriangulation {
 		return triangles.stream();
 	}
 
-	@Override
 	public Stream<IPoint> streamPoints() {
 		if(!finished) {
 			execute();

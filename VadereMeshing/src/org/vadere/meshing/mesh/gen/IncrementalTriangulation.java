@@ -299,6 +299,20 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
+	public void enableCache() {
+		if(!pointLocator.isCached()) {
+			pointLocator = new CachedPointLocator<>(pointLocator, this);
+		}
+	}
+
+	@Override
+	public void disableCache() {
+		if(pointLocator.isCached()) {
+			pointLocator = pointLocator.getUncachedLocator();
+		}
+	}
+
+	@Override
 	public void init() {
 		if(!initialized) {
 
@@ -561,13 +575,13 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
 				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeFaceAtBorder(f, true));
+				faces2.forEach(f -> removeFaceAtBoundary(f, true));
 			}
 
 			if(!mesh.isDestroyed(p2)) {
 				List<F> faces3 = mesh.getFaces(p2);
 				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeFaceAtBorder(f, true));
+				faces3.forEach(f -> removeFaceAtBoundary(f, true));
 			}*/
 
 			finalized = true;
@@ -670,6 +684,11 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	@Override
 	public Optional<F> locateFace(final IPoint point) {
 		return pointLocator.locate(point);
+	}
+
+	@Override
+	public Optional<F> locateFace(@NotNull final IPoint point, final Object caller) {
+		return pointLocator.locate(point, caller);
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCA;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -33,12 +34,12 @@ public class CellularAutomaton extends OptimalStepsModel {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
 						   AttributesAgent attributesPedestrian, Random random) {
 
 		logger.debug("initialize CA");
 
-		initialize(modelAttributesList, topography, attributesPedestrian, random,
+		initialize(modelAttributesList, domain, attributesPedestrian, random,
 				Model.findAttributes(modelAttributesList, AttributesCA.class), logger);
 		}
 }

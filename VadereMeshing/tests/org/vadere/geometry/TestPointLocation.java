@@ -128,31 +128,31 @@ public class TestPointLocation {
 
 	@Test
 	public void testDirectFaceLocation() {
-		assertEquals(face1, triConnectivity.locateFace(0, 0).get());
+		assertEquals(face1, triConnectivity.locate(0, 0).get());
 
-		assertEquals(face1, triConnectivity.locateFace(1.4,1.5).get());
+		assertEquals(face1, triConnectivity.locate(1.4,1.5).get());
 
-		assertEquals(face1, triConnectivity.locateFace(1.4,1.5).get());
+		assertEquals(face1, triConnectivity.locate(1.4,1.5).get());
 
-		assertEquals(border, triConnectivity.locateFace(1.4,3.5).get());
+		assertEquals(border, triConnectivity.locate(1.4,3.5).get());
 
-		assertEquals(border, triConnectivity.locateFace(-1.5,1.4).get());
+		assertEquals(border, triConnectivity.locate(-1.5,1.4).get());
 
-		assertEquals(face2, triConnectivity.locateFace(3.5,1.4).get());
+		assertEquals(face2, triConnectivity.locate(3.5,1.4).get());
 
-		assertEquals(border, triConnectivity.locateFace(3.5,0.2).get());
+		assertEquals(border, triConnectivity.locate(3.5,0.2).get());
 
-		assertEquals(face2, triConnectivity.locateFace(3.0,1.5).get());
+		assertEquals(face2, triConnectivity.locate(3.0,1.5).get());
 
-		assertEquals(face2, triConnectivity.locateFace(4.5,3.0).get());
+		assertEquals(face2, triConnectivity.locate(4.5,3.0).get());
 
-		assertEquals(face1, triConnectivity.locateFace(0, 0).get());
+		assertEquals(face1, triConnectivity.locate(0, 0).get());
 
-		assertEquals(face2, triConnectivity.locateFace(3.0, EPSILON).get());
+		assertEquals(face2, triConnectivity.locate(3.0, EPSILON).get());
 
-		assertEquals(face1, triConnectivity.locateFace(1.5,3.0 - EPSILON).get());
+		assertEquals(face1, triConnectivity.locate(1.5,3.0 - EPSILON).get());
 
-		assertEquals(border, triConnectivity.locateFace(1.5 - EPSILON,3.0 + EPSILON).get());
+		assertEquals(border, triConnectivity.locate(1.5 - EPSILON,3.0 + EPSILON).get());
 	}
 
 	@Test

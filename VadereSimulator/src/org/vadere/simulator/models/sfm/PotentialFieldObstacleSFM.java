@@ -4,13 +4,13 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -31,16 +31,16 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 		PotentialFieldObstacle {
 
 	private Collection<Obstacle> obstacles;
-	private Topography topography;
+	private Domain domain;
 	private AttributesPotentialSFM attributes;
 
 	public PotentialFieldObstacleSFM() {}
 
 	@Override
-	public void initialize(final List<Attributes> attributesList, final Topography topography,
+	public void initialize(final List<Attributes> attributesList, final Domain domain,
 						   final AttributesAgent attributesPedestrian, final Random random) {
-		this.obstacles = topography.getObstacles();
-		this.topography = topography;
+		this.obstacles = domain.getTopography().getObstacles();
+		this.domain = domain;
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialSFM.class);
 	}
 
@@ -110,8 +110,8 @@ public class PotentialFieldObstacleSFM implements GradientProvider,
 	public PotentialFieldObstacleSFM copy() {
 		PotentialFieldObstacleSFM potentialFieldObstacle = new PotentialFieldObstacleSFM();
 		potentialFieldObstacle.attributes = attributes;
-		potentialFieldObstacle.topography = topography;
-		potentialFieldObstacle.obstacles = new LinkedList<>(topography.getObstacles());
+		potentialFieldObstacle.domain = domain;
+		potentialFieldObstacle.obstacles = new LinkedList<>(domain.getTopography().getObstacles());
 		return potentialFieldObstacle;
 	}
 }

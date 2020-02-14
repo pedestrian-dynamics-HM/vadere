@@ -16,6 +16,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -46,7 +47,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
 	private List<StepSizeAdjuster> stepSizeAdjusters;
-	private Topography topography;
+	private Domain domain;
 	private double lastSimTimeInSec;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
@@ -57,23 +58,23 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
 						   AttributesAgent attributesPedestrian, Random random) {
 		logger.debug("initialize OSM");
-		initialize(modelAttributesList, topography, attributesPedestrian, random,
+		initialize(modelAttributesList, domain, attributesPedestrian, random,
 				Model.findAttributes(modelAttributesList, AttributesOSM.class), logger);
 	}
 
 
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
 						   AttributesAgent attributesPedestrian, Random random, AttributesOSM atm, Logger logger) {
 
 		this.attributesOSM = atm;
-		this.topography = topography;
+		this.domain = domain;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
-		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
+		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, domain,
 				attributesPedestrian, random);
 		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
@@ -81,15 +82,15 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
@@ -108,7 +109,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		}
 
 		this.stepCircleOptimizer = StepCircleOptimizer.create(
-				attributesOSM, random, topography, iPotentialTargetGrid);
+				attributesOSM, random, domain.getTopography(), iPotentialTargetGrid);
 
 		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
@@ -122,9 +123,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			this.executorService = null;
 		}
 
-		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
-		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, domain.getTopography(), attributesOSM);
+		this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+		this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
 		models.add(this);
 	}
@@ -240,7 +241,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, registerDynamicElementId(topography, id));
+				this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;
@@ -253,7 +254,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				attributesAgent, topography, random, potentialFieldTarget,
+				attributesAgent, domain.getTopography(), random, potentialFieldTarget,
 				potentialFieldObstacle.copy(), potentialFieldPedestrian,
 				speedAdjusters, stepCircleOptimizer.clone());
 		pedestrian.setPosition(position);

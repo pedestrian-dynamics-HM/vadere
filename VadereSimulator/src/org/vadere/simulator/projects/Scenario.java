@@ -1,6 +1,10 @@
 package org.vadere.simulator.projects;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
@@ -65,9 +69,9 @@ public class Scenario {
 	 */
 	public void setSimulationRunning(boolean simulationRunning) {
 		if (simulationRunning){
-			simulationScenarioStore = copyScenarioStore();
+			this.simulationScenarioStore = copyScenarioStore();
 		} else {
-			simulationScenarioStore = null;
+			this.simulationScenarioStore = null;
 		}
 		this.simulationRunning = simulationRunning;
 	}
@@ -79,8 +83,6 @@ public class Scenario {
 			throw  new RuntimeException();
 		}
 	}
-
-
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
 		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);

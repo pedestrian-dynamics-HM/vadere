@@ -6,6 +6,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
@@ -18,7 +19,6 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
-import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
@@ -49,7 +49,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	private PotentialFieldTargetGrid competitiveField;
 	private PotentialFieldTargetGrid gentleField;
 
-	private final Topography topography;
+	private final Domain domain;
 	private Map<Pedestrian, PedestrianAttitudeType> pedestrianAttitudeMap;
 	private Map<Pedestrian, Double> lifeTimeMap;
 	private List<Pedestrian> pedestrians;
@@ -61,33 +61,33 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	private List<Queue> queues;
 
 	public PotentialFieldTargetQueuingGrid(
-			final Topography topography,
+			final Domain domain,
 			final AttributesAgent attributesPedestrian,
 			final AttributesQueuingGame attributesQueuingGame) {
 
-		if (!isValidArguments(topography, attributesQueuingGame)) {
+		if (!isValidArguments(domain.getTopography(), attributesQueuingGame)) {
 			throw new IllegalArgumentException("wrong TimeCostFunctionType.");
 		}
 		this.attributesQueuingGame = attributesQueuingGame;
-		this.topography = topography;
-		this.topography.addElementAddedListener(Pedestrian.class, this);
-		this.topography.addElementRemovedListener(Pedestrian.class, this);
+		this.domain = domain;
+		this.domain.getTopography().addElementAddedListener(Pedestrian.class, this);
+		this.domain.getTopography().addElementRemovedListener(Pedestrian.class, this);
 		this.random = new Random();
-		this.competitiveField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
+		this.competitiveField = new PotentialFieldTargetGrid(domain, attributesPedestrian,
 				attributesQueuingGame.getNavigationFloorField());
-		this.gentleField = new PotentialFieldTargetGrid(topography, attributesPedestrian,
+		this.gentleField = new PotentialFieldTargetGrid(domain, attributesPedestrian,
 				attributesQueuingGame.getQueuingFloorField());
 		this.pedestrianAttitudeMap = new HashMap<>();
 		this.lifeTimeMap = new HashMap<>();
 		this.pedestrians = new ArrayList<>();
 		this.queues = new ArrayList<>();
 
-		topography.getElements(Pedestrian.class).forEach(this::addPedestrian);
+		domain.getTopography().getElements(Pedestrian.class).forEach(this::addPedestrian);
 
-		Rectangle2D bounds = topography.getBounds();
+		Rectangle2D bounds = domain.getTopography().getBounds();
 		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), 0.1, new CellState(), bounds.getMinX(), bounds.getMinY());
 
-		List<VShape> targetShapes = topography.getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
+		List<VShape> targetShapes = domain.getTopography().getTargets().stream().map(t -> t.getShape()).collect(Collectors.toList());
         AttributesFloorField attributesFloorField = new AttributesFloorField();
 
 		for (VShape shape : targetShapes) {
@@ -95,7 +95,7 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 					new CellState(0.0, PathFindingTag.Target));
 		}
 
-		for (Obstacle obstacle : topography.getObstacles()) {
+		for (Obstacle obstacle : domain.getTopography().getObstacles()) {
 			FloorDiscretizer.setGridValuesForShapeCentered(
 					cellGrid, obstacle.getShape(),
 					new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
@@ -108,10 +108,10 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 		IDistanceFunction distFunc = new DistanceFunctionTarget(cellGrid, targetShapes);
 
         this.detector = new QueueDetector(cellGrid, distFunc, true, new UnitTimeCostFunction(),
-				attributesPedestrian, topography,
+				attributesPedestrian, domain.getTopography(),
                 attributesFloorField.getTargetAttractionStrength(), attributesFloorField.getObstacleGridPenalty());
-		this.queues = topography.getTargets().stream().map(t -> t.getId()).distinct()
-				.map(targetId -> new Queue(topography, targetId, detector)).collect(Collectors.toList());
+		this.queues = domain.getTopography().getTargets().stream().map(t -> t.getId()).distinct()
+				.map(targetId -> new Queue(domain.getTopography(), targetId, detector)).collect(Collectors.toList());
 	}
 
 	private void addPedestrian(final Pedestrian ped) {
@@ -314,8 +314,8 @@ public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGri
 	}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		// TODO should be used to initialize the Model
 	}
 

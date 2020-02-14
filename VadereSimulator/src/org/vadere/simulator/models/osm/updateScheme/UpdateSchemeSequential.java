@@ -65,7 +65,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.WAIT) {
-			osmBehaviorController.wait(pedestrian, timeStepInSec);
+			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 		}

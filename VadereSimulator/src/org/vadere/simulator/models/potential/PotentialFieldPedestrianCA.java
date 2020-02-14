@@ -1,10 +1,9 @@
 package org.vadere.simulator.models.potential;
 
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -27,8 +26,8 @@ public class PotentialFieldPedestrianCA implements PotentialFieldAgent {
 	public PotentialFieldPedestrianCA() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain topography,
+	                       AttributesAgent attributesPedestrian, Random random) {
 
 	}
 

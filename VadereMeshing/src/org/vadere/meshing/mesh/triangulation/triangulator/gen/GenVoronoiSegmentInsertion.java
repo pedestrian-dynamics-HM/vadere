@@ -9,7 +9,6 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -46,12 +45,14 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	// Improvements: use multiple unsorted queues to improve performance
 	private PriorityQueue<F> active;
 
+	// TODO: use the mesh property container
 	private Set<F> activeSet;
 	private Set<F> accepted;
 	private Map<F, VTriangle> triangles;
 	private boolean createHoles;
-	private Function<IPoint, Double> circumRadiusFunc;
-	private final static int MAX_POINTS = 20000;
+	private Function<IPoint, Double> edgeLenFunction;
+	//TODO make it a parameter
+	private final static int MAX_POINTS = 200_000;
 	private double delta = 1.5;
 
 	private VoronoiSegPlacement<V, E, F> placementStrategy;
@@ -59,7 +60,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	public GenVoronoiSegmentInsertion(@NotNull final PSLG pslg,
 	                                  @NotNull final IMeshSupplier<V, E, F> meshSupplier,
 	                                  final boolean createHoles,
-	                                  @NotNull Function<IPoint, Double> circumRadiusFunc) {
+	                                  @NotNull Function<IPoint, Double> edgeLenFunction) {
 		this.initialized = false;
 		this.generated = false;
 		this.active = new PriorityQueue<>(new GenVoronoiSegmentInsertion.FaceQualityComparator());
@@ -67,7 +68,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		this.activeSet = new HashSet<>();
 		this.triangles = new HashMap<>();
 		this.createHoles = createHoles;
-		this.circumRadiusFunc = circumRadiusFunc;
+		this.edgeLenFunction = edgeLenFunction;
 		this.pslg = pslg.addLines(generateLines(pslg));
 		this.segmentBound = pslg.getSegmentBound();
 
@@ -75,30 +76,29 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		 * This prevent the flipping of constrained edges
 		 */
 		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, pslg, false);
-		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), circumRadiusFunc);
+		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), edgeLenFunction);
 	}
 
 	public GenVoronoiSegmentInsertion(@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                                  @NotNull final Function<IPoint, Double> circumRadiusFunc) {
 		this.triangulation = triangulation;
-		this.initialized = true;
+		this.initialized = false;
 		this.generated = false;
 		this.active = new PriorityQueue<>(new GenVoronoiSegmentInsertion.FaceQualityComparator());
 		this.accepted = new HashSet<>();
 		this.activeSet = new HashSet<>();
 		this.triangles = new HashMap<>();
 		this.createHoles = false;
-		this.circumRadiusFunc = circumRadiusFunc;
+		this.edgeLenFunction = circumRadiusFunc;
 		this.pslg = null;
 		this.cdt = null;
 		this.segmentBound = GeometryUtils.polygonFromPoints2D(
 				getTriangulation().getMesh().getVertices(triangulation.getMesh().getBorder()));
 		this.placementStrategy = new VoronoiSegPlacement<>(triangulation.getMesh(), circumRadiusFunc);
-		scan();
 	}
 
 	private boolean isAccepted(@NotNull final E edge) {
-		return circumRadiusFunc.apply(getMesh().toLine(edge).midPoint()) / getMesh().toTriangle(getMesh().getFace(edge)).getCircumscribedRadius() < 1.5;
+		return edgeLenFunction.apply(getMesh().toLine(edge).midPoint()) / getMesh().toTriangle(getMesh().getFace(edge)).getCircumscribedRadius() < 1.5;
 	}
 
 	private void scan() {
@@ -111,14 +111,32 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		}
 	}
 
+	private void splitBoundaryEdges() {
+		boolean split;
+		do {
+			split = false;
+			List<E> boundaryEdges = getMesh().getBoundaryEdges();
+			for(E edge : boundaryEdges) {
+				VLine line = getMesh().toLine(edge);
+				if(line.length() > edgeLenFunction.apply(line.midPoint())) {
+					getTriangulation().splitEdge(edge, true);
+					split = true;
+				}
+			}
+		} while (split);
+	}
+
 	@Override
 	public void refine() {
 		if(!refinementFinished()) {
 			if(!initialized) {
-				cdt.generate(true);
+				if(triangulation == null) {
+					cdt.generate(true);
+					triangulation = cdt.getTriangulation();
+				}
+				splitBoundaryEdges();
 				scan();
 				initialized = true;
-				triangulation = cdt.getTriangulation();
 			}
 
 			if(!active.isEmpty()) {
@@ -146,7 +164,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		}
 
 		VPoint x = placementStrategy.computePlacement(shortestEdge, triangles.get(face));
-		Optional<F> optionalF = getTriangulation().locateFace(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
+		Optional<F> optionalF = getTriangulation().locateMarch(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
 
 		if(optionalF.isPresent() && !getMesh().isBoundary(optionalF.get())) {
 			V v = getMesh().createVertex(x.getX(), x.getY());
@@ -259,7 +277,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		}
 		else {
 			double r = getMesh().toTriangle(face).getCircumscribedRadius();
-			boolean accepted =  r / circumRadiusFunc.apply(getMesh().toTriangle(face).midPoint()) < delta /*&& getTriangulation().faceToQuality(face) >= minQuality*/;
+			boolean accepted =  r * Math.sqrt(3) <= edgeLenFunction.apply(getMesh().toTriangle(face).midPoint())  /*&& getTriangulation().faceToQuality(face) >= minQuality*/;
 			if(accepted) {
 				this.accepted.add(face);
 			}
@@ -304,7 +322,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 				List<VLine> newSplitLines = new ArrayList<>();
 				for(VLine splitLine : splitLines) {
 					VPoint midPoint = splitLine.midPoint();
-					double desiredLen = circumRadiusFunc.apply(midPoint) * Math.sqrt(3);
+					double desiredLen = edgeLenFunction.apply(midPoint) * Math.sqrt(3);
 					double len = splitLine.length();
 					if(len >  desiredLen) {
 						newSplitLines.add(new VLine(splitLine.getVPoint1(), midPoint));

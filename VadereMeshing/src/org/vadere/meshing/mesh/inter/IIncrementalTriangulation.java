@@ -43,7 +43,7 @@ import java.util.stream.Stream;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<F>, ITriangulation, ITriConnectivity<V, E, F>, Cloneable {
+public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<F>, ITriangulation<V, E, F>, ITriConnectivity<V, E, F>, Cloneable {
 
 	void init();
 	void compute();
@@ -98,6 +98,10 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 	void remove(final IPoint point);
 
 	void setPointLocator(@NotNull final IPointLocator.Type type);
+
+	void enableCache();
+
+	void disableCache();
 
 	default Set<VLine> getEdges() {
 		return getMesh()

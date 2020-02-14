@@ -335,10 +335,13 @@ public class TikzGenerator {
 		final StringBuffer generatedCode = new StringBuffer("");
 
 		if (config.isShowTrajectories()) {
-			Collection<Agent> agents = model.getAgents();
 			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents @ simTimeInSec %f of \n",model.getSimTimeInSec()));
+
+			Collection<Agent> agents = model.getAgents();
+
 			TableTrajectoryFootStep trajectories = model.getTrajectories();
 			Table dataFrame;
+
 			if (model.config.isShowAllTrajectories()) {
 				dataFrame = model.getAppearedPedestrians();
 			} else {
@@ -353,7 +356,6 @@ public class TikzGenerator {
 				Table slice = dataFrame.where(dataFrame.intColumn(trajectories.pedIdCol).isEqualTo(agent.getId()));
 
 				for(Row row : slice) {
-					int agentId = row.getInt(trajectories.pedIdCol);
 					boolean isLastStep = row.getDouble(trajectories.endTimeCol) > model.getSimTimeInSec();
 					double startX = row.getDouble(trajectories.startXCol);
 					double startY = row.getDouble(trajectories.startYCol);
@@ -366,7 +368,6 @@ public class TikzGenerator {
 						endY = interpolatedPos.getY();
 					}
 
-					int pedId = row.getInt(trajectories.pedIdCol);
 					trajectory.append(String.format(Locale.US, "(%f,%f) to ", startX, startY));
 
 					if(row.getRowNumber() == slice.rowCount()-1) {
@@ -384,15 +385,21 @@ public class TikzGenerator {
 	}
 
     private String applyAgentColorToTrajectory(String trajectory, Optional<Agent> agent) {
-	    String colorString = "AgentColor";
+	    String colorString = "trajectory, draw=AgentColor";
 
-	    if (agent.get() instanceof Pedestrian) {
-	        Pedestrian pedestrian = (Pedestrian)agent.get();
-		    Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
-            colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-        }
+		if (agent.get() instanceof Pedestrian) {
+			Pedestrian pedestrian = (Pedestrian) agent.get();
+			ScenarioElement selectedElement = model.getSelectedElement();
 
-        return String.format(Locale.US, "\\draw[trajectory, draw=%s]\n%s;\n", colorString, trajectory);
+			if (selectedElement instanceof Pedestrian && selectedElement.getId() == pedestrian.getId()) {
+				colorString = "selected";
+			} else {
+				Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
+				colorString = String.format(Locale.US, "trajectory, draw={rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+			}
+		}
+
+        return String.format(Locale.US, "\\draw[%s]\n%s;\n", colorString, trajectory);
     }
 
 	/**

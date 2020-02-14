@@ -73,7 +73,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		this.facesData = new HashMap<>();
 
 		this.verticesDoubleData = new HashMap<>();
-		this.halfEdgesData = new HashMap<>();
+		this.halfEdgesDoubleData = new HashMap<>();
 		this.facesDoubleData = new HashMap<>();
 
 		this.verticesBooleanData = new HashMap<>();

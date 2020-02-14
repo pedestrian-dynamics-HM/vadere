@@ -69,7 +69,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.WAIT) {
-			osmBehaviorController.wait(pedestrian, timeStepInSec);
+			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 		}

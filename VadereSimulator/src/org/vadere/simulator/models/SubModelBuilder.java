@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
@@ -16,16 +17,16 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 public class SubModelBuilder {
 	
 	private final List<Attributes> modelAttributesList;
-	private final Topography topography;
+	private final Domain domain;
 	private final AttributesAgent attributesPedestrian;
 	private final Random random;
 
 	private final List<Model> subModels = new LinkedList<>();
 
-	public SubModelBuilder(List<Attributes> modelAttributesList, Topography topography,
+	public SubModelBuilder(List<Attributes> modelAttributesList, Domain domain,
 			AttributesAgent attributesPedestrian, Random random) {
 		this.modelAttributesList = modelAttributesList;
-		this.topography = topography;
+		this.domain = domain;
 		this.attributesPedestrian = attributesPedestrian;
 		this.random = random;
 	}
@@ -34,7 +35,7 @@ public class SubModelBuilder {
 		for (String submodelName : subModelClassNames) {
 			final DynamicClassInstantiator<Model> modelInstantiator = new DynamicClassInstantiator<>();
 			final Model submodel = modelInstantiator.createObject(submodelName);
-			submodel.initialize(modelAttributesList, topography, attributesPedestrian, random);
+			submodel.initialize(modelAttributesList, domain, attributesPedestrian, random);
 			subModels.add(submodel);
 		}
 	}

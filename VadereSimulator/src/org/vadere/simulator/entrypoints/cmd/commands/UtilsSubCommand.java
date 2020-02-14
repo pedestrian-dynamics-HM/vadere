@@ -9,6 +9,7 @@ import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -142,7 +143,8 @@ public class UtilsSubCommand implements SubCommandRunner {
 		EikonalSolverCacheProvider provider = new EikonalSolverCacheProvider(cache);
 		for (Target target : scenario.getTopography().getTargets()) {
 			logger.infof("write cache for target %s", target.getId());
-			provider.provide(scenario.getTopography()
+			//TODO: load the mesh if there is one
+			provider.provide(new Domain(scenario.getTopography())
 					, target.getId()
 					, scenario.getTopography().getTargetShapes().get(target.getId())
 					, scenario.getTopography().getAttributesPedestrian()

@@ -12,10 +12,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
-import org.vadere.meshing.utils.io.poly.MeshPSLGWriter;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
@@ -39,7 +36,7 @@ public class TestFMMEikMesh {
 	private static Logger log = Logger.getLogger(TestFMMEikMesh.class);
 
 	@Test
-	public void testTriangulationFMM() throws IOException {
+	public void testTriangulationFMMMuenchnerFreiheit() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/muenchner_freiheit.poly");
 		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(() -> new PMesh());
 		var mesh = meshReader.readMesh(inputStream);
@@ -71,6 +68,53 @@ public class TestFMMEikMesh {
 		System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
 	}
 
+	@Test
+	public void testTriangulationFMMKaiserslautern() throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_tri.poly");
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(() -> new PMesh());
+		var mesh = meshReader.readMesh(inputStream);
+
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(mesh);
+
+		double xmin = 150;
+		double ymin = 80;
+		double h = 10;
+		double w = 10;
+
+		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
+		VPoint targetPoint = new VPoint(40, 40);
+
+		EikonalSolver solver = new EikonalSolverFMMTriangulation(
+				new UnitTimeCostFunction(),
+				Collections.singleton(targetPoint),
+				triangulation);
+		long ms = System.currentTimeMillis();
+		log.info("start FFM");
+		solver.initialize();
+		log.info("FFM finished");
+		log.info("time: " + (System.currentTimeMillis() - ms));
+
+
+
+		ms = System.currentTimeMillis();
+		log.info("start walk");
+		solver.getPotential(10, 10, this);
+		log.info("walk finished");
+		log.info("time: " + (System.currentTimeMillis() - ms));
+
+		ms = System.currentTimeMillis();
+		log.info("start cached walk");
+		solver.getPotential(10, 10, this);
+		log.info("walk finished");
+		log.info("time: " + (System.currentTimeMillis() - ms));
+
+		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
+
+		//System.out.println(meshPolyWriter.to2DPoly(triangulation.getMesh(), 1, i -> "potential", v -> false));
+
+		System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
+	}
+
 	@Ignore
 	@Test
 	public void testFilledChickenFMM() throws IOException {
@@ -86,7 +130,7 @@ public class TestFMMEikMesh {
 	private void testTriangulationFMM(@NotNull final String file, @NotNull final VPoint targetPoint, final double h0) throws IOException {
 		// 1. read the base PSLG-file
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(file);
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 
 		// 2. generate the unstructured mesh using EikMesh
 		Collection<VPoint> fixPoints = new ArrayList<>();

@@ -161,7 +161,7 @@ public abstract class IOOutput {
 			try {
 				Files.delete(directory.toPath());
 			} catch (IOException e) {
-				logger.error("could not deleteEdge output-directory: " + directory.getAbsolutePath() + ", "
+				logger.error("could not delete output directory: " + directory.getAbsolutePath() + ", "
 						+ e.getLocalizedMessage());
 			}
 
