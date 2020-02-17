@@ -1,0 +1,12 @@
+{
+    "dataset": {
+        "path": "../../../datasets/densitymaps/sbb/dataset1/",
+        "test_size": 0.2,
+        "shuffle": true
+    },
+    "number_of_targets": 54,
+    "number_of_trees": 50,
+    "number_of_cores": 4,
+    "save": true,
+    "prediction_model": "od-matrix"
+}

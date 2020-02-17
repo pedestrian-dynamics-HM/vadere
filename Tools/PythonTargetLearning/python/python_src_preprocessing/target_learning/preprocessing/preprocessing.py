@@ -19,7 +19,7 @@ def get_target_percentiles(pedestrians, ped2target, targets):
 
     ids = list(pedestrians['pedestrianId'])
     total = len(ids)
-
+    print(total)
     filtered_dict = {k: v for k, v in ped2target.items() if k in ids}
     used_targets = filtered_dict.values()
 
