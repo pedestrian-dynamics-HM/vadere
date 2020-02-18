@@ -63,8 +63,7 @@ public class SingleSourceController extends SourceController {
 										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
+
 					}else{
 						spawnPoints = getRandomArrayPositions(
 								numberToSpawn,
@@ -74,8 +73,7 @@ public class SingleSourceController extends SourceController {
 										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
+
 					}
 
 
@@ -95,7 +93,6 @@ public class SingleSourceController extends SourceController {
 								numberToSpawn,
 								new ArrayList<>()
 						);
-
 					}
 
 				}
