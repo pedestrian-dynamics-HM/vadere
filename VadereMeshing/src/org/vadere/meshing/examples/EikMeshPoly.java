@@ -1,22 +1,26 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
+import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -25,31 +29,38 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class EikMeshPoly {
 	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
 
-
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		//meshPoly("/poly/room.poly");
+		meshPoly("/poly/07-BarrierPositions_base.poly");
 		//meshPoly("/poly/corner.poly");
-		meshPoly("/poly/railing.poly");
+		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
 		edgeLengthFunctionApprox.smooth(0.4);
 		edgeLengthFunctionApprox.printPython();
+
+		VPolygon targetShape = new VRectangle(4, 4, 2, 2).toPolygon();
+		List<VShape> singleTarget = Collections.singletonList(targetShape);
 
 
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction);
 
 		var ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -59,34 +70,55 @@ public class EikMeshPoly {
 		);
 		ruppert.generate();
 
+
+		Collection<VPolygon> polygons = pslg.getAllPolygons();
+		//polygons.add(targetShape);
+
 		// (3) use EikMesh to improve the mesh
-		double h0 = 1.0;
+		double h0 = 5.0;
 		var meshImprover = new PEikMesh(
-				distanceFunction,
-				edgeLengthFunctionApprox,
+				distanceFunctionApproximation,
+				p -> edgeLengthFunctionApprox.apply(p),
 				h0,
 				pslg.getBoundingBox(),
-				pslg.getAllPolygons()
+				polygons
 		);
 
-		var meshPanel = new PMeshPanel(meshImprover.getMesh(), f -> meshImprover.getMesh().getBooleanData(f, "frozen"), 1000, 800);
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		Predicate<PFace> alertPredicate = f ->{
+			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
+		};
+
+		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
+		var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
 		meshPanel.display("Combined distance functions " + h0);
 		meshImprover.improve();
 		while (!meshImprover.isFinished()) {
 			synchronized (meshImprover.getMesh()) {
 				meshImprover.improve();
 			}
-			//Thread.sleep(2000);
+			//Thread.sleep(500);
 			meshPanel.repaint();
 		}
 		//meshImprover.generate();
 
 
-		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, 1.0f)), "mesh.tex");
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), "mesh.tex");
 		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "muenchner_freiheit.poly");
+		String[] splitName = fileName.split("\\.");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "07-BarrierPositions_base"+ "_tri.poly");
+
 	}
 
 	public static void displayPolyFile(@NotNull final String fileName) throws IOException {

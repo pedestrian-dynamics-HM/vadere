@@ -11,7 +11,6 @@ import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -23,7 +22,6 @@ import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,8 +34,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -94,19 +90,17 @@ public class TikzGenerator {
 
 	public void generateTikz(final File file) {
 		String tikzCodeColorDefinitions = generateTikzColorDefinitions(model);
-		String tikzCodeDrawSettings = generateTikzDrawSettings(model);
 		String tikzCodeScenarioElements = convertScenarioElementsToTikz();
 
 		String tikzOutput = "" +
 				"\\documentclass{standalone}\n" +
 				"\\usepackage{tikz}\n\n" +
 				tikzCodeColorDefinitions +
-				tikzCodeDrawSettings +
 				"\\begin{document}\n" +
                 "% Change scaling to [x=1mm,y=1mm] if TeX reports \"Dimension too large\".\n" +
 				"\\begin{tikzpicture}\n" +
 				"[x=1cm,y=1cm,\n" +
-				addStyles() +
+				generateTikzStyles() +
 				"]\n" +
 				tikzCodeScenarioElements +
 				"\\end{tikzpicture}\n" +
@@ -123,17 +117,6 @@ public class TikzGenerator {
 			logger.error(e1.getMessage());
 			e1.printStackTrace();
 		}
-	}
-
-	private String addStyles(){
-		StringBuilder sb = new StringBuilder();
-		sb.append("trajectory/.style={},\n");
-		sb.append("pedestrian/.style={fill=AgentColor},\n"); // default color
-		sb.append("walkdirection/.style={},\n");
-		sb.append("ped_circle/.style={circle, minimum size=\\AgentDiameter cm, inner sep=0pt},\n");
-		sb.append("selected/.style={},\n");
-		sb.append("group/.style={},\n");
-		return sb.toString();
 	}
 
 	private String generateTikzColorDefinitions(SimulationModel<? extends DefaultSimulationConfig> model) {
@@ -166,29 +149,27 @@ public class TikzGenerator {
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
 		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentIdColor", 255, 127, 0); // This orange color is hard-coded in "DefaultRenderer".
+		colorDefinitions += "\n";
+
+		double opacityBetweenZeroAndOne = model.getConfig().getMeasurementAreaAlpha() / 255.0;
+		colorDefinitions += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
 
 		colorDefinitions += "\n";
 
 		return colorDefinitions;
 	}
 
-	private String generateTikzDrawSettings(SimulationModel<? extends DefaultSimulationConfig> model) {
-		// Generate TeX variables for common draw settings like agent radius and
-		// use them later on when generating TikZ code. These settins can be used
-		// by TikZ users to adapt the drawing quickly.
-		String drawSettings = "% Draw Settings\n";
+	private String generateTikzStyles() {
+		String tikzStyles = "";
 
-		double agentRadius = model.getConfig().getPedestrianTorso() / 2.0;
-		double opacityBetweenZeroAndOne = model.getConfig().getMeasurementAreaAlpha() / 255.0;
+		tikzStyles += "trajectory/.style={line width=1},\n";
+		tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", model.getConfig().getPedestrianTorso());
+		tikzStyles += "walkdirection/.style={},\n";
+		tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
+		tikzStyles += "group/.style={},\n";
+		tikzStyles += "voronoi/.style={black, line width=1}\n";
 
-		drawSettings += String.format(Locale.US,"\\newcommand{\\AgentRadius}{%f}\n", agentRadius);
-		drawSettings += String.format(Locale.US,"\\newcommand{\\AgentDiameter}{%f}\n", 2*agentRadius);
-		drawSettings += String.format(Locale.US,"\\newcommand{\\LineWidth}{%d}\n", 1);
-		drawSettings += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
-
-		drawSettings += "\n";
-
-		return drawSettings;
+		return tikzStyles;
 	}
 
 	private String convertScenarioElementsToTikz() {
@@ -219,7 +200,7 @@ public class TikzGenerator {
 			generatedCode += "% Sources\n";
 			for (Source source : topography.getSources()) {
 				VPoint centroid = source.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (src_%d) at (%f,%f); %%centroid coordinate for source %d\n", source.getId(), centroid.x, centroid.y, source.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (Source%d) at (%f,%f); %% Centroid: Source %d\n", source.getId(), centroid.x, centroid.y, source.getId());
 				generatedCode += String.format(Locale.US, "\\fill[SourceColor] %s;\n", generatePathForScenarioElement(source));
 			}
 		} else {
@@ -230,7 +211,7 @@ public class TikzGenerator {
 			generatedCode += "% Targets\n";
 			for (Target target : topography.getTargets()) {
 				VPoint centroid = target.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (trg_%d) at (%f,%f); %%centroid coordinate for target %d\n", target.getId(), centroid.x, centroid.y, target.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (Target%d) at (%f,%f); %% Centroid: Target %d\n", target.getId(), centroid.x, centroid.y, target.getId());
 				generatedCode += String.format(Locale.US, "\\fill[TargetColor] %s;\n", generatePathForScenarioElement(target));
 			}
 		} else {
@@ -241,7 +222,7 @@ public class TikzGenerator {
 			generatedCode += "% Target Changers\n";
 			for (TargetChanger targetChanger : topography.getTargetChangers()) {
 				VPoint centroid = targetChanger.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (target_changer_%d) at (%f,%f); %%centroid coordinate for target changer %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
 				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
 			}
 		} else {
@@ -252,7 +233,7 @@ public class TikzGenerator {
 			generatedCode += "% Absorbing Areas\n";
 			for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
 				VPoint centroid = absorbingArea.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (absorb_%d) at (%f,%f); %%centroid coordinate for absorbingArea %d\n", absorbingArea.getId(), centroid.x, centroid.y, absorbingArea.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (AbsorbingArea%d) at (%f,%f); %% Centroid: AbsorbingArea %d\n", absorbingArea.getId(), centroid.x, centroid.y, absorbingArea.getId());
 				generatedCode += String.format(Locale.US, "\\fill[AbsorbingAreaColor] %s;\n", generatePathForScenarioElement(absorbingArea));
 			}
 		} else {
@@ -263,7 +244,7 @@ public class TikzGenerator {
 			generatedCode += "% Obstacles\n";
 			for (Obstacle obstacle : topography.getObstacles()) {
 				VPoint centroid = obstacle.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (obs_%d) at (%f,%f); %%centroid coordinate for obstacle %d\n", obstacle.getId(), centroid.x, centroid.y, obstacle.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (Obstacle%d) at (%f,%f); %% Centroid: Obstacle %d\n", obstacle.getId(), centroid.x, centroid.y, obstacle.getId());
 				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
 			}
 		} else {
@@ -274,7 +255,7 @@ public class TikzGenerator {
 			generatedCode += "% Stairs\n";
 			for (Stairs stair : topography.getStairs()) {
 				VPoint centroid = stair.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (str_%d) at (%f,%f); %%centroid coordinate for stair %d\n", stair.getId(), centroid.x, centroid.y, stair.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (Stair%d) at (%f,%f); %% Centroid: Stair %d\n", stair.getId(), centroid.x, centroid.y, stair.getId());
 				generatedCode += String.format(Locale.US, "\\fill[black] %s;\n", generatePathForScenarioElement(stair));
 				generatedCode += String.format(Locale.US, "\\fill[StairColor] %s;\n", generatePathForStairs(stair));
 			}
@@ -286,7 +267,7 @@ public class TikzGenerator {
 			generatedCode += "% Measurement Areas\n";
 			for (MeasurementArea measurementArea : topography.getMeasurementAreas()) {
 				VPoint centroid = measurementArea.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (mrmtA_%d) at (%f,%f); %%centroid coordinate for measurementArea %d\n", measurementArea.getId(), centroid.x, centroid.y, measurementArea.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (MeasurementArea%d) at (%f,%f); %% Centroid: MeasurementArea %d\n", measurementArea.getId(), centroid.x, centroid.y, measurementArea.getId());
 				generatedCode += String.format(Locale.US, "\\fill[MeasurementAreaColor,opacity=\\MeasurementAreaOpacity] %s;\n", generatePathForScenarioElement(measurementArea));
 			}
 		} else {
@@ -323,7 +304,7 @@ public class TikzGenerator {
 			generatedCode += "% Agent Ids\n";
 
 			for (Agent agent : model.getAgents()) {
-				generatedCode += String.format(Locale.US, "\\node[text=AgentIdColor] (pedIdNode_id%d) at (%f,%f) {\\textbf{%d}};\n",
+				generatedCode += String.format(Locale.US, "\\node[text=AgentIdColor] (PedestrianId%d) at (%f,%f) {\\textbf{%d}};\n",
 						agent.getId(), agent.getPosition().x, agent.getPosition().y, agent.getId());
 			}
 		} else {
@@ -331,13 +312,19 @@ public class TikzGenerator {
 		}
 
         if (!topography.hasBoundary()){
+			generatedCode += "% Topography Boundary\n";
         	int id=1;
 			for(Obstacle obstacle : Topography.createObstacleBoundary(topography)) {
 				VPoint centroid = obstacle.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (bound_%d) at (%f,%f); %%centroid coordinate for obstacle %d\n", id, centroid.x, centroid.y, obstacle.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (BoundaryObstacle%d) at (%f,%f); %% Centroid: BoundaryObstacle %d\n", id, centroid.x, centroid.y, obstacle.getId());
 				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
 				id++;
 			}
+		}
+
+		if (model.getSelectedElement() != null) {
+			generatedCode += "% Selected Elements\n";
+			generatedCode += String.format(Locale.US, "\\draw[selected] %s;\n", generatePathForScenarioElement(model.getSelectedElement()));
 		}
 
         return generatedCode;
@@ -348,10 +335,13 @@ public class TikzGenerator {
 		final StringBuffer generatedCode = new StringBuffer("");
 
 		if (config.isShowTrajectories()) {
-			Collection<Agent> agents = model.getAgents();
 			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents @ simTimeInSec %f of \n",model.getSimTimeInSec()));
+
+			Collection<Agent> agents = model.getAgents();
+
 			TableTrajectoryFootStep trajectories = model.getTrajectories();
 			Table dataFrame;
+
 			if (model.config.isShowAllTrajectories()) {
 				dataFrame = model.getAppearedPedestrians();
 			} else {
@@ -366,7 +356,6 @@ public class TikzGenerator {
 				Table slice = dataFrame.where(dataFrame.intColumn(trajectories.pedIdCol).isEqualTo(agent.getId()));
 
 				for(Row row : slice) {
-					int agentId = row.getInt(trajectories.pedIdCol);
 					boolean isLastStep = row.getDouble(trajectories.endTimeCol) > model.getSimTimeInSec();
 					double startX = row.getDouble(trajectories.startXCol);
 					double startY = row.getDouble(trajectories.startYCol);
@@ -379,7 +368,6 @@ public class TikzGenerator {
 						endY = interpolatedPos.getY();
 					}
 
-					int pedId = row.getInt(trajectories.pedIdCol);
 					trajectory.append(String.format(Locale.US, "(%f,%f) to ", startX, startY));
 
 					if(row.getRowNumber() == slice.rowCount()-1) {
@@ -397,15 +385,21 @@ public class TikzGenerator {
 	}
 
     private String applyAgentColorToTrajectory(String trajectory, Optional<Agent> agent) {
-	    String colorString = "AgentColor";
+	    String colorString = "trajectory, draw=AgentColor";
 
-	    if (agent.get() instanceof Pedestrian) {
-	        Pedestrian pedestrian = (Pedestrian)agent.get();
-		    Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
-            colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-        }
+		if (agent.get() instanceof Pedestrian) {
+			Pedestrian pedestrian = (Pedestrian) agent.get();
+			ScenarioElement selectedElement = model.getSelectedElement();
 
-        return String.format(Locale.US, "\\draw[trajectory, draw=%s]\n%s;\n", colorString, trajectory);
+			if (selectedElement instanceof Pedestrian && selectedElement.getId() == pedestrian.getId()) {
+				colorString = "selected";
+			} else {
+				Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
+				colorString = String.format(Locale.US, "trajectory, draw={rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+			}
+		}
+
+        return String.format(Locale.US, "\\draw[%s]\n%s;\n", colorString, trajectory);
     }
 
 	/**
@@ -458,7 +452,7 @@ public class TikzGenerator {
 
 
         for (Agent agent : model.getAgents()) {
-        	if(agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
+        	if (agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
 
 				if(config.isShowWalkdirection() && model instanceof PostvisualizationModel){
 					generatedCode += drawWalkingDirection(agent);
@@ -476,7 +470,7 @@ public class TikzGenerator {
 				        cce.printStackTrace();
 
 				        // Fall back to default rendering of agents.
-				        String agentTextPattern = "\\node[ped_circle, pedestrian, fill=AgentColor] (%f,%f) (ped_%d) at (%f,%f) {};\n";
+				        String agentTextPattern = "\\node[pedestrian, fill=AgentColor] (%f,%f) (Pedestrian%d) at (%f,%f) {};\n";
 				        generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
 			        }
 		        } else {
@@ -484,21 +478,16 @@ public class TikzGenerator {
 			        Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
 
 			        if (pedestrianColor.equals(model.getConfig().getPedestrianDefaultColor())){
-						String agentTextPattern = "\\node[ped_circle, pedestrian] (ped_%d) at (%f,%f) {};\n";
+						String agentTextPattern = "\\node[pedestrian] (Pedestrian%d) at (%f,%f) {};\n";
 						generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
 					} else {
 			        	// override default color
 						String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
 						// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
 						// generatedCode += String.format(Locale.US, "\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
-						String agentTextPattern = "\\node[ped_circle, pedestrian, fill=%s] (ped_%d) at (%f,%f) {};\n";
+						String agentTextPattern = "\\node[pedestrian, fill=%s] (Pedestrian%d) at (%f,%f) {};\n";
 						generatedCode += String.format(Locale.US, agentTextPattern, colorString,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
 					}
-		        }
-
-		        if (model.isElementSelected() && model.getSelectedElement().equals(agent)) {
-			        String agentTextPattern = "\\draw[ped_circle, pedestrian, selected, magenta] (ped_%d) at (%f,%f) {};\n";
-			        generatedCode += String.format(Locale.US, agentTextPattern,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
 		        }
 	        }
         }
@@ -566,7 +555,7 @@ public class TikzGenerator {
 			if (voronoiDiagram != null) {
 				RectangleLimits limits = voronoiDiagram.getLimits();
 
-				voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) rectangle (%f,%f);\n",
+				voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[voronoi] (%f,%f) rectangle (%f,%f);\n",
 						limits.xLow, limits.yLow,
 						limits.xHigh, limits.yLow);
 			}
@@ -587,7 +576,7 @@ public class TikzGenerator {
 							closed = true;
 						} else {
 
-							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[voronoi] (%f,%f) to (%f,%f);\n",
 									last.getOrigin().x, last.getOrigin().y,
 									next.getOrigin().x, next.getOrigin().y);
 
@@ -609,7 +598,7 @@ public class TikzGenerator {
 						if (next == null || next.getOrigin() == null) {
 							go = false;
 						} else {
-							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[black, line width=\\LineWidth] (%f,%f) to (%f,%f);\n",
+							voronoiDiagramAsTikz += String.format(Locale.US, "\\draw[voronoi] (%f,%f) to (%f,%f);\n",
 									last.getOrigin().x, last.getOrigin().y,
 									next.getOrigin().x, next.getOrigin().y);
 

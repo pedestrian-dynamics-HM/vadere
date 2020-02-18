@@ -11,6 +11,7 @@ import org.vadere.simulator.models.seating.trainmodel.Compartment;
 import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.models.seating.trainmodel.SeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
@@ -20,7 +21,6 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetListener;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.TrainGeometry;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -55,14 +55,14 @@ public class SeatingModel implements Model {
 	private RandomGenerator rng;
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> attributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesSeating.class);
 		
 		DynamicClassInstantiator<TrainGeometry> instantiator = new DynamicClassInstantiator<>();
 		TrainGeometry trainGeometry = instantiator.createObject(attributes.getTrainGeometry());
 		try {
-			trainModel = new TrainModel(topography, trainGeometry);
+			trainModel = new TrainModel(domain.getTopography(), trainGeometry);
 		} catch (Exception e) {
 			throw new IllegalStateException(String.format("Topography is corrupt or not a %s train.",
 					trainGeometry.getClass().getSimpleName()), e);

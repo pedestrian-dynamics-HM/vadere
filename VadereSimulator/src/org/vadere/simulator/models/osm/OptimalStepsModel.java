@@ -5,46 +5,30 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.SpeedAdjuster;
-import org.vadere.simulator.models.StepSizeAdjuster;
-import org.vadere.simulator.models.SubModelBuilder;
+import org.vadere.simulator.models.*;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupSpeedAdjuster;
-import org.vadere.simulator.models.osm.optimization.ParticleSwarmOptimizer;
-import org.vadere.simulator.models.osm.optimization.PatternSearchOptimizer;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerBrent;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerCircleNelderMead;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerEvolStrat;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerGradient;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerNelderMead;
-import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerPowell;
 import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.*;
-import org.vadere.state.types.OptimizationType;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.UpdateType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -63,7 +47,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<SpeedAdjuster> speedAdjusters;
 	private List<StepSizeAdjuster> stepSizeAdjusters;
-	private Topography topography;
+	private Domain domain;
 	private double lastSimTimeInSec;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
@@ -74,16 +58,23 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
 						   AttributesAgent attributesPedestrian, Random random) {
-
 		logger.debug("initialize OSM");
-		this.attributesOSM = Model.findAttributes(modelAttributesList, AttributesOSM.class);
-		this.topography = topography;
+		initialize(modelAttributesList, domain, attributesPedestrian, random,
+				Model.findAttributes(modelAttributesList, AttributesOSM.class), logger);
+	}
+
+
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+						   AttributesAgent attributesPedestrian, Random random, AttributesOSM atm, Logger logger) {
+
+		this.attributesOSM = atm;
+		this.domain = domain;
 		this.random = random;
 		this.attributesPedestrian = attributesPedestrian;
 
-		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, topography,
+		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, domain,
 				attributesPedestrian, random);
 		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
@@ -91,15 +82,15 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributesOSM.getTargetPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, attributesOSM.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 
 		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
 				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
@@ -117,8 +108,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			this.speedAdjusters.add(new CentroidGroupSpeedAdjuster(centroidGroupModel));
 		}
 
-		this.stepCircleOptimizer = createStepCircleOptimizer(
-				attributesOSM, random, topography, iPotentialTargetGrid);
+		this.stepCircleOptimizer = StepCircleOptimizer.create(
+				attributesOSM, random, domain.getTopography(), iPotentialTargetGrid);
 
 		// TODO implement a step speed adjuster for this!
 		if (attributesPedestrian.isDensityDependentSpeed()) {
@@ -132,9 +123,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			this.executorService = null;
 		}
 
-		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, topography, attributesOSM);
-		this.topography.addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-		this.topography.addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, domain.getTopography(), attributesOSM);
+		this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+		this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
 		models.add(this);
 	}
@@ -224,54 +215,6 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		}
 	}
 
-	private StepCircleOptimizer createStepCircleOptimizer(
-			AttributesOSM attributesOSM, Random random, Topography topography,
-			IPotentialFieldTargetGrid potentialFieldTarget) {
-
-		StepCircleOptimizer result;
-		double movementThreshold = attributesOSM.getMovementThreshold();
-
-		OptimizationType type = attributesOSM.getOptimizationType();
-		if (type == null) {
-			type = OptimizationType.DISCRETE;
-		}
-
-		switch (type) {
-			case BRENT:
-				result = new StepCircleOptimizerBrent(random);
-				break;
-			case EVOLUTION_STRATEGY:
-				result = new StepCircleOptimizerEvolStrat();
-				break;
-			case NELDER_MEAD:
-				result = new StepCircleOptimizerNelderMead(random);
-				break;
-			case NELDER_MEAD_CIRCLE:
-				result = new StepCircleOptimizerCircleNelderMead(random, attributesOSM);
-				break;
-			case POWELL:
-				result = new StepCircleOptimizerPowell(random);
-				break;
-			case PSO:
-				result = new ParticleSwarmOptimizer(movementThreshold, random);
-				break;
-			case PATTERN_SEARCH:
-				result = new PatternSearchOptimizer(movementThreshold, attributesOSM, random);
-				break;
-			case GRADIENT:
-				result = new StepCircleOptimizerGradient(topography,
-						potentialFieldTarget, attributesOSM);
-				break;
-			case DISCRETE:
-			case NONE:
-			default:
-				result = new StepCircleOptimizerDiscrete(movementThreshold, random);
-				break;
-		}
-
-		return result;
-	}
-
 	@Override
 	public void preLoop(final double simTimeInSec) {
 		this.lastSimTimeInSec = simTimeInSec;
@@ -289,8 +232,8 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		lastSimTimeInSec = simTimeInSec;
 	}
 
-		/*
-	 * At the moment all pedestrians also the initalPedestrians get this.attributesPedestrain!!!
+	/**
+	 * At the moment, all pedestrians inherit position from "this.attributesPedestian"!
 	 */
 	@Override
 	public <T extends DynamicElement> PedestrianOSM createElement(VPoint position, int id, Class<T> type) {
@@ -298,7 +241,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, registerDynamicElementId(topography, id));
+				this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;
@@ -311,7 +254,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				attributesAgent, topography, random, potentialFieldTarget,
+				attributesAgent, domain.getTopography(), random, potentialFieldTarget,
 				potentialFieldObstacle.copy(), potentialFieldPedestrian,
 				speedAdjusters, stepCircleOptimizer.clone());
 		pedestrian.setPosition(position);

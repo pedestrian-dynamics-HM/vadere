@@ -1,7 +1,7 @@
 {
   "name" : "rimea_05_react",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -120,7 +120,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 8.5,
@@ -129,7 +129,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -154,7 +154,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 4,
         "shape" : {
           "x" : 1.0,
           "y" : 1.0,
@@ -169,6 +169,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

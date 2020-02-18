@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_2Sources1Place_2Group_and_3Group",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -120,7 +120,7 @@
           "height" : 5.6,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 23.2,
@@ -129,7 +129,7 @@
           "height" : 6.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 4.5,
@@ -138,7 +138,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 37.1,
@@ -147,7 +147,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -187,6 +187,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
@@ -207,6 +208,7 @@
         "startTime" : 0.0,
         "endTime" : 200.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 0.0, 1.0, 0.0 ],

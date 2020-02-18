@@ -41,7 +41,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	private TextView attributesModelView; // Model tab
 	private TextView attributesPsychologyView; // Psychology tab
 	private TextView topographyFileView; // Topography tab
-	private TextView eventFileView; // Stimulus tab
+	private TextView perceptionFileView; // Stimulus tab
 	private DataProcessingView dataProcessingGUIview; // DataProcessing
 	private TopographyWindow topographyCreatorView; // Topography creator tab... OR:
 	private final PostvisualizationWindow postVisualizationView; // Post-Visualization tab, replaces Topography tab if output is selected
@@ -201,9 +201,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		topographyFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
-		eventFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.STIMULUS);
-		eventFileView.isEditable(true);
-		tabbedPane.addTab(Messages.getString("Tab.Stimuli.title"), eventFileView);
+		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
+		perceptionFileView.isEditable(true);
+		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
 
 		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
@@ -295,8 +295,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		this.topographyFileView.setVadereScenario(scenario);
 		this.topographyFileView.isEditable(isEditable);
 
-		this.eventFileView.setVadereScenario(scenario);
-		this.eventFileView.isEditable(isEditable);
+		this.perceptionFileView.setVadereScenario(scenario);
+		this.perceptionFileView.isEditable(isEditable);
 
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);

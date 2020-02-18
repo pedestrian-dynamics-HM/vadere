@@ -3,6 +3,9 @@ package org.vadere.state.attributes.scenario;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Attributes of "TargetChanger" object, used by "TargetChangerController" during simulation.
  */
@@ -28,7 +31,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      * is heading to the given target as new target. Otherwise, use the given target
      * id as "normal" target id.
      */
-    private int nextTarget = ID_NOT_SET;
+    private LinkedList<Integer> nextTarget = new LinkedList<>();
     /**
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
@@ -48,7 +51,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.id = id;
     }
 
-    public AttributesTargetChanger(final VShape shape, final int id, double reachDistance, int nextTarget, double probabilityToChangeTarget) {
+    public AttributesTargetChanger(final VShape shape, final int id, double reachDistance, LinkedList<Integer> nextTarget, double probabilityToChangeTarget) {
         this.shape = shape;
         this.id = id;
         this.reachDistance = reachDistance;
@@ -78,7 +81,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         return nextTargetIsPedestrian;
     }
 
-    public int getNextTarget() {
+    public LinkedList<Integer> getNextTarget() {
         return nextTarget;
     }
 
@@ -106,7 +109,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.nextTargetIsPedestrian = nextTargetIsPedestrian;
     }
 
-    public void setNextTarget(int nextTarget) {
+    public void setNextTarget(LinkedList<Integer> nextTarget) {
         this.nextTarget = nextTarget;
     }
 

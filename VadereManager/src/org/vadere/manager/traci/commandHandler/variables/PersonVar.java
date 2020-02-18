@@ -12,7 +12,11 @@ public enum PersonVar {
 	ID_LIST(0x00, TraCIDataType.STRING_LIST), // get
 	COUNT(0x01, TraCIDataType.INTEGER), // get
 	NEXT_ID(0x02, TraCIDataType.INTEGER), // get
+	HAS_NEXT_TARGET(0x03, TraCIDataType.INTEGER), // get
+	NEXT_TARGET_LIST_INDEX(0x04, TraCIDataType.INTEGER), // get, set
 	SPEED(0x40, TraCIDataType.DOUBLE), // get, set
+	MAX_SPEED(0x45, TraCIDataType.DOUBLE), // get
+	VELOCITY(0x41, TraCIDataType.POS_2D), // get
 	POS_2D(0x42, TraCIDataType.POS_2D), // get, set
 	POS_2D_LIST(0xff, TraCIDataType.POS_2D_LIST), // get
 	POS_3D(0x42, TraCIDataType.POS_3D), // get
@@ -22,17 +26,15 @@ public enum PersonVar {
 	TYPE(0x4f, TraCIDataType.STRING), // get, set
 	COLOR(0x45, TraCIDataType.COLOR), // get, set
 	EDGE_POS(0x56, TraCIDataType.DOUBLE), // get
-	LENGTH(0x44,TraCIDataType.DOUBLE), // get, set
+	LENGTH(0x44, TraCIDataType.DOUBLE), // get, set
 	MIN_GAP(0x4c, TraCIDataType.DOUBLE), // get, set
 	WIDTH(0x4d, TraCIDataType.DOUBLE), // get, set
-	WAITING_TIME(0x7a,TraCIDataType.DOUBLE), // get
+	WAITING_TIME(0x7a, TraCIDataType.DOUBLE), // get
 	NEXT_EDGE(0xc1, TraCIDataType.STRING), // get
 	REMAINING_STAGES(0xc2, TraCIDataType.INTEGER), // get
 	VEHICLE(0xc3, TraCIDataType.STRING), // get
-	ADD(0x80, TraCIDataType.COMPOUND_OBJECT), // set
-	APPEND_STAGE(0xc4, TraCIDataType.COMPOUND_OBJECT), // set
+	ADD(0x80, TraCIDataType.STRING),
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
-	REROUTE(0x90, TraCIDataType.COMPOUND_OBJECT), // set
 	TARGET_LIST(0xfe, TraCIDataType.STRING_LIST), // get, set
 	;
 
@@ -46,8 +48,8 @@ public enum PersonVar {
 	}
 
 
-	public static PersonVar fromId(int id){
-		for(PersonVar var : values()){
+	public static PersonVar fromId(int id) {
+		for (PersonVar var : values()) {
 			if (var.id == id)
 				return var;
 		}
@@ -61,5 +63,9 @@ public enum PersonVar {
 				": id=" + id +
 				", type=" + type +
 				'}';
+	}
+
+	public String logShort() {
+		return String.format("{%s:0x%02X}", name(), id);
 	}
 }

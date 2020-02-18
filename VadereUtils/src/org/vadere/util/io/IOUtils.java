@@ -31,6 +31,8 @@ public class IOUtils {
 
 	public static final String OUTPUT_DIR = "output";
 
+	public static final String MESH_DIR = "meshes";
+
 	public static final String SCENARIO_DIR = "scenarios";
 
 	public static final String CORRUPT_DIR = "corrupt";

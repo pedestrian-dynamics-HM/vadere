@@ -1,16 +1,18 @@
 package org.vadere.meshing.mesh.inter;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * A {@link ITriangulation} is a set of connected triangles.
  */
-public interface ITriangulation {
+public interface ITriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
 	/**
 	 * Returns a {@link Stream} of {@link VTriangle} which represent the triangles of this triangulation.
@@ -37,4 +39,9 @@ public interface ITriangulation {
 	 * @return a {@link Stream} of {@link IPoint} which are the points of the triangulation.
 	 */
 	Stream<IPoint> streamPoints();
+
+
+	Optional<F> locateFace(final IPoint point);
+
+	Optional<F> locateFace(@NotNull final IPoint point, final Object caller);
 }

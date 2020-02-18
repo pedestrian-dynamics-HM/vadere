@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -32,14 +33,14 @@ public interface PotentialFieldObstacle extends Model {
 
 	static PotentialFieldObstacle createPotentialField(
 			final List<Attributes> modelAttributesList,
-			final Topography topography,
+			final Domain domain,
 			final AttributesAgent attributesPedestrian,
 			final Random random,
 			final String className) {
 
 		DynamicClassInstantiator<PotentialFieldObstacle> instantiator = new DynamicClassInstantiator<>();
 		PotentialFieldObstacle result = instantiator.createObject(className);
-		result.initialize(modelAttributesList, topography, attributesPedestrian, random);
+		result.initialize(modelAttributesList, domain, attributesPedestrian, random);
 		return result;
 	}
 }

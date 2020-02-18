@@ -4,8 +4,8 @@ import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
-import org.vadere.manager.traci.respons.StatusResponse;
-import org.vadere.manager.traci.respons.TraCIStatusResponse;
+import org.vadere.manager.traci.response.StatusResponse;
+import org.vadere.manager.traci.response.TraCIStatusResponse;
 import org.vadere.manager.traci.writer.TraCIPacket;
 
 /**
@@ -17,17 +17,14 @@ import org.vadere.manager.traci.writer.TraCIPacket;
  *
  * [ cmdIdentifier(based on API) ] [ variableId ] [ elementId] [ dataTypeId ] [ data ]
  *
- * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_****
- * - variableId: Id for the var. The numbers may be the same between different APIs
- *   see {@link PersonVar} enum
- * - elementId: String based id for the object (i.e. a pedestrianId)
- * - dataTypeId: see {@link TraCIDataType}
- * - data: data to be returned.
+ * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_**** - variableId: Id for the var.
+ * The numbers may be the same between different APIs see {@link PersonVar} enum - elementId: String
+ * based id for the object (i.e. a pedestrianId) - dataTypeId: see {@link TraCIDataType} - data:
+ * data to be returned.
  *
  * see {@link org.vadere.manager.traci.commandHandler.PersonCommandHandler} for execution handing.
- *
  */
-public class TraCISetCommand extends TraCICommand{
+public class TraCISetCommand extends TraCICommand {
 
 	protected int variableId;
 	protected String elementId;
@@ -35,12 +32,6 @@ public class TraCISetCommand extends TraCICommand{
 	protected Object variableValue;
 
 	private StatusResponse statusResponse;
-
-	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data){
-		return TraCIPacket.create()
-				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
-						dataType, data);
-	}
 
 	public TraCISetCommand(TraCICmd traCICmd, TraCICommandBuffer cmdBuffer) {
 		super(traCICmd);
@@ -51,7 +42,13 @@ public class TraCISetCommand extends TraCICommand{
 
 	}
 
-	public Object getVariableValue(){
+	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data) {
+		return TraCIPacket.create()
+				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+						dataType, data);
+	}
+
+	public Object getVariableValue() {
 		return variableValue;
 	}
 
@@ -67,14 +64,22 @@ public class TraCISetCommand extends TraCICommand{
 		return returnDataType;
 	}
 
-	public TraCISetCommand setErr(String desc){
+	public StatusResponse getStatusResponse() {
+		return statusResponse;
+	}
+
+	public TraCISetCommand setErr(String desc) {
 		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.ERR, desc);
 		return this;
 	}
 
-	public TraCISetCommand setOK(){
-		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.OK, "");
+	public TraCISetCommand setOK(String descr) {
+		statusResponse = new StatusResponse(traCICmd, TraCIStatusResponse.OK, descr);
 		return this;
+	}
+
+	public TraCISetCommand setOK() {
+		return setOK("");
 	}
 
 	@Override

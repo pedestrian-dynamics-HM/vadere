@@ -7,31 +7,25 @@ import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.GradientProviderType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
-import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
@@ -44,22 +38,17 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private List<Model> models = new LinkedList<>();
 
 	@Deprecated
-	public GradientNavigationModel(final Topography scenario,
+	public GradientNavigationModel(final Domain domain,
 			final AttributesGNM attributes,
 			final PotentialFieldObstacle potentialFieldObstacle,
 			final PotentialFieldAgent potentialFieldPedestrian,
 			final IPotentialFieldTargetGrid potentialFieldTarget,
 			final AttributesAgent attributesPedestrian, final Random random) {
-		super(Pedestrian.class, scenario, IntegratorFactory.createFirstOrderIntegrator(attributes
+		super(Pedestrian.class, domain, IntegratorFactory.createFirstOrderIntegrator(attributes
 				.getAttributesODEIntegrator()), new GNMEquations(),
 				attributesPedestrian, random);
 		this.attributes = attributes;
 		this.targets = new TreeMap<>();
-		this.floorGradient = FloorGradientProviderFactory
-				.createFloorGradientProvider(
-						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
-						scenario, targets, null);
-
 		this.potentialFieldObstacle = potentialFieldObstacle;
 		this.potentialFieldPedestrian = potentialFieldPedestrian;
 		this.potentialFieldTarget = potentialFieldTarget;
@@ -70,27 +59,32 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 
 		this.attributes = Model.findAttributes(modelAttributesList, AttributesGNM.class);
 
 		super.initializeODEModel(Pedestrian.class,
 				IntegratorFactory.createFirstOrderIntegrator(
 						attributes.getAttributesODEIntegrator()),
-				new GNMEquations(), attributesPedestrian, topography, random);
+				new GNMEquations(), attributesPedestrian, domain, random);
 
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, attributes.getTargetPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, attributes.getTargetPotentialModel());
 
 		this.potentialFieldTarget = iPotentialTargetGrid;
 		models.add(iPotentialTargetGrid);
 
 		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributes.getObstaclePotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributes.getObstaclePotentialModel());
 
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, topography, attributesPedestrian, random, attributes.getPedestrianPotentialModel());
+				modelAttributesList, domain, attributesPedestrian, random, attributes.getPedestrianPotentialModel());
+
+		this.floorGradient = FloorGradientProviderFactory
+				.createFloorGradientProvider(
+						GradientProviderType.FLOOR_EUCLIDEAN_CONTINUOUS,
+						domain, targets, null);
 
 		models.add(this);
 	}
@@ -98,9 +92,9 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	public void rebuildFloorField(final double simTimeInSec) {
 		// build list of current targets
 		Map<Integer, Target> targets = new HashMap<>();
-		for (Pedestrian pedestrian : topography.getElements(Pedestrian.class)) {
+		for (Pedestrian pedestrian : domain.getTopography().getElements(Pedestrian.class)) {
 			if (pedestrian.hasNextTarget()) {
-				Target t = topography.getTarget(pedestrian.getNextTargetId());
+				Target t = domain.getTopography().getTarget(pedestrian.getNextTargetId());
 				if (t != null) {
 					targets.put(t.getId(), t);
 				}
@@ -119,7 +113,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 
 		floorGradient = FloorGradientProviderFactory
 				.createFloorGradientProvider(
-						attributes.getFloorGradientProviderType(), topography,
+						attributes.getFloorGradientProviderType(), domain,
 						targets, this.potentialFieldTarget);
 	}
 
@@ -143,15 +137,15 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 
 		rebuildFloorField(simTimeInSec);
 
-		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		Collection<Pedestrian> pedestrians = domain.getTopography().getElements(Pedestrian.class);
 
-		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestrians, this.getClass());
+		UnsupportedSelfCategoryException.throwIfPedestriansNotTargetOrientied(pedestrians, this.getClass());
 
 		// set gradient provider and pedestrians
 		equations.setElements(pedestrians);
 
 		equations.setGradients(floorGradient, potentialFieldObstacle,
-				potentialFieldPedestrian, topography);
+				potentialFieldPedestrian, domain.getTopography());
 
 		super.update(simTimeInSec);
 	}
@@ -161,7 +155,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("GNM cannot initialize " + type.getCanonicalName());
 
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(topography, id));
+		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

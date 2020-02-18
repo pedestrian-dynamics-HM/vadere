@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
@@ -35,39 +34,40 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			if(!skipUdate.contains(pedestrian)) {
 				update((PedestrianOSM) pedestrian, currentTimeInSec, timeStepInSec);
 			}
-			//pedestrian.update(timeStepInSec, -1, CallMethod.SEQUENTIAL);
 		}
 		skipUdate.clear();
 	}
 
 	protected void update(@NotNull final PedestrianOSM pedestrian, final double currentTimeInSec, final double timeStepInSec) {
-		Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
-
 		// for the first step after creation, timeOfNextStep has to be initialized
 		if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
 		}
 
-		if (mostImportantStimulus instanceof ElapsedTime) {
-			pedestrian.clearStrides();
-			if (pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED) {
+		SelfCategory selfCategory = pedestrian.getSelfCategory();
+
+		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
+		} else if (selfCategory == SelfCategory.COOPERATIVE) {
+			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+
+			if(candidate != null) {
+				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+				// We update "this" pedestrian and "candidate" here. Therefore, candidate is already treated and will be skipped.
+				skipUdate.add(candidate);
+			} else {
 				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-			} else if (pedestrian.getSelfCategory() == SelfCategory.COOPERATIVE) {
-				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-				if(candidate != null) {
-					osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-					// here we update not only pedestrian but also candidate, therefore candidate is already treated and will be skipped.
-					skipUdate.add(candidate);
-				} else {
-					stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-				}
 			}
-		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
-			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantStimulus instanceof Bang) {
-			osmBehaviorController.reactToBang(pedestrian, topography);
-		} else if (mostImportantStimulus instanceof ChangeTarget) {
-			osmBehaviorController.reactToTargetChange(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
+		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
+			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
+		} else if (selfCategory == SelfCategory.WAIT) {
+			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
+		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
+			osmBehaviorController.changeTarget(pedestrian, topography);
 		}
 	}
 

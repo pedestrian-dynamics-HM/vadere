@@ -2,6 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.simulator.models.osm.CellularAutomaton;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @DataProcessorClass()
 public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrianIdOverlapKey, OverlapData> {
 	private double minDist;
+	private double SPAWN_BUFFER = 0.001;
 
 
 	public PedestrianOverlapProcessor() {
@@ -32,7 +34,13 @@ public class PedestrianOverlapProcessor extends DataProcessor<TimestepPedestrian
 	protected void doUpdate(final SimulationState state) {
 		double pedRadius = state.getTopography().getAttributesPedestrian().getRadius();
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
-		minDist = pedRadius * 2;
+
+		String mainModelstring =state.getScenarioStore().getMainModel();
+		if(mainModelstring != null && mainModelstring.equals(CellularAutomaton.class.getName())) {
+			minDist = pedRadius * 2 - SPAWN_BUFFER; // allow touching agents for Cellular Automaton
+		}else{
+			minDist = pedRadius * 2;
+		}
 		int timeStep = state.getStep();
 		for (Pedestrian ped : peds) {
 			// get all Pedestrians with at most pedRadius*2.5 distance away

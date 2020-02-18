@@ -1,18 +1,21 @@
 package org.vadere.simulator.control.util;
 
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
 import java.util.function.Function;
+
 
 public class SpawnArray {
 	private static Logger logger = Logger.getLogger(SpawnArray.class);
 	private static double SPAWN_BUFFER = 0.001;
+	private final double grid_resolution_ca = 0.4;
 
 	protected final VRectangle spawnElementBound;
 	protected final VRectangle bound;
@@ -31,17 +34,36 @@ public class SpawnArray {
 
 	protected int nextSpawnPoint;
 
+
 	public SpawnArray(final VShape boundShape,
 					  final VRectangle spawnElementBound,
 					  Function<VPoint, VShape> shapeProducer,
-					  SpawnOverlapCheck testFreeSpace) {
+					  SpawnOverlapCheck testFreeSpace,
+					  final AttributesSource sourceAttributes) {
 		this.bound = new VRectangle(boundShape.getBounds2D());
 		this.spawnElementBound = spawnElementBound;
 		this.shapeProducer = shapeProducer;
 		this.testFreeSpace = testFreeSpace;
 
-		xDim = (int) (bound.width / spawnElementBound.width);
-		yDim = (int) (bound.height / spawnElementBound.height);
+		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+			SPAWN_BUFFER = 0;
+		}
+
+		/* cellular automaton */
+		double offset_x_low = 0;
+		double offset_y_low = 0;
+		double offset_x_high = 0;
+		double offset_y_high = 0;
+
+		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+			offset_x_low = calculateOffsetLow(bound.x);
+			offset_x_high = calculateOffsetHigh(bound.x+bound.width);
+			offset_y_low = calculateOffsetLow(bound.y);
+			offset_y_high = calculateOffsetHigh(bound.y+bound.height);
+		}
+
+		xDim = (int) ((bound.width - offset_x_low - offset_x_high)/ spawnElementBound.width);
+		yDim = (int) ((bound.height- offset_y_low - offset_y_high ) / spawnElementBound.height);
 
 		if (xDim * yDim <= 0) {
 			xDim = (xDim == 0) ? 1 : xDim;
@@ -62,7 +84,7 @@ public class SpawnArray {
 			eY = spawnElementBound.y + spawnElementBound.height / 2 + SPAWN_BUFFER;
 		}
 
-		firstSpawnPoint = new VPoint(bound.x + eX, bound.y + eY);
+		firstSpawnPoint = new VPoint(bound.x + eX + offset_x_low, bound.y + eY + offset_y_low);
 		validSpawnPointMapInBoundShape = new HashMap<>();
 		int validIndex = 0;
 
@@ -75,11 +97,30 @@ public class SpawnArray {
 				validIndex++;
 			}
 		}
+
 		allowedSpawnPoints.trimToSize();
+
 		nextSpawnPoint = 0;
 	}
 
 	public List<VPoint> getAllowedSpawnPoints() {
 		return allowedSpawnPoints;
 	}
+
+	private double roundTo3DecimalPlaces(double toRound){
+		return Math.round(toRound*1000.0)/1000.0;
+	}
+
+	private double calculateOffsetLow (double bound_low){
+		double tmp_x = roundTo3DecimalPlaces((bound_low/ grid_resolution_ca) % 1);
+		double tmp_x_offset = roundTo3DecimalPlaces((1 - tmp_x) * grid_resolution_ca);
+		return tmp_x > 0 && tmp_x < 1? tmp_x_offset : 0.0 ;
+	}
+	private double calculateOffsetHigh (double bound_high) {
+
+		double tmp_y = roundTo3DecimalPlaces((bound_high / grid_resolution_ca) % 1);
+		double tmp_y_offset = roundTo3DecimalPlaces(tmp_y * grid_resolution_ca);
+		return tmp_y > 0 && tmp_y < 1 ? tmp_y_offset : 0.0;
+	}
+
 }

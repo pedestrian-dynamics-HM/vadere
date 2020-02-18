@@ -1,21 +1,11 @@
 package org.vadere.simulator.models.bhm;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
-import org.vadere.state.psychology.perception.types.ElapsedTime;
-import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.psychology.perception.types.Wait;
-import org.vadere.state.psychology.perception.types.WaitInArea;
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
@@ -26,6 +16,8 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
+
+import java.util.*;
 
 public class PedestrianBHM extends Pedestrian {
 
@@ -182,16 +174,17 @@ public class PedestrianBHM extends Pedestrian {
 		double endTimeStep = timeOfNextStep + durationNextStep;
 		timeOfNextStep = endTimeStep;
 
-		Stimulus mostImportantStimulus = getMostImportantStimulus();
+		SelfCategory selfCategory = getSelfCategory();
+
 		VPoint position = getPosition();
-		if (mostImportantStimulus instanceof ElapsedTime) {
+		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
 			updateTargetDirection();
 			nextPosition = navigation.getNavigationPosition();
 			makeStep();
-		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
+		} else if (selfCategory == SelfCategory.WAIT) {
 			// do nothing
 		} else {
-			throw new UnsupportedStimulusException(mostImportantStimulus, this.getClass());
+			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);
 		}
 
 		FootStep currentFootstep = new FootStep(position, getPosition(), startTimeStep, endTimeStep);

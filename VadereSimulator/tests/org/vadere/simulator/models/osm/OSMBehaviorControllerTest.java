@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm;
 import org.junit.Test;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -116,7 +117,7 @@ public class OSMBehaviorControllerTest {
         List<Attributes> floorFieldAttributes = new ArrayList<>();
         floorFieldAttributes.add(new AttributesFloorField());
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
-                topography,
+                new Domain(topography),
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
         // Force that target potential gets calculated so that the gradient can be used later on.
@@ -224,7 +225,7 @@ public class OSMBehaviorControllerTest {
         List<Attributes> floorFieldAttributes = new ArrayList<>();
         floorFieldAttributes.add(new AttributesFloorField());
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
-                topography,
+                new Domain(topography),
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
 
@@ -285,7 +286,7 @@ public class OSMBehaviorControllerTest {
         List<Attributes> floorFieldAttributes = new ArrayList<>();
         floorFieldAttributes.add(new AttributesFloorField());
         IPotentialFieldTargetGrid potentialFieldTargetGrid = IPotentialFieldTargetGrid.createPotentialField(floorFieldAttributes,
-                topography,
+                new Domain(topography),
                 new AttributesAgent(),
                 attributesOSM.getTargetPotentialModel());
 
@@ -616,7 +617,7 @@ public class OSMBehaviorControllerTest {
         assertEquals(timeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
 
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-        controllerUnderTest.wait(pedestrian1, currentSimTimeInSec);
+        controllerUnderTest.wait(pedestrian1, topography, currentSimTimeInSec);
 
         double expectedTimeOfNextStep = currentSimTimeInSec + timeOfNextStep;
         assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);

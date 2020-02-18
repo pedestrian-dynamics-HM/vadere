@@ -180,7 +180,7 @@ public class PSLGGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public static PSLG toPSLGtoVShapes(@NotNull final InputStream inputStream) throws IOException {
+	public static PSLG toPSLG(@NotNull final InputStream inputStream) throws IOException {
 		// (1) read input file
 		Map<Integer, VPoint> vertices = new HashMap<>();
 		Map<Integer, VPoint> holes = new HashMap<>();
@@ -318,7 +318,7 @@ public class PSLGGenerator {
 			} while (from != start && segments.containsKey(from));
 
 			// defines a polygon
-			if(polyIndices.size() > 3 && polyIndices.get(0) == polyIndices.get(polyIndices.size()-1)) {
+			if(polyIndices.size() > 3 && polyIndices.get(0).equals(polyIndices.get(polyIndices.size()-1))) {
 				polyIndices.remove(polyIndices.size()-1);
 				List<VPoint> pointList = polyIndices.stream().map(index -> vertices.get(index)).collect(Collectors.toList());
 				VPolygon polygon = GeometryUtils.toPolygon(pointList);

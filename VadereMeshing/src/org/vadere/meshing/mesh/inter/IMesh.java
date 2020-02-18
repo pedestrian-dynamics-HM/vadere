@@ -319,6 +319,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		setData(vertex, name, data);
 	}
 
+	default void setIntegerData(@NotNull final V vertex, @NotNull final String name, int data) {
+		setData(vertex, name, data);
+	}
+
 	//default void setBooleanNull(@NotNull final V vertex, @NotNull final String name, boolean nil) {}
 
 	//default void setDoubleNull(@NotNull final V vertex, @NotNull final String name, double nil) {}
@@ -341,6 +345,14 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(edge, name, Double.class).orElse(0.0);
 	}
 
+	default int getIntegerData(@NotNull E edge, @NotNull final String name) {
+		return getData(edge, name, Integer.class).orElse(0);
+	}
+
+	default int getIntegerData(@NotNull V vertex, @NotNull final String name) {
+		return getData(vertex, name, Integer.class).orElse(0);
+	}
+
 	/**
 	 * Sets the data for a specific half-edge in O(1).
 	 *
@@ -355,6 +367,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	default void setDoubleData(@NotNull E edge, @NotNull final String name, double data) {
+		setData(edge, name, data);
+	}
+
+	default void setIntegerData(@NotNull E edge, @NotNull final String name, int data) {
 		setData(edge, name, data);
 	}
 
@@ -375,6 +391,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(face, name, Double.class).orElse(0.0);
 	}
 
+	default int getIntegerData(@NotNull F face, @NotNull final String name) {
+		return getData(face, name, Integer.class).orElse(0);
+	}
+
 	/**
 	 * Sets the data for a specific face in O(1).
 	 *
@@ -388,6 +408,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	default void setDoubleData(@NotNull F face, @NotNull final String name, final double data) {
+		setData(face, name, data);
+	}
+
+	default void setIntegerData(@NotNull F face, @NotNull final String name, final int data) {
 		setData(face, name, data);
 	}
 
@@ -1321,6 +1345,25 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	/**
+	 * Returns the midpoint {@link VPoint} of a triangle defined by the face.
+	 * Assumption: The face represents a triangle, i.e. it has exactly 3 distinct points. This
+	 * requires O(1) time.
+	 *
+	 * @param face the face.
+	 * @return the midpoint {@link VPoint} of a triangle defined by the face.
+	 */
+	default VPoint getTriangleMidPoint(@NotNull final F face) {
+		assert getVertices(face).size() == 3 : "number of vertices of " + face + " is " + getVertices(face).size();
+		E e1 = getEdge(face);
+		E e2 = getNext(e1);
+		E e3 = getNext(e2);
+		V v1 = getVertex(e1);
+		V v2 = getVertex(e2);
+		V v3 = getVertex(e3);
+		return GeometryUtils.getTriangleMidpoint(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
+	}
+
+	/**
 	 * Returns a triple {@link Triple} which represents a triangle by transforming the face to a triangle.
 	 * Assumption: The face represents a triangle, i.e. it has exactly 3 distinct points. This requires O(1) time.
 	 *
@@ -1427,6 +1470,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return () -> new AdjacentVertexIterator<>(this, vertex);
 	}
 
+	default List<V> getAdjacentVertices(@NotNull final V vertex) {
+		return Lists.newArrayList(new AdjacentVertexIterator<>(this, vertex));
+	}
+
 	/**
 	 * Returns an Iterable {@link Iterable} which can be used to iterate over all edges of a face.
 	 *
@@ -1479,6 +1526,17 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 */
 	default Stream<E> streamEdges(@NotNull final F face) {
 		Iterable<E> iterable = getEdgeIt(face);
+		return StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	/**
+	 * Returns a Stream {@link Stream} of all adjacent vertices of the vertex.
+	 *
+	 * @param v the vertex
+	 * @return a Stream {@link Stream} of all adjacent vertices
+	 */
+	default Stream<V> streamVertices(@NotNull final V v) {
+		Iterable<V> iterable = getAdjacentVertexIt(v);
 		return StreamSupport.stream(iterable.spliterator(), false);
 	}
 
@@ -1919,7 +1977,6 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 				minDistance = distance;
 			}
 		}
-
 		return result;
 	}
 

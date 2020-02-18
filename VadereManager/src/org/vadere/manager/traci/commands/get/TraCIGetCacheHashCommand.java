@@ -21,7 +21,7 @@ public class TraCIGetCacheHashCommand extends TraCIGetCommand {
 		super(getCmd.getTraCICmd(), getCmd.getVariableIdentifier(), getCmd.getElementIdentifier());
 		getCmd.getCmdBuffer().ensureBytes(1);
 		TraCIDataType dataType = TraCIDataType.fromId(getCmd.getCmdBuffer().readUnsignedByte());
-		if (!dataType.equals(TraCIDataType.STRING)){
+		if (!dataType.equals(TraCIDataType.STRING)) {
 			throw new TraCIException("expected String value in TraCIGetCacheHashCommand");
 		}
 		this.file = getCmd.getCmdBuffer().readString();
@@ -29,7 +29,7 @@ public class TraCIGetCacheHashCommand extends TraCIGetCommand {
 
 	static public TraCIGetCacheHashCommand create(TraCIGetCommand getCmd) {
 		if (getCmd.getTraCICmd().equals(TraCICmd.GET_SIMULATION_VALUE) &&
-				getCmd.getVariableIdentifier() == SimulationVar.CACHE_HASH.id ){
+				getCmd.getVariableIdentifier() == SimulationVar.CACHE_HASH.id) {
 
 			return new TraCIGetCacheHashCommand(getCmd);
 		} else {

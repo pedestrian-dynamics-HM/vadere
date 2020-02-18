@@ -3,16 +3,14 @@ package org.vadere.meshing.mesh.triangulation;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.InterpolationUtil;
 
@@ -24,17 +22,25 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 
+
 	private static final String propName = "edgeLength";
 
 	public EdgeLengthFunctionApprox(
 			@NotNull final PSLG pslg,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc) {
+		this(pslg, circumRadiusFunc, p -> Double.POSITIVE_INFINITY);
+	}
+
+	public EdgeLengthFunctionApprox(
+			@NotNull final PSLG pslg,
+			@NotNull final Function<IPoint, Double> circumRadiusFunc,
+			final IEdgeLengthFunction edgeLengthFunction) {
 
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 		/**
 		 * Add a bound around so the edge function is also defined outside.
 		 */
-		VRectangle bound = GeometryUtils.boundRelative(pslg.getSegmentBound().getPoints(), 0.3);
+		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
 		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
@@ -59,12 +65,12 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				}
 			}
 
-			triangulation.getMesh().setDoubleData(v, propName, minEdgeLen);
+			triangulation.getMesh().setDoubleData(v, propName, Math.min(edgeLengthFunction.apply(v), minEdgeLen));
 		}
 	}
 
 	public EdgeLengthFunctionApprox(@NotNull final PSLG pslg) {
-		this(pslg, p -> Double.POSITIVE_INFINITY);
+		this(pslg, p -> Double.POSITIVE_INFINITY, p -> Double.POSITIVE_INFINITY);
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 	}
 
@@ -100,7 +106,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	@Override
 	public Double apply(@NotNull final IPoint p) {
-		var face = triangulation.locateFace(p.getX(), p.getY()).get();
+		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY())).get();
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {
@@ -120,7 +126,8 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 	}
 
 	public void printPython() {
-		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, propName)));
+		String str = triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, propName));
+		System.out.println(str);
 		/*var points = triangulation.getMesh().getPoints();
 		System.out.print("[");
 		for(var dataPoint : points) {

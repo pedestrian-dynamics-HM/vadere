@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_discrete_ca",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -174,7 +174,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 2,
         "shape" : {
           "x" : 2.0,
           "y" : 2.0,
@@ -189,6 +189,7 @@
         "startTime" : 0.0,
         "endTime" : 100.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

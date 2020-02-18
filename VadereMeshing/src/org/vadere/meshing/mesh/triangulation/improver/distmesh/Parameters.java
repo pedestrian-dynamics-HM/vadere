@@ -10,11 +10,13 @@ public class Parameters {
     public final static double DELTAT = 0.2;
     public final static double MIN_TRIANGLE_QUALITY = 0.1;
     public final static double MIN_FORCE_RATIO = 0.3;
-    public final static double MIN_SPLIT_TRIANGLE_QUALITY = 0.5;
+    public final static double MIN_COLLAPSE_QUALITY = 0.5;
+	public final static double MIN_SPLIT_QUALITY = 0.5;
+	public final static double MAX_COLLAPSE_ANGLE = Math.PI * 0.5;
 	public final static double h0 = 0.15;
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
-    public final static double qualityMeasurement = 0.85;
+    public final static double qualityMeasurement = 0.95;
 	public final static double qualityConvergence = 0.001;
     public final static double MINIMUM = 0.25;
     public final static double DENSITYWEIGHT = 2;

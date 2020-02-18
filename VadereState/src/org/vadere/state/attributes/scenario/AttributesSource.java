@@ -48,6 +48,15 @@ public class AttributesSource extends AttributesEmbedShape {
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private boolean spawnAtRandomPositions;
+
+
+	/**
+	 * If set to true, the pedestrians are spawned on a rectangular grid for the cellular automaton. Different to the
+	 * regular spawnArray, they will touch if the cells are 0.4m and the radius is set to 0.2m.
+	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private boolean spawnAtGridPositionsCA;
+
 	/**
 	 * If set to true, only free space is used to create pedestrians at each
 	 * wave. When the endTime is reached and not enough pedestrians have been
@@ -126,6 +135,7 @@ public class AttributesSource extends AttributesEmbedShape {
 		return startTime;
 	}
 
+
 	/** If end time equals start time, exactly one single spawn event will be triggered. */
 	public double getEndTime() {
 		return endTime;
@@ -147,6 +157,9 @@ public class AttributesSource extends AttributesEmbedShape {
 	public boolean isSpawnAtRandomPositions() {
 		return spawnAtRandomPositions;
 	}
+
+	public boolean isSpawnAtGridPositionsCA(){ return spawnAtGridPositionsCA; }
+
 
 	public boolean isUseFreeSpaceOnly() {
 		return useFreeSpaceOnly;

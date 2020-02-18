@@ -1,7 +1,7 @@
 {
   "name" : "groupBaseScenario.scenario",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -364,6 +364,7 @@
         "startTime" : 0.0,
         "endTime" : 4000.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 0.0, 1.0 ],

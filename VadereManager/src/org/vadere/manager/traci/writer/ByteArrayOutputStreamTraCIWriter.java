@@ -2,8 +2,8 @@ package org.vadere.manager.traci.writer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.compoundobjects.CompoundObject;
 import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;
@@ -27,23 +27,22 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	ByteArrayOutputStream data;
 
 
-
 	public ByteArrayOutputStreamTraCIWriter() {
 		data = new ByteArrayOutputStream();
 	}
 
 	@Override
-	public ByteBuffer asByteBuffer(){
+	public ByteBuffer asByteBuffer() {
 		return ByteBuffer.wrap(data.toByteArray());
 	}
 
 	@Override
-	public byte[] asByteArray(){
+	public byte[] asByteArray() {
 		return data.toByteArray();
 	}
 
 	@Override
-	public TraCIWriter rest(){
+	public TraCIWriter rest() {
 		data.reset();
 		return this;
 	}
@@ -51,7 +50,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	@Override
 	public TraCIWriter writeObjectWithId(TraCIDataType dataType, Object data) {
 
-		switch (dataType){
+		switch (dataType) {
 			case U_BYTE:
 				writeUnsignedByteWithId((int) data);
 				break;
@@ -73,8 +72,8 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 			case POS_2D:
 				write2DPosition((VPoint) data);
 				break;
-			case POS_2D_LIST:										// new
-				write2DPositionListWithId((Map<String, VPoint>) data);     // new
+			case POS_2D_LIST:
+				write2DPositionListWithId((Map<String, VPoint>) data);
 				break;
 			case POS_3D:
 				write3DPosition((Vector3D) data);
@@ -99,10 +98,11 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 				break;
 			case COMPOUND_OBJECT:
 				writeCompoundObject((CompoundObject) data);
+			case NULL:
+				writeNull();
 				break;
 			default:
 				logger.errorf("cannot write %s", dataType.toString());
-
 		}
 
 		return this;
@@ -170,24 +170,24 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writeString(String val){
+	public TraCIWriter writeString(String val) {
 		writeString(val, StandardCharsets.US_ASCII);
 		return this;
 	}
 
 	@Override
-	public TraCIWriter writeStringList(List<String> val){
+	public TraCIWriter writeStringList(List<String> val) {
 		writeInt(val.size());
 		val.forEach(this::writeString);
 		return this;
 	}
 
 	@Override
-	public int getStringByteCount(String val){
-		return  val.getBytes(StandardCharsets.US_ASCII).length;
+	public int getStringByteCount(String val) {
+		return val.getBytes(StandardCharsets.US_ASCII).length;
 	}
 
-	private TraCIWriter writeString(String val, Charset c){
+	private TraCIWriter writeString(String val, Charset c) {
 		byte[] byteString = val.getBytes(c);
 		writeInt(byteString.length);
 		if (byteString.length > 0)
@@ -196,7 +196,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter write2DPosition(VPoint val){
+	public TraCIWriter write2DPosition(VPoint val) {
 		writeUnsignedByte(TraCIDataType.POS_2D.id);
 		writeDouble(val.x);
 		writeDouble(val.y);
@@ -204,14 +204,14 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter write2DPositionListWithId(Map<String, VPoint> data){
+	public TraCIWriter write2DPositionListWithId(Map<String, VPoint> data) {
 		writeUnsignedByte(TraCIDataType.POS_2D_LIST.id);
 		write2DPositionList(data);
 		return this;
 	}
 
 	@Override
-	public TraCIWriter write2DPositionList(Map<String, VPoint> data){
+	public TraCIWriter write2DPositionList(Map<String, VPoint> data) {
 		writeInt(data.entrySet().size());
 		data.entrySet().stream().forEach(p -> {
 			writeString(p.getKey());
@@ -223,7 +223,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter write3DPosition(Vector3D val){
+	public TraCIWriter write3DPosition(Vector3D val) {
 		writeUnsignedByte(TraCIDataType.POS_3D.id);
 		writeDouble(val.x);
 		writeDouble(val.y);
@@ -231,9 +231,8 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		return this;
 	}
 
-
 	@Override
-	public TraCIWriter writeRoadMapPosition(RoadMapPosition val){
+	public TraCIWriter writeRoadMapPosition(RoadMapPosition val) {
 		writeUnsignedByte(TraCIDataType.POS_ROAD_MAP.id);
 		writeString(val.getRoadId());
 		writeDouble(val.getPos());
@@ -242,7 +241,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writeLonLatPosition(VPoint lonLat){
+	public TraCIWriter writeLonLatPosition(VPoint lonLat) {
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT.id);
 		writeDouble(lonLat.x);
 		writeDouble(lonLat.y);
@@ -250,7 +249,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writeLonLatAltPosition(Vector3D lonLatAlt){
+	public TraCIWriter writeLonLatAltPosition(Vector3D lonLatAlt) {
 		writeUnsignedByte(TraCIDataType.POS_LON_LAT_ALT.id);
 		writeDouble(lonLatAlt.x);
 		writeDouble(lonLatAlt.y);
@@ -259,16 +258,17 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writePolygon(VPoint... points){
+	public TraCIWriter writePolygon(VPoint... points) {
 		writePolygon(Arrays.asList(points));
 		return this;
 	}
 
 	@Override
-	public TraCIWriter writePolygon(List<VPoint> points){
+	public TraCIWriter writePolygon(List<VPoint> points) {
 		writeUnsignedByte(TraCIDataType.POLYGON.id);
-		if(points.size() > 255)
-			throw new TraCIException("Polygon to big. TraCI only supports polygon up to 255 points.");
+		if (points.size() > 255)
+			throw new TraCIException("Polygon to big. " +
+					"TraCI only supports polygon up to 255 points.");
 		writeUnsignedByte(points.size());
 		points.forEach(p -> {
 			writeDouble(p.getX());
@@ -278,12 +278,13 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases){
+	public TraCIWriter writeTrafficLightPhaseList(List<TrafficLightPhase> phases) {
 		writeUnsignedByte(TraCIDataType.TRAFFIC_LIGHT_PHASE_LIST.id);
-		if(phases.size() > 255)
-			throw new TraCIException("Traffic Light Phase List to big. TraCI only supports list up to 255 elements.");
+		if (phases.size() > 255)
+			throw new TraCIException("Traffic Light Phase List to big. " +
+					"TraCI only supports list up to 255 elements.");
 		writeUnsignedByte(phases.size());
-		phases.forEach( phase -> {
+		phases.forEach(phase -> {
 			writeString(phase.getPrecRoad());
 			writeString(phase.getSuccRoad());
 			writeUnsignedByte(phase.getPhase().id);
@@ -292,7 +293,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public TraCIWriter writeColor(Color color){
+	public TraCIWriter writeColor(Color color) {
 		writeUnsignedByte(TraCIDataType.COLOR.id);
 		writeUnsignedByte(color.getRed());
 		writeUnsignedByte(color.getGreen());
@@ -306,12 +307,18 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 		writeUnsignedByte(TraCIDataType.COMPOUND_OBJECT.id);
 		writeInt(compoundObject.size());
 		Iterator<Pair<TraCIDataType, Object>> iter = compoundObject.itemIterator();
-		while (iter.hasNext()){
+		while (iter.hasNext()) {
 			Pair<TraCIDataType, Object> p = iter.next();
 			if (p.getLeft().equals(TraCIDataType.COMPOUND_OBJECT))
-					throw new TraCIException("Recursive CompoundObject are not allowed.");
+				throw new TraCIException("Recursive CompoundObject are not allowed.");
 			writeObjectWithId(p.getLeft(), p.getRight());
 		}
+		return this;
+	}
+
+	@Override
+	public TraCIWriter writeNull() {
+		writeUnsignedByte(TraCIDataType.NULL.id);
 		return this;
 	}
 
@@ -321,16 +328,15 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	/**
-	 * Check if the given cmdLen fits into a single byte. If not use the extended
-	 * cmdLen format which nulls the first byte and introduces a int field for the
-	 * cmdLen.
+	 * Check if the given cmdLen fits into a single byte. If not use the extended cmdLen format
+	 * which nulls the first byte and introduces a int field for the cmdLen.
 	 *
-	 * @param cmdLen	number of bytes of command *including* one byte for the cmdLen field.
+	 * @param cmdLen number of bytes of command *including* one byte for the cmdLen field.
 	 */
 	@Override
 	public TraCIWriter writeCommandLength(int cmdLen) {
 
-		if (cmdLen <= 255){ //
+		if (cmdLen <= 255) { //
 			writeUnsignedByte(cmdLen);
 		} else {
 			// use extended cmdLen field (+4 byte)
@@ -342,7 +348,7 @@ public class ByteArrayOutputStreamTraCIWriter implements TraCIWriter {
 	}
 
 	@Override
-	public int size(){
+	public int size() {
 		return data.size();
 	}
 }

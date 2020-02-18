@@ -25,21 +25,28 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 		super(edgeLengthFunc, triangulation);
 	}
 
+	public PEikMesh(@NotNull final IEdgeLengthFunction edgeLengthFunc,
+	                @NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation,
+	                boolean refine) {
+		super(edgeLengthFunc, triangulation, refine);
+	}
+
+
 
 	public PEikMesh(@NotNull final IDistanceFunction distanceFunc,
 	                @NotNull final IEdgeLengthFunction edgeLengthFunc,
-	                final double initialEdgeLen,
-	                @NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation) {
-		super(distanceFunc, edgeLengthFunc, initialEdgeLen, triangulation);
+	                @NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation,
+	                final boolean refine) {
+		super(distanceFunc, edgeLengthFunc, triangulation, refine);
 	}
 
 	public PEikMesh(
 			@NotNull IDistanceFunction distanceFunc,
 			@NotNull IEdgeLengthFunction edgeLengthFunc,
-			double initialEdgeLen,
-			@NotNull PTriangulation triangulation) {
+			@NotNull PTriangulation triangulation,
+			final boolean refine) {
 
-		super(distanceFunc, edgeLengthFunc, initialEdgeLen, triangulation);
+		super(distanceFunc, edgeLengthFunc, triangulation, refine);
 	}
 
 	public PEikMesh(

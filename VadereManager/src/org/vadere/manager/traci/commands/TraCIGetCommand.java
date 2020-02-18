@@ -3,9 +3,9 @@ package org.vadere.manager.traci.commands;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
-import org.vadere.manager.traci.respons.TraCIGetResponse;
+import org.vadere.manager.traci.response.TraCIGetResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 import java.nio.charset.StandardCharsets;
 
@@ -19,13 +19,11 @@ import java.nio.charset.StandardCharsets;
  *
  * [ cmdIdentifier(based on API) ] [ variableId ] [ elementId]
  *
- * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_****
- * - variableId: Id for the var. The numbers may be the same between different APIs
- *   see {@link PersonVar} enum
- * - elementId: String based id for the object (i.e. a pedestrianId)
+ * - cmdIdentifier(based on API): see {@link TraCICmd} enum GET_**** - variableId: Id for the var.
+ * The numbers may be the same between different APIs see {@link PersonVar} enum - elementId: String
+ * based id for the object (i.e. a pedestrianId)
  *
  * see {@link org.vadere.manager.traci.commandHandler.PersonCommandHandler} for execution handing.
- *
  */
 public class TraCIGetCommand extends TraCICommand {
 
@@ -34,24 +32,6 @@ public class TraCIGetCommand extends TraCICommand {
 	protected TraCICommandBuffer cmdBuffer;
 
 	private TraCIGetResponse response;
-
-
-	public static TraCIPacket build(TraCICmd commandIdentifier, int variableIdentifier, String elementIdentifier){
-		int cmdLen = 1 + 1 + 1 + 4 + elementIdentifier.getBytes(StandardCharsets.US_ASCII).length;
-		TraCIPacket packet = TraCIPacket.create();
-		packet.writeCommandLength(cmdLen) // [1|5]
-				.writeUnsignedByte(commandIdentifier.id) // 1
-				.writeUnsignedByte(variableIdentifier) // 1
-				.writeString(elementIdentifier); // 4+strLen
-
-		return packet;
-	}
-
-	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data){
-		return TraCIPacket.create()
-				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
-						dataType, data);
-	}
 
 
 	public TraCIGetCommand(TraCICmd traCICmd, int variableIdentifier, String elementIdentifier) {
@@ -66,6 +46,23 @@ public class TraCIGetCommand extends TraCICommand {
 		this.variableIdentifier = cmdBuffer.readUnsignedByte();
 		this.elementIdentifier = cmdBuffer.readString();
 		this.cmdBuffer = cmdBuffer;
+	}
+
+	public static TraCIPacket build(TraCICmd commandIdentifier, int variableIdentifier, String elementIdentifier) {
+		int cmdLen = 1 + 1 + 1 + 4 + elementIdentifier.getBytes(StandardCharsets.US_ASCII).length;
+		TraCIPacket packet = TraCIPacket.create();
+		packet.writeCommandLength(cmdLen) // [1|5]
+				.writeUnsignedByte(commandIdentifier.id) // 1
+				.writeUnsignedByte(variableIdentifier) // 1
+				.writeString(elementIdentifier); // 4+strLen
+
+		return packet;
+	}
+
+	public static TraCIPacket build(TraCICmd commandIdentifier, String elementIdentifier, int variableIdentifier, TraCIDataType dataType, Object data) {
+		return TraCIPacket.create()
+				.wrapCommand(commandIdentifier, elementIdentifier, variableIdentifier,
+						dataType, data);
 	}
 
 	public int getVariableIdentifier() {

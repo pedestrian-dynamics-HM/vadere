@@ -12,20 +12,37 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
+/**
+ * Implementation of Rivara's bisection of longest edge algorithm for triangular mesh refinement.
+ *
+ *
+ * <b>References:</b>
+ * <ol>
+ *     <li>
+ *           <a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.1620200412">Algorithm of Rivara</a>
+ *     </li>
+ * </ol>
+ * @param <V> the type of the vertices
+ * @param <E> the type of the half-edges
+ * @param <F> the type of the faces
+ *
+ * @author Benedikt Zoennchen
+ */
 public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
 
 	private final IIncrementalTriangulation<V, E, F> triangulation;
-	private final IEdgeLengthFunction edgeLengthFunction;
+	private final Predicate<E> edgeRefinePredicates;
 	private boolean finished;
 	private boolean refined;
 
 	public GenRivaraRefinement(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-			@NotNull final IEdgeLengthFunction edgeLengthFunction
+			@NotNull final Predicate<E> edgeRefinePredicates
 			) {
 		this.triangulation = triangulation;
-		this.edgeLengthFunction = edgeLengthFunction;
+		this.edgeRefinePredicates = edgeRefinePredicates;
 		this.finished = false;
 	}
 
@@ -59,8 +76,7 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 		if(!finished) {
 			for(E edge : getMesh().getEdges()) {
 				if(!getMesh().isBoundary(edge)) {
-					VLine line = getMesh().toLine(edge);
-					if(edgeLengthFunction.apply(line.midPoint()) < line.length()) {
+					if(edgeRefinePredicates.test(edge)) {
 						refined = true;
 						refine(getMesh().getFace(edge));
 					}

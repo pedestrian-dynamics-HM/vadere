@@ -193,6 +193,11 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 				legacyDir = dir.getParent().resolve(LEGACY_DIR).resolve(OUTPUT_DIR).resolve(fileFolder);
 			}
 
+			// Ignore meshes
+			if(file.isDirectory() && file.getName().equals(IOUtils.MESH_DIR)) {
+				continue;
+			}
+
 			Path scenarioFilePath = Paths.get(file.getAbsolutePath());
 			try {
 				if (migrateScenario(scenarioFilePath, legacyDir, dirName)) {

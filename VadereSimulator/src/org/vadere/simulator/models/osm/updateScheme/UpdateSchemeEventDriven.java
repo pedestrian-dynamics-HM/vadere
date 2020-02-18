@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
-import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
@@ -48,45 +47,31 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			return;
 		}
 
-		Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
+		SelfCategory selfCategory = pedestrian.getSelfCategory();
 
-		if (mostImportantStimulus instanceof ElapsedTime) {
-			double stepDuration = pedestrian.getDurationNextStep();
-			if (pedestrian.getSelfCategory() == SelfCategory.TARGET_ORIENTED) {
-				// this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
-				pedestrian.updateNextPosition();
-				osmBehaviorController.makeStep(pedestrian, topography, stepDuration);
-				pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + stepDuration);
-			} else if (pedestrian.getSelfCategory() == SelfCategory.COOPERATIVE) {
-				// this call will also invoke setTimeOfNextStep
-				PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-				//TODO: Benedikt Kleinmeier:
-				if(candidate != null) {
-					//if(Math.abs(pedestrian.getTimeOfNextStep() - candidate.getTimeOfNextStep()) < MathUtil.EPSILON) {
-						pedestrianEventsQueue.remove(candidate);
-						osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-						pedestrianEventsQueue.add(candidate);
-					/*} else {
-						pedestrian.setTimeOfNextStep(candidate.getTimeOfNextStep());
-					}*/
-				} else {
-					pedestrian.updateNextPosition();
-					osmBehaviorController.makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
-					pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-				}
+		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
+		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.COOPERATIVE) {
+			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
+
+			if (candidate != null) {
+				pedestrianEventsQueue.remove(candidate);
+				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
+				pedestrianEventsQueue.add(candidate);
+			} else {
+				osmBehaviorController.makeStepToTarget(pedestrian, topography);
 			}
-		} else if (mostImportantStimulus instanceof Wait || mostImportantStimulus instanceof WaitInArea) {
-			osmBehaviorController.wait(pedestrian, timeStepInSec);
-		} else if (mostImportantStimulus instanceof Bang) {
-			osmBehaviorController.reactToBang(pedestrian, topography);
-
-			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
-		} else if (mostImportantStimulus instanceof ChangeTarget) {
-			osmBehaviorController.reactToTargetChange(pedestrian, topography);
-
-			// Set time of next step. Otherwise, the internal OSM event queue hangs endlessly.
-			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.WAIT) {
+			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
+		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
+			osmBehaviorController.changeTarget(pedestrian, topography);
 		}
 	}
 

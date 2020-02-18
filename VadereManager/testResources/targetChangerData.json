@@ -1,0 +1,14 @@
+{
+  "id" : 7,
+  "shape" : {
+    "x" : 1.2,
+    "y" : 8.4,
+    "width" : 1.0,
+    "height" : 1.0,
+    "type" : "RECTANGLE"
+  },
+  "reachDistance" : 0.0,
+  "nextTargetIsPedestrian" : false,
+  "nextTarget" : [-1],
+  "probabilityToChangeTarget" : 0.0
+}

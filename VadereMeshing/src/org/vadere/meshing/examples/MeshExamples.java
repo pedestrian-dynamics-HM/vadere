@@ -59,10 +59,10 @@ public class MeshExamples {
 		}*/
 		//eikMeshRandom();
 		//eikMeshGreenland();
-		//ruppertsTriangulationKaiserslautern();
+		ruppertsTriangulationKaiserslauternLarge();
 		//ruppertsTriangulationPoly();
 		//ruppertsTriangulationPolyGreenland();
-		delaunayTriangulation();
+//		delaunayTriangulation();
 		//dirichletRefinment();
 //		delaunayRefinment();
 		//constrainedDelaunayTriangulation();
@@ -223,7 +223,7 @@ public class MeshExamples {
 
 	public static void constrainedDelaunayTriangulation() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> constrains = pslg.getAllSegments();
 		var cdt = new PContrainedDelaunayTriangulator(
 				pslg,
@@ -306,7 +306,7 @@ public class MeshExamples {
 
 	public static void ruppertsTriangulationKaiserslautern() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
@@ -354,9 +354,59 @@ public class MeshExamples {
 		System.out.println("finished");
 	}
 
+	public static void ruppertsTriangulationKaiserslauternLarge() throws IOException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_large.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+		Collection<VLine> lines = pslg.getAllSegments();
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IEdgeLengthFunction h = p -> 0.01 /*+ 0.2*Math.abs(distanceFunction.apply(p))*/;
+		var ruppert = new PRuppertsTriangulator(
+				pslg,
+				//p -> 0.01,
+				10.0
+		);
+
+		PMeshPanel panel = new PMeshPanel(ruppert.getMesh(), 1000, 1000);
+		panel.display(" Voronoi Vertex Insertion");
+
+		while (!ruppert.isFinished()) {
+			try {
+				Thread.sleep(20);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			synchronized (ruppert.getMesh()) {
+				ruppert.step();
+			}
+			panel.repaint();
+		}
+
+		/*var eikMesh = new PEikMeshGen<>(h, ruppert.getTriangulation());
+
+		while (!eikMesh.isFinished()) {
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			synchronized (eikMesh.getMesh()) {
+				eikMesh.improve();
+			}
+			panel.repaint();
+		}*/
+
+		System.out.println(TexGraphGenerator.toTikz(ruppert.getMesh()));
+		System.out.println("finished");
+	}
+
 	public static void ruppertsTriangulationPoly() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> segments = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
@@ -400,7 +450,7 @@ public class MeshExamples {
 
 	public static void ruppertsTriangulationPolyGreenland() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/greenland.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		double theta = 20;
 		PRuppertsTriangulator ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -495,7 +545,7 @@ public class MeshExamples {
 
 	public static void eikMeshA() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 
 //		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
 
@@ -549,7 +599,7 @@ public class MeshExamples {
 
 	public static void eikMeshEik() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/eikmesh.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 
 //		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
 
@@ -603,7 +653,7 @@ public class MeshExamples {
 
 	public static void eikMeshKaiserslauternApprox() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
@@ -671,7 +721,7 @@ public class MeshExamples {
 
 	public static void eikMeshKaiserslautern() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 
@@ -741,7 +791,7 @@ public class MeshExamples {
 
 	public static void eikMeshGreenland() throws IOException, InterruptedException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/greenland.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
 
 		// (1) construct background mesh distance function
@@ -802,7 +852,7 @@ public class MeshExamples {
 	public static void dirichletRefinment() throws InterruptedException, IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
 		boolean duplicatedLines = false;
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
@@ -836,7 +886,7 @@ public class MeshExamples {
 	public static void delaunayRefinment() throws InterruptedException, IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/a.poly");
 		boolean duplicatedLines = false;
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		Collection<VLine> lines = pslg.getAllSegments();
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();

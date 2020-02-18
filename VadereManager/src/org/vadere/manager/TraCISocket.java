@@ -1,8 +1,9 @@
 package org.vadere.manager;
 
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;
-import org.vadere.manager.traci.respons.TraCIResponse;
+import org.vadere.manager.traci.response.TraCIResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
+import org.vadere.util.logging.Logger;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -12,35 +13,43 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 /**
- *  //todo comment
+ * //todo comment
  */
 public class TraCISocket implements Closeable {
 
 	private final static int TRACI_LEN_LENGTH = 4;
-
+	private static Logger logger = Logger.getLogger(TraCISocket.class);
 	private final Socket socket;
 	private final DataOutputStream outStream;
 	private final DataInputStream inStream;
+	private final boolean tracePackets;
 	private String host;
 	private int port;
 
-	public TraCISocket(Socket socket) throws IOException {
+	public TraCISocket(Socket socket, boolean tracePackets) throws IOException {
 		this.socket = socket;
 		this.host = this.socket.getInetAddress().toString();
 		this.port = this.socket.getPort();
 		this.outStream = new DataOutputStream(socket.getOutputStream());
 		this.inStream = new DataInputStream(socket.getInputStream());
+		this.tracePackets = tracePackets;
+		if (this.tracePackets)
+			logger.infof("TraCISocket is in TRACE-MODE. Ensure the correct Loglevel to see all Information.");
 	}
 
-	public int getPort(){
+	public TraCISocket(Socket socket) throws IOException {
+		this(socket, false);
+	}
+
+	public int getPort() {
 		return port;
 	}
 
-	public String getHost(){
+	public String getHost() {
 		return host;
 	}
 
-	public boolean hasClientConnection(){
+	public boolean hasClientConnection() {
 		return socket.isConnected();
 	}
 
@@ -54,7 +63,9 @@ public class TraCISocket implements Closeable {
 		outStream.write(buf.array(), buf.arrayOffset(), buf.array().length);
 	}
 
-	public void sendExact(final TraCIPacket packet) throws IOException{
+	public void sendExact(final TraCIPacket packet) throws IOException {
+		if (tracePackets)
+			logger.tracef("send packet [%d byte]: %s", packet.size(), packet.asHexString());
 		send(packet.send());
 	}
 
@@ -65,23 +76,23 @@ public class TraCISocket implements Closeable {
 		inStream.readFully(buf, 0, len);
 	}
 
-	public byte[] receive (int bufSize) throws IOException{
+	public byte[] receive(int bufSize) throws IOException {
 		byte[] buf = new byte[bufSize];
 		receiveComplete(buf, bufSize);
 		return buf;
 	}
 
-	public TraCIPacketBuffer receiveExact() throws IOException{
+	public TraCIPacketBuffer receiveExact() throws IOException {
 
 		// read first 4 bytes (containing TracCI packet length)
 		ByteBuffer msgLength = ByteBuffer.wrap(receive(TRACI_LEN_LENGTH));
 		int data_length = msgLength.getInt() - TRACI_LEN_LENGTH;
 
-		if (data_length <=0){
+		if (data_length <= 0) {
 			return TraCIPacketBuffer.empty();
 		} else {
 			byte[] data = receive(data_length);
-			return  TraCIPacketBuffer.wrap(data);
+			return TraCIPacketBuffer.wrap(data);
 		}
 	}
 

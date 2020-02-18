@@ -92,6 +92,21 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		this.edgeColorFunction = edgeColorFunction;
 	}
 
+	public MeshRenderer(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			@Nullable final Function<F, Color> faceColorFunction,
+			@Nullable final Function<E, Color> edgeColorFunction,
+			@Nullable final Function<V, Color> vertexColorFunction) {
+		this.mesh = mesh;
+		this.alertPred = alertPred;
+		this.faces = new ArrayList<>();
+		this.edges = new ArrayList<>();
+		this.faceColorFunction = faceColorFunction;
+		this.edgeColorFunction = edgeColorFunction;
+		this.vertexColorFunction = vertexColorFunction;
+	}
+
 	/**
 	 * Construct a mesh renderer which will not fill the faces.
 	 *
@@ -148,7 +163,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-			faces = mesh.clone().getFaces();
+			faces = mesh/*.clone()*/.getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
 		}
@@ -174,11 +189,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 
 			if(alertPred.test(face)) {
 				graphics.setColor(new Color(200, 0, 0));
-			}
-			else if(faceColorFunction != null) {
-				graphics.setColor(faceColorFunction.apply(face));
 			} else {
-				graphics.setColor(Color.GRAY);
+				if(faceColorFunction != null) {
+					graphics.setColor(faceColorFunction.apply(face));
+				} else {
+					graphics.setColor(Color.GRAY);
+				}
 			}
 			graphics.fill(polygon);
 		}
@@ -196,9 +212,11 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			Color vc = Color.BLACK;
 			if(vertexColorFunction != null) {
 				vc = vertexColorFunction.apply(vertex);
-			}
-			graphics.setColor(vc);
-			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
+			} /*else if(mesh.isAtBoundary(vertex)) {
+				vc = Color.RED;
+			}*/
+			//graphics.setColor(vc);
+			//graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
 
 		graphics.setColor(c);
@@ -242,13 +260,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 
 			//if(mesh.getNumberOfVertices() > 6) {
-				Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
-				graphics.fillRect(0, 0, width, height);
-				renderGraphics(graphics, width, height);
+			Graphics2D graphics = (Graphics2D) bufferedImage.getGraphics();
+			graphics.fillRect(0, 0, width, height);
+			renderGraphics(graphics, width, height);
 			//}
 
 			return bufferedImage;
 		}
 	}
-
 }

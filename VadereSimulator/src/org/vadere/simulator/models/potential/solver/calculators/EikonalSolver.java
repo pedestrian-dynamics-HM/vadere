@@ -45,6 +45,10 @@ public interface EikonalSolver {
 
 	double getPotential(final IPoint pos, final double unknownPenalty, final double weight);
 
+	default double getPotential(final IPoint pos, final double unknownPenalty, final double weight, final Object caller) {
+		return getPotential(pos, unknownPenalty, weight);
+	}
+
 	/**
 	 * Returns a copy of the current (for the current F which might change over time) solution of the eikonal equation.
 	 *
@@ -56,7 +60,15 @@ public interface EikonalSolver {
 		return getPotential(pos.getX(), pos.getY());
 	}
 
+	default double getPotential(final IPoint pos, final Object caller) {
+		return getPotential(pos.getX(), pos.getY(), caller);
+	}
+
 	double getPotential(final double x, final double y);
+
+	default double getPotential(final double x, final double y, Object caller) {
+		return getPotential(x, y);
+	}
 
 	default boolean isHighAccuracy() {
 		return true;

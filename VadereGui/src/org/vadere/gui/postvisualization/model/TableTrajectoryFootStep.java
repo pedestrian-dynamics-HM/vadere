@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.StimulusFactory;
@@ -56,6 +57,7 @@ public class TableTrajectoryFootStep {
 
 	public final int mostImportantStimulusCol;
 	public final int selfCategoryCol;
+	public final int groupMembershipCol;
 
 	public static final int agentDFPedIdCol = 0;
 	public static final int birthTimeCol = 1;
@@ -86,6 +88,7 @@ public class TableTrajectoryFootStep {
 		groupSizeCol = columnNames.getGroupSizeCol(dataFrame);
 		mostImportantStimulusCol = columnNames.getMostImportantStimulusCol(dataFrame);
 		selfCategoryCol = columnNames.getSelfCategoryCol(dataFrame);
+		groupMembershipCol = columnNames.getGroupMembershipCol(dataFrame);
 
 
 		this.trajectoryDataFrame = dataFrame;
@@ -147,6 +150,12 @@ public class TableTrajectoryFootStep {
 			String selfCategoryEnumName = row.getString(selfCategoryCol);
 			SelfCategory selfCategory = SelfCategory.valueOf(selfCategoryEnumName);
 			pedestrian.setSelfCategory(selfCategory);
+		}
+
+		if(groupMembershipCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
+			String groupMembershipEnumName = row.getString(groupMembershipCol);
+			GroupMembership groupMembership = GroupMembership.valueOf(groupMembershipEnumName);
+			pedestrian.setGroupMembership(groupMembership);
 		}
 
 		return pedestrian;

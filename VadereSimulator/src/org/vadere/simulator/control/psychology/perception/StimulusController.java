@@ -31,13 +31,9 @@ public class StimulusController {
     public StimulusController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
 
-        oneTimeStimuli = scenarioStore.getStimulusInfoStore().getStimulusInfos().stream()
-                .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == false)
-                .collect(Collectors.toList());
+        oneTimeStimuli = filterOneTimeStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
 
-        recurringStimuli = scenarioStore.getStimulusInfoStore().getStimulusInfos().stream()
-                .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == true)
-                .collect(Collectors.toList());
+        recurringStimuli = filterRecurringStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
 
         oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
         recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
@@ -95,6 +91,18 @@ public class StimulusController {
                 .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
 
         return activeStimuli;
+    }
+
+    public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi){
+        return lsi.stream()
+                .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == false)
+                .collect(Collectors.toList());
+    }
+
+    public static List<StimulusInfo> filterRecurringStimuli(List<StimulusInfo> lsi){
+        return lsi.stream()
+                .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == true)
+                .collect(Collectors.toList());
     }
 
     /**

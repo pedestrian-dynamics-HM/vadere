@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.scenarioelements.OfflineTopographyController;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
@@ -38,7 +39,7 @@ public class OfflineSimulation {
 		this.topography = vadere.getTopography();
 		long seed = vadere.getAttributesSimulation().getSimulationSeed();
 		this.random = new Random(seed);
-		this.topographyController = new OfflineTopographyController(topography, random);
+		this.topographyController = new OfflineTopographyController(new Domain(topography), random);
 
 		this.trajectories = null;
 		this.simulationStates = null;

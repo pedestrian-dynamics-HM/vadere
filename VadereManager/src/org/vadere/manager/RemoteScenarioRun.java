@@ -13,9 +13,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener {
 
-	private List<Subscription> subscriptions;
 	private final Object waitForLoopEnd;
 	private final ReentrantLock lock;
+	private List<Subscription> subscriptions;
 	private boolean lastSimulationStep;
 
 
@@ -28,10 +28,10 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		addRemoteManagerListener(this);
 	}
 
-	synchronized public boolean accessState(RemoteManager remoteManager, StateAccessHandler stateAccessHandler){
+	synchronized public boolean accessState(RemoteManager remoteManager, StateAccessHandler stateAccessHandler) {
 		try {
 			if (!isWaitForSimCommand()) {
-				synchronized (waitForLoopEnd){
+				synchronized (waitForLoopEnd) {
 					waitForLoopEnd.wait();
 				}
 			}
@@ -47,7 +47,7 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		return true;
 	}
 
-	synchronized public void nextStep(double simTime){
+	synchronized public void nextStep(double simTime) {
 		try {
 			lock.lock();
 			nextSimCommand(simTime);
@@ -59,14 +59,14 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 
 	@Override
 	public void simulationStepFinishedListener() {
-		synchronized (waitForLoopEnd){
+		synchronized (waitForLoopEnd) {
 			waitForLoopEnd.notify();
 		}
 	}
 
 	@Override
 	public void lastSimulationStepFinishedListener() {
-		synchronized (waitForLoopEnd){
+		synchronized (waitForLoopEnd) {
 			lastSimulationStep = true;
 			waitForLoopEnd.notify();
 		}

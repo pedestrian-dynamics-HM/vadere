@@ -2,6 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PedestrianRepulsionPotentialCycle;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -58,7 +59,7 @@ public interface PotentialFieldAgent extends Model {
 
 	static PotentialFieldAgent createPotentialField(
 			final List<Attributes> modelAttributesList,
-			final Topography topography,
+			final Domain domain,
 			final AttributesAgent attributesPedestrian,
 			final Random random,
 			final String className) {
@@ -67,10 +68,10 @@ public interface PotentialFieldAgent extends Model {
 		PotentialFieldAgent result = instantiator.createObject(className);
 
 		// if the scenario has a teleporter, the cycle potential has to be added, too
-		if (topography.hasTeleporter()) {
-			result = new PedestrianRepulsionPotentialCycle(result, topography);
+		if (domain.getTopography().hasTeleporter()) {
+			result = new PedestrianRepulsionPotentialCycle(result, domain.getTopography());
 		}
-		result.initialize(modelAttributesList, topography, attributesPedestrian, random);
+		result.initialize(modelAttributesList, domain, attributesPedestrian, random);
 		return result;
 	}
 	

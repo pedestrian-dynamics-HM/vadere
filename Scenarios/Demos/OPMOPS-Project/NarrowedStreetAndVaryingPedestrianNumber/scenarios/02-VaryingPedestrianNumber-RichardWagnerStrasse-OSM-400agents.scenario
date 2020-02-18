@@ -1,7 +1,7 @@
 {
   "name" : "02-VaryingPedestrianNumber-RichardWagnerStrasse-OSM-400agents",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -2561,6 +2561,7 @@
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1, 2 ],
         "groupSizeDistribution" : [ 1.0 ],

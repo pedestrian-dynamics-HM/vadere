@@ -43,7 +43,7 @@ public class ScenarioStore {
 	}
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-						 final AttributesSimulation attributesSimulation, final AttributesPsychology attributesPsychology, final Topography topography, final StimulusInfoStore stimulusInfoStore) {
+	                     final AttributesSimulation attributesSimulation, final AttributesPsychology attributesPsychology, final Topography topography, final StimulusInfoStore stimulusInfoStore) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
@@ -58,6 +58,7 @@ public class ScenarioStore {
 		return topography;
 	}
 
+
 	public synchronized void setTopography(final Topography topography) {
 		//logger.info("setTopography:" + topography + ", thread:" + Thread.currentThread());
 		this.topography = topography;
@@ -68,7 +69,7 @@ public class ScenarioStore {
 	}
 
 	public AttributesCar getAttributesCar() {
-		return topography.getAttributesCar();
+		return getTopography().getAttributesCar();
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class ScenarioStore {
 		attributesList.forEach(a -> a.seal());
 		attributesSimulation.seal();
 		attributesPsychology.seal();
-		topography.sealAllAttributes();
+		getTopography().sealAllAttributes();
 	}
 
 	public <T extends Attributes> T getAttributes(@NotNull final Class<T> clazz) {

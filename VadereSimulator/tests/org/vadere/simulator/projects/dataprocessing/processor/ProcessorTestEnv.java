@@ -177,7 +177,7 @@ public abstract class ProcessorTestEnv<K extends DataKey<K>, V> {
 	}
 
 	List<SimulationState> getSimStates() {
-		return states.stream().map(s -> s.state).collect(Collectors.toList());
+		return states.stream().map(SimulationStateMock::get).collect(Collectors.toList());
 	}
 
 	void addToExpectedOutput(K dataKey, V value) {

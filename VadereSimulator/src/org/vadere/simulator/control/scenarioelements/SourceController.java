@@ -16,6 +16,7 @@ import java.util.Random;
 
 public abstract class SourceController {
 
+	protected final double BUFFER_CA = 0.01; // amount of overlap between spawned agents that is allowed in order to allow touching agents in CA
 	protected final double NO_EVENT = Double.MAX_VALUE;
 //	public static final double SPAWN_BUFFER_SIZE = 0.03;
 
@@ -99,9 +100,12 @@ public abstract class SourceController {
 	}
 
 	protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
-		boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpace));
+		VShape freeSpaceCA = new VCircle(((VCircle) freeSpace).getCenter(), ((VCircle) freeSpace).getRadius()-BUFFER_CA);
+		final VShape freeSpaceModelSpecific = sourceAttributes.isSpawnAtGridPositionsCA()? freeSpaceCA : freeSpace;
+
+		boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpaceModelSpecific));
 		boolean obstOverlap = this.getTopography().getObstacles().stream()
-				.map(Obstacle::getShape).noneMatch(shape -> shape.intersects(freeSpace));
+				.map(Obstacle::getShape).noneMatch(shape -> shape.intersects(freeSpaceModelSpecific));
 
 		return pedOverlap && obstOverlap;
 	}

@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -138,7 +138,7 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 0.0,
@@ -147,7 +147,7 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 0.0,
@@ -156,7 +156,7 @@
           "height" : 4.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 0.5,
@@ -165,7 +165,7 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 9.5,
@@ -174,7 +174,7 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -192,7 +192,7 @@
             "y" : 0.5001
           } ]
         },
-        "id" : -1
+        "id" : 7
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -210,7 +210,7 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : -1
+        "id" : 8
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -228,7 +228,7 @@
             "y" : 4.4999
           } ]
         },
-        "id" : -1
+        "id" : 9
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -246,7 +246,7 @@
             "y" : 5.0001
           } ]
         },
-        "id" : -1
+        "id" : 10
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -264,7 +264,7 @@
             "y" : 0.5001
           } ]
         },
-        "id" : -1
+        "id" : 11
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -282,7 +282,7 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : -1
+        "id" : 12
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -300,7 +300,7 @@
             "y" : 4.4999
           } ]
         },
-        "id" : -1
+        "id" : 13
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -318,7 +318,7 @@
             "y" : 5.0001
           } ]
         },
-        "id" : -1
+        "id" : 14
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -345,7 +345,7 @@
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 15,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -377,7 +377,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -388,7 +393,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 16,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -420,7 +425,12 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
-          "selfCategory" : "TARGET_ORIENTED"
+          "threatMemory" : {
+            "allThreats" : [ ],
+            "latestThreatUnhandled" : false
+          },
+          "selfCategory" : "TARGET_ORIENTED",
+          "groupMembership" : "OUT_GROUP"
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

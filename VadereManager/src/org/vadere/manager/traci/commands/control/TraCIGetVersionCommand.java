@@ -1,26 +1,25 @@
 package org.vadere.manager.traci.commands.control;
 
-import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.commands.TraCICommand;
-import org.vadere.manager.traci.respons.TraCIGetVersionResponse;
+import org.vadere.manager.traci.response.TraCIGetVersionResponse;
+import org.vadere.manager.traci.writer.TraCIPacket;
 
 public class TraCIGetVersionCommand extends TraCICommand {
 
 	private TraCIGetVersionResponse response;
 
-	public static TraCIPacket build(){
+	public TraCIGetVersionCommand() {
+		super(TraCICmd.GET_VERSION);
+		response = new TraCIGetVersionResponse();
+	}
+
+	public static TraCIPacket build() {
 		TraCIPacket packet = TraCIPacket.create(6); // 4
 		packet.writeCommandLength(2) // 1
 				.writeUnsignedByte(TraCICmd.GET_VERSION.id); // 1
 		return packet;
 	}
-
-	public TraCIGetVersionCommand(){
-		super(TraCICmd.GET_VERSION);
-		response = new TraCIGetVersionResponse();
-	}
-
 
 	public TraCIGetVersionResponse getResponse() {
 		return response;

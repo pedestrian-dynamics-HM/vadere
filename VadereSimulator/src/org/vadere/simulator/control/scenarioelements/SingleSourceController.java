@@ -39,8 +39,8 @@ public class SingleSourceController extends SourceController {
 				source.getShape(),
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				this.dynamicElementFactory::getDynamicElementRequiredPlace,
-				this::testFreeSpace
-		);
+				this::testFreeSpace,
+                source.getAttributes());
 	}
 
 	@Override
@@ -53,14 +53,30 @@ public class SingleSourceController extends SourceController {
 
 				if (sourceAttributes.isSpawnAtRandomPositions()) {
 
-					spawnPoints = getRealRandomPositions(
-							numberToSpawn,
-							random,
-							getDynElementsAtSource().stream()
-									.map(PointPositioned::getPosition)
-									.map(dynamicElementFactory::getDynamicElementRequiredPlace)
-									.collect(Collectors.toList())
-					);
+					if(!sourceAttributes.isSpawnAtGridPositionsCA()) {
+
+						spawnPoints = getRealRandomPositions(
+								numberToSpawn,
+								random,
+								getDynElementsAtSource().stream()
+										.map(PointPositioned::getPosition)
+										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+										.collect(Collectors.toList())
+						);
+						numberToSpawn -= spawnPoints.size();
+						assert (numberToSpawn >= 0);
+					}else{
+						spawnPoints = getRandomArrayPositions(
+								numberToSpawn,
+								random,
+								getDynElementsAtSource().stream()
+										.map(PointPositioned::getPosition)
+										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
+										.collect(Collectors.toList())
+						);
+						numberToSpawn -= spawnPoints.size();
+						assert (numberToSpawn >= 0);
+					}
 
 
 				} else {
@@ -98,6 +114,20 @@ public class SingleSourceController extends SourceController {
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Computes numberToSpawn random positions within the source on a SpawnArray.
+	 * @param numberToSpawn number of required spawn positions
+	 * @param random random generator
+	 * @param blockPedestrianShapes the required space of other pedestrians
+	 * @return numberToSpawn or less random feasible positions
+	 */
+	private List<VPoint> getRandomArrayPositions(final int numberToSpawn, @NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes) {
+		spawnArray.shuffleSpawnPoints(random); // shuffle list of possible positions
+
+		return getRealPositions(numberToSpawn, blockPedestrianShapes);
 	}
 
 	private List<VPoint> getRealPositions(final int numberToSpawn, @NotNull final List<VShape> blockPedestrianShapes) {

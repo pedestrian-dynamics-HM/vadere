@@ -3,7 +3,8 @@ package org.vadere.manager.traci.commandHandler;
 
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
-import org.vadere.manager.VadereServer;
+import org.vadere.manager.server.VadereServer;
+import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIVersion;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;
@@ -14,10 +15,10 @@ import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
 import org.vadere.manager.traci.commands.control.TraCISendFileCommandV20_0_1;
 import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
-import org.vadere.manager.traci.respons.StatusResponse;
-import org.vadere.manager.traci.respons.TraCIGetVersionResponse;
-import org.vadere.manager.traci.respons.TraCISimTimeResponse;
-import org.vadere.manager.traci.respons.TraCIStatusResponse;
+import org.vadere.manager.traci.response.StatusResponse;
+import org.vadere.manager.traci.response.TraCIGetVersionResponse;
+import org.vadere.manager.traci.response.TraCISimTimeResponse;
+import org.vadere.manager.traci.response.TraCIStatusResponse;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -25,17 +26,16 @@ import java.lang.reflect.Method;
 /**
  * Handel {@link org.vadere.manager.traci.commands.TraCICommand}s for the Control API
  */
-public class ControlCommandHandler extends CommandHandler<ControlVar>{
-
-	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
+public class ControlCommandHandler extends CommandHandler<ControlVar> {
 
 	public static ControlCommandHandler instance;
+	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
 
 	static {
 		instance = new ControlCommandHandler();
 	}
 
-	private ControlCommandHandler(){
+	private ControlCommandHandler() {
 		super();
 		init(ControlHandler.class, ControlHandlers.class);
 	}
@@ -49,7 +49,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 	@Override
 	protected void init_HandlerMult(Method m) {
 		ControlHandler[] ans = m.getAnnotation(ControlHandlers.class).value();
-		for(ControlHandler a : ans){
+		for (ControlHandler a : ans) {
 			putHandler(a.cmd(), a.var(), m);
 		}
 	}
@@ -60,7 +60,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 
 	public TraCICommand process_close(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		TraCICloseCommand cmd = (TraCICloseCommand)rawCmd;
+		TraCICloseCommand cmd = (TraCICloseCommand) rawCmd;
 
 		remoteManager.setClientCloseCommandReceived(true);
 
@@ -74,15 +74,16 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
 		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
-		logger.debugf("Simulate to: %f", cmd.getTargetTime());
-//		remoteManager.nextStep(cmd.getTargetTime());
+		logger.debugf("%s: Simulate until=%f", TraCICmd.SIM_STEP.name(), cmd.getTargetTime());
 		if (!remoteManager.nextStep(cmd.getTargetTime())) {
 			//simulation finished;
 			cmd.setResponse(TraCISimTimeResponse.simEndReached());
 			return cmd;
 		}
 		// execute all
-		logger.debug("execute subscriptions");
+		logger.debugf("%s: execute %d subscriptions",
+				TraCICmd.SIM_STEP.name(),
+				remoteManager.getSubscriptions().size());
 		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
 		// remove subscriptions no longer valid
@@ -103,7 +104,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 
 	public TraCICommand process_getVersion(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand)rawCmd;
+		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand) rawCmd;
 		cmd.setResponse(new TraCIGetVersionResponse(VadereServer.currentVersion));
 
 		return cmd;
@@ -111,7 +112,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar>{
 
 	public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)){
+		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)) {
 			TraCISendFileCommandV20_0_1 cmd = (TraCISendFileCommandV20_0_1) rawCmd;
 
 			remoteManager.loadScenario(cmd.getFile(), cmd.getCacheData());

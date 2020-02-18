@@ -28,10 +28,10 @@ public class BackgroundMesh<V extends IVertex, E extends IHalfEdge, F extends IF
 	public Optional<F> locate(@NotNull final Object obj, final double x, final double y) {
 		if(cache.containsKey(obj)) {
 			F startFace = cache.get(obj);
-			return triConnectivity.locateFace(x, y, startFace);
+			return triConnectivity.locateMarch(x, y, startFace);
 		}
 		else {
-			Optional<F> optionalF = triConnectivity.locateFace(x, y);
+			Optional<F> optionalF = triConnectivity.locate(x, y);
 			if(optionalF.isPresent()) {
 				cache.put(obj, optionalF.get());
 			}

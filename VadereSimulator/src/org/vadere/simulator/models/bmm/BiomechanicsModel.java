@@ -4,11 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesBMM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.perception.exceptions.UnsupportedStimulusException;
+import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -45,12 +46,12 @@ public class BiomechanicsModel implements MainModel {
 	}
 
 	@Override
-	public void initialize(List<Attributes> modelAttributesList, Topography topography,
-						   AttributesAgent attributesPedestrian, Random random) {
+	public void initialize(List<Attributes> modelAttributesList, Domain domain,
+	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributesBHM = Model.findAttributes(modelAttributesList, AttributesBHM.class);
 		this.attributesBMM = Model.findAttributes(modelAttributesList, AttributesBMM.class);
 		this.attributesPedestrian = attributesPedestrian;
-		this.topography = topography;
+		this.topography = domain.getTopography();
 		this.random = random;
 		this.models.add(this);
 	}
@@ -93,7 +94,7 @@ public class BiomechanicsModel implements MainModel {
 
 		List<VPoint> positions = pedestriansBMM.stream().map(ped -> ped.getPosition()).collect(Collectors.toList());
 
-		UnsupportedStimulusException.throwIfNotElapsedTimeEvent(pedestriansBMM, this.getClass());
+		UnsupportedSelfCategoryException.throwIfPedestriansNotTargetOrientied(pedestriansBMM, this.getClass());
 
 		for (PedestrianBMM agent : pedestriansBMM) {
 			agent.update(simTimeInSec, deltaTime);

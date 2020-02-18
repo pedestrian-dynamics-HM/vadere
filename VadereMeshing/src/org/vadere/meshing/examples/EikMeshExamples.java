@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
+import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.movie.MovRecorder;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
@@ -23,7 +24,10 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -31,22 +35,61 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Shows a very basic example how {@link GenEikMesh} can be used
  * to mesh a simple geometry.
  */
 public class EikMeshExamples {
+	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
 
 	public static void main(String... args) throws InterruptedException, IOException {
+		squareHole2();
 		//delaunayTriangulation();
 		//distanceFuncCombination();
-		uniformMeshDiscFunction(0.15);
+		//uniformMeshDiscFunction(0.15);
 		//uniformMeshRingFunction(0.05);
 		//combineDistanceFunctions();
 		//edgeLengthFunction();
 		/*edgeLengthAndDistanceFunction();
 		userDefinedPoints();*/
+	}
+
+	public static void squareHole() throws InterruptedException {
+
+		IDistanceFunction distanceFunction = p -> Math.max(Math.abs(p.getX()-0.5), Math.abs(p.getY()-0.5)) - 0.5;
+
+		var improver = new PEikMesh(distanceFunction, p -> 0.1, 0.01, new VRectangle(-2, -2, 4, 4));
+		var panel = new PMeshPanel(improver.getMesh(), 500, 500);
+		panel.display("A square mesh");
+		panel.repaint();
+
+		improver.initialize();
+		for(int i = 0; i < 1000; i++) {
+			Thread.sleep(50);
+			improver.improve();
+			panel.repaint();
+		}
+
+	}
+
+	public static void squareHole2() throws InterruptedException {
+		VRectangle rect = new VRectangle(0, 0, 1, 1);
+		IDistanceFunction distanceFunction = p -> rect.distance(p);
+
+		var improver = new PEikMesh(distanceFunction, p -> 0.1, 0.01, new VRectangle(-2, -2, 4, 4), Arrays.asList(rect));
+		var panel = new PMeshPanel(improver.getMesh(), 500, 500);
+		panel.display("A square mesh");
+		panel.repaint();
+
+		improver.initialize();
+		for(int i = 0; i < 1000; i++) {
+			Thread.sleep(50);
+			improver.improve();
+			panel.repaint();
+		}
+
 	}
 
 	public static void delaunayTriangulation() throws InterruptedException {
@@ -78,7 +121,7 @@ public class EikMeshExamples {
 		panel.repaint();
 
 		for(int i = 0; i < 1000; i++) {
-			Thread.sleep(5000);
+			Thread.sleep(50);
 			improver.improve();
 			panel.repaint();
 		}
@@ -174,8 +217,7 @@ public class EikMeshExamples {
 				d,
 				p -> edgeLength + 0.3 * Math.abs(d.apply(p)),
 				edgeLength,
-				GeometryUtils.boundRelative(boundary.getPath()),
-				Arrays.asList(rect)
+				boundary
 		);
 
 		// generate the mesh
@@ -186,14 +228,14 @@ public class EikMeshExamples {
 		// (optional) define the gui to display the mesh
 		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 
-		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
-		recorder.record();
+		//var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		//recorder.record();
 
 		meshPanel.display("Geometry defined by shapes");
-		//meshImprover.initialize();
-		//meshPanel.repaint();
+		meshImprover.initialize();
+		meshPanel.repaint();
 
-		/*while (!meshImprover.isFinished()) {
+		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
 
 			try {
@@ -202,13 +244,13 @@ public class EikMeshExamples {
 				e.printStackTrace();
 			}
 			meshPanel.repaint();
-		}*/
+		}
 
 		meshImprover.setDistanceFunc(d_b);
 		meshImprover.setEdgeLenFunction(p -> edgeLength + 0.3 * Math.abs(d_b.apply(p)));
-		recorder.record();
+		//recorder.record();
 
-		/*while (!meshImprover.isFinished()) {
+		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
 
 			try {
@@ -217,18 +259,18 @@ public class EikMeshExamples {
 				e.printStackTrace();
 			}
 			meshPanel.repaint();
-		}*/
+		}
 
 		meshImprover.setDistanceFunc(d_r);
 		meshImprover.setEdgeLenFunction(p -> edgeLength + 0.3 * Math.abs(d_r.apply(p)));
-		recorder.record();
+		//recorder.record();
 
 
 		IDistanceFunction d_c = IDistanceFunction.createDisc(0, 0, 0.5);
 		meshImprover.setDistanceFunc(d_c);
 		meshImprover.setEdgeLenFunction(p -> edgeLength /*+ 0.3 * Math.abs(d_c.apply(p))*/);
-		recorder.record();
-		/*while (!meshImprover.isFinished()) {
+		//recorder.record();
+		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
 
 			try {
@@ -237,13 +279,22 @@ public class EikMeshExamples {
 				e.printStackTrace();
 			}
 			meshPanel.repaint();
-		}*/
+		}
 
-		recorder.finish();
+		//recorder.finish();
 
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.getMesh().isAtBoundary(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
 
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
-
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), "mesh.tex");
 	}
 
 	/**
@@ -531,5 +582,30 @@ public class EikMeshExamples {
 
 		// display the mesh
 		//meshPanel.display("User defined Points");
+	}
+
+	private static void write(final String string, final String filename) throws IOException {
+		File outputFile = new File("./"+filename);
+		try(FileWriter fileWriter = new FileWriter(outputFile)) {
+			fileWriter.write(string);
+		}
+	}
+
+	private static String toTexDocument(final String tikz) {
+		return "\\documentclass[usenames,dvipsnames]{standalone}\n" +
+				"\\usepackage[utf8]{inputenc}\n" +
+				"\\usepackage{amsmath}\n" +
+				"\\usepackage{amsfonts}\n" +
+				"\\usepackage{amssymb}\n" +
+				"\\usepackage{calc}\n" +
+				"\\usepackage{graphicx}\n" +
+				"\\usepackage{tikz}\n" +
+				"\\usepackage{xcolor}\n" +
+				"\n" +
+				"%\\clip (-0.200000,-0.100000) rectangle (1.2,0.8);\n" +
+				"\\begin{document}"+
+				tikz
+				+
+				"\\end{document}";
 	}
 }

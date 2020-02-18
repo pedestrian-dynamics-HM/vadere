@@ -20,10 +20,10 @@ public class PedestrianSpeedSetupCheck extends AbstractScenarioCheck implements 
 						.topographyError()
 						.target(p)
 						.reason(ScenarioCheckerReason.PEDESTRIAN_SPEED_SETUP,
-								"(" + p.getAttributes().getMinimumSpeed()
-										+ "  &lt; treadDepth  &lt; "
-										+ p.getAttributes().getMaximumSpeed() +
-										") current SpeedDistributionMean is: " + String.format("%.2f", speedMean))
+								String.format("[min: %.2f, max: %.2f, mean: %.2f]",
+										p.getAttributes().getMinimumSpeed(),
+										p.getAttributes().getMaximumSpeed(),
+										speedMean))
 						.build());
 			}
 			if (p.getAttributes().getMinimumSpeed() > Pedestrian.PEDESTRIAN_MAX_SPEED_METER_PER_SECOND || p.getAttributes().getMaximumSpeed() > Pedestrian.PEDESTRIAN_MAX_SPEED_METER_PER_SECOND) {

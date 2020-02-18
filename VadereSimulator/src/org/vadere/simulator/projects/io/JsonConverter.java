@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;

@@ -33,7 +33,7 @@ public class TestPSLG {
 	@Test
 	public void testdProtection() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
-		PSLG pslg = PSLGGenerator.toPSLGtoVShapes(inputStream);
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		pslg = pslg.toProtectedPSLG(Double.POSITIVE_INFINITY);
 		System.out.println(TexGraphGenerator.toTikz(pslg.getAllSegments()));
 	}

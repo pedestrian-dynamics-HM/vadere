@@ -184,4 +184,12 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 		return getTriangulation().faceToQuality(face);
 	}
 
+	default double faceToQuality(final E edge) {
+		if(getMesh().isBoundary(edge)) {
+			return faceToQuality(getMesh().getTwinFace(edge));
+		} else {
+			return faceToQuality(getMesh().getFace(edge));
+		}
+	}
+
 }

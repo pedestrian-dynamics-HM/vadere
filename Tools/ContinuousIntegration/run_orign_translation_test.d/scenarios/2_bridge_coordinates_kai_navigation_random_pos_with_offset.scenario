@@ -1,7 +1,7 @@
 {
   "name" : "2_bridge_coordinates_kai_navigation_random_pos_with_offset",
   "description" : "",
-  "release" : "1.7",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -264,6 +264,7 @@
         "startTime" : 0.0,
         "endTime" : 100.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],

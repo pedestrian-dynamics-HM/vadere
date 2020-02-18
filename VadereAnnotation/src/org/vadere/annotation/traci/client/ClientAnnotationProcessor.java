@@ -189,8 +189,33 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
 	}
 
 	protected void writeSET(PrintWriter writer, ApiHandler apiHandler){
-		writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(String elementId, ").append(apiHandler.dataTypeStr).append(" data) throws IOException {").println();
-		writer.append("\t\tTraCIPacket p = TraCISetCommand.build(").append(apiHandler.cmd).append(", elementId, ").append(apiHandler.varId).append(", ").append(apiHandler.varType).append(", data);").println();
+		if (apiHandler.ignoreElementId) {
+			writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(").append(apiHandler.dataTypeStr);
+			if(apiHandler.dataTypeStr.length() > 0){
+				writer.append(" data");
+			}
+			writer.append(") throws IOException {").println();
+			writer.append("\t\tTraCIPacket p = TraCISetCommand.build(").append(apiHandler.cmd).append(", \"-1\", ").append(apiHandler.varId).append(", ").append(apiHandler.varType);
+			if(apiHandler.dataTypeStr.length() > 0){
+				writer.append(", data");
+			} else {
+				writer.append(", null");
+			}
+			writer.append(");").println();
+		} else {
+			writer.append("\tpublic TraCIResponse ").append(apiHandler.name).append("(String elementId");
+			if(apiHandler.dataTypeStr.length() > 0){
+				writer.append(", ").append(apiHandler.dataTypeStr).append(" data");
+			}
+			writer.append(") throws IOException {").println();
+			writer.append("\t\tTraCIPacket p = TraCISetCommand.build(").append(apiHandler.cmd).append(", elementId, ").append(apiHandler.varId).append(", ").append(apiHandler.varType);
+			if(apiHandler.dataTypeStr.length() > 0){
+				writer.append(", data");
+			} else {
+				writer.append(", null");
+			}
+			writer.append(");").println();
+		}
 
 		writer.append("\n\t\tsocket.sendExact(p);\n").println();
 		writer.append("\t\treturn socket.receiveResponse();").println();

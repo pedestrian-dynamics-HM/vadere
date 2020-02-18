@@ -776,7 +776,7 @@ public class CLDistMesh {
                 AFace<P> face = mesh.getFace(rEdge);
 
                 if(!mesh.isBoundary(face) && !mesh.isDestroyed(face)) {
-                    removeFaceAtBorder(face);
+                    removeFaceAtBoundary(face);
                 }
             }
         }*/
