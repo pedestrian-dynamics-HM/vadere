@@ -222,8 +222,9 @@ public class SingleSourceController extends SourceController {
 
 	@Override
 	protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
-		// Reset number to spawn (do not accumulate agents from past updates, where not all could be spawned.
-		// This behaviour can be accomblished by a concrete class SpawnDistribution.
+
+		// The concrete distribution implements how to proceed with agents that could not all be spawned
+		// e.g. because the source is too small
 		numberToSpawn = this.distribution.getOutstandingSpawnNumber();
 
 		while (timeOfNextEvent <= simTimeInSec) {
