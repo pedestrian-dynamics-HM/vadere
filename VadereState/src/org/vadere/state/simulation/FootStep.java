@@ -128,10 +128,6 @@ public final class FootStep {
 		return interpolateFootStep(new FootStep(new VPoint(startX, startY), new VPoint(endX, endY), startTime, endTime), time);
 	}
 
-	public static VPoint interpolateFootStep(final VPoint start, final VPoint end, final double startTime, final double endTime, final double time) {
-		return interpolateFootStep(new FootStep(start, end, startTime, endTime), time);
-	}
-
 	public static VPoint interpolateFootStep(final FootStep footStep, final double time){
 		final double startTime = footStep.getStartTime();
 		final double endTime = footStep.getEndTime();
