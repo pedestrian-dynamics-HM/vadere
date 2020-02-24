@@ -24,13 +24,15 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
             super(initialCapactiy);
         }
 
-        @Override
+        @Override //Overwrites the toString to Vadere-CSV style
         public String toString() {
             StringBuilder csvString = new StringBuilder();
 
+            final String csvSeparator = " ";
+
             for(Integer i : this){
-                if(csvString.length() != 0){
-                    csvString.append(" ");
+                if(csvString.length() != 0){   // Insert for the previous number
+                    csvString.append(csvSeparator);
                 }
                 csvString.append(i);
             }
@@ -53,7 +55,7 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
         // pre-allocate:
         IntegerArrayListCSV result = new IntegerArrayListCSV(nBins);
 
-        // set all values to zero
+        // set all values to zero initially
         for(int i = 0; i < nBins; ++i){
             result.add(0);
         }
@@ -61,16 +63,17 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
         final double binSize = (max - min) / nBins;
 
         for (double d : data) {
+
             int bin = (int) ((d - min) / binSize);
-            if (bin < 0) { /* this data is smaller than min */ }
-            else if (bin >= nBins) { /* this data point is bigger than max */ }
-            else {
+
+            if(bin >= 0 && bin < nBins){
+                // if bin < 0      --> data is smaller than min
+                // if bin >= nBins --> data is greater than max
                 result.set(bin, result.get(bin) + 1);
             }
         }
         return result;
     }
-
 
     @Override
     public void preLoop(final SimulationState state) {
@@ -83,12 +86,12 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
         }
 
         if( ! (direction.equals("x") || direction.equals("y"))){
-            throw new IllegalArgumentException("direction must be x or y");
+            throw new IllegalArgumentException("parameter 'direction' must be either 'x' or 'y'");
         }
 
-        String prefix = direction + "_bin_";
+        String prefix = direction + "_bin";
 
-        // Headers can only be set according to the user setting nrBins
+        // Headers can only be be set according to the user setting nrBins
         String[] headers = new String[nrBins];
 
         for(int i = 0; i < nrBins; ++i){
