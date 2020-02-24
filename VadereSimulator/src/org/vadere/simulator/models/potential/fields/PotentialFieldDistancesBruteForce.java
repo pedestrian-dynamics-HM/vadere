@@ -18,6 +18,8 @@ import org.vadere.util.logging.Logger;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
@@ -78,9 +80,35 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 
 		if (!isInitialized){
 			long ms = System.currentTimeMillis();
-			this.cellGrid.pointStream().forEach(p -> computeDistanceToGridPoint(p));
+
+			List<Point> points = this.cellGrid.pointStream().collect(Collectors.toList());
+			int totalPoints = points.size();
+			int processedPoints = 0;
+			double checkpointInPercentage = 0.0;
+
+
+			for (Point point : points) {
+				checkpointInPercentage = printProgressIfCheckpointReached(processedPoints, totalPoints, checkpointInPercentage);
+				computeDistanceToGridPoint(point);
+				processedPoints++;
+			}
+
 			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 		}
+	}
+
+	private double printProgressIfCheckpointReached(int processedPoints, int totalPoints, double checkpointInPercentage) {
+		double newCheckpoint = checkpointInPercentage;
+
+		double progressInPercentage = ((double) processedPoints / totalPoints) * 100;
+
+		if (progressInPercentage >= checkpointInPercentage) {
+			logger.info(String.format("Progress: %2.0f%% -> %d/%d [points]", progressInPercentage, processedPoints, totalPoints));
+			double stepSize = 10.0;
+			newCheckpoint += stepSize;
+		}
+
+		return newCheckpoint;
 	}
 
 	private void computeDistanceToGridPoint(@NotNull final Point gridPoint) {
