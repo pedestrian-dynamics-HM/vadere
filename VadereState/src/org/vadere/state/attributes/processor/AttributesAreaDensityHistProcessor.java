@@ -8,8 +8,8 @@ package org.vadere.state.attributes.processor;
 
 public class AttributesAreaDensityHistProcessor extends AttributesProcessor {
 
-    private int nrBins;
-    private String direction;
+    private int nrBins=5;
+    private String direction="x";
 
     public int getNrBins() {
         return nrBins;

@@ -19,17 +19,27 @@ import java.util.Collection;
 public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayList<Integer>>  {
 
     static class IntegerArrayListCSV extends ArrayList<Integer>{
+
+        public IntegerArrayListCSV(int initialCapactiy){
+            super(initialCapactiy);
+        }
+
         @Override
         public String toString() {
-            String row = "";
-            for(Integer i : this){}
-            return row;
+            StringBuilder csvString = new StringBuilder();
+
+            for(Integer i : this){
+                if(csvString.length() != 0){
+                    csvString.append(" ");
+                }
+                csvString.append(i);
+            }
+            return csvString.toString();
         }
     }
 
     public AreaDensityHistProcessor() {
         super();
-
         setAttributes(new AttributesAreaDensityHistProcessor());
     }
 
@@ -37,11 +47,11 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
         return (AttributesAreaDensityHistProcessor) this.getAttributes();
     }
 
-    private ArrayList<Integer> computeHistogram(double[] data, double min, double max) {
+    private IntegerArrayListCSV computeHistogram(double[] data, double min, double max) {
         int nBins = this.getCastedAttributes().getNrBins();
 
         // pre-allocate:
-        ArrayList<Integer> result = new ArrayList<>(nBins);
+        IntegerArrayListCSV result = new IntegerArrayListCSV(nBins);
 
         // set all values to zero
         for(int i = 0; i < nBins; ++i){
@@ -64,14 +74,25 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
 
     @Override
     public void preLoop(final SimulationState state) {
-        // TODO: make checks here!
+
         int nrBins = this.getCastedAttributes().getNrBins();
+        String direction = this.getCastedAttributes().getDirection();
+
+        if(nrBins < 0){
+            throw new IllegalArgumentException("nr bins must be positive");
+        }
+
+        if( ! (direction.equals("x") || direction.equals("y"))){
+            throw new IllegalArgumentException("direction must be x or y");
+        }
+
+        String prefix = direction + "_bin_";
 
         // Headers can only be set according to the user setting nrBins
         String[] headers = new String[nrBins];
 
         for(int i = 0; i < nrBins; ++i){
-            headers[i] = "bin" + i;
+            headers[i] = prefix + i;
         }
         this.setHeaders(headers);
         this.getData().clear();
@@ -85,9 +106,22 @@ public class AreaDensityHistProcessor extends DataProcessor<TimestepKey, ArrayLi
         // TODO: only insert elements that are in a measurement area (if required)
         Collection<Pedestrian> pedCollection = pedestrians.getElements();
 
-        double[] directionPosition = pedCollection.stream().mapToDouble(ped -> ped.getPosition().x).toArray();
+        String direction = getCastedAttributes().getDirection();
 
-        ArrayList<Integer> binValues = this.computeHistogram(directionPosition, 0, state.getTopography().getBounds().width);
+        double[] directionPosition;
+        ArrayList<Integer> binValues;
+        double lowerBound, heigherBound;
+        if(direction.equals("x")){
+            directionPosition = pedCollection.stream().mapToDouble(ped -> ped.getPosition().x).toArray();
+            lowerBound = state.getTopography().getBounds().x;
+            heigherBound = lowerBound + state.getTopography().getBounds().width;
+        }else{ // direction.equals("y") -- checked in pre-loop
+            directionPosition = pedCollection.stream().mapToDouble(ped -> ped.getPosition().y).toArray();
+            lowerBound = state.getTopography().getBounds().y;
+            heigherBound = lowerBound + state.getTopography().getBounds().height;
+        }
+        binValues = this.computeHistogram(directionPosition, lowerBound, heigherBound);
+
         this.putValue(new TimestepKey(state.getStep()), binValues);
     }
 
