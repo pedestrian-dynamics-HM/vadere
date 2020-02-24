@@ -79,9 +79,9 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
         - python3 -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
-        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
+        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
     only:
         refs:
             - master
@@ -93,7 +93,7 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
+        - scp ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
     # Run job only for "tags" (usually on the "stable" branch). Watch out: Multiple "only" tags are ORed together.
     # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/27818
     only:
@@ -106,7 +106,7 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
+        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
     when: manual
 
 .template_seed_test:
