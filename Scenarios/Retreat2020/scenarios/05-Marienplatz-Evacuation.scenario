@@ -71,7 +71,7 @@
         "intimateSpacePower" : 1
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
-        "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
+        "createMethod" : "FAST_MARCHING_TRI",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
@@ -4728,10 +4728,48 @@
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
-      "targets" : [ ],
+      "targets" : [ {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 345.8,
+          "y" : 21.6,
+          "width" : 30.3,
+          "height" : 27.1,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
-      "sources" : [ ],
+      "sources" : [ {
+        "id" : 145,
+        "shape" : {
+          "x" : 118.7,
+          "y" : 197.3,
+          "width" : 29.8,
+          "height" : 22.4,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 100,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN"
+      } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.195,
