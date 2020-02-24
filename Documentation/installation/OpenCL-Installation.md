@@ -28,4 +28,40 @@ Please, use following instructions to set up the OpenCL components for your oper
     
     </details>
   * [Intel Driverpack (only driver needed)](https://software.intel.com/en-us/articles/opencl-drivers#latest_linux_driver)
- 
+
+# Geforce RTX 2080 Ti eingebaut und installiert am 21.02.2019
+
+``` installing rtx 1080 ti on minimuc
+$ sudo apt-add-repository ppa:graphics-drivers/ppa
+$ sudo apt install nvidia-utils-440
+$ sudo apt install nvidia-driver-418 nvidia-settings
+$ sudo reboot
+
+#check driver
+$ nvidia-smi
+Fri Feb 21 13:01:51 2020
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.59 Driver Version: 440.59 CUDA Version: 10.2 |
+|-------------------------------+----------------------+----------------------+
+| GPU Name Persistence-M| Bus-Id Disp.A | Volatile Uncorr. ECC |
+| Fan Temp Perf Pwr:Usage/Cap| Memory-Usage | GPU-Util Compute M. |
+|===============================+======================+======================|
+| 0 GeForce RTX 208... Off | 00000000:3B:00.0 Off | N/A |
+| 34% 36C P0 41W / 260W | 0MiB / 11019MiB | 0% Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes: GPU Memory |
+| GPU PID Type Process name Usage |
+|=============================================================================|
+| No running processes found |
++-----------------------------------------------------------------------------+
+```
+
+``` add symbolic link from libOpenCL.so.1 -> libOpenCL.so
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/x86_64-linux-gnu/libOpenCL.so
+cd /etc
+sudo mv ld.so.cache ld.so.cache.bak
+sudo ldconfig
+```
