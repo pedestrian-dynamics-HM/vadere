@@ -2,26 +2,18 @@
 
 # TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
 
-# include imports after here:
-import os
-import sys
-import shutil
-import subprocess
 import datetime
 import multiprocessing
-
-from suqc.configuration import SuqcConfig
-import suqc
-
-import pandas as pd
+import os
+import shutil
+import subprocess
+import sys
 from typing import Union
 
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
+import pandas as pd
+
+import suqc
+from suqc.configuration import SuqcConfig
 
 
 def get_current_suqc_state():
@@ -60,23 +52,24 @@ def create_folder(path, delete_if_exists=True):
     os.mkdir(path)
 
 
-def check_parent_exists_folder_remove(p, query: bool):
-    if p.endswith("/"):
-        p = p.rstrip("/")
+def check_parent_exists_folder_remove(folder_path, ask_user_to_replace: bool):
+    if folder_path.endswith("/"):
+        folder_path = folder_path.rstrip("/")
 
     # parent folder:
-    parent = os.path.dirname(p)
+    parent = os.path.dirname(folder_path)
 
     if not os.path.exists(parent) or not os.path.isdir(parent):
-        raise ValueError(f"Path {p} is not valid, because path {parent} is not a directory or does not exist.")
+        raise ValueError(f"Path {folder_path} is not valid, because path {parent} is not a directory or does "
+                         f"not exist.")
 
-    if os.path.exists(p):
-        if os.path.isfile(p):
-            raise ValueError(f"Path {p} is a file not a directory.")
+    if os.path.exists(folder_path):
+        if os.path.isfile(folder_path):
+            raise ValueError(f"Path to {folder_path} is a file not a directory.")
 
-        if query and not user_query_yes_no(
-                f"The directory {p} does already exist. In the process it may get removed (which results in a loss of "
-                "data). Do you want to proceed?", default="no"):
+        if ask_user_to_replace and not user_query_yes_no(
+                f"The directory {folder_path} does already exist. In the process it may get removed (which results in "
+                f"a loss of data). Do you want to proceed?", default="no"):
             print("Terminating...")
             exit()
 
@@ -85,6 +78,9 @@ def check_parent_exists_folder_remove(p, query: bool):
 
 def njobs_check_and_set(njobs, ntasks):
     nkernels = multiprocessing.cpu_count()
+
+    if not isinstance(njobs, int) or njobs == 0 or njobs < -1:
+        raise ValueError("njobs has to be an integer and cannot be zero or smaller than -1")
 
     if njobs > ntasks:
         print(f"WARNING: More jobs are requested (={njobs}) than tasks to carry out (={ntasks}). "
@@ -118,7 +114,7 @@ def parent_folder_clean(p):
         p = p.rstrip("/")
 
     parent = os.path.dirname(p)
-    return parent + "/"  # better to indicate a folder with trailing '/'
+    return parent + os.path.sep  # better to indicate a folder with trailing
 
 
 def remove_folder(path):
@@ -182,4 +178,3 @@ def user_query_numbered_list(elements: list):
                 return elements[choice]
         except ValueError:
             print("The number has to be an integer.")
-
