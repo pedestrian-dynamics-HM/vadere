@@ -10,7 +10,6 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
-import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;

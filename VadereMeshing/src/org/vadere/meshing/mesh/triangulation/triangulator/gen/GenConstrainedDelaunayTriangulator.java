@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -237,7 +236,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 			VLine vEdge = triangulation.getMesh().toLine(edge);
 
-			// to be save
+			// to be save, TODO inconsistent geometry check which may lead to a deadlock (isLeftOfRobust is "robust" while intersectLineSegment is not")
 			if(GeometryUtils.intersectLineSegment(vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, v1.getX(), v1.getY(), v2.getX(), v2.getY())) {
 				E next = triangulation.getMesh().getNext(edge);
 				E prev = triangulation.getMesh().getPrev(edge);

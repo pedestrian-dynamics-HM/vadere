@@ -2612,7 +2612,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			// find the entering edge
 			for(E e : getMesh().getEdgeIt(startFace)) {
 				// line intersection
-				if(intersects(q, pDirection, e) && isLeftOf(p.getX(), p.getY(), e)) {
+				if(intersects(q, pDirection, e) && isLeftOfRobust(p.getX(), p.getY(), e)) {
 					inEdge = e;
 					break;
 				}
