@@ -1,6 +1,7 @@
 .idea 
 __pycache__
 *.pyc
+.mypy_cache/
 
 *.csv
 
@@ -9,8 +10,11 @@ log.out
 
 # do not track Vadere outputs (folders and files and environments), every computer as different paths, which results in changes for every commit.
 vadere_scenarios 
-*.scenarios
+!tutorial/example.scenario
+*.scenario
 *.project
+*.json
+
 # will be created automatically:
 suqc/suqc_envs/
 
@@ -18,13 +22,12 @@ suqc/suqc_envs/
 *.jar
 
 # Configuration files (generated when importing the project)
-suq_config.json
+suq_controller.conf
 update_server.sh
 
 
 # pickle files
 *.p
-
 
 # Ignore virtual environment
 venv
@@ -36,5 +39,5 @@ suqc.egg-info
 
 
 # tutorial output
-/tutorial/example_output/
+/tutorial/*/
 /tutorial/example_multirun_output/

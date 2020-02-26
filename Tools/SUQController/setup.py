@@ -1,20 +1,11 @@
 #!/usr/bin/env python3
 
-# TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
-
 import os
 
 from setuptools import setup, find_packages
 
 from suqc.configuration import SuqcConfig
 from suqc import __version__
-
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
 
 # To generate a new requirements.txt file run in console (install vis 'pip3 install pipreqs'):
 # pipreqs --use-local --force /home/daniel/REPOS/suq-controller

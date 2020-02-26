@@ -1,33 +1,22 @@
 #!/usr/bin/env python3
 
-# TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
-
 import abc
-
-import pandas as pd
-import numpy as np
-
 from typing import *
 
+import numpy as np
+import pandas as pd
 # http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterSampler.html
 from sklearn.model_selection import ParameterGrid
 
 from suqc.environment import EnvironmentManager
 from suqc.utils.dict_utils import *
 
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
 
-
-class ParameterVariation(metaclass=abc.ABCMeta):
+class ParameterVariationBase(metaclass=abc.ABCMeta):
 
     MULTI_IDX_LEVEL0_PAR = "Parameter"
     MULTI_IDX_LEVEL0_LOC = "Location"
-    ROW_IDX_NAME = "par_id"  # TODO: think of defining the 'default' data parts somewhere else...
+    ROW_IDX_NAME_ID = "id"
 
     def __init__(self):
         self._points = pd.DataFrame()
@@ -36,21 +25,42 @@ class ParameterVariation(metaclass=abc.ABCMeta):
     def points(self):
         return self._points
 
+    def nr_parameter_variations(self):
+        nr_parameter_variations = len(self.points.index.levels[0])
+        assert self.points.index.names[0] == "id"
+        return nr_parameter_variations
+
+    def nr_scenario_runs(self):
+        # If this fails, then it is likely that the function self.multiply_scenario_runs was not called before
+        nr_scenario_runs = len(self.points.index.levels[1])
+        assert self.points.index.names[1] == "run_id"
+        return nr_scenario_runs
+
+    def multiply_scenario_runs(self, scenario_runs):
+
+        idx_ids = self._points.index.values.repeat(scenario_runs)
+        idx_run_ids = np.tile(np.arange(scenario_runs), self._points.shape[0])
+
+        self._points = pd.DataFrame(self._points.values.repeat(scenario_runs, axis=0),
+                                    index=pd.MultiIndex.from_arrays([idx_ids, idx_run_ids], names=["id", "run_id"]),
+                                    columns=self._points.columns)
+        return self
+
     def _add_dict_points(self, points: List[dict]):
         # NOTE: it may be required to generalize 'points' definition, at the moment it is assumed to be a list(grid),
         # where 'grid' is a ParameterGrid of scikit-learn
 
         df = pd.concat([self._points, pd.DataFrame(points)], ignore_index=True, axis=0)
-        df.index.name = ParameterVariation.ROW_IDX_NAME
+        df.index.name = ParameterVariationBase.ROW_IDX_NAME_ID
 
-        df.columns = pd.MultiIndex.from_product([[ParameterVariation.MULTI_IDX_LEVEL0_PAR], df.columns])
+        df.columns = pd.MultiIndex.from_product([[ParameterVariationBase.MULTI_IDX_LEVEL0_PAR], df.columns])
         self._points = df
 
     def _add_df_points(self, points: pd.DataFrame):
         self._points = points
 
     def check_selected_keys(self, scenario: dict):
-        keys = self._points[ParameterVariation.MULTI_IDX_LEVEL0_PAR].columns
+        keys = self._points[ParameterVariationBase.MULTI_IDX_LEVEL0_PAR].columns
 
         for k in keys:
             try:  # check that the value is 'final' (i.e. not another sub-directory) and that the key is unique.
@@ -59,37 +69,35 @@ class ParameterVariation(metaclass=abc.ABCMeta):
                 raise e  # re-raise Exception
         return True
 
-    def nr_par_variations(self):
-        return self._points.shape[0]
-
     def to_dictlist(self):
         return [i[1] for i in self.par_iter()]
 
     def par_iter(self):
-        # nan entries are not considered
-        for i, row in self._points[ParameterVariation.MULTI_IDX_LEVEL0_PAR].iterrows():
 
+        for (par_id, run_id), row in self._points[ParameterVariationBase.MULTI_IDX_LEVEL0_PAR].iterrows():
             # TODO: this is not nice coding, however, there are some issues. See issue #40
-            ret = dict(row)
+            parameter_variation = dict(row)
             delete_keys = list()
-            for k, v in ret.items():
+
+            # nan entries are not considered and therefore removed
+            for k, v in parameter_variation.items():
                 if isinstance(v, np.float) and np.isnan(v):
                     delete_keys.append(k)
 
             for dk in delete_keys:
-                del ret[dk]
+                del parameter_variation[dk]
 
-            yield (i, ret)
+            yield (par_id, run_id, parameter_variation)
 
 
-class UserDefinedSampling(ParameterVariation):
+class UserDefinedSampling(ParameterVariationBase):
 
     def __init__(self, points: List[dict]):
         super(UserDefinedSampling, self).__init__()
         self._add_dict_points(points)
 
 
-class FullGridSampling(ParameterVariation):
+class FullGridSampling(ParameterVariationBase):
 
     def __init__(self, grid: Union[dict, ParameterGrid]):
         super(FullGridSampling, self).__init__()
@@ -103,7 +111,7 @@ class FullGridSampling(ParameterVariation):
         self._add_dict_points(points=list(grid))         # list creates all points described by the 'grid'
 
 
-class RandomSampling(ParameterVariation):
+class RandomSampling(ParameterVariationBase):
 
     # TODO: Check out ParameterSampler in scikit learn which I think combines random sampling with a grid.
 
@@ -146,7 +154,7 @@ class RandomSampling(ParameterVariation):
         self._add_dict_points(samples)
 
 
-class BoxSamplingUlamMethod(ParameterVariation):
+class BoxSamplingUlamMethod(ParameterVariationBase):
 
     def __init__(self):
         super(BoxSamplingUlamMethod, self).__init__()
@@ -252,8 +260,8 @@ class BoxSamplingUlamMethod(ParameterVariation):
 
         df_final = pd.concat([df_x, df_y, df_z], axis=1)
         df_final.columns = pd.MultiIndex.from_product(
-            [[ParameterVariation.MULTI_IDX_LEVEL0_PAR], df_final.columns.values])
-        df_final.index.name = ParameterVariation.ROW_IDX_NAME
+            [[ParameterVariationBase.MULTI_IDX_LEVEL0_PAR], df_final.columns.values])
+        df_final.index.name = ParameterVariationBase.ROW_IDX_NAME_ID
 
         df_final["boxid"] = df_final.T.apply(self._get_box)
 

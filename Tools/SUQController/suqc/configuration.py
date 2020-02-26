@@ -1,43 +1,29 @@
 #!/usr/bin/env python3
 
-# TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
-
 import os
 import json
 import os.path as p
 import pathlib
 
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
-
 
 # configuration of the suq-controller
-DEFAULT_SUQ_CONFIG = {"default_vadere_src_path": "TODO",   # TODO Feature: compile Vadere before using the jar file
-                      "server": {
-                          "host": "",
-                          "user": "",
-                          "port": -1
-                      }}
+DEFAULT_SUQC_CONFIG = {"default_vadere_src_path": "TODO",  # TODO Feature: #25
+                       "server": {
+                        "host": "",
+                        "user": "",
+                        "port": -1}}
 
 
 def check_setup(_paths_class):
 
     if not os.path.exists(_paths_class.path_cfg_folder()) and _paths_class.is_package_paths():
         print(f"INFO: Setting up configuration folder {_paths_class.path_cfg_folder()}")
-        os.mkdir(
-            _paths_class.path_cfg_folder())  # the next two checks will fail automatically too, because the folder is empty
-
-    if not os.path.exists(_paths_class.path_models_folder()):
-        print(f"INFO: Setting up default model lookup folder {_paths_class.path_models_folder()}")
-        os.mkdir(_paths_class.path_models_folder())
+        # the next two checks will fail automatically too, because the folder is empty
+        os.mkdir(_paths_class.path_cfg_folder())
 
     if not os.path.exists(_paths_class.path_suq_config_file()):
         print(f"INFO: Setting up default configuration file located at {_paths_class.path_suq_config_file()}")
-        _paths_class.store_config(DEFAULT_SUQ_CONFIG)
+        _paths_class.store_config(DEFAULT_SUQC_CONFIG)
 
     if not os.path.exists(_paths_class.path_container_folder()):
         print(f"INFO: Setting up the default container path (which will store output of simulation runs). "
@@ -47,12 +33,12 @@ def check_setup(_paths_class):
     return _paths_class
 
 
-# class annotation -> everythime the clsas is used, it will be checked if the folders are correctly configured
+# class annotation -> everythime the class is used, it will be checked if the folders are correctly configured
 @check_setup
 class SuqcConfig(object):
 
     NAME_PACKAGE = "suqc"
-    NAME_SUQ_CONFIG_FILE = "suq_config.json"
+    NAME_SUQ_CONFIG_FILE = "suq_controller.conf"
     NAME_MODELS_FOLDER = "models"
     NAME_CON_FOLDER = "suqc_envs"
     NAME_PACKAGE_FILE = "PACKAGE.txt"
@@ -73,7 +59,7 @@ class SuqcConfig(object):
     @classmethod
     def _name_cfg_folder(cls):
         if cls.is_package_paths():
-            return ".suqc"
+            return ".config"
         else:
             raise RuntimeError("This should not be called when IS_PACKAGE=False.")
 
@@ -92,7 +78,11 @@ class SuqcConfig(object):
     @classmethod
     def path_cfg_folder(cls):
         if cls.is_package_paths():
-            return p.join(cls.path_usrhome_folder(), cls._name_cfg_folder())
+            dir2conf = p.join(cls.path_usrhome_folder(), cls._name_cfg_folder())
+            if not p.exists(dir2conf):
+                # TODO instead of raising error the directory can also be created.
+                raise ValueError(f"Directory {dir2conf} does not exist.")
+            return dir2conf
         else:
             return cls.path_src_folder()
 

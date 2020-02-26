@@ -46,6 +46,7 @@ class Py4jClient:
         self.server_log = server_log
         self.entrypoint_log = entry_point_log
         self.debug = debug
+        self.entrypoint_jar = ''
 
         self._build_argparser()
         if isinstance(args, List):
@@ -53,6 +54,7 @@ class Py4jClient:
         else:
             self._parser.parse_args(["--help"])
 
+    def connect(self):
         self._start_entrypoint()
         self._connect_gateway()
 
@@ -111,12 +113,18 @@ class Py4jClient:
 
     def _start_entrypoint(self):
         if self.start_server:
+            if self.entrypoint_jar == '':
+                jar_path = os.path.join(
+                    self.vadere_base_path,
+                    "VadereManager/target/vadere-server.jar",
+                ),
+            else:
+                jar_path = self.entrypoint_jar
+
             vadere_server_cmd = [
                 "java",
                 "-jar",
-                os.path.join(
-                    self.vadere_base_path, "VadereManager/target/vadere-server.jar",
-                ),
+                jar_path,
             ]
             vadere_server_cmd.extend(self._server_args())
             self.server_thread = Runner(
@@ -132,13 +140,18 @@ class Py4jClient:
             self.server_thread = None
             print("Connecting to existing Server...")
 
-        entrypoint_cmd = [
-            "java",
-            "-jar",
-            os.path.join(
+        if self.entrypoint_jar == '':
+            jar_path = os.path.join(
                 self.vadere_base_path,
                 "VadereManager/target/vadere-traci-entrypoint.jar",
             ),
+        else:
+            jar_path = self.entrypoint_jar
+
+        entrypoint_cmd = [
+            "java",
+            "-jar",
+            jar_path,
         ]
         entrypoint_cmd.extend(self._entrypoint_args())
         self.entrypoint_thread = Runner(
@@ -252,13 +265,3 @@ class Py4jClient:
             dest="defaultScenario",
             help="Supply a default scenario",
         )
-
-
-if __name__ == "__main__":
-    c = Py4jClient.create(
-        project_path="/path/to/vadere/scenarios/",
-        vadere_base_path="/path/to/vadere",
-        start_server=False,
-        debug=False,
-    )
-    c.startScenario("Test001.scenario")

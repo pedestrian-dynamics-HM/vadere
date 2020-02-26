@@ -1,154 +1,168 @@
 #!/usr/bin/env python3
 
-# TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
-
-import os
 import json
-import shutil
 import multiprocessing
+import os
+import shutil
 
-from suqc.qoi import QuantityOfInterest
 from suqc.environment import VadereConsoleWrapper
-from suqc.parameter.sampling import *
-from suqc.parameter.postchanges import ScenarioChanges
 from suqc.parameter.create import VadereScenarioCreation
-from suqc.utils.general import create_folder, check_parent_exists_folder_remove, njobs_check_and_set, str_timestamp, \
-    parent_folder_clean
-from suqc.remote import ServerRequest, ServerConnection
-from suqc.configuration import SuqcConfig
+from suqc.parameter.postchanges import PostScenarioChangesBase
+from suqc.parameter.sampling import *
+from suqc.qoi import QuantityOfInterest
+from suqc.remote import ServerRequest
+from suqc.utils.general import create_folder, njobs_check_and_set, parent_folder_clean
 
-from typing import *
 
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
+class RequestItem(object):
+
+    def __init__(self, parameter_id, run_id, scenario_path, base_path, output_folder):
+        self.parameter_id = parameter_id
+        self.run_id = run_id
+        self.base_path = base_path
+        self.output_folder = output_folder
+        self.scenario_path = scenario_path
+
+        self.output_path = os.path.join(self.base_path, self.output_folder)
+
+    def add_qoi_result(self, qoi_result):
+        self.qoi_result = qoi_result
+
+    def add_meta_info(self, required_time, return_code):
+        self.required_time = required_time
+        self.return_code = return_code
 
 
 class Request(object):
 
-    def __init__(self, query_list: List[dict], model: Union[str, VadereConsoleWrapper],
+    PARAMETER_ID = "id"
+    RUN_ID = "run_id"
+
+    def __init__(self, request_item_list: List[RequestItem], model: Union[str, VadereConsoleWrapper],
                  qoi: Union[QuantityOfInterest, None]):
 
-        model = VadereConsoleWrapper.infer_model(model)
+        if len(request_item_list) == 0:
+            raise ValueError("request_item_list has no entries.")
 
-        self.qoi = qoi  # Can be None, if this is the case, no data will be written
-        self.model = model
+        self.model = VadereConsoleWrapper.infer_model(model)
+        self.request_item_list = request_item_list
+        # Can be None, if this is the case, no output data will be parsed to pd.DataFrame
+        self.qoi = qoi
 
-        self.container = query_list
-        self._add_return_keys()
-
-        # Return values
-        self.qoi_data = None
-        self.req_time = None
-
-    def _add_return_keys(self):
-        for d in self.container:
-            d["data"] = None
-            d["req_time"] = np.nan
+        # Return values as pd.DataFrame from all runs (they cannot be included directly by the runs,
+        # because Python's mulitprocessing is not shared memory due to the GIL (i.e. different/independent processes
+        # are created
+        self.compiled_qoi_data = None
+        self.compiled_run_info = None
 
     def _interpret_return_value(self, ret_val, par_id):
         if ret_val == 0:
             return True
-        else: # ret_val == 1:
+        else:  # ret_val != 0
             print(f"WARNING: Simulation with parameter setting {par_id} failed.")
             return False
 
-    def _single_request(self, container_element) -> Tuple[dict, np.float64]:
-        par_id = container_element["par_id"]
-        scenario_path = container_element["scenario_path"]
-        output_path = container_element["output_path"]
+    def _single_request(self, request_item: RequestItem) -> RequestItem:
 
-        self._create_output_path(output_path)
+        self._create_output_path(request_item.output_path)
 
-        ret_val, req_time = self.model.run_simulation(scenario_path, output_path)
-        is_results = self._interpret_return_value(ret_val, par_id)
+        return_code, required_time, output_on_error = \
+            self.model.run_simulation(request_item.scenario_path, request_item.output_path)
+
+        is_results = self._interpret_return_value(return_code, request_item.parameter_id)
 
         if is_results and self.qoi is not None:
-            result = self.qoi.read_and_extract_qois(par_id, output_path)
+            result = self.qoi.read_and_extract_qois(par_id=request_item.parameter_id, run_id=request_item.run_id,
+                                                    output_path=request_item.output_path)
+        elif not is_results and self.qoi is not None:
+            # something went wrong during run
+            assert output_on_error is not None
+
+            filename_stdout = "stdout_on_error.txt"
+            filename_stderr = "stderr_on_error.txt"
+            self._write_console_output(output_on_error["stdout"],
+                                       request_item.output_path,
+                                       filename_stdout)
+            self._write_console_output(output_on_error["stderr"],
+                                       request_item.output_path,
+                                       filename_stderr)
+            result = None
         else:
             result = None
 
         if self.qoi is not None and not is_results:
-            req_time = np.nan
+            required_time = np.nan
 
-        container_element["data"] = result
-        container_element["req_time"] = req_time
+        request_item.add_qoi_result(result)
+        request_item.add_meta_info(required_time=required_time, return_code=return_code)
 
-        # because of the multi-processor, don't try to already add the results here to _results_df
-        return container_element
+        # Because of the multi-processor part, don't try to already add the results here to _results_df
+        return request_item
 
     def _create_output_path(self, output_path):
         create_folder(output_path, delete_if_exists=True)
         return output_path
 
-    def _finalize_qoi(self):
+    def _write_console_output(self, msg, output_path, filename):
+        _file = os.path.abspath(os.path.join(output_path, filename))
 
-        qoi_results = [r["data"] for r in self.container]
+        if msg is not None:
+            with open(_file, "wb") as out:
+                out.write(msg)
+
+    def _compile_qoi(self):
+
+        qoi_results = [item_.qoi_result for item_ in self.request_item_list]
 
         filenames = None
         for ires in qoi_results:
             if ires is not None:
                 # it is assumed that the the keys for all elements in results are the same!
+                # TODO: this assumption may fail... possibly better to check for this!
                 filenames = list(ires.keys())
                 break
 
         if filenames is None:
-            print("WARNING: All simulations failed, only 'None' results.")
+            print("WARNING: All simulations failed, only 'None' results. Look in the "
+                  "output folder for error messages.")
             final_results = None
         else:
             # Successful runs are collected and are concatenated into a single pd.DataFrame below
             final_results = dict()
 
-            for f in filenames:
+            for filename in filenames:
 
-                collected_data = list()
+                collected_df = [item_[filename] for item_ in qoi_results if item_ is not None]
+                collected_df = pd.concat(collected_df, axis=0)
 
-                for ires in qoi_results:
-                    if ires is not None:
-                        collected_data.append(ires[f])
-
-                collected_data = pd.concat(collected_data, axis=0)
-                final_results[f] = collected_data
+                final_results[filename] = collected_df
 
         if filenames is not None and len(filenames) == 1:
-            # there is no need to have the key/value if only file was requested
+            # There is no need to have the key/value if only one file was requested.
             final_results = final_results[filenames[0]]
 
         return final_results
 
-    def _finalize_req_time(self):
-        idx = [r["par_id"] for r in self.container]
-        val = [r["req_time"] for r in self.container]
-        return pd.Series(val, idx)
+    def _compile_run_info(self):
+        data = [(item_.parameter_id, item_.run_id, item_.required_time, item_.return_code) for item_ in self.request_item_list]
+        df = pd.DataFrame(data, columns=[self.PARAMETER_ID, self.RUN_ID, "required_wallclock_time", "return_code"])
+        df.set_index(keys=[self.PARAMETER_ID, self.RUN_ID], inplace=True)
+        return df
 
     def _sp_query(self):
         # enumerate returns tuple(par_id, scenario filepath) see ParameterVariation.generate_vadere_scenarios and
         # ParameterVariation._vars_object()
-        results = list()
-        for arg in self.container:
-            res = self._single_request(arg)
-            results.append(res)
+        for i, request_item in enumerate(self.request_item_list):
+            self.request_item_list[i] = self._single_request(request_item)
 
     def _mp_query(self, njobs):
         pool = multiprocessing.Pool(processes=njobs)
-        all_results = pool.map(self._single_request, self.container)
-
-        # Data has to be copied from the results into the local container
-        for k, res in enumerate(all_results):
-            el = self.container[k]
-            assert el["par_id"] == res["par_id"]
-            self.container[k]["data"] = res["data"]
-            self.container[k]["req_time"] = res["req_time"]
+        self.request_item_list = pool.map(self._single_request, self.request_item_list)
 
     def run(self, njobs: int = 1):
 
-        assert not isinstance(njobs, int) or njobs != 0 or njobs < -1, \
-            "njobs has to be an integer and cannot be zero or smaller than -1"
-
-        nr_simulations = len(self.container)  # nr of rows = nr of parameter settings = #simulations
+        # nr of rows = nr of parameter settings = #simulations
+        nr_simulations = len(self.request_item_list)
         njobs = njobs_check_and_set(njobs=njobs, ntasks=nr_simulations)
 
         if njobs == 1:
@@ -157,274 +171,264 @@ class Request(object):
             self._mp_query(njobs=njobs)
 
         if self.qoi is not None:
-            self.qoi_data = self._finalize_qoi()
+            self.compiled_qoi_data = self._compile_qoi()
 
-        self.req_time = self._finalize_req_time()
+        self.compiled_run_info = self._compile_run_info()
+        return self.compiled_qoi_data, self.compiled_run_info
 
-        return self.qoi_data, self.req_time
 
+class VariationBase(Request, ServerRequest):
 
-class FullVaryScenario(Request, ServerRequest):
+    def __init__(self,
+                 env_man: EnvironmentManager,
+                 parameter_variation: ParameterVariationBase,
+                 model: str,
+                 qoi: Union[str, List[str], QuantityOfInterest],
+                 post_changes: PostScenarioChangesBase = None,
+                 njobs: int = 1,
+                 remove_output=False):
 
-    def __init__(self, env_man: EnvironmentManager, par_var: ParameterVariation, model: str,
-                 qoi: Union[str, List[str], QuantityOfInterest], sc_change: ScenarioChanges = None, njobs: int = 1):
-
-        self.njobs = njobs
-        self.par_var = par_var
+        self.parameter_variation = parameter_variation
         self.env_man = env_man
-        self.sc_change = sc_change
+        self.post_changes = post_changes
         self.model = model
+        self.remove_output = remove_output
+
+        if qoi is None and remove_output:
+            raise ValueError("it does not make sense: not collecting a qoi (qoi=None and "
+                             "not keeping the output (remove_output=False).")
 
         if isinstance(qoi, (str, list)):
             self.qoi = QuantityOfInterest(basis_scenario=self.env_man.basis_scenario, requested_files=qoi)
         else:
             self.qoi = qoi
 
-        vadcreate = VadereScenarioCreation(self.env_man, self.par_var, self.sc_change)
-        query_list = vadcreate.generate_vadere_scenarios(njobs)
+        scenario_creation = VadereScenarioCreation(self.env_man, self.parameter_variation, self.post_changes)
+        request_item_list = scenario_creation.generate_vadere_scenarios(njobs)
 
-        super(FullVaryScenario, self).__init__(query_list, self.model, self.qoi)
+        super(VariationBase, self).__init__(request_item_list, self.model, self.qoi)
+        ServerRequest.__init__(self)
+
+    def _remove_output(self):
+        if self.env_man.env_path is not None:
+            shutil.rmtree(self.env_man.env_path)
 
     def run(self, njobs: int = 1):
-        qoi_result, req_time = super(FullVaryScenario, self).run(njobs)
+        qoi_result_df, meta_info = super(VariationBase, self).run(njobs)
 
-        par_lookup = self.par_var.points.copy(deep=True)
-        par_lookup["req_time"] = req_time
+        # add another level to distinguish the columns with the parameter lookup
+        meta_info.columns = pd.MultiIndex.from_arrays([["MetaInfo"] * meta_info.shape[1], meta_info.columns])
+        lookup_df = pd.concat([self.parameter_variation.points, meta_info], axis=1)
 
-        return par_lookup, qoi_result
+        if self.remove_output:
+            self._remove_output()
+
+        return lookup_df, qoi_result_df
 
     @classmethod
-    def _remote_run(cls, remote_pickle_arg_path, remote_pickle_res_path, remote_env_name, njobs):
+    def _remote_run(cls, remote_pickle_arg_path):
+
         kwargs = cls.open_arg_pickle(remote_pickle_arg_path)
+        env_man = EnvironmentManager(base_path=None, env_name=kwargs["remote_env_name"])
 
-        setup = cls(env_man=EnvironmentManager(remote_env_name),
-                    par_var=kwargs["par_var"],
+        setup = cls(env_man=env_man,
+                    parameter_variation=kwargs["parameter_variation"],
+                    model=kwargs["model"],
                     qoi=kwargs["qoi"],
-                    model=kwargs["model"])
+                    post_changes=kwargs["post_changes"],
+                    njobs=kwargs["njobs"],
+                    remove_output=False)  # the output for remote will be removed after all is transferred
 
-        res = setup.run(njobs)
-        cls.dump_result_pickle(res, remote_pickle_res_path)
+        res = setup.run(kwargs["njobs"])
+        cls.dump_result_pickle(res, kwargs["remote_pickle_res_path"])
 
-    def remote(self, njobs):
+    def remote(self, njobs=1):
+        pickle_content = {"qoi": self.qoi,
+                          "parameter_variation": self.parameter_variation,
+                          "post_changes": self.post_changes,
+                          "njobs": njobs}
 
-        with ServerConnection() as sc:
+        local_transfer_files = {"path_basis_scenario": self.env_man.path_basis_scenario}
 
-            self.setup_connection(sc)
-
-            self._transfer_local2remote(self.env_man.path_basis_scenario)
-            remote_model_path = self._transfer_model_local2remote(self.model)
-
-            pickle_content = {"par_var": self.par_var, "qoi": self.qoi, "model": remote_model_path,
-                              "sc_change": self.sc_change}
-
-            remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._default_result_pickle_path_remote()
-
-            s = f"""python3 -c 'import suqc; suqc.FullVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
-
-            self.server.con.run(s)
-
-            local_pickle_path = self._default_result_pickle_path_local(self.env_man.get_env_outputfolder_path())
-            res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
-
-            self._remove_remote_folder()
-
-        return res
+        remote_result = super(VariationBase, self)._remote_ssh_logic(local_env_man=self.env_man,
+                                                                     local_pickle_content=pickle_content,
+                                                                     local_transfer_files=local_transfer_files,
+                                                                     local_model_obj=self.model,
+                                                                     class_name="VariationBase",
+                                                                     transfer_output=not self.remove_output)
+        return remote_result
 
 
-class QuickVaryScenario(FullVaryScenario, ServerRequest):
+@DeprecationWarning
+class SampleVariation(VariationBase, ServerRequest):
 
-    def __init__(self, scenario_path: str, parameter_var: List[dict], qoi: Union[str, List[str]],
-                 model: Union[str, VadereConsoleWrapper], env_remote=None):
+    def __init__(self,
+                 scenario_path: str,
+                 parameter_sampling: ParameterVariationBase,
+                 qoi: Union[str, List[str]],
+                 model: Union[str, VadereConsoleWrapper],
+                 scenario_runs=1,
+                 output_path=None,
+                 output_folder=None,
+                 remove_output=False,
+                 env_remote=None):
+        # TODO
+        pass
+
+
+class DictVariation(VariationBase, ServerRequest):
+
+    def __init__(self,
+                 scenario_path: str,
+                 parameter_dict_list: List[dict],
+                 qoi: Union[str, List[str]],
+                 model: Union[str, VadereConsoleWrapper],
+                 scenario_runs=1,
+                 post_changes=PostScenarioChangesBase(apply_default=True),
+                 njobs_create_scenarios=1,
+                 output_path=None,
+                 output_folder=None,
+                 remove_output=False,
+                 env_remote=None):
 
         self.scenario_path = scenario_path
+        self.remove_output = remove_output
 
         assert os.path.exists(scenario_path) and scenario_path.endswith(".scenario"), \
             "Filepath must exist and the file has to end with .scenario"
 
-        # TODO: find a way to "finally" remore this folder (even when exception occured!)
-        # results are only returned, not saved, but output has to be saved, the removed again.
-        self.temporary_env_name = "_".join(["temporary", os.path.basename(scenario_path).replace(".scenario", ""),
-                                            str_timestamp()])
-
         if env_remote is None:
-            env = EnvironmentManager.create_environment(
-                env_name=self.temporary_env_name, basis_scenario=self.scenario_path, replace=True)
-            self.tmp_folder_path = env.env_path
-
+            env = EnvironmentManager.create_variation_env(basis_scenario=self.scenario_path,
+                                                          base_path=output_path,
+                                                          env_name=output_folder,
+                                                          handle_existing="ask_user_replace")
+            self.env_path = env.env_path
         else:
-            self.temporary_env_name = env_remote.env_path
-            self.tmp_folder_path = None  # Do not remove the folder because this is done with the remote procedure
+            self.env_path = env_remote.env_path
+            self.remove_output = False  # Do not remove the folder because this is done with the remote procedure
             env = env_remote
 
-        par_var = UserDefinedSampling(parameter_var)
+        parameter_variation = UserDefinedSampling(parameter_dict_list)
+        parameter_variation = parameter_variation.multiply_scenario_runs(scenario_runs=scenario_runs)
 
-        # there is no need to have more than 1 processor, for user defined input
-        super(QuickVaryScenario, self).__init__(env, par_var, model, qoi, None, 1)
-
-    def _remove_temporary_path(self):
-        if self.tmp_folder_path is not None:
-            shutil.rmtree(self.tmp_folder_path)
-
-    def run(self, njobs: int = 1):
-        res = super(QuickVaryScenario, self).run(njobs)
-        self._remove_temporary_path()
-        return res
-
-    @classmethod
-    def _remote_run(cls, remote_pickle_arg_path, remote_pickle_res_path, remote_env_name, njobs):
-        kwargs = cls.open_arg_pickle(remote_pickle_arg_path)
-
-        setup = QuickVaryScenario(scenario_path=kwargs["sp"],
-                                  parameter_var=kwargs["par_var"],
-                                  qoi=kwargs["qoi"],
-                                  model=kwargs["model"],
-                                  env_remote=EnvironmentManager(remote_env_name))
-
-        res = setup.run(njobs)
-        cls.dump_result_pickle(res, remote_pickle_res_path)
-
-    def remote(self, njobs):
-
-        with ServerConnection() as sc:
-            self.setup_connection(sc)
-
-            remote_scenario_path = self._transfer_local2remote(self.scenario_path)
-            remote_model_path = self._transfer_model_local2remote(self.model)
-
-            pickle_content = {"sp": remote_scenario_path, "par_var": self.par_var.to_dictlist(), "qoi": self.qoi, "model": remote_model_path}
-
-            # TODO: duplicated code!
-            remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._default_result_pickle_path_remote()
-
-            s = f"""python3 -c 'import suqc; suqc.QuickVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
-
-            self.server.con.run(s)
-            local_pickle_path = self._default_result_pickle_path_local(SuqcConfig.path_container_folder())
-
-            res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
-
-            self._remove_remote_folder()
-
-        self._remove_temporary_path()
-
-        return res
+        super(DictVariation, self).__init__(env_man=env,
+                                            parameter_variation=parameter_variation,
+                                            model=model,
+                                            qoi=qoi,
+                                            post_changes=post_changes,
+                                            njobs=njobs_create_scenarios,
+                                            remove_output=remove_output)
 
 
-class SingleKeyVaryScenario(QuickVaryScenario, ServerRequest):
+class SingleKeyVariation(DictVariation, ServerRequest):
 
-    def __init__(self, scenario_path: str, key: str, values: np.ndarray, qoi: Union[str, List[str]], model: str, env_remote=None):
+    def __init__(self, scenario_path: str,
+                 key: str,
+                 values: np.ndarray,
+                 qoi: Union[str, List[str]],
+                 model: Union[str, VadereConsoleWrapper],
+                 scenario_runs=1,
+                 post_changes=PostScenarioChangesBase(apply_default=True),
+                 output_path=None,
+                 output_folder=None,
+                 remove_output=False,
+                 env_remote=None):
+
         self.key = key
         self.values = values
 
         simple_grid = [{key: v} for v in values]
-        super(SingleKeyVaryScenario, self).__init__(scenario_path, simple_grid, qoi, model, env_remote)
+        super(SingleKeyVariation, self).__init__(scenario_path=scenario_path,
+                                                 parameter_dict_list=simple_grid,
+                                                 qoi=qoi,
+                                                 model=model,
+                                                 scenario_runs=scenario_runs,
+                                                 post_changes=post_changes,
+                                                 output_folder=output_folder,
+                                                 output_path=output_path,
+                                                 remove_output=remove_output,
+                                                 env_remote=env_remote)
+
+
+class FolderExistScenarios(Request, ServerRequest):
+
+    def __init__(self, path_scenario_folder, model, scenario_runs=1, output_path=None,
+                 output_folder=None,
+                 handle_existing="ask_user_replace"):
+
+        self.scenario_runs = scenario_runs
+        assert os.path.exists(path_scenario_folder)
+        self.path_scenario_folder = path_scenario_folder
+
+        self.env_man = EnvironmentManager.create_new_environment(base_path=output_path, env_name=output_folder,
+                                                                 handle_existing=handle_existing)
+
+        request_item_list = list()
+
+        for filename in os.listdir(os.path.abspath(path_scenario_folder)):
+            file_base_name = os.path.basename(filename)
+
+            if file_base_name.endswith(".scenario"):
+                scenario_name = file_base_name.replace(".scenario", "")
+
+                request_item = self._generate_request_items(
+                    scenario_name=scenario_name, filename=filename)
+
+                request_item_list += request_item
+
+        super(FolderExistScenarios, self).__init__(request_item_list=request_item_list,
+                                                   model=model,
+                                                   qoi=None)
+        ServerRequest.__init__(self)
 
     @classmethod
-    def _remote_run(cls, remote_pickle_arg_path, remote_pickle_res_path, remote_env_name, njobs):
+    def _remote_run(cls, remote_pickle_arg_path):
+
         kwargs = cls.open_arg_pickle(remote_pickle_arg_path)
 
-        setup = cls(scenario_path=kwargs["sp"],
-                    key=kwargs["key"],
-                    values=kwargs["val"],
-                    qoi=kwargs["qoi"],
-                    model=kwargs["model"],
-                    env_remote=EnvironmentManager(remote_env_name))
+        setup = cls(path_scenario_folder=kwargs["remote_folder_path"], model=kwargs["model"],
+                    output_folder=kwargs["remote_env_name"], handle_existing="write_in")
+        res = setup.run(kwargs["njobs"])
+        cls.dump_result_pickle(res, kwargs["remote_pickle_res_path"])
 
-        res = setup.run(njobs)
-        cls.dump_result_pickle(res, remote_pickle_res_path)
+    def _generate_request_items(self, scenario_name, filename):
 
-    def remote(self, njobs):
+        # generate request item for each scenario run
+        scenario_request_items = list()
+        for run in range(self.scenario_runs):
 
-        with ServerConnection() as sc:
+            item = RequestItem(parameter_id=scenario_name,
+                               run_id=run,
+                               scenario_path=os.path.join(self.path_scenario_folder, filename),
+                               base_path=self.env_man.env_path,
+                               output_folder="_".join([scenario_name, "output",
+                                                       "" if self.scenario_runs == 1
+                                                       else str(run)]))
 
-            self.setup_connection(sc)
+            scenario_request_items.append(item)
+        return scenario_request_items
 
-            remote_scenario_path = self._transfer_local2remote(self.scenario_path)
-            remote_model_path = self._transfer_model_local2remote(self.model)
+    def remote(self, njobs=1):
 
-            pickle_content = {"sp": remote_scenario_path, "key": self.key, "val": self.values, "qoi": self.qoi,
-                              "model": remote_model_path}
+        local_pickle_content = {"njobs": njobs}
 
-            remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-            remote_pickle_res_path = self._default_result_pickle_path_remote()
+        local_transfer_files = dict()
+        for i, request in enumerate(self.request_item_list):
+            local_transfer_files["scenario_path_{i}"] = request.scenario_path
 
-            s = f"""python3 -c 'import suqc; suqc.SingleKeyVaryScenario._remote_run("{remote_pickle_arg_path}", "{remote_pickle_res_path}", "{self.remote_env_name}", {njobs})'"""
-            self.server.con.run(s)
-
-            local_pickle_path = self._default_result_pickle_path_local(self.tmp_folder_path)
-            res = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
-
-        self._remove_temporary_path()
-        return res
-
-
-class MultiScenarioOutput(Request, ServerRequest):
-
-    def __init__(self, path_scenarios, path_output, model):
-        query_list = list()
-        self.path_scenarios = path_scenarios
-        self.path_output = path_output
-
-        assert os.path.exists(self.path_scenarios)
-        assert check_parent_exists_folder_remove(path_output, True)
-
-        create_folder(path_output, delete_if_exists=True)
-
-        self.return_df = pd.DataFrame()
-
-        for f in os.listdir(os.path.abspath(path_scenarios)):
-            bname = os.path.basename(f)
-            if bname.endswith(".scenario"):
-                scname = bname.replace(".scenario", "")
-                query_list.append({"par_id": scname,
-                                   "scenario_path": os.path.join(path_scenarios, f),
-                                   "output_path": os.path.join(path_output, "_".join([scname, "output"]))})
-
-                self.return_df.loc[scname, "output_path"] = path_output
-
-        self.scenario_paths = {p["scenario_path"] for p in query_list}
-
-        super(MultiScenarioOutput, self).__init__(query_list, model, qoi=None)
-
-    @classmethod
-    def _remote_run(cls, remote_folder_path, remote_output_folder, remote_model_path, remote_pickle_res_path, njobs):
-        setup = cls(remote_folder_path, remote_output_folder, remote_model_path)
-        res = setup.run(njobs)
-        cls.dump_result_pickle(res, remote_pickle_res_path)
-
-    def remote(self, njobs):
-
-        with ServerConnection() as sc:
-            self.setup_connection(sc)
-
-            for file in self.scenario_paths:
-                self._transfer_local2remote(file)
-
-            remote_model_path = self._transfer_model_local2remote(self.model)
-
-            # TODO provide the default pickle paths in a function
-            remote_pickle_res_path = self._default_result_pickle_path_remote()
-
-            s = f"""python3 -c 'import suqc; suqc.MultiScenarioOutput._remote_run("{self.remote_folder_path}", "{self.remote_output_folder()}", "{remote_model_path}", "{remote_pickle_res_path}", {njobs})'"""
-            self.server.con.run(s)
-
-            # TODO: duplicated code!
-            zipped_file_local = self._transfer_compressed_output_remote2local(self.path_output)
-            self._uncompress_file2target(zipped_file_local, self.path_output)
-
-            self._transfer_pickle_remote2local(remote_pickle_res_path,
-                                               self._default_result_pickle_path_local(self.path_output))
-            self._remove_remote_folder()
+        self._remote_ssh_logic(local_env_man=self.env_man,
+                               local_pickle_content=local_pickle_content,
+                               local_transfer_files=local_transfer_files,
+                               local_model_obj=self.model,
+                               class_name="FolderExistScenarios",
+                               transfer_output=True)
 
     def run(self, njobs: int = 1):
-        _, req_time = super(MultiScenarioOutput, self).run(njobs)
-        self.return_df.loc[:, "req_time"] = req_time
-        return self.return_df
+        _, meta_info = super(FolderExistScenarios, self).run(njobs)
+        return meta_info
 
 
-class ProjectOutput(MultiScenarioOutput):
+class ProjectOutput(FolderExistScenarios):
 
     def __init__(self, project_path, model):
 
@@ -437,89 +441,98 @@ class ProjectOutput(MultiScenarioOutput):
         parent_path = parent_folder_clean(project_path)
 
         # This is by Vaderes convention:
-        path_scenarios = os.path.join(parent_path, "scenarios")
-        path_output = os.path.join(parent_path, "output")
+        path_scenario_folder = os.path.join(parent_path, "scenarios")
+        super(ProjectOutput, self).__init__(path_scenario_folder=path_scenario_folder,
+                                            model=model,
+                                            output_path=parent_path,
+                                            output_folder="output")
 
-        super(ProjectOutput, self).__init__(path_scenarios, path_output, model)
 
+class SingleExistScenario(Request, ServerRequest):
 
-class SingleScenarioOutput(Request, ServerRequest):
+    def __init__(self, path_scenario,
+                 qoi,
+                 model,
+                 scenario_runs=1,
+                 output_path=None,
+                 output_folder=None,
+                 handle_existing="ask_user_replace"):
 
-    def __init__(self, path_scenario, path_output, model, qoi=None, force_replace=False):
+        self.path_scenario = os.path.abspath(path_scenario)
+        assert os.path.exists(self.path_scenario) and self.path_scenario.endswith(".scenario")
 
-        self.path_scenario = path_scenario
-        self.path_output = path_output
+        scenario_name = os.path.basename(path_scenario).replace(".scenario", "")
 
-        if qoi is not None:  # TODO: write "Infer QoI" function
+        self.env_man = EnvironmentManager.create_new_environment(base_path=output_path,
+                                                                 env_name=output_folder,
+                                                                 handle_existing=handle_existing)
+        self.scenario_runs = scenario_runs
+
+        if qoi is not None:
             if isinstance(qoi, (str, list)):
                 with open(path_scenario, "r") as f:
                     basis_scenario = json.load(f)
-
                 qoi = QuantityOfInterest(basis_scenario=basis_scenario, requested_files=qoi)
             else:
                 raise ValueError("Invalid format of Quantity of Interest")
 
-        path_scenario = os.path.abspath(path_scenario)
+        request_item_list = self._generate_request_list(scenario_name=scenario_name, path_scenario=path_scenario)
 
-        assert os.path.exists(path_scenario) and path_scenario.endswith(".scenario")
-        assert check_parent_exists_folder_remove(path_output, not force_replace)
+        super(SingleExistScenario, self).__init__(request_item_list=request_item_list,
+                                                  model=model,
+                                                  qoi=qoi)
+        ServerRequest.__init__(self)
 
-        scname = os.path.basename(path_scenario).replace(".scenario", "")
+    def _generate_request_list(self, scenario_name, path_scenario):
 
-        query_list = [{"par_id": scname,
-                       "scenario_path": path_scenario,
-                       "output_path": path_output}]
+        if self.scenario_runs == 1:
+            # No need to attach the run_id if there is only one run
+            output_folder = lambda run_id: os.path.join(self.env_man.env_name, "vadere_output")
+        else:
+            output_folder = lambda run_id: os.path.join(self.env_man.env_name,
+                                                        f"vadere_output_{str(run_id).zfill(len(str(run_id)))}")
 
-        super(SingleScenarioOutput, self).__init__(query_list, model, qoi)
+        request_item_list = list()
+        for run_id in range(self.scenario_runs):
+            request_item = RequestItem(parameter_id=scenario_name,
+                                       run_id=run_id,
+                                       scenario_path=path_scenario,
+                                       base_path=self.env_man.base_path,
+                                       output_folder=output_folder(run_id=run_id))
+            request_item_list.append(request_item)
+        return request_item_list
 
     def run(self, njobs: int = 1):
-        if njobs != 1:
-            print("WARNING: For a single scenario only njobs=1 is valid. Setting njobs=1.")
-            njobs=1
-
-        res = super(SingleScenarioOutput, self).run(njobs)
+        res = super(SingleExistScenario, self).run(njobs)
         return res
 
     @classmethod
-    def _remote_run(cls, remote_scenario_path, remote_output_folder, remote_model_path, remote_pickle_arg_path, remote_pickle_res_path):
+    def _remote_run(cls, remote_pickle_arg_path):
 
-        if remote_pickle_arg_path is not None and os.path.exists(remote_pickle_arg_path):
-            kwargs = cls.open_arg_pickle(remote_pickle_arg_path)
-            setup = cls(remote_scenario_path, remote_output_folder, remote_model_path, kwargs["qoi"], True)
-            res = setup.run(1)
-            cls.dump_result_pickle(res, remote_pickle_res_path)
-        else:
-            setup = cls(remote_scenario_path, remote_output_folder, remote_model_path, None, True)
-            setup.run(1)
+        kwargs = cls.open_arg_pickle(remote_pickle_arg_path)
 
-    def remote(self):
+        setup = cls(path_scenario=kwargs["path_scenario"],
+                    qoi=kwargs["qoi"],
+                    model=kwargs["model"],
+                    scenario_runs=kwargs["scenario_runs"],
+                    output_path=None,
+                    output_folder=kwargs["remote_env_name"],
+                    handle_existing="write_in")  # needs to write in because the environment already exists
 
-        with ServerConnection() as sc:
-            self.setup_connection(sc)
+        res = setup.run(njobs=kwargs["njobs"])
+        cls.dump_result_pickle(res, kwargs["remote_pickle_res_path"])
 
-            # Setup
-            remote_scenario_path = self._transfer_local2remote(self.path_scenario)
-            remote_model_path = self._transfer_model_local2remote(self.model)
+    def remote(self, njobs=1):
 
-            if self.qoi is not None:
-                pickle_content = {"qoi": self.qoi}
-                remote_pickle_arg_path = self._transfer_pickle_local2remote(**pickle_content)
-                remote_pickle_res_path = self._default_result_pickle_path_remote()
-                s = f"""python3 -c 'import suqc; suqc.SingleScenarioOutput._remote_run("{remote_scenario_path}", "{self.remote_output_folder()}", "{remote_model_path}", "{remote_pickle_arg_path}", "{remote_pickle_res_path}")'"""
-            else:
-                remote_pickle_res_path = None
-                s = f"""python3 -c 'import suqc; suqc.SingleScenarioOutput._remote_run("{remote_scenario_path}", "{self.remote_output_folder()}", "{remote_model_path}", None, None)'"""
+        local_pickle_content = {"njobs": njobs, "qoi": self.qoi, "scenario_runs": self.scenario_runs}
+        local_transfer_files = {"path_scenario": self.path_scenario}
 
-            self.server.con.run(s)
-
-            zipped_file_local = self._transfer_compressed_output_remote2local(self.path_output)
-            self._uncompress_file2target(zipped_file_local, self.path_output)
-
-            if self.qoi is not None:
-                self._transfer_pickle_remote2local(remote_pickle_res_path,
-                                                   self._default_result_pickle_path_local(self.path_output))
-
-            self._remove_remote_folder()
+        self._remote_ssh_logic(local_env_man=self.env_man,
+                               local_pickle_content=local_pickle_content,
+                               local_transfer_files=local_transfer_files,
+                               local_model_obj=self.model,
+                               class_name="SingleExistScenario",
+                               transfer_output=True)
 
 
 if __name__ == "__main__":
