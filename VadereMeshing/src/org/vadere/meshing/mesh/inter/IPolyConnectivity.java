@@ -1031,6 +1031,23 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param edge  the half-edge
 	 * @return true if the point (x1, y1) is left of the half-edge, false otherwise
 	 */
+	default boolean isLeftOfRobust(final double x1, final double y1, @NotNull final E edge) {
+		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
+		V v2 = getMesh().getVertex(edge);
+		return GeometryUtils.isLeftOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
+	}
+
+	/**
+	 * Returns true if the point (x1, y1) is left of the half-edge in O(1). The half-edge is directed
+	 * and ends in its point.
+	 *
+	 * Does not change the connectivity.
+	 *
+	 * @param x1    the x-coordinate of the point
+	 * @param y1    the y-coordinate of the point
+	 * @param edge  the half-edge
+	 * @return true if the point (x1, y1) is left of the half-edge, false otherwise
+	 */
 	default boolean isLeftOf(final double x1, final double y1, @NotNull final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);

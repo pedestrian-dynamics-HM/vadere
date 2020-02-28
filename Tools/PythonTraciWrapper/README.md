@@ -69,6 +69,19 @@ cli2.startScenario(scenarioPath)
 embed()
 ```
 
+```python
+if __name__ == "__main__":
+    c = Py4jClient.create(
+        project_path="VADERE_PATH/Scenarios/Demos/roVer/scenarios",
+        vadere_base_path="VADERE_PATH",
+        start_server=False,
+        debug=False,
+    )
+    c.entrypoint_jar = "/VADERE_PATH/Tools/PythonTraciWrapper/vadere-traci-entrypoint.jar"
+    c.connect()
+    c.startScenario("roVerTest002.scenario")
+```
+
 ## Extend API
 
 If new TraCI commands are implemented in vadere, these can also be used via a python client. To achieve this the following steps are required:

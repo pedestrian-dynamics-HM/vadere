@@ -116,6 +116,8 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		try {
 			SimulationCfg cfg = new SimulationCfg((CompoundObject) cmd.getVariableValue());
 			remoteManager.setSimCfg(cfg);
+			logger.infof("Received SimulationConfig:");
+			logger.infof(cfg.toString());
 			cmd.setOK();
 
 		} catch (TraCIException ex) {

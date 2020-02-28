@@ -42,6 +42,25 @@ stages:
 # 2. Variables from "variables" section are not expanded correctly in "url"
 #    section of an "environment".
 
+# WATCH OUT:
+#
+# We use "scp -o StrictHostKeyChecking=no" to transfer data to
+# "webdev02-mwn.lrz.de"! Not checking the host key allows man-in-the-middle
+# attacks!
+#
+# Unfortunately, this workaround is necessary since LRZ moved Vadere's webspace
+# from "webdev-mwn.lrz.de" to "webdev02-mwn.lrz.de". Since then, scp sometimes
+# returns with following error: "host verification failed".
+# I.e., the key in CI worker's "~/.ssh/known_hosts" and returned host key from
+# "webdev02-mwn.lrz.de" do not match.
+#
+# Even deleting "~/.ssh/known_hosts" and re-adding "webdev02-mwn.lrz.de"'s key
+# does not work via "ssh-keyscan -H webdev02-mwn.lrz.de > ~/.ssh/known_hosts".
+#
+# Maybe, worker's SSH version (OpenSSH_7.6p1) and host's SSH versions
+# (OpenSSH_7.9p1) or LRZ has a severe problem because their servers always
+# return different / unrelieable SSH keys!
+
 # Job Template Definitions
 .template_unit_tests:
     stage: unit_test
@@ -79,9 +98,9 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
+        - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
         - python3 -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
-        - scp ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
+        - scp -o StrictHostKeyChecking=no ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
     only:
         refs:
             - master
@@ -93,7 +112,7 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
+        - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
     # Run job only for "tags" (usually on the "stable" branch). Watch out: Multiple "only" tags are ORed together.
     # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/27818
     only:
@@ -106,7 +125,7 @@ stages:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
         - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar
-        - scp ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev-mwn.lrz.de:~/webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
+        - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
     when: manual
 
 .template_seed_test:

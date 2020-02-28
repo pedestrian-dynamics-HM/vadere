@@ -40,7 +40,7 @@ public class VTriangle extends VPolygon {
     private double radius = -1;
 
     /**
-     * Creates a triangle. Points must be given in ccw order.
+     * Creates a triangle. Points must be given in ccwRobust order.
      *
      * @param p1 first point of the triangle
      * @param p2 second point of the triangle

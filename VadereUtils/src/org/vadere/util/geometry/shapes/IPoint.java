@@ -1,6 +1,11 @@
 package org.vadere.util.geometry.shapes;
 
+import com.github.davidmoten.rtree.geometry.Geometry;
+import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
+
 import org.vadere.util.geometry.GeometryUtils;
+
+import java.awt.geom.Rectangle2D;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +15,7 @@ import static org.junit.Assert.assertEquals;
  * {@link IPoint#add(IPoint)} change the 2D-coordinates of the this point.
  *
  */
-public interface IPoint extends Cloneable {
+public interface IPoint extends Cloneable, Geometry {
 
 	double getX();
 
@@ -158,4 +163,25 @@ public interface IPoint extends Cloneable {
 	 * @return a copy of the point
 	 */
 	IPoint clone();
+
+	// Methods used by the R-Tree, for this data structure a point is equal to a Rectangle where each defining point is equal (zero area)
+	@Override
+	default double distance(com.github.davidmoten.rtree.geometry.Rectangle rectangle) {
+		return mbr().distance(rectangle);
+	}
+
+	@Override
+	default com.github.davidmoten.rtree.geometry.Rectangle mbr() {
+		return RectangleDouble.create(getX(), getY(), getX(), getY());
+	}
+
+	@Override
+	default boolean intersects(com.github.davidmoten.rtree.geometry.Rectangle rectangle) {
+		return mbr().intersects(rectangle);
+	}
+
+	@Override
+	default boolean isDoublePrecision() {
+		return true;
+	}
 }
