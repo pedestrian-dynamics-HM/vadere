@@ -1,23 +1,13 @@
 #!/usr/bin/env python3
 
-# TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
-
 import os
 import re
-
 from typing import *
 
 import pandas as pd
 
-from suqc.utils.dict_utils import deep_dict_lookup
 from suqc.environment import EnvironmentManager
-
-# --------------------------------------------------
-# people who contributed code
-__authors__ = "Daniel Lehmberg"
-# people who made suggestions or reported bugs but didn't contribute code
-__credits__ = ["n/a"]
-# --------------------------------------------------
+from suqc.utils.dict_utils import deep_dict_lookup
 
 
 class FileDataInfo(object):
@@ -103,11 +93,11 @@ class QuantityOfInterest(object):
                         found = True
                     else:
                         raise ValueError("The Vadere scenario is not correctly set up! There are two processors with "
-                                         f"the id={pid} could not be ")
+                                         f"the id={pid}.")
 
             if not found:
                 raise ValueError(f"The Vadere scenario is not correctly set up! Processor id {pid} could not be found "
-                                 "in 'processors'")
+                                 "in 'processors'.")
 
         return selected_procs
 
@@ -126,24 +116,31 @@ class QuantityOfInterest(object):
 
         df = pd.read_csv(filepath, delimiter=" ", header=[0], comment="#")
 
-        if req_qoi.output_key.__eq__("NoDataKeyOutputFile"):
-            return df
-        else:
+        if req_qoi.nr_row_indices != 0:
             idx_keys = df.columns[:nr_row_indices]
             return df.set_index(idx_keys.tolist())
+        else:
+            return df
 
-    def _add_parid2idx(self, df, par_id):
+    def _add_parid2idx(self, df, par_id, run_id):
         # from https://stackoverflow.com/questions/14744068/prepend-a-level-to-a-pandas-multiindex
-        return pd.concat([df], keys=[par_id], names=["par_id"])
 
-    def read_and_extract_qois(self, par_id, output_path):
+        original_column_order = df.index.names
+        df["id"] = par_id
+        df["run_id"] = run_id
+        df.set_index(["id", "run_id"], append=True, inplace=True)
+
+        df = df.reorder_levels(["id", "run_id"] + original_column_order)
+        return df
+
+    def read_and_extract_qois(self, par_id, run_id, output_path):
 
         read_data = dict()
 
         for k in self.req_qois:
             filepath = os.path.join(output_path, k.filename)
             df_data = self._read_csv(k, filepath)
-            read_data[k.filename] = self._add_parid2idx(df_data, par_id)    # filename is identifier for QoI
+            read_data[k.filename] = self._add_parid2idx(df_data, par_id, run_id)    # filename is identifier for QoI
 
         return read_data
 

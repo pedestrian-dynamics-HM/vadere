@@ -41,7 +41,7 @@ public class GrahamScan {
 		// sort by y first, x secondly to get an extreme point
 		Arrays.sort(points, new VPointCoordinateComparator());
 
-		// now sort by ccw relative to first extreme point
+		// now sort by ccwRobust relative to first extreme point
 		Arrays.sort(points, 1, numberOfPoints, new VPointPolarComparator(points[0]));
 
 		// first extreme point will be in the hull
@@ -178,21 +178,21 @@ public class GrahamScan {
 			double dx2 = o2.x - point.x;
 			double dy2 = o2.y - point.y;
 
-			// o1 above point and o2 below point => o1 before o2 ccw
+			// o1 above point and o2 below point => o1 before o2 ccwRobust
 			if (dy1 >= 0 && dy2 < 0) {
 				return -1;
 			}
-			// o1 is below point and o2 above point => o2 before o1 ccw
+			// o1 is below point and o2 above point => o2 before o1 ccwRobust
 			else if (dy2 >= 0 && dy1 < 0) {
 				return 1;
 			}
 			// horizontal line between o1 and o2, so look at dx
 			else if (dy1 == 0 && dy2 == 0) {
-				// o1 right of point and o2 left of point => o1 before o2 ccw
+				// o1 right of point and o2 left of point => o1 before o2 ccwRobust
 				if (dx1 >= 0 && dx2 < 0) {
 					return -1;
 				}
-				// o2 right of point and o2 left of point => o2 before o1 ccw
+				// o2 right of point and o2 left of point => o2 before o1 ccwRobust
 				else if (dx2 >= 0 && dx1 < 0) {
 					return 1;
 				}

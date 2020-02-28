@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(".."))
 
 from tutorial.imports import *
 
-run_local = True
+run_local = False
 
 
 ###############################################################################################################
@@ -21,10 +21,15 @@ if __name__ == "__main__":  # main required by Windows to run in parallel
     par_var = [{"speedDistributionMean": 1.0, "maximumSpeed": 3.0},
                {"speedDistributionMean": 1.3, "maximumSpeed": 4.0, "acceleration": 3.0}]
 
-    setup = QuickVaryScenario(scenario_path=path2scenario,
-                              parameter_var=par_var,
-                              qoi="density.txt",
-                              model=path2model)
+    setup = DictVariation(scenario_path=path2scenario,
+                          parameter_dict_list=par_var,
+                          qoi="density.txt",
+                          model=path2model,
+                          scenario_runs=1,
+                          post_changes=PostScenarioChangesBase(apply_default=True),
+                          output_path=None,
+                          output_folder=None,
+                          remove_output=False)
 
     if run_local:
         par_var, data = setup.run(-1)  # -1 indicates to use all cores available to parallelize the scenarios
