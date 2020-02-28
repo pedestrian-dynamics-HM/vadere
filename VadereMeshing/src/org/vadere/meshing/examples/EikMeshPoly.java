@@ -24,10 +24,7 @@ import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,22 +37,23 @@ public class EikMeshPoly {
 	public static void main(String... args) throws InterruptedException, IOException {
 		//meshPoly("/poly/mf_small_very_simple.poly");
 		//meshPoly("/poly/bridge.poly");
-		meshPoly("/poly/07-BarrierPositions_base.poly");
+		// meshPoly("/poly/07-BarrierPositions_base.poly");
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
+		meshPoly("./Scenarios/Retreat2020/scenarios/meshes/05-Marienplatz-Evacuation.obstacles.poly");
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
-		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+		final InputStream inputStream = new FileInputStream(new File(fileName));
+		// final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+
+		System.out.println(String.format("Meshing %s...", fileName));
+
 		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
 		edgeLengthFunctionApprox.smooth(0.4);
 		edgeLengthFunctionApprox.printPython();
-
-		VPolygon targetShape = new VRectangle(4, 4, 2, 2).toPolygon();
-		List<VShape> singleTarget = Collections.singletonList(targetShape);
-
 
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
@@ -117,7 +115,7 @@ public class EikMeshPoly {
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String[] splitName = fileName.split("\\.");
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "07-BarrierPositions_base"+ "_tri.poly");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName + "_tri.poly");
 
 	}
 
