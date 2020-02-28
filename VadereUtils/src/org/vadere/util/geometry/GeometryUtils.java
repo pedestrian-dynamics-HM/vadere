@@ -109,6 +109,10 @@ public class GeometryUtils {
 		return Optional.empty();
 	}
 
+	public static VPoint intersectionPoint(@NotNull final VLine line1, @NotNull final VLine line2) {
+		return intersectionPoint(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);
+	}
+
 	/**
 	 * Tests if there is a intersection between the {@link VRectangle} boundary and the line-segment defined by ((x1, y1), (x2, y2)).
 	 *
@@ -1811,7 +1815,7 @@ public class GeometryUtils {
 	 * @param by y-coordinate of b
 	 * @return the projection of a onto b
 	 */
-	public static IPoint projectOnto(double ax, double ay, double bx, double by) {
+	public static VPoint projectOnto(double ax, double ay, double bx, double by) {
 		assert bx * bx + by * by > GeometryUtils.DOUBLE_EPS;
 		double blen = Math.sqrt(bx * bx + by * by);
 		double bxn = bx / blen;
@@ -1819,7 +1823,7 @@ public class GeometryUtils {
 
 		// scalar product
 		double alpha = ax * bxn + ay * byn;
-		IPoint a1 = new VPoint(bxn * alpha, byn * alpha);
+		VPoint a1 = new VPoint(bxn * alpha, byn * alpha);
 		return a1;
 	}
 
@@ -1835,7 +1839,7 @@ public class GeometryUtils {
 	 *
 	 * @return he projection of a onto the line (p,q)
 	 */
-	public static IPoint projectOntoLine(double ax, double ay, double px, double py, double qx, double qy) {
+	public static VPoint projectOntoLine(double ax, double ay, double px, double py, double qx, double qy) {
 		double bx = qx - px;
 		double by = qy - py;
 		double apx = ax - px;

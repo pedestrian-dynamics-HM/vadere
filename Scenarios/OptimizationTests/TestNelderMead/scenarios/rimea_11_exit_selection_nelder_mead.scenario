@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.06642665170830378,
-        "maxMeanDifferenceFuncValue" : 0.038131134445867326,
+        "maxMeanPointDistance" : 0.0741743541679023,
+        "maxMeanDifferenceFuncValue" : 0.03977588209021506,
         "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.0500643679096149,
-        "infoMinFuncDifference" : -0.0053311824072430625,
-        "infoMaxFuncDifference" : 3.112265864907295,
-        "infoStddevPointDistance" : 0.10963419080612646,
-        "infoStddevDifferenceFuncValue" : 0.14872546127402636
+        "infoMaxPointDistanceL2" : 1.116456695995013,
+        "infoMinFuncDifference" : -0.014172405140369548,
+        "infoMaxFuncDifference" : 3.285814543687535,
+        "infoStddevPointDistance" : 0.12307022389816641,
+        "infoStddevDifferenceFuncValue" : 0.13840077341363527
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -234,15 +234,15 @@
       "sources" : [ {
         "id" : 2,
         "shape" : {
-          "x" : 2.5,
-          "y" : 8.0,
-          "width" : 3.95,
-          "height" : 4.74,
+          "x" : 0.6,
+          "y" : 6.4,
+          "width" : 10.0,
+          "height" : 8.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 100,
+        "spawnNumber" : 70,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
