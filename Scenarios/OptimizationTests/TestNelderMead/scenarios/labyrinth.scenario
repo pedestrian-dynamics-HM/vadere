@@ -12,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.04705163542370941,
-        "maxMeanDifferenceFuncValue" : 0.03298870696113479,
+        "maxMeanPointDistance" : 0.047248341974057265,
+        "maxMeanDifferenceFuncValue" : 0.0329863099144855,
         "infoMinPointDistanceL2" : 0.0,
         "infoMaxPointDistanceL2" : 1.0541951228902773,
         "infoMinFuncDifference" : -0.0016375350829207491,
         "infoMaxFuncDifference" : 0.3743672139399621,
-        "infoStddevPointDistance" : 0.059142505956065274,
-        "infoStddevDifferenceFuncValue" : 0.043765945536457754
+        "infoStddevPointDistance" : 0.059219156393017336,
+        "infoStddevDifferenceFuncValue" : 0.043716364372130515
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -31,7 +31,7 @@
       "attributes" : {
         "expectedResult" : "SUCCESS",
         "evacuationTimeProcessorId" : 4,
-        "maximalEvacuationTime" : 300.0,
+        "maximalEvacuationTime" : 400.0,
         "minimalEvacuationTime" : 0.0
       }
     }, {
@@ -112,7 +112,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 400.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -121,7 +121,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "simulationSeed" : 2
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
