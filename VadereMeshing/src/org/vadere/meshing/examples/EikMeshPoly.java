@@ -41,12 +41,13 @@ public class EikMeshPoly {
 		//meshPoly("/poly/corner.poly");
 		//meshPoly("/poly/railing.poly");
 		//displayPolyFile("/poly/muenchner_freiheit.poly");
+		//meshPoly("/poly/05-Marienplatz-Evacuation.poly");
 		meshPoly("./Scenarios/Retreat2020/scenarios/meshes/05-Marienplatz-Evacuation.obstacles.poly");
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
 		final InputStream inputStream = new FileInputStream(new File(fileName));
-		// final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+		//final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
 
 		System.out.println(String.format("Meshing %s...", fileName));
 
@@ -137,6 +138,10 @@ public class EikMeshPoly {
 
 	private static void write(final String string, final String filename) throws IOException {
 		File outputFile = new File("./"+filename);
+		if(!outputFile.exists()) {
+			outputFile.createNewFile();
+		}
+
 		try(FileWriter fileWriter = new FileWriter(outputFile)) {
 			fileWriter.write(string);
 		}

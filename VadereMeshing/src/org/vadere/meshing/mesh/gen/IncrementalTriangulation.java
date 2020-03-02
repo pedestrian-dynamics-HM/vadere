@@ -426,7 +426,8 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		else {
 			//log.info("splitTriangle()");
 			if(!contains(vertex.getX(), vertex.getY(), face)) {
-				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), face));
+				log.warn("at this time the point " + vertex + " has to be contained in " + face);
+				//System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), face));
 			}
 			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
