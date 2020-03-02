@@ -2393,9 +2393,9 @@
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : true,
+        "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
