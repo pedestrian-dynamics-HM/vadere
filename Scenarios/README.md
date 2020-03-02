@@ -36,22 +36,18 @@ We prepared four small examples:
    - Compare different locomotion models.
      * **Used scenarios:**
        - 01-MinimalExample-OptimalStepsModel
-       - 02-MinimalExample-GradientNavigationModel
+       - 01-MinimalExample-GradientNavigationModel
      * **Steps:**
-       1. Run both simlations.
+       1. Run both simlations, watch your result in the PostVis and play around!
        2. Compare both simulations:
           - What are the effects of different locomotion models?
           - TODO: Ask more questions to inspirate particpants!
-2. In the second example, you should change a simulation parameter, the `PersonalSpace`, and check the consequences.
-   * **Used scenario:** 03-PersonalSpace-Adjustment
-   * **Steps:**
-     1. GUI: `Model -> pedPotential...SpaceWidth`
-3. In the third example, you should measure the density.
-   * **Used scenario:** 04-Density-Measurement
+2. In the third example, you should measure the density.
+   * **Used scenario:** 02-Density-Measurement
    * **Steps:**
      1. GUI: `Data output`.
      2. Add a file to write output to.
      3. Add a density processor to write into this file.
      4. Analyze output file and compare output with other groups.
-4. In the fourth example, you should estimate how long it takes to evacuate 1000 pedestrians from Marienplatz and check your estimation against a simulation run.
-   * **Used scenario:** 05-Marienplatz-Evacuation
+3. In the fourth example, you should estimate how long it takes to evacuate 1000 pedestrians from Marienplatz and check your estimation against a simulation run.
+   * **Used scenario:** 03-Marienplatz-Evacuation

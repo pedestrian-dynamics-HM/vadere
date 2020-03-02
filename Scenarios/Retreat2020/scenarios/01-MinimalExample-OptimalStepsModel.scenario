@@ -27,7 +27,7 @@
         "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "UNIT",
+          "type" : "NAVIGATION",
           "obstacleDensityWeight" : 3.5,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,

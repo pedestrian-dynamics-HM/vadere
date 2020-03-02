@@ -1,5 +1,5 @@
 {
-  "name" : "05-Marienplatz-Evacuation",
+  "name" : "03-Marienplatz-Evacuation",
   "description" : "",
   "release" : "1.11",
   "processWriters" : {
@@ -2416,8 +2416,8 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 346.3,
-          "y" : 22.1,
+          "x" : 352.3,
+          "y" : 9.0,
           "width" : 30.3,
           "height" : 27.1,
           "type" : "RECTANGLE"
