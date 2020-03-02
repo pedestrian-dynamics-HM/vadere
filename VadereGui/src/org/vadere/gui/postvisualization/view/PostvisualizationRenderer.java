@@ -100,7 +100,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				} else {
 					Color cc = agentColors.get(pedId);
 					if(cc == null) {
-						System.out.println("wtf");
+						//System.out.println("wtf");
 					}
 					g.setColor(agentColors.get(pedId));
 					g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
