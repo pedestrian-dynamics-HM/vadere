@@ -31,28 +31,28 @@ Get familiar with Vadere - its features and its limitions.
 
 We prepared four small examples:
 
-1. Get started in the first example and compare two different models in Vadere
+1. Get started in the first example and compare two different locomotion models in Vadere.
    * **Used scenarios:**
      - 01-MinimalExample-OptimalStepsModel
      - 01-MinimalExample-GradientNavigationModel
    * **Steps:**
-     1. Get familiar with the GUI
+     1. Get familiar with the GUI.
      2. Compare different locomotion models by running both simlations.
      3. Compare both simulations in the PosVis (see `Output files` section in the GUI)
         - How do the trajectories differ between OSM and GNM?
-        - Draw a Voronoi density area and compare the two runs?
+        - Draw a Voronoi diagram using the toolbar and compare densities in both runs.
 2. In the second example, you should measure the density.
    * **Used scenario:** 02-Density-Measurement
    * **Steps:**
      1. GUI: `Data output`.
-     2. Add a file to write output to.
-     3. Add a density processor (recommended: `PedestrianDensityCountingProcessor`) to write into this file.
+     2. Add a file to write density information to.
+     3. Add a density processor (recommended: `PedestrianDensityCountingProcessor`) to write into file from (2).
      4. Analyze output files: What is the max. observed density value?
 3. Estimate how long it takes to evacuate 500 agents from Marienplatz and check your estimation against a simulation. Note: you may also increase the number of agents, but depending on your hardware the simulation may take a while. 
    * **Used scenario:** 03-Marienplatz-Evacuation
    * **Steps:**
-     1. What is a reasonable location and shapes of the source? 
-     2. Place single or multiple targets? Note: Make sure all targets have the same ID and are set in the `source` JSON field `targetIds`. 
+     1. What is a reasonable location and shape of the source? 
+     2. Place single or multiple targets? Note: Make sure all targets have the same Id and are set in the `source` JSON field `targetIds`. 
      3. How fast should the agents run? (`Topography -> attributesPedestrian -> [speedDistributionMean | speedDistributionStandardDeviation]`)
      4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time?
 
