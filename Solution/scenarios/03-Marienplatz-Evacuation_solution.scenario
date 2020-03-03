@@ -1,5 +1,5 @@
 {
-  "name" : "03-Marienplatz-Evacuation",
+  "name" : "03-Marienplatz-Evacuation_solution",
   "description" : "",
   "release" : "1.11",
   "processWriters" : {
@@ -7,6 +7,18 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 1, 2 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "overlaps.csv",
+      "processors" : [ ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "overlapCount.txt",
+      "processors" : [ ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "evac.txt",
+      "processors" : [ 3 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -15,8 +27,15 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 2
     }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 3,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 4
+      }
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
-      "id" : 3
+      "id" : 4
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -2305,11 +2324,139 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 352.3,
-          "y" : 9.0,
-          "width" : 30.3,
-          "height" : 27.1,
-          "type" : "RECTANGLE"
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 78.3,
+            "y" : 312.4
+          }, {
+            "x" : 77.9,
+            "y" : 324.2
+          }, {
+            "x" : 2.0,
+            "y" : 325.4
+          }, {
+            "x" : 2.0,
+            "y" : 203.7
+          }, {
+            "x" : 20.7,
+            "y" : 259.2
+          }, {
+            "x" : 27.6,
+            "y" : 316.9
+          }, {
+            "x" : 28.0,
+            "y" : 315.2
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 270.0,
+            "y" : 292.1
+          }, {
+            "x" : 213.5,
+            "y" : 307.3
+          }, {
+            "x" : 242.4,
+            "y" : 324.3
+          }, {
+            "x" : 277.6,
+            "y" : 316.8
+          }, {
+            "x" : 277.5,
+            "y" : 316.8
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 41.2,
+            "y" : 130.6
+          }, {
+            "x" : 37.2,
+            "y" : 146.5
+          }, {
+            "x" : 3.7,
+            "y" : 152.9
+          }, {
+            "x" : 2.7,
+            "y" : 106.6
+          }, {
+            "x" : 3.0,
+            "y" : 106.6
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 52.8,
+            "y" : 50.6
+          }, {
+            "x" : 35.599999999999994,
+            "y" : 74.6
+          }, {
+            "x" : 73.8,
+            "y" : 88.1
+          }, {
+            "x" : 85.0,
+            "y" : 66.5
+          } ]
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 348.5,
+            "y" : 116.4
+          }, {
+            "x" : 332.3,
+            "y" : 96.6
+          }, {
+            "x" : 380.1,
+            "y" : 77.1
+          }, {
+            "x" : 388.3,
+            "y" : 106.7
+          } ]
         },
         "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
@@ -2322,23 +2469,83 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 145,
+        "id" : 0,
         "shape" : {
-          "x" : 119.2,
-          "y" : 197.8,
-          "width" : 29.8,
-          "height" : 22.4,
-          "type" : "RECTANGLE"
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 130.3,
+            "y" : 252.3
+          }, {
+            "x" : 118.3,
+            "y" : 253.7
+          }, {
+            "x" : 117.3,
+            "y" : 243.3
+          }, {
+            "x" : 108.0,
+            "y" : 214.9
+          }, {
+            "x" : 107.9,
+            "y" : 192.4
+          }, {
+            "x" : 124.5,
+            "y" : 187.3
+          }, {
+            "x" : 137.5,
+            "y" : 184.2
+          }, {
+            "x" : 148.2,
+            "y" : 180.4
+          }, {
+            "x" : 131.0,
+            "y" : 152.6
+          }, {
+            "x" : 162.3,
+            "y" : 134.0
+          }, {
+            "x" : 177.8,
+            "y" : 158.5
+          }, {
+            "x" : 184.5,
+            "y" : 177.4
+          }, {
+            "x" : 213.6,
+            "y" : 167.8
+          }, {
+            "x" : 216.1,
+            "y" : 165.6
+          }, {
+            "x" : 242.3,
+            "y" : 153.7
+          }, {
+            "x" : 264.8,
+            "y" : 174.3
+          }, {
+            "x" : 225.7,
+            "y" : 194.3
+          }, {
+            "x" : 231.3,
+            "y" : 207.0
+          }, {
+            "x" : 166.2,
+            "y" : 226.1
+          }, {
+            "x" : 145.9,
+            "y" : 231.8
+          }, {
+            "x" : 127.1,
+            "y" : 240.5
+          } ]
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 500,
+        "spawnNumber" : 2000,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : false,
+        "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN"
