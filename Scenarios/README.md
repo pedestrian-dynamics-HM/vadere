@@ -47,13 +47,13 @@ We prepared four small examples:
      1. GUI: `Data output`.
      2. Add a file to write output to.
      3. Add a density processor (recommended: `PedestrianDensityCountingProcessor`) to write into this file.
-     4. Analyze output files: What is the max. observed densityvalue?
-3. Estimate how long it takes to evacuate 1000 (or more?) pedestrians from Marienplatz and check your estimation against a simulation.
+     4. Analyze output files: What is the max. observed density value?
+3. Estimate how long it takes to evacuate 500 agents from Marienplatz and check your estimation against a simulation. Note: you may also increase the number of agents, but depending on your hardware the simulation may take a while. 
    * **Used scenario:** 03-Marienplatz-Evacuation
    * **Steps:**
-     1. What are reasonable locations and shapes of source(s)?
-     2. Place single or multiple targets? NOTE: Make sure all targets have the same ID and are set in the `source` JSON field `targetIds`. 
-     3. How fast can people run? (`Topography -> attributesPedestrian -> [speedDistributionMean | speedDistributionStandardDeviation]`)
-     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time.
+     1. What is a reasonable location and shapes of the source? 
+     2. Place single or multiple targets? Note: Make sure all targets have the same ID and are set in the `source` JSON field `targetIds`. 
+     3. How fast should the agents run? (`Topography -> attributesPedestrian -> [speedDistributionMean | speedDistributionStandardDeviation]`)
+     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time?
 
 
