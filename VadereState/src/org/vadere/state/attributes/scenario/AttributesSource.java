@@ -47,7 +47,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * left corner downwards.
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean spawnAtRandomPositions;
+	private boolean spawnAtRandomPositions = true;
 
 
 	/**
@@ -67,7 +67,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * exactly the same place. Maybe Deprecate this switch.
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean useFreeSpaceOnly = true;
+	private boolean useFreeSpaceOnly = false;
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new LinkedList<>();
 
