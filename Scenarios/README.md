@@ -40,20 +40,20 @@ We prepared four small examples:
      2. Compare different locomotion models by running both simlations.
      3. Compare both simulations in the PosVis (see `Output files` section in the GUI)
         - How do the trajectories differ between OSM and GNM?
-        - Draw a Voronoi diagram using the toolbar and compare densities in both runs.
+        - Visualize densities in both scenarios by drawing a rectangle with the "Voronoi diagram" tool in the toolbar.
 2. In the second example, you should measure the density.
    * **Used scenario:** 02-Density-Measurement
    * **Steps:**
      1. GUI: `Data output`.
-     2. Add a file to write density information to.
-     3. Add a density processor (recommended: `PedestrianDensityCountingProcessor`) to write into file from (2).
-     4. Analyze output files: What is the max. observed density value?
+     2. Add a density processor (recommended: `PedestrianDensityCountingProcessor` with a `radius` of 1.5 [m]) to measure the density in each timestep for each pedestrian.
+     3. Add a file to write the density information to (select `TimestepPedestrianIdKey` as `Data Key and the output processor from (2)`).
+     4. Analyze output files: What is the max. observed density value? Note: Vadere stores the output to `path/to/project/output/<scenario_run>` (in GUI: Right-click on an output in the `Output files` panel and then `Copy output path to clipboard`)
 3. Estimate how long it takes to evacuate 500 agents from Marienplatz and check your estimation against a simulation. Note: you may also increase the number of agents, but depending on your hardware the simulation may take a while. 
    * **Used scenario:** 03-Marienplatz-Evacuation
    * **Steps:**
-     1. What is a reasonable location and shape of the source? 
+     1. What is a reasonable location and shape for source(s)? 
      2. Place single or multiple targets? Note: Make sure all targets have the same Id and are set in the `source` JSON field `targetIds`. 
      3. How fast should the agents run? (`Topography -> attributesPedestrian -> [speedDistributionMean | speedDistributionStandardDeviation]`)
-     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time?
+     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time? Note: Select `PedestrianIdKey` as `Data Key` for the corresponding output file.
 
 
