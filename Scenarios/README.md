@@ -31,12 +31,12 @@ Get familiar with Vadere - its features and its limitions.
 
 We prepared four small examples:
 
-1. Get started in the first example and compare two different locomotion models in Vadere.
+1. Get started with the first example and compare two different locomotion models in Vadere.
    * **Used scenarios:**
      - 01-MinimalExample-OptimalStepsModel
      - 01-MinimalExample-GradientNavigationModel
    * **Steps:**
-     1. Get familiar with the GUI.
+     1. Get familiar with the GUI (i.e., input files, output files, toolbar, ...).
      2. Compare different locomotion models by running both simlations.
      3. Compare both simulations in the PosVis (see `Output files` section in the GUI)
         - How do the trajectories differ between OSM and GNM?
@@ -46,14 +46,14 @@ We prepared four small examples:
    * **Steps:**
      1. GUI: `Data output`.
      2. Add a density processor (recommended: `PedestrianDensityCountingProcessor` with a `radius` of 1.5 [m]) to measure the density in each timestep for each pedestrian.
-     3. Add a file to write the density information to (select `TimestepPedestrianIdKey` as `Data Key and the output processor from (2)`).
-     4. Analyze output files: What is the max. observed density value? Note: Vadere stores the output to `path/to/project/output/<scenario_run>` (in GUI: Right-click on an output in the `Output files` panel and then `Copy output path to clipboard`)
-3. Estimate how long it takes to evacuate 500 agents from Marienplatz and check your estimation against a simulation. Note: you may also increase the number of agents, but depending on your hardware the simulation may take a while. 
+     3. Add a file to write the density information to (select `TimestepPedestrianIdKey` as `Data Key` and the output processor from (2)).
+     4. Analyze output files: What is the max. observed density value? **Note:** Vadere stores the output to `path/to/project/output/<scenario_run>` (in GUI: Right-click on an output in the `Output files` panel and then `Copy output path to clipboard`)
+3. Estimate how long it takes to evacuate 500 agents from Marienplatz and check your estimation against a simulation. **Note:** you may also increase the number of agents, but depending on your hardware the simulation may take a while. 
    * **Used scenario:** 03-Marienplatz-Evacuation
    * **Steps:**
      1. What is a reasonable location and shape for source(s)? 
-     2. Place single or multiple targets? Note: Make sure all targets have the same Id and are set in the `source` JSON field `targetIds`. 
+     2. Place single or multiple targets to get a realistic simulation? **Note:** Make sure all targets have the same Id and the target id is used in the source(s) (field `targetIds`).
      3. How fast should the agents run? (`Topography -> attributesPedestrian -> [speedDistributionMean | speedDistributionStandardDeviation]`)
-     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time? Note: Select `PedestrianIdKey` as `Data Key` for the corresponding output file.
+     4. Use the `PedestrianEvacuationTimeProcessor` to measure the evacuation time per pedestrian. What is the maximum and mean evacuation time? **Note:** Select `PedestrianIdKey` as `Data Key` for the corresponding output file.
 
 
