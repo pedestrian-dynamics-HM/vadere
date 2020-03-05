@@ -26,7 +26,7 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Dependencies
 
-* Java 11 or above (OpenJDK recommended -> see the official [Java website](https://jdk.java.net/))
+* Java 11 or above (OpenJDK recommended -> see [here](http://www.vadere.org/getting-started/) for more information)
 * OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details)
 
 ### Pre-Built Releases
@@ -44,9 +44,12 @@ The ZIP file contains:
 * **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
 * **Scenarios** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-### Run the Application
+### Getting Started
 
-Open a terminal and enter `path/to/openjdk/java -jar vadere-gui.jar`.
+Either run the Vadere simulator by
+
+- Double-clicking `vadere-gui.jar` (after installing [Java](http://www.vadere.org/getting-started/))
+- Entering `path/to/openjdk/java -jar vadere-gui.jar`
 
 ### Run Built-In Examples
 
