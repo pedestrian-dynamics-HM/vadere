@@ -162,6 +162,9 @@ public class AttributesSource extends AttributesEmbedShape {
 
 	public boolean isSpawnAtGridPositionsCA(){ return spawnAtGridPositionsCA; }
 
+	public AttributesAgent getAttributesPedestrian() {
+		return attributesPedestrian;
+	}
 
 	public boolean isUseFreeSpaceOnly() {
 		return useFreeSpaceOnly;
@@ -252,4 +255,7 @@ public class AttributesSource extends AttributesEmbedShape {
 		checkSealed();
 		this.id = id;
 	}
+
+
+
 }
