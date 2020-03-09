@@ -3,6 +3,12 @@ package org.vadere.state.util;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
+import org.vadere.state.scenario.Source;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
@@ -69,6 +75,28 @@ public class JacksonObjectMapper extends ObjectMapper {
 			public void serialize(VRectangle vRect, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
 					throws IOException {
 				jsonGenerator.writeTree(serializeVRectangle(vRect));
+			}
+		});
+
+//		sm.addDeserializer(AttributesSource.class, new JsonDeserializer<AttributesSource>() {
+//			@Override
+//			public AttributesSource deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+//					throws IOException {
+//				ObjectNode node = jsonParser.readValueAsTree();
+//				AttributesSource attr = convertValue(node, AttributesSource.class);
+//
+//				return attr;
+//			}
+//		});
+
+		sm.addSerializer(AttributesSource.class, new JsonSerializer<AttributesSource>() {
+			@Override
+			public void serialize(AttributesSource source, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+					throws IOException {
+				JsonNode sNode = convertValue(source, JsonNode.class);
+				JsonNode pedAttr = sNode.get("attributesPedestrian");
+				((ObjectNode) pedAttr).remove("id");
+				jsonGenerator.writeTree(sNode);
 			}
 		});
 
