@@ -78,27 +78,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 			}
 		});
 
-//		sm.addDeserializer(AttributesSource.class, new JsonDeserializer<AttributesSource>() {
-//			@Override
-//			public AttributesSource deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-//					throws IOException {
-//				ObjectNode node = jsonParser.readValueAsTree();
-//				AttributesSource attr = convertValue(node, AttributesSource.class);
-//
-//				return attr;
-//			}
-//		});
 
-		sm.addSerializer(AttributesSource.class, new JsonSerializer<AttributesSource>() {
-			@Override
-			public void serialize(AttributesSource source, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-					throws IOException {
-				JsonNode sNode = convertValue(source, JsonNode.class);
-				JsonNode pedAttr = sNode.get("attributesPedestrian");
-				((ObjectNode) pedAttr).remove("id");
-				jsonGenerator.writeTree(sNode);
-			}
-		});
 
 		sm.addDeserializer(VShape.class, new JsonDeserializer<VShape>() {
 			@Override

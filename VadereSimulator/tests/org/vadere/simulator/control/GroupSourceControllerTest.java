@@ -97,8 +97,17 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 
 			@Override
 			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
+
+				return createElement(position, id, d.attributesPedestrian, type);
+			}
+
+			@Override
+			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+				AttributesAgent aAttr = (AttributesAgent) attr;
+
 				AttributesAgent att = new AttributesAgent(
-						d.attributesPedestrian, registerDynamicElementId(null, id));
+						aAttr, registerDynamicElementId(null, id));
 				Pedestrian ped = new Pedestrian(att, d.random);
 				ped.setPosition(position);
 				return ped;

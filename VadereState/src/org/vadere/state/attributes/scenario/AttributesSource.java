@@ -94,6 +94,8 @@ public class AttributesSource extends AttributesEmbedShape {
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private AttributesAgent attributesPedestrian = null;
 	@SuppressWarnings("unused")
 	private AttributesSource() {}
 
