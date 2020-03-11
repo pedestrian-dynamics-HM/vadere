@@ -202,6 +202,16 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 		return new int[] {iX, iY};
 	}
 
+	public int[][] getCellObjectCount(){
+		int[][] count = new int[this.gridSize[0]][this.gridSize[1]];
+		for (int r = 0; r < grid.length; r++) {
+			for (int c = 0; c < grid[r].length; c++) {
+				count[r][c] = grid[r][c].objects.size();
+			}
+		}
+		return count;
+	}
+
 	/**
 	 * Adds a given object to the grid at position of the object. The position is
 	 * discretized automatically to fit in the cells.
