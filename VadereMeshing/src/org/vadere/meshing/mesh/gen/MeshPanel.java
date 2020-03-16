@@ -148,7 +148,7 @@ public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		jFrame.setSize((int)width+10, (int)height+10);
 		jFrame.add(this);
 		jFrame.setTitle(title);
-		jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		jFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setVisible(true);
 		jFrame.setVisible(true);
 		//jFrame.setIgnoreRepaint(true);
