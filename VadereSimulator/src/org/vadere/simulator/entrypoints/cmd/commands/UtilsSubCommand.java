@@ -1,16 +1,19 @@
 package org.vadere.simulator.entrypoints.cmd.commands;
 
+import com.google.common.io.Resources;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Target;
@@ -18,6 +21,9 @@ import org.vadere.state.types.CacheType;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +43,8 @@ public class UtilsSubCommand implements SubCommandRunner {
 		methods.put("getHash", Pair.of("[-i: file, -o: ignored]", this::getHash));
 		methods.put("binCache", Pair.of("[-i: file, -o: directory]",this::calculateBinCache));
 		methods.put("txtCache", Pair.of("[-i: file, -o: directory]",this::calculateTextCache));
-
+		methods.put("getVersion", Pair.of("returns version",this::getVersion));
+		methods.put("getCommitHash", Pair.of("returns commit hash",this::getCommitHash));
 	}
 
 	public String[] methodsString(){
@@ -85,10 +92,22 @@ public class UtilsSubCommand implements SubCommandRunner {
 	 *  Return the hash used to check if a new cache value needed to be calculated.
 	 */
 	private void getHash(Namespace ns, ArgumentParser parser) throws Exception{
-		Scenario scenario = createScenario(ns.getString("input"));
-		System.out.println(ScenarioCache.getHash(scenario));
+		calculateCache(ns, parser, CacheType.TXT_CACHE);
 	}
 
+	/**
+	 * Returns the current version
+	 */
+	private void getVersion(Namespace ns, ArgumentParser parser) throws Exception{
+		System.out.println(Version.latest().toString());
+	}
+
+	private void getCommitHash(Namespace ns, ArgumentParser parser) throws Exception{
+		System.out.println(HashGenerator.commitHash());
+		/* String filename = Resources.class.getResource("/current_commit_hash.txt").getFile();
+		String commit_hash = (new BufferedReader(new FileReader(filename))).readLine();
+		System.out.println(commit_hash); */ 
+	}
 
 	private void calculateBinCache(Namespace ns, ArgumentParser parser) throws Exception{
 		calculateCache(ns, parser, CacheType.BIN_CACHE);
