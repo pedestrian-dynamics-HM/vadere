@@ -24,10 +24,7 @@ import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,24 +35,24 @@ public class EikMeshPoly {
 	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		//meshPoly("/poly/mf_small_very_simple.poly");
-		//meshPoly("/poly/bridge.poly");
-		meshPoly("/poly/07-BarrierPositions_base.poly");
-		//meshPoly("/poly/corner.poly");
-		//meshPoly("/poly/railing.poly");
-		//displayPolyFile("/poly/muenchner_freiheit.poly");
+		if (args.length == 0) {
+			System.out.println("Please provide \".obstacles.poly\" file!");
+		}
+
+		for (String fileName : args) {
+			meshPoly(fileName);
+		}
 	}
 
 	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
-		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
+		final InputStream inputStream = new FileInputStream(new File(fileName));
+
+		System.out.println(String.format("Meshing %s...", fileName));
+
 		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
 		edgeLengthFunctionApprox.smooth(0.4);
 		edgeLengthFunctionApprox.printPython();
-
-		VPolygon targetShape = new VRectangle(4, 4, 2, 2).toPolygon();
-		List<VShape> singleTarget = Collections.singletonList(targetShape);
-
 
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
@@ -112,12 +109,12 @@ public class EikMeshPoly {
 		//meshImprover.generate();
 
 
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), "mesh.tex");
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), fileName + ".tex");
 		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String[] splitName = fileName.split("\\.");
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), "07-BarrierPositions_base"+ "_tri.poly");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName + "_tri.poly");
 
 	}
 
@@ -138,7 +135,7 @@ public class EikMeshPoly {
 	}
 
 	private static void write(final String string, final String filename) throws IOException {
-		File outputFile = new File("./"+filename);
+		File outputFile = new File(filename);
 		try(FileWriter fileWriter = new FileWriter(outputFile)) {
 			fileWriter.write(string);
 		}
