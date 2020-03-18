@@ -1,6 +1,5 @@
 package org.vadere.simulator.entrypoints.cmd.commands;
 
-import com.google.common.io.Resources;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
@@ -13,7 +12,6 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBrute
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.projects.io.HashGenerator;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Target;
@@ -21,9 +19,6 @@ import org.vadere.state.types.CacheType;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,14 +94,14 @@ public class UtilsSubCommand implements SubCommandRunner {
 	 * Returns the current version
 	 */
 	private void getVersion(Namespace ns, ArgumentParser parser) throws Exception{
-		System.out.println(Version.latest().toString());
+		System.out.println(Version.releaseNumber());
 	}
 
 	private void getCommitHash(Namespace ns, ArgumentParser parser) throws Exception{
-		System.out.println(HashGenerator.commitHash());
+		System.out.println(Version.commitHash());
 		/* String filename = Resources.class.getResource("/current_commit_hash.txt").getFile();
 		String commit_hash = (new BufferedReader(new FileReader(filename))).readLine();
-		System.out.println(commit_hash); */ 
+		System.out.println(commit_hash); */
 	}
 
 	private void calculateBinCache(Namespace ns, ArgumentParser parser) throws Exception{

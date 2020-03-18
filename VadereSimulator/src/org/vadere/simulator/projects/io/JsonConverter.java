@@ -3,8 +3,8 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
+import org.vadere.simulator.entrypoints.Version;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
@@ -99,9 +99,9 @@ public class JsonConverter {
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
 		node.put("name", scenarioStore.getName());
 		node.put("description", scenarioStore.getDescription());
-		node.put("release", HashGenerator.releaseNumber());
+		node.put("release", Version.releaseNumber());
 		if (commitHashIncluded)
-			node.put("commithash", HashGenerator.commitHash());
+			node.put("commithash", Version.commitHash());
 	}
 
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {

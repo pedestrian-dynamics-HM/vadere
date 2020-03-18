@@ -1,16 +1,17 @@
 package org.vadere.simulator.entrypoints;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.logging.Logger;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * Versions in strict order from oldest to newest.
  */
 public enum Version {
-
-
 
 	UNDEFINED("undefined"),
 	NOT_A_RELEASE("not a release"),
@@ -35,14 +36,16 @@ public enum Version {
 	V1_8(1, 8),
 	V1_9(1, 9),
 	V1_10(1, 10),
-	V1_11(1, 11),
-	;
+	V1_11(1, 11);
 
 
+
+	private static Logger logger = Logger.getLogger(Version.class);
 	private String label;
 	private int major;
 	private int minor;
 
+	private static final String CURRENT_COMMIT_HASH_RESOURCE = "/current_commit_hash.txt";
 
 	Version(String label) {
 		this.major = -1;
@@ -54,6 +57,35 @@ public enum Version {
 		this.major = major;
 		this.minor = minor;
 		this.label = major + "." + minor;
+	}
+
+	public static String commitHash() {
+		String commitHash = getFirstStringTokenFromResource(CURRENT_COMMIT_HASH_RESOURCE);
+
+		if (commitHash == null) {
+			commitHash = "topographyWarning: no commit hash";
+			logger.warn("No commit hash found. The project will not contain a hash of the software source code.");
+		}
+
+		return commitHash;
+	}
+
+	public static String releaseNumber() {
+		return latest().label();
+	}
+
+	/* Read commit hash from file
+	 */
+	private static String getFirstStringTokenFromResource(String resource) {
+		final InputStream in = Version.class.getResourceAsStream(resource);
+		if (in != null) {
+			try (final Scanner scanner = new Scanner(in)) {
+				if (scanner.hasNext()) {
+					return scanner.next();
+				}
+			}
+		}
+		return null;
 	}
 
 	public String label() {
