@@ -2,7 +2,6 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -12,60 +11,69 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.utils.color.Colors;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimestepFaceIdKey;
-import org.vadere.state.attributes.processor.AttributesMeshTimestepProcessor;
+import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
+import org.vadere.state.attributes.processor.AttributesMeshProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.DistanceFunction;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * @author Benedikt Zoennchen
- *
- * @param <V>
  */
-@DataProcessorClass(label = "MeshTimestepDataProcessor")
-public abstract class MeshTimestepDataProcessor<V> extends DataProcessor<TimestepFaceIdKey, V> {
+@DataProcessorClass(label = "MeshProcessor")
+public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, PFace>> {
 
 	private IMesh<PVertex, PHalfEdge, PFace> mesh;
 	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 	private MeasurementArea measurementArea;
 
-	protected MeshTimestepDataProcessor(final String... headers) {
-		super(headers);
+	public MeshProcessor() {
+		super("mesh");
+		setAttributes(new AttributesMeshProcessor());
 	}
 
 	@Override
-	public void init(final ProcessorManager manager) {
+	public void init(ProcessorManager manager) {
 		super.init(manager);
-		AttributesMeshTimestepProcessor att = this.getAttributes();
+		AttributesMeshProcessor att = getAttributes();
 		this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
 	}
-	/*
 
-		@NotNull final IDistanceFunction distanceFunc,
-			@NotNull final IEdgeLengthFunction edgeLengthFunc,
-			@NotNull final Collection<? extends IPoint> fixPoints,
-			final double initialEdgeLen,
-			@NotNull final VRectangle bound,
-			@NotNull final Collection<? extends VShape> shapes,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier)
-	 */
+	public IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
+		return triangulation;
+	}
+
+	public MeasurementArea getMeasurementArea() {
+		return measurementArea;
+	}
 
 	@Override
-	public void preLoop(@NotNull final SimulationState state) {
-		super.preLoop(state);
+	public void postLoopAddResultInfo(@NotNull final SimulationState state, @NotNull final SimulationResult result){
+		result.addData(getSimulationResultHeader(), getTriangulation().getMesh().getMeshInformations());
+	}
 
+	@Override
+	public String getSimulationResultHeader() {
+		return "mesh (" + getTriangulation().getMesh().hashCode() + ")";
+	}
+
+	@Override
+	public String[] toStrings(final NoDataKey key) {
+		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
+		return new String[] { this.hasValue(key) ? meshPolyWriter.to2DPoly(this.getValue(key)) : "NA" };
+	}
+
+	@Override
+	public void preLoop(SimulationState state) {
+		super.preLoop(state);
 		VPolygon measurementPolygon = measurementArea.asPolygon();
 
 		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh(
@@ -107,29 +115,22 @@ public abstract class MeshTimestepDataProcessor<V> extends DataProcessor<Timeste
 		triangulation = meshImprover.getTriangulation();
 		mesh = triangulation.getMesh();
 
+		this.putValue(NoDataKey.key() ,mesh);
+
 		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);
 		var meshPanel = new PMeshPanel(meshRenderer, 300, 300);
 		meshPanel.display();
-		//System.out.println(mesh.toPythonTriangulation(null));
-	}
-
-	public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
-		return mesh;
-	}
-
-	public MeasurementArea getMeasurementArea() {
-		return this.measurementArea;
-	}
-
-	public IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
-		return triangulation;
 	}
 
 	@Override
-	public AttributesMeshTimestepProcessor getAttributes() {
-		if(super.getAttributes() == null) {
-			setAttributes(new AttributesMeshTimestepProcessor());
+	protected void doUpdate(@NotNull final SimulationState state) {}
+
+	@Override
+	public AttributesMeshProcessor getAttributes() {
+		if (super.getAttributes() == null) {
+			setAttributes(new AttributesMeshProcessor());
 		}
-		return (AttributesMeshTimestepProcessor)super.getAttributes();
+
+		return (AttributesMeshProcessor)super.getAttributes();
 	}
 }

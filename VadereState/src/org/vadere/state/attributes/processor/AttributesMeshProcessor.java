@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-public class AttributesMeshTimestepProcessor extends AttributesProcessor {
+public class AttributesMeshProcessor extends AttributesProcessor {
 	private int measurementAreaId = -1;
 	private double edgeLength = 1.0;
 

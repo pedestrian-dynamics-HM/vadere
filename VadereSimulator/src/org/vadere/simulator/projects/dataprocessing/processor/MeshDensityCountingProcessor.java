@@ -2,21 +2,46 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepFaceIdKey;
-import org.vadere.state.attributes.processor.AttributesMeshTimestepProcessor;
+import org.vadere.state.attributes.processor.AttributesMeshDensityCountingProcessor;
+import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.Collection;
 
-@DataProcessorClass()
-public class MeshDensityCountingProcessor extends MeshTimestepDataProcessor<Integer>{
+@DataProcessorClass(label = "MeshDensityCountingProcessor")
+public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKey, Integer> {
 
 	private final static String propertyNameNumberOfPedestrians = "numberOfPedestrians";
+	private MeshProcessor meshProcessor;
 
 	public MeshDensityCountingProcessor() {
 		super("meshDensityCounting");
-		setAttributes(new AttributesMeshTimestepProcessor());
+		setAttributes(new AttributesMeshDensityCountingProcessor());
+	}
+
+	@Override
+	public void init(ProcessorManager manager) {
+		super.init(manager);
+		this.meshProcessor = (MeshProcessor) manager.getProcessor(getAttributes().getMeshProcessorId());
+	}
+
+	private IMesh<PVertex, PHalfEdge, PFace> getMesh() {
+		return meshProcessor.getTriangulation().getMesh();
+	}
+
+	private MeasurementArea getMeasurementArea() {
+		return meshProcessor.getMeasurementArea();
+	}
+
+	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
+		return meshProcessor.getTriangulation();
 	}
 
 	@Override
@@ -48,4 +73,11 @@ public class MeshDensityCountingProcessor extends MeshTimestepDataProcessor<Inte
 		}
 	}
 
+	@Override
+	public AttributesMeshDensityCountingProcessor getAttributes() {
+		if(super.getAttributes() == null) {
+			setAttributes(new AttributesMeshDensityCountingProcessor());
+		}
+		return (AttributesMeshDensityCountingProcessor)super.getAttributes();
+	}
 }

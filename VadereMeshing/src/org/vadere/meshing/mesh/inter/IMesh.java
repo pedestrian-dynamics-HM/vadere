@@ -1939,6 +1939,13 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return result;
 	}
 
+	default String getMeshInformations() {
+		// here we divide the number of half-edges by 2 because each edge is represented by 2 half-edges
+		return "#vertices = " + getNumberOfVertices() +
+				", #edges = " + getNumberOfEdges() / 2 +
+				", #faces = " + getNumberOfFaces();
+	}
+
 	/**
 	 * This method is for synchronizing resources if multiple threads are used.
 	 * It tries to lock the vertex which might be uses to modify the mesh data structure
