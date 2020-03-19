@@ -199,7 +199,7 @@ public class VadereConsole {
 				.setDefault("func", utilsSubCommand);
 
 		misc.addArgument("-i")
-				.required(true)
+				.required(false)
 				.type(String.class)
 				.dest("input")
 				.help("A input file or directory depending on called method.");
