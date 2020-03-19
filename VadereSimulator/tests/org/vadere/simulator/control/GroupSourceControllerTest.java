@@ -172,7 +172,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(10)
+				.setDistributionParams(10)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.5, 0.5)
 				.setGroupSizeDistributionMock(2, 3, 2, 3);
@@ -194,7 +194,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(5)
+				.setDistributionParams(5)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.5, 0.5)
 				.setGroupSizeDistributionMock(2, 3, 2, 3);
@@ -214,7 +214,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		double endTime = 1.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(0.1)
+				.setDistributionParams(0.1)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.5, 0.5)
 				.setGroupSizeDistributionMock(2, 3, 2, 3, 2, 2, 3, 3, 3, 2, 2, 3, 3, 3, 3);
@@ -325,7 +325,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	public void testSpawnRateGreaterThanUpdateRate() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(1)
-				.setSpawnIntervalForConstantDistribution(0.3)
+				.setDistributionParams(0.3)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
 				.setGroupSizeDistributionMock(4, 3, 4, 4);
