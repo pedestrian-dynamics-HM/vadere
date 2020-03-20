@@ -3,7 +3,7 @@ package org.vadere.simulator.entrypoints.cmd.commands;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationAssistant;

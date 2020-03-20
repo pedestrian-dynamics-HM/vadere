@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.migration.jsontranformation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.simulator.projects.migration.MigrationException;

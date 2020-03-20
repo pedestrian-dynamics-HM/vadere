@@ -4,7 +4,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.migration.MigrationOptions;

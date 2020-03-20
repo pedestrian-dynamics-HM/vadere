@@ -7,7 +7,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.entrypoints.cmd.commands.MigrationSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ProjectRunSubCommand;
 import org.vadere.simulator.entrypoints.cmd.commands.ScenarioRunSubCommand;
@@ -34,7 +34,7 @@ public class VadereConsole {
 		addSubCommandsToParser(argumentParser);
 
 		try {
-			Namespace ns = vadereArgumentParser.parseArgsAndProcessOptions(args);
+			Namespace ns = vadereArgumentParser.parseArgsAndProcessInitialOptions(args);
 			SubCommandRunner sRunner = ns.get("func");
 			StdOutErrLog.addStdOutErrToLog();
 			sRunner.run(ns, argumentParser);

@@ -6,6 +6,7 @@
 
 ### Added
 
+- Added "--version" to "vadere-console.jar".
 - Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
 - Added "Psychology" tab in GUI which shows all psychology-related attributes of a scenario (which are stored in JSON node "attributesPsychology").
 - Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.

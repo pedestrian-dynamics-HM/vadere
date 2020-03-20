@@ -35,7 +35,7 @@ public class VadereApplication {
 
 		Namespace ns;
 		try {
-			ns = vadereArgumentParser.parseArgsAndProcessOptions(args);
+			ns = vadereArgumentParser.parseArgsAndProcessInitialOptions(args);
 			Messages.loadLanguageFromPreferences(VadereApplication.class);
 			ProjectView.start(ns.getString("project-path"));
 		} catch (UnsatisfiedLinkError linkError) {

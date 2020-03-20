@@ -26,7 +26,6 @@ VadereGui/*.svg
 VadereGui/*.mov
 VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
-VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
 # Python (byte-compiled, optimized, DLL files etc.)

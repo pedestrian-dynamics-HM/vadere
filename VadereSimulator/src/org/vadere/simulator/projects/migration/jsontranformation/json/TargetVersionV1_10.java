@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.migration.jsontranformation.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
 

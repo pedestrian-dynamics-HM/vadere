@@ -3,7 +3,7 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
@@ -101,7 +101,7 @@ public class JsonConverter {
 		node.put("description", scenarioStore.getDescription());
 		node.put("release", Version.releaseNumber());
 		if (commitHashIncluded)
-			node.put("commithash", Version.commitHash());
+			node.put("commithash", Version.getVersionControlCommitHash());
 	}
 
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {
