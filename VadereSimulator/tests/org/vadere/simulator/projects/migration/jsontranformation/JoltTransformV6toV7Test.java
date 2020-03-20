@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.state.attributes.models.AttributesOSM;
 

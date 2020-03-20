@@ -25,7 +25,6 @@ public class MaxOverlapProcessor extends NoDataKeyProcessor<Double> {
 	public MaxOverlapProcessor() {
 		super("max_size_overlap");
 		setAttributes(new AttributesMaxOverlapProcessor());
-
 	}
 
 	@Override

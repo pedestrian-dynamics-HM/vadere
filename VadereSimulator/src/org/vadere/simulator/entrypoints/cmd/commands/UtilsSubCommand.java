@@ -5,7 +5,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
@@ -38,8 +38,6 @@ public class UtilsSubCommand implements SubCommandRunner {
 		methods.put("getHash", Pair.of("[-i: file, -o: ignored]", this::getHash));
 		methods.put("binCache", Pair.of("[-i: file, -o: directory]",this::calculateBinCache));
 		methods.put("txtCache", Pair.of("[-i: file, -o: directory]",this::calculateTextCache));
-		methods.put("getVersion", Pair.of("returns version",this::getVersion));
-		methods.put("getCommitHash", Pair.of("returns commit hash",this::getCommitHash));
 	}
 
 	public String[] methodsString(){
@@ -88,20 +86,6 @@ public class UtilsSubCommand implements SubCommandRunner {
 	 */
 	private void getHash(Namespace ns, ArgumentParser parser) throws Exception{
 		calculateCache(ns, parser, CacheType.TXT_CACHE);
-	}
-
-	/**
-	 * Returns the current version
-	 */
-	private void getVersion(Namespace ns, ArgumentParser parser) throws Exception{
-		System.out.println(Version.releaseNumber());
-	}
-
-	private void getCommitHash(Namespace ns, ArgumentParser parser) throws Exception{
-		System.out.println(Version.commitHash());
-		/* String filename = Resources.class.getResource("/current_commit_hash.txt").getFile();
-		String commit_hash = (new BufferedReader(new FileReader(filename))).readLine();
-		System.out.println(commit_hash); */
 	}
 
 	private void calculateBinCache(Namespace ns, ArgumentParser parser) throws Exception{

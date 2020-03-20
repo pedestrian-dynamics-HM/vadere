@@ -4,7 +4,7 @@ import org.hamcrest.core.StringContains;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;

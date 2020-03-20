@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
@@ -22,10 +22,8 @@ import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
 import org.vadere.state.attributes.models.AttributesPotentialOSM;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.util.StateJsonConverter;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 @MigrationTransformation(targetVersionLabel = "0.1")
 public class JoltTransformV0toV1 extends JoltTransformation {

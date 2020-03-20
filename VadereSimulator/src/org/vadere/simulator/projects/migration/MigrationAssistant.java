@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.migration;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.incident.IncidentMigrationAssistant;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
 import org.vadere.util.io.IOUtils;

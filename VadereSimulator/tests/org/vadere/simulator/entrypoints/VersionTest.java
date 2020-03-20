@@ -1,7 +1,7 @@
 package org.vadere.simulator.entrypoints;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.Test;
+import org.vadere.util.version.Version;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
