@@ -96,6 +96,28 @@ public class SimplePerceptionModelTest {
     }
 
     @Test
+    public void updateRanksChangeTargetScriptedHigherThanElapsedTime() {
+        Topography topography = createTopography();
+
+        List<Pedestrian> pedestrians = createPedestrians(2);
+        List<Stimulus> stimuli = new ArrayList<>();
+
+        Stimulus expectedStimulus = new ChangeTargetScripted();
+        stimuli.add(new ElapsedTime());
+        stimuli.add(expectedStimulus);
+
+        SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
+        simplePerceptionModel.initialize(topography);
+
+        pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
+
+        simplePerceptionModel.update(pedestrians, stimuli);
+
+        // Use "==" to compare if it is the same reference!
+        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+    }
+
+    @Test
     public void updateRanksChangeTargetHigherThanElapsedTime() {
         Topography topography = createTopography();
 
@@ -229,5 +251,28 @@ public class SimplePerceptionModelTest {
 
         assertEquals(expectedTime, pedestrians.get(0).getMostImportantStimulus().getTime(), ALLOWED_DOUBLE_ERROR);
         assertEquals(expectedElapsedTime.getTime(), pedestrians.get(1).getMostImportantStimulus().getTime(), ALLOWED_DOUBLE_ERROR);
+    }
+
+    @Test
+    public void updateRanksChangeTargetScriptedHigherThanChangeTarget() {
+        Topography topography = createTopography();
+
+        List<Pedestrian> pedestrians = createPedestrians(2);
+        List<Stimulus> stimuli = new ArrayList<>();
+
+        Stimulus expectedStimulus = new ChangeTargetScripted();
+        stimuli.add(new ElapsedTime());
+        stimuli.add(new ChangeTarget());
+        stimuli.add(expectedStimulus);
+
+        SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
+        simplePerceptionModel.initialize(topography);
+
+        pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
+
+        simplePerceptionModel.update(pedestrians, stimuli);
+
+        // Use "==" to compare if it is the same reference!
+        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
     }
 }

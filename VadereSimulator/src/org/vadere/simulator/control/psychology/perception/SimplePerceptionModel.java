@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Use a very simple strategy to rank stimulus priority:
  *
- * ChangeTarget > Threat > Wait > WaitInArea > ElapsedTime
+ * ChangeTargetScripted > ChangeTarget > Threat > Wait > WaitInArea > ElapsedTime
  */
 public class SimplePerceptionModel implements IPerceptionModel {
 
@@ -43,8 +43,11 @@ public class SimplePerceptionModel implements IPerceptionModel {
         List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
+        List<Stimulus> changeTargetScriptedStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTargetScripted).collect(Collectors.toList());
 
-        if (changeTargetStimuli.size() >= 1) {
+        if (changeTargetScriptedStimuli.size() >= 1) {
+            mostImportantStimulus = changeTargetScriptedStimuli.get(0);
+        } else if (changeTargetStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetStimuli.get(0);
         } else if (threatStimuli.size() >= 1) {
             Stimulus closestThreat = selectClosestAndPerceptibleThreat(pedestrian, threatStimuli);
