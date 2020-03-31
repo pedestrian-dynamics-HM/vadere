@@ -15,6 +15,14 @@ However, we welcome contributions from external sources.
 
 The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview). 
 
+## Contact
+
+If you have questions about Vadere, have found a software bug or have a suggestion for improvements, please feel free to either
+
+* [open an issue](https://gitlab.lrz.de/vadere/vadere/issues) (Note: you require an LRZ account), or
+* send an e-mail with your enquiry to our mailing list [vadere@lists.lrz.de](vadere@lists.lrz.de)
+
+
 ## Pipeline Status
 
 | Branch  | Pipeline Status  | Coverage |
