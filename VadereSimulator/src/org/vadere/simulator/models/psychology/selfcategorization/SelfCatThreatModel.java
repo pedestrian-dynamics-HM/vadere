@@ -89,11 +89,20 @@ public class SelfCatThreatModel implements MainModel {
 
     @Override
     public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
+
+        return createElement(position, id, this.attributesPedestrian, type);
+    }
+
+    @Override
+    public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+        AttributesAgent aAttr = (AttributesAgent)attr;
+
         if (!Pedestrian.class.isAssignableFrom(type))
             throw new IllegalArgumentException("cannot initialize " + type.getCanonicalName());
 
         AttributesAgent pedAttributes = new AttributesAgent(
-                this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
+                aAttr, registerDynamicElementId(domain.getTopography(), id));
 
         PedestrianSelfCatThreat pedestrian = createElement(position, pedAttributes);
 

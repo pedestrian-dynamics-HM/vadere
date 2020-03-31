@@ -3,6 +3,12 @@ package org.vadere.state.util;
 import java.io.IOException;
 import java.util.List;
 
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
+import org.vadere.state.scenario.Source;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
@@ -71,6 +77,8 @@ public class JacksonObjectMapper extends ObjectMapper {
 				jsonGenerator.writeTree(serializeVRectangle(vRect));
 			}
 		});
+
+
 
 		sm.addDeserializer(VShape.class, new JsonDeserializer<VShape>() {
 			@Override
