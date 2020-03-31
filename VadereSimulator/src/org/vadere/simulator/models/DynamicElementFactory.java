@@ -17,6 +17,11 @@ public interface DynamicElementFactory {
 	 */
 	 <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type);
 
+	/**
+	 * Override the DynamicElement Attributes given in the topography by the values given here.
+	 * Note: The Attribute values come from the source and are set by the SourceController
+	 * during DynamicElement Creation.
+	 */
 	<T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type);
 
 
