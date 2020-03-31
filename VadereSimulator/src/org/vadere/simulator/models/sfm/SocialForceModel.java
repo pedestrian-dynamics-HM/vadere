@@ -146,13 +146,21 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 
 	@Override
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
+		return createElement(position, id, this.elementAttributes, type);
+	}
+
+	@Override
+	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+		AttributesAgent aAttr = (AttributesAgent)attr;
+
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("SFM cannot initialize " + type.getCanonicalName());
 
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
+		AttributesAgent pedAttributes = new AttributesAgent(aAttr, registerDynamicElementId(domain.getTopography(), id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}
+
 
 	private Pedestrian create(@NotNull final VPoint position, @NotNull final AttributesAgent pedAttributes) {
 		Pedestrian pedestrian = new Pedestrian(pedAttributes, random);

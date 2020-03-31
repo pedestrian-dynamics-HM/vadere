@@ -94,6 +94,8 @@ public class AttributesSource extends AttributesEmbedShape {
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private AttributesAgent attributesPedestrian = null;
 	@SuppressWarnings("unused")
 	private AttributesSource() {}
 
@@ -160,6 +162,9 @@ public class AttributesSource extends AttributesEmbedShape {
 
 	public boolean isSpawnAtGridPositionsCA(){ return spawnAtGridPositionsCA; }
 
+	public AttributesAgent getAttributesPedestrian() {
+		return attributesPedestrian;
+	}
 
 	public boolean isUseFreeSpaceOnly() {
 		return useFreeSpaceOnly;
@@ -250,4 +255,7 @@ public class AttributesSource extends AttributesEmbedShape {
 		checkSealed();
 		this.id = id;
 	}
+
+
+
 }

@@ -84,11 +84,19 @@ public class BehaviouralHeuristicsModel implements MainModel {
 
 	@Override
 	public <T extends DynamicElement> PedestrianBHM createElement(VPoint position, int id, Class<T> type) {
+		return createElement(position, id, this.attributesPedestrian, type);
+	}
+
+	@Override
+	public <T extends DynamicElement> PedestrianBHM createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+		AttributesAgent aAttr = (AttributesAgent)attr;
+
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("BHM cannot initialize " + type.getCanonicalName());
 
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, registerDynamicElementId(topography, id));
+				aAttr, registerDynamicElementId(topography, id));
 
 		PedestrianBHM pedestrian = createElement(position, pedAttributes);
 		pedestrian.setPosition(position);
