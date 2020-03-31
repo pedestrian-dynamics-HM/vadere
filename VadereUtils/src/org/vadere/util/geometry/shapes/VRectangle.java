@@ -1,5 +1,8 @@
 package org.vadere.util.geometry.shapes;
 
+import com.github.davidmoten.rtree.geometry.Rectangle;
+import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
+
 import org.vadere.util.geometry.GeometryUtils;
 
 import java.awt.geom.Rectangle2D;
@@ -206,5 +209,4 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		}
 		return lines;
 	}
-
 }

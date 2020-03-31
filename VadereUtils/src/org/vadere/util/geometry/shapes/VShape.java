@@ -1,5 +1,8 @@
 package org.vadere.util.geometry.shapes;
 
+import com.github.davidmoten.rtree.geometry.Geometry;
+import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
+
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
@@ -11,7 +14,7 @@ import java.util.Optional;
 /**
  * Geometric shape and position.
  */
-public interface VShape extends Shape, Cloneable {
+public interface VShape extends Shape, Cloneable, Geometry {
 
 	double BORDER_TOLERANCE = 0.1;
 
@@ -135,5 +138,28 @@ public interface VShape extends Shape, Cloneable {
 		angle += Math.PI + Math.PI / (directions);
 		double indexRatio = (angle) / (2 * Math.PI);
 		return (int)(indexRatio * directions);
+	}
+
+
+	// Methods used by the R-Tree
+	@Override
+	default double distance(com.github.davidmoten.rtree.geometry.Rectangle rectangle) {
+		return mbr().distance(rectangle);
+	}
+
+	@Override
+	default com.github.davidmoten.rtree.geometry.Rectangle mbr() {
+		Rectangle2D bound = getBounds2D();
+		return RectangleDouble.create(bound.getMinX(), bound.getMinY(), bound.getMaxX(), bound.getMaxY());
+	}
+
+	@Override
+	default boolean intersects(com.github.davidmoten.rtree.geometry.Rectangle rectangle) {
+		return mbr().intersects(rectangle);
+	}
+
+	@Override
+	default boolean isDoublePrecision() {
+		return true;
 	}
 }

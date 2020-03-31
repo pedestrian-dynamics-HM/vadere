@@ -1939,6 +1939,13 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return result;
 	}
 
+	default String getMeshInformations() {
+		// here we divide the number of half-edges by 2 because each edge is represented by 2 half-edges
+		return "#vertices = " + getNumberOfVertices() +
+				", #edges = " + getNumberOfEdges() / 2 +
+				", #faces = " + getNumberOfFaces();
+	}
+
 	/**
 	 * This method is for synchronizing resources if multiple threads are used.
 	 * It tries to lock the vertex which might be uses to modify the mesh data structure
@@ -2316,7 +2323,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 *
 	 * @return a string representing the mesh
 	 */
-	default String toPythonTriangulation(@NotNull final Function<V, Double> evalPoint) {
+	default String toPythonTriangulation(@Nullable final Function<V, Double> evalPoint) {
 		garbageCollection();
 		StringBuilder builder = new StringBuilder();
 		List<V> vertices = getVertices();
@@ -2341,12 +2348,14 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		builder.append("]\n");
 
 		// [z1, z2, ...] z = value
-		builder.append("z = [");
-		for(V v : vertices) {
-			builder.append(evalPoint.apply(v) + ",");
+		if(evalPoint != null) {
+			builder.append("z = [");
+			for(V v : vertices) {
+				builder.append(evalPoint.apply(v) + ",");
+			}
+			builder.delete(builder.length()-1, builder.length());
+			builder.append("]\n");
 		}
-		builder.delete(builder.length()-1, builder.length());
-		builder.append("]\n");
 
 		// [[vId1, vId2, vId3], ...]
 		List<F> faces = getFaces();

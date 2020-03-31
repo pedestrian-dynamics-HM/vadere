@@ -20,7 +20,7 @@ public class PostVisualisation {
 		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
 
 		try {
-			vadereArgumentParser.parseArgsAndProcessOptions(args);
+			vadereArgumentParser.parseArgsAndProcessInitialOptions(args);
 		} catch (UnsatisfiedLinkError linkError) {
 			System.err.println("[LWJGL]: " + linkError.getMessage());
 		} catch (ArgumentParserException e) {

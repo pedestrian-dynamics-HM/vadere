@@ -1,6 +1,6 @@
 package org.vadere.simulator.projects.migration;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 
 import java.util.Objects;
 

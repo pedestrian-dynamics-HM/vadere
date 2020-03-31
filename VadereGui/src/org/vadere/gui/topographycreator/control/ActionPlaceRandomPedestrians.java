@@ -41,22 +41,19 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		ActionRandomPedestrianDialog dialog = new ActionRandomPedestrianDialog();
-		if (dialog.getValue()){
+
+		if (dialog.showDialog() && dialog.isValid()) {
 			IDrawPanelModel model = getScenarioPanelModel();
 
 			int numOfPeds = dialog.getNumOfPeds();
 			Supplier<LinkedList<Integer>> targetSupplier = getTargetSupplier(dialog);
 			Random random = dialog.getRandom();
 
-			Rectangle2D.Double topographyBound = model.getTopographyBound();
-			Rectangle2D.Double legalBound = new Rectangle2D.Double(topographyBound.x + 0.8, topographyBound.y + 0.8,
-					topographyBound.width -1.6, topographyBound.height -1.6);
-
+			Rectangle2D.Double legalBound = dialog.getBoundaryRectangle();
 			SimpleReachablePointProvider provider = SimpleReachablePointProvider.uniform(random, legalBound, model.getTopography().getObstacleDistanceFunction());
 
-
 			int placedPedestrians = 0;
-			while (placedPedestrians < numOfPeds){
+			while (placedPedestrians < numOfPeds) {
 
 				IPoint p = provider.stream(dist ->  dist > 0.25).findFirst().get();
 				getScenarioPanelModel().setSelectionShape(new VCircle(p.getX(), p.getY(), this.dotRadius));

@@ -48,29 +48,6 @@
                 </execution>
             </executions>
         </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
-            <executions>
-                <execution>
-                    <id>write-version-control-info-to-file</id>
-                    <phase>generate-resources</phase>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <!-- Write a file with current version of Vadere to get reproducible simulations. -->
-            <configuration>
-                <executable>git</executable>
-                <arguments>
-                    <argument>rev-parse</argument>
-                    <argument>HEAD</argument>
-                </arguments>
-                <outputFile>resources/current_commit_hash.txt</outputFile>
-            </configuration>
-        </plugin>
       <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>

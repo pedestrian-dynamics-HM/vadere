@@ -5,13 +5,12 @@ import com.bazaarvoice.jolt.Diffy;
 import com.bazaarvoice.jolt.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class JoltTransformation extends AbstractJsonTransformation implements JsonTransformation, JsonNodeExplorer {

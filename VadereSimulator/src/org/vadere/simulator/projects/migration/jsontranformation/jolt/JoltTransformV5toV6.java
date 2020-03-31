@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
-import org.vadere.simulator.projects.migration.jsontranformation.AbstractJsonTransformation;
 import org.vadere.simulator.projects.migration.jsontranformation.JoltTransformation;
 
 import java.util.Iterator;

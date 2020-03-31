@@ -1,16 +1,23 @@
-package org.vadere.simulator.entrypoints;
+package org.vadere.util.version;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.logging.Logger;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Scanner;
 
 /**
- * Versions in strict order from oldest to newest.
+ * Vadere versions in strict order from oldest to newest.
+ *
+ * In Vadere, each release consists of a semantic version with "major.minor"
+ * and the corresponding commit hash from the version control system.
+ *
+ * The commit hash from version control is stored in {@link #VERSION_CONTROL_INFO_FILE}
+ * when compiling Vadere (during Maven's "generate-resources" phase).
  */
 public enum Version {
-
-
 
 	UNDEFINED("undefined"),
 	NOT_A_RELEASE("not a release"),
@@ -35,14 +42,14 @@ public enum Version {
 	V1_8(1, 8),
 	V1_9(1, 9),
 	V1_10(1, 10),
-	V1_11(1, 11),
-	;
+	V1_11(1, 11);
 
+	private static Logger logger = Logger.getLogger(Version.class);
+	private static final String VERSION_CONTROL_INFO_FILE = "/current_commit_hash.txt";
 
 	private String label;
 	private int major;
 	private int minor;
-
 
 	Version(String label) {
 		this.major = -1;
@@ -54,6 +61,33 @@ public enum Version {
 		this.major = major;
 		this.minor = minor;
 		this.label = major + "." + minor;
+	}
+
+	public static String getVersionControlCommitHash() {
+		String commitHash = readFileFromJavaResourceFolder(VERSION_CONTROL_INFO_FILE);
+
+		if (commitHash == null) {
+			commitHash = "No version control commit hash available!";
+			logger.warn("No version control commit hash available!");
+		}
+
+		return commitHash;
+	}
+
+	private static String readFileFromJavaResourceFolder(String resource) {
+		final InputStream in = Version.class.getResourceAsStream(resource);
+		if (in != null) {
+			try (final Scanner scanner = new Scanner(in)) {
+				if (scanner.hasNext()) {
+					return scanner.next();
+				}
+			}
+		}
+		return null;
+	}
+
+	public static String releaseNumber() {
+		return latest().label();
 	}
 
 	public String label() {
@@ -107,8 +141,6 @@ public enum Version {
         }
 		return values;
     }
-
-
 
 	public Version nextVersion() {
 		int nextId = versionId(this) == (values().length - 1) ? versionId(this) : versionId(this) + 1;

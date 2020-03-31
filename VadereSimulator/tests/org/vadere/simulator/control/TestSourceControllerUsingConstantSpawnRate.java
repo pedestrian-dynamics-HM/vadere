@@ -1,108 +1,21 @@
 package org.vadere.simulator.control;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
-import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.scenarioelements.SourceController;
-import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
-import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestSourceControllerUsingConstantSpawnRate {
+public class TestSourceControllerUsingConstantSpawnRate extends TestSourceController {
 
 
-	ArrayList<SourceTestData> sourceTestData;
 
-	protected SourceTestData first() {
-		return sourceTestData.get(0);
-	}
-
-	protected SourceTestData second() {
-		return sourceTestData.get(1);
-	}
-
-	@Before
-	public void init() {
-		sourceTestData = new ArrayList<>();
-	}
-
-	public SourceControllerFactory getSourceControllerFactory(SourceTestData d) {
-		return new SingleSourceControllerFactory();
-	}
-
-
-	public void initialize(SourceTestAttributesBuilder builder) throws IOException{
-
-		SourceTestData d = new SourceTestData();
-
-		d.attributesSource = builder.getResult();
-		d.attributesPedestrian = new AttributesAgent();
-
-		d.random = new Random(builder.getRandomSeed());
-
-		d.source = new Source(d.attributesSource);
-		d.pedestrianFactory = new DynamicElementFactory() {
-			private int pedestrianIdCounter = 0;
-
-			@Override
-			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
-				return createElement(position, id, d.attributesPedestrian, type );
-			}
-
-			@Override
-			public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
-
-				AttributesAgent aAttr = (AttributesAgent) attr;
-
-				AttributesAgent att = new AttributesAgent(
-						aAttr, registerDynamicElementId(null, id));
-				Pedestrian ped = new Pedestrian(att, d.random);
-				ped.setPosition(position);
-				return ped;
-			}
-
-			@Override
-			public int registerDynamicElementId(Topography topography, int id) {
-				return id > 0 ? id : ++pedestrianIdCounter;
-			}
-
-			@Override
-			public int getNewDynamicElementId(Topography topography) {
-				return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
-			}
-
-			@Override
-			public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
-				return createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class).getShape();
-			}
-
-
-		};
-
-		d.sourceControllerFactory = getSourceControllerFactory(d);
-
-		d.sourceController = d.sourceControllerFactory.create(d.topography, d.source,
-				d.pedestrianFactory, d.attributesPedestrian, d.random);
-
-		sourceTestData.add(d);
-	}
 
 	/**
 	 * Test method for {@link SourceController#update(double)}.
@@ -131,7 +44,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(startTime).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(10);
+				.setDistributionParams(10);
 		initialize(builder);
 
 		first().sourceController.update(startTime);
@@ -152,7 +65,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 10.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(5);
+				.setDistributionParams(5);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
@@ -171,7 +84,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		double endTime = 1.0;
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
-				.setSpawnIntervalForConstantDistribution(0.1);
+				.setDistributionParams(0.1);
 		initialize(builder);
 
 		for (double simTimeInSec = 0; simTimeInSec < endTime * 2; simTimeInSec += 1.0) {
@@ -217,13 +130,7 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		assertEquals("wrong pedestrian number.", 100, countPedestrians(0));
 	}
 
-	protected int countPedestrians(int source) {
-		return sourceTestData.get(source).topography.getElements(Pedestrian.class).size();
-	}
 
-	protected void pedestrianCountEquals(int expected) {
-		assertEquals(expected, countPedestrians(0));
-	}
 
 	protected void doUpdates(int source, int number, double startTime, double endTimeExclusive) {
 		double timeStep = (endTimeExclusive - startTime) / number;
@@ -247,15 +154,4 @@ public class TestSourceControllerUsingConstantSpawnRate {
 		}
 	}
 
-	class SourceTestData {
-		public Random random;
-		public AttributesAgent attributesPedestrian;
-		public DynamicElementFactory pedestrianFactory;
-		public Source source;
-		public Topography topography = new Topography();
-		public SourceController sourceController;
-		public AttributesSource attributesSource;
-		public SourceControllerFactory sourceControllerFactory;
-		public long randomSeed = 0;
-	}
 }

@@ -119,7 +119,7 @@ public class TestBoyerWatson {
 		IMesh<PVertex, PHalfEdge, PFace> mesh = delaunayTriangulation.getMesh();
 		PHalfEdge edge = mesh.getEdge(face);
 
-		// triangulations are always ccw ordered!
+		// triangulations are always ccwRobust ordered!
 		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
 
 		delaunayTriangulation.splitTriangle(face, centerPoint, false);

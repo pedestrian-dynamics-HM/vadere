@@ -1,10 +1,12 @@
 package org.vadere.util.io;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.vadere.util.config.VadereConfig;
+import org.vadere.util.version.Version;
 
 /**
  * This class provides the functionality to parse command line arguments
@@ -23,7 +25,7 @@ public class VadereArgumentParser {
     public VadereArgumentParser() {
         argumentParser = ArgumentParsers.newArgumentParser("Vadere")
                 .defaultHelp(true)
-                .description("Runs the Vadere pedestrian simulator.");
+                .description("Run the Vadere pedestrian simulator.");
 
         addOptionsToParser(argumentParser);
     }
@@ -34,11 +36,15 @@ public class VadereArgumentParser {
     }
 
     // Methods
-    public Namespace parseArgsAndProcessOptions(String[] args) throws ArgumentParserException {
+    public Namespace parseArgsAndProcessInitialOptions(String[] args) throws ArgumentParserException {
+        if (versionIsRequested(args)) {
+            System.out.println(String.format("Vadere %s (Commit Hash: %s)", Version.releaseNumber(), Version.getVersionControlCommitHash()));
+            System.exit(0);
+        }
+
         Namespace namespace = argumentParser.parseArgs(args);
 
         String configFile = namespace.getString("configfile");
-
         if (configFile != null) {
             VadereConfig.setConfigPath(configFile);
         }
@@ -46,7 +52,25 @@ public class VadereArgumentParser {
         return namespace;
     }
 
+    private boolean versionIsRequested(String[] args) {
+        boolean versionRequrested = false;
+
+        for (String currentArgument : args) {
+            if (currentArgument.contains("--version")) {
+                versionRequrested = true;
+                break;
+            }
+        }
+
+        return versionRequrested;
+    }
+
     private void addOptionsToParser(ArgumentParser parser) {
+        parser.addArgument("--version")
+                .action(Arguments.storeTrue())
+                .dest("version")
+                .help("Print version information and exit Vadere.");
+
         parser.addArgument("--loglevel")
                 .required(false)
                 .type(String.class)

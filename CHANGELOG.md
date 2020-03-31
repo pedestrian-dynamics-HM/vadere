@@ -6,6 +6,7 @@
 
 ### Added
 
+- Added "--version" to "vadere-console.jar".
 - Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
 - Added "Psychology" tab in GUI which shows all psychology-related attributes of a scenario (which are stored in JSON node "attributesPsychology").
 - Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.
@@ -19,7 +20,7 @@
   * Hover over hash to see full value
   * Left-Click to copy full hash to clipboard.
 - TraCI commands: 
-  * getHash: return Scenario hash for given scenario 
+  * getHash: return scenario hash for given scenario 
   * CompoundObject implementation to allow complex get/set commands (i.e. create pedestrian hat 
     random location during simulation run)
 - osm2vadere converter:

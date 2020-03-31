@@ -81,9 +81,9 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	private Predicate<E> illegalPredicate;
 	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
 
-	static {
+	/*static {
 		ITriConnectivity.log.setDebug();
-	}
+	}*/
 
 	/**
 	 * Construct a triangulation using an empty mesh.
@@ -398,7 +398,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
-	public E insertVertex(@NotNull V vertex, @NotNull F face) {
+	public E insertVertex(@NotNull final V vertex, @NotNull final F face) {
 		if(!initialized) {
 			init();
 		}
