@@ -20,7 +20,7 @@
   * Hover over hash to see full value
   * Left-Click to copy full hash to clipboard.
 - TraCI commands: 
-  * getHash: return Scenario hash for given scenario 
+  * getHash: return scenario hash for given scenario 
   * CompoundObject implementation to allow complex get/set commands (i.e. create pedestrian hat 
     random location during simulation run)
 - osm2vadere converter:

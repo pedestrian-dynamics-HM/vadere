@@ -1,6 +1,8 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
@@ -17,6 +19,7 @@ import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.math.TruncatedNormalDistribution;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -162,11 +165,15 @@ public abstract class SourceController {
 		topography.addElement(newElement);
 	}
 
+
 	private DynamicElement createDynamicElement(final VPoint position) {
 		Agent result;
 		switch (sourceAttributes.getDynamicElementType()) {
 			case PEDESTRIAN:
-				result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
+				if (source.getAttributes().getAttributesPedestrian() == null) {
+					result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);}
+				else{
+					result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, source.getAttributes().getAttributesPedestrian(), Pedestrian.class); }
 				break;
 			case CAR:
 				result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Car.class);

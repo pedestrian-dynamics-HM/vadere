@@ -4,6 +4,7 @@ package org.vadere.gui.topographycreator.view;
 import org.vadere.gui.projectview.view.ProjectView;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
@@ -16,17 +17,20 @@ import javax.swing.event.DocumentEvent;
 public class ActionRandomPedestrianDialog {
 
 	private JTextField numberOfPeds_field;
+	private JTextField boundaryRectangle_field;
 	private JTextField targets_field;
 	private JTextField seed_field;
 	private JPanel panel;
 
 	private boolean valid;
 	private int numOfPeds;
+	private Rectangle2D.Double boundaryRectangle;
 	private LinkedList<Integer> selectedTargets;
 	private int seed;
 	private Random random;
 
-	public ActionRandomPedestrianDialog(){
+	public ActionRandomPedestrianDialog() {
+
 		numberOfPeds_field = new JTextField("10", 15);
 		numberOfPeds_field.setHorizontalAlignment(JTextField.RIGHT);
 		numberOfPeds_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
@@ -35,14 +39,40 @@ public class ActionRandomPedestrianDialog {
 				String text = numberOfPeds_field.getText();
 				try{
 					numOfPeds = Integer.parseInt(text);
-					ActionRandomPedestrianDialog.this.valid = true;
+					valid = true;
 					numberOfPeds_field.setForeground(Color.BLACK);
 				} catch (Exception ex){
-					ActionRandomPedestrianDialog.this.valid = false;
+					valid = false;
 					numberOfPeds_field.setForeground(Color.RED);
 				}
 			}
 		});
+
+		boundaryRectangle_field = new JTextField("x, y, width, height", 15);
+		boundaryRectangle_field.setHorizontalAlignment(JTextField.RIGHT);
+		boundaryRectangle_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void handle(DocumentEvent e) {
+				String text = boundaryRectangle_field.getText();
+				try{
+					String[] numbersAsString = text.split(",");
+
+					boundaryRectangle = new Rectangle2D.Double(
+							Double.parseDouble(numbersAsString[0]),
+							Double.parseDouble(numbersAsString[1]),
+							Double.parseDouble(numbersAsString[2]),
+							Double.parseDouble(numbersAsString[3])
+							);
+
+					valid = true;
+					boundaryRectangle_field.setForeground(Color.BLACK);
+				} catch (Exception ex){
+					valid = false;
+					boundaryRectangle_field.setForeground(Color.RED);
+				}
+			}
+		});
+
 		targets_field = new JTextField("-1", 15);
 		targets_field.setHorizontalAlignment(JTextField.RIGHT);
 		targets_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
@@ -60,7 +90,7 @@ public class ActionRandomPedestrianDialog {
 					}
 					targets_field.setForeground(Color.BLACK);
 				}catch (Exception ex){
-					ActionRandomPedestrianDialog.this.valid = false;
+					valid = false;
 					targets_field.setForeground(Color.RED);
 				}
 			}
@@ -72,10 +102,10 @@ public class ActionRandomPedestrianDialog {
 			public void handle(DocumentEvent e) {
 				try{
 					seed = Integer.parseInt(seed_field.getText());
-					ActionRandomPedestrianDialog.this.valid = true;
+					valid = true;
 					seed_field.setForeground(Color.BLACK);
 				} catch (Exception ex){
-					ActionRandomPedestrianDialog.this.valid = false;
+					valid = false;
 					seed_field.setForeground(Color.RED);
 				}
 			}
@@ -87,12 +117,14 @@ public class ActionRandomPedestrianDialog {
 
 		panel.add(new JLabel("Set Number of Pedestrians"), c(GridBagConstraints.HORIZONTAL, 0, 0));
 		panel.add(numberOfPeds_field, c(GridBagConstraints.HORIZONTAL, 1, 0));
-		panel.add(new JLabel("Set Targets (-1 for random)"), c(GridBagConstraints.HORIZONTAL, 0, 1));
-		panel.add(targets_field, c(GridBagConstraints.HORIZONTAL, 1, 1));
-		panel.add(new JLabel("Set Random Seed (-1 for random)"), c(GridBagConstraints.HORIZONTAL, 0, 2));
-		panel.add(seed_field, c(GridBagConstraints.HORIZONTAL, 1, 2));
+		panel.add(new JLabel("In Boundary Rectangle"), c(GridBagConstraints.HORIZONTAL, 0, 1));
+		panel.add(boundaryRectangle_field, c(GridBagConstraints.HORIZONTAL, 1, 1));
+		panel.add(new JLabel("Set Targets (-1 for random)"), c(GridBagConstraints.HORIZONTAL, 0, 2));
+		panel.add(targets_field, c(GridBagConstraints.HORIZONTAL, 1, 2));
+		panel.add(new JLabel("Set Random Seed (-1 for random)"), c(GridBagConstraints.HORIZONTAL, 0, 3));
+		panel.add(seed_field, c(GridBagConstraints.HORIZONTAL, 1, 3));
 		panel.add(new JLabel("May take a while because intelligent distance function not available yet..."),
-				  c(GridBagConstraints.HORIZONTAL, 0,3,2));
+				  c(GridBagConstraints.HORIZONTAL, 0,4,2));
 
 		numOfPeds = 10;
 		selectedTargets = new LinkedList<>();
@@ -126,6 +158,8 @@ public class ActionRandomPedestrianDialog {
 		return numOfPeds;
 	}
 
+	public Rectangle2D.Double getBoundaryRectangle() { return boundaryRectangle; }
+
 	public boolean useRandomTargets(){
 		return selectedTargets.isEmpty() || selectedTargets.peekFirst() == -1;
 	}
@@ -145,11 +179,15 @@ public class ActionRandomPedestrianDialog {
 		return selectedTargets;
 	}
 
-	public boolean getValue(){
+	public boolean showDialog(){
 		return JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				panel,
 				"Create Random Pedestrians",
 				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
+	}
+
+	public boolean isValid() {
+		return valid;
 	}
 }
