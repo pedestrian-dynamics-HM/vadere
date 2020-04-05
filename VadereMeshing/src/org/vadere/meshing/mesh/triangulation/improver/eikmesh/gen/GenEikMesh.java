@@ -93,6 +93,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 	private boolean allowVertexCollapse = true;
 	private boolean allowFaceCollapse = true;
+
 	private boolean removeLowBoundaryTriangles = false;
 	private boolean removeOutsideTriangles = false;
 	private boolean useVirtualEdges = true;
@@ -741,7 +742,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					.map(e -> getMesh().getPrev(e))
 					.allMatch(e -> getTriangulation().isLeftOf(newX, newY, e));
 		}
-		return true;
+		return false;
 	}
 
 	/**

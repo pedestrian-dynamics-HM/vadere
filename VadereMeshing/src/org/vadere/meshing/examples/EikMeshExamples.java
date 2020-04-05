@@ -45,10 +45,10 @@ public class EikMeshExamples {
 	private static final Color lightBlue = new Color(0.8584083044982699f, 0.9134486735870818f, 0.9645674740484429f);
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		squareHole2();
+		//squareHole2();
 		//delaunayTriangulation();
 		//distanceFuncCombination();
-		//uniformMeshDiscFunction(0.15);
+		uniformMeshDiscFunction(0.15);
 		//uniformMeshRingFunction(0.05);
 		//combineDistanceFunctions();
 		//edgeLengthFunction();
@@ -354,6 +354,21 @@ public class EikMeshExamples {
 
 		// display the mesh
 		meshPanel.display("Geometry defined by a distance function (disc)");
+
+		// display the mesh
+		meshPanel.display("Combination of distance functions");
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.GREEN;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.BLUE, e -> Color.BLACK, vertexColorFunction,1.0f, true));
 
 		/*var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
 		recorder.record();

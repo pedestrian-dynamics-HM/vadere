@@ -1,5 +1,7 @@
 package org.vadere.meshing.utils.io.tex;
 
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.apache.commons.collections.map.HashedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
@@ -13,8 +15,10 @@ import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -142,6 +146,129 @@ public class TexGraphGenerator {
 		return toTikz(mesh, coloring, edgeColorFunction, null, scaling, drawVertices);
 	}
 
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> Map<Color, String> buildFaceColorMap(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Function<F, Color> coloring) {
+
+		Map<Color, String> bidiMap = new HashMap<>();
+
+		int counter = 1;
+		for(F face : mesh.getFaces()) {
+			Color c = coloring.apply(face);
+			if(!bidiMap.containsKey(c)) {
+				bidiMap.put(c, "faceColor"+counter);
+				counter++;
+			}
+		}
+		return bidiMap;
+	}
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> Map<Color, String> buildEdgeColorMap(
+			@NotNull final IMesh<V, E, F> mesh,
+			@Nullable final Function<E, Color> coloring) {
+
+		if(coloring == null) {
+			return null;
+		}
+
+		Map<Color, String> bidiMap = new HashMap<>();
+
+		int counter = 1;
+		for(E edge : mesh.getEdges()) {
+			Color c = coloring.apply(edge);
+			if(!bidiMap.containsKey(c)) {
+				bidiMap.put(c, "edgeColor"+counter);
+				counter++;
+			}
+		}
+		return bidiMap;
+	}
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> Map<Color, String> buildVertexColorMap(
+			@NotNull final IMesh<V, E, F> mesh,
+			@Nullable final Function<V, Color> coloring) {
+
+		if(coloring == null) {
+			return null;
+		}
+
+		Map<Color, String> bidiMap = new HashMap<>();
+
+		int counter = 1;
+		for(V vertex : mesh.getVertices()) {
+			Color c = coloring.apply(vertex);
+			if(!bidiMap.containsKey(c)) {
+				bidiMap.put(c, "vertexColor"+counter);
+				counter++;
+			}
+		}
+		return bidiMap;
+	}
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> void prolog(@NotNull final StringBuilder builder,
+	                      @NotNull final IMesh<V, E, F> mesh,
+                             @NotNull final Map<Color, String> faceColorBidiMap,
+                             @Nullable final Map<Color, String> edgeColorBidiMap,
+                             @Nullable final Map<Color, String> vertexColorBidiMap) {
+		builder.append("\\documentclass{standalone}\n");
+		builder.append("\\usepackage{tikz}\n\n");
+		colorDefinitions(builder, mesh, faceColorBidiMap, edgeColorBidiMap, vertexColorBidiMap);
+		builder.append("\\pgfmathsetmacro{\\circleSize}{1.5pt}");
+		builder.append("\\begin{document}\n");
+		builder.append("% Change scaling to [x=1mm,y=1mm] if TeX reports \"Dimension too large\".\n");
+		builder.append("\\begin{tikzpicture}\n");
+		builder.append("[x=1cm,y=1cm]\n");
+		//generateTikzStyles() +
+	}
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> void ending(@NotNull final StringBuilder builder,
+	                                                                                       @NotNull final IMesh<V, E, F> mesh,
+	                                                                                       @NotNull final Function<F, Color> coloring,
+	                                                                                       @Nullable final Function<E, Color> edgeColorFunction,
+	                                                                                       @Nullable final Function<V, Color> vertexColorFunction) {
+		builder.append("\\end{tikzpicture}\n");
+		builder.append("\\end{document}\n");
+	}
+
+
+	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> void colorDefinitions(
+			@NotNull final StringBuilder builder,
+			@NotNull final IMesh<V, E, F> mesh,
+	                              @NotNull final Map<Color, String> faceColorBidiMap,
+	                              @Nullable final Map<Color, String> edgeColorBidiMap,
+	                              @Nullable final Map<Color, String> vertexColorBidiMap) {
+
+		builder.append("% Color Definitions\n");
+		String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
+
+		for(Object object : faceColorBidiMap.keySet()) {
+			Color c = (Color)object;
+			String name = faceColorBidiMap.get(c);
+			builder.append(String.format(Locale.US, colorTextPattern, name, c.getRed(), c.getGreen(), c.getBlue()));
+			builder.append(String.format(Locale.US, colorTextPattern, name+"Fill", c.getRed(), c.getGreen(), c.getBlue()));
+		}
+
+		if(edgeColorBidiMap != null) {
+			for(Object object : edgeColorBidiMap.keySet()) {
+				Color c = (Color)object;
+				String name = edgeColorBidiMap.get(c);
+				builder.append(String.format(Locale.US, colorTextPattern, name, c.getRed(), c.getGreen(), c.getBlue()));
+			}
+		}
+
+		if(vertexColorBidiMap != null) {
+			for(Object object : vertexColorBidiMap.keySet()) {
+				Color c = (Color)object;
+				String name = vertexColorBidiMap.get(c);
+				builder.append(String.format(Locale.US, colorTextPattern, name, c.getRed(), c.getGreen(), c.getBlue()));
+				builder.append(String.format(Locale.US, colorTextPattern, name+"Fill", c.getRed(), c.getGreen(), c.getBlue()));
+			}
+		}
+
+		builder.append("\n");
+	}
+
 	/**
 	 * Transforms a {@link IMesh} into a tikz string. The tikz graphic is scaled by the scaling. Each face
 	 * of the mesh is filled by the color defined by the coloring-function.
@@ -165,37 +292,45 @@ public class TexGraphGenerator {
 			final boolean drawVertices) {
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
+		// key = color, value = name (String)
+		Map<Color, String> faceColorBidiMap = buildFaceColorMap(mesh, coloring);
+		@Nullable Map<Color, String> edgeColorBidiMap = buildEdgeColorMap(mesh, edgeColorFunction);
+		@Nullable Map<Color, String> vertexColorBidiMap = buildVertexColorMap(mesh, vertexColorFunction);
+
+		prolog(builder, mesh, faceColorBidiMap, edgeColorBidiMap, vertexColorBidiMap);
 
 		for(F face : mesh.getFaces()) {
 			Color c = coloring.apply(face);
-			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+			String colorName = faceColorBidiMap.get(c);
+			//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 			V first = mesh.streamVertices(face).findFirst().get();
 			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			if(edgeColorFunction != null) {
-				builder.append("\\filldraw[fill="+tikzColor+"]" + poly + ";\n");
+				builder.append("\\filldraw[fill="+colorName+"]" + poly + ";\n");
 			}
 			else {
-				builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
+				builder.append("\\filldraw[color="+colorName+",fill="+colorName+"Fill]" + poly + ";\n");
 			}
 		}
 
 		if(edgeColorFunction != null) {
 			for (E edge : mesh.getEdges()) {
 				Color c = edgeColorFunction.apply(edge);
+				String colorName = edgeColorBidiMap.get(c);
 				VLine line = mesh.toLine(edge);
-				String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-				builder.append("\\draw[color="+tikzColor+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
+				//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+				builder.append("\\draw[color="+colorName+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
 			}
 		}
-		double pt = 1.5;
+
 		if(drawVertices) {
 			for(V vertex : mesh.getVertices()) {
 				Color c = vertexColorFunction != null ? vertexColorFunction.apply(vertex) : Color.BLACK;
-				String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-				builder.append("\\draw[color="+tikzColor+", fill="+tikzColor+"]("+toString(vertex.getX())+","+toString(vertex.getY())+") circle ("+pt+"pt);\n");
+				String colorName = vertexColorBidiMap.get(c);
+				//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
+				builder.append("\\draw[color="+colorName+", fill="+colorName+"Fill]("+toString(vertex.getX())+","+toString(vertex.getY())+") circle (\\circleSize);\n");
 			}
 		}
 
@@ -204,7 +339,7 @@ public class TexGraphGenerator {
 			builder.append("\\draw[black,thick]" + poly + ";\n");
 		}*/
 
-		builder.append("\\end{tikzpicture}");
+		ending(builder, mesh, coloring, edgeColorFunction, vertexColorFunction);
 		return builder.toString();
 	}
 

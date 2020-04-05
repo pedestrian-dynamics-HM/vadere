@@ -1,12 +1,17 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
@@ -17,6 +22,7 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -26,6 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -61,7 +68,9 @@ public class EikMeshPlots {
 		//cornerLFS();
 
 		//uniformRing(0.3);
-		randomDelaunay();
+		//randomDelaunay();
+		//discSubtractRect2(0.1);
+		squareInSquare(0.1);
 	}
 
 	public static void randomDelaunay() throws IOException, InterruptedException {
@@ -299,6 +308,42 @@ public class EikMeshPlots {
 				h0,
 				GeometryUtils.boundRelative(boundary.getPath()),
 				Arrays.asList(rect)
+		);
+
+		// generate the mesh
+		meshImprover.generate();
+
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
+		// (optional) define the gui to display the mesh
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_disc_rect_non_uniform_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void squareInSquare(double h0) throws IOException {
+		// define your holes
+		VRectangle innerRect = new VRectangle(-1, -1, 2, 2);
+		VRectangle outerRect = new VRectangle(-3, -3, 6, 6);
+
+		//IDistanceFunction d_in = IDistanceFunction.create(innerRect);
+		//IDistanceFunction d_out = IDistanceFunction.create(outerRect);
+
+		//IDistanceFunction d_in = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1;
+		IDistanceFunction d_in = p -> p.distanceToOrigin() - 1;
+		IDistanceFunction d_out = IDistanceFunction.create(outerRect);
+		IDistanceFunction d = IDistanceFunction.substract(d_out, d_in);
+
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh(
+				d,
+				h -> h0,
+				Collections.EMPTY_LIST,
+				h0,
+				GeometryUtils.boundRelative(outerRect.getPath()),
+				Arrays.asList(outerRect),
+				() -> new PMesh()
 		);
 
 		// generate the mesh

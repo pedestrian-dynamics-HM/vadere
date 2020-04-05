@@ -11,7 +11,9 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
+import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -24,6 +26,7 @@ import org.vadere.util.math.DistanceFunction;
 
 import java.awt.*;
 import java.util.Collections;
+import java.util.function.Function;
 
 /**
  * @author Benedikt Zoennchen
@@ -87,7 +90,7 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 		);
 
 
-		/*Function<PVertex, Color> vertexColorFunction = v -> {
+		Function<PVertex, Color> vertexColorFunction = v -> {
 			if(meshImprover.isSlidePoint(v)){
 				return Colors.BLUE;
 			} else if(meshImprover.isFixPoint(v)) {
@@ -108,7 +111,7 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 			}
 			//Thread.sleep(500);
 			meshPanel.repaint();
-		}*/
+		}
 
 
 		triangulation = meshImprover.generate();
@@ -117,9 +120,10 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 
 		this.putValue(NoDataKey.key() ,mesh);
 
-		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);
-		var meshPanel = new PMeshPanel(meshRenderer, 300, 300);
+		//var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);
+		//var meshPanel = new PMeshPanel(meshRenderer, 300, 300);
 		meshPanel.display();
+		System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Color.WHITE, null, vertexColorFunction,1.0f, true));
 	}
 
 	@Override

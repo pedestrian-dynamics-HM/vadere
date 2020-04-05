@@ -215,8 +215,8 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			} /*else if(mesh.isAtBoundary(vertex)) {
 				vc = Color.RED;
 			}*/
-			//graphics.setColor(vc);
-			//graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
+			graphics.setColor(vc);
+			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
 
 		graphics.setColor(c);

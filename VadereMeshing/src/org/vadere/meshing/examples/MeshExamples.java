@@ -57,9 +57,9 @@ public class MeshExamples {
 		/*for(int i = 1; i <= 629; i++) {
 			System.out.println(i + " " + i + " " + (i + 1));
 		}*/
-		//eikMeshRandom();
+		eikMeshRandom();
 		//eikMeshGreenland();
-		ruppertsTriangulationKaiserslauternLarge();
+		//ruppertsTriangulationKaiserslauternLarge();
 		//ruppertsTriangulationPoly();
 		//ruppertsTriangulationPolyGreenland();
 //		delaunayTriangulation();
@@ -274,15 +274,15 @@ public class MeshExamples {
 		};
 
 		PMeshPanel panel = new PMeshPanel(dt.getMesh(), 1000, 1000);
-		//panel.display(" Voronoi Vertex Insertion");
+		panel.display(" Voronoi Vertex Insertion");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
 		var eikMesh = new PEikMesh(
-				p -> 1.0 + Math.abs(bound.distance(p)),
+				p -> 1.0 /*+ Math.abs(bound.distance(p))*/,
 				dt.getTriangulation()
 		);
 
-		/*System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
 		while (!eikMesh.isFinished()) {
 			try {
 				Thread.sleep(30);
@@ -294,11 +294,11 @@ public class MeshExamples {
 				eikMesh.improve();
 			}
 			panel.repaint();
-		}*/
+		}
 
-		var recorder = new MovRecorder<>(eikMesh, panel.getMeshRenderer(), 1024, 800, eikMesh.getMesh().getBound());
-		recorder.record();
-		recorder.finish();
+		//var recorder = new MovRecorder<>(eikMesh, panel.getMeshRenderer(), 1024, 800, eikMesh.getMesh().getBound());
+		//recorder.record();
+		//recorder.finish();
 
 		//System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
 		//System.out.println("finished");

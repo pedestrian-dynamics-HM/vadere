@@ -637,7 +637,8 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	private void establishConstrains() {
 		List<VLine> lines = boundary.stream().flatMap(shape -> shape.lines().stream()).collect(Collectors.toList());
-		GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
+		//GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
+		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, minEdgeLen / 2 / Math.sqrt(3) / 5);
 		cdt.generate(false);
 		projections.putAll(cdt.getProjections());
 		constrains.addAll(cdt.getConstrains());
