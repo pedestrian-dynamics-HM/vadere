@@ -30,6 +30,8 @@ public class StimulusPresettings {
                 new Threat(),
                 new Wait(),
                 new WaitInArea(0, new VRectangle(0, 0, 10, 10)),
+                new ChangeTarget(),
+                new ChangeTargetScripted()
         };
 
         for (Stimulus stimulus : stimuliToUse) {
