@@ -2,10 +2,8 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.models.osm.CellularAutomaton;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.OverlapData;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestiansNearbyData;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestriansNearbyData;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdOverlapKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestriansNearbyIdKey;
 import org.vadere.state.scenario.DynamicElement;
@@ -23,17 +21,31 @@ import java.util.stream.Collectors;
  */
 
 @DataProcessorClass()
-public class PedestiansNearbyProcessor extends DataProcessor<TimestepPedestriansNearbyIdKey, PedestiansNearbyData> {
+public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestriansNearbyIdKey, PedestriansNearbyData> {
 	private double minDist;
-	private double SPAWN_BUFFER = 0.001;
+	private double maxDistance = 1.5;
 
 
-	public PedestiansNearbyProcessor() {
-		super("distance", "overlaps");
+	public PedestriansNearbyProcessor() {
+		super("durationTimesteps");
 	}
 
 	@Override
 	protected void doUpdate(final SimulationState state) {
+		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+		int timeStep = state.getStep();
+		for (Pedestrian ped : peds) {
+			// get all Pedestrians with at most maxDistance away
+			// this reduces the amount of overlap tests
+			VPoint pedPos = ped.getPosition();
+			List<DynamicElement> dynElemNneighbours = getDynElementsAtPosition(state.getTopography(), ped.getPosition(), maxDistance);
+			List<PedestriansNearbyData> pedsNearby = dynElemNneighbours
+					.parallelStream()
+					.filter(p -> ped.getId() != p.getId())
+					.map(p -> new PedestriansNearbyData(ped, p, 1))
+					.collect(Collectors.toList());
+			pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPed1Id(), o.getPed2Id()), o));
+		}
 		/*double pedRadius = state.getTopography().getAttributesPedestrian().getRadius();
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 

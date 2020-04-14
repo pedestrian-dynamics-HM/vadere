@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.datakey;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile;
 import org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile;
+import org.vadere.state.attributes.AttributesSimulation;
 
 import java.util.Objects;
 
@@ -12,15 +13,21 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int timeStep;
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
+	private final int durationTimesteps;
 
 	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB) {
 		this.timeStep = timeStep;
-		this.pedId1 = (pedA <= pedB) ? pedA : pedB;
-		this.pedId2 = (pedA > pedB) ? pedA : pedB;
+		this.pedId1 = Math.min(pedA, pedB);
+		this.pedId2 = Math.max(pedA, pedB);
+		this.durationTimesteps = 1; //todo simulation step length
+	}
+
+	public double getDuration() {
+		return durationTimesteps;
 	}
 
 	public static String[] getHeaders(){
-		return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "overlapPedestrianId"};
+		return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
 	}
 
 	public int getTimeStep() {
@@ -46,6 +53,9 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 			result =  Integer.compare(this.pedId1, o.pedId1);
 			if (result == 0){
 				result = Integer.compare(this.pedId2, o.pedId2);
+				if (result == 0) {
+					result = Integer.compare(this.durationTimesteps, o.durationTimesteps);
+				}
 			}
 		}
 		return result;
@@ -58,13 +68,14 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 		TimestepPedestriansNearbyIdKey that = (TimestepPedestriansNearbyIdKey) o;
 		return timeStep == that.timeStep &&
 				pedId1 == that.pedId1 &&
-				pedId2 == that.pedId2;
+				pedId2 == that.pedId2 &&
+				durationTimesteps == that.durationTimesteps;
 	}
 
 	@Override
 	public int hashCode() {
 
-		return Objects.hash(timeStep, pedId1, pedId2);
+		return Objects.hash(timeStep, pedId1, pedId2, durationTimesteps);
 	}
 
 	@Override
@@ -73,6 +84,7 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 				"timeStep=" + timeStep +
 				", pedId1=" + pedId1 +
 				", pedId2=" + pedId2 +
+				", durationTimesteps=" + durationTimesteps +
 				'}';
 	}
 }
