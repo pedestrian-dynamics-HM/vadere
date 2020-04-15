@@ -13,18 +13,14 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int timeStep;
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
-	private final int durationTimesteps;
+
 
 	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB) {
 		this.timeStep = timeStep;
 		this.pedId1 = Math.min(pedA, pedB);
 		this.pedId2 = Math.max(pedA, pedB);
-		this.durationTimesteps = 1; //todo simulation step length
 	}
 
-	public double getDuration() {
-		return durationTimesteps;
-	}
 
 	public static String[] getHeaders(){
 		return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
@@ -46,6 +42,19 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
+	public boolean isContinuationOf(PedestriansNearbyData other) {
+		return other.getPedId1() == getPedId1() &&
+				other.getPedId2() == getPedId2() &&
+				(other.getStartTimestep() + other.getDurationTimesteps() == getTimeStep());
+	}
+	public boolean isAccountedForBy(PedestriansNearbyData other) {
+		return equals(other) ||
+				(other.getPedId1() == getPedId1() &&
+				other.getPedId2() == getPedId2() &&
+				getTimeStep() >= other.getStartTimestep() &&
+				getTimeStep() < other.getStartTimestep() + other.getDurationTimesteps());
+	}
+
 	@Override
 	public int compareTo(@NotNull TimestepPedestriansNearbyIdKey o) {
 		int result = Integer.compare(this.timeStep, o.timeStep);
@@ -53,9 +62,6 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 			result =  Integer.compare(this.pedId1, o.pedId1);
 			if (result == 0){
 				result = Integer.compare(this.pedId2, o.pedId2);
-				if (result == 0) {
-					result = Integer.compare(this.durationTimesteps, o.durationTimesteps);
-				}
 			}
 		}
 		return result;
@@ -67,15 +73,15 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 		if (o == null || getClass() != o.getClass()) return false;
 		TimestepPedestriansNearbyIdKey that = (TimestepPedestriansNearbyIdKey) o;
 		return timeStep == that.timeStep &&
-				pedId1 == that.pedId1 &&
-				pedId2 == that.pedId2 &&
-				durationTimesteps == that.durationTimesteps;
+				((pedId1 == that.pedId1 &&
+						pedId2 == that.pedId2) || (pedId2 == that.pedId1 &&
+						pedId1 == that.pedId2));
 	}
 
 	@Override
 	public int hashCode() {
 
-		return Objects.hash(timeStep, pedId1, pedId2, durationTimesteps);
+		return Objects.hash(timeStep, pedId1, pedId2);
 	}
 
 	@Override
@@ -84,7 +90,8 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 				"timeStep=" + timeStep +
 				", pedId1=" + pedId1 +
 				", pedId2=" + pedId2 +
-				", durationTimesteps=" + durationTimesteps +
 				'}';
 	}
+
+
 }

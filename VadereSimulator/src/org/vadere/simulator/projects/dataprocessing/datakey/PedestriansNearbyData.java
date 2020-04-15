@@ -6,49 +6,50 @@ public class PedestriansNearbyData {
 
 	public static final PedestriansNearbyData noOverLap = new PedestriansNearbyData();
 
-	private final int ped1Id;
-	private final int ped2Id;
-	private final int durationTimesteps;
+	private final int pedId1;
+	private final int pedId2;
+	private int durationTimesteps;
+	private int startTimestep;
+
 
 
 	private PedestriansNearbyData() {
-		this.ped1Id = -1;
-		this.ped2Id = -1;
+		this.pedId1 = -1;
+		this.pedId2 = -1;
 		this.durationTimesteps = 1;
+		this.startTimestep = 1;
 	}
 
+	public int getStartTimestep() {
+		return startTimestep;
+	}
 
-	public PedestriansNearbyData(final DynamicElement ped1, final DynamicElement ped2, final int durationTimesteps){
-		this.ped1Id = ped1.getId();
-		this.ped2Id = ped2.getId();
+	public PedestriansNearbyData(int ped1, int ped2, final int durationTimesteps, int startTimestep){
+		this.pedId1 = Math.min(ped1, ped2);
+		this.pedId2 = Math.max(ped1, ped2);
 		this.durationTimesteps = durationTimesteps;
+		this.startTimestep = startTimestep;
 	}
 
-	/*public boolean isOverlap(){
-		return overlap > 0;
-	}*/
-
-	/*public boolean isNotSelfOverlap(){
-		return  !(ped1Id == ped2Id);
-	}*/
-
-	public int getPed1Id() {
-		return ped1Id;
+	public int getPedId1() {
+		return pedId1;
 	}
 
-	public int getPed2Id() {
-		return ped2Id;
+	public int getPedId2() {
+		return pedId2;
 	}
 
-	/*public Double getOverlap() {
-		return overlap;
-	}*/
+	public int getDurationTimesteps() {
+		return durationTimesteps;
+	}
+
+	public PedestriansNearbyData getDataWithIncrementedDuration() {
+		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + 1, getStartTimestep());
+	}
+
 
 	public String[] toStrings(){
 		return new String[]{Integer.toString(durationTimesteps)};
 	}
 
-	/*public int maxDist(@NotNull PedestiansNearbyData o) {
-		return Double.compare(overlap, o.getOverlap());
-	}*/
 }
