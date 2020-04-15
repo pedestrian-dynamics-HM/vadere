@@ -2,7 +2,9 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.jcodec.common.DictionaryCompressor;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesTargetChanger;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -39,12 +41,14 @@ public class TargetChangerController {
     private Map<Integer, Agent> processedAgents;
     int seed;
     BinomialDistribution binomialDistribution;
+    private Random random;
 
     // Constructors
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
         this.targetChanger = targetChanger;
         this.topography = topography;
         this.processedAgents = new HashMap<>();
+        this.random = random;
 
         seed = random.nextInt();
         JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
@@ -77,16 +81,47 @@ public class TargetChangerController {
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
 
-                int nextTargetListIndex = agent.getNextTargetListIndex();
+                boolean changeTarget = false;
+                boolean keepTarget;
+                int targetId;
+                int binomialDistributionSample;
 
-                int binomialDistributionSample = binomialDistribution.sample();
-                boolean changeTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
+                LinkedList<Integer> keepTargets = new LinkedList<>();
+
+                seed = this.random.nextInt();
+                JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+                randomGenerator.setSeed(seed);
+
+                int index = 0;
+                for( Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()  ) {
+
+                    binomialDistribution = new BinomialDistribution(randomGenerator,  BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability);
+                    binomialDistributionSample = binomialDistribution.sample();
+                    keepTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
+
+                    if (keepTarget){
+
+                        changeTarget = true;
+                        if (targetChanger.getAttributes().getProbabilityToChangeTarget().size() == 1){
+                            keepTargets = targetChanger.getAttributes().getNextTarget();
+                            break;
+                        }
+                        else {
+                            targetId = targetChanger.getAttributes().getNextTarget().get(index);
+                            keepTargets.add(targetId);
+
+                        }
+                    }
+                    index += 1;
+
+                }
+
 
                 if (changeTarget) {
                     if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
                         useDynamicTargetForAgentOrUseStaticAsFallback(agent);
                     } else {
-                        useStaticTargetForAgent(agent);
+                        useStaticTargetForAgent(agent,keepTargets);
                     }
                 }
 
@@ -150,7 +185,8 @@ public class TargetChangerController {
             Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);
             agentFollowsOtherPedestrian(agent, pedToFollow);
         } else {
-            useStaticTargetForAgent(agent);
+            LinkedList<Integer> usedTargets = targetChanger.getAttributes().getNextTarget();
+            useStaticTargetForAgent(agent, usedTargets);
         }
     }
 
@@ -166,8 +202,9 @@ public class TargetChangerController {
         pedToFollow.getFollowers().add(agent);
     }
 
-    private void useStaticTargetForAgent(Agent agent) {
-        agent.setTargets(targetChanger.getAttributes().getNextTarget());
+    private void useStaticTargetForAgent(Agent agent, LinkedList<Integer> keepTargets) {
+
+        agent.setTargets(keepTargets);
         agent.setNextTargetListIndex(0);
         agent.setIsCurrentTargetAnAgent(false);
     }
