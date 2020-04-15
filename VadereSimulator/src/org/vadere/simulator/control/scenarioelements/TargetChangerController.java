@@ -81,43 +81,10 @@ public class TargetChangerController {
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
 
-                boolean changeTarget = false;
-                boolean keepTarget;
-                int targetId;
-                int binomialDistributionSample;
 
-                LinkedList<Integer> keepTargets = new LinkedList<>();
+                LinkedList<Integer> keepTargets = getFilteredTargetList();
 
-                seed = this.random.nextInt();
-                JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-                randomGenerator.setSeed(seed);
-
-                int index = 0;
-                for( Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()  ) {
-
-                    binomialDistribution = new BinomialDistribution(randomGenerator,  BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability);
-                    binomialDistributionSample = binomialDistribution.sample();
-                    keepTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
-
-                    if (keepTarget){
-
-                        changeTarget = true;
-                        if (targetChanger.getAttributes().getProbabilityToChangeTarget().size() == 1){
-                            keepTargets = targetChanger.getAttributes().getNextTarget();
-                            break;
-                        }
-                        else {
-                            targetId = targetChanger.getAttributes().getNextTarget().get(index);
-                            keepTargets.add(targetId);
-
-                        }
-                    }
-                    index += 1;
-
-                }
-
-
-                if (changeTarget) {
+                if (keepTargets.size() > 0) {
                     if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
                         useDynamicTargetForAgentOrUseStaticAsFallback(agent);
                     } else {
@@ -130,6 +97,44 @@ public class TargetChangerController {
                 processedAgents.put(agent.getId(), agent);
             }
         }
+    }
+
+    private LinkedList<Integer> getFilteredTargetList(){
+
+        boolean keepTarget;
+        int targetId;
+        int binomialDistributionSample;
+
+        LinkedList<Integer> keepTargets = new LinkedList<>();
+
+        seed = this.random.nextInt();
+        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+        randomGenerator.setSeed(seed);
+
+        int index = 0;
+        for( Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()  ) {
+
+            binomialDistribution = new BinomialDistribution(randomGenerator,  BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability);
+            binomialDistributionSample = binomialDistribution.sample();
+            keepTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
+
+            if (keepTarget){
+
+                if (targetChanger.getAttributes().getProbabilityToChangeTarget().size() == 1){
+                    keepTargets = targetChanger.getAttributes().getNextTarget();
+                    break;
+                }
+                else {
+                    targetId = targetChanger.getAttributes().getNextTarget().get(index);
+                    keepTargets.add(targetId);
+
+                }
+            }
+            index += 1;
+
+        }
+        return keepTargets;
+
     }
 
     private Collection<DynamicElement> getDynamicElementsNearTargetChangerArea() {
@@ -185,8 +190,8 @@ public class TargetChangerController {
             Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);
             agentFollowsOtherPedestrian(agent, pedToFollow);
         } else {
-            LinkedList<Integer> usedTargets = targetChanger.getAttributes().getNextTarget();
-            useStaticTargetForAgent(agent, usedTargets);
+            LinkedList<Integer> keepTargets = getFilteredTargetList();
+            useStaticTargetForAgent(agent, keepTargets);
         }
     }
 
