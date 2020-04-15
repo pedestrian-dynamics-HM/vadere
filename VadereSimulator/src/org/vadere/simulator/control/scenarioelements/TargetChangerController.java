@@ -50,9 +50,11 @@ public class TargetChangerController {
         JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
         randomGenerator.setSeed(seed);
 
-        double probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
+        LinkedList<Double> probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
         int trials = BINOMIAL_DISTRIBUTION_SUCCESS_VALUE; // I.e., possible outcomes are 0 and 1 when calling "sample()".
-        binomialDistribution = new BinomialDistribution(randomGenerator, trials, probabilityToChangeTarget);
+
+        // 0.5 = probabilityToChangeTarget
+        binomialDistribution = new BinomialDistribution(randomGenerator, trials, 0.5);
     }
 
     // Getters
@@ -74,6 +76,8 @@ public class TargetChangerController {
 
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
+
+                int nextTargetListIndex = agent.getNextTargetListIndex();
 
                 int binomialDistributionSample = binomialDistribution.sample();
                 boolean changeTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
