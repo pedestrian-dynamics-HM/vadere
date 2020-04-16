@@ -43,8 +43,8 @@ public class PedestriansNearbyData {
 		return durationTimesteps;
 	}
 
-	public PedestriansNearbyData getDataWithIncrementedDuration() {
-		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + 1, getStartTimestep());
+	public PedestriansNearbyData getDataWithIncrementedDuration(int increment) {
+		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + increment, getStartTimestep());
 	}
 
 
