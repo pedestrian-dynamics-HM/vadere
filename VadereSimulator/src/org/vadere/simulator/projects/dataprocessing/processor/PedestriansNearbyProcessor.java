@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestriansNearbyIdKey, PedestriansNearbyData> {
     private double maxDistance; // todo adjustable with json
     private int sampleEveryNthStep;
+    private int allowedAbsenceTimestepsIfContactReturns;
 
 
     public PedestriansNearbyProcessor() {
@@ -63,7 +64,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
             PedestriansNearbyData currentVal = getValue(alreadyExisting);
             if (key.isAccountedForBy(currentVal)) {
                 return;
-            } else if (key.isContinuationOf(currentVal)) {
+            } else if (key.isContinuationOf(currentVal, allowedAbsenceTimestepsIfContactReturns)) {
                 super.putValue(alreadyExisting, currentVal.getDataWithIncrementedDuration(sampleEveryNthStep));
                 return;
             }
@@ -77,6 +78,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         AttributesPedestrianNearbyProcessor att = (AttributesPedestrianNearbyProcessor) this.getAttributes();
         maxDistance = att.getMaxDistanceForANearbyPedestrian();
         sampleEveryNthStep = att.getSampleEveryNthStep();
+        allowedAbsenceTimestepsIfContactReturns = att.getAllowedAbsenceTimestepsIfContactReturns();
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {

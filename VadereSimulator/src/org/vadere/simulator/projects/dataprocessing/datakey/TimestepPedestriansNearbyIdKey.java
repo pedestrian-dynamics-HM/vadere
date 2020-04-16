@@ -42,10 +42,11 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
-	public boolean isContinuationOf(PedestriansNearbyData other) {
+	public boolean isContinuationOf(PedestriansNearbyData other, int toleranceTimesteps) {
 		return other.getPedId1() == getPedId1() &&
 				other.getPedId2() == getPedId2() &&
-				(other.getStartTimestep() + other.getDurationTimesteps() == getTimeStep());
+				(other.getStartTimestep() + other.getDurationTimesteps() <= getTimeStep()) &&
+				(other.getStartTimestep() + other.getDurationTimesteps() + toleranceTimesteps >= getTimeStep());
 	}
 	public boolean isAccountedForBy(PedestriansNearbyData other) {
 		return equals(other) ||

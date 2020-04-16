@@ -8,6 +8,7 @@ package org.vadere.state.attributes.processor;
 public class AttributesPedestrianNearbyProcessor extends AttributesProcessor {
     private double maxDistanceForANearbyPedestrian = 1.5;
     private int sampleEveryNthStep = 1;
+    private int allowedAbsenceTimestepsIfContactReturns = 0;
 
     public double getMaxDistanceForANearbyPedestrian() {
         return maxDistanceForANearbyPedestrian;
@@ -15,5 +16,9 @@ public class AttributesPedestrianNearbyProcessor extends AttributesProcessor {
 
     public int getSampleEveryNthStep() {
         return sampleEveryNthStep;
+    }
+
+    public int getAllowedAbsenceTimestepsIfContactReturns() {
+        return allowedAbsenceTimestepsIfContactReturns;
     }
 }
