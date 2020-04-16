@@ -93,9 +93,9 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 150.0,
+      "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 1.0,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -541,17 +541,17 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 44.9,
-            "y" : 10.0
+            "x" : 45.00369641484811,
+            "y" : 9.661738113536078
           }, {
-            "x" : 44.9,
-            "y" : 8.0
+            "x" : 45.00369641484811,
+            "y" : 7.938261886464043
           }, {
-            "x" : 46.4,
-            "y" : 8.0
+            "x" : 46.29630358515213,
+            "y" : 7.938261886464043
           }, {
-            "x" : 46.4,
-            "y" : 10.0
+            "x" : 46.29630358515213,
+            "y" : 9.661738113536078
           } ]
         },
         "id" : 60
@@ -627,24 +627,6 @@
           } ]
         },
         "id" : 64
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 28.3,
-            "y" : 10.5
-          }, {
-            "x" : 28.3,
-            "y" : 7.5
-          }, {
-            "x" : 29.900000000000002,
-            "y" : 7.5
-          }, {
-            "x" : 29.900000000000002,
-            "y" : 10.5
-          } ]
-        },
-        "id" : 65
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -849,6 +831,24 @@
           } ]
         },
         "id" : 59
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 28.3,
+            "y" : 10.5
+          }, {
+            "x" : 28.3,
+            "y" : 7.5
+          }, {
+            "x" : 29.900000000000002,
+            "y" : 7.5
+          }, {
+            "x" : 29.900000000000002,
+            "y" : 10.5
+          } ]
+        },
+        "id" : 65
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -873,13 +873,13 @@
         "id" : 100,
         "absorbing" : false,
         "shape" : {
-          "x" : 25.44772613231842,
-          "y" : 9.606067878540303,
-          "width" : 1.605044781489056,
-          "height" : 1.489311002178649,
+          "x" : 26.54772613231842,
+          "y" : 8.947595565234668,
+          "width" : 1.0359735731416286,
+          "height" : 1.489826513082832,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
+        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -890,13 +890,13 @@
         "id" : 102,
         "absorbing" : false,
         "shape" : {
-          "x" : 28.01669388585928,
-          "y" : 9.63266271786492,
+          "x" : 28.41669388585928,
+          "y" : 11.23053560439983,
           "width" : 1.4833061141407207,
-          "height" : 1.4627161628540328,
+          "height" : 0.8004699338486994,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -907,13 +907,13 @@
         "id" : 104,
         "absorbing" : false,
         "shape" : {
-          "x" : 30.783139248655615,
-          "y" : 9.63266271786492,
-          "width" : 1.838035152995534,
-          "height" : 1.4627161628540328,
+          "x" : 30.607171158481087,
+          "y" : 8.881867924951603,
+          "width" : 0.9420961773906136,
+          "height" : 1.5993725802212744,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -924,13 +924,13 @@
         "id" : 101,
         "absorbing" : false,
         "shape" : {
-          "x" : 25.55379979928805,
-          "y" : 6.22007421023965,
+          "x" : 26.05379979928805,
+          "y" : 5.32007421023965,
           "width" : 1.3517756381125494,
-          "height" : 1.8321996574419313,
+          "height" : 0.836287564307483,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -941,13 +941,13 @@
         "id" : 103,
         "absorbing" : false,
         "shape" : {
-          "x" : 27.9,
-          "y" : 6.32007421023965,
-          "width" : 1.502953400742264,
-          "height" : 1.909863114610756,
+          "x" : 27.342698357755474,
+          "y" : 6.981712962962962,
+          "width" : 1.960255042986791,
+          "height" : 1.3482243618874437,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -958,13 +958,13 @@
         "id" : 105,
         "absorbing" : false,
         "shape" : {
-          "x" : 30.9,
-          "y" : 6.246669049564266,
+          "x" : 32.1,
+          "y" : 5.246669049564266,
           "width" : 1.7380368098159522,
-          "height" : 1.8091560943424163,
+          "height" : 0.8308195566431866,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -975,13 +975,13 @@
         "id" : 106,
         "absorbing" : false,
         "shape" : {
-          "x" : 34.54248205900175,
-          "y" : 10.6,
-          "width" : 2.1664453627963383,
-          "height" : 1.3953788807189529,
+          "x" : 34.84248205900175,
+          "y" : 11.177953492173376,
+          "width" : 1.5499737600052157,
+          "height" : 0.8953057093957923,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -992,13 +992,13 @@
         "id" : 107,
         "absorbing" : false,
         "shape" : {
-          "x" : 35.7,
-          "y" : 6.347229086192525,
-          "width" : 1.8642543361357369,
-          "height" : 1.9536219486658606,
+          "x" : 33.96804449828853,
+          "y" : 6.945093457943923,
+          "width" : 1.9962098378472106,
+          "height" : 1.455757576914463,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1009,13 +1009,13 @@
         "id" : 108,
         "absorbing" : false,
         "shape" : {
-          "x" : 38.339860022343416,
-          "y" : 10.573017259334996,
-          "width" : 1.6601399776565842,
-          "height" : 1.4223616213839563,
+          "x" : 37.22375361364307,
+          "y" : 8.947595565234668,
+          "width" : 0.9640053908183006,
+          "height" : 1.6359920852403143,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1026,13 +1026,13 @@
         "id" : 109,
         "absorbing" : false,
         "shape" : {
-          "x" : 39.1,
-          "y" : 6.321341267136249,
+          "x" : 38.8,
+          "y" : 5.321341267136249,
           "width" : 1.6413535276073716,
-          "height" : 1.952914928397517,
+          "height" : 0.8350205074108832,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1043,13 +1043,13 @@
         "id" : 111,
         "absorbing" : false,
         "shape" : {
-          "x" : 42.4,
-          "y" : 6.421341267136249,
-          "width" : 1.6413535276073716,
-          "height" : 1.952914928397517,
+          "x" : 40.645972751048035,
+          "y" : 7.102839794623282,
+          "width" : 2.095380776559338,
+          "height" : 1.2714164009104838,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1060,13 +1060,13 @@
         "id" : 110,
         "absorbing" : false,
         "shape" : {
-          "x" : 41.7,
-          "y" : 10.521341267136249,
+          "x" : 41.4,
+          "y" : 11.15166243606015,
           "width" : 1.6413535276073716,
-          "height" : 1.3719547640687768,
+          "height" : 0.863380494980964,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1107,6 +1107,91 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 114,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 45.3,
+          "y" : 5.3,
+          "width" : 3.8,
+          "height" : 0.7,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 2.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 200,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 45.7,
+          "y" : 12.92834890965732,
+          "width" : 3.3999999999999986,
+          "height" : 1.2716510903426794,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 112,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 44.8,
+          "y" : 9.6,
+          "width" : 1.7000000000000028,
+          "height" : 0.8812405051728778,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 4.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 115,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 48.3703790238837,
+          "y" : 8.2,
+          "width" : 0.8296209761163027,
+          "height" : 2.4000000000000004,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 3.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 113,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 44.8,
+          "y" : 7.131947929887311,
+          "width" : 1.6913508935553807,
+          "height" : 0.8680520701126886,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 4.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ {
         "id" : 6,
@@ -1119,8 +1204,8 @@
         },
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
-        "nextTarget" : [ 100, 101, 102, 103, 104, 105, 106, 107, 108 ],
-        "probabilityToChangeTarget" : [ 1.0, 0.4, 1.0, 0.4, 1.0, 0.5, 0.5, 1.0 ]
+        "nextTarget" : [ 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
+        "probabilityToChangeTarget" : [ 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.4, 0.3, 1.0 ]
       }, {
         "id" : 1,
         "shape" : {
@@ -1132,8 +1217,21 @@
         },
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
-        "nextTarget" : [ 101, 102, 103, 104, 105, 106, 107, 108 ],
-        "probabilityToChangeTarget" : [ 1.0, 0.4, 1.0, 0.4, 1.0, 0.5, 1.0 ]
+        "nextTarget" : [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
+        "probabilityToChangeTarget" : [ 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.3, 1.0 ]
+      }, {
+        "id" : 2,
+        "shape" : {
+          "x" : 45.7,
+          "y" : 12.001557632398754,
+          "width" : 3.3654205607476655,
+          "height" : 0.8722741433021781,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : [ 101, 102, 103, 104, 105, 106, 107, 200 ],
+        "probabilityToChangeTarget" : [ 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -1146,16 +1244,16 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 10.0 ],
+        "distributionParameters" : [ 16.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 99 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "groupSizeDistribution" : [ 2.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
@@ -1168,16 +1266,16 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 15.0 ],
+        "distributionParameters" : [ 16.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 300.0,
+        "endTime" : 1000.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 99 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "groupSizeDistribution" : [ 2.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
@@ -1203,7 +1301,7 @@
         "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
+        "maximumSpeed" : 1.5,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
