@@ -3,6 +3,7 @@ package org.vadere.state.attributes.scenario;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -35,7 +36,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
      */
-    private LinkedList<Double> probabilityToChangeTarget = new LinkedList<>();
+    private LinkedList<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
 
     // Constructors
     public AttributesTargetChanger() {

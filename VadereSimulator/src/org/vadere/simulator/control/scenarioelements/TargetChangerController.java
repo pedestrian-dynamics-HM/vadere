@@ -42,6 +42,7 @@ public class TargetChangerController {
     int seed;
     BinomialDistribution binomialDistribution;
     private Random random;
+    private LinkedList<BinomialDistribution> binomialDistributions = null;
 
     // Constructors
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
@@ -55,16 +56,34 @@ public class TargetChangerController {
         randomGenerator.setSeed(seed);
 
         LinkedList<Double> probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
-        int trials = BINOMIAL_DISTRIBUTION_SUCCESS_VALUE; // I.e., possible outcomes are 0 and 1 when calling "sample()".
 
-        // 0.5 = probabilityToChangeTarget
-        binomialDistribution = new BinomialDistribution(randomGenerator, trials, 0.5);
+        binomialDistributions = getBinomialDistributions();
     }
+
 
     // Getters
     public Map<Integer, Agent> getProcessedAgents() {
         return processedAgents;
     }
+
+    public LinkedList<BinomialDistribution> getBinomialDistributions(){
+
+        if (binomialDistributions == null) {
+
+            LinkedList<BinomialDistribution> binomialDistributionsL = new LinkedList<>();
+            seed = this.random.nextInt();
+            JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+            randomGenerator.setSeed(seed);
+
+            for (Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()) {
+                binomialDistributionsL.add(new BinomialDistribution(randomGenerator, BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability));
+            }
+            binomialDistributions = binomialDistributionsL;
+        }
+
+        return binomialDistributions;
+    }
+
 
     // Public Methods
     public void update(double simTimeInSec) {
@@ -86,7 +105,7 @@ public class TargetChangerController {
 
                 if (keepTargets.size() > 0) {
                     if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
-                        useDynamicTargetForAgentOrUseStaticAsFallback(agent);
+                        useDynamicTargetForAgentOrUseStaticAsFallback(agent, keepTargets);
                     } else {
                         useStaticTargetForAgent(agent,keepTargets);
                     }
@@ -101,33 +120,24 @@ public class TargetChangerController {
 
     private LinkedList<Integer> getFilteredTargetList(){
 
-        boolean keepTarget;
-        int targetId;
-        int binomialDistributionSample;
 
+        int binomialDistributionSample;
         LinkedList<Integer> keepTargets = new LinkedList<>();
 
-        seed = this.random.nextInt();
-        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-        randomGenerator.setSeed(seed);
 
         int index = 0;
-        for( Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()  ) {
+        for( BinomialDistribution binomialDistribution : getBinomialDistributions()  ) {
 
-            binomialDistribution = new BinomialDistribution(randomGenerator,  BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability);
             binomialDistributionSample = binomialDistribution.sample();
-            keepTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
 
-            if (keepTarget){
+            if (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE){
 
                 if (targetChanger.getAttributes().getProbabilityToChangeTarget().size() == 1){
                     keepTargets = targetChanger.getAttributes().getNextTarget();
                     break;
                 }
                 else {
-                    targetId = targetChanger.getAttributes().getNextTarget().get(index);
-                    keepTargets.add(targetId);
-
+                    keepTargets.add(targetChanger.getAttributes().getNextTarget().get(index));
                 }
             }
             index += 1;
@@ -170,7 +180,7 @@ public class TargetChangerController {
         }
     }
 
-    private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent) {
+    private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent, LinkedList<Integer> keepTargets) {
         int nextTarget = (targetChanger.getAttributes().getNextTarget().size() > 0)
                 ? targetChanger.getAttributes().getNextTarget().get(0)
                 : Attributes.ID_NOT_SET;
@@ -190,7 +200,7 @@ public class TargetChangerController {
             Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);
             agentFollowsOtherPedestrian(agent, pedToFollow);
         } else {
-            LinkedList<Integer> keepTargets = getFilteredTargetList();
+
             useStaticTargetForAgent(agent, keepTargets);
         }
     }
@@ -208,7 +218,6 @@ public class TargetChangerController {
     }
 
     private void useStaticTargetForAgent(Agent agent, LinkedList<Integer> keepTargets) {
-
         agent.setTargets(keepTargets);
         agent.setNextTargetListIndex(0);
         agent.setIsCurrentTargetAnAgent(false);
