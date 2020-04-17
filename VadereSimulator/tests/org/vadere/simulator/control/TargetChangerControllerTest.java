@@ -231,7 +231,7 @@ public class TargetChangerControllerTest {
     @Test
     public void targetChangerWithListOfTargetsAndStaticTargets() {
         LinkedList<Integer> nextTarget = createIntegerList(2, 1);
-        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0,1.0)); // must be 1
         pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
@@ -249,6 +249,30 @@ public class TargetChangerControllerTest {
         assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
         assertListEqual(pedestrians.get(1).getTargets(), createIntegerList(2, 1));
     }
+
+    @Test
+    public void targetChangerSkipFirstTargetInListOftaticTargets() {
+        LinkedList<Integer> nextTarget = createIntegerList(2, 1);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(0.0,1.0)); // must be 1
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListEqual(pedestrians.get(1).getTargets(), createIntegerList( 1));
+    }
+
+
 
     @Test
     public void targetChangerWithListOfTargetsAndDynamicTargets() { //must choose first element

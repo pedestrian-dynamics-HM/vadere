@@ -53,6 +53,8 @@ public class TargetChangerController {
 
         this.probabilitiesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget();
 
+
+
         seed = random.nextInt();
         binomialDistributions = getBinomialDistributions();
     }
@@ -84,6 +86,16 @@ public class TargetChangerController {
 
     // Public Methods
     public void update(double simTimeInSec) {
+
+        int numberTargets = targetChanger.getAttributes().getNextTarget().size();
+        int numberProbabilitesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget().size();
+
+        if (! ( (numberProbabilitesToChangeTarget == 1) || (numberProbabilitesToChangeTarget== numberProbabilitesToChangeTarget)) ) {
+            log.error("The size of probabilitesToChangeTarget must be 1 or equal to nextTarget.");
+        }
+
+
+
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
 
             final Agent agent;
