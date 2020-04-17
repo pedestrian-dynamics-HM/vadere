@@ -36,7 +36,9 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
      */
-    private LinkedList<Double> probabilitiesToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
+    private LinkedList<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
+
+
 
     // Constructors
     public AttributesTargetChanger() {
@@ -63,7 +65,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
             }
         }
 
-        this.probabilitiesToChangeTarget = this.probabilitiesToChangeTarget;
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
     // Getters
@@ -89,7 +91,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
     }
 
     public LinkedList<Double> getProbabilitiesToChangeTarget() {
-        return probabilitiesToChangeTarget;
+        return probabilityToChangeTarget;
     }
 
     // Setters
@@ -124,7 +126,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
                 throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
             }
         }
-        this.probabilitiesToChangeTarget = probabilitiesToChangeTarget;
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
 }
