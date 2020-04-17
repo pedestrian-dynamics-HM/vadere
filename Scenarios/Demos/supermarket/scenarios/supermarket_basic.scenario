@@ -93,7 +93,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 10000.0,
+      "finishTime" : 1500.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -1781,7 +1781,7 @@
         "nextSpeed" : -1.0
       }, {
         "id" : 902,
-        "absorbing" : true,
+        "absorbing" : false,
         "shape" : {
           "x" : 14.6,
           "y" : 17.2,
@@ -2105,7 +2105,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
         "nextTarget" : [ 301, 400, 402, 404, 405, 505, 406, 601, 602, 603, 604, 407, 408, 409, 509, 410, 411, 412, 413, 513, 414, 415, 900, 800, 803 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
+        "probabilityToChangeTarget" : [ 0.1, 0.4, 0.4, 0.4, 0.8, 0.4, 0.8, 0.1, 0.1, 0.1, 0.1, 0.8, 0.4, 0.8, 0.8, 0.4, 0.6, 0.4, 0.6, 0.4, 0.4, 0.4, 0.3, 1.0, 1.0 ]
       }, {
         "id" : 13,
         "shape" : {
@@ -2217,13 +2217,20 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 10.0,
-        "endTime" : 30.0,
+        "startTime" : 0.0,
+        "endTime" : 10.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "Wait"
+        "type" : "WaitInArea",
+        "area" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 10.0,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
+        }
       } ]
     } ]
   }
