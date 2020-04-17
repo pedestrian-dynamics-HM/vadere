@@ -1,7 +1,7 @@
 {
   "name" : "complex_NAVIGATION_001",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -366,7 +366,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 8 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3,
         "shape" : {
@@ -387,7 +388,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 15, 8 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
@@ -408,7 +410,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6, 7 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 1,
         "shape" : {
@@ -429,7 +432,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6, 7 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
