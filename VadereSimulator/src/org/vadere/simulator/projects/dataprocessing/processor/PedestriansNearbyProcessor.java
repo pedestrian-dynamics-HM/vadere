@@ -13,8 +13,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +25,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
     private double maxDistance; // todo adjustable with json
     private int sampleEveryNthStep;
     private int allowedAbsenceTimestepsIfContactReturns;
+    private int minTimespanOfContactTimesteps;
 
 
     public PedestriansNearbyProcessor() {
@@ -54,6 +54,19 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         }
     }
 
+    @Override
+    public void postLoop(final SimulationState state) {
+        List<TimestepPedestriansNearbyIdKey> toBeRemoved = new ArrayList<>();
+        for (TimestepPedestriansNearbyIdKey key : getKeys()) {
+            if (getValue(key).getDurationTimesteps() < minTimespanOfContactTimesteps) {
+                toBeRemoved.add(key);
+            }
+        }
+        for (TimestepPedestriansNearbyIdKey toRemove: toBeRemoved) {
+            removeKey(toRemove);
+        }
+    }
+
     public String[] toStrings(final TimestepPedestriansNearbyIdKey key) {
         return this.hasValue(key) ? this.getValue(key).toStrings() : new String[]{"N/A", "N/A"};
     }
@@ -79,6 +92,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         maxDistance = att.getMaxDistanceForANearbyPedestrian();
         sampleEveryNthStep = att.getSampleEveryNthStep();
         allowedAbsenceTimestepsIfContactReturns = att.getAllowedAbsenceTimestepsIfContactReturns();
+        minTimespanOfContactTimesteps = att.getMinTimespanOfContactTimesteps();
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {
