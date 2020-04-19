@@ -5,7 +5,6 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestriansNearbyData;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestriansNearbyIdKey;
-import org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor;
 import org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -26,10 +25,11 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
     private int sampleEveryNthStep;
     private int allowedAbsenceTimestepsIfContactReturns;
     private int minTimespanOfContactTimesteps;
+    private boolean printContacTrajectories;
 
 
     public PedestriansNearbyProcessor() {
-        super("durationTimesteps");
+        super("durationTimesteps", "xCoord-Contact", "yCoord-Contact");
         setAttributes(new AttributesPedestrianNearbyProcessor());
     }
 
@@ -48,7 +48,11 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
             List<PedestriansNearbyData> pedsNearby = dynElemNneighbours
                     .parallelStream()
                     .filter(p -> ped.getId() != p.getId())
-                    .map(p -> new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep))
+                    .map(p -> {
+                        VPoint pointOfContact = new VPoint(ped.getPosition().getX() - p.getPosition().getX(), ped.getPosition().getY() - p.getPosition().getY());
+                        List<VPoint> trajectory = new ArrayList<>();
+                        trajectory.add(pointOfContact);
+                        return new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep, trajectory, printContacTrajectories);})
                     .collect(Collectors.toList());
             pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPedId1(), o.getPedId2()), o));
         }
@@ -78,7 +82,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
             if (key.isAccountedForBy(currentVal)) {
                 return;
             } else if (key.isContinuationOf(currentVal, allowedAbsenceTimestepsIfContactReturns)) {
-                super.putValue(alreadyExisting, currentVal.getDataWithIncrementedDuration(sampleEveryNthStep));
+                super.putValue(alreadyExisting, currentVal.getUpdatedData(value, sampleEveryNthStep));
                 return;
             }
         }
@@ -93,6 +97,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         sampleEveryNthStep = att.getSampleEveryNthStep();
         allowedAbsenceTimestepsIfContactReturns = att.getAllowedAbsenceTimestepsIfContactReturns();
         minTimespanOfContactTimesteps = att.getMinTimespanOfContactTimesteps();
+        printContacTrajectories = att.getPrintContactTrajectories();
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {
