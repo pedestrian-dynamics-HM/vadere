@@ -4,6 +4,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.CheckAreasInAreaDensityVoronoiProcessor;
 import org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -12,12 +13,13 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 @DataProcessorClass(label = "PedStimulusCountingProcessor")
-public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Long> {
+public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Double> {
 
 	private Predicate<Pedestrian> filter_by_stimuli;
 	private Pattern filter_pattern = null;
 
 	public PedStimulusCountingProcessor(){
+		super("PercentageInformed");
 		setAttributes(new AttributesPedStimulusCountingProcessor());
 	}
 
@@ -39,7 +41,8 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Lon
 	protected void doUpdate(SimulationState state) {
 		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
 
-		long percentageInformed = peds.stream().filter(p -> filter_by_stimuli.test(p)).count() / peds.size();
+		double percentageInformed = peds.stream().filter(p -> filter_by_stimuli.test(p)).count() / peds.size();
+
 
 		this.putValue(new TimestepKey(state.getStep()), percentageInformed);
 
