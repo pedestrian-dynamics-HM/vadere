@@ -1,7 +1,7 @@
 {
   "name" : "mf_base",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.11",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
