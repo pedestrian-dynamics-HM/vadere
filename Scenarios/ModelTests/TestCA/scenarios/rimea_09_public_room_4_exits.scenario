@@ -1,7 +1,7 @@
 {
   "name" : "rimea_09_public_room_4_exits",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -264,7 +264,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

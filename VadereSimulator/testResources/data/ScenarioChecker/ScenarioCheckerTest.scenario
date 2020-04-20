@@ -1,7 +1,7 @@
 {
   "name" : "TopographyCheckerTest",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -553,7 +553,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 2,
         "shape" : {
@@ -574,7 +575,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 10,
         "shape" : {
@@ -595,7 +597,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3, 7, 8, 19, 20, 21, 27, 28, 29, 30, 31 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 14,
         "shape" : {
@@ -616,7 +619,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 15,
         "shape" : {
@@ -637,7 +641,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 16,
         "shape" : {
@@ -658,7 +663,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 17,
         "shape" : {
@@ -679,7 +685,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 18,
         "shape" : {
@@ -700,7 +707,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 22,
         "shape" : {
@@ -721,7 +729,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 23,
         "shape" : {
@@ -742,7 +751,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

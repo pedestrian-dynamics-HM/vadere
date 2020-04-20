@@ -2,9 +2,7 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.jcodec.common.DictionaryCompressor;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesTargetChanger;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -37,10 +35,11 @@ public class TargetChangerController {
 
     // Member Variables
     public final TargetChanger targetChanger;
+    private LinkedList<Double> probabilitiesToChangeTarget;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
     int seed;
-    BinomialDistribution binomialDistribution;
+    //BinomialDistribution binomialDistribution;
     private Random random;
     private LinkedList<BinomialDistribution> binomialDistributions = null;
 
@@ -51,12 +50,12 @@ public class TargetChangerController {
         this.processedAgents = new HashMap<>();
         this.random = random;
 
+
+        this.probabilitiesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget();
+
+
+
         seed = random.nextInt();
-        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-        randomGenerator.setSeed(seed);
-
-        LinkedList<Double> probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
-
         binomialDistributions = getBinomialDistributions();
     }
 
@@ -71,11 +70,11 @@ public class TargetChangerController {
         if (binomialDistributions == null) {
 
             LinkedList<BinomialDistribution> binomialDistributionsL = new LinkedList<>();
-            seed = this.random.nextInt();
-            JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-            randomGenerator.setSeed(seed);
 
-            for (Double probability : targetChanger.getAttributes().getProbabilityToChangeTarget()) {
+            JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+            randomGenerator.setSeed(this.seed);
+
+            for (Double probability : this.probabilitiesToChangeTarget) {
                 binomialDistributionsL.add(new BinomialDistribution(randomGenerator, BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability));
             }
             binomialDistributions = binomialDistributionsL;
@@ -87,6 +86,16 @@ public class TargetChangerController {
 
     // Public Methods
     public void update(double simTimeInSec) {
+
+        int numberTargets = targetChanger.getAttributes().getNextTarget().size();
+        int numberProbabilitesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget().size();
+
+        if (! ( (numberProbabilitesToChangeTarget == 1) || (numberProbabilitesToChangeTarget== numberProbabilitesToChangeTarget)) ) {
+            log.error("The size of probabilitesToChangeTarget must be 1 or equal to nextTarget.");
+        }
+
+
+
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
 
             final Agent agent;
@@ -102,6 +111,8 @@ public class TargetChangerController {
 
 
                 LinkedList<Integer> keepTargets = getFilteredTargetList();
+
+                int aa  = keepTargets.size();
 
                 if (keepTargets.size() > 0) {
                     if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
@@ -132,7 +143,7 @@ public class TargetChangerController {
 
             if (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE){
 
-                if (targetChanger.getAttributes().getProbabilityToChangeTarget().size() == 1){
+                if (targetChanger.getAttributes().getProbabilitiesToChangeTarget().size() == 1){
                     keepTargets = targetChanger.getAttributes().getNextTarget();
                     break;
                 }

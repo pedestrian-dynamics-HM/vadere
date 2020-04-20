@@ -38,6 +38,8 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      */
     private LinkedList<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
 
+
+
     // Constructors
     public AttributesTargetChanger() {
     }
@@ -63,7 +65,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
             }
         }
 
-        this.probabilityToChangeTarget = probabilityToChangeTarget;
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
     // Getters
@@ -88,7 +90,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         return nextTarget;
     }
 
-    public LinkedList<Double> getProbabilityToChangeTarget() {
+    public LinkedList<Double> getProbabilitiesToChangeTarget() {
         return probabilityToChangeTarget;
     }
 
@@ -116,7 +118,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.nextTarget = nextTarget;
     }
 
-    public void setProbabilityToChangeTarget(LinkedList<Double> probabilitiesToChangeTarget) {
+    public void setProbabilitiesToChangeTarget(LinkedList<Double> probabilitiesToChangeTarget) {
 
         for (Double probabilityToChangeTarget : probabilitiesToChangeTarget){
 
@@ -124,7 +126,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
                 throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
             }
         }
-        this.probabilityToChangeTarget = probabilityToChangeTarget;
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
 }

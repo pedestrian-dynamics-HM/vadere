@@ -1,7 +1,7 @@
 {
   "name" : "04-Test-TargetChanger-ChangesToDynamicTarget",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -199,7 +199,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : true,
         "nextTarget" : [ 2 ],
-        "probabilityToChangeTarget" : 1.0
+        "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -222,7 +222,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1, 2 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
@@ -243,7 +244,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
