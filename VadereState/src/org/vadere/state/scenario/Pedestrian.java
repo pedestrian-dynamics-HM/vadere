@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -66,7 +67,7 @@ public class Pedestrian extends Agent {
 		idAsTarget = -1;
 		isChild = false;
 		isLikelyInjured = false;
-		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP);
+		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -110,6 +111,7 @@ public class Pedestrian extends Agent {
 	public ThreatMemory getThreatMemory() { return psychologyStatus.getThreatMemory(); }
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
+	public KnowledgeBase getKnowledgeBase() {return psychologyStatus.getKnowledgeBase(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
