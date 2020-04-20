@@ -1,12 +1,13 @@
 {
-  "name" : "16-ScriptAgents-ChangeTargetScriptedCognitionModel",
+  "name" : "08-UnidirectionalFlow-OSMSequential-PsychEnabled",
   "description" : "",
   "release" : "1.11",
+  "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2 ]
+      "processors" : [ 7, 8, 9, 10 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -17,12 +18,6 @@
       "processors" : [ 4 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 1
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 2
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 3
     }, {
@@ -32,6 +27,18 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 8
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
+      "id" : 9
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
+      "id" : 10
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -53,7 +60,7 @@
         "minimumStepLength" : true,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
-        "updateType" : "EVENT_DRIVEN",
+        "updateType" : "SEQUENTIAL",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
@@ -93,7 +100,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 30.0,
+      "finishTime" : 60.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -101,14 +108,14 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 2810487519014576514,
+      "fixedSeed" : 6138355022448163583,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "ChangeTargetScriptedCognitionModel"
+        "cognition" : "CooperativeCognitionModel"
       }
     },
     "topography" : {
@@ -116,8 +123,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 10.0,
-          "height" : 20.0
+          "width" : 20.0,
+          "height" : 3.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -127,64 +134,13 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 4,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 8.0,
-          "y" : 18.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 0.9,
-          "y" : 1.0,
+          "x" : 18.5,
+          "y" : 0.75,
           "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 3.0,
-          "y" : 1.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 3,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.0,
-          "y" : 1.0,
-          "width" : 1.0,
-          "height" : 1.0,
+          "height" : 1.5,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -198,17 +154,17 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 1,
+        "id" : 2,
         "shape" : {
-          "x" : 1.0,
-          "y" : 18.0,
+          "x" : 0.5,
+          "y" : 0.75,
           "width" : 1.0,
-          "height" : 1.0,
+          "height" : 1.5,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 4,
+        "spawnNumber" : 20,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -217,49 +173,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
-      }, {
-        "id" : 2,
-        "shape" : {
-          "x" : 3.0,
-          "y" : 18.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
-      }, {
-        "id" : 3,
-        "shape" : {
-          "x" : 5.0,
-          "y" : 18.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 3 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
@@ -276,43 +191,8 @@
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
       "teleporter" : null,
-      "attributesCar" : {
-        "id" : -1,
-        "radius" : 0.2,
-        "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
-        "acceleration" : 2.0,
-        "footstepHistorySize" : 4,
-        "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
-        "length" : 4.5,
-        "width" : 1.7,
-        "direction" : {
-          "x" : 1.0,
-          "y" : 0.0
-        }
-      }
+      "attributesCar" : null
     },
-    "stimulusInfos" : [ {
-      "timeframe" : {
-        "startTime" : 0.0,
-        "endTime" : 0.4,
-        "repeat" : true,
-        "waitTimeBetweenRepetition" : 0.0
-      },
-      "stimuli" : [ {
-        "type" : "ChangeTargetScripted",
-        "allowedTimeDelta" : 0.4,
-        "changeRemainingPedestrians" : false,
-        "originalTargetIds" : [ 1, 2 ],
-        "newTargetIds" : [ 4, 4 ],
-        "simTimesToChangeTarget" : [ 4.0, 8.0 ],
-        "totalAgentsToChangeTarget" : [ 1, 2 ]
-      } ]
-    } ]
+    "stimulusInfos" : [ ]
   }
 }
