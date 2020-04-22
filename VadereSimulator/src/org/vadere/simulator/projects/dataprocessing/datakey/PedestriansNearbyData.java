@@ -14,6 +14,7 @@ public class PedestriansNearbyData {
 	private int startTimestep;
 	private List<VPoint> trajectory;
 	private boolean printTrajectory;
+	private boolean printForPostVis; // is an ugly one time thing that shouldn't be merged
 
 
 
@@ -30,13 +31,14 @@ public class PedestriansNearbyData {
 		return startTimestep;
 	}
 
-	public PedestriansNearbyData(int ped1, int ped2, final int durationTimesteps, int startTimestep, List<VPoint> contactTrajectory, boolean printTrajectory){
+	public PedestriansNearbyData(int ped1, int ped2, final int durationTimesteps, int startTimestep, List<VPoint> contactTrajectory, boolean printTrajectory, boolean printForPostVis){
 		this.pedId1 = Math.min(ped1, ped2);
 		this.pedId2 = Math.max(ped1, ped2);
 		this.durationTimesteps = durationTimesteps;
 		this.startTimestep = startTimestep;
 		this.trajectory = contactTrajectory;
 		this.printTrajectory = printTrajectory;
+		this.printForPostVis = printForPostVis;
 	}
 
 	public int getPedId1() {
@@ -49,6 +51,10 @@ public class PedestriansNearbyData {
 
 	public int getDurationTimesteps() {
 		return durationTimesteps;
+	}
+
+	public boolean isPrintForPostVis() {
+		return printForPostVis;
 	}
 
 	public List<VPoint> getTrajectory() {
@@ -64,11 +70,30 @@ public class PedestriansNearbyData {
 	public PedestriansNearbyData getUpdatedData(PedestriansNearbyData newData, int sampleEveryNthStep) {
 		List<VPoint> traj = getTrajectory();
 		traj.addAll(newData.getTrajectory());
-		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + sampleEveryNthStep, getStartTimestep(),traj, printTrajectory);
+		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + sampleEveryNthStep, getStartTimestep(),traj, printTrajectory, printForPostVis);
 	}
 
 
 	public String[] toStrings(){
+		// printForPostVis is an ugly one time thing that shouldn't be merged
+		if (printForPostVis) {
+			StringBuilder ret = new StringBuilder();
+			List<VPoint> traj = getTrajectory();
+			for (int i = 0; i < traj.size(); i++) {
+				VPoint p = traj.get(i);
+				VPoint pNext;
+				if (i != traj.size() -1) {
+					pNext = traj.get(i + 1);
+				} else {
+					pNext = traj.get(i);
+				}
+				ret.append(hashCode()).append(" ").append(startTimestep*0.4 + i*0.4).append(" ").append(startTimestep*0.4 + (i+1)*0.4).append(" ").append(p.x).append(" ").append(p.y).append(" ").append(pNext.x).append(" ").append(pNext.y).append(" 9999");
+				if (i != traj.size() -1) {
+					ret.append("\n");
+				}
+			}
+			return new String[]{ret.toString()};
+		}
 		if (!printTrajectory) {
 			return new String[]{Integer.toString(durationTimesteps)};
 		}

@@ -11,6 +11,8 @@ public class AttributesPedestrianNearbyProcessor extends AttributesProcessor {
     private int allowedAbsenceTimestepsIfContactReturns = 0;
     private int minTimespanOfContactTimesteps = 1;
     private boolean printContactTrajectories = false;
+    private boolean printForPostVis = false;
+
 
     public double getMaxDistanceForANearbyPedestrian() {
         return maxDistanceForANearbyPedestrian;
@@ -30,5 +32,9 @@ public class AttributesPedestrianNearbyProcessor extends AttributesProcessor {
 
     public boolean getPrintContactTrajectories() {
         return printContactTrajectories;
+    }
+
+    public boolean getPrintForPostVis() {
+        return printForPostVis;
     }
 }

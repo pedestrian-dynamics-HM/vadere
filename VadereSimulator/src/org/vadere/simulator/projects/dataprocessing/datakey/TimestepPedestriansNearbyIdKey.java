@@ -13,12 +13,14 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int timeStep;
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
+	private final boolean printForPostVis;
 
 
-	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB) {
+	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB, boolean printForPostVis) {
 		this.timeStep = timeStep;
 		this.pedId1 = Math.min(pedA, pedB);
 		this.pedId2 = Math.max(pedA, pedB);
+		this.printForPostVis = printForPostVis; // is an ugly one time thing that shouldn't be merged
 	}
 
 
@@ -39,6 +41,11 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	}
 
 	public String[] toStrings(){
+		// printForPostVis is an ugly one time thing that shouldn't be merged
+		if (printForPostVis) {
+			//return new String[]{Integer.toString(999), Double.toString(timeStep*0.4), Double.toString(timeStep*0.4 + 0.4)};
+			return new String[]{};
+		}
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
@@ -49,8 +56,7 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 				(other.getStartTimestep() + other.getDurationTimesteps() + toleranceTimesteps >= getTimeStep());
 	}
 	public boolean isAccountedForBy(PedestriansNearbyData other) {
-		return equals(other) ||
-				(other.getPedId1() == getPedId1() &&
+		return (other.getPedId1() == getPedId1() &&
 				other.getPedId2() == getPedId2() &&
 				getTimeStep() >= other.getStartTimestep() &&
 				getTimeStep() < other.getStartTimestep() + other.getDurationTimesteps());
