@@ -4,7 +4,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCIDataType;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 /**
  * CompoundObject implementation based on TraCI as described in https://sumo.dlr.de/docs/TraCI/Protocol.html#atomar_types
@@ -94,16 +96,37 @@ public class CompoundObject {
 		return new Iter(this, typeAssertion);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CompoundObject that = (CompoundObject) o;
+		return Arrays.equals(type, that.type) &&
+				Arrays.equals(data, that.data);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Arrays.hashCode(type);
+		result = 31 * result + Arrays.hashCode(data);
+		return result;
+	}
 
 	private class Iter implements Iterator<Pair<TraCIDataType, Object>> {
 
 		private final CompoundObject compoundObject;
+		private final Predicate<TraCIDataType> typeAssertionTest;
 		private final TraCIDataType typeAssertion;
 		private int curr;
 
 		Iter(CompoundObject compoundObject, TraCIDataType typeAssertion) {
 			this.compoundObject = compoundObject;
 			this.typeAssertion = typeAssertion;
+			if (typeAssertion != null) {
+				this.typeAssertionTest = traCIDataType -> traCIDataType.equals(typeAssertion);
+			} else {
+				this.typeAssertionTest = traCIDataType -> true;
+			}
 			this.curr = 0;
 		}
 
@@ -112,10 +135,12 @@ public class CompoundObject {
 			return curr < compoundObject.size();
 		}
 
+
+
 		@Override
 		public Pair<TraCIDataType, Object> next() {
 			Pair<TraCIDataType, Object> p = Pair.of(compoundObject.type[curr], compoundObject.data[curr]);
-			if (!p.getLeft().equals(this.typeAssertion)) {
+			if (! this.typeAssertionTest.test(p.getLeft())) {
 				throw new TraCIException("Type mismatch in CompoundObject. Expected '%s' but found '%s'",
 						this.typeAssertion.name(), p.getLeft().name());
 			}
