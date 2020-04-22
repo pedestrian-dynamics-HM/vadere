@@ -18,8 +18,8 @@ import java.util.Collection;
 @DataProcessorClass(label = "MeshDensityCountingProcessor")
 public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKey, Integer> {
 
-	private final static String propertyNameNumberOfPedestrians = "numberOfPedestrians";
-	private MeshProcessor meshProcessor;
+	protected final static String propertyNameNumberOfPedestrians = "numberOfPedestrians";
+	protected MeshProcessor meshProcessor;
 
 	public MeshDensityCountingProcessor() {
 		super("meshDensityCounting");
@@ -32,38 +32,35 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 		this.meshProcessor = (MeshProcessor) manager.getProcessor(getAttributes().getMeshProcessorId());
 	}
 
-	private IMesh<PVertex, PHalfEdge, PFace> getMesh() {
+	protected IMesh<PVertex, PHalfEdge, PFace> getMesh() {
 		return meshProcessor.getTriangulation().getMesh();
 	}
 
-	private MeasurementArea getMeasurementArea() {
+	protected MeasurementArea getMeasurementArea() {
 		return meshProcessor.getMeasurementArea();
 	}
 
-	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
+	protected IIncrementalTriangulation<PVertex, PHalfEdge, PFace> getTriangulation() {
 		return meshProcessor.getTriangulation();
 	}
 
-	@Override
-	protected void doUpdate(SimulationState state) {
-		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+	protected void doUpdateOnPed(Pedestrian ped){
+		if(getMeasurementArea().asPolygon().contains(ped.getPosition())) {
+			PFace f = getTriangulation().locate(ped.getPosition(), ped).get();
+			int n = getMesh().getIntegerData(f, propertyNameNumberOfPedestrians) + 1;
+			getMesh().setIntegerData(f, propertyNameNumberOfPedestrians, n);
+			assert !getMesh().isBoundary(f);
+		}
+	}
 
+	protected void reset_count(){
 		// reset count
 		for(PFace f : getMesh().getFaces()) {
 			getMesh().setIntegerData(f, propertyNameNumberOfPedestrians, 0);
 		}
+	}
 
-		// compute count
-		for(Pedestrian ped : peds) {
-
-			if(getMeasurementArea().asPolygon().contains(ped.getPosition())) {
-				PFace f = getTriangulation().locate(ped.getPosition(), ped).get();
-				int n = getMesh().getIntegerData(f, propertyNameNumberOfPedestrians) + 1;
-				getMesh().setIntegerData(f, propertyNameNumberOfPedestrians, n);
-				assert !getMesh().isBoundary(f);
-			}
-		}
-
+	protected void write_count(SimulationState state){
 		// write count
 		int faceId = 1;
 		for(PFace f : getMesh().getFaces()) {
@@ -71,6 +68,20 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 			this.putValue(new TimestepFaceIdKey(state.getStep(), faceId), n);
 			faceId++;
 		}
+	}
+
+	@Override
+	protected void doUpdate(SimulationState state) {
+		Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
+
+		reset_count();
+
+		// compute count
+		for(Pedestrian ped : peds) {
+			doUpdateOnPed(ped);
+		}
+
+		write_count(state);
 	}
 
 	@Override

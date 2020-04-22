@@ -1,6 +1,5 @@
 package org.vadere.manager.traci.commandHandler;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.manager.RemoteManager;
@@ -12,36 +11,31 @@ import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
-import org.vadere.manager.traci.writer.TraCIPacket;
-import org.vadere.simulator.entrypoints.ScenarioFactory;
+import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.manager.traci.compound.CompoundObjectBuilder;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.state.scenario.DynamicElementContainer;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.types.ScenarioElementType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.io.IOUtils;
-import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Random;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 
 public class PersonCommandHandlerTest extends CommandHandlerTest {
 
@@ -669,6 +663,37 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 		};
 		TraCICommand ret = persCmdHandler.process_setNextTargetListIndex(cmd, rm);
 		testTraCICommand(ret, TraCICmd.SET_PERSON_STATE, CmdType.VALUE_SET);
+		checkSET_OK(ret);
+		testSetValue(ret, varID, varType, elementID, data);
+	}
+
+
+	@Test
+	public void process_setInformationItem() {
+		PersonVar var = PersonVar.INFORMATION_ITEM;
+		int varID = var.id;
+		TraCIDataType varType = var.type;
+		String elementID = "10";
+		Pedestrian p = new Pedestrian(new AttributesAgent(10), new Random(1));
+		CompoundObject data = CompoundObjectBuilder.builder()
+				.add(TraCIDataType.DOUBLE)
+				.add(TraCIDataType.DOUBLE)
+				.add(TraCIDataType.STRING)
+				.build(12.2, 13.2, "reason001");
+
+		TraCISetCommand cmd = (TraCISetCommand) getFirstCommand(TraCISetCommand.build(
+				TraCICmd.SET_PERSON_STATE, elementID, varID, varType, data));
+		RemoteManager rm = new TestRemoteManager() {
+			@Override
+			protected void mockIt() {
+				when(simState.getTopography().getPedestrianDynamicElements().getElement(Integer.parseInt(elementID)))
+						.thenReturn(p);
+			}
+		};
+		KnowledgeItem s = new KnowledgeItem(12.2, 13.2, "reason001");
+
+		TraCICommand ret = persCmdHandler.process_setStimulus(cmd, rm);
+		assertThat(p.getKnowledgeBase().getKnowledge().get(0), equalTo(s));
 		checkSET_OK(ret);
 		testSetValue(ret, varID, varType, elementID, data);
 	}
