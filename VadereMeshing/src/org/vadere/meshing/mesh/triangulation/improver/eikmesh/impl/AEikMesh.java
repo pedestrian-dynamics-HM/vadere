@@ -5,6 +5,7 @@ import org.vadere.meshing.mesh.gen.AFace;
 import org.vadere.meshing.mesh.gen.AHalfEdge;
 import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.util.geometry.shapes.VRectangle;

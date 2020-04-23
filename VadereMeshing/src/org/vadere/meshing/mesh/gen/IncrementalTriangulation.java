@@ -7,7 +7,6 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
@@ -555,14 +554,29 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}*/
 
 
+	private boolean isVirtualVertex(@NotNull final V v) {
+		return virtualVertices.contains(v);
+	}
+
 
 	@Override
 	public void finish() {
 		if(!finalized) {
-			// we have to use other halfedges than he1 and he2 since they might be deleted
-			// if we deleteBoundaryFace he0!
-
+			// remove the super triangle properly!
 			if(!useMeshForBound) {
+				// flip all edges
+				List<E> toLegalize = new ArrayList<>();
+				for(V virtualPoint : virtualVertices) {
+
+					for(E edge : getMesh().getEdges(virtualPoint)) {
+						V vertex = getMesh().getVertex(getMesh().getNext(edge));
+						if(isLeftOf(vertex.getX(), vertex.getY(), getMesh().getNext(getMesh().getTwin(edge)))) {
+							flip(edge);
+							toLegalize.add(edge);
+						}
+					}
+				}
+
 				for(V virtualPoint : virtualVertices) {
 					if(!mesh.isDestroyed(virtualPoint)) {
 						List<F> faces1 = mesh.getFaces(virtualPoint);
@@ -570,7 +584,15 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 						faces1.forEach(f -> removeFaceAtBorder(f, true));
 					}
 				}
+
+				for(E edge : toLegalize) {
+					if(!getMesh().isDestroyed(edge)) {
+						legalize(edge);
+					}
+				}
 			}
+
+			//assert getMesh().streamEdges().noneMatch(e -> isIllegal(e));
 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
@@ -763,8 +785,20 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	 */
 	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p) {
-		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			return isDelaunayIllegal(edge, p);
+		// TODO: duplicated code
+		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			V v1 = getMesh().getVertex(edge);
+			V v2 = getMesh().getTwinVertex(edge);
+
+			/*if(isVirtualVertex(v1)) {
+				E e = getMesh().getNext(getMesh().getTwin(edge));
+				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
+			} else if(isVirtualVertex(v2)) {
+				E e = getMesh().getPrev(getMesh().getTwin(edge));
+				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
+			} else {*/
+				return isDelaunayIllegal(edge, p);
+			//}
 		}
 
 		return false;
@@ -773,8 +807,19 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p, final double eps) {
-		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			return isDelaunayIllegal(edge, p, eps);
+		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			// special case for infinity vertices for which the arc of their circumcircle becomes a line!
+			//V v1 = getMesh().getVertex(edge);
+			//V v2 = getMesh().getTwinVertex(edge);
+
+			/*if(isVirtualVertex(v1)) {
+				return isLeftOf(p.getX(), p.getY(), getMesh().getNext(getMesh().getTwin(edge)));
+			} else if(isVirtualVertex(v2)) {
+				return isLeftOf(p.getX(), p.getY(), getMesh().getPrev(getMesh().getTwin(edge)));
+			} else {
+			*/
+				return isDelaunayIllegal(edge, p, eps);
+			//}
 		}
 
 		return false;
@@ -803,7 +848,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		return false;
 	}*/
 
-	public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
+	/*public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
 		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
@@ -826,7 +871,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			//}
 		}
 		return false;
-	}
+	}*/
 
 	/*public static <P extends IPoint> boolean isIllegalEdge(final E edge){
 		P p = edge.getNext().getEnd();
@@ -873,6 +918,21 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			//log.info("#its = " + its);
 		//}
 	}
+
+	/*@Override
+	/*@Override
+	public void legalizeNonRecursive(@NotNull final E edge, final V p) {
+		boolean found = false;
+		do {
+			found = false;
+			for(E e : getMesh().getEdges()) {
+				if(isIllegal(e)) {
+					flip(e);
+					found = true;
+				}
+			}
+		} while (found);
+	}*/
 
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
@@ -1004,7 +1064,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		BowyerWatsonSlow bw3 = new BowyerWatsonSlow(points);
 		bw3.execute();
 		Set<VLine> edges3 = bw3.getTriangles().stream()
-				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
+				.flatMap(triangle -> triangle.streamLines()).collect(Collectors.toSet());
 		System.out.println(System.currentTimeMillis() - ms);
 
 		JFrame window3 = new JFrame();

@@ -131,7 +131,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 
 	@Override
 	public void setCoords(@NotNull AVertex vertex, double x, double y) {
-		throw new UnsupportedOperationException("not jet implemented.");
+		vertex.setPoint(new VPoint(x, y));
 	}
 
 	@Override
@@ -167,9 +167,75 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	}
 
 	@Override
+	public boolean getBooleanData(@NotNull final AVertex vertex, @NotNull final String name) {
+		if(!verticesBooleanData.containsKey(name)) {
+			return false;
+		} else {
+			BooleanArrayList dataArray = verticesBooleanData.get(name);
+			assert dataArray.size() == vertices.size();
+			return dataArray.getBoolean(vertex.getId());
+		}
+	}
+
+	@Override
+	public double getDoubleData(@NotNull final AVertex vertex, @NotNull final String name) {
+		if(!verticesDoubleData.containsKey(name)) {
+			return 0.0;
+		} else {
+			DoubleArrayList dataArray = verticesDoubleData.get(name);
+			assert dataArray.size() == vertices.size();
+			return dataArray.getDouble(vertex.getId());
+		}
+	}
+
+	@Override
+	public boolean getBooleanData(@NotNull final AHalfEdge edge, @NotNull final String name) {
+		if(!halfEdgesBooleanData.containsKey(name)) {
+			return false;
+		} else {
+			BooleanArrayList dataArray = halfEdgesBooleanData.get(name);
+			assert dataArray.size() == edges.size();
+			return dataArray.getBoolean(edge.getId());
+		}
+	}
+
+	@Override
+	public double getDoubleData(@NotNull final AHalfEdge edge, @NotNull final String name) {
+		if(!halfEdgesDoubleData.containsKey(name)) {
+			return 0.0;
+		} else {
+			DoubleArrayList dataArray = halfEdgesDoubleData.get(name);
+			assert dataArray.size() == edges.size();
+			return dataArray.getDouble(edge.getId());
+		}
+	}
+
+	@Override
+	public boolean getBooleanData(@NotNull final AFace face, @NotNull final String name) {
+		if(!facesBooleanData.containsKey(name)) {
+			return false;
+		} else {
+			BooleanArrayList dataArray = facesBooleanData.get(name);
+			assert dataArray.size() == faces.size();
+			return dataArray.getBoolean(face.getId());
+		}
+	}
+
+	@Override
+	public double getDoubleData(@NotNull final AFace face, @NotNull final String name) {
+		if(!facesDoubleData.containsKey(name)) {
+			return 0.0;
+		} else {
+			DoubleArrayList dataArray = facesDoubleData.get(name);
+			assert dataArray.size() == faces.size();
+			return dataArray.getDouble(face.getId());
+		}
+	}
+
+	@Override
 	public <CV> Optional<CV> getData(@NotNull final AVertex vertex, @NotNull final String name, @NotNull Class<CV> clazz) {
 		if(!verticesData.containsKey(name)) {
-			throw new IllegalArgumentException(name + " is not a property of vertices.");
+			return Optional.ofNullable(null);
 		} else {
 			ObjectArrayList<CV> dataArray = (ObjectArrayList<CV>) verticesData.get(name);
 			assert dataArray.size() == vertices.size();
@@ -192,7 +258,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	@Override
 	public <CE> Optional<CE> getData(@NotNull final AHalfEdge edge, @NotNull final String name, @NotNull Class<CE> clazz) {
 		if(!halfEdgesData.containsKey(name)) {
-			throw new IllegalArgumentException(name + " is not a property of vertices.");
+			return Optional.ofNullable(null);
 		} else {
 			AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
 			assert dataArray.size() == vertices.size();
@@ -215,7 +281,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	@Override
 	public <CF> Optional<CF> getData(@NotNull final AFace face, @NotNull final String name, @NotNull Class<CF> clazz) {
 		if(!facesData.containsKey(name)) {
-			throw new IllegalArgumentException(name + " is not a property of vertices.");
+			return Optional.ofNullable(null);
 		} else {
 			AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
 			assert dataArray.size() == vertices.size();
@@ -239,6 +305,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setDoubleData(@NotNull final AFace face, @NotNull final String name, final double data) {
 		if(!facesDoubleData.containsKey(name)) {
 			DoubleArrayList dataArray = new DoubleArrayList(faces.size());
+			dataArray.size(faces.size());
 			facesDoubleData.put(name, dataArray);
 		}
 		DoubleArrayList dataArray = facesDoubleData.get(name);
@@ -250,6 +317,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setDoubleData(@NotNull final AVertex vertex, @NotNull final String name, final double data) {
 		if(!verticesDoubleData.containsKey(name)) {
 			DoubleArrayList dataArray = new DoubleArrayList(vertices.size());
+			dataArray.size(vertices.size());
 			verticesDoubleData.put(name, dataArray);
 		}
 		DoubleArrayList dataArray = verticesDoubleData.get(name);
@@ -261,6 +329,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setDoubleData(@NotNull final AHalfEdge edge, @NotNull final String name, final double data) {
 		if(!halfEdgesDoubleData.containsKey(name)) {
 			DoubleArrayList dataArray = new DoubleArrayList(edges.size());
+			dataArray.size(edges.size());
 			halfEdgesDoubleData.put(name, dataArray);
 		}
 		DoubleArrayList dataArray = halfEdgesDoubleData.get(name);
@@ -272,6 +341,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setBooleanData(@NotNull final AFace face, @NotNull final String name, final boolean data) {
 		if(!facesBooleanData.containsKey(name)) {
 			BooleanArrayList dataArray = new BooleanArrayList(faces.size());
+			dataArray.size(faces.size());
 			facesBooleanData.put(name, dataArray);
 		}
 		BooleanArrayList dataArray = facesBooleanData.get(name);
@@ -283,6 +353,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setBooleanData(@NotNull final AVertex vertex, @NotNull final String name, final boolean data) {
 		if(!verticesBooleanData.containsKey(name)) {
 			BooleanArrayList dataArray = new BooleanArrayList(vertices.size());
+			dataArray.size(vertices.size());
 			verticesBooleanData.put(name, dataArray);
 		}
 		BooleanArrayList dataArray = verticesBooleanData.get(name);
@@ -294,6 +365,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 	public void setBooleanData(@NotNull final AHalfEdge edge, @NotNull final String name, final boolean data) {
 		if(!halfEdgesBooleanData.containsKey(name)) {
 			BooleanArrayList dataArray = new BooleanArrayList(edges.size());
+			dataArray.size(edges.size());
 			halfEdgesBooleanData.put(name, dataArray);
 		}
 		BooleanArrayList dataArray = halfEdgesBooleanData.get(name);
@@ -404,6 +476,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		for (ObjectArrayList edgeProperty : halfEdgesData.values()) {
 			edgeProperty.add(null);
 		}
+		for(DoubleArrayList edgeDoubleProperty : halfEdgesDoubleData.values()) {
+			edgeDoubleProperty.add(0.0);
+		}
+		for(BooleanArrayList edgeBooleanProperty : halfEdgesBooleanData.values()) {
+			edgeBooleanProperty.add(false);
+		}
 		numberOfEdges++;
 		return edge;
 	}
@@ -420,6 +498,14 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		faces.add(face);
 		for (ObjectArrayList faceProperty : facesData.values()) {
 			faceProperty.add(null);
+		}
+
+		for(DoubleArrayList faceDoubleProperty : facesDoubleData.values()) {
+			faceDoubleProperty.add(0.0);
+		}
+
+		for(BooleanArrayList faceBooleanProperty : facesBooleanData.values()) {
+			faceBooleanProperty.add(false);
 		}
 
 		if(!hole) {
@@ -447,6 +533,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		int id = vertices.size();
 		for (ObjectArrayList vertexProperty : verticesData.values()) {
 			vertexProperty.add(null);
+		}
+		for(DoubleArrayList vertexDoubleProperty : verticesDoubleData.values()) {
+			vertexDoubleProperty.add(0.0);
+		}
+		for(BooleanArrayList vertexBooleanProperty : verticesBooleanData.values()) {
+			vertexBooleanProperty.add(false);
 		}
 		return new AVertex(id, point);
 	}

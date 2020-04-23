@@ -3199,17 +3199,21 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the quality of a face / triangle
 	 */
 	default double faceToQuality(final F face) {
-		VLine[] lines = getMesh().toTriangle(face).getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			throw new IllegalArgumentException(face + " is not a feasible triangle!");
-		}
-		return part;
+		assert getMesh().getEdges(face).size() == 3;
+		E edge = getMesh().getEdge(face);
+		IPoint p1 = getMesh().getVertex(edge);
+		IPoint p2 = getMesh().getVertex(getMesh().getNext(edge));
+		IPoint p3 = getMesh().getVertex(getMesh().getPrev(edge));
+
+		double quality = GeometryUtils.qualityInCircleOutCircle(p1, p2, p3);
+		return GeometryUtils.qualityInCircleOutCircle(p1, p2, p3);
+	}
+
+	default double faceToLongestEdgeQuality(final F face) {
+		E edge = getMesh().getEdge(face);
+		IPoint p1 = getMesh().getVertex(edge);
+		IPoint p2 = getMesh().getVertex(getMesh().getNext(edge));
+		IPoint p3 = getMesh().getVertex(getMesh().getPrev(edge));
+		return GeometryUtils.qualityLongestEdgeInCircle(p1, p2, p3);
 	}
 }

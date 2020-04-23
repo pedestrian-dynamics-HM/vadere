@@ -702,6 +702,53 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Computes the incenter circle radius of a triangle (p1, p2, p3).
+	 *
+	 * Assumption: the three points form a valid triangle.
+	 *
+	 * @param p1 the first point of the triangle
+	 * @param p2 the second point of the triangle
+	 * @param p3 the third point of the triangle
+	 *
+	 * @return the incenter circle radius of a triangle (p1, p2, p3)
+	 */
+	public static double getIncircleRaduis(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
+		double a = p1.distance(p2);
+		double b = p2.distance(p3);
+		double c = p3.distance(p1);
+		double perimeter = a + b + c;
+		double s = perimeter / 2.0;
+
+		return Math.sqrt(s * (s-a) * (s-b) * (s-c)) / s;
+	}
+
+	public static double qualityInCircleOutCircle(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
+		double a = p1.distance(p2);
+		double b = p1.distance(p3);
+		double c = p3.distance(p2);
+		double part;
+		if(a != 0.0 && b != 0.0 && c != 0.0) {
+			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		}
+		else {
+			throw new IllegalArgumentException(new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3)).toString() + " is not a feasible triangle!");
+		}
+		return part;
+	}
+
+	public static double qualityLongestEdgeInCircle(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
+		VTriangle tri = new VTriangle(new VPoint(p1), new VPoint(p2), new VPoint(p3));
+		double longestEdge = 0.0;
+		for(VLine line : tri.getLines()) {
+			if(longestEdge < line.length()) {
+				longestEdge = line.length();
+			}
+		}
+		assert longestEdge != 0.0;
+		return 2 * Math.sqrt(3) * tri.getIncircleRadius() / longestEdge;
+	}
+
+	/**
 	 * Tests if the half-line-segment starting at p in the direction (q-p) intersects the line-segment (p1,p2).
 	 *
 	 * @param p     the starting point of the half-line-segment
@@ -803,6 +850,24 @@ public class GeometryUtils {
 	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
 	 */
 	public static boolean intersectLineSegment(final double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		return intersectLine(x1, y1, x2, y2, x3, y3, x4, y4) && intersectLine(x3, y3, x4, y4, x1, y1, x2, y2);
+	}
+
+	/**
+	 * Tests if the first line-segment (p = (x1, y1), q = (x2, y2)) intersects the second line-segment (p1 = (x3, y3), p2 = (x4, y4)).
+	 *
+	 * @param x1 x-coordinate of p
+	 * @param y1 y-coordinate of p
+	 * @param x2 x-coordinate of q
+	 * @param y2 y-coordinate of q
+	 * @param x3 x-coordinate of p1
+	 * @param y3 y-coordinate of p1
+	 * @param x4 x-coordinate of p2
+	 * @param y4 y-coordinate of p2
+	 *
+	 * @return true if the first line-segment intersects the second line-segment, otherwise false.
+	 */
+	public static boolean isColinear(final double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
 		return intersectLine(x1, y1, x2, y2, x3, y3, x4, y4) && intersectLine(x3, y3, x4, y4, x1, y1, x2, y2);
 	}
 
@@ -1440,18 +1505,7 @@ public class GeometryUtils {
 	 * @return the quality smaller or equals one of the triangle
 	 */
 	public static double qualityOf(@NotNull final VTriangle triangle) {
-		VLine[] lines = triangle.getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part = 0.0;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
-		}
-		else {
-			part = 0.0;
-		}
-		return part;
+		return GeometryUtils.qualityInCircleOutCircle(triangle.p1, triangle.p2, triangle.p3);
 	}
 
 	/**

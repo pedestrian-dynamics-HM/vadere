@@ -117,6 +117,8 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 	private void enforceConstrain(@NotNull final Pair<V, V> constrain) {
 		V v1 = constrain.getLeft();
 		V v2 = constrain.getRight();
+
+		// this may also contain co-linear edges!
 		LinkedList<E> intersectingEdges = triangulation.getIntersectingEdges(v1, v2);
 
 		for(E edge : intersectingEdges) {
@@ -132,16 +134,29 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 				VPoint intersectionPoint = GeometryUtils.intersectionPoint(vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, v1.getX(), v1.getY(), v2.getX(), v2.getY());
 
 				if(intersectionPoint.distanceSq(v11) <= tol * tol) {
-					getMesh().setPoint(v11, intersectionPoint);
+					//getMesh().setPoint(v11, intersectionPoint);
 					projectionMap.put(v11, vEdge);
 				} else if(intersectionPoint.distanceSq(v22) <= tol * tol) {
-					getMesh().setPoint(v22, intersectionPoint);
+					//getMesh().setPoint(v22, intersectionPoint);
 					projectionMap.put(v22, vEdge);
 				} else {
 					V vertex = getMesh().createVertex(intersectionPoint);
 					triangulation.splitEdge(vertex, edge);
 					projectionMap.put(vertex, vEdge);
 				}
+			} else {
+				// the edge is co-linear that means we add the complete edge to be part of the constrains or one vertex is very close to (v1--v2).
+				/*if(GeometryUtils.distanceToLineSegment(v1, v2, v11.getX(), v11.getY()) <= tol) {
+					VPoint projection1 = GeometryUtils.projectOntoLine(v11.getX(), v11.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+					getMesh().setPoint(v11, projection1);
+					projectionMap.put(v11, vEdge);
+				}
+
+				if(GeometryUtils.distanceToLineSegment(v1, v2, v22.getX(), v22.getY()) <= tol) {
+					VPoint projection2 = GeometryUtils.projectOntoLine(v22.getX(), v22.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+					getMesh().setPoint(v22, projection2);
+					projectionMap.put(v22, vEdge);
+				}*/
 			}
 		}
 	}

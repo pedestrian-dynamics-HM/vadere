@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
+import org.vadere.util.geometry.Geometry;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -496,7 +497,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 		if(!points.contains(p)) {
 			points.add(p);
-			E newEdge = triangulation.getAnyEdge(triangulation.splitEdge(v, edge, true));
+			E newEdge = triangulation.getAnyEdge(triangulation.splitEdge(v, edge, false));
 			triangulation.insertEvent(newEdge);
 			smallestEdgeLength = Math.min(smallestEdgeLength, line.length() / 2.0);
 		}
@@ -533,7 +534,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
 
 				getMesh().arrangeMemory(sierpinksyFaceOrder);
-				triangulation.getMesh().garbageCollection();
+				getMesh().garbageCollection();
 				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
 			}
 		}
@@ -638,7 +639,8 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	private void establishConstrains() {
 		List<VLine> lines = boundary.stream().flatMap(shape -> shape.lines().stream()).collect(Collectors.toList());
 		//GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
-		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, minEdgeLen / 2 / Math.sqrt(3) / 5);
+		//GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, minEdgeLen / 2);
+		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, GeometryUtils.DOUBLE_EPS);
 		cdt.generate(false);
 		projections.putAll(cdt.getProjections());
 		constrains.addAll(cdt.getConstrains());

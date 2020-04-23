@@ -333,7 +333,7 @@ public class EikMeshExamples {
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
 		// (optional) define the gui to display the mesh
-		meshImprover.generate();
+		//meshImprover.generate();
 
 
 		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
@@ -347,16 +347,20 @@ public class EikMeshExamples {
 		System.out.println(polyString);
 
 		var mesh = reader.readMesh(inputStream);
-		var meshPanel = new PMeshPanel(mesh, 1000, 800);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
 
 		// generate the mesh
-
 
 		// display the mesh
 		meshPanel.display("Geometry defined by a distance function (disc)");
 
-		// display the mesh
-		meshPanel.display("Combination of distance functions");
+
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			//meshPanel.repaint();
+			//Thread.sleep(100);
+			//meshPanel.repaint();
+		}
 
 		Function<PVertex, Color> vertexColorFunction = v -> {
 			if(meshImprover.isSlidePoint(v)){

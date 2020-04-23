@@ -163,7 +163,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-			faces = mesh/*.clone()*/.getFaces();
+			faces = mesh./*clone().*/getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
 		}
