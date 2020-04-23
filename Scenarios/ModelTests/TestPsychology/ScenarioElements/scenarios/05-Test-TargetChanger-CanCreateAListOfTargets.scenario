@@ -1,5 +1,5 @@
 {
-  "name" : "04-Test-TargetChanger-ChangesToDynamicTarget",
+  "name" : "05-Test-TargetChanger-CanCreateAListOfTargets",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
@@ -117,30 +117,21 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 20.0,
-          "height" : 20.0
+          "height" : 10.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ {
-        "shape" : {
-          "x" : 2.0,
-          "y" : 10.0,
-          "width" : 16.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 6
-      } ],
+      "obstacles" : [ ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : false,
+        "absorbing" : true,
         "shape" : {
-          "x" : 18.3,
-          "y" : 17.0,
+          "x" : 9.0,
+          "y" : 8.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -156,8 +147,8 @@
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 0.7,
-          "y" : 11.1,
+          "x" : 9.0,
+          "y" : 0.9,
           "width" : 1.1,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -171,10 +162,27 @@
         "nextSpeed" : -1.0
       }, {
         "id" : 3,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 12.0,
+          "y" : 4.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 4,
         "absorbing" : true,
         "shape" : {
-          "x" : 17.9,
-          "y" : 0.9,
+          "x" : 18.0,
+          "y" : 4.5,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -190,37 +198,37 @@
       "targetChangers" : [ {
         "id" : 5,
         "shape" : {
-          "x" : 15.5,
-          "y" : 0.6801097393689985,
-          "width" : 0.741975308641976,
-          "height" : 2.735274876015615,
+          "x" : 7.9,
+          "y" : 0.4801097393689986,
+          "width" : 0.8242798353909446,
+          "height" : 8.97119341563786,
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : true,
-        "nextTarget" : [ 2 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
+        "nextTargetIsPedestrian" : false,
+        "nextTarget" : [ 3, 4 ],
+        "probabilityToChangeTarget" : [ 1.0, 0.5 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
         "id" : 3,
         "shape" : {
-          "x" : 5.5,
-          "y" : 8.1,
+          "x" : 1.0,
+          "y" : 8.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1,
+        "spawnNumber" : 5,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 1, 2 ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -235,14 +243,14 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1,
+        "spawnNumber" : 5,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 3 ],
+        "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
