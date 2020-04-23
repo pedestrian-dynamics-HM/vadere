@@ -33,30 +33,53 @@ public class TargetChangerController {
     private static final Logger log = Logger.getLogger(TargetChangerController.class);
     private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
+
     // Member Variables
     public final TargetChanger targetChanger;
-    private LinkedList<Double> probabilitiesToChangeTarget;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
-    int seed;
-    //BinomialDistribution binomialDistribution;
+
+    private LinkedList<Double> probabilitiesToChangeTarget;
+    private int seed;
     private Random random;
-    private LinkedList<BinomialDistribution> binomialDistributions = null;
+    private LinkedList<BinomialDistribution> binomialDistributions;
 
     // Constructors
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
+        throwExceptionOnInvalidInput(targetChanger);
+
         this.targetChanger = targetChanger;
         this.topography = topography;
         this.processedAgents = new HashMap<>();
+
         this.random = random;
-
-
         this.probabilitiesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget();
+        this.seed = random.nextInt();
+        this.binomialDistributions = getBinomialDistributions();
+    }
 
+    private void throwExceptionOnInvalidInput(TargetChanger targetChanger) {
+        int totalTargets = targetChanger.getAttributes().getNextTarget().size();
+        int totalProbabilities = targetChanger.getAttributes().getProbabilitiesToChangeTarget().size();
 
+        boolean inputIsValid = (totalProbabilities == 1) || (totalProbabilities == totalTargets);
 
-        seed = random.nextInt();
-        binomialDistributions = getBinomialDistributions();
+        if ( inputIsValid == false) {
+            throw new IllegalArgumentException("The size of \"probabilitiesToChangeTarget\" must be 1 or equal to nextTarget.");
+        }
+    }
+
+    private LinkedList<BinomialDistribution> getBinomialDistributions() {
+        LinkedList<BinomialDistribution> binomialDistributions = new LinkedList<>();
+
+        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+        randomGenerator.setSeed(seed);
+
+        for (Double probability : probabilitiesToChangeTarget) {
+            binomialDistributions.add(new BinomialDistribution(randomGenerator, BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability));
+        }
+
+        return binomialDistributions;
     }
 
 
@@ -65,37 +88,9 @@ public class TargetChangerController {
         return processedAgents;
     }
 
-    public LinkedList<BinomialDistribution> getBinomialDistributions(){
-
-        if (binomialDistributions == null) {
-
-            LinkedList<BinomialDistribution> binomialDistributionsL = new LinkedList<>();
-
-            JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-            randomGenerator.setSeed(this.seed);
-
-            for (Double probability : this.probabilitiesToChangeTarget) {
-                binomialDistributionsL.add(new BinomialDistribution(randomGenerator, BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, probability));
-            }
-            binomialDistributions = binomialDistributionsL;
-        }
-
-        return binomialDistributions;
-    }
-
 
     // Public Methods
     public void update(double simTimeInSec) {
-
-        int numberTargets = targetChanger.getAttributes().getNextTarget().size();
-        int numberProbabilitesToChangeTarget = targetChanger.getAttributes().getProbabilitiesToChangeTarget().size();
-
-        if (! ( (numberProbabilitesToChangeTarget == 1) || (numberProbabilitesToChangeTarget== numberProbabilitesToChangeTarget)) ) {
-            log.error("The size of probabilitesToChangeTarget must be 1 or equal to nextTarget.");
-        }
-
-
-
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
 
             final Agent agent;
@@ -108,54 +103,11 @@ public class TargetChangerController {
 
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
-
-
-                LinkedList<Integer> keepTargets = getFilteredTargetList();
-
-                int aa  = keepTargets.size();
-
-                if (keepTargets.size() > 0) {
-                    if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
-                        useDynamicTargetForAgentOrUseStaticAsFallback(agent, keepTargets);
-                    } else {
-                        useStaticTargetForAgent(agent,keepTargets);
-                    }
-                }
-
+                setAgentTargetList(agent);
                 notifyListenersTargetChangerAreaReached(agent);
-
                 processedAgents.put(agent.getId(), agent);
             }
         }
-    }
-
-    private LinkedList<Integer> getFilteredTargetList(){
-
-
-        int binomialDistributionSample;
-        LinkedList<Integer> keepTargets = new LinkedList<>();
-
-
-        int index = 0;
-        for( BinomialDistribution binomialDistribution : getBinomialDistributions()  ) {
-
-            binomialDistributionSample = binomialDistribution.sample();
-
-            if (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE){
-
-                if (targetChanger.getAttributes().getProbabilitiesToChangeTarget().size() == 1){
-                    keepTargets = targetChanger.getAttributes().getNextTarget();
-                    break;
-                }
-                else {
-                    keepTargets.add(targetChanger.getAttributes().getNextTarget().get(index));
-                }
-            }
-            index += 1;
-
-        }
-        return keepTargets;
-
     }
 
     private Collection<DynamicElement> getDynamicElementsNearTargetChangerArea() {
@@ -189,6 +141,43 @@ public class TargetChangerController {
         if (enteringTimes.containsKey(agentId) == false) {
             enteringTimes.put(agentId, simTimeInSec);
         }
+    }
+
+    private void setAgentTargetList(Agent agent) {
+        LinkedList<Integer> nextTargets = getNextTargets();
+
+        if (nextTargets.size() > 0) {
+            if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
+                useDynamicTargetForAgentOrUseStaticAsFallback(agent, nextTargets);
+            } else {
+                useStaticTargetForAgent(agent,nextTargets);
+            }
+        }
+    }
+
+    private LinkedList<Integer> getNextTargets() {
+
+        LinkedList<Integer> nextTargets = new LinkedList<>();
+
+        for (int i = 0; i < binomialDistributions.size(); i++) {
+
+            BinomialDistribution binomialDistribution = binomialDistributions.get(i);
+            int binomialDistributionSample = binomialDistribution.sample();
+
+            if (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE) {
+
+                // If only one probability is given, just take the target list which was defined by the user.
+                // Otherwise, create a list of new targets (if we saw a "success" value while sampling.
+                if (targetChanger.getAttributes().getProbabilitiesToChangeTarget().size() == 1) {
+                    nextTargets = targetChanger.getAttributes().getNextTarget();
+                    break;
+                } else {
+                    nextTargets.add(targetChanger.getAttributes().getNextTarget().get(i));
+                }
+            }
+        }
+
+        return nextTargets;
     }
 
     private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent, LinkedList<Integer> keepTargets) {
@@ -228,8 +217,8 @@ public class TargetChangerController {
         pedToFollow.getFollowers().add(agent);
     }
 
-    private void useStaticTargetForAgent(Agent agent, LinkedList<Integer> keepTargets) {
-        agent.setTargets(keepTargets);
+    private void useStaticTargetForAgent(Agent agent, LinkedList<Integer> nextTargets) {
+        agent.setTargets(nextTargets);
         agent.setNextTargetListIndex(0);
         agent.setIsCurrentTargetAnAgent(false);
     }
