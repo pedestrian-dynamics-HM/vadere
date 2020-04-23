@@ -1,7 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
+import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
@@ -16,14 +18,21 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
+import org.vadere.simulator.projects.migration.GeometryCleaner;
 import org.vadere.state.attributes.processor.AttributesMeshProcessor;
 import org.vadere.state.scenario.MeasurementArea;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.DistanceFunction;
+import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
@@ -74,15 +83,29 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 	@Override
 	public void preLoop(SimulationState state) {
 		super.preLoop(state);
-		VPolygon measurementPolygon = measurementArea.asPolygon();
+		// 1. clean geometry
+		List<VPolygon> obstacleShapes = state.getTopography().getObstacleShapes().stream().map(v -> new VPolygon(v)).collect(Collectors.toList());
+		GeometryCleaner geometryCleaner = new GeometryCleaner(
+				measurementArea.asPolygon(),
+				obstacleShapes,
+				GeometryUtils.DOUBLE_EPS);
+		Pair<VPolygon, List<VPolygon>> measurementPolygonAndHoles = geometryCleaner.cutObstacles();
+		VPolygon measurementPolygon = measurementPolygonAndHoles.getLeft();
+		List<VPolygon> holes = measurementPolygonAndHoles.getRight();
+
+		// 2. mesh geometry
+		IDistanceFunction distanceFunction = IDistanceFunction.create(measurementPolygon, holes);
+		List<VPolygon> allPolygons = new ArrayList<>();
+		allPolygons.add(measurementPolygon);
+		allPolygons.addAll(holes);
 
 		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh(
-				new DistanceFunction(measurementPolygon, Collections.EMPTY_LIST),
+				distanceFunction,
 				h -> getAttributes().getEdgeLength(),
 				Collections.EMPTY_LIST,
 				getAttributes().getEdgeLength(),
 				GeometryUtils.boundRelative(measurementPolygon.getPoints()),
-				Collections.singleton(measurementPolygon),
+				allPolygons,
 				() -> new PMesh()
 		);
 
