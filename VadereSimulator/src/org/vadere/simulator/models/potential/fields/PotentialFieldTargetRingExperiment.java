@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.potential.fields;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.osm.PedestrianOSM;
@@ -88,6 +89,11 @@ public class PotentialFieldTargetRingExperiment implements IPotentialFieldTarget
 
 	@Override
 	public Function<Agent, IMesh<?, ?, ?>> getDiscretization() {
+		throw new UnsupportedOperationException("not jet implemented.");
+	}
+
+	@Override
+	public double getPotential(@NotNull IPoint pos, int targetId) {
 		throw new UnsupportedOperationException("not jet implemented.");
 	}
 

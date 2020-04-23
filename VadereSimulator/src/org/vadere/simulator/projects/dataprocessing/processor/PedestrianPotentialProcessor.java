@@ -22,8 +22,9 @@ import java.util.List;
  *
  * Note that computing the agent potential can be computational expensive.
  *
- * This processor can be used to compute the geodesic distance to the target if the target potential is a static potential using F(x) = 1 as
+ * This processor can be used to compute the geodesic distance to a target if the target potential is a static potential using F(x) = 1 as
  * the traveling speed of the wave in the eikonal equation! By this one can compute the distance between agent with respect to the target.
+ * If a targetId is specified i.e. it is not -1 then it will be used instead of the targetId of the agent's target.
  *
  * @author Benedikt Zoennchen
  */
@@ -50,8 +51,10 @@ public class PedestrianPotentialProcessor extends DataProcessor<TimestepPedestri
 			for (Pedestrian pedestrian : pedestrians){
 				TimestepPedestrianIdKey key = new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId());
 				VPoint pos = pedestrianPositionProcessor.getValue(key);
+				int targetId = getAttributes().getTargetId() == -1 ? pedestrian.getNextTargetId() : getAttributes().getTargetId();
+
 				switch (getAttributes().getType()) {
-					case TARGET: potential = model.getPotentialFieldTarget().getPotential(pos, pedestrian); break;
+					case TARGET: potential = model.getPotentialFieldTarget().getPotential(pos, targetId); break;
 					case OBSTACLE: potential = model.getPotentialFieldObstacle().getObstaclePotential(pos, pedestrian); break;
 					case PEDESTRIAN: {
 						// TODO: at this point we do not know which agents are relevant so we take them all which might cause expensive computations!
@@ -59,7 +62,7 @@ public class PedestrianPotentialProcessor extends DataProcessor<TimestepPedestri
 					} break;
 					case ALL:
 					default: {
-						double targetPotential = model.getPotentialFieldTarget().getPotential(pos, pedestrian);
+						double targetPotential = model.getPotentialFieldTarget().getPotential(pos, targetId);
 						double obstaclePotential = model.getPotentialFieldObstacle().getObstaclePotential(pos, pedestrian);
 						double agentPotential = model.getPotentialFieldAgent().getAgentPotential(pos, pedestrian, copy);
 						potential = targetPotential + obstaclePotential + agentPotential;
