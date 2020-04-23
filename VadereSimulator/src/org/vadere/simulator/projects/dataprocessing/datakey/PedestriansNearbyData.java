@@ -5,6 +5,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class PedestriansNearbyData {
 
@@ -87,7 +88,12 @@ public class PedestriansNearbyData {
 				} else {
 					pNext = traj.get(i);
 				}
-				ret.append(hashCode()).append(" ").append(startTimestep*0.4 + i*0.4).append(" ").append(startTimestep*0.4 + (i+1)*0.4).append(" ").append(p.x).append(" ").append(p.y).append(" ").append(pNext.x).append(" ").append(pNext.y).append(" 9999");
+				Random rand = new Random();
+				double r1 = rand.nextDouble();
+				r1 = r1*0.3 - 0.15;
+				double r2 = rand.nextDouble();
+				r2 = r2*0.3 - 0.15;
+				ret.append(hashCode()).append(" ").append(startTimestep*0.4 + i*0.4).append(" ").append(startTimestep*0.4 + (i+1)*0.4).append(" ").append(p.x + r2).append(" ").append(p.y + r1).append(" ").append(pNext.x + r1).append(" ").append(pNext.y + r2).append(" 9999");
 				if (i != traj.size() -1) {
 					ret.append("\n");
 				}

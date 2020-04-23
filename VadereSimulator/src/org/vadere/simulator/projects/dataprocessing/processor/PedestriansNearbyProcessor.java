@@ -53,7 +53,8 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
                     .map(p -> {
                         double xAverage = (ped.getPosition().getX() + p.getPosition().getX())/2.;
                         double yAverage = (ped.getPosition().getY() + p.getPosition().getY())/2.;
-                        System.out.println("x1= " + ped.getPosition().getX() + "y1= " + ped.getPosition().getY() + "x2= " + p.getPosition().getX() + "y2= " + p.getPosition().getY() + "xAver= " + xAverage + "yAver= " + yAverage);
+                        //System.out.println("x1= " + ped.getPosition().getX() + "y1= " + ped.getPosition().getY() + "x2= " + p.getPosition().getX() + "y2= " + p.getPosition().getY() + "xAver= " + xAverage + "yAver= " + yAverage);
+                        //System.out.println("x1= " + ped.getPosition().getX() + "y1= " + ped.getPosition().getY() + "x2= " + p.getPosition().getX() + "y2= " + p.getPosition().getY() + "xAver= " + xAverage + "yAver= " + yAverage);
                         VPoint pointOfContact = new VPoint(xAverage, yAverage);
                         List<VPoint> trajectory = new ArrayList<>();
                         trajectory.add(pointOfContact);
