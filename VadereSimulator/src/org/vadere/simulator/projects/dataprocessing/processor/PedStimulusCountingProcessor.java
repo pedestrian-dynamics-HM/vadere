@@ -30,12 +30,13 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		// setup filter
 		AttributesPedStimulusCountingProcessor  attr = getAttributes();
 
-		if (attr.isRegexFilter()){
-			filter_pattern = Pattern.compile(attr.getInformationFilter());
-			filter_by_stimuli = ped -> ped.getKnowledgeBase().knows_about(filter_pattern);
+		if (getAttributes().isRegexFilter()){
+			filter_pattern = Pattern.compile(getAttributes().getInformationFilter());
+			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(filter_pattern);
 		} else {
-			filter_by_stimuli = ped -> ped.getKnowledgeBase().knows_about(attr.getInformationFilter());
+			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(getAttributes().getInformationFilter());
 		}
+
 	}
 
 	@Override
