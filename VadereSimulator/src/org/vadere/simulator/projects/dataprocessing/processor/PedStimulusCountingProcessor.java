@@ -20,6 +20,9 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 
 	private Predicate<Pedestrian> filter_by_stimuli;
 	private Pattern filter_pattern = null;
+	private double stopIfPercentageIsInformed = 0.95;
+	private int numberOfAdditionalTimeFrames = 20;
+	private double dynamicFinishTime = -1.0;
 
 	public PedStimulusCountingProcessor() {
 		super("numberPedsInformed", "numberPedsAll", "percentageInformed");
@@ -38,6 +41,9 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(getAttributes().getInformationFilter());
 		}
 
+		stopIfPercentageIsInformed = attr.getStopIfPercentageIsInformed();
+		numberOfAdditionalTimeFrames = attr.getNumberOfAdditionalTimeFrames();
+
 	}
 
 	@Override
@@ -50,12 +56,18 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		numberPedsAll = Math.max(numberPedsAll,numberPedsInformed);
 
 
+		//if (state.getSimTimeInSec() > 1.0){ numberPedsInformed = numberPedsAll; }
+
 		InformationDegree informationDegree =  new InformationDegree(numberPedsInformed, numberPedsAll);
 
+		if ((dynamicFinishTime == -1.0)  && (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed)) {
 
-		AttributesSimulation attributesSimulation = state.getScenarioStore().getAttributesSimulation();
-		attributesSimulation.setFinishTime(10);
-		state.getScenarioStore().setAttributesSimulation(attributesSimulation);
+			AttributesSimulation attributesSimulation = state.getScenarioStore().getAttributesSimulation();
+			dynamicFinishTime = state.getSimTimeInSec() + state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength() * Math.max(numberOfAdditionalTimeFrames, 1);
+			attributesSimulation.setFinishTime(dynamicFinishTime);
+			state.getScenarioStore().setAttributesSimulation(attributesSimulation);
+
+		}
 
 
 
