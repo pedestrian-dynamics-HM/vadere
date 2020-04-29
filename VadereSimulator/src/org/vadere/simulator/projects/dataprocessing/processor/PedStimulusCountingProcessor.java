@@ -5,6 +5,7 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.InformationDegree;
@@ -48,8 +49,20 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 
 		numberPedsAll = Math.max(numberPedsAll,numberPedsInformed);
 
+
 		InformationDegree informationDegree =  new InformationDegree(numberPedsInformed, numberPedsAll);
+
+
+		AttributesSimulation attributesSimulation = state.getScenarioStore().getAttributesSimulation();
+		attributesSimulation.setFinishTime(10);
+		state.getScenarioStore().setAttributesSimulation(attributesSimulation);
+
+
+
+
 		putValue(new TimestepKey(state.getStep()), informationDegree);
+
+		// model.getProject().interruptRunningScenarios();
 
 	}
 

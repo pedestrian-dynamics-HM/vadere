@@ -69,7 +69,7 @@ public class AttributesSimulation extends Attributes {
 	// Setters...
 
 	public void setFinishTime(double finishTime) {
-		checkSealed();
+		//checkSealed();
 		this.finishTime = finishTime;
 	}
 

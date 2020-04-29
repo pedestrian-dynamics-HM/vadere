@@ -282,6 +282,7 @@ public class Simulation {
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
+					runTimeInSec = this.simulationState.getScenarioStore().getAttributesSimulation().getFinishTime();
 				}
 
 				for (PassiveCallback c : passiveCallbacks) {
@@ -314,6 +315,7 @@ public class Simulation {
 						}
 					}
 				}
+
 
 
 
