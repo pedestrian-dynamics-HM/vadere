@@ -1,7 +1,7 @@
 {
   "name" : "16-Threat-ImitatingBehavior-SelfCatThreatModel",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
   "processWriters" : {
     "files" : [ {

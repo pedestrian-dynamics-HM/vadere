@@ -1,7 +1,7 @@
 {
   "name" : "basic_5_1_roadReachTarget_ovm1",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -123,7 +123,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "CAR"
+        "dynamicElementType" : "CAR",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

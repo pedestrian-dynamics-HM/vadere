@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_4Source4Place_v2_EVD_2G_3G_4G_5G",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -243,7 +243,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 5 ],
         "groupSizeDistribution" : [ 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 2,
         "shape" : {
@@ -264,7 +265,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3,
         "shape" : {
@@ -285,7 +287,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 7 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
@@ -306,7 +309,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 8 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
