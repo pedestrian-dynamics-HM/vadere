@@ -1,7 +1,8 @@
 {
-  "name" : "11-RiMEA11-ExitSelection-OSMEventDriven-PsychDisabled",
+  "name" : "14-RiMEA11-ExitSelection-OSMEventDriven-PsychEnabled",
   "description" : "",
   "release" : "1.12",
+  "commithash" : "07f63246e220bfb821e9cfabc318da3d30b960fd",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -111,7 +112,7 @@
       "simulationSeed" : 1
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : false,
+      "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"

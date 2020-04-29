@@ -1,7 +1,8 @@
 {
-  "name" : "14-ThreatShort-SelfCatThreatModel",
+  "name" : "16-ThreatLong-SelfCatThreatModel",
   "description" : "",
   "release" : "1.12",
+  "commithash" : "07f63246e220bfb821e9cfabc318da3d30b960fd",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -349,7 +350,7 @@
     "stimulusInfos" : [ {
       "timeframe" : {
         "startTime" : 15.0,
-        "endTime" : 15.4,
+        "endTime" : 17.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
