@@ -23,6 +23,7 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 	private double stopIfPercentageIsInformed = 0.95;
 	private int numberOfAdditionalTimeFrames = 20;
 	private double dynamicFinishTime = -1.0;
+	private boolean dynamicFinishTimeSet = false;
 
 	public PedStimulusCountingProcessor() {
 		super("numberPedsInformed", "numberPedsAll", "percentageInformed");
@@ -56,25 +57,21 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		numberPedsAll = Math.max(numberPedsAll,numberPedsInformed);
 
 
-		//if (state.getSimTimeInSec() > 1.0){ numberPedsInformed = numberPedsAll; }
-
+		// test wihtout omnet: if (state.getSimTimeInSec() > 1.0){ numberPedsInformed = numberPedsAll; }
 		InformationDegree informationDegree =  new InformationDegree(numberPedsInformed, numberPedsAll);
 
-		if ((dynamicFinishTime == -1.0)  && (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed)) {
-
-			AttributesSimulation attributesSimulation = state.getScenarioStore().getAttributesSimulation();
+		// force stop before simulation time defined in json is reached.
+		if ((!dynamicFinishTimeSet)  && (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed)) {
 			dynamicFinishTime = state.getSimTimeInSec() + state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength() * Math.max(numberOfAdditionalTimeFrames, 1);
-			attributesSimulation.setFinishTime(dynamicFinishTime);
-			state.getScenarioStore().setAttributesSimulation(attributesSimulation);
-
+			dynamicFinishTimeSet = true;
 		}
 
-
-
+		if (dynamicFinishTimeSet){
+			state.setStopTime(dynamicFinishTime);
+		}
 
 		putValue(new TimestepKey(state.getStep()), informationDegree);
 
-		// model.getProject().interruptRunningScenarios();
 
 	}
 

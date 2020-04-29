@@ -282,12 +282,12 @@ public class Simulation {
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
-					runTimeInSec = this.simulationState.getScenarioStore().getAttributesSimulation().getFinishTime();
 				}
 
 				for (PassiveCallback c : passiveCallbacks) {
 					c.postUpdate(simTimeInSec);
 				}
+
 
 
 				// Single step hook
@@ -316,14 +316,16 @@ public class Simulation {
 					}
 				}
 
-
-
-
-				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
+				// run simulation until finish time OR stop if a certain condition is fulfilled
+				double stopTime = Math.min(runTimeInSec, this.simulationState.getStopTime());
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
 				} else {
 					isRunSimulation = false;
+					if (stopTime < runTimeInSec) {
+						logger.info("Run simulation until time t=" + stopTime +"s is reached."); }
 				}
+
 
 				//remove comment to fasten simulation for evacuation simulations
 				//if (topography.getElements(Pedestrian.class).size() == 0){
