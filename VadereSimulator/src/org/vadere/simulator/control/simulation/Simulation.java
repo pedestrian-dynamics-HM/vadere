@@ -288,7 +288,17 @@ public class Simulation {
 					c.postUpdate(simTimeInSec);
 				}
 
-
+				double stopTime = Math.min(runTimeInSec, this.simulationState.getStopTime());
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
+					// do nothing here. This is done after the  Remote Control Hook
+				} else {
+					// inform Remote Control Hook that simulation is stopped before
+					// static runTimeInSec is reached.
+					isRunSimulation = false;
+					remoteRunListeners.forEach(e-> e.simulationStoppedEarlyListener(simTimeInSec));
+					if (stopTime < runTimeInSec) {
+						logger.info("Run simulation until time t=" + stopTime +"s is reached."); }
+				}
 
 				// Single step hook
 				// Remote Control Hook
@@ -316,14 +326,8 @@ public class Simulation {
 					}
 				}
 
-				// run simulation until finish time OR stop if a certain condition is fulfilled
-				double stopTime = Math.min(runTimeInSec, this.simulationState.getStopTime());
 				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
-				} else {
-					isRunSimulation = false;
-					if (stopTime < runTimeInSec) {
-						logger.info("Run simulation until time t=" + stopTime +"s is reached."); }
 				}
 
 

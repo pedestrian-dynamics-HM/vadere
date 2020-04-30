@@ -143,6 +143,10 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
+	public double getSimulationStoppedEarlyAtTime(){
+		return currentSimulationRun.getSimulationStoppedEarlyAtTime();
+	}
+
 	public boolean isClientCloseCommandReceived() {
 		return clientCloseCommandReceived;
 	}
