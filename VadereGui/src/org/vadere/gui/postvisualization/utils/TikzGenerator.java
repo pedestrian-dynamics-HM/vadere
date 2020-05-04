@@ -19,30 +19,17 @@ import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.RectangleLimits;
 import org.vadere.util.voronoi.VoronoiDiagram;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.awt.geom.Rectangle2D;
+import java.io.*;
+import java.util.*;
 
-import tech.tablesaw.api.Row;
-import tech.tablesaw.api.Table;
-
-import static java.awt.geom.PathIterator.SEG_CLOSE;
-import static java.awt.geom.PathIterator.SEG_CUBICTO;
-import static java.awt.geom.PathIterator.SEG_LINETO;
-import static java.awt.geom.PathIterator.SEG_MOVETO;
-import static java.awt.geom.PathIterator.SEG_QUADTO;
+import static java.awt.geom.PathIterator.*;
 
 /**
  * Convert the (Java) scenario description into a TikZ representation.
@@ -64,6 +51,8 @@ import static java.awt.geom.PathIterator.SEG_QUADTO;
  * elements, colors etc.).
  */
 public class TikzGenerator {
+
+	public enum EXPORT_OPTION { EXPORT_WHOLE_TOPOGRAPHY, EXPORT_CURRENT_VIEWPORT };
 
 	private final static Logger logger = Logger.getLogger(TikzGenerator.class);
 	private final SimulationRenderer renderer;
@@ -88,9 +77,9 @@ public class TikzGenerator {
 		translationTable[SEG_CLOSE] = "";
 	}
 
-	public void generateTikz(final File file) {
+	public void generateTikz(final File file, EXPORT_OPTION exportOption) {
 		String tikzCodeColorDefinitions = generateTikzColorDefinitions(model);
-		String tikzCodeScenarioElements = convertScenarioElementsToTikz();
+		String tikzCodeScenarioElements = convertScenarioElementsToTikz(exportOption);
 
 		String tikzOutput = "" +
 				"\\documentclass{standalone}\n" +
@@ -172,20 +161,42 @@ public class TikzGenerator {
 		return tikzStyles;
 	}
 
-	private String convertScenarioElementsToTikz() {
+	private Rectangle2D getExportBounds(EXPORT_OPTION exportOption, Topography topography) {
+		Rectangle2D exportBounds = new Rectangle2D.Double();
+
+		if (exportOption == EXPORT_OPTION.EXPORT_WHOLE_TOPOGRAPHY) {
+			exportBounds.setRect(topography.getBounds());
+		} else {
+			Rectangle2D viewportBound = model.getViewportBound();
+
+			// When exporting the current viewport only, consider that the viewport is usually cut off
+			// only horizontally or vertically. I.e, the dimension which is not cut off is filled up with a lot
+			// of gray margin. Therefore, limit this dimension to the corresponding topography dimension.
+			double width = Math.min(viewportBound.getWidth(), topography.getBounds().getWidth());
+			double height = Math.min(viewportBound.getHeight(), topography.getBounds().getHeight());
+
+			exportBounds.setRect(viewportBound.getX(), viewportBound.getY(), width, height);
+		}
+
+		return exportBounds;
+	}
+
+	private String convertScenarioElementsToTikz(EXPORT_OPTION exportOption) {
 		String generatedCode = "";
 
 		DefaultSimulationConfig config = model.getConfig();
 		Topography topography = model.getTopography();
 
-		// Clip everything outside of topography bound.
+		Rectangle2D exportBounds = getExportBounds(exportOption, topography);
+
+		// Clip everything outside of the user-defined bound.
 		generatedCode += "% Clipping\n";
 		String clipTextPattern = "\\clip (%f,%f) rectangle (%f,%f);\n";
 		generatedCode += String.format(Locale.US, clipTextPattern,
-				topography.getBounds().x,
-				topography.getBounds().y,
-				topography.getBounds().x + topography.getBounds().width,
-				topography.getBounds().y + topography.getBounds().height);
+				exportBounds.getX(),
+				exportBounds.getY(),
+				exportBounds.getX() + exportBounds.getWidth(),
+				exportBounds.getY() + exportBounds.getHeight());
 
 		// Draw background elements first, then other scenario elements.
 		generatedCode += "% Ground\n";
