@@ -26,7 +26,7 @@ public class SimulationCfg {
 
 	public SimulationCfg(CompoundObject obj) {
 		if (obj.size() != 10) {
-			throw new TraCIException("Expected at least 9 elements");
+			throw new TraCIException("Expected at least 10 elements");
 		}
 		configName = (String) obj.getData(0, TraCIDataType.STRING);
 		experiment = (String) obj.getData(1, TraCIDataType.STRING);
