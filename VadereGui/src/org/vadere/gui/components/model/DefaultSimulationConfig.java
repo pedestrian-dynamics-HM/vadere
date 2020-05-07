@@ -23,6 +23,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	private boolean interpolatePositions = true;
 	private boolean showPedestrianIds = false;
+	private boolean showPedestrianInOutGroup = false;
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
@@ -65,6 +66,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		}
 
 		this.showPedestrianIds = config.showPedestrianIds;
+		this.showPedestrianInOutGroup = config.showPedestrianInOutGroup;
 		this.gridWidth = config.gridWidth;
 		this.showDensity = config.showDensity;
 		this.showTargetPotentialField = config.showTargetPotentialField;
@@ -332,8 +334,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showPedestrianIds;
 	}
 
+	public boolean isShowPedestrianInOutGroup() { return showPedestrianInOutGroup; }
+
 	public void setShowPedestrianIds(final boolean showPedestrianIds) {
 		this.showPedestrianIds = showPedestrianIds;
+	}
+
+	public void setShowPedestrianInOutGroup(final boolean showPedestrianInOutGroup) {
+		this.showPedestrianInOutGroup = showPedestrianInOutGroup;
 	}
 
 	public boolean isShowFaydedPedestrians() {

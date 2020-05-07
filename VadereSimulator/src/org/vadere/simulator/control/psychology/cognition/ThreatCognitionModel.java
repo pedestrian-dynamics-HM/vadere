@@ -109,6 +109,7 @@ public class ThreatCognitionModel implements ICognitionModel {
      * accelerate and search for a safe zone.
      */
     private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
+        // TODO: Use only pedestrians with GroupMembership.IN_GROUP!
         // TODO: Maybe, alse look for "SelfCategory.INSIDE_THREAT_AREA".
         List<Pedestrian> threatenedPedestrians = getClosestPedestriansWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA);
 
@@ -116,7 +117,7 @@ public class ThreatCognitionModel implements ICognitionModel {
             Pedestrian threatenedPedestrian = threatenedPedestrians.get(0);
             Threat latestThreat = threatenedPedestrian.getThreatMemory().getLatestThreat();
 
-            assert  latestThreat != null;
+            assert latestThreat != null;
 
             handleThreat(pedestrian, latestThreat);
         } else {

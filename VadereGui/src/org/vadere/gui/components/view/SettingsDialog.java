@@ -372,7 +372,7 @@ public class SettingsDialog extends JDialog {
 				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
 
 		FormLayout otherSettingsLayout = new FormLayout(createCellsWithSeparators(4), // col
-				createCellsWithSeparators(16)); // rows
+				createCellsWithSeparators(18)); // rows
 		otherSettingsPane.setLayout(otherSettingsLayout);
 
 		// For each scenario element, add a checkbox to toggle its visibility.
@@ -385,6 +385,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
 		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
+		JCheckBox chShowPedestrianInOutGroup = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianInOutGroup.text")));
 		JCheckBox chHideVoronoiDiagram = new JCheckBox((Messages.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
 
 		chInterpolatePositions.setSelected(model.config.isInterpolatePositions());
@@ -452,6 +453,12 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
+        chShowPedestrianInOutGroup.setSelected(model.config.isShowPedestrianInOutGroup());
+        chShowPedestrianInOutGroup.addItemListener(e -> {
+            model.config.setShowPedestrianInOutGroup(!model.config.isShowPedestrianInOutGroup());
+            model.notifyObservers();
+        });
+
 		int row = 0;
 		int column = 2;
 		int colSpan = 5;
@@ -467,6 +474,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowMeasurementAreas, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowTargetChangers, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
+        otherSettingsPane.add(chShowPedestrianInOutGroup, cc.xyw(column, row += NEXT_CELL, colSpan));
 
 		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
 		chChowLogo.setSelected(model.config.isShowLogo());
