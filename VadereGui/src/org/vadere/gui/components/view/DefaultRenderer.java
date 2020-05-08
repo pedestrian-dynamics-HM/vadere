@@ -358,7 +358,7 @@ public abstract class DefaultRenderer {
 	}
 
 	protected void renderPedestrianInOutGroup(final Graphics2D g, Pedestrian pedestrian) {
-		Color groupMembershipColor = GroupMembership.getColor(pedestrian.getGroupMembership());
+		Color groupMembershipColor = defaultModel.getConfig().getGroupMembershipColor(pedestrian.getGroupMembership());
 		g.setColor(groupMembershipColor);
 		g.setStroke(new BasicStroke(getSelectedShapeBorderLineWidth()));
 		draw(pedestrian.getShape(), g);

@@ -45,24 +45,5 @@ public enum GroupMembership {
     OUT_GROUP,
     OUT_GROUP_FRIENDLY,
     OUT_GROUP_NEUTRAL,
-    OUT_GROUP_HOSTILE;
-
-    /** Use this color palette: https://www.color-hex.com/color-palette/38840 */
-    public static Color getColor(GroupMembership groupMembership) {
-        Color color = Color.BLACK;
-
-        if (groupMembership == IN_GROUP) {
-            color = new Color(213,94,0);
-        } else if (groupMembership == OUT_GROUP) {
-            color = new Color(0,0,0);
-        } else if (groupMembership == OUT_GROUP_FRIENDLY) {
-            color = new Color(0,135,98);
-        } else if (groupMembership == OUT_GROUP_NEUTRAL) {
-            color = new Color(153,153,153);
-        } else if (groupMembership == OUT_GROUP_HOSTILE) {
-            color = new Color(229,229,0);
-        }
-
-        return color;
-    }
+    OUT_GROUP_HOSTILE
 }

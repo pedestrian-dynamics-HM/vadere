@@ -471,7 +471,7 @@ public class TikzGenerator {
 		        if (model.getConfig().isShowGroups()) {
 					generatedCode += drawAgentWithGroupSettings(agent);
 				} else {
-					generatedCode += drawAgentWithoutGroupStyle(agent);
+					generatedCode += drawAgentWithoutGroupSettings(agent);
 				}
 	        }
         }
@@ -502,7 +502,7 @@ public class TikzGenerator {
 	}
 
 	@NotNull
-	private String drawAgentWithoutGroupStyle(Agent agent) {
+	private String drawAgentWithoutGroupSettings(Agent agent) {
 		String generatedCode = "";
 
 		// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
@@ -540,10 +540,9 @@ public class TikzGenerator {
 	}
 
 	private String getTikzColorString(GroupMembership groupMembership) {
-		return String.format("{rgb,255: red,%d; green,%d; blue,%d}",
-				GroupMembership.getColor(groupMembership).getRed(),
-				GroupMembership.getColor(groupMembership).getGreen(),
-				GroupMembership.getColor(groupMembership).getBlue());
+		Color color = model.getConfig().getGroupMembershipColor(groupMembership);
+
+		return String.format("{rgb,255: red,%d; green,%d; blue,%d}", color.getRed(), color.getGreen(), color.getBlue());
 	}
 
 	private String generatePathForScenarioElement(ScenarioElement element) {
