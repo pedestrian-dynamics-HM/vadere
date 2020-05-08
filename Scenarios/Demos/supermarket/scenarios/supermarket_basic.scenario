@@ -17,7 +17,7 @@
       "processors" : [ 4 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "contacttraj.txt",
+      "filename" : "pedsNearby.txt",
       "processors" : [ 5 ]
     } ],
     "processors" : [ {
@@ -43,9 +43,9 @@
       "attributes" : {
         "maxDistanceForANearbyPedestrian" : 1.5,
         "sampleEveryNthStep" : 1,
-        "allowedAbsenceTimestepsIfContactReturns" : 1,
-        "minTimespanOfContactTimesteps" : 1,
-        "printContactTrajectories" : true,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 20,
+        "printContactTrajectories" : false,
         "printForPostVis" : true
       }
     } ],
@@ -2105,10 +2105,10 @@
         "id" : 9999,
         "absorbing" : true,
         "shape" : {
-          "x" : 7.0,
-          "y" : 7.4,
-          "width" : 2.2,
-          "height" : 1.2,
+          "x" : 23.5,
+          "y" : 25.5,
+          "width" : 1.5,
+          "height" : 0.5,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
