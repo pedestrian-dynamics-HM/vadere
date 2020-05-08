@@ -15,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "pedsNearby.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -31,6 +35,18 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.5,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 20,
+        "printContactTrajectories" : false,
+        "printForPostVis" : true
       }
     } ],
     "isTimestamped" : true,
@@ -2081,6 +2097,23 @@
         "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 2,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 9999,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 23.5,
+          "y" : 25.5,
+          "width" : 1.5,
+          "height" : 0.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
         "individualWaiting" : true,
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
