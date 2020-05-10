@@ -381,15 +381,23 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		return menuBar;
 	}
 
-	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
 
 		try {
-			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			if (contactsTrajectoryFile != null) {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readTrajectories(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+			} else {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			}
 			model.notifyObservers();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+		loadOutputFile(trajectoryFile, null, scenario);
 	}
 
 	public void loadOutputFile(final Scenario scenario) {

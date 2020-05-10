@@ -27,11 +27,13 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
     private int minTimespanOfContactTimesteps;
     private boolean printContacTrajectories;
     private boolean printForPostVis;
+    private static boolean staticPrintForPostVis;
 
 
 
     public PedestriansNearbyProcessor() {
-        super("durationTimesteps", "xCoord-Contact", "yCoord-Contact");
+        //super("durationTimesteps", "xCoord-Contact", "yCoord-Contact");
+        super("endTime", "startX", "startY", "endX", "endY", "targetId");
         setAttributes(new AttributesPedestrianNearbyProcessor());
     }
 
@@ -105,7 +107,7 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         minTimespanOfContactTimesteps = att.getMinTimespanOfContactTimesteps();
         printContacTrajectories = att.getPrintContactTrajectories();
         printForPostVis = att.getPrintForPostVis();
-
+        staticPrintForPostVis = printForPostVis;
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {

@@ -645,10 +645,25 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			private void loadScenarioIntoGui(OutputBundle bundle) throws IOException {
 
 				Scenario scenarioRM = bundle.getScenarioRM();
-				Optional<File> optionalTrajectoryFile = IOUtils
-						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
-				if (optionalTrajectoryFile.isPresent()) {
-					scenarioJPanel.loadOutputFileForPostVis(optionalTrajectoryFile.get(), scenarioRM);
+				/*Optional<File> optionalTrajectoryFile = IOUtils
+						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);*/
+				File[] trajFiles = IOUtils.getFileList(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
+				Optional<File> trajectoryFile = Optional.empty();
+				Optional<File> contactsTrajectoryFile = Optional.empty();
+				for (File f :trajFiles) {
+					if (f.getName().contains("contacts")) {
+						contactsTrajectoryFile = Optional.of(f);
+					} else {
+						trajectoryFile = Optional.of(f);
+					}
+				}
+
+				if (trajectoryFile.isPresent()) {
+					if (contactsTrajectoryFile.isPresent()) {
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), contactsTrajectoryFile.get(), scenarioRM);
+					} else {
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), scenarioRM);
+					}
 				} else {
 					scenarioJPanel.loadOutputFileForPostVis(scenarioRM);
 					logger.error("could not find trajectory file in : "

@@ -14,6 +14,7 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
 	private final boolean printForPostVis;
+	private static boolean staticPrintForPostVis;
 
 
 	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB, boolean printForPostVis) {
@@ -21,11 +22,13 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 		this.pedId1 = Math.min(pedA, pedB);
 		this.pedId2 = Math.max(pedA, pedB);
 		this.printForPostVis = printForPostVis; // is an ugly one time thing that shouldn't be merged
+		staticPrintForPostVis = printForPostVis;
 	}
 
 
 	public static String[] getHeaders(){
-		return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
+		//return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
+		return new String[]{"pedestrianId", "simTime"};
 	}
 
 	public int getTimeStep() {

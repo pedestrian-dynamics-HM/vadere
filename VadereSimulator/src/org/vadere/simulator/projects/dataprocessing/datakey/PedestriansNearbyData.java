@@ -95,7 +95,7 @@ public class PedestriansNearbyData {
 				r2 = r2*0.3 - 0.15;
 				ret.append(hashCode()).append(" ").append(startTimestep*0.4 + i*0.4).append(" ").append(startTimestep*0.4 + (i+1)*0.4).append(" ").append(p.x + r2).append(" ").append(p.y + r1).append(" ").append(pNext.x + r1).append(" ").append(pNext.y + r2).append(" 9999");
 				if (i != traj.size() -1) {
-					ret.append("\n");
+					ret.append("\r\n");
 				}
 			}
 			return new String[]{ret.toString()};

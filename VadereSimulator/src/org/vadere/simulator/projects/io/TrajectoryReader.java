@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
@@ -41,6 +42,7 @@ public class TrajectoryReader {
 		dataFrame = Table.read().usingOptions(options);
 		ColumnNames columnNames = ColumnNames.getInstance();
 		if(columnNames.hasDuplicates(dataFrame)) {
+			//System.out.println("The header of table " + dataFrame + " is contains duplicates which can lead to unwanted side effects");
 			throw new IOException("The header of table " + dataFrame + " is contains duplicates which can lead to unwanted side effects");
 		}
 		return dataFrame;

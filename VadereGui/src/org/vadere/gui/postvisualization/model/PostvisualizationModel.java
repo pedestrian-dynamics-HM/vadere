@@ -63,6 +63,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private TableTrajectoryFootStep trajectories;
 
+	private TableTrajectoryFootStep contactTrajectories;
+
 	private String outputPath;
 
 	private AttributesAgent attributesAgent;
@@ -72,6 +74,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public PostvisualizationModel() {
 		super(new PostvisualizationConfig());
 		this.trajectories = new TableTrajectoryFootStep(Table.create());
+		this.contactTrajectories = new TableTrajectoryFootStep(Table.create());
 		this.scenario = new Scenario("");
 		this.topographyId = 0;
 		this.potentialContainer = null;
@@ -82,8 +85,11 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.outputChanged = false;
 	}
 
+	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath) {
+		init(trajectories, contactTrajectories, scenario, projectPath, new AttributesAgent());
+	}
 	public synchronized void init(final Table trajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, scenario, projectPath, new AttributesAgent());
+		init(trajectories, null, scenario, projectPath, new AttributesAgent());
 	}
 
 	/**
@@ -93,10 +99,15 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	 *                      This scenario will not contain any agents.
 	 * @param projectPath   the path to the project.
 	 */
-	public synchronized void init(final Table trajectories, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
+	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
 		this.scenario = scenario;
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
+		if (contactTrajectories != null) {
+			this.contactTrajectories = new TableTrajectoryFootStep(contactTrajectories);
+		} else {
+			this.contactTrajectories = null;
+		}
 		this.visTime = 0;
 		this.attributesAgent = attributesAgent;
 		this.outputPath = projectPath;
@@ -192,6 +203,9 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	public synchronized TableTrajectoryFootStep getTrajectories() {
 		return trajectories;
+	}
+	public synchronized TableTrajectoryFootStep getContactTrajectories() {
+		return contactTrajectories;
 	}
 
 	public synchronized Table getAgentTable() {
