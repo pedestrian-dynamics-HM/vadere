@@ -1,6 +1,5 @@
 package org.vadere.gui.postvisualization.utils;
 
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
@@ -9,6 +8,7 @@ import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationConfig;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
+import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.Trajectory;
@@ -159,26 +159,6 @@ public class TikzGenerator {
 		tikzStyles += "voronoi/.style={black, line width=1}\n";
 
 		return tikzStyles;
-	}
-
-	private Rectangle2D getExportBounds(EXPORT_OPTION exportOption, Topography topography) {
-		Rectangle2D exportBounds = new Rectangle2D.Double();
-
-		if (exportOption == EXPORT_OPTION.EXPORT_WHOLE_TOPOGRAPHY) {
-			exportBounds.setRect(topography.getBounds());
-		} else {
-			Rectangle2D viewportBound = model.getViewportBound();
-
-			// When exporting the current viewport only, consider that the viewport is usually cut off
-			// only horizontally or vertically. I.e, the dimension which is not cut off is filled up with a lot
-			// of gray margin. Therefore, limit this dimension to the corresponding topography dimension.
-			double width = Math.min(viewportBound.getWidth(), topography.getBounds().getWidth());
-			double height = Math.min(viewportBound.getHeight(), topography.getBounds().getHeight());
-
-			exportBounds.setRect(viewportBound.getX(), viewportBound.getY(), width, height);
-		}
-
-		return exportBounds;
 	}
 
 	private String convertScenarioElementsToTikz(EXPORT_OPTION exportOption) {
@@ -341,12 +321,32 @@ public class TikzGenerator {
         return generatedCode;
 	}
 
+	private Rectangle2D getExportBounds(EXPORT_OPTION exportOption, Topography topography) {
+		Rectangle2D exportBounds = new Rectangle2D.Double();
+
+		if (exportOption == EXPORT_OPTION.EXPORT_WHOLE_TOPOGRAPHY) {
+			exportBounds.setRect(topography.getBounds());
+		} else {
+			Rectangle2D viewportBound = model.getViewportBound();
+
+			// When exporting the current viewport only, consider that the viewport is usually cut off
+			// only horizontally or vertically. I.e, the dimension which is not cut off is filled up with a lot
+			// of gray margin. Therefore, limit this dimension to the corresponding topography dimension.
+			double width = Math.min(viewportBound.getWidth(), topography.getBounds().getWidth());
+			double height = Math.min(viewportBound.getHeight(), topography.getBounds().getHeight());
+
+			exportBounds.setRect(viewportBound.getX(), viewportBound.getY(), width, height);
+		}
+
+		return exportBounds;
+	}
+
 	private String drawTrajectories(PostvisualizationConfig config, PostvisualizationModel model) {
 		// Use a thread-safe string implementation because streams are used here.
 		final StringBuffer generatedCode = new StringBuffer("");
 
 		if (config.isShowTrajectories()) {
-			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents @ simTimeInSec %f of \n",model.getSimTimeInSec()));
+			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents at simTimeInSec %f\n",model.getSimTimeInSec()));
 
 			Collection<Agent> agents = model.getAgents();
 
@@ -387,7 +387,7 @@ public class TikzGenerator {
 				}
 
 				String coloredTrajectory = applyAgentColorToTrajectory(trajectory.toString(), Optional.ofNullable(agentColors.get(agent.getId())));
-				generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d @ simTimeInSec %f \n", agent.getId(), model.getSimTimeInSec()));
+				generatedCode.append(String.format(Locale.US, "%% Trajectory Agent %d at simTimeInSec %f\n", agent.getId(), model.getSimTimeInSec()));
 				generatedCode.append(coloredTrajectory);
 			}
 		}
@@ -461,52 +461,91 @@ public class TikzGenerator {
     private String drawAgents(DefaultSimulationConfig config) {
 	    String generatedCode = "";
 
-
         for (Agent agent : model.getAgents()) {
         	if (agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
 
-				if(config.isShowWalkdirection() && model instanceof PostvisualizationModel){
+				if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
 					generatedCode += drawWalkingDirection(agent);
 				}
 
 		        if (model.getConfig().isShowGroups()) {
-			        Pedestrian pedestrian = (Pedestrian) agent;
-			        Color pedestrianColor = renderer.getPedestrianColor(agent);
-			        try {
-				        Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
-				        String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-				        generatedCode += String.format(Locale.US, "\\fill[pedestrian, group, fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
-			        } catch (ClassCastException cce) {
-				        logger.error("Error casting to Pedestrian");
-				        cce.printStackTrace();
-
-				        // Fall back to default rendering of agents.
-				        String agentTextPattern = "\\node[pedestrian, fill=AgentColor] (%f,%f) (Pedestrian%d) at (%f,%f) {};\n";
-				        generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
-			        }
-		        } else {
-			        Pedestrian pedestrian = (Pedestrian) agent;
-			        Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
-
-			        if (pedestrianColor.equals(model.getConfig().getPedestrianDefaultColor())){
-						String agentTextPattern = "\\node[pedestrian] (Pedestrian%d) at (%f,%f) {};\n";
-						generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
-					} else {
-			        	// override default color
-						String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
-						// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
-						// generatedCode += String.format(Locale.US, "\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
-						String agentTextPattern = "\\node[pedestrian, fill=%s] (Pedestrian%d) at (%f,%f) {};\n";
-						generatedCode += String.format(Locale.US, agentTextPattern, colorString,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
-					}
-		        }
+					generatedCode += drawAgentWithGroupSettings(agent);
+				} else {
+					generatedCode += drawAgentWithoutGroupSettings(agent);
+				}
 	        }
         }
 
         return generatedCode;
     }
 
-    private String generatePathForScenarioElement(ScenarioElement element) {
+	@NotNull
+	private String drawAgentWithGroupSettings(Agent agent) {
+		String generatedCode = "";
+
+		try {
+			Pedestrian pedestrian = (Pedestrian) agent;
+			Color pedestrianColor = renderer.getPedestrianColor(agent);
+			Shape pedestrianShape = renderer.getAgentRender().getShape(pedestrian);
+
+			String colorString = String.format(Locale.US, "{rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+			generatedCode += String.format(Locale.US, "\\fill[pedestrian, group, fill=%s] %s;\n", colorString, generatePathForShape(pedestrianShape));
+		} catch (ClassCastException cce) {
+			logger.error("Error casting to Pedestrian");
+			cce.printStackTrace();
+			// Fall back to default rendering of agents.
+			String agentTextPattern = "\\node[pedestrian] (Pedestrian%d) at (%f,%f) {};\n";
+			generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
+		}
+
+		return generatedCode;
+	}
+
+	@NotNull
+	private String drawAgentWithoutGroupSettings(Agent agent) {
+		String generatedCode = "";
+
+		// Do not draw agents as path for performance reasons. Usually, agents have a circular shape.
+		// generatedCode += String.format(Locale.US, "\\fill[AgentColor] %s\n", generatePathForScenarioElement(agent));
+		try {
+			String agentTextPattern = "\\node[pedestrian%s] (Pedestrian%d) at (%f,%f) {};\n";
+			// Watch out: "pedestrianModifications", e.g. "fill=black" can overwrite TikZ style "pedestrian".
+			// I.e., last "fill" wins in TikZ and previous ones are ignored!
+			String pedestrianModifications = getPedestrianModifications((Pedestrian) agent);
+			generatedCode += String.format(Locale.US, agentTextPattern, pedestrianModifications,  agent.getId(), agent.getPosition().x, agent.getPosition().y);
+		} catch (ClassCastException cce) {
+			logger.error("Error casting to Pedestrian");
+			cce.printStackTrace();
+			// Fall back to default rendering of agents.
+			String agentTextPattern = "\\node[pedestrian] (Pedestrian%d) at (%f,%f) {};\n";
+			generatedCode += String.format(Locale.US, agentTextPattern, agent.getId(), agent.getPosition().x, agent.getPosition().y);
+		}
+
+		return generatedCode;
+	}
+
+	private String getPedestrianModifications(Pedestrian pedestrian) {
+		String agentModifications = "";
+
+		Color pedestrianColor = renderer.getPedestrianColor(pedestrian);
+
+		if (pedestrianColor.equals(model.getConfig().getPedestrianDefaultColor()) == false) {
+			agentModifications += String.format(", fill={rgb,255: red,%d; green,%d; blue,%d}", pedestrianColor.getRed(), pedestrianColor.getGreen(), pedestrianColor.getBlue());
+		}
+		if (model.getConfig().isShowPedestrianInOutGroup()) {
+			agentModifications += String.format(", draw=%s, line width=2", getTikzColorString(pedestrian.getGroupMembership()));
+		}
+
+		return agentModifications;
+	}
+
+	private String getTikzColorString(GroupMembership groupMembership) {
+		Color color = model.getConfig().getGroupMembershipColor(groupMembership);
+
+		return String.format("{rgb,255: red,%d; green,%d; blue,%d}", color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	private String generatePathForScenarioElement(ScenarioElement element) {
 		String generatedPath = "";
 
 		AffineTransform noTransformation = new AffineTransform();
