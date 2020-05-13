@@ -1,11 +1,10 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.apache.commons.math3.distribution.UniformIntegerDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyElementFactory;
 import org.vadere.gui.topographycreator.view.ActionRandomPedestrianDialog;
+import org.vadere.gui.topographycreator.view.ActionRandomPedestrianDialog.TARGET_OPTION;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -14,19 +13,21 @@ import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.random.SimpleReachablePointProvider;
-
-import java.awt.event.ActionEvent;
-import java.awt.geom.Rectangle2D;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.function.Supplier;
 
 import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
+import java.awt.event.ActionEvent;
+import java.awt.geom.Rectangle2D;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class ActionPlaceRandomPedestrians extends TopographyAction {
+
+	private static Logger logger = Logger.getLogger(ActionPlaceRandomPedestrians.class);
 
 	private final UndoableEditSupport undoSupport;
 	private final double dotRadius;
@@ -46,7 +47,7 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 			IDrawPanelModel model = getScenarioPanelModel();
 
 			int numOfPeds = dialog.getNumOfPeds();
-			Supplier<LinkedList<Integer>> targetSupplier = getTargetSupplier(dialog);
+
 			Random random = dialog.getRandom();
 
 			Rectangle2D.Double legalBound = dialog.getBoundaryRectangle();
@@ -68,7 +69,7 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 					model.getCurrentType();
 					model.hideSelection();
 					AgentWrapper element = (AgentWrapper)TopographyElementFactory.getInstance().createScenarioShape(model.getCurrentType(), model.getSelectionShape());
-					element.getAgentInitialStore().setTargets(targetSupplier.get());
+					element.getAgentInitialStore().setTargets(getTargetList(dialog.getTargetOption(), dialog.getTargetList()));
 					model.addShape(element);
 					model.setSelectedElement(element);
 
@@ -81,27 +82,23 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 		getScenarioPanelModel().notifyObservers();
 	}
 
-	// if no target is given via the dialog select a single random target existing in the topography.
-	private Supplier<LinkedList<Integer>> getTargetSupplier(ActionRandomPedestrianDialog dialog){
-		if (dialog.useRandomTargets()){
-			Integer[] targets = getScenarioPanelModel().getTopography().getTargets()
-					.stream()
-					.map(Target::getId)
-					.toArray(Integer[]::new);
-			return new Supplier<LinkedList<Integer>>() {
+	private LinkedList<Integer> getTargetList(TARGET_OPTION selectedOption, LinkedList<Integer> dialogList) {
+		LinkedList<Integer> targetList = new LinkedList<>();
 
-				UniformIntegerDistribution dist =
-						new UniformIntegerDistribution(new JDKRandomGenerator(dialog.getRandom().nextInt()), 0, targets.length -1);
-				@Override
-				public LinkedList<Integer> get() {
-					LinkedList<Integer> ret = new LinkedList<>();
-					ret.add(targets[dist.sample()]);
-					return ret;
-				}
-			};
-		} else {
-			return dialog::getSelectedTargets;
+		if (selectedOption == TARGET_OPTION.EMPTY) {
+			// Nothing to do here.
+		}  else if (selectedOption == TARGET_OPTION.RANDOM) {
+			List<Target> targets = getScenarioPanelModel().getTopography().getTargets();
+			Random random = new Random();
+			Target randomTarget = targets.get(random.nextInt(targets.size()));
+
+			targetList.add(randomTarget.getId());
+
+		} else if (selectedOption == TARGET_OPTION.USE_LIST) {
+			targetList.addAll(dialogList);
 		}
+
+		return targetList;
 	}
 
 	private boolean checkOverlap(VShape newPedestrian){
