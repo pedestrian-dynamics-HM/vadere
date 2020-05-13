@@ -64,7 +64,7 @@
           "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
           "submodels" : [ ]
         },
-        "probabilityInGroupMembership" : 0.0
+        "probabilityInGroupMembership" : 1.0
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
