@@ -1,7 +1,5 @@
 package org.vadere.gui.topographycreator.view;
 
-
-import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.view.ProjectView;
 
@@ -13,57 +11,77 @@ import java.awt.event.ItemListener;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 public class ActionRandomPedestrianDialog {
 
-	public enum TARGET_OPTION { EMPTY, RANDOM, USE_LIST };
+	public enum TARGET_OPTION { EMPTY, RANDOM, USE_LIST }
 
-	private JTextField numberOfPeds_field;
-	private JTextField boundaryRectangle_field;
-	private JTextField targets_field;
-	private JTextField seed_field;
+	// Member Variables
+	private JTextField numberOfPedsField;
+	private JTextField boundaryRectangleField;
+	private JTextField targetsField;
+	private JTextField seedField;
+	private JTextField groupMembershipRatioField;
 
 	private JRadioButton rbTargetEmpty;
 	private JRadioButton rbTargetRandom;
 	private JRadioButton rbTargetUseList;
 
-	private JPanel panel;
+	private JPanel panelWindow;
+	private JPanel panelRadioButtons;
 
 	private boolean valid;
 	private int numOfPeds;
 	private Rectangle2D.Double boundaryRectangle;
 	private LinkedList<Integer> targetList;
 	private int seed;
+	private double groupMembershipRatio;
 	private Random random;
 
+	// Constructors
 	public ActionRandomPedestrianDialog() {
 
-		numberOfPeds_field = new JTextField("10", 15);
-		numberOfPeds_field.setHorizontalAlignment(JTextField.RIGHT);
-		numberOfPeds_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
+		valid = false;
+		numOfPeds = 10;
+		boundaryRectangle = new Rectangle2D.Double();
+		targetList = new LinkedList<>();
+		targetList.add(-1);
+		seed = -1;
+		groupMembershipRatio = 0.5;
+
+		createGuiElements();
+		groupGuiElements();
+		placeGuiElements();
+
+	}
+
+	private void createGuiElements() {
+
+		numberOfPedsField = new JTextField(String.format(Locale.US, "%d", numOfPeds), 15);
+		numberOfPedsField.setHorizontalAlignment(JTextField.RIGHT);
+		numberOfPedsField.getDocument().addDocumentListener(new SimpleDocumentListener() {
 			@Override
 			public void handle(DocumentEvent e) {
-				String text = numberOfPeds_field.getText();
-				try{
+				String text = numberOfPedsField.getText();
+				try {
 					numOfPeds = Integer.parseInt(text);
-					valid = true;
-					numberOfPeds_field.setForeground(Color.BLACK);
+					setValid(true, numberOfPedsField);
 				} catch (Exception ex){
-					valid = false;
-					numberOfPeds_field.setForeground(Color.RED);
+					setValid(false, numberOfPedsField);
 				}
 			}
 		});
 
-		boundaryRectangle_field = new JTextField("x, y, width, height", 15);
-		boundaryRectangle_field.setHorizontalAlignment(JTextField.RIGHT);
-		boundaryRectangle_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
+		boundaryRectangleField = new JTextField("x, y, width, height", 15);
+		boundaryRectangleField.setHorizontalAlignment(JTextField.RIGHT);
+		boundaryRectangleField.getDocument().addDocumentListener(new SimpleDocumentListener() {
 			@Override
 			public void handle(DocumentEvent e) {
-				String text = boundaryRectangle_field.getText();
-				try{
+				String text = boundaryRectangleField.getText();
+				try {
 					String[] numbersAsString = text.split(",");
 
 					boundaryRectangle = new Rectangle2D.Double(
@@ -73,83 +91,72 @@ public class ActionRandomPedestrianDialog {
 							Double.parseDouble(numbersAsString[3])
 							);
 
-					valid = true;
-					boundaryRectangle_field.setForeground(Color.BLACK);
+					setValid(true, boundaryRectangleField);
 				} catch (Exception ex){
-					valid = false;
-					boundaryRectangle_field.setForeground(Color.RED);
+					setValid(false, boundaryRectangleField);
 				}
 			}
 		});
 
-		targets_field = new JTextField("-1", 15);
-		targets_field.setHorizontalAlignment(JTextField.RIGHT);
-		targets_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
+		targetsField = new JTextField("-1", 15);
+		targetsField.setHorizontalAlignment(JTextField.RIGHT);
+		targetsField.getDocument().addDocumentListener(new SimpleDocumentListener() {
 			@Override
 			public void handle(DocumentEvent e) {
-				String strippedText = targets_field.getText().replace(" ", "");
+				String strippedText = targetsField.getText().replace(" ", "");
 				String[] splittedText = strippedText.split(",");
 
 				try {
 					targetList = Arrays.stream(splittedText).mapToInt(Integer::parseInt).boxed().collect(Collectors.toCollection(LinkedList::new));
-					valid = true;
-					targets_field.setForeground(Color.BLACK);
+					setValid(true, targetsField);
 				}catch (Exception ex){
-					valid = false;
-					targets_field.setForeground(Color.RED);
+					setValid(false, targetsField);
 				}
 			}
 		});
 
-		JPanel panelRadioButtons = createTargetRadioButtonPanel();
+		createTargetRadioButtons();
 
-		seed_field = new JTextField("-1", 15);
-		seed_field.setHorizontalAlignment(JTextField.RIGHT);
-		seed_field.getDocument().addDocumentListener(new SimpleDocumentListener() {
+		seedField = new JTextField(String.format(Locale.US, "%d", seed), 15);
+		seedField.setHorizontalAlignment(JTextField.RIGHT);
+		seedField.getDocument().addDocumentListener(new SimpleDocumentListener() {
 			@Override
 			public void handle(DocumentEvent e) {
 				try{
-					seed = Integer.parseInt(seed_field.getText());
-					valid = true;
-					seed_field.setForeground(Color.BLACK);
+					seed = Integer.parseInt(seedField.getText());
+					setValid(true, seedField);
 				} catch (Exception ex){
-					valid = false;
-					seed_field.setForeground(Color.RED);
+					setValid(false, seedField);
 				}
 			}
 		});
 
-		GridBagLayout layout = new GridBagLayout();
-		panel = new JPanel();
-		panel.setLayout(layout);
+		groupMembershipRatioField = new JTextField(String.format(Locale.US, "%.1f", groupMembershipRatio), 15);
+		groupMembershipRatioField.setHorizontalAlignment(JTextField.RIGHT);
+		groupMembershipRatioField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void handle(DocumentEvent e) {
+				try {
+					groupMembershipRatio = Double.parseDouble(groupMembershipRatioField.getText());
 
-		panel.add(new JLabel("Set Number of Pedestrians"), c(GridBagConstraints.HORIZONTAL, 0, 0));
-		panel.add(numberOfPeds_field, c(GridBagConstraints.HORIZONTAL, 1, 0));
-		panel.add(new JLabel("In Boundary Rectangle"), c(GridBagConstraints.HORIZONTAL, 0, 1));
-		panel.add(boundaryRectangle_field, c(GridBagConstraints.HORIZONTAL, 1, 1));
+					boolean isValid = (groupMembershipRatio >= 0.0 && groupMembershipRatio <= 1.0);
+					setValid(isValid, groupMembershipRatioField);
+				} catch (Exception ex) {
+					setValid(false, groupMembershipRatioField);
+				}
+			}
+		});
 
-		panel.add(new JLabel("Set Targets"), c(GridBagConstraints.HORIZONTAL, 0, 2));
-		panel.add(panelRadioButtons, c(GridBagConstraints.HORIZONTAL, 1, 2));
-		panel.add(targets_field, c(GridBagConstraints.HORIZONTAL, 1, 3));
-
-		panel.add(new JLabel("Set Random Seed (-1 for random)"), c(GridBagConstraints.HORIZONTAL, 0, 4));
-		panel.add(seed_field, c(GridBagConstraints.HORIZONTAL, 1, 4));
-		panel.add(new JLabel("May take a while because intelligent distance function not available yet..."),
-				  c(GridBagConstraints.HORIZONTAL, 0,5,2));
-
-		numOfPeds = 10;
-		targetList = new LinkedList<>();
-		targetList.add(-1);
-		seed = -1;
-		valid = false;
+		panelWindow = new JPanel();
+		panelRadioButtons = new JPanel();
 	}
 
-	@NotNull
-	private JPanel createTargetRadioButtonPanel() {
+	private void createTargetRadioButtons() {
+
 		rbTargetEmpty = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetEmptyOption.label"), true);
 		rbTargetRandom = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetRandomOption.label"), false);
 		rbTargetUseList = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetListOption.label"), false);
-		targets_field.setEditable(false);
+		targetsField.setEditable(false);
 
 		ButtonGroup buttonGroupTarget = new ButtonGroup();
 		buttonGroupTarget.add(rbTargetEmpty);
@@ -160,30 +167,54 @@ public class ActionRandomPedestrianDialog {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				boolean targetsFieldState = e.getStateChange() == ItemEvent.SELECTED;
-				targets_field.setEditable(targetsFieldState);
+				targetsField.setEditable(targetsFieldState);
 			}
 		});
 
-		JPanel panelRadioButtons = new JPanel();
-		panelRadioButtons.setLayout(new FlowLayout());
-
-		int x = 0;
-		int y = 0;
-		panelRadioButtons.add(rbTargetEmpty, c(GridBagConstraints.HORIZONTAL, x, y++));
-		panelRadioButtons.add(rbTargetRandom, c(GridBagConstraints.HORIZONTAL, x, y++));
-		panelRadioButtons.add(rbTargetUseList, c(GridBagConstraints.HORIZONTAL, x, y++));
-		return panelRadioButtons;
 	}
 
+	private void groupGuiElements() {
+		panelRadioButtons.setLayout(new FlowLayout());
+
+		panelRadioButtons.add(rbTargetEmpty);
+		panelRadioButtons.add(rbTargetRandom);
+		panelRadioButtons.add(rbTargetUseList);
+	}
+
+	private void placeGuiElements() {
+		panelWindow.setLayout(new GridBagLayout());
+		int row = 0;
+		int col0 = 0;
+		int col1 = 1;
+
+		panelWindow.add(new JLabel("Set Number of Pedestrians"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(numberOfPedsField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
+		panelWindow.add(new JLabel("In Boundary Rectangle"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(boundaryRectangleField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
+		panelWindow.add(new JLabel("Set Targets"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(panelRadioButtons, c(GridBagConstraints.HORIZONTAL, col1, row++));
+		panelWindow.add(targetsField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
+		panelWindow.add(new JLabel("Set Random Seed (-1 for random)"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(seedField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
+		panelWindow.add(new JLabel("Ingroup Membership Ratio"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(groupMembershipRatioField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
+		panelWindow.add(new JLabel("May take a while because intelligent distance function not available yet..."),
+				c(GridBagConstraints.HORIZONTAL, col0,row,2));
+	}
 
 	private GridBagConstraints c(int fill, int gridx, int gridy, int width){
-
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = fill;
 		c.gridx = gridx;
 		c.gridy = gridy;
 		c.gridwidth = width;
 		c.insets = new Insets(2,2,2,2);
+
 		return c;
 	}
 
@@ -193,7 +224,13 @@ public class ActionRandomPedestrianDialog {
 		c.gridx = gridx;
 		c.gridy = gridy;
 		c.insets = new Insets(2,2,2,2);
+
 		return c;
+	}
+
+	// Getter
+	public boolean isValid() {
+		return valid;
 	}
 
 	public int getNumOfPeds() {
@@ -218,6 +255,14 @@ public class ActionRandomPedestrianDialog {
 		return selectedOption;
 	}
 
+	public LinkedList<Integer> getTargetList() {
+		return targetList;
+	}
+
+	public double getGroupMembershipRatio() {
+		return groupMembershipRatio;
+	}
+
 	public Random getRandom(){
 		if (random == null){
 			if (seed == -1){
@@ -229,20 +274,23 @@ public class ActionRandomPedestrianDialog {
 		return random;
 	}
 
-	public LinkedList<Integer> getTargetList() {
-		return targetList;
+	// Setter
+	private void setValid(boolean valid, JComponent causingElement) {
+		this.valid = valid;
+
+		Color color = (valid) ? Color.BLACK : Color.RED;
+		causingElement.setForeground(color);
 	}
 
-	public boolean showDialog(){
-		return JOptionPane.showConfirmDialog(
+	// Methods
+	public boolean showDialog() {
+		int returnValue = JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
-				panel,
-				"Create Random Pedestrians",
-				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
-	}
+				panelWindow,
+				Messages.getString("TopographyCreator.PlaceRandomPedestrians.label"),
+				JOptionPane.OK_CANCEL_OPTION);
 
-	public boolean isValid() {
-		return valid;
+		return returnValue == JOptionPane.OK_OPTION;
 	}
 
 }
