@@ -56,10 +56,10 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	private void renderPedestrians(final Graphics2D g, final Color color) {
 		if (!model.isEmpty()) {
 			renderTrajectories(g);
-			if (SHOW_CONTACTS && model.getContactData() != null) {
-				if (CONTACT_LINES_INTEAD_OF_TRAJECTORIES) {
+			if (model.config.getShowContacts() != 0 && model.getContactData() != null) {
+				if (model.config.getShowContacts() == 1) {
 					renderConnectingLinesByContact(g);
-				} else {
+				} else if (model.config.getShowContacts() == 2) {
 					renderContactTrajectories(g);
 				}
 			}

@@ -31,6 +31,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showMeasurementArea = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
+	private int showContacts = 0;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
 	private boolean showTargetPotentielFieldMesh = false;
@@ -71,6 +72,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showWalkdirection = config.showWalkdirection;
 		this.showGrid = config.showGrid;
 		this.showPedestrians = config.showPedestrians;
+		this.showContacts = config.showContacts;
 		this.showLogo = config.showLogo;
 		this.showStairs = config.showStairs;
 		this.showGroups = config.showGroups;
@@ -101,6 +103,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showPedestrians;
 	}
 
+	public int getShowContacts() {
+		return showContacts;
+	}
+	public boolean isShowContacts() {
+		return showContacts == 0;
+	}
+
+
 	public boolean isShowWalkdirection() {
 		return showWalkdirection;
 	}
@@ -116,6 +126,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowPedestrians(boolean showPedestrians) {
 		this.showPedestrians = showPedestrians;
+		setChanged();
+	}
+
+	public void setShowContacts(int showContacts) {
+		this.showContacts = showContacts;
 		setChanged();
 	}
 

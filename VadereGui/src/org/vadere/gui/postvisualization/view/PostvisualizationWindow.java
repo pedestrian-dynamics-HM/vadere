@@ -183,6 +183,17 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				}, "ProjectView.btnShowPedestrian.tooltip");
 
 		addActionToToolbar(toolbar,
+				new ActionVisualization("show_contacts", resources.getIcon("contacts.png", iconWidth, iconHeight),
+						model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						model.config.setShowContacts((model.config.getShowContacts() +1)%3);
+						model.notifyObservers();
+					}
+
+				}, "ProjectView.btnShowContacts.tooltip");
+
+		addActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
 						resources.getIcon("trajectories.png", iconWidth, iconHeight), model) {
 					@Override
