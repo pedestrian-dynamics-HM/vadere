@@ -81,12 +81,9 @@ public class ActionOpenFile extends ActionVisualization {
 					Optional<File> trajectoryFile = Optional.empty();
 					Optional<File> contactsTrajectoryFile = Optional.empty();
 					for (File f :trajFiles) {
-						logger.info("file read with filename "+ f.getName());
 						if (f.getName().contains("contacts")) {
-							logger.info("contactsTrajectoryFile is "+ f.getName());
 							contactsTrajectoryFile = Optional.of(f);
 						} else {
-							logger.info("trajectoryFile is "+ f.getName());
 							trajectoryFile = Optional.of(f);
 						}
 					}

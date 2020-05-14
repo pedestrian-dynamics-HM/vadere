@@ -25,15 +25,12 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
     private int sampleEveryNthStep;
     private int allowedAbsenceTimestepsIfContactReturns;
     private int minTimespanOfContactTimesteps;
-    private boolean printContacTrajectories;
-    private boolean printForPostVis;
-    private static boolean staticPrintForPostVis;
 
 
 
     public PedestriansNearbyProcessor() {
-        //super("durationTimesteps", "xCoord-Contact", "yCoord-Contact");
-        super("endTime", "startX", "startY", "endX", "endY", "targetId");
+        super("durationTimesteps", "xPath", "yPath");
+        //super("endTime", "startX", "startY", "endX", "endY", "targetId");
         setAttributes(new AttributesPedestrianNearbyProcessor());
     }
 
@@ -60,9 +57,9 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
                         VPoint pointOfContact = new VPoint(xAverage, yAverage);
                         List<VPoint> trajectory = new ArrayList<>();
                         trajectory.add(pointOfContact);
-                        return new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep, trajectory, printContacTrajectories, printForPostVis);})
+                        return new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep, trajectory);})
                     .collect(Collectors.toList());
-            pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPedId1(), o.getPedId2(), printForPostVis), o));
+            pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPedId1(), o.getPedId2()), o));
         }
     }
 
@@ -105,9 +102,6 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         sampleEveryNthStep = att.getSampleEveryNthStep();
         allowedAbsenceTimestepsIfContactReturns = att.getAllowedAbsenceTimestepsIfContactReturns();
         minTimespanOfContactTimesteps = att.getMinTimespanOfContactTimesteps();
-        printContacTrajectories = att.getPrintContactTrajectories();
-        printForPostVis = att.getPrintForPostVis();
-        staticPrintForPostVis = printForPostVis;
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {

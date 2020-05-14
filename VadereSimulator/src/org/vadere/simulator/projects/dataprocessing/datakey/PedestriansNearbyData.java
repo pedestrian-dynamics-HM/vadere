@@ -14,8 +14,6 @@ public class PedestriansNearbyData {
 	private int durationTimesteps;
 	private int startTimestep;
 	private List<VPoint> trajectory;
-	private boolean printTrajectory;
-	private boolean printForPostVis; // is an ugly one time thing that shouldn't be merged
 
 
 
@@ -32,14 +30,12 @@ public class PedestriansNearbyData {
 		return startTimestep;
 	}
 
-	public PedestriansNearbyData(int ped1, int ped2, final int durationTimesteps, int startTimestep, List<VPoint> contactTrajectory, boolean printTrajectory, boolean printForPostVis){
+	public PedestriansNearbyData(int ped1, int ped2, final int durationTimesteps, int startTimestep, List<VPoint> contactTrajectory){
 		this.pedId1 = Math.min(ped1, ped2);
 		this.pedId2 = Math.max(ped1, ped2);
 		this.durationTimesteps = durationTimesteps;
 		this.startTimestep = startTimestep;
 		this.trajectory = contactTrajectory;
-		this.printTrajectory = printTrajectory;
-		this.printForPostVis = printForPostVis;
 	}
 
 	public int getPedId1() {
@@ -52,10 +48,6 @@ public class PedestriansNearbyData {
 
 	public int getDurationTimesteps() {
 		return durationTimesteps;
-	}
-
-	public boolean isPrintForPostVis() {
-		return printForPostVis;
 	}
 
 	public List<VPoint> getTrajectory() {
@@ -71,13 +63,13 @@ public class PedestriansNearbyData {
 	public PedestriansNearbyData getUpdatedData(PedestriansNearbyData newData, int sampleEveryNthStep) {
 		List<VPoint> traj = getTrajectory();
 		traj.addAll(newData.getTrajectory());
-		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + sampleEveryNthStep, getStartTimestep(),traj, printTrajectory, printForPostVis);
+		return new PedestriansNearbyData(getPedId1(), getPedId2(), getDurationTimesteps() + sampleEveryNthStep, getStartTimestep(),traj);
 	}
 
 
 	public String[] toStrings(){
 		// printForPostVis is an ugly one time thing that shouldn't be merged
-		if (printForPostVis) {
+		/*if (printForPostVis) {
 			StringBuilder ret = new StringBuilder();
 			List<VPoint> traj = getTrajectory();
 			for (int i = 0; i < traj.size(); i++) {
@@ -99,17 +91,14 @@ public class PedestriansNearbyData {
 				}
 			}
 			return new String[]{ret.toString()};
-		}
-		if (!printTrajectory) {
-			return new String[]{Integer.toString(durationTimesteps)};
-		}
+		}*/
 		StringBuilder ret = new StringBuilder();
 		List<VPoint> traj = getTrajectory();
 		for (int i = 0; i < traj.size(); i++) {
 			VPoint p = traj.get(i);
-			ret.append(p.x).append(" ").append(p.y).append("\n");
+			ret.append(p.x).append(" ").append(p.y);
 			if (i != traj.size() -1) {
-				ret.append("- - - - ");
+				ret.append("\r\n").append("- - - - ");
 			}
 		}
 		return new String[]{Integer.toString(durationTimesteps), ret.toString()};

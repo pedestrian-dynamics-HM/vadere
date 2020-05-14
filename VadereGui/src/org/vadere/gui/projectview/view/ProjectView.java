@@ -645,16 +645,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			private void loadScenarioIntoGui(OutputBundle bundle) throws IOException {
 
 				Scenario scenarioRM = bundle.getScenarioRM();
-				/*Optional<File> optionalTrajectoryFile = IOUtils
-						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);*/
-				File[] trajFiles = IOUtils.getFileList(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
-				Optional<File> trajectoryFile = Optional.empty();
+				Optional<File> trajectoryFile = IOUtils
+						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
+				File[] txtFiles = IOUtils.getFileList(bundle.getDirectory(), ".txt");
 				Optional<File> contactsTrajectoryFile = Optional.empty();
-				for (File f :trajFiles) {
+				for (File f :txtFiles) {
 					if (f.getName().contains("contacts")) {
 						contactsTrajectoryFile = Optional.of(f);
-					} else {
-						trajectoryFile = Optional.of(f);
 					}
 				}
 

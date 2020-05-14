@@ -63,7 +63,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private TableTrajectoryFootStep trajectories;
 
-	private TableTrajectoryFootStep contactTrajectories;
+	private ContactData contactData;
 
 	private String outputPath;
 
@@ -74,7 +74,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public PostvisualizationModel() {
 		super(new PostvisualizationConfig());
 		this.trajectories = new TableTrajectoryFootStep(Table.create());
-		this.contactTrajectories = new TableTrajectoryFootStep(Table.create());
+		this.contactData = null;
 		this.scenario = new Scenario("");
 		this.topographyId = 0;
 		this.potentialContainer = null;
@@ -104,9 +104,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
 		if (contactTrajectories != null) {
-			this.contactTrajectories = new TableTrajectoryFootStep(contactTrajectories);
-		} else {
-			this.contactTrajectories = null;
+			this.contactData = new ContactData(contactTrajectories);
 		}
 		this.visTime = 0;
 		this.attributesAgent = attributesAgent;
@@ -204,8 +202,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public synchronized TableTrajectoryFootStep getTrajectories() {
 		return trajectories;
 	}
-	public synchronized TableTrajectoryFootStep getContactTrajectories() {
-		return contactTrajectories;
+	public synchronized ContactData getContactData() {
+		return contactData;
 	}
 
 	public synchronized Table getAgentTable() {

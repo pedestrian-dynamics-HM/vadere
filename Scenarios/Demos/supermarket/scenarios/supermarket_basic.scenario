@@ -38,16 +38,7 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
-      "attributes" : {
-        "maxDistanceForANearbyPedestrian" : 1.5,
-        "sampleEveryNthStep" : 1,
-        "allowedAbsenceTimestepsIfContactReturns" : 0,
-        "minTimespanOfContactTimesteps" : 20,
-        "printContactTrajectories" : false,
-        "printForPostVis" : true
-      }
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

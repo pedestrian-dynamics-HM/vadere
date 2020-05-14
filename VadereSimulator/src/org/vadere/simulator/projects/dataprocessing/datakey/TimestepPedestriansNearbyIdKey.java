@@ -13,22 +13,18 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int timeStep;
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
-	private final boolean printForPostVis;
-	private static boolean staticPrintForPostVis;
 
 
-	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB, boolean printForPostVis) {
+	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB) {
 		this.timeStep = timeStep;
 		this.pedId1 = Math.min(pedA, pedB);
 		this.pedId2 = Math.max(pedA, pedB);
-		this.printForPostVis = printForPostVis; // is an ugly one time thing that shouldn't be merged
-		staticPrintForPostVis = printForPostVis;
 	}
 
 
 	public static String[] getHeaders(){
-		//return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
-		return new String[]{"pedestrianId", "simTime"};
+		return new String[]{"startTimeStep", "1stPedId", "2ndPedId"};
+		//return new String[]{"pedestrianId", "simTime"};
 	}
 
 	public int getTimeStep() {
@@ -45,10 +41,10 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 
 	public String[] toStrings(){
 		// printForPostVis is an ugly one time thing that shouldn't be merged
-		if (printForPostVis) {
+		/*if (printForPostVis) {
 			//return new String[]{Integer.toString(999), Double.toString(timeStep*0.4), Double.toString(timeStep*0.4 + 0.4)};
 			return new String[]{};
-		}
+		}*/
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
