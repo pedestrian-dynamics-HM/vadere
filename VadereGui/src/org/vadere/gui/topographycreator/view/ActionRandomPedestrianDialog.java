@@ -20,6 +20,7 @@ public class ActionRandomPedestrianDialog {
 	public enum TARGET_OPTION { EMPTY, RANDOM, USE_LIST }
 
 	// Member Variables
+	private JTextField firstPedIdField;
 	private JTextField numberOfPedsField;
 	private JTextField boundaryRectangleField;
 	private JTextField targetsField;
@@ -34,6 +35,7 @@ public class ActionRandomPedestrianDialog {
 	private JPanel panelRadioButtons;
 
 	private boolean valid;
+	private int firstPedId;
 	private int numOfPeds;
 	private Rectangle2D.Double boundaryRectangle;
 	private LinkedList<Integer> targetList;
@@ -45,6 +47,7 @@ public class ActionRandomPedestrianDialog {
 	public ActionRandomPedestrianDialog() {
 
 		valid = false;
+		firstPedId = 1;
 		numOfPeds = 10;
 		boundaryRectangle = new Rectangle2D.Double();
 		targetList = new LinkedList<>();
@@ -59,6 +62,21 @@ public class ActionRandomPedestrianDialog {
 	}
 
 	private void createGuiElements() {
+
+		firstPedIdField = new JTextField(String.format(Locale.US, "%d", firstPedId), 15);
+		firstPedIdField.setHorizontalAlignment(JTextField.RIGHT);
+		firstPedIdField.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void handle(DocumentEvent e) {
+				String text = firstPedIdField.getText();
+				try {
+					firstPedId = Integer.parseInt(text);
+					setValid(true, firstPedIdField);
+				} catch (Exception ex){
+					setValid(false, firstPedIdField);
+				}
+			}
+		});
 
 		numberOfPedsField = new JTextField(String.format(Locale.US, "%d", numOfPeds), 15);
 		numberOfPedsField.setHorizontalAlignment(JTextField.RIGHT);
@@ -187,6 +205,9 @@ public class ActionRandomPedestrianDialog {
 		int col0 = 0;
 		int col1 = 1;
 
+		panelWindow.add(new JLabel("First Pedestrian Id"), c(GridBagConstraints.HORIZONTAL, col0, row));
+		panelWindow.add(firstPedIdField, c(GridBagConstraints.HORIZONTAL, col1, row++));
+
 		panelWindow.add(new JLabel("Set Number of Pedestrians"), c(GridBagConstraints.HORIZONTAL, col0, row));
 		panelWindow.add(numberOfPedsField, c(GridBagConstraints.HORIZONTAL, col1, row++));
 
@@ -231,6 +252,10 @@ public class ActionRandomPedestrianDialog {
 	// Getter
 	public boolean isValid() {
 		return valid;
+	}
+
+	public int getFirstPedId() {
+		return firstPedId;
 	}
 
 	public int getNumOfPeds() {

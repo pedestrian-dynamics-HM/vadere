@@ -56,6 +56,7 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 			double groupMembershipRatio = dialog.getGroupMembershipRatio();
 			BinomialDistribution binomialDistribution = new BinomialDistribution(BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, groupMembershipRatio);
 
+			int firstPedId = dialog.getFirstPedId();
 			int numOfPeds = dialog.getNumOfPeds();
 			int createdPeds = 0;
 
@@ -64,7 +65,8 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 				VCircle newPosition = new VCircle(point.getX(), point.getY(), this.agentRadius);
 
 				if (checkOverlap(newPosition) == false) {
-					Pedestrian pedestrian = createPedestrian(dialog, topography, random, binomialDistribution, point);
+					int pedId = firstPedId + i;
+					Pedestrian pedestrian = createPedestrian(dialog, topography, random, binomialDistribution, point, pedId);
 					addPedestrianToTopography(pedestrian);
 					createdPeds++;
 				}
@@ -94,10 +96,10 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 	}
 
 	@NotNull
-	private Pedestrian createPedestrian(ActionRandomPedestrianDialog dialog, Topography topography, Random random, BinomialDistribution binomialDistribution, IPoint point) {
+	private Pedestrian createPedestrian(ActionRandomPedestrianDialog dialog, Topography topography, Random random, BinomialDistribution binomialDistribution, IPoint point, int id) {
 		AttributesAgent attributesAgent = new AttributesAgent(
 				topography.getAttributesPedestrian(),
-				topography.getNextDynamicElementId());
+				id);
 
 		Pedestrian pedestrian = new Pedestrian(attributesAgent, random);
 		pedestrian.setPosition(new VPoint(point));
