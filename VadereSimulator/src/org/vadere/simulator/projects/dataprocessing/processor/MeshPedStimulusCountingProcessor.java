@@ -26,9 +26,9 @@ public class MeshPedStimulusCountingProcessor extends MeshDensityCountingProcess
 		// setup filter
 		if (getAttributes().isRegexFilter()){
 			filter_pattern = Pattern.compile(getAttributes().getInformationFilter());
-			filter_by_stimuli = ped -> ped.getKnowledgeBase().knows_about(filter_pattern);
+			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(filter_pattern);
 		} else {
-			filter_by_stimuli = ped -> ped.getKnowledgeBase().knows_about(getAttributes().getInformationFilter());
+			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(getAttributes().getInformationFilter());
 		}
 	}
 
@@ -41,7 +41,7 @@ public class MeshPedStimulusCountingProcessor extends MeshDensityCountingProcess
 		// compute count
 		for(Pedestrian ped : peds) {
 			// update knowledgeBase
-			ped.getKnowledgeBase().update_obsolete(state.getSimTimeInSec());
+			ped.getKnowledgeBase().updateObsolete(state.getSimTimeInSec());
 			// filter by knowledge of pedestrian
 			if (filter_by_stimuli.test(ped)) {
 				doUpdateOnPed(ped);

@@ -16,7 +16,7 @@ import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.state.psychology.perception.types.InformationStimulus;
+import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.Vector3D;
@@ -394,7 +394,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.STIMULUS, name = "setInformation")
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.INFORMATION_ITEM, name = "setInformation")
 	public TraCICommand process_setStimulus(TraCISetCommand cmd, RemoteManager remoteManager) {
 		CompoundObject data = (CompoundObject) cmd.getVariableValue();
 		double start_t = (double)data.getData(0, TraCIDataType.DOUBLE);
@@ -406,8 +406,8 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementId()));
 			if (checkIfPedestrianExists(ped, cmd)) {
-				InformationStimulus s = new InformationStimulus(start_t, obsolete_at, information);
-				ped.getKnowledgeBase().add_information(s);
+				KnowledgeItem s = new KnowledgeItem(start_t, obsolete_at, information);
+				ped.getKnowledgeBase().addInformation(s);
 				cmd.setOK();
 			}
 		});

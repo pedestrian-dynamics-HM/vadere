@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.cognition;
 
+import java.awt.*;
+
 /**
  * According to the self-categorization theory ("reicher-2010"), people define
  * themselves as a member of social categories (see{@link SelfCategory}). When

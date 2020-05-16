@@ -301,7 +301,7 @@ public class TopographyWindow extends JPanel {
 				.getResource("/icons/paint_method_rectangle_icon.png")), panelModel, new DrawRectangleMode(
 				panelModel, undoSupport),
 				basicAction);
-		Action dot = new ActionSwitchSelectionMode(Messages.getString("TopographyCreator.btnCircle.label"), new ImageIcon(Resources.class
+		Action dot = new ActionSwitchSelectionMode(Messages.getString("TopographyCreator.btnPedestrian.label"), new ImageIcon(Resources.class
 				.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
