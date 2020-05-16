@@ -1,11 +1,8 @@
 package org.vadere.simulator.projects.dataprocessing.datakey;
 
-import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class PedestriansNearbyData {
 
@@ -17,14 +14,6 @@ public class PedestriansNearbyData {
 
 
 
-
-	/*private PedestriansNearbyData() {
-		this.pedId1 = -1;
-		this.pedId2 = -1;
-		this.durationTimesteps = 1;
-		this.startTimestep = 1;
-		this.trajectory = new ArrayList<>();
-	}*/
 
 	public int getStartTimestep() {
 		return startTimestep;
@@ -68,30 +57,6 @@ public class PedestriansNearbyData {
 
 
 	public String[] toStrings(){
-		// printForPostVis is an ugly one time thing that shouldn't be merged
-		/*if (printForPostVis) {
-			StringBuilder ret = new StringBuilder();
-			List<VPoint> traj = getTrajectory();
-			for (int i = 0; i < traj.size(); i++) {
-				VPoint p = traj.get(i);
-				VPoint pNext;
-				if (i != traj.size() -1) {
-					pNext = traj.get(i + 1);
-				} else {
-					pNext = traj.get(i);
-				}
-				Random rand = new Random();
-				double r1 = rand.nextDouble();
-				r1 = r1*0.3 - 0.15;
-				double r2 = rand.nextDouble();
-				r2 = r2*0.3 - 0.15;
-				ret.append(hashCode()).append(" ").append(startTimestep*0.4 + i*0.4).append(" ").append(startTimestep*0.4 + (i+1)*0.4).append(" ").append(p.x + r2).append(" ").append(p.y + r1).append(" ").append(pNext.x + r1).append(" ").append(pNext.y + r2).append(" 9999");
-				if (i != traj.size() -1) {
-					ret.append("\r\n");
-				}
-			}
-			return new String[]{ret.toString()};
-		}*/
 		StringBuilder ret = new StringBuilder();
 		List<VPoint> traj = getTrajectory();
 		for (int i = 0; i < traj.size(); i++) {

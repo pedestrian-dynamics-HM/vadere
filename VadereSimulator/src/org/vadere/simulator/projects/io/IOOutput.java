@@ -298,8 +298,8 @@ public abstract class IOOutput {
 
 		if (files == null || files.length < 1) {
 			throw new IOException("missing trajectory file with the extension " + fileExtension);
-		//} else if (files.length > 1) {
-		//	throw new IOException("multiply trajectory files with the extension " + fileExtension);
+		} else if (files.length > 1) {
+			throw new IOException("multiply trajectory files with the extension " + fileExtension);
 		} else {
 			return files[0].toPath();
 		}

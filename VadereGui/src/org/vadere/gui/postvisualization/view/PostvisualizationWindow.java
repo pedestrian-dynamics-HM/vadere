@@ -187,7 +187,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						model.config.setShowContacts((model.config.getShowContacts() +1)%3);
+						model.config.setShowContacts(!model.config.isShowContacts());
 						model.notifyObservers();
 					}
 

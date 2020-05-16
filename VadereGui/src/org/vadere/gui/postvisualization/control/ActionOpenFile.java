@@ -76,28 +76,13 @@ public class ActionOpenFile extends ActionVisualization {
 					Player.getInstance(model).stop();
 
 					File scenarioOutputDir = threadFile.isDirectory() ? threadFile : threadFile.getParentFile();
-					File[] trajFiles = IOUtils.getFileList(scenarioOutputDir, IOUtils.TRAJECTORY_FILE_EXTENSION);
-
-					Optional<File> trajectoryFile = Optional.empty();
-					Optional<File> contactsTrajectoryFile = Optional.empty();
-					for (File f :trajFiles) {
-						if (f.getName().contains("contacts")) {
-							contactsTrajectoryFile = Optional.of(f);
-						} else {
-							trajectoryFile = Optional.of(f);
-						}
-					}
-					//Optional<File> trajectoryFile =
-					//		IOUtils.getFirstFile(scenarioOutputDir, IOUtils.TRAJECTORY_FILE_EXTENSION);
+					Optional<File> trajectoryFile =
+							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.TRAJECTORY_FILE_EXTENSION);
 					Optional<File> snapshotFile =
 							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.SCENARIO_FILE_EXTENSION);
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
 						Scenario vadere = IOOutput.readScenario(snapshotFile.get().toPath());
-						if (contactsTrajectoryFile.isPresent()) {
-							model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), IOOutput.readTrajectories(contactsTrajectoryFile.get().toPath()), vadere, contactsTrajectoryFile.get().getParent());
-						} else {
-							model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), vadere, trajectoryFile.get().getParent());
-						}
+						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), vadere, trajectoryFile.get().getParent());
 						model.notifyObservers();
 						dialog.dispose();
 						setLastDirectories(scenarioOutputDir);

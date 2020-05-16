@@ -31,7 +31,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showMeasurementArea = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
-	private int showContacts = 0;
+	private boolean showContacts = true;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
 	private boolean showTargetPotentielFieldMesh = false;
@@ -103,11 +103,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showPedestrians;
 	}
 
-	public int getShowContacts() {
-		return showContacts;
-	}
 	public boolean isShowContacts() {
-		return showContacts == 0;
+		return showContacts;
 	}
 
 
@@ -129,7 +126,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
-	public void setShowContacts(int showContacts) {
+	public void setShowContacts(boolean showContacts) {
 		this.showContacts = showContacts;
 		setChanged();
 	}

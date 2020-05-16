@@ -24,7 +24,6 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 
 	public static String[] getHeaders(){
 		return new String[]{"startTimeStep", "1stPedId", "2ndPedId"};
-		//return new String[]{"pedestrianId", "simTime"};
 	}
 
 	public int getTimeStep() {
@@ -40,11 +39,6 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	}
 
 	public String[] toStrings(){
-		// printForPostVis is an ugly one time thing that shouldn't be merged
-		/*if (printForPostVis) {
-			//return new String[]{Integer.toString(999), Double.toString(timeStep*0.4), Double.toString(timeStep*0.4 + 0.4)};
-			return new String[]{};
-		}*/
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
@@ -92,7 +86,7 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 
 	@Override
 	public String toString() {
-		return "TimestepPedestrianIdOverlapKey{" +
+		return "TimestepPedestriansNearbyIdKey{" +
 				"timeStep=" + timeStep +
 				", pedId1=" + pedId1 +
 				", pedId2=" + pedId2 +

@@ -23,9 +23,6 @@ import tech.tablesaw.api.Table;
 public class PostvisualizationRenderer extends SimulationRenderer {
 
 	private static final double MIN_ARROW_LENGTH = 0.1;
-	private static final boolean SHOW_CONTACTS = true;
-	private static final boolean CONTACT_LINES_INTEAD_OF_TRAJECTORIES = true;
-
 	private static Logger logger = Logger.getLogger(PostvisualizationRenderer.class);
 	private PostvisualizationModel model;
 
@@ -56,12 +53,8 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	private void renderPedestrians(final Graphics2D g, final Color color) {
 		if (!model.isEmpty()) {
 			renderTrajectories(g);
-			if (model.config.getShowContacts() != 0 && model.getContactData() != null) {
-				if (model.config.getShowContacts() == 1) {
-					renderConnectingLinesByContact(g);
-				} else if (model.config.getShowContacts() == 2) {
-					renderContactTrajectories(g);
-				}
+			if (model.config.isShowContacts() && model.getContactData() != null) {
+				renderConnectingLinesByContact(g);
 			}
 		}
 	}
@@ -79,42 +72,21 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		Table pairs = model.getContactData().getPairsOfPedestriansInContactAt(model.getSimTimeInSec());
 		
 		for (Row row: pairs) {
-			VPoint ped1Pos = pedPositions.get(row.getInt(0));
-			VPoint ped2Pos = pedPositions.get(row.getInt(1));
+			int id1 = row.getInt(0);
+			int id2 = row.getInt(1);
+			VPoint ped1Pos = pedPositions.get(id1);
+			VPoint ped2Pos = pedPositions.get(id2);
 			Path2D.Double path = new Path2D.Double();
 			path.moveTo(ped1Pos.x, ped1Pos.y);
 			path.lineTo(ped2Pos.x, ped2Pos.y);
 			draw(path, g);
-		}
-		g.setStroke(stroke);
-		g.setColor(color);
-	}
 
-	private void renderContactTrajectories(Graphics2D g) {
-		if (!model.config.isShowAllTrajectories()) return;
-		Color color = g.getColor();
-		Stroke stroke = g.getStroke();
-		g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
-		g.setColor(Color.red);
-
-		ContactData contactData = model.getContactData();
-		List<Table> trajectories = contactData.getTrajectoriesOfContactsUntil(model.getSimTimeInSec());
-		Random rand = new Random();
-		for (Table trajectory: trajectories) {
-			if (trajectory.column(0).size() != 1) {
-				for (int i = 1; i < trajectory.column(0).size(); i++) {
-					Path2D.Double path = new Path2D.Double();
-					double xPrev = Double.parseDouble(trajectory.getString(i - 1, 0));
-					double yPrev = Double.parseDouble(trajectory.getString(i - 1, 1));
-					double x = Double.parseDouble(trajectory.getString(i, 0));
-					double y = Double.parseDouble(trajectory.getString(i, 1));
-					// draws noisy lines to emphasize the spots of prolonged contact without peds moving
-					path.moveTo(xPrev + rand.nextDouble() * 0.3 - 0.15, yPrev + rand.nextDouble() * 0.3 - 0.15);
-					path.lineTo(x + rand.nextDouble() * 0.3 - 0.15, y + rand.nextDouble() * 0.3 - 0.15);
-					draw(path, g);
-				}
+			// paint agents in contact red
+			if (model.config.isShowPedestrians()) {
+				agents.stream().filter(a -> a.getId() == id1 || a.getId() == id2).forEach(a -> getAgentRender().render(a, Color.red, g));
 			}
 		}
+
 		g.setStroke(stroke);
 		g.setColor(color);
 	}
