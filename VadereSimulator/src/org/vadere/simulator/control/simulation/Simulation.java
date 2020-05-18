@@ -288,7 +288,12 @@ public class Simulation {
 					c.postUpdate(simTimeInSec);
 				}
 
-				double stopTime = Math.min(runTimeInSec, this.simulationState.getStopTime());
+				double stopTime = runTimeInSec;
+				if (this.simulationState.isSimStop()) {
+					// get stopTime if the simulation should finish before finish time. New finish time = stop time
+					stopTime = this.simTimeInSec;
+				}
+
 				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
 					// do nothing here. This is done after the  Remote Control Hook
 				} else {

@@ -16,7 +16,7 @@ public class SimulationState {
 	private final int step;
 	private final String name;
 	private final MainModel mainModel;
-	private double stopTime = Float.POSITIVE_INFINITY;
+	private boolean simStop = false;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
@@ -76,11 +76,11 @@ public class SimulationState {
 		return Optional.ofNullable(mainModel);
 	}
 
-	public double getStopTime(){
-		return this.stopTime;
+	public  void setSimStop(boolean stop){
+		this.simStop = stop;
 	}
 
-	public void setStopTime(double stopTime) {
-		this.stopTime = stopTime;
+	public boolean isSimStop() {
+		return simStop;
 	}
 }

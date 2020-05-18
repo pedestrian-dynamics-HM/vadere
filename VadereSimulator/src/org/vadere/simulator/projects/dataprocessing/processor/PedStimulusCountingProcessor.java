@@ -21,9 +21,6 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 	private Predicate<Pedestrian> filter_by_stimuli;
 	private Pattern filter_pattern = null;
 	private double stopIfPercentageIsInformed = 0.95;
-	private int numberOfAdditionalTimeFrames = 20;
-	private double dynamicFinishTime = -1.0;
-	private boolean dynamicFinishTimeSet = false;
 
 	public PedStimulusCountingProcessor() {
 		super("numberPedsInformed", "numberPedsAll", "percentageInformed");
@@ -43,7 +40,6 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		}
 
 		stopIfPercentageIsInformed = attr.getStopIfPercentageIsInformed();
-		numberOfAdditionalTimeFrames = attr.getNumberOfAdditionalTimeFrames();
 
 	}
 
@@ -55,19 +51,11 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		int numberPedsAll = (int) peds.stream().filter(p-> p.getFootstepHistory().getFootSteps().size() > 1).count();
 
 		numberPedsAll = Math.max(numberPedsAll,numberPedsInformed);
-
-
-		// test wihtout omnet: if (state.getSimTimeInSec() > 1.0){ numberPedsInformed = numberPedsAll; }
 		InformationDegree informationDegree =  new InformationDegree(numberPedsInformed, numberPedsAll);
 
 		// force stop before simulation time defined in json is reached.
-		if ((!dynamicFinishTimeSet)  && (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed)) {
-			dynamicFinishTime = state.getSimTimeInSec() + state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength() * Math.max(numberOfAdditionalTimeFrames, 1);
-			dynamicFinishTimeSet = true;
-		}
-
-		if (dynamicFinishTimeSet){
-			state.setStopTime(dynamicFinishTime);
+		if (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed) {
+			setStopSimBeforeSimFinish(true);
 		}
 
 		putValue(new TimestepKey(state.getStep()), informationDegree);
@@ -89,6 +77,8 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		String[] informationDegrees = this.getValue(key).getValueString();
 		return informationDegrees;
 	}
+
+
 
 
 
