@@ -2,17 +2,13 @@ package org.vadere.simulator.projects.io;
 
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 /**
- * A TrajectoryReader is the counterpart of the {@link FootStepProcessor}.
- *
  * Output file assumptions:
  * The TrajectoryReader assumes that the first row of the output is the headline and
  * that there exist certain columns named:
@@ -25,15 +21,15 @@ import tech.tablesaw.io.csv.CsvReadOptions;
  *      targetId [optional] and
  *      groupId [optional].
  * The order of the rows (expect for the first row / header) can be arbitrary.
- * Columns has to be separated by {@link TrajectoryReader#SPLITTER} and {@link OutputFile#headerProcSep}.
+ * Columns has to be separated by {@link ContactDataReader#SPLITTER} and {@link OutputFile#headerProcSep}.
  */
-public class TrajectoryReader {
+public class ContactDataReader {
 
 	private static final char SPLITTER = ' ';
 	private Table dataFrame;
 	private Path trajectoryFilePath;
 
-	public TrajectoryReader(final Path trajectoryFilePath) {
+	public ContactDataReader(final Path trajectoryFilePath) {
 		this.trajectoryFilePath = trajectoryFilePath;
 	}
 

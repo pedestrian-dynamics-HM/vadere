@@ -183,6 +183,17 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				}, "ProjectView.btnShowPedestrian.tooltip");
 
 		addActionToToolbar(toolbar,
+				new ActionVisualization("show_contacts", resources.getIcon("contacts.png", iconWidth, iconHeight),
+						model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						model.config.setShowContacts(!model.config.isShowContacts());
+						model.notifyObservers();
+					}
+
+				}, "ProjectView.btnShowContacts.tooltip");
+
+		addActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
 						resources.getIcon("trajectories.png", iconWidth, iconHeight), model) {
 					@Override
@@ -381,15 +392,23 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		return menuBar;
 	}
 
-	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
 
 		try {
-			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			if (contactsTrajectoryFile != null) {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+			} else {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			}
 			model.notifyObservers();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+		loadOutputFile(trajectoryFile, null, scenario);
 	}
 
 	public void loadOutputFile(final Scenario scenario) {
