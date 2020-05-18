@@ -9,4 +9,9 @@ public interface RemoteRunListener {
 	void simulationStepFinishedListener();
 
 	void lastSimulationStepFinishedListener();
+
+	/**
+	 *  Notify RemoteManger about early shutdown. This is used to gracefully stop TraCI connection.
+	 */
+	void simulationStoppedEarlyListener(double time);
 }

@@ -17,6 +17,7 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 	private final ReentrantLock lock;
 	private List<Subscription> subscriptions;
 	private boolean lastSimulationStep;
+	private double simulationStoppedEarlyAtTime;
 
 
 	public RemoteScenarioRun(Scenario scenario, Path outputDir, RunnableFinishedListener scenarioFinishedListener, Path scenarioPath, ScenarioCache scenarioCache) {
@@ -25,6 +26,7 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		this.waitForLoopEnd = new Object();
 		this.lock = new ReentrantLock();
 		this.lastSimulationStep = false;
+		this.simulationStoppedEarlyAtTime = Double.MAX_VALUE;
 		addRemoteManagerListener(this);
 	}
 
@@ -72,8 +74,16 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		}
 	}
 
+	@Override
+	public void simulationStoppedEarlyListener(double time) {
+		simulationStoppedEarlyAtTime = time;
+	}
+
 	public boolean isLastSimulationStep() {
 		return lastSimulationStep;
 	}
 
+	public double getSimulationStoppedEarlyAtTime() {
+		return simulationStoppedEarlyAtTime;
+	}
 }

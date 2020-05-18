@@ -61,6 +61,7 @@ public class ControlCommandHandlerTest extends CommandHandlerTest {
 		TraCISimStepCommand rawCmd = (TraCISimStepCommand) getFirstCommand(TraCISimStepCommand.build(targetTime));
 		RemoteManager rm = mock(RemoteManager.class, Mockito.RETURNS_DEEP_STUBS);
 		when(rm.nextStep(targetTime)).thenReturn(true);
+		when(rm.getSimulationStoppedEarlyAtTime()).thenReturn(Double.MAX_VALUE);
 		TraCICommand cmd = ctrCmdHandler.process_simStep(rawCmd, rm);
 
 		testTraCICommand(cmd, traciCmd, cmdType);

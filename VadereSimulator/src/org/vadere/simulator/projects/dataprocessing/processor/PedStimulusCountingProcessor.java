@@ -5,6 +5,7 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.processor.AttributesPedStimulusCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.InformationDegree;
@@ -19,6 +20,7 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 
 	private Predicate<Pedestrian> filter_by_stimuli;
 	private Pattern filter_pattern = null;
+	private double stopIfPercentageIsInformed = 0.95;
 
 	public PedStimulusCountingProcessor() {
 		super("numberPedsInformed", "numberPedsAll", "percentageInformed");
@@ -37,6 +39,8 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 			filter_by_stimuli = ped -> ped.getKnowledgeBase().knowsAbout(getAttributes().getInformationFilter());
 		}
 
+		stopIfPercentageIsInformed = attr.getStopIfPercentageIsInformed();
+
 	}
 
 	@Override
@@ -47,9 +51,15 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		int numberPedsAll = (int) peds.stream().filter(p-> p.getFootstepHistory().getFootSteps().size() > 1).count();
 
 		numberPedsAll = Math.max(numberPedsAll,numberPedsInformed);
-
 		InformationDegree informationDegree =  new InformationDegree(numberPedsInformed, numberPedsAll);
+
+		// force stop before simulation time defined in json is reached.
+		if (informationDegree.getPercentageInformed() >= stopIfPercentageIsInformed) {
+			setStopSimBeforeSimFinish(true);
+		}
+
 		putValue(new TimestepKey(state.getStep()), informationDegree);
+
 
 	}
 
@@ -67,6 +77,8 @@ public class PedStimulusCountingProcessor extends DataProcessor<TimestepKey, Inf
 		String[] informationDegrees = this.getValue(key).getValueString();
 		return informationDegrees;
 	}
+
+
 
 
 
