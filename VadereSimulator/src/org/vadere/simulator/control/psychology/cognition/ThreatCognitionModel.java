@@ -7,6 +7,7 @@ import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
@@ -94,13 +95,38 @@ public class ThreatCognitionModel implements ICognitionModel {
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
         boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
+        boolean pedestrianIsBlockedByObstacle = pedestrianIsBlockedByObstacle(pedestrian, topography);
 
-        if (pedestrianIsInsideThreatArea) {
+        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA to agents if they are blocked by a wall.
+        if (pedestrianIsInsideThreatArea && pedestrianIsBlockedByObstacle == false) {
             pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
         } else {
             pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
         }
     }
+
+    // TODO Write unit tests!
+    private boolean pedestrianIsBlockedByObstacle(Pedestrian pedestrian, Topography topography) {
+        boolean isBlocked = false;
+
+        int requiredFootSteps = 2;
+        double requiredSpeedToBeBlocked = 0.05;
+        double requiredDistanceToObstacle = 1.0;
+
+        FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
+
+        if (footstepHistory.size() >= requiredFootSteps) {
+            if (footstepHistory.getAverageSpeedInMeterPerSecond() <= requiredSpeedToBeBlocked) {
+                // Watch out: This is probably a very expensive call but Gerta suggests to include it to get a realistic behavior!
+                if (topography.distanceToObstacle(pedestrian.getPosition()) <= requiredDistanceToObstacle) {
+                    isBlocked = true;
+                }
+            }
+        }
+
+        return  isBlocked;
+    }
+
 
     /**
      * If a threatened ingroup pedestrian is nearby, use the same reaction as if

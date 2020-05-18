@@ -129,7 +129,37 @@
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 23.0,
+            "y" : 3.75
+          }, {
+            "x" : 24.5,
+            "y" : 3.75
+          }, {
+            "x" : 24.5,
+            "y" : 5.5
+          }, {
+            "x" : 23.0,
+            "y" : 5.5
+          }, {
+            "x" : 23.0,
+            "y" : 6.5
+          }, {
+            "x" : 25.5,
+            "y" : 6.5
+          }, {
+            "x" : 25.5,
+            "y" : 3.0
+          }, {
+            "x" : 23.0,
+            "y" : 3.0
+          } ]
+        },
+        "id" : 7
+      } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
