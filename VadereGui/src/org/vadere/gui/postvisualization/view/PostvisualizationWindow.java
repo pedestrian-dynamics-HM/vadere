@@ -33,6 +33,7 @@ import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
+import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
@@ -178,6 +179,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 					public void actionPerformed(ActionEvent e) {
 						model.config.setShowPedestrians(!model.config.isShowPedestrians());
 						model.notifyObservers();
+
 					}
 
 				}, "ProjectView.btnShowPedestrian.tooltip");
@@ -187,8 +189,13 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						model.config.setShowContacts(!model.config.isShowContacts());
-						model.notifyObservers();
+						if (!model.config.isContactsRecorded()) {
+							JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
+									Messages.getString("PostVis.ShowContactsErrorMessage.text"));
+						} else {
+							model.config.setShowContacts(!model.config.isShowContacts());
+							model.notifyObservers();
+						}
 					}
 
 				}, "ProjectView.btnShowContacts.tooltip");
