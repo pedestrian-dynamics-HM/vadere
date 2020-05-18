@@ -25,13 +25,11 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
     private int sampleEveryNthStep;
     private int allowedAbsenceTimestepsIfContactReturns;
     private int minTimespanOfContactTimesteps;
-    private boolean printContacTrajectories;
-    private boolean printForPostVis;
 
 
 
     public PedestriansNearbyProcessor() {
-        super("durationTimesteps", "xCoord-Contact", "yCoord-Contact");
+        super("durationTimesteps", "xPath", "yPath");
         setAttributes(new AttributesPedestrianNearbyProcessor());
     }
 
@@ -53,14 +51,12 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
                     .map(p -> {
                         double xAverage = (ped.getPosition().getX() + p.getPosition().getX())/2.;
                         double yAverage = (ped.getPosition().getY() + p.getPosition().getY())/2.;
-                        //System.out.println("x1= " + ped.getPosition().getX() + "y1= " + ped.getPosition().getY() + "x2= " + p.getPosition().getX() + "y2= " + p.getPosition().getY() + "xAver= " + xAverage + "yAver= " + yAverage);
-                        //System.out.println("x1= " + ped.getPosition().getX() + "y1= " + ped.getPosition().getY() + "x2= " + p.getPosition().getX() + "y2= " + p.getPosition().getY() + "xAver= " + xAverage + "yAver= " + yAverage);
                         VPoint pointOfContact = new VPoint(xAverage, yAverage);
                         List<VPoint> trajectory = new ArrayList<>();
                         trajectory.add(pointOfContact);
-                        return new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep, trajectory, printContacTrajectories, printForPostVis);})
+                        return new PedestriansNearbyData(ped.getId(), p.getId(), sampleEveryNthStep, timeStep, trajectory);})
                     .collect(Collectors.toList());
-            pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPedId1(), o.getPedId2(), printForPostVis), o));
+            pedsNearby.forEach(o -> this.putValue(new TimestepPedestriansNearbyIdKey(timeStep, o.getPedId1(), o.getPedId2()), o));
         }
     }
 
@@ -103,9 +99,6 @@ public class PedestriansNearbyProcessor extends DataProcessor<TimestepPedestrian
         sampleEveryNthStep = att.getSampleEveryNthStep();
         allowedAbsenceTimestepsIfContactReturns = att.getAllowedAbsenceTimestepsIfContactReturns();
         minTimespanOfContactTimesteps = att.getMinTimespanOfContactTimesteps();
-        printContacTrajectories = att.getPrintContactTrajectories();
-        printForPostVis = att.getPrintForPostVis();
-
     }
 
     private List<DynamicElement> getDynElementsAtPosition(final Topography topography, VPoint sourcePosition, double radius) {

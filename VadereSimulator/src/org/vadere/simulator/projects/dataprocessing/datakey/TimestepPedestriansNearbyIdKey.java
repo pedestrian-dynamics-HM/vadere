@@ -13,19 +13,17 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	private final int timeStep;
 	private final int pedId1;	//smaller id
 	private final int pedId2;	//bigger id
-	private final boolean printForPostVis;
 
 
-	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB, boolean printForPostVis) {
+	public TimestepPedestriansNearbyIdKey(int timeStep, int pedA, int pedB) {
 		this.timeStep = timeStep;
 		this.pedId1 = Math.min(pedA, pedB);
 		this.pedId2 = Math.max(pedA, pedB);
-		this.printForPostVis = printForPostVis; // is an ugly one time thing that shouldn't be merged
 	}
 
 
 	public static String[] getHeaders(){
-		return new String[]{TimestepKey.getHeader(), PedestrianIdKey.getHeader(), "pedestrianNearbyId"};
+		return new String[]{"startTimeStep", "1stPedId", "2ndPedId"};
 	}
 
 	public int getTimeStep() {
@@ -41,11 +39,6 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 	}
 
 	public String[] toStrings(){
-		// printForPostVis is an ugly one time thing that shouldn't be merged
-		if (printForPostVis) {
-			//return new String[]{Integer.toString(999), Double.toString(timeStep*0.4), Double.toString(timeStep*0.4 + 0.4)};
-			return new String[]{};
-		}
 		return new String[]{Integer.toString(timeStep), Integer.toString(pedId1), Integer.toString(pedId2)};
 	}
 
@@ -93,7 +86,7 @@ public class TimestepPedestriansNearbyIdKey implements DataKey<TimestepPedestria
 
 	@Override
 	public String toString() {
-		return "TimestepPedestrianIdOverlapKey{" +
+		return "TimestepPedestriansNearbyIdKey{" +
 				"timeStep=" + timeStep +
 				", pedId1=" + pedId1 +
 				", pedId2=" + pedId2 +

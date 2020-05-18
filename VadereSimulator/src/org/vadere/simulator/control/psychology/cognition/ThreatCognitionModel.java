@@ -34,7 +34,6 @@ public class ThreatCognitionModel implements ICognitionModel {
     }
 
     @Override
-    // TODO: Maybe, use also use cooperative behavior from "CooperativeCognitionModel".
     public void update(Collection<Pedestrian> pedestrians) {
         for (Pedestrian pedestrian : pedestrians) {
             if (pedestrian.getMostImportantStimulus() instanceof Threat) {
@@ -103,20 +102,29 @@ public class ThreatCognitionModel implements ICognitionModel {
         }
     }
 
-    /* If a threatened pedestrian is nearby, use the same reaction as if
-     * the current "pedestrian" would have perceived the same threat.
-     * I.e., store the perceived threat and use "INSIDE_THREAT_AREA" to
-     * accelerate and search for a safe zone.
+    /**
+     * If a threatened ingroup pedestrian is nearby, use the same reaction as if
+     * the current "pedestrian" would have perceived the same threat. I.e, imitate
+     * the behavior of the perceived and threatened ingroup member:
+     *
+     * <ol>
+     *     <li>Firstly, accelerate and get out of threat area.</li>
+     *     <li>Then, search for a safe zone.</li>
+     * </ol>
+     *
+     * This behavior is triggered by method {@link #handleThreat(Pedestrian, Stimulus)}.
      */
     private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
-        // TODO: Maybe, alse look for "SelfCategory.INSIDE_THREAT_AREA".
         List<Pedestrian> threatenedPedestrians = getClosestPedestriansWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA);
+        List<Pedestrian> threatenedIngroupPeds = threatenedPedestrians.stream()
+                .filter(ped -> ped.getGroupMembership() == GroupMembership.IN_GROUP)
+                .collect(Collectors.toList());
 
-        if (threatenedPedestrians.isEmpty() == false) {
-            Pedestrian threatenedPedestrian = threatenedPedestrians.get(0);
+        if (threatenedIngroupPeds.isEmpty() == false) {
+            Pedestrian threatenedPedestrian = threatenedIngroupPeds.get(0);
             Threat latestThreat = threatenedPedestrian.getThreatMemory().getLatestThreat();
 
-            assert  latestThreat != null;
+            assert latestThreat != null;
 
             handleThreat(pedestrian, latestThreat);
         } else {
