@@ -351,7 +351,10 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	}
 
 	public void loadOutputFileForPostVis(File trajectoryFile, Scenario scenarioRM) throws IOException {
-		postVisualizationView.loadOutputFile(trajectoryFile, scenarioRM);
+		postVisualizationView.loadOutputFile(trajectoryFile, null,  scenarioRM);
+	}
+	public void loadOutputFileForPostVis(File trajectoryFile, File contactsTrajectoryFile, Scenario scenarioRM) throws IOException {
+		postVisualizationView.loadOutputFile(trajectoryFile, contactsTrajectoryFile, scenarioRM);
 	}
 
 	public static void setActiveTopographyErrorMsg(JEditorPane msg){

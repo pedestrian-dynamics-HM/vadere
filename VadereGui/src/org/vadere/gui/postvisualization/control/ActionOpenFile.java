@@ -80,7 +80,6 @@ public class ActionOpenFile extends ActionVisualization {
 							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.TRAJECTORY_FILE_EXTENSION);
 					Optional<File> snapshotFile =
 							IOUtils.getFirstFile(scenarioOutputDir, IOUtils.SCENARIO_FILE_EXTENSION);
-
 					if (trajectoryFile.isPresent() && snapshotFile.isPresent()) {
 						Scenario vadere = IOOutput.readScenario(snapshotFile.get().toPath());
 						model.init(IOOutput.readTrajectories(trajectoryFile.get().toPath()), vadere, trajectoryFile.get().getParent());

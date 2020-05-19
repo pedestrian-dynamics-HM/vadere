@@ -249,7 +249,7 @@
       } ],
       "dynamicElements" : [ {
         "attributes" : {
-          "id" : -1,
+          "id" : 6,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -286,7 +286,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -297,7 +300,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 7,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -334,7 +337,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -345,7 +351,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 8,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -382,7 +388,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -393,7 +402,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 9,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -430,7 +439,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -441,7 +453,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 10,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -478,7 +490,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -489,7 +504,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 11,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -526,7 +541,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -537,7 +555,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 12,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -574,7 +592,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -585,7 +606,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 13,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -622,7 +643,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -633,7 +657,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 14,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -670,7 +694,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -681,7 +708,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 15,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -718,7 +745,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -729,7 +759,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 16,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -766,7 +796,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -777,7 +810,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 17,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -814,7 +847,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -825,7 +861,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 18,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -862,7 +898,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -873,7 +912,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 19,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -910,7 +949,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -921,7 +963,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 20,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -958,7 +1000,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -969,7 +1014,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 21,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1006,7 +1051,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1017,7 +1065,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 22,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1054,7 +1102,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1065,7 +1116,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 23,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1102,7 +1153,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1113,7 +1167,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 24,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1150,7 +1204,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1161,7 +1218,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 25,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1198,7 +1255,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1209,7 +1269,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 26,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1246,7 +1306,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1257,7 +1320,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 27,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1294,7 +1357,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1305,7 +1371,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 28,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1342,7 +1408,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1353,7 +1422,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 29,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1390,7 +1459,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1401,7 +1473,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 30,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1438,7 +1510,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1449,7 +1524,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 31,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1486,7 +1561,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1497,7 +1575,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 32,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1534,7 +1612,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1545,7 +1626,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 33,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1582,7 +1663,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1593,7 +1677,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 34,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1630,7 +1714,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1641,7 +1728,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 35,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1678,7 +1765,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1689,7 +1779,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 36,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1726,7 +1816,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1737,7 +1830,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 37,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1774,7 +1867,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1785,7 +1881,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 38,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1822,7 +1918,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1833,7 +1932,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 39,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1870,7 +1969,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1881,7 +1983,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 40,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1918,7 +2020,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1929,7 +2034,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 41,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -1966,7 +2071,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -1977,7 +2085,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 42,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2014,7 +2122,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2025,7 +2136,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 43,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2062,7 +2173,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2073,7 +2187,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 44,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2110,7 +2224,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2121,7 +2238,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 45,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2158,7 +2275,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2169,7 +2289,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 46,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2206,7 +2326,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2217,7 +2340,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 47,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2254,7 +2377,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2265,7 +2391,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 48,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2302,7 +2428,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2313,7 +2442,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 49,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2350,7 +2479,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2361,7 +2493,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 50,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2398,7 +2530,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2409,7 +2544,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 51,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2446,7 +2581,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2457,7 +2595,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 52,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2494,7 +2632,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2505,7 +2646,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 53,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2542,7 +2683,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2553,7 +2697,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 54,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2590,7 +2734,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2601,7 +2748,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 55,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2638,7 +2785,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2649,7 +2799,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 56,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2686,7 +2836,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2697,7 +2850,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 57,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2734,7 +2887,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2745,7 +2901,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 58,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2782,7 +2938,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2793,7 +2952,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 59,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2830,7 +2989,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2841,7 +3003,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 60,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2878,7 +3040,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2889,7 +3054,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 61,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2926,7 +3091,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2937,7 +3105,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 62,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -2974,7 +3142,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -2985,7 +3156,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 63,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3022,7 +3193,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3033,7 +3207,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 64,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3070,7 +3244,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3081,7 +3258,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 65,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3118,7 +3295,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3129,7 +3309,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 66,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3166,7 +3346,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3177,7 +3360,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 67,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3214,7 +3397,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3225,7 +3411,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 68,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3262,7 +3448,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3273,7 +3462,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 69,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3310,7 +3499,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3321,7 +3513,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 70,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3358,7 +3550,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3369,7 +3564,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 71,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3406,7 +3601,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3417,7 +3615,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 72,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3454,7 +3652,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3465,7 +3666,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 73,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3502,7 +3703,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3513,7 +3717,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 74,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3550,7 +3754,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3561,7 +3768,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 75,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3598,7 +3805,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3609,7 +3819,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 76,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3646,7 +3856,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3657,7 +3870,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 77,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3694,7 +3907,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3705,7 +3921,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 78,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3742,7 +3958,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3753,7 +3972,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 79,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3790,7 +4009,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3801,7 +4023,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 80,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3838,7 +4060,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3849,7 +4074,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 81,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3886,7 +4111,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3897,7 +4125,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 82,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3934,7 +4162,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3945,7 +4176,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 83,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -3982,7 +4213,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -3993,7 +4227,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 84,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4030,7 +4264,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4041,7 +4278,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 85,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4078,7 +4315,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4089,7 +4329,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 86,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4126,7 +4366,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4137,7 +4380,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 87,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4174,7 +4417,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4185,7 +4431,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 88,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4222,7 +4468,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4233,7 +4482,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 89,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4270,7 +4519,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4281,7 +4533,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 90,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4318,7 +4570,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4329,7 +4584,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 91,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4366,7 +4621,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4377,7 +4635,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 92,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4414,7 +4672,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4425,7 +4686,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 93,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4462,7 +4723,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4473,7 +4737,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 94,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4510,7 +4774,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4521,7 +4788,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 95,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4558,7 +4825,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4569,7 +4839,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 96,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4606,7 +4876,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4617,7 +4890,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 97,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4654,7 +4927,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4665,7 +4941,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 98,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4702,7 +4978,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4713,7 +4992,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 99,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4750,7 +5029,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4761,7 +5043,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 100,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4798,7 +5080,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4809,7 +5094,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 101,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4846,7 +5131,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4857,7 +5145,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 102,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4894,7 +5182,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4905,7 +5196,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 103,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4942,7 +5233,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -4953,7 +5247,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 104,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -4990,7 +5284,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5001,7 +5298,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 105,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5038,7 +5335,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5049,7 +5349,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 106,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5086,7 +5386,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5097,7 +5400,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 107,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5134,7 +5437,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5145,7 +5451,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 108,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5182,7 +5488,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5193,7 +5502,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 109,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5230,7 +5539,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5241,7 +5553,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 110,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5278,7 +5590,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5289,7 +5604,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 111,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5326,7 +5641,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5337,7 +5655,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 112,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5374,7 +5692,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5385,7 +5706,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 113,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5422,7 +5743,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5433,7 +5757,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 114,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5470,7 +5794,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5481,7 +5808,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 115,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5518,7 +5845,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5529,7 +5859,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 116,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5566,7 +5896,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5577,7 +5910,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 117,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5614,7 +5947,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5625,7 +5961,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 118,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5662,7 +5998,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5673,7 +6012,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 119,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5710,7 +6049,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5721,7 +6063,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 120,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5758,7 +6100,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5769,7 +6114,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 121,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5806,7 +6151,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5817,7 +6165,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 122,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5854,7 +6202,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5865,7 +6216,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 123,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5902,7 +6253,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5913,7 +6267,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 124,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5950,7 +6304,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -5961,7 +6318,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 125,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -5998,7 +6355,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6009,7 +6369,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 126,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6046,7 +6406,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6057,7 +6420,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 127,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6094,7 +6457,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6105,7 +6471,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 128,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6142,7 +6508,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6153,7 +6522,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 129,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6190,7 +6559,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6201,7 +6573,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 130,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6238,7 +6610,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6249,7 +6624,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 131,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6286,7 +6661,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6297,7 +6675,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 132,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6334,7 +6712,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6345,7 +6726,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 133,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6382,7 +6763,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6393,7 +6777,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 134,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6430,7 +6814,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6441,7 +6828,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 135,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6478,7 +6865,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6489,7 +6879,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 136,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6526,7 +6916,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6537,7 +6930,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 137,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6574,7 +6967,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6585,7 +6981,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 138,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6622,7 +7018,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6633,7 +7032,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 139,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6670,7 +7069,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6681,7 +7083,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 140,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6718,7 +7120,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6729,7 +7134,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 141,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6766,7 +7171,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6777,7 +7185,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 142,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6814,7 +7222,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6825,7 +7236,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 143,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6862,7 +7273,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6873,7 +7287,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 144,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6910,7 +7324,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6921,7 +7338,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 145,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -6958,7 +7375,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -6969,7 +7389,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 146,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7006,7 +7426,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7017,7 +7440,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 147,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7054,7 +7477,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7065,7 +7491,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 148,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7102,7 +7528,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7113,7 +7542,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 149,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7150,7 +7579,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7161,7 +7593,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 150,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7198,7 +7630,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7209,7 +7644,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 151,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7246,7 +7681,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7257,7 +7695,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 152,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7294,7 +7732,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7305,7 +7746,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 153,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7342,7 +7783,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7353,7 +7797,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 154,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7390,7 +7834,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7401,7 +7848,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 155,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7438,7 +7885,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7449,7 +7899,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 156,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7486,7 +7936,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7497,7 +7950,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 157,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7534,7 +7987,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7545,7 +8001,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 158,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7582,7 +8038,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7593,7 +8052,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 159,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7630,7 +8089,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7641,7 +8103,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 160,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7678,7 +8140,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7689,7 +8154,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 161,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7726,7 +8191,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7737,7 +8205,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 162,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7774,7 +8242,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7785,7 +8256,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 163,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7822,7 +8293,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7833,7 +8307,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 164,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7870,7 +8344,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7881,7 +8358,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 165,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7918,7 +8395,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7929,7 +8409,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 166,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -7966,7 +8446,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -7977,7 +8460,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 167,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8014,7 +8497,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8025,7 +8511,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 168,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8062,7 +8548,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8073,7 +8562,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 169,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8110,7 +8599,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8121,7 +8613,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 170,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8158,7 +8650,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8169,7 +8664,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 171,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8206,7 +8701,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8217,7 +8715,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 172,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8254,7 +8752,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8265,7 +8766,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 173,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8302,7 +8803,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8313,7 +8817,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 174,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8350,7 +8854,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8361,7 +8868,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 175,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8398,7 +8905,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8409,7 +8919,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 176,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8446,7 +8956,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8457,7 +8970,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 177,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8494,7 +9007,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8505,7 +9021,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 178,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8542,7 +9058,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8553,7 +9072,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 179,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8590,7 +9109,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8601,7 +9123,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 180,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8638,7 +9160,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8649,7 +9174,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 181,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8686,7 +9211,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8697,7 +9225,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 182,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8734,7 +9262,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8745,7 +9276,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 183,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8782,7 +9313,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8793,7 +9327,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 184,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8830,7 +9364,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8841,7 +9378,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 185,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8878,7 +9415,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8889,7 +9429,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 186,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8926,7 +9466,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8937,7 +9480,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 187,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -8974,7 +9517,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -8985,7 +9531,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 188,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9022,7 +9568,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9033,7 +9582,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 189,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9070,7 +9619,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9081,7 +9633,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 190,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9118,7 +9670,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9129,7 +9684,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 191,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9166,7 +9721,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9177,7 +9735,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 192,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9214,7 +9772,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9225,7 +9786,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 193,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9262,7 +9823,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9273,7 +9837,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 194,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9310,7 +9874,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9321,7 +9888,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 195,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9358,7 +9925,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9369,7 +9939,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 196,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9406,7 +9976,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9417,7 +9990,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 197,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9454,7 +10027,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9465,7 +10041,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 198,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9502,7 +10078,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9513,7 +10092,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 199,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9550,7 +10129,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9561,7 +10143,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 200,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9598,7 +10180,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9609,7 +10194,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 201,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9646,7 +10231,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9657,7 +10245,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 202,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9694,7 +10282,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9705,7 +10296,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 203,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9742,7 +10333,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9753,7 +10347,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 204,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9790,7 +10384,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -9801,7 +10398,7 @@
         "type" : "PEDESTRIAN"
       }, {
         "attributes" : {
-          "id" : -1,
+          "id" : 205,
           "radius" : 0.2,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -9838,7 +10435,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

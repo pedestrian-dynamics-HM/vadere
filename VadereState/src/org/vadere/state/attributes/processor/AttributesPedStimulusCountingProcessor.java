@@ -4,6 +4,8 @@ public class AttributesPedStimulusCountingProcessor extends AttributesProcessor 
 
 	private String informationFilter = "";
 	private boolean isRegexFilter = false;
+	private double stopIfPercentageIsInformed = 0.95;
+	private int numberOfAdditionalTimeFrames = 20;
 
 	public String getInformationFilter() {
 		return informationFilter;
@@ -23,5 +25,11 @@ public class AttributesPedStimulusCountingProcessor extends AttributesProcessor 
 		isRegexFilter = regexFilter;
 	}
 
+	public int getNumberOfAdditionalTimeFrames() {
+		return numberOfAdditionalTimeFrames;
+	}
 
+	public double getStopIfPercentageIsInformed() {
+		return stopIfPercentageIsInformed;
+	}
 }

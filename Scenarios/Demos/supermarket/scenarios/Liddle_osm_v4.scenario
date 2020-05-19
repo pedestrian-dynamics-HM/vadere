@@ -1,15 +1,15 @@
 {
-  "name" : "scenario001",
+  "name" : "Liddle_osm_v4",
   "description" : "",
   "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 5, 6 ]
+      "processors" : [ 1, 2 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
+      "filename" : "overlap.csv",
       "processors" : [ 3 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -17,10 +17,16 @@
       "processors" : [ 4 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "pedsNearby.txt",
-      "processors" : [ 8 ]
+      "filename" : "contacts.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 2
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 3
     }, {
@@ -31,14 +37,15 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 5
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 6
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
-      "id" : 8
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.5,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -50,7 +57,7 @@
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "optimizationType" : "NELDER_MEAD",
-        "varyStepDirection" : true,
+        "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
@@ -100,15 +107,15 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 50.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.5,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
-      "fixedSeed" : 183115877309837713,
+      "useFixedSeed" : false,
+      "fixedSeed" : 1,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
@@ -123,8 +130,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 10.0,
-          "height" : 10.0
+          "width" : 20.0,
+          "height" : 15.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -132,33 +139,51 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 0.5,
-          "y" : 5.3,
-          "width" : 6.7,
-          "height" : 1.0,
+          "x" : 3.0,
+          "y" : 9.0,
+          "width" : 5.0,
+          "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : 3
+        "id" : 1
       }, {
         "shape" : {
-          "x" : 2.0,
-          "y" : 2.7,
-          "width" : 7.5,
-          "height" : 1.3,
+          "x" : 3.0,
+          "y" : 0.0,
+          "width" : 5.0,
+          "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "id" : 4
+        "id" : 2
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 8.5,
+          "y" : 6.0,
+          "width" : 1.0,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 8.0,
+          "y" : 5.6,
+          "width" : 2.0,
+          "height" : 4.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      } ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 2,
+        "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 6.6,
-          "y" : 0.8,
-          "width" : 2.4,
-          "height" : 1.6,
+          "x" : 1.0,
+          "y" : 6.8,
+          "width" : 1.4,
+          "height" : 1.4,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -172,36 +197,36 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 1,
+        "id" : 3,
         "shape" : {
-          "x" : 1.0,
-          "y" : 7.504761904761905,
-          "width" : 2.0095238095238095,
-          "height" : 1.4952380952380953,
+          "x" : 14.0,
+          "y" : 2.5,
+          "width" : 5.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : 8,
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 100,
+        "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
-        "endTime" : 50.0,
+        "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2 ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "radius" : 0.2,
+        "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
+        "minimumSpeed" : 0.01,
+        "maximumSpeed" : 5.0,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,

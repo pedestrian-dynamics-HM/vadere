@@ -98,6 +98,15 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		});
 		cmd.setResponse(response);
 
+		// check RemoteManager if simulation is ended prematurely. This can happen if the
+		// a finish state is reached earlier than the given simulation time. In this case
+		// inform the TraCI client about this instead of giving it the Subscription results.
+		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
+			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
+			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
+			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+		}
+
 		logger.debug("process_simStep done.");
 		return cmd;
 	}
