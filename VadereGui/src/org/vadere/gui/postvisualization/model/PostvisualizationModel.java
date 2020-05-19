@@ -104,6 +104,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
 		if (contactTrajectories != null) {
+			this.config.setContactsRecorded(true);
 			this.contactData = new ContactData(contactTrajectories);
 		}
 		this.visTime = 0;
