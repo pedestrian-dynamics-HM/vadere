@@ -72,7 +72,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
-			//else if
 		}
 	}
 

@@ -66,7 +66,6 @@ public class ThreatCognitionModel implements ICognitionModel {
         } else {
             // Check if pedestrian re-entered the same threat area.
             Threat oldThreat = pedestrian.getThreatMemory().getLatestThreat();
-
             isNewThreat = oldThreat.getOriginAsTargetId() != threat.getOriginAsTargetId();
         }
 
