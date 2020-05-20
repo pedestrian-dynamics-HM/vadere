@@ -160,9 +160,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderConnectingLinesByContact(Graphics2D g) {
-		boolean showContacts = model.config.isShowContacts() &&
-				model.getContactData() != null &&
-				model.config.isShowAllTrajectories(); // TODO Why do "showContacts" depend on "showAllTrajectories"?
+		boolean showContacts = model.config.isShowContacts() && model.getContactData() != null;
 
 		if (showContacts) {
 			Color savedColor = g.getColor();
