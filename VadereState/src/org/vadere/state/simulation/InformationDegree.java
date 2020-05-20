@@ -29,5 +29,7 @@ public class InformationDegree {
         return valueLine;
     }
 
-
+    public double getPercentageInformed() {
+        return percentageInformed;
+    }
 }
