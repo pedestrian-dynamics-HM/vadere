@@ -2,7 +2,6 @@ package org.vadere.gui.postvisualization.view;
 
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.gui.renderer.agent.AgentRender;
@@ -14,8 +13,9 @@ import tech.tablesaw.api.Table;
 
 import java.awt.*;
 import java.awt.geom.Path2D;
-import java.util.*;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PostvisualizationRenderer extends SimulationRenderer {
 
@@ -40,48 +40,10 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	protected void renderSimulationContent(final Graphics2D g) {
 
 		if (!model.isEmpty()) {
-			renderTrajectories(g);
-			if (model.config.isShowContacts() && model.getContactData() != null) {
-				renderConnectingLinesByContact(g);
-			}
-		}
-	}
+			Color savedColor = g.getColor();
 
-	private void renderConnectingLinesByContact(Graphics2D g) {
-		if (!model.config.isShowAllTrajectories()) return;
-		Color color = g.getColor();
-		Stroke stroke = g.getStroke();
-		g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
-		g.setColor(Color.red);
-
-		Collection<Pedestrian> agents = model.getPedestrians();
-		Map<Integer, VPoint> pedPositions = new HashMap<>();
-		agents.forEach(a -> pedPositions.put(a.getId(), a.getPosition()));
-		Table pairs = model.getContactData().getPairsOfPedestriansInContactAt(model.getSimTimeInSec());
-		
-		for (Row row: pairs) {
-			int id1 = row.getInt(0);
-			int id2 = row.getInt(1);
-			VPoint ped1Pos = pedPositions.get(id1);
-			VPoint ped2Pos = pedPositions.get(id2);
-			Path2D.Double path = new Path2D.Double();
-			path.moveTo(ped1Pos.x, ped1Pos.y);
-			path.lineTo(ped2Pos.x, ped2Pos.y);
-			draw(path, g);
-
-			// paint agents in contact red
-			if (model.config.isShowPedestrians()) {
-				agents.stream().filter(a -> a.getId() == id1 || a.getId() == id2).forEach(a -> getAgentRender().render(a, Color.red, g));
-			}
-		}
-
-		g.setStroke(stroke);
-		g.setColor(color);
-	}
-
-	private void renderTrajectories(final Graphics2D g) {
-		Color color = g.getColor();
-		AgentRender agentRender = getAgentRender();
+			Table slice = (model.config.isShowAllTrajectories()) ? model.getAppearedPedestrians() : model.getAlivePedestrians() ;
+			Collection<Pedestrian> pedestrians = model.getPedestrians();
 
 			Map<Integer, Color> pedestrianColors = new HashMap<>();
 			pedestrians.forEach(ped -> pedestrianColors.put(ped.getId(),  getPedestrianColor(ped)));
@@ -90,12 +52,14 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			renderPedestrians(g, pedestrians, pedestrianColors);
 
 			g.setColor(savedColor);
-		}
 
+			if (model.config.isShowContacts() && model.getContactData() != null) {
+				renderConnectingLinesByContact(g);
+			}
+		}
 	}
 
-		Map<Integer, Color> agentColors = new HashMap<>();
-		agents.forEach(agent -> agentColors.put(agent.getId(), getPedestrianColor(agent)));
+	private void renderTrajectories(Graphics2D g, Table slice, Map<Integer, Color> pedestrianColors) {
 
 		Color savedColor = g.getColor();
 		Stroke savedStroke = g.getStroke();
@@ -103,14 +67,14 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		TableTrajectoryFootStep trajectories = model.getTrajectories();
 
 		if (model.config.isShowTrajectories()) {
-			for (Row row : slice) {
+			for(Row row : slice) {
 				boolean isLastStep = row.getDouble(trajectories.endTimeCol) > model.getSimTimeInSec();
 				double startX = row.getDouble(trajectories.startXCol);
 				double startY = row.getDouble(trajectories.startYCol);
 				double endX = row.getDouble(trajectories.endXCol);
 				double endY = row.getDouble(trajectories.endYCol);
 
-				if (isLastStep && model.config.isInterpolatePositions()) {
+				if(isLastStep && model.config.isInterpolatePositions()) {
 					VPoint interpolatedPos = FootStep.interpolateFootStep(startX, startY, endX, endY, row.getDouble(trajectories.startTimeCol), row.getDouble(trajectories.endTimeCol), model.getSimTimeInSec());
 					endX = interpolatedPos.getX();
 					endY = interpolatedPos.getY();
@@ -122,8 +86,8 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 					g.setColor(Color.MAGENTA);
 					g.setStroke(new BasicStroke(getLineWidth() / 2.0f));
 				} else {
-					Color cc = agentColors.get(pedId);
-					if (cc == null) {
+					Color cc = pedestrianColors.get(pedId);
+					if(cc == null) {
 						System.out.println("wtf");
 					}
 					g.setColor(pedestrianColors.get(pedId));
@@ -146,9 +110,10 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		AgentRender agentRender = getAgentRender();
 
 		if (model.config.isShowPedestrians()) {
-			for (Pedestrian agent : agents) {
-				if (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId())) {
-					agentRender.render(agent, agentColors.get(agent.getId()), g);
+			for(Pedestrian pedestrian : pedestrians) {
+				if (model.config.isShowFaydedPedestrians() || model.isAlive(pedestrian.getId())) {
+					agentRender.render(pedestrian, agentColors.get(pedestrian.getId()), g);
+
 					if (model.config.isShowPedestrianIds()) {
 						DefaultRenderer.paintAgentId(g, pedestrian);
 					}
@@ -197,6 +162,36 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		}
 	}
 
+	private void renderConnectingLinesByContact(Graphics2D g) {
+		if (!model.config.isShowAllTrajectories()) return;
+		Color color = g.getColor();
+		Stroke stroke = g.getStroke();
+		g.setStroke(new BasicStroke(getLineWidth() / 4.0f));
+		g.setColor(Color.red);
+
+		Collection<Pedestrian> agents = model.getPedestrians();
+		Map<Integer, VPoint> pedPositions = new HashMap<>();
+		agents.forEach(a -> pedPositions.put(a.getId(), a.getPosition()));
+		Table pairs = model.getContactData().getPairsOfPedestriansInContactAt(model.getSimTimeInSec());
+
+		for (Row row: pairs) {
+			int id1 = row.getInt(0);
+			int id2 = row.getInt(1);
+			VPoint ped1Pos = pedPositions.get(id1);
+			VPoint ped2Pos = pedPositions.get(id2);
+			Path2D.Double path = new Path2D.Double();
+			path.moveTo(ped1Pos.x, ped1Pos.y);
+			path.lineTo(ped2Pos.x, ped2Pos.y);
+			draw(path, g);
+
+			// paint agents in contact red
+			if (model.config.isShowPedestrians()) {
+				agents.stream().filter(a -> a.getId() == id1 || a.getId() == id2).forEach(a -> getAgentRender().render(a, Color.red, g));
+			}
+		}
+
+		g.setStroke(stroke);
+		g.setColor(color);
+	}
+
 }
-
-
