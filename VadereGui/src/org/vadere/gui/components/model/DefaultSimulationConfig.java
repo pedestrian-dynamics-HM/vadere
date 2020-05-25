@@ -33,6 +33,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
 	private boolean showContacts = true;
+	private boolean contactsRecorded = false;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
 	private boolean showTargetPotentielFieldMesh = false;
@@ -109,6 +110,13 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showContacts;
 	}
 
+	public boolean isContactsRecorded() {
+		return contactsRecorded;
+	}
+
+	public void setContactsRecorded(boolean contactsRecorded) {
+		this.contactsRecorded = contactsRecorded;
+	}
 
 	public boolean isShowWalkdirection() {
 		return showWalkdirection;
