@@ -73,19 +73,10 @@ public class SimulationCfg {
 	}
 
 	public String outputPath() {
-		if (outputVecFile.endsWith(".vec")) {
-			return outputVecFile.substring(0, outputVecFile.length() - 4);
-		}
-		if (outputScalarFile.endsWith(".sca")) {
-			return outputScalarFile.substring(0, outputScalarFile.length() - 4);
-		}
-		return String.format("%s/%s/%s/%s_vars_%s_rep_%s",
+		return String.format("%s/%s_%s/vadere.d",
 				resultRootDir,
 				configName,
-				experiment,
-				dateTime,
-				iterationVariables,
-				repetition
+				experiment
 		);
 	}
 
