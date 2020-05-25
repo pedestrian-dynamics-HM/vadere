@@ -21,7 +21,8 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 
 
 	public RemoteScenarioRun(Scenario scenario, Path outputDir, RunnableFinishedListener scenarioFinishedListener, Path scenarioPath, ScenarioCache scenarioCache) {
-		super(scenario, outputDir.toString(), scenarioFinishedListener, scenarioPath, scenarioCache);
+		// overwriteTimestampSetting. In RemoteScenarioRun the caller defines where the output should go.
+		super(scenario, outputDir.toString(), true,scenarioFinishedListener, scenarioPath, scenarioCache);
 		this.singleStepMode = true;
 		this.waitForLoopEnd = new Object();
 		this.lock = new ReentrantLock();
