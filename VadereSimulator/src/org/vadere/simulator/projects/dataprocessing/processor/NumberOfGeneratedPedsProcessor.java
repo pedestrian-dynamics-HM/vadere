@@ -30,8 +30,7 @@ public class NumberOfGeneratedPedsProcessor extends DataProcessor<TimestepKey, D
         if ( t + 1e-7 >= getAttributes().getStartTime() &&  t - 1e-7 <= getAttributes().getEndTime() ) {
 
             int numAgentsGen;
-            Collection<Pedestrian> peds2 = state.getTopography().getElements(Pedestrian.class);
-            List<Integer> newPedIds = peds2.stream().map(Agent::getId).collect(Collectors.toList());
+            List<Integer> newPedIds = state.getTopography().getElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toList());
 
             if (this.getPedsIds() == null){
                 numAgentsGen = newPedIds.size();

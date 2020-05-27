@@ -2,7 +2,7 @@ package org.vadere.state.attributes.processor;
 
 public class AttributesNumberOfGeneratedPedsProcessor extends AttributesProcessor {
 
-    private double startTime = 10.0;
+    private double startTime = 0.0;
     private double endTime = -1; // -1 until simulation finished
 
 
@@ -14,7 +14,7 @@ public class AttributesNumberOfGeneratedPedsProcessor extends AttributesProcesso
         if (endTime >= startTime - 1e-7)
             return endTime;
         else
-            return Float.POSITIVE_INFINITY;
+            return Double.MAX_VALUE;
 
     }
 }
