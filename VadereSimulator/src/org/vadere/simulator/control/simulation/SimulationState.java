@@ -77,7 +77,8 @@ public class SimulationState {
 	}
 
 	public  void setSimStop(boolean stop){
-		this.simStop = stop;
+		if (!this.simStop)
+			this.simStop = stop;
 	}
 
 	public boolean isSimStop() {
