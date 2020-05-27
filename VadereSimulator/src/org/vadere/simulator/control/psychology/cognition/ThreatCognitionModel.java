@@ -56,6 +56,12 @@ public class ThreatCognitionModel implements ICognitionModel {
         // Current stimulus is a threat => store it and make clear that pedestrian is inside threat area.
         pedestrian.getThreatMemory().add((Threat) stimulus);
         pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
+
+        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
+        // so that agents directly search a safe zone if they are blocked by a wall.
+        if (pedestrianIsBlockedByObstacle(pedestrian, topography)) {
+            pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
+        }
     }
 
     private boolean isNewThreatForPedestrian(Pedestrian pedestrian, Threat threat) {
@@ -96,7 +102,8 @@ public class ThreatCognitionModel implements ICognitionModel {
         boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
         boolean pedestrianIsBlockedByObstacle = pedestrianIsBlockedByObstacle(pedestrian, topography);
 
-        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA to agents if they are blocked by a wall.
+        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
+        // so that agents directly search a safe zone if they are blocked by a wall.
         if (pedestrianIsInsideThreatArea && pedestrianIsBlockedByObstacle == false) {
             pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
         } else {
