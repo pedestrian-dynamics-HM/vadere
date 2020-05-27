@@ -11,6 +11,10 @@ public class AttributesNumberOfGeneratedPedsProcessor extends AttributesProcesso
     }
 
     public double getEndTime() {
-        return endTime;
+        if (endTime >= startTime - 1e-7)
+            return endTime;
+        else
+            return Float.POSITIVE_INFINITY;
+
     }
 }
