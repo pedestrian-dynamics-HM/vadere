@@ -74,16 +74,16 @@ public class ParadeLengthProcessor extends DataProcessor<TimestepKey, Double> {
 		int timestepFirstLeaves = (int) Math.round(timeFirstLeaves / simTimeStepLength);
 
 		// find all timesteps between timeAllSpawned and timeFirstLeaves
-		Set<TimestepPedestrianIdKey> time_step_keys = pedestrianPotentialProcessor.getKeys().stream().
+		Set<TimestepPedestrianIdKey> timestepKeys = pedestrianPotentialProcessor.getKeys().stream().
 				filter(key -> (key.getTimestep() >= timestepAllSpawned && key.getTimestep() < timestepFirstLeaves)).collect(Collectors.toSet());
 
 		Set<Integer> timesteps = new HashSet<>();
-		time_step_keys.stream().forEach(key -> timesteps.add(key.getTimestep()));
+		timestepKeys.stream().forEach(key -> timesteps.add(key.getTimestep()));
 
 		// for each time step between timestepAllSpawned and timestepFirstLeaves, calculate the parade length
 		for (Integer timestep : timesteps) {
 			// get all TimestepPedestrianIdKey in potential for this timestep
-			List<TimestepPedestrianIdKey> timestepKeyi = time_step_keys.stream().filter(key -> key.getTimestep().equals(timestep)).collect(Collectors.toList());
+			List<TimestepPedestrianIdKey> timestepKeyi = timestepKeys.stream().filter(key -> key.getTimestep().equals(timestep)).collect(Collectors.toList());
 
 			calculateParadeLengthPerTimestep(timestepKeyi, timestep.intValue());
 		}
