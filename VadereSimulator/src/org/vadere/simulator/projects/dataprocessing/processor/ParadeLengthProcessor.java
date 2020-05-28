@@ -14,7 +14,12 @@ import java.util.stream.Collectors;
 
 /**
  * @author Marion Goedel
- * Evaluates the length of a parade, based on the PedestrianPotentialProcessor
+ * Evaluates the length of a parade, based on the PedestrianPotentialProcessor.
+ * The length of the parade is given in travel time by calculating the difference in the potential.
+ * The difference in potential is calculated between the average of the first numberOfAgentsAveraged agents and the
+ * average of the last numberOfAgentsAveraged agents.
+ * The parade length is only evaluated for the timesteps in which all agents are spawned.
+ * That means, it will not work with continuous spawning.
  */
 
 @DataProcessorClass()
@@ -61,42 +66,28 @@ public class ParadeLengthProcessor extends DataProcessor<TimestepKey, Double> {
 		double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
 		// find first timestep (last agent is spawned) [s]
-		double time_all_spawned = Collections.max(pedestrianStartTimeProcessor.getValues());
-		int time_step_all_spawned = (int) Math.round(time_all_spawned / simTimeStepLength);
+		double timeAllSpawned = Collections.max(pedestrianStartTimeProcessor.getValues());
+		int timestepAllSpawned = (int) Math.round(timeAllSpawned / simTimeStepLength);
 
 		// find last timestep (first agent reaches its target) [s]
-		double time_first_leaves = Collections.min(pedestrianEvacuationTimeProcessor.getValues());
-		int time_step_first_leaves = (int) Math.round(time_first_leaves / simTimeStepLength);
+		double timeFirstLeaves = Collections.min(pedestrianEvacuationTimeProcessor.getValues());
+		int timestepFirstLeaves = (int) Math.round(timeFirstLeaves / simTimeStepLength);
 
-		// find all Timesteps between time_all_spawned and time_first_leaves
-		Set<Integer> time_steps = new HashSet<>();
-
+		// find all timesteps between timeAllSpawned and timeFirstLeaves
 		Set<TimestepPedestrianIdKey> time_step_keys = pedestrianPotentialProcessor.getKeys().stream().
-				filter(key -> (key.getTimestep() >= time_step_all_spawned && key.getTimestep() < time_step_first_leaves)).collect(Collectors.toSet());
+				filter(key -> (key.getTimestep() >= timestepAllSpawned && key.getTimestep() < timestepFirstLeaves)).collect(Collectors.toSet());
 
-		time_step_keys.stream().forEach(key -> time_steps.add(key.getTimestep()));
+		Set<Integer> timesteps = new HashSet<>();
+		time_step_keys.stream().forEach(key -> timesteps.add(key.getTimestep()));
 
-		for (Integer time_step : time_steps) {
-			List<TimestepPedestrianIdKey> time_step_keys_i = time_step_keys.stream().filter(key -> key.getTimestep().equals(time_step)).collect(Collectors.toList());
+		// for each time step between timestepAllSpawned and timestepFirstLeaves, calculate the parade length
+		for (Integer timestep : timesteps) {
+			// get all TimestepPedestrianIdKey in potential for this timestep
+			List<TimestepPedestrianIdKey> timestepKeyi = time_step_keys.stream().filter(key -> key.getTimestep().equals(timestep)).collect(Collectors.toList());
 
-			TreeSet<Double> potential = new TreeSet();
-			time_step_keys_i.stream().forEach(key -> potential.add(pedestrianPotentialProcessor.getValue(key)));
-
-			if(potential.size() >= this.numberOfAgentsAveraged) {
-				OptionalDouble min_potential = potential.stream().limit(this.numberOfAgentsAveraged).mapToDouble(p -> p).average();
-				List<Double> f = new ArrayList(potential);
-				OptionalDouble max_potential = f.subList(potential.size() - this.numberOfAgentsAveraged, potential.size()).stream().mapToDouble(p -> p).average();
-
-				if (min_potential.isPresent() && max_potential.isPresent()) {
-					double paradeLength = max_potential.getAsDouble() - min_potential.getAsDouble();
-					putValue(new TimestepKey(time_step), paradeLength);
-				}
-			}else{
-				logger.warn("Make sure that numberOfAgentsAveraged is smaller than your spawnNumber!");
-			}
-
-
+			calculateParadeLengthPerTimestep(timestepKeyi, timestep.intValue());
 		}
+
 	}
 
 	@Override
@@ -106,5 +97,32 @@ public class ParadeLengthProcessor extends DataProcessor<TimestepKey, Double> {
 		}
 
 		return super.getAttributes();
+	}
+
+	private void calculateParadeLengthPerTimestep(List<TimestepPedestrianIdKey> timestepKeyi, int timestep ) {
+
+		// collect all potential values
+		TreeSet<Double> potential = new TreeSet();
+		timestepKeyi.stream().forEach(key -> potential.add(pedestrianPotentialProcessor.getValue(key)));
+
+		if (potential.size() >= this.numberOfAgentsAveraged) {
+			// todo: consider using median instead of average to avoid impact of agents which far ahead / behind
+
+			// find the  lowest numberOfAgentsAveraged values of the potential and average them
+			OptionalDouble minPotential = potential.stream().limit(this.numberOfAgentsAveraged).mapToDouble(p -> p).average();
+
+			// find the  highest numberOfAgentsAveraged values of the potential and average them
+			List<Double> shortlistPotential = new ArrayList(potential);
+			OptionalDouble maxPotential = shortlistPotential.subList(potential.size() - this.numberOfAgentsAveraged, potential.size()).stream().mapToDouble(p -> p).average();
+
+			if (minPotential.isPresent() && maxPotential.isPresent()) {
+				// paradeLength is the difference between the highest and lowest potential values
+				// todo: transform to meters with speed, e.g. freeflowspeedmean
+				double paradeLength = maxPotential.getAsDouble() - minPotential.getAsDouble();
+				putValue(new TimestepKey(timestep), paradeLength);
+			}
+		} else {
+			logger.warn("Make sure that numberOfAgentsAveraged is smaller than your spawnNumber!");
+		}
 	}
 }
