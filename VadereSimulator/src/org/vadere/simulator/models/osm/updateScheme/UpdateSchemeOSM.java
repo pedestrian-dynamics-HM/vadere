@@ -25,6 +25,9 @@ import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import java.util.List;
 import java.util.Random;
 
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_CPU;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
+
 public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian>, DynamicElementAddListener<Pedestrian> {
 
 	enum CallMethod {
@@ -69,28 +72,32 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			double cellSize = new AttributesPotentialCompact().getPedPotentialWidth() + maxStepSize + 0.4;
 
 			switch (updateType) {
-				case EVENT_DRIVEN_CL: {
+				case EVENT_DRIVEN_CL_CPU:
+				case EVENT_DRIVEN_CL_GPU: {
 					CLParallelEventDrivenOSM clOptimalStepsModel = new CLParallelEventDrivenOSM(
 							attributesOSM,
 							attributesFloorField,
 							new VRectangle(topography.getBounds()),
 							targetEikonalSolver,
 							distanceEikonalSolver,
+							updateType.isGPUScheme() ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU,
 							cellSize);
 					return new CLUpdateSchemeEventDriven(topography, clOptimalStepsModel);
 				}
-				case PARALLEL_CL:
-				case PARALLEL_OPEN_CL:  {
+				case PARALLEL_CL_CPU:
+				case PARALLEL_CL_GPU: {
 					CLParallelOSM clOptimalStepsModel = new CLParallelOSM(
 							attributesOSM,
 							attributesFloorField,
 							new VRectangle(topography.getBounds()),
 							targetEikonalSolver,
 							distanceEikonalSolver,
+							updateType.isGPUScheme() ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU,
 							cellSize);
 					return new CLUpdateSchemeParallel(topography, clOptimalStepsModel);
 				}
-				case PARALLEL_SHARED_MEM_CL:
+				case PARALLEL_SHARED_MEM_CL_CPU:
+				case PARALLEL_SHARED_MEM_CL_GPU:
 				default : {
 					CLParallelOSMLocalMem clOptimalStepsModel = new CLParallelOSMLocalMem(
 							attributesOSM,
@@ -98,6 +105,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 							new VRectangle(topography.getBounds()),
 							targetEikonalSolver,
 							distanceEikonalSolver,
+							updateType.isGPUScheme() ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU,
 							cellSize);
 					return new CLUpdateSchemeParallel(topography, clOptimalStepsModel);
 				}

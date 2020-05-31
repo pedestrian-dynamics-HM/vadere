@@ -168,7 +168,7 @@ public class TestCLOSMEventDriven {
 		targetPotentialField.preLoop(0.4f);
 		pedestrians = new ArrayList<>();
 
-		for(int i = 0; i < numberOfElements-1; i++) {
+		for(int i = 0; i < numberOfElements; i++) {
 			VPoint randomPosition = new VPoint(
 					(float)(bound.getMinX() + random.nextDouble() * bound.getWidth()),
 					(float)(bound.getMinY() + random.nextDouble() * bound.getHeight()));
@@ -179,12 +179,11 @@ public class TestCLOSMEventDriven {
 			pedestrians.add(pedestrianOSM);
 		}
 
-		PedestrianOSM lastPedestrian = pedestrians.get(pedestrians.size()-1);
-
+		/*PedestrianOSM lastPedestrian = pedestrians.get(pedestrians.size()-1);
 		PedestrianOSM pedestrianOSM = mock(PedestrianOSM.class);
 		when(pedestrianOSM.getPosition()).thenReturn(lastPedestrian.getPosition().add(new VPoint(-0.001, -0.001)));
 		when(pedestrianOSM.getDesiredStepSize()).thenReturn(maxStepSize);
-		pedestrians.add(pedestrianOSM);
+		pedestrians.add(pedestrianOSM);*/
 	}
 
 	//@Ignore

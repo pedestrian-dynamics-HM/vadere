@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.osm.opencl;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opencl.CLContextCallback;
@@ -11,12 +12,14 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
+import org.vadere.util.opencl.UnsupportedOpenCLException;
 import org.vadere.util.opencl.examples.InfoUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.opencl.CL10.CL_CONTEXT_PLATFORM;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_LOCAL_MEM_SIZE;
@@ -24,6 +27,7 @@ import static org.lwjgl.opencl.CL10.CL_DEVICE_MAX_WORK_GROUP_SIZE;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_NAME;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_ALL;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_CPU;
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_DEFAULT;
 import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
 import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_END;
 import static org.lwjgl.opencl.CL10.CL_PROFILING_COMMAND_START;
@@ -66,15 +70,17 @@ public abstract class CLAbstract {
 	protected long clContext;
 	protected long clQueue;
 	protected long clProgram;
+	protected final int deviceType;
 
 	protected boolean profiling;
 	protected boolean debug;
 	private long maxWorkGroupSize;
 	private long maxLocalMemorySize;
 
-	public CLAbstract() {
+	public CLAbstract(int deviceType) {
 		profiling = false;
 		debug = false;
+		this.deviceType = deviceType;
 
 		if(debug) {
 			Configuration.DEBUG.set(true);
@@ -131,14 +137,26 @@ public abstract class CLAbstract {
 			PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
 			CLInfo.checkCLError(clGetPlatformIDs(platformIDs, numberOfPlatforms));
 
-			clPlatform = platformIDs.get(1);
+			// if all, find the possibly best
+			Optional<Pair<Long, Long>> platformAndDevice;
+			if(deviceType == CL_DEVICE_TYPE_ALL) {
+				platformAndDevice = CLUtils.getFirstSupportedPlatformAndDevice(CL_DEVICE_TYPE_DEFAULT);
+				if(!platformAndDevice.isPresent()) {
+					platformAndDevice = CLUtils.getFirstSupportedPlatformAndDevice(CL_DEVICE_TYPE_ALL);
+				}
+			}
+			else {
+				platformAndDevice = CLUtils.getFirstSupportedPlatformAndDevice(deviceType);
+			}
 
-			IntBuffer numberOfDevices = stack.mallocInt(1);
-			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, null, numberOfDevices));
-			PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-			CLInfo.checkCLError(clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, deviceIDs, numberOfDevices));
 
-			clDevice = deviceIDs.get(0);
+			if(!platformAndDevice.isPresent()) {
+				log.debug("No support for OpenCl found.");
+				throw new UnsupportedOpenCLException("No support for OpenCl found.");
+			}
+
+			clPlatform = platformAndDevice.get().getLeft();
+			clDevice = platformAndDevice.get().getRight();
 
 			log.debug("CL_DEVICE_NAME = " + CLInfo.getDeviceInfoStringUTF8(clDevice, CL_DEVICE_NAME));
 

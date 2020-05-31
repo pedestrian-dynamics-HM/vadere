@@ -53,7 +53,7 @@
         "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
-        "updateType" : "EVENT_DRIVEN_CL",
+        "updateType" : "EVENT_DRIVEN_CL_CPU",
         "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",

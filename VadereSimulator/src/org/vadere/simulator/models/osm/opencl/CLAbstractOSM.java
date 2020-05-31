@@ -109,7 +109,6 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 	protected AttributesOSM attributesOSM;
 	protected AttributesFloorField attributesFloorField;
 	protected VRectangle bound;
-	protected final int deviceType;
 	protected  EikonalSolver targetPotential;
 	protected  EikonalSolver obstaclePotential;
 	protected int[] iGridSize;
@@ -151,13 +150,12 @@ public abstract class CLAbstractOSM extends CLAbstract implements ICLOptimalStep
 			@NotNull final EikonalSolver obstaclePotential,
 			final int device,
 			final double cellSize) throws OpenCLException {
-		super();
+		super(device);
 		this.counter = 0;
 		this.pedestrianSet = false;
 		this.attributesOSM = attributesOSM;
 		this.attributesFloorField = attributesFloorField;
 		this.bound = bound;
-		this.deviceType = device;
 		this.targetPotential = targetPotential;
 		this.obstaclePotential = obstaclePotential;
 

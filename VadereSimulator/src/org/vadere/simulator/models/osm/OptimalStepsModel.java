@@ -62,8 +62,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.vadere.state.types.UpdateType.PARALLEL_OPEN_CL;
-
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
@@ -161,10 +159,12 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			@NotNull final Topography topography,
 			@NotNull final AttributesOSM attributesOSM) {
 		switch (attributesOSM.getUpdateType()) {
-			case PARALLEL_OPEN_CL:
-			case PARALLEL_CL:
-			case PARALLEL_SHARED_MEM_CL:
-			case EVENT_DRIVEN_CL: {
+			case PARALLEL_CL_CPU:
+			case PARALLEL_CL_GPU:
+			case PARALLEL_SHARED_MEM_CL_CPU:
+			case PARALLEL_SHARED_MEM_CL_GPU:
+			case EVENT_DRIVEN_CL_CPU:
+			case EVENT_DRIVEN_CL_GPU: {
 				//throw new UnsupportedOperationException("not jet implemented.");
 				return UpdateSchemeOSM.createOpenCLUpdateScheme(
 						topography,

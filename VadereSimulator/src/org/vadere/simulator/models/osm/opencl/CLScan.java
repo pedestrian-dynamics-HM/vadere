@@ -10,6 +10,7 @@ import org.vadere.util.opencl.OpenCLException;
 
 import java.nio.IntBuffer;
 
+import static org.lwjgl.opencl.CL10.CL_DEVICE_TYPE_GPU;
 import static org.lwjgl.opencl.CL10.CL_MEM_READ_WRITE;
 import static org.lwjgl.opencl.CL10.clCreateBuffer;
 import static org.lwjgl.opencl.CL10.clCreateKernel;
@@ -34,6 +35,7 @@ public class CLScan extends CLAbstract {
 	private final String fileName;
 
 	public CLScan(@NotNull final String fileName) throws OpenCLException {
+		super(CL_DEVICE_TYPE_GPU);
 		this.fileName = fileName;
 	}
 

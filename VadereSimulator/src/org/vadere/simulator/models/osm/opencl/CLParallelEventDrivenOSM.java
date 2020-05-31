@@ -725,10 +725,10 @@ __kernel void move (
 		CLInfo.checkCLError(clReleaseKernel(clFilterIds));
 		CLInfo.checkCLError(clReleaseKernel(clMove));
 		CLInfo.checkCLError(clReleaseKernel(clAlign));
-		CLInfo.checkCLError(clReleaseMemObject(cl_scan_pow2));
-		CLInfo.checkCLError(clReleaseMemObject(cl_scan_pad_to_pow2));
-		CLInfo.checkCLError(clReleaseMemObject(cl_scan_subarrays));
-		CLInfo.checkCLError(clReleaseMemObject(cl_scan_inc_subarrays));
+		CLInfo.checkCLError(clReleaseKernel(cl_scan_pow2));
+		CLInfo.checkCLError(clReleaseKernel(cl_scan_pad_to_pow2));
+		CLInfo.checkCLError(clReleaseKernel(cl_scan_subarrays));
+		CLInfo.checkCLError(clReleaseKernel(cl_scan_inc_subarrays));
 	}
 
 	@Override
