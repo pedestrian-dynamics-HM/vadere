@@ -128,13 +128,13 @@ public class CLDistMesh extends CLOperation {
 
     private AMesh mesh;
 
-    private boolean doublePrecision = false;
+    private boolean doublePrecision = true;
 
     private List<IPoint> result;
     private boolean hasToRead = false;
 
     public CLDistMesh(@NotNull final AMesh mesh) {
-    	super(CL_DEVICE_TYPE_CPU);
+    	super(CL_DEVICE_TYPE_GPU);
     	profiling = true;
         if(profiling) {
             Configuration.DEBUG.set(true);

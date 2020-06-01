@@ -27,7 +27,7 @@ public class VisualTestGPUEdgeBased {
 	private static final Logger log = Logger.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
+	private static final IEdgeLengthFunction uniformEdgeLength = p -> 0.3;
 	private static final IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y, false);
 	private static final double initialEdgeLength =  1.5;
 
