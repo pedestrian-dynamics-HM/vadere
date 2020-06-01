@@ -66,11 +66,11 @@ public class VisualTestGPUVertexBased {
 		overAllTime.stop();
 		meshGenerator.finish();
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
-		log.info("quality: " + meshGenerator.getQuality());
-		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		System.out.println("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		System.out.println("#edges: " + meshGenerator.getMesh().getEdges().size());
+		System.out.println("#faces: " + meshGenerator.getMesh().getFaces().size());
+		System.out.println("quality: " + meshGenerator.getQuality());
+		System.out.println("overall time: " + overAllTime.getTime() + "[ms]");
 	}
 
 	public static void main(String[] args) throws OpenCLException {

@@ -124,7 +124,7 @@ public class CLDistMeshHE {
 
     private AMesh mesh;
 
-    private boolean doublePrecision = true;
+    private boolean doublePrecision = false;
     private boolean profiling = false;
 
     private boolean hasToRead = false;
@@ -189,9 +189,9 @@ public class CLDistMeshHE {
             clGetPlatformIDs(platformIDs, numberOfPlatforms);
             clPlatform = platformIDs.get(0);
 
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, null, numberOfDevices);
             PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
+            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_CPU, deviceIDs, numberOfDevices);
 
             clDevice = deviceIDs.get(0);
             printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);

@@ -196,7 +196,12 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
         }
 
         numberOfIterations++;
-        return clDistMesh.step(flipAll);
+	    try {
+		    return clDistMesh.step(flipAll);
+	    } catch (OpenCLException e) {
+		    e.printStackTrace();
+		    return false;
+	    }
 		/*log.info("#illegalMovementTests: " + numberOfIllegalMovementTests);
 		log.info("#retriangulations: " + numberOfRetriangulations);
 		log.info("#steps: " + numberOfIterations);
@@ -204,7 +209,11 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
     }
 
     public void finish() {
-        clDistMesh.finish();
+	    try {
+		    clDistMesh.finish();
+	    } catch (OpenCLException e) {
+		    e.printStackTrace();
+	    }
     }
 
     public void refresh() {
