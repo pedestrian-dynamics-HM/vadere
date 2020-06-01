@@ -2,12 +2,15 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.SpaceFillingCurve;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -24,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -38,6 +42,8 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 	private final Map<V, VLine> projectionMap;
 	private boolean generated;
 	private final double tol;
+	private final GenSpaceFillingCurve<V, E, F> sfc;
+
 
 	public GenConstrainSplitter(
 			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
@@ -50,19 +56,28 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final PSLG pslg,
 			final double tol) {
-		this(triangulation, pslg.getAllSegments(), tol);
+		this(triangulation, pslg.getAllSegments(), tol, null);
 	}
 
 	public GenConstrainSplitter(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final Collection<VLine> constrains,
 			final double tol) {
+		this(triangulation, constrains, tol, null);
+	}
+
+	public GenConstrainSplitter(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final Collection<VLine> constrains,
+			final double tol,
+			@Nullable final GenSpaceFillingCurve<V, E, F> sfc) {
 		this.constrains = constrains;
 		this.points = Collections.EMPTY_LIST;
 		this.vConstrains = new ArrayList<>(constrains.size());
 		this.eConstrains = new HashSet<>(constrains.size());
 		this.projectionMap = new HashMap<>();
 		this.tol = tol;
+		this.sfc = sfc;
 
 		/**
 		 * This prevent the flipping of constrained edges
@@ -141,7 +156,7 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 					projectionMap.put(v22, vEdge);
 				} else {
 					V vertex = getMesh().createVertex(intersectionPoint);
-					triangulation.splitEdge(vertex, edge);
+					triangulation.splitEdge(vertex, edge, false);
 					projectionMap.put(vertex, vEdge);
 				}
 			} else {

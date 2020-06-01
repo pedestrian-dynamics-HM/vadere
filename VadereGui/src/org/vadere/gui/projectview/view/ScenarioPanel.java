@@ -256,7 +256,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					tabbedPane.removeTabAt(tabbedPane.indexOfComponent(topographyCreatorView));
 				}
 
-				topographyCreatorView = new TopographyWindow(scenario);
+				topographyCreatorView = new TopographyWindow(scenario, model);
 				tabbedPane.addTab(Messages.getString("Tab.TopographyCreator.title"), topographyCreatorView);
 				tabbedPane.validate();
 				tabbedPane.repaint();

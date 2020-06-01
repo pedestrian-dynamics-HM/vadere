@@ -43,15 +43,18 @@ public class RegularRefinement {
 		);
 
 		// display the mesh
-
+		MeshPanel meshPanel = new MeshPanel<>(meshImprover.getMesh(), 500, 500);
+		meshPanel.display();
 		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
-			//Thread.sleep(10);
-		//	meshPanel.repaint();
+			Thread.sleep(10);
+			System.out.println("quality = " + meshImprover.getQuality());
+			System.out.println("boundary edges = " + meshImprover.getMesh().getBoundaryEdges().size());
+			meshPanel.repaint();
 		}
 
 		meshImprover.finish();
-		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh().clone(), 800, 800);
+		meshPanel = new PMeshPanel(dt.getMesh().clone(), 800, 800);
 		meshPanel.display("Random Delaunay triangulation");
 		//meshPanel.repaint();
 
@@ -71,7 +74,7 @@ public class RegularRefinement {
 
 		//Thread.sleep(2000);
 
-		refinement.coarse();
+		//refinement.coarse();
 
 		PMeshPanel meshPanel2 = new PMeshPanel(dt.getMesh().clone(), 800, 800);
 		meshPanel2.display("Coarsen mesh");

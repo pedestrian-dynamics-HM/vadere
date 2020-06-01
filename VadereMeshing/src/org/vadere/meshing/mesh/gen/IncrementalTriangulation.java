@@ -5,18 +5,22 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenConstrainedDelaunayTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
@@ -25,9 +29,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -297,6 +304,115 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		}
 	}
 
+	public void fillHoles(@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+		for(F hole : getMesh().getHoles()) {
+			List<IPoint> points = getMesh().getPoints(hole);
+			IncrementalTriangulation<V, E, F> incrementalTriangulation = new IncrementalTriangulation<>(
+					meshSupplier.get(),
+					IPointLocator.Type.JUMP_AND_WALK,
+					GeometryUtils.boundRelative(points),
+					e -> true);
+
+			List<VLine> constrians = getMesh().streamEdges(hole).map(e -> getMesh().toLine(e)).collect(Collectors.toList());
+
+			// generate a contrained delaunay triangulation
+			GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(incrementalTriangulation, constrians, false, false);
+			cdt.generate(true);
+
+			// remove all faces outside the hole
+			VPolygon polygon = getMesh().toPolygon(hole);
+			Predicate<F> removePredicate = face -> !polygon.contains(getMesh().toTriangle(face).midPoint());
+			cdt.getTriangulation().shrinkBorder(removePredicate, true);
+
+			IMesh<V, E, F> holeMesh = incrementalTriangulation.getMesh();
+			Map<V, V> vertexToVertex = new HashMap<>();
+			Map<F, F> faceToFace = new HashMap<>();
+			Map<E, E> edgeToEdge = new HashMap<>();
+
+			E edge = getMesh().getEdge(hole);
+			VPoint p2 = getMesh().toPoint(getMesh().getTwinVertex(edge));
+			VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
+			E otherEdge = getMesh().getEdge(holeMesh.getBorder(), p1, p2).get();
+
+
+			List<E> edges = getMesh().getEdges(edge).stream().map(e -> getMesh().getTwin(e)).collect(Collectors.toList());
+			List<E> otherEdges = holeMesh.getEdges(otherEdge);
+			otherEdges.add(otherEdges.remove(0));
+			Collections.reverse(otherEdges);
+			assert edges.size() == otherEdges.size();
+
+			// copy elements
+			for(int i = 0; i < edges.size(); i++) {
+				E e = edges.get(i);
+				E o = otherEdges.get(i);
+				vertexToVertex.put(holeMesh.getVertex(o), getMesh().getVertex(e));
+			}
+
+			for(V v : holeMesh.getVertices()) {
+				if(!getMesh().isAtBoundary(v)) {
+					// maybe clone the vertex?
+					vertexToVertex.put(v, getMesh().insertVertex(holeMesh.getX(v), holeMesh.getY(v)));
+				}
+			}
+
+			for(E e : holeMesh.getEdges()) {
+				V v = holeMesh.getVertex(e);
+				edgeToEdge.put(e, getMesh().createEdge(vertexToVertex.get(v)));
+			}
+
+			for(F face : holeMesh.getFaces()) {
+				faceToFace.put(face, getMesh().createFace());
+			}
+			//faceToFace.put(holeMesh.getBorder(), )
+
+			// copy connectivity
+			for(E o : holeMesh.getEdges()) {
+				E e = edgeToEdge.get(o);
+				getMesh().setTwin(e, edgeToEdge.get(holeMesh.getTwin(o)));
+				getMesh().setNext(e, edgeToEdge.get(holeMesh.getNext(o)));
+				getMesh().setPrev(e, edgeToEdge.get(holeMesh.getPrev(o)));
+				getMesh().setVertex(e, vertexToVertex.get(holeMesh.getVertex(o)));
+
+				if(!holeMesh.isBoundary(holeMesh.getFace(o))) {
+					getMesh().setFace(e, faceToFace.get(holeMesh.getFace(o)));
+				}
+			}
+
+			for(F o : holeMesh.getFaces()) {
+				F e = faceToFace.get(o);
+				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			}
+
+			for(V o : holeMesh.getVertices()) {
+				V e = vertexToVertex.get(o);
+				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			}
+
+			// merge internal
+			for(int i = 0; i < edges.size(); i++) {
+				E e = edges.get(i);
+				E o = edgeToEdge.get(otherEdges.get(i));
+
+				E twin = getMesh().getTwin(e);
+				V tv = getMesh().getVertex(twin);
+				E ve = getMesh().getEdge(tv);
+				E oTwin = holeMesh.getTwin(o);
+
+				if(ve.equals(twin)) {
+					getMesh().setEdge(tv, oTwin);
+				}
+
+				getMesh().setTwin(e, oTwin);
+				getMesh().destroyEdge(twin);
+				getMesh().destroyEdge(o);
+			}
+
+			// destroy the hole-mesh
+			holeMesh.clear();
+			getMesh().destroyFace(hole);
+		}
+	}
+
 	@Override
 	public void enableCache() {
 		if(!pointLocator.isCached()) {
@@ -396,8 +512,13 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		return insertVertex(getMesh().createVertex(point), face);
 	}
 
-	@Override
 	public E insertVertex(@NotNull final V vertex, @NotNull final F face) {
+		return insertVertex(vertex, face, true);
+	}
+
+
+	@Override
+	public E insertVertex(@NotNull final V vertex, @NotNull final F face, boolean legalize) {
 		if(!initialized) {
 			init();
 		}
@@ -418,7 +539,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		}
 		if(GeometryUtils.isOnEdge(p1, p2, vertex, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
-			E newEdge = getAnyEdge(splitEdge(vertex, edge, true));
+			E newEdge = getAnyEdge(splitEdge(vertex, edge, legalize));
 			insertEvent(newEdge);
 			return newEdge;
 		}
@@ -429,7 +550,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			}*/
 			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
-			E newEdge = splitTriangle(face, vertex,  true);
+			E newEdge = splitTriangle(face, vertex,  legalize);
 			insertEvent(newEdge);
 			return newEdge;
 		}
@@ -467,13 +588,18 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public E insertVertex(V vertex) {
+		return insertVertex(vertex, true);
+	}
+
+	@Override
+	public E insertVertex(V vertex, boolean legalize) {
 		if(!initialized) {
 			init();
 		}
 
 		if(contains(vertex)) {
 			F face = pointLocator.locatePoint(vertex);
-			return insertVertex(vertex, face);
+			return insertVertex(vertex, face, legalize);
 		}
 		else {
 			throw new IllegalArgumentException(vertex + " is not contained in " + bound);
@@ -714,6 +840,21 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
+	public Optional<F> locateFace(@NotNull final double x, final double y, final Object caller) {
+		return pointLocator.locate(x, y, caller);
+	}
+
+	@Override
+	public Optional<F> locateFace(@NotNull double x, double y, Object caller, boolean abortAtBoundary) {
+		return pointLocator.locate(x, y, caller, abortAtBoundary);
+	}
+
+	@Override
+	public Optional<F> locateFace(@NotNull final double x, final double y) {
+		return pointLocator.locate(x, y);
+	}
+
+	@Override
 	public Set<F> getFaces() {
 		return streamFaces().collect(Collectors.toSet());
 	}
@@ -837,7 +978,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			V y = mesh.getVertex(t1);
 			V z = mesh.getVertex(t2);
 
-			//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			if (Utils.ccw(x,y,z) > 0
@@ -860,7 +1001,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			V y = mesh.getVertex(t1);
 			V z = mesh.getVertex(t2);
 
-			//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			//if(Utils.ccw(z,x,y) > 0) {
@@ -951,10 +1092,10 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
-	public void splitEdgeEvent(F original, F f1, F f2, V v) {
-		pointLocator.postSplitHalfEdgeEvent(original, f1, f2,v );
+	public void splitEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
+		pointLocator.postSplitHalfEdgeEvent(originalEdge, original, f1, f2,v );
 		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitHalfEdgeEvent(original, f1, f2, v);
+			triEventListener.postSplitHalfEdgeEvent(originalEdge, original, f1, f2, v);
 		}
 	}
 

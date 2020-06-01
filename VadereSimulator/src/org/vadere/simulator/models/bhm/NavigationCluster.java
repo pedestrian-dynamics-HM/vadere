@@ -104,7 +104,7 @@ public class NavigationCluster implements Navigation {
 			double angleToTargetThisMin, angleToTargetThisMax;
 			VPoint evasionPointMin, evasionPointMax;
 
-			// only the greater angle is a candidate for a new extreme value
+			// only the greater angle3D is a candidate for a new extreme value
 			if (angleToTarget1 < angleToTarget2) {
 				angleToTargetThisMin = angleToTarget1;
 				angleToTargetThisMax = angleToTarget2;

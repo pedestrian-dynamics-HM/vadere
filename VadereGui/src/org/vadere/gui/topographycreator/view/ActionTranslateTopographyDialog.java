@@ -19,8 +19,13 @@ public class ActionTranslateTopographyDialog {
 	private final double xOld;
 	private final double yOld;
 	private boolean valid;
+	private final String label;
 
 	public ActionTranslateTopographyDialog(final double x, double y){
+		this(x, y, "x, y");
+	}
+
+	public ActionTranslateTopographyDialog(final double x, double y, final String label){
 
 		this.textField = new JTextField(30);
 		this.textField.setText(String.format(Locale.ENGLISH, "%f, %f", x, y));
@@ -30,6 +35,7 @@ public class ActionTranslateTopographyDialog {
 		this.y = y;
 		this.xOld = x;
 		this.yOld = y;
+		this.label = label;
 	}
 
 	public double getX() {
@@ -44,7 +50,7 @@ public class ActionTranslateTopographyDialog {
 		return JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				textField,
-				"x, y",
+				label,
 				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
 	}
 

@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
@@ -18,6 +19,7 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,7 +42,7 @@ import java.util.stream.Collectors;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  */
-public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
+public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F>, ITriEventListener<V, E, F> {
 
 	private static final Logger logger = Logger.getLogger(GenUniformRefinementTriangulatorSFC.class);
 
@@ -75,6 +77,8 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	private final Map<V, VLine> projections;
 
 	private final Collection<E> constrains;
+
+	private final Collection<IPoint> fixPoints;
 
 	/**
 	 * The set of inserted points.
@@ -116,8 +120,6 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	private boolean refinementFinished;
 
-	private final Collection<V> fixPoints;
-
 	private Collection<V> insertedFixPoints;
 
 	private double smallestEdgeLength;
@@ -152,7 +154,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 			final double h0,
 			final IDistanceFunction distFunc,
 			final Collection<IPoint> fixPoints) {
-
+		this.fixPoints = fixPoints;
 		this.smallestEdgeLength = Double.POSITIVE_INFINITY;
 		this.meshSupplier = meshSupplier;
 		this.initialized = false;
@@ -165,7 +167,6 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		this.candidates = new ArrayList<>();
 		this.sfc = new GenSpaceFillingCurve<>();
 		this.mesh = meshSupplier.get();
-		this.fixPoints = fixPoints.stream().map(p -> mesh.createVertex(p.getX(), p.getY())).collect(Collectors.toList());
 		this.insertedFixPoints = new ArrayList<>();
 		this.projections = new HashMap<>();
 		this.constrains = new ArrayList<>();
@@ -515,14 +516,15 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		if(!finished) {
 			synchronized (getMesh()) {
 				//nextSFCLevel(0.2);
+				triangulation.addTriEventListener(this);
 				finished = true;
 				// TODO: adjust sierpinsky order, idea: construct a tree -> locate the face using the tree -> replace the face by the three new faces
 				insertFixPoints(fixPoints);
-				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 				triangulation.finish();
 
 				// the following calls are quite expensive
 				establishConstrains();
+				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 				shrinkBorder();
 				createHoles();
 				//triangulation.smoothBorder();
@@ -531,25 +533,32 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				List<F> holes = getMesh().streamHoles().collect(Collectors.toList());
 				logger.info("#holes:" + holes.size());
 				sierpinksyFaceOrder.addAll(holes);
-				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
+				logger.info("#sier-faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfVertices());
 
 				getMesh().arrangeMemory(sierpinksyFaceOrder);
+				triangulation.removeTriEventListener(this);
 				getMesh().garbageCollection();
-				logger.info("#faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfFaces());
+				logger.info("#sier-faces:" + sierpinksyFaceOrder.size() + ", #faces" + getMesh().getNumberOfFaces());
 			}
 		}
     }
 
-	private void insertFixPoints(@NotNull final Collection<V> fixPoints) {
-		for(V vertex : fixPoints) {
-			V insertedVertex = getMesh().getVertex(getTriangulation().insertVertex(vertex));
-			insertedFixPoints.add(insertedVertex);
+	private void insertFixPoints(@NotNull final Collection<IPoint> fixPoints) {
+		//int count = 1;
+		for(IPoint point : fixPoints) {
+			V vertex = getMesh().createVertex(point);
+			//assert getMesh().getFaces().stream().noneMatch(f -> getNode(f) == null) : "count " + count;
+			V insertedVertex = getMesh().getVertex(getTriangulation().insertVertex(vertex, false));
+			getMesh().setBooleanData(vertex, "fixPoint", true);
+			//getMesh().getFaces().stream().filter(f -> getNode(f) == null).forEach(f -> System.out.println(f));
+			//assert getMesh().getFaces().stream().noneMatch(f -> getNode(f) == null) : "count " + count;
+			//count++;
 		}
 	}
 
 	@Override
 	public Collection<V> getFixPoints() {
-		return insertedFixPoints;
+		return getMesh().streamVertices().filter(v -> getMesh().getBooleanData(v, "fixPoint")).collect(Collectors.toList());
 	}
 
 
@@ -640,10 +649,12 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		List<VLine> lines = boundary.stream().flatMap(shape -> shape.lines().stream()).collect(Collectors.toList());
 		//GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(getTriangulation(), lines, true);
 		//GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, minEdgeLen / 2);
-		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, GeometryUtils.DOUBLE_EPS);
+
+		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, GeometryUtils.DOUBLE_EPS, sfc);
 		cdt.generate(false);
 		projections.putAll(cdt.getProjections());
 		constrains.addAll(cdt.getConstrains());
+
 	}
 
 	private void createHoles() {
@@ -824,4 +835,93 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
     private String curveToTikz() {
 		return TexGraphGenerator.toTikz(getMesh(), sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList()));
     }
+
+
+	@Override
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {
+		E e1 = getMesh().getEdge(f1);
+		E e2 = getMesh().getEdge(f2);
+		E e3 = getMesh().getEdge(f3);
+
+		for(E edge : getMesh().getEdgeIt(f1)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				SFCNode<V, E ,F> element1 = new SFCNode<>(e1, node.getDirection().next());
+				SFCNode<V, E ,F> element2 = new SFCNode<>(e2, node.getDirection().next());
+				SFCNode<V, E ,F> element3 = new SFCNode<>(e3, node.getDirection().next());
+				sfc.replace(element1, element2, element3, node);
+				return;
+			}
+		}
+
+		for(E edge : getMesh().getEdgeIt(f2)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				SFCNode<V, E ,F> element1 = new SFCNode<>(e1, node.getDirection().next());
+				SFCNode<V, E ,F> element2 = new SFCNode<>(e2, node.getDirection().next());
+				SFCNode<V, E ,F> element3 = new SFCNode<>(e3, node.getDirection().next());
+				sfc.replace(element1, element2, element3, node);
+				return;
+			}
+		}
+
+		for(E edge : getMesh().getEdgeIt(f3)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				SFCNode<V, E ,F> element1 = new SFCNode<>(e1, node.getDirection().next());
+				SFCNode<V, E ,F> element2 = new SFCNode<>(e2, node.getDirection().next());
+				SFCNode<V, E ,F> element3 = new SFCNode<>(e3, node.getDirection().next());
+				sfc.replace(element1, element2, element3, node);
+				return;
+			}
+		}
+	}
+
+	@Override
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
+		SFCNode<V, E, F> node = getNode(f1, f2);
+		SFCDirection dir = node.getDirection();
+
+		E e1 = getMesh().getEdge(f1);
+		E e2 = getMesh().getEdge(f2);
+
+		SFCNode<V, E ,F> element1 = new SFCNode<>(e1, dir.next());
+		SFCNode<V, E ,F> element2 = new SFCNode<>(e2, dir.next());
+
+		sfc.replace(element1, element2, node);
+	}
+
+	private SFCNode<V, E ,F> getNode(F f1, F f2) {
+		for(E edge : getMesh().getEdgeIt(f1)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				return node;
+			}
+		}
+
+		for(E edge : getMesh().getEdgeIt(f2)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				return node;
+			}
+		}
+
+		return null;
+	}
+
+	private SFCNode<V, E ,F> getNode(F f1) {
+		for(E edge : getMesh().getEdgeIt(f1)) {
+			SFCNode<V, E, F> node = sfc.getNode(edge);
+			if(node != null) {
+				return node;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void postFlipEdgeEvent(F f1, F f2) {}
+
+	@Override
+	public void postInsertEvent(V vertex) {}
 }

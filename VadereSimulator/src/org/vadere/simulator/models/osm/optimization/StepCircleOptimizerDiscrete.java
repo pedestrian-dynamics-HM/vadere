@@ -117,13 +117,13 @@ public class StepCircleOptimizerDiscrete extends StepCircleOptimizer {
 					.getStepCircleResolution() / (2 * Math.PI));*/
 		}
 
-		// maximum possible angle of movement relative to ankerAngle
+		// maximum possible angle3D of movement relative to ankerAngle
 		double angle;
 
-		// smallest possible angle of movement
+		// smallest possible angle3D of movement
 		double anchorAngle;
 
-		// compute maximum angle and corresponding anchor if appropriate
+		// compute maximum angle3D and corresponding anchor if appropriate
 		if (attributesOSM.getMovementType() == MovementType.DIRECTIONAL) {
 		    //TODO: this code snippet has to be understood and maybe reformulate / explained
             /*

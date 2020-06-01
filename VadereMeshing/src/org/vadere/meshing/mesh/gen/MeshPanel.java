@@ -75,6 +75,19 @@ public class MeshPanel<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		this.width = width;
 	}
 
+	public MeshPanel(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final Predicate<F> alertPred,
+			final double width,
+			final double height,
+			@NotNull final Function<F, Color> colorFunction,
+			@NotNull final Function<E, Color> edgeColorFunction,
+			@NotNull final Function<V, Color> vertexColorFuntion) {
+		this.meshRenderer = new MeshRenderer<>(mesh, alertPred, colorFunction, edgeColorFunction, vertexColorFuntion);
+		this.height = height;
+		this.width = width;
+	}
+
 	/**
 	 * Construct a mesh panel filling faces with the color defined by the color function.
 	 *

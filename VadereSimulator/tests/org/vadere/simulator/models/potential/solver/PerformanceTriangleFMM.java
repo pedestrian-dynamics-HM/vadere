@@ -6,8 +6,7 @@ import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -34,10 +33,10 @@ public class PerformanceTriangleFMM {
 		return meshGenerator.generate();
 	}
 
-	private static void solve(EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver) {
+	private static void solve(MeshEikonalSolverFMM<PVertex, PHalfEdge, PFace> solver) {
 		long ms = System.currentTimeMillis();
 		System.out.println("start FFM");
-		solver.initialize();
+		solver.solve();
 		System.out.println("FFM finished");
 		System.out.println("time: " + (System.currentTimeMillis() - ms));
 	}
@@ -60,7 +59,7 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (3) solve the eikonal equation on the mesh
 		 */
-		EikonalSolverFMMTriangulation<PVertex, PHalfEdge, PFace> solver = new EikonalSolverFMMTriangulation(
+		MeshEikonalSolverFMM<PVertex, PHalfEdge, PFace> solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				triangulation,
 				targetVertices,

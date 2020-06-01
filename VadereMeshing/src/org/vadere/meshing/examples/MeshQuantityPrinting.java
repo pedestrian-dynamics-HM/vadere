@@ -18,6 +18,8 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
 import org.vadere.meshing.utils.color.Colors;
+import org.vadere.meshing.utils.io.IOUtils;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -48,7 +50,7 @@ import java.util.stream.Collectors;
 public class MeshQuantityPrinting {
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		spaceFillingCurve();
+		spaceFillingCurve2();
 		//uniformMeshDiscFunction(0.10);
 		//uniformMeshDiscFunctionDistMesh(0.05);
 		//distMeshFail(0.05);
@@ -72,7 +74,7 @@ public class MeshQuantityPrinting {
 		IDistanceFunction d = IDistanceFunction.substract(drect3, p -> disc3.distance(p));
 
 		// define the EikMesh-Improver
-		IEdgeLengthFunction h = p -> h0 + 0.2 * Math.abs(d.apply(p));
+		IEdgeLengthFunction h = p -> h0 + 0.5 * Math.abs(d.apply(p));
 		List<VShape> constrains = new ArrayList<>();
 		constrains.add(bound);
 
@@ -85,10 +87,14 @@ public class MeshQuantityPrinting {
 		);
 		//HSBtoRGB
 
+		int partitions = 3;
+		int numberOfFaces = 1924;
 		Function<AFace, Color> faceColorFunction = f -> {
 			int id = ((AFace)f).getId();
 			//ColorHelper colorHelper = new ColorHelper(7400);
-			return new Color(Color.HSBtoRGB(id / 2864.0f, 0.7f, 1.0f));
+			int fac = numberOfFaces / partitions;
+			float part = id / numberOfFaces;
+			return new Color(Color.HSBtoRGB((id / fac) / ((float)partitions), 0.7f, 1.0f));
 			//return colorHelper.numberToColor(id);
 		};
 
@@ -96,17 +102,81 @@ public class MeshQuantityPrinting {
 		MeshPanel<AVertex, AHalfEdge, AFace> meshPanel = new MeshPanel<>(meshRenderer, 500, 500);
 		meshPanel.display();
 
-		while (!meshImprover.isInitialized()) {
+		while (!meshImprover.isFinished()) {
 			Thread.sleep(10);
 			meshImprover.improve();
 			meshPanel.repaint();
 			System.out.println(meshImprover.getMesh().getFaces().stream().mapToInt(f -> f.getId()).max().getAsInt());
 		}
 
-		BufferedWriter meshWriter = getWriter("spaceFillingCurve_mesh.tex", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
+		BufferedWriter meshWriter = IOUtils.getWriter("spaceFillingCurve_partition_mesh.tex", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
+		meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), faceColorFunction, e -> Color.BLACK, v -> Color.BLACK, 1.0f, true));
+		meshWriter.close();
+	}
+
+	private static void spaceFillingCurve2() throws InterruptedException, IOException {
+		String fileName = "/poly/kaiserslautern.poly";
+		final InputStream inputStream = ElementSizeFunction.class.getResourceAsStream("/poly/bridge.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+		IDistanceFunction d = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
+		double h0 = 0.5;
+
+		// define the EikMesh-Improver
+		IEdgeLengthFunction h = p -> h0 + 0.4 * Math.abs(d.apply(p));
+		List<VShape> constrains = new ArrayList<>();
+		constrains.add(pslg.getSegmentBound());
+		constrains.addAll(pslg.getHoles());
+
+		AEikMesh meshImprover = new AEikMesh(
+				d,
+				h,
+				h0,
+				pslg.getBoundingBox(),
+				constrains
+		);
+		//HSBtoRGB
+
+		int partitions = 3;
+		int numberOfFaces = 8376;
+		Function<AFace, Color> faceColorFunction = f -> {
+			int id = ((AFace)f).getId();
+			//ColorHelper colorHelper = new ColorHelper(7400);
+			int fac = numberOfFaces / partitions;
+			float part = id / numberOfFaces;
+			//return new Color(Color.HSBtoRGB((id / fac) / ((float)partitions), 0.7f, 1.0f));
+			return new Color(Color.HSBtoRGB(((float)id) / numberOfFaces, 0.7f, 1.0f));
+			//return colorHelper.numberToColor(id);
+		};
+
+		Function<AVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else if(meshImprover.isSlidePoint(v)) {
+				return Colors.BLUE;
+			}
+			return Color.BLACK;
+		};
+
+		MeshRenderer<AVertex, AHalfEdge, AFace> meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, faceColorFunction, e -> Color.black, vertexColorFunction);
+		MeshPanel<AVertex, AHalfEdge, AFace> meshPanel = new MeshPanel<>(meshRenderer, 1000, 1000);
+		meshPanel.display();
+
+		while (!meshImprover.isFinished()) {
+			Thread.sleep(10);
+			meshImprover.improve();
+			meshPanel.repaint();
+			System.out.println(meshImprover.getQuality());
+			System.out.println(meshImprover.getMesh().getNumberOfFaces());
+		}
+
+		BufferedWriter meshWriter = IOUtils.getWriter("spaceFillingCurve_partition_mesh.tex", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
 		meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), faceColorFunction, e -> Color.BLACK, v -> Color.BLACK, 1.0f, true));
 		meshWriter.close();
 
+		BufferedWriter writer = IOUtils.getWriter("bridge.poly", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
+		MeshPolyWriter<AVertex, AHalfEdge, AFace> meshPolyWriter = new MeshPolyWriter<>();
+		writer.write(meshPolyWriter.to2DPoly(meshImprover.getMesh()));
+		writer.close();
 	}
 
 	private static void eikMeshQualities(
@@ -115,19 +185,19 @@ public class MeshQuantityPrinting {
 			@NotNull final LinkedList<Integer> meshPrints,
 			@NotNull final File dir) throws IOException {
 		Collections.sort(meshPrints);
-		BufferedWriter bufferedWriterQualities1 = getWriter("qualities1_eik.csv", dir);
+		BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
 		bufferedWriterQualities1.write("iteration quality\n");
 
-		BufferedWriter bufferedWriterQualities2 = getWriter("qualities2_eik.csv", dir);
+		BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
 		bufferedWriterQualities2.write("iteration quality\n");
 
-		BufferedWriter bufferedWriterAngles = getWriter("angles_eik.csv", dir);
-		bufferedWriterAngles.write("iteration angle\n");
+		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+		bufferedWriterAngles.write("iteration angle3D\n");
 
 		int init = 1;
 		while (!meshImprover.isInitialized()) {
 			meshImprover.initialize();
-			BufferedWriter meshWriter = getWriter("mesh_int_" + init + ".tex", dir);
+			BufferedWriter meshWriter = IOUtils.getWriter("mesh_int_" + init + ".tex", dir);
 			meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, e -> Color.BLACK, v -> Color.BLACK, 1.0f, true));
 			meshWriter.close();
 			init++;
@@ -148,7 +218,7 @@ public class MeshQuantityPrinting {
 
 			if(!meshPrints.isEmpty() && meshPrints.peek() == iteration) {
 				meshPrints.poll();
-				BufferedWriter meshWriter = getWriter("mesh_" + iteration + ".tex", dir);
+				BufferedWriter meshWriter = IOUtils.getWriter("mesh_" + iteration + ".tex", dir);
 				meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, e -> Color.BLACK, v -> {
 
 					if(meshImprover.isFixPoint(v)){
@@ -175,17 +245,17 @@ public class MeshQuantityPrinting {
 	                                      @NotNull final LinkedList<Integer> meshPrints,
 	                                      @NotNull final File dir) throws IOException {
 		Collections.sort(meshPrints);
-		BufferedWriter bufferedWriterQualities1 = getWriter("qualities1_dist.csv", dir);
+		BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_dist.csv", dir);
 		bufferedWriterQualities1.write("iteration quality\n");
 
-		BufferedWriter bufferedWriterIllegalEdges = getWriter("illegal_edges.csv", dir);
+		BufferedWriter bufferedWriterIllegalEdges = IOUtils.getWriter("illegal_edges.csv", dir);
 		bufferedWriterIllegalEdges.write("iteration illEdges\n");
 
-		BufferedWriter bufferedWriterQualities2 = getWriter("qualities2_dist.csv", dir);
+		BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_dist.csv", dir);
 		bufferedWriterQualities2.write("iteration quality\n");
 
-		BufferedWriter bufferedWriterAngles = getWriter("angles_dist.csv", dir);
-		bufferedWriterAngles.write("iteration angle\n");
+		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_dist.csv", dir);
+		bufferedWriterAngles.write("iteration angle3D\n");
 
 		int iteration = 1;
 		while (iteration < maxIteration+1) {
@@ -201,7 +271,7 @@ public class MeshQuantityPrinting {
 			if(!meshPrints.isEmpty() && meshPrints.peek() == iteration) {
 				meshPrints.poll();
 
-				BufferedWriter meshWriter = getWriter("mesh_" + iteration + ".tex", dir);
+				BufferedWriter meshWriter = IOUtils.getWriter("mesh_" + iteration + ".tex", dir);
 				meshWriter.write(TexGraphGenerator.toTikz(distmesh.getTriangles(),  f -> Colors.YELLOW, e -> Color.BLACK, v -> Color.BLACK, 1.0f, true));
 				meshWriter.close();
 			}
@@ -377,19 +447,5 @@ public class MeshQuantityPrinting {
 
 		}
 		return builder.toString();
-	}
-
-	private static BufferedWriter getWriter(@NotNull final String filename, @NotNull final File dir) throws IOException {
-		FileWriter fileWriter = new FileWriter(dir.getAbsolutePath()+"/"+getNow()+"_"+filename);
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		return bufferedWriter;
-	}
-
-
-	private static String getNow() {
-		Date todaysDate = new java.util.Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-		String formattedDate = formatter.format(todaysDate);
-		return formattedDate;
 	}
 }

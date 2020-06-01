@@ -88,6 +88,11 @@ public class DelaunayTree<V extends IVertex, E extends IHalfEdge, F extends IFac
     }
 
 	@Override
+	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
+		throw new UnsupportedOperationException("not jet implemented");
+	}
+
+	@Override
 	public Type getType() {
 		return Type.DELAUNAY_TREE;
 	}
@@ -116,7 +121,7 @@ public class DelaunayTree<V extends IVertex, E extends IHalfEdge, F extends IFac
 	}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
 		checkRoot();
 		DAG<DAGElement<V, E, F>> faceDag = map.remove(original);
 

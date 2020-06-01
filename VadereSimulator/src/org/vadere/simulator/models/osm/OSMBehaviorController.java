@@ -305,7 +305,7 @@ public class OSMBehaviorController {
     }
 
     /**
-     * Calculate the angle between the two vectors v1 and v2 where
+     * Calculate the angle3D between the two vectors v1 and v2 where
      * v1 = (TargetPedestrian1 - pedestrian1) and v2 = (TargetPedestrian2 - pedestrian2):
      *
      * <pre>
@@ -320,13 +320,13 @@ public class OSMBehaviorController {
      *     T2: target of pedestrian 2
      *     P1: pedestrian 1
      *     P2: pedestrian 2
-     *     a : angle between the two vectors
+     *     a : angle3D between the two vectors
      * </pre>
      *
      * This is required to decide if pedestrian1 and pedestrian2 can be swapped because they have different walking
      * directions.
      *
-     * @return An angle between 0 and <i>pi</i> radian or -1 if at least one of the given pedestrians has no target.
+     * @return An angle3D between 0 and <i>pi</i> radian or -1 if at least one of the given pedestrians has no target.
      */
     public double calculateAngleBetweenTargets(Pedestrian pedestrian1, Pedestrian pedestrian2, Topography topography) {
         double angleInRadian = -1;
@@ -356,7 +356,7 @@ public class OSMBehaviorController {
             VPoint closestTargetPoint = target.getShape().closestPoint(pedestrian.getPosition());
             vectorPedestrianToTarget = closestTargetPoint.subtract(pedestrian.getPosition());
         } else {
-            throw new IllegalArgumentException(String.format("Unsupported angle calculation type: \"%s\"", pedestrian.getAttributes().getWalkingDirectionCalculation()));
+            throw new IllegalArgumentException(String.format("Unsupported angle3D calculation type: \"%s\"", pedestrian.getAttributes().getWalkingDirectionCalculation()));
         }
 
         return vectorPedestrianToTarget;

@@ -134,7 +134,7 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 			}
 		}
 		return Optional.empty();*/
-		Optional<F> optFace = getTriangulation().locateMarch(x, y, face);
+		Optional<F> optFace = getTriangulation().locateMarch(x, y, face, false);
 		if(optFace.isPresent() && !getMesh().isBoundary(optFace.get())) {
 			return optFace;
 		}

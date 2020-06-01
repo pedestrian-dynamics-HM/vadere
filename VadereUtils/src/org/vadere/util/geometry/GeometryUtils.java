@@ -77,6 +77,16 @@ public class GeometryUtils {
 	}
 
 	/**
+	 * Determinant of a 3x3-matrix
+	 *
+	 * @param a
+	 * @return
+	 */
+	public static double det3D(final double[][] a) {
+		return a[0][0]*a[1][1]*a[2][2] + a[0][1]*a[1][2]*a[2][0] + a[0][2]*a[1][0]*a[2][1] - a[0][2]*a[1][1]*a[2][0] - a[0][1]*a[1][0]*a[2][2] - a[0][0]*a[1][2]*a[2][1];
+	}
+
+	/**
 	 * Computes the (optional) intersection point of a {@link VRectangle} boundary and the line-segment defined by ((x1, y1), (x2, y2)).
 	 *
 	 * @param rectangle the rectangle
@@ -285,8 +295,8 @@ public class GeometryUtils {
 	 * @param circle                            the circle defining the disc (containing the points)
 	 * @param numberOfCircles                   the number of circles
 	 * @param numberOfPointsOfLargestCircle     the number of points of the most outer circle
-	 * @param anchorAngle                       start angle of the segment
-	 * @param angle                             anchorAngle + angle = end angle of the segment
+	 * @param anchorAngle                       start angle3D of the segment
+	 * @param angle                             anchorAngle + angle3D = end angle3D of the segment
 	 *
 	 * @return a set of points which are positioned inside a disc segment
 	 */
@@ -520,15 +530,25 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Returns the angle between the x-axis, p1 and p2.
+	 * Returns the angle3D between the x-axis, p1 and p2.
 	 *
 	 * @param p1 the first point
 	 * @param p2 the second point
 	 *
-	 * @return the angle between the x-axis, p1 and p2
+	 * @return the angle3D between the x-axis, p1 and p2
 	 */
 	public static double angleTo(@NotNull final VPoint p1, @NotNull final VPoint p2) {
 		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+
+		if (atan2 < 0.0) {
+			atan2 = Math.PI * 2 + atan2;
+		}
+
+		return atan2;
+	}
+
+	public static double angleTo(@NotNull final double p1x,  final double p1y, final double p2x, final double p2y) {
+		double atan2 = Math.atan2(p1y - p2y, p1x - p2x);
 
 		if (atan2 < 0.0) {
 			atan2 = Math.PI * 2 + atan2;
@@ -973,18 +993,69 @@ public class GeometryUtils {
 		return isInsideCircle(a, b, c, x, y, 0.0);
 	}
 
+
 	/**
 	 * Computes the cross product of two vectors and store it in the cross
 	 * vector. This is a c-like call.
 	 *
 	 * @param v1    the first vector
 	 * @param v2    the second vector
-	 * @param cross the result vector
+	 * @param cross
 	 */
 	public static void cross(@NotNull final double[] v1, @NotNull double[] v2, @NotNull double[] cross) {
 		cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
 		cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
 		cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
+
+	}
+
+	public static double dot(@NotNull final double[] a, @NotNull double[] b) {
+		return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+	}
+
+	public static double dot(@NotNull final IPoint a, @NotNull final IPoint b) {
+		return a.getX()*b.getY() + a.getY()*b.getY();
+	}
+
+	public static double[] norm3D(@NotNull final double[] a, @NotNull double[] b, @NotNull double[] c) {
+		double[][] a1 = new double[3][3];
+		a1[0][0] = 1; a1[0][1] = a[1]; a1[0][2] = a[2];
+		a1[1][0] = 1; a1[1][1] = b[1]; a1[1][2] = b[2];
+		a1[2][0] = 1; a1[2][1] = c[1]; a1[2][2] = c[2];
+
+		double[][] a2 = new double[3][3];
+		a2[0][0] = a[0]; a2[0][1] = 1; a2[0][2] = a[2];
+		a2[1][0] = b[0]; a2[1][1] = 1; a2[1][2] = b[2];
+		a2[2][0] = c[0]; a2[2][1] = 1; a2[2][2] = c[2];
+
+		double[][] a3 = new double[3][3];
+		a3[0][0] = a[0]; a3[0][1] = a[1]; a3[0][2] = 1;
+		a3[1][0] = b[0]; a3[1][1] = b[1]; a3[1][2] = 1;
+		a3[2][0] = c[0]; a3[2][1] = c[1]; a3[2][2] = 1;
+
+		double x = det3D(a1);
+		double y = det3D(a2);
+		double z = det3D(a3);
+
+		return new double[]{x, y, z};
+	}
+
+	public static double[] unitNorm(@NotNull final double[] a, @NotNull double[] b, @NotNull double[] c) {
+		double[] norm = norm3D(a, b, c);
+		double len = len(norm[0], norm[1], norm[2]);
+		return new double[]{norm[0] / len, norm[1] / len, norm[2] / len};
+	}
+
+
+
+	public static void norm3D(@NotNull final double[] v) {
+		double len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+		assert len > 0;
+		if(len > 0) {
+			v[0] = v[0] / len;
+			v[1] = v[1] / len;
+			v[2] = v[2] / len;
+		}
 	}
 
 	/**
@@ -1085,6 +1156,32 @@ public class GeometryUtils {
 
 	public static double areaOfPolygon(@NotNull final double x[], @NotNull final double y[]){
 		return Math.abs(signedAreaOfPolygon(x, y));
+	}
+
+	public static double areaOfPolygon(@NotNull final double x[], @NotNull final double y[], @NotNull final double z[]){
+		assert x.length >= 3 && x.length == y.length && x.length == z.length;
+
+		double[] total = new double[]{0, 0, 0};
+
+		for(int i = 0; i < x.length; i++) {
+			double[] vi1 = new double[] {x[i], y[i], z[i]};
+			double[] vi2;
+
+			if(i == x.length - 1) {
+				vi2 = new double[] {x[0], y[0], z[0]};
+			} else {
+				vi2 = new double[] {x[i+1], y[i+1], z[i+1]};
+			}
+
+			double[] prod = new double[3];
+			cross(vi1, vi2, prod);
+			total[0] += prod[0];
+			total[1] += prod[1];
+			total[2] += prod[2];
+		}
+
+		double result = dot(total, unitNorm(new double[]{x[0], y[0], z[0]}, new double[]{x[1], y[1], z[1]}, new double[]{x[2], y[2], z[2]}));
+		return Math.abs(result/2.0);
 	}
 
 	public static double areaOfPolygon(@NotNull final List<? extends IPoint> vertices){
@@ -1277,13 +1374,13 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * The (smallest possible) angle at C from the triangle ACB.
+	 * The (smallest possible) angle3D at C from the triangle ACB.
 	 *
 	 * @param A first point of the triangle
 	 * @param C second point of the triangle
 	 * @param B third point of the triangle
 	 *
-	 * @return the (smallest possible) angle at C from the triangle ACB.
+	 * @return the (smallest possible) angle3D at C from the triangle ACB.
 	 */
 	public static double angle(@NotNull final IPoint A, @NotNull final IPoint C, @NotNull final IPoint B) {
 		double phi1 = angleTo(A, C);
@@ -1292,15 +1389,53 @@ public class GeometryUtils {
 		return Math.min(phi, 2 * Math.PI - phi);
 	}
 
+	public static double angle3D(
+			final double ax, final double ay, final double az,
+			final double bx, final double by, final double bz) {
+
+		double dot = (ax * bx + ay * by + az * bz);
+		double aLen = len(ax, ay, az);
+		double bLen = len(bx, by, bz);
+		double c = dot / (aLen * bLen);
+
+		if(Math.abs(c - 1.0) < GeometryUtils.DOUBLE_EPS) {
+			return 0;
+		}
+		return Math.acos(c);
+	}
+
+	public static double angle2D(
+			final double ax, final double ay,
+			final double bx, final double by) {
+
+		double dot = (ax * bx + ay * by);
+		double aLen = len(ax, ay);
+		double bLen = len(bx, by);
+		double c = dot / (aLen * bLen);
+
+		if(Math.abs(c - 1.0) < GeometryUtils.DOUBLE_EPS) {
+			return 0;
+		}
+		return Math.acos(c);
+	}
+
+	public static double len(final double ax, final double ay, final double az) {
+		return Math.sqrt(ax * ax + ay * ay + az * az);
+	}
+
+	public static double len(final double ax, final double ay) {
+		return Math.sqrt(ax * ax + ay * ay);
+	}
+
 	/**
-	 * Computes the angle between the positive x-axis and the point (to - from).
+	 * Computes the angle3D between the positive x-axis and the point (to - from).
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 *
 	 * @see <a href="https://en.wikipedia.org/wiki/Atan2">https://en.wikipedia.org/wiki/Atan2</a>
 	 * @param from the first point / vector
 	 * @param to   the second point / vector
 	 *
-	 * @return the angle between the positive x-axis and the vector (from -> to)
+	 * @return the angle3D between the positive x-axis and the vector (from -> to)
 	 */
 	public static double angleTo(@NotNull final IPoint from, @NotNull final IPoint to) {
 		double atan2 = Math.atan2(to.getY() - from.getY(), to.getX() - from.getX());
@@ -1314,25 +1449,25 @@ public class GeometryUtils {
 
 
 	/**
-	 * Computes the angle between the positive x-axis and the point (to - (0,0)).
+	 * Computes the angle3D between the positive x-axis and the point (to - (0,0)).
 	 * Result is in interval (0,2*PI) according to standard math usage.
 	 *
 	 * @see <a href="https://en.wikipedia.org/wiki/Atan2">https://en.wikipedia.org/wiki/Atan2</a>
 	 * @param to   the second point / vector
 	 *
-	 * @return the angle between the positive x-axis and the vector ((0,0) -> to)
+	 * @return the angle3D between the positive x-axis and the vector ((0,0) -> to)
 	 */
 	public static double angleTo(@NotNull final IPoint to) {
 		return angleTo(new VPoint(0,0), to);
 	}
 
 	/**
-	 * Returns the angle between two lines in clock wise order (cw).
+	 * Returns the angle3D between two lines in clock wise order (cw).
 	 *
 	 * @param line1 the first line
 	 * @param line2 the second line
 	 *
-	 * @return the angle between two lines in clock wise order (cw).
+	 * @return the angle3D between two lines in clock wise order (cw).
 	 */
 	public static double angleBetween2Lines(@NotNull final VLine line1, @NotNull final VLine line2)
 	{
@@ -1882,22 +2017,29 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Projects the point (ax, ay) onto the line defined by (p = (px, py), q = (qx, qy)).
+	 * Projects the point (qx, qy) onto the line defined by (p0 = (p0x, p0y), p1 = (p1x, p1y)).
+	 * see https://cs.nyu.edu/~yap/classes/visual/03s/hw/h2/math.pdf
 	 *
-	 * @param ax x-coordinate of a
-	 * @param ay y-coordinate of a
-	 * @param px x-coordinate of p
-	 * @param py y-coordinate of p
-	 * @param qx x-coordinate of q
-	 * @param qy y-coordinate of q
+	 * @param qx x-coordinate of a
+	 * @param qy y-coordinate of a
+	 * @param p0x x-coordinate of p0
+	 * @param p0y y-coordinate of p0
+	 * @param p1x x-coordinate of p1
+	 * @param p1y y-coordinate of p1
 	 *
 	 * @return he projection of a onto the line (p,q)
 	 */
-	public static VPoint projectOntoLine(double ax, double ay, double px, double py, double qx, double qy) {
-		double bx = qx - px;
-		double by = qy - py;
-		double apx = ax - px;
-		double apy = ay - py;
-		return projectOnto(apx, apy, bx, by).add(new VPoint(px, py));
+	public static VPoint projectOntoLine(double qx, double qy, double p0x, double p0y, double p1x, double p1y) {
+		double ax11 = p1x - p0x;
+		double ax12 = p1y - p0y;
+		double ax21 = p0y - p1y;
+		double ax22 = p1x - p0x;
+		double bx1 = qx * (p1x - p0x) + qy * (p1y - p0y);
+		double bx2 = p0y * (p1x - p0x) - p0x * (p1y - p0y);
+		double det = (ax11 * ax22 - ax12 * ax21);
+
+		double px1 = (ax22 * bx1 - ax12 * bx2) / det;
+		double px2 = (-ax21 * bx1 + ax11 * bx2) / det;
+		return new VPoint(px1, px2);
 	}
 }

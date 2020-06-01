@@ -48,6 +48,16 @@ public class PMeshPanel extends MeshPanel<PVertex, PHalfEdge, PFace> {
 
 	public PMeshPanel(
 			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
+			double width,
+			double height,
+			@NotNull final Function<PFace, Color> faceColorFunction,
+			@NotNull final Function<PHalfEdge, Color> edgeColorFunction,
+			@NotNull final Function<PVertex, Color> vertexColorFunction) {
+		super(mesh, f -> false, width, height, faceColorFunction, edgeColorFunction, vertexColorFunction);
+	}
+
+	public PMeshPanel(
+			@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh,
 			@NotNull Predicate<PFace> predicate,
 			double width,
 			double height) {

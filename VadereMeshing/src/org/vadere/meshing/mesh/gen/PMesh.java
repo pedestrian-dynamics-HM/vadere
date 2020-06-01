@@ -236,6 +236,7 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 		halfEdge.setEnd(vertex);
 	}
 
+
 	/*@Override
 	public List<PHalfEdge<P>> getEdges(@NotNull final PVertex<P> vertex) {
 		return
@@ -262,19 +263,23 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 		vertex.getLock().unlock();
 	}
 
+	private void addEdge(@NotNull PHalfEdge edge) {
+		assert !edges.contains(edge);
+		edges.add(edge);
+		numberOfEdges++;
+	}
+
 	@Override
 	public PHalfEdge createEdge(@NotNull final PVertex vertex) {
 		PHalfEdge edge = new PHalfEdge(vertex);
-		edges.add(edge);
-		numberOfEdges++;
+		addEdge(edge);
 		return edge;
 	}
 
 	@Override
 	public PHalfEdge createEdge(@NotNull final PVertex vertex, @NotNull final PFace face) {
 		PHalfEdge edge = new PHalfEdge(vertex, face);
-		edges.add(edge);
-		numberOfEdges++;
+		addEdge(edge);
 		return edge;
 	}
 

@@ -24,5 +24,6 @@ public class Parameters {
     public final static int SAMPLENUMBER = 10;
     public final static int SAMPLEDIVISION = 10;
     public final static int SEGMENTDIVISION = 0;
-    public final static int MAX_NUMBER_OF_STEPS = 600;
+    //TODO increase this
+    public final static int MAX_NUMBER_OF_STEPS = 100;
 }

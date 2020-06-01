@@ -73,11 +73,16 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 
 	@Override
 	public Optional<F> locate(double x, double y, Object caller) {
+		return locate(x, y, caller, false);
+	}
+
+	@Override
+	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
 		Optional<F> optFace;
 		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
-			optFace = triConnectivity.locateMarch(x, y, cache.get(caller));
+			optFace = triConnectivity.locateMarch(x, y, cache.get(caller), false);
 		} else {
-			optFace = pointLocator.locate(x, y);
+			optFace = pointLocator.locate(x, y, false);
 		}
 
 		if(optFace.isPresent() && !triConnectivity.getMesh().isBoundary(optFace.get())) {
@@ -106,7 +111,7 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {}
 
 	@Override
 	public void postFlipEdgeEvent(F f1, F f2) {}

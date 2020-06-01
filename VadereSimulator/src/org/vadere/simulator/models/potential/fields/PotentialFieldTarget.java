@@ -143,12 +143,17 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		// Since we iterate over ALL obstacle shapes which might be complex polygons
 		// this loop can be very computational expensive.
 		// TODO: introduce a data structure such that we only have to check one or a view shapes.
-		if(attributes.getCreateMethod().isUsingCellGrid()) {
+		/*if(attributes.getCreateMethod().isUsingCellGrid()) {
 			for (ScenarioElement b : domain.getTopography().getObstacles()) {
 				if (b.getShape().contains(pos)) {
 					return Double.MAX_VALUE;
 				}
 			}
+		}*/
+
+		// point lies outside
+		if(domain.getTopography().distanceToObstacle(pos) <= 0) {
+			return Double.MAX_VALUE;
 		}
 
 		/* Find minimal potential of given targets. */

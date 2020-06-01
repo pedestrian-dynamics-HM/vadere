@@ -67,7 +67,7 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 	 * optimization by Brent.
 	 * 
 	 * @param angle
-	 *        the angle to the relevant position
+	 *        the angle3D to the relevant position
 	 * @return the potential value
 	 * @throws FunctionEvaluationException
 	 *         the function evaluation exception
@@ -88,7 +88,7 @@ public class PotentialEvaluationFunction implements UnivariateRealFunction,
 	 * Returns the target potential.
 	 * 
 	 * @param angle
-	 *        the angle of the direction to new position
+	 *        the angle3D of the direction to new position
 	 */
 	public double getTargetPotential(double angle) {
 		VPoint pedPos = pedestrian.getPosition();

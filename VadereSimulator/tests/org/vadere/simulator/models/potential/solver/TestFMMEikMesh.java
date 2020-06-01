@@ -17,7 +17,7 @@ import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -51,13 +51,13 @@ public class TestFMMEikMesh {
 		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
 		VPoint targetPoint = new VPoint(xmin, ymin);
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(
+		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
 				triangulation);
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
-		solver.initialize();
+		solver.solve();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
@@ -84,13 +84,13 @@ public class TestFMMEikMesh {
 		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
 		VPoint targetPoint = new VPoint(40, 40);
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(
+		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
 				triangulation);
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
-		solver.initialize();
+		solver.solve();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
@@ -156,13 +156,13 @@ public class TestFMMEikMesh {
 		//eikMesh.generate();
 
 		// 3. solve the eikonal equation on the given mehsh
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(
+		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				eikMesh.getTriangulation(),
 				eikMesh.getFixVertices().stream().filter(v -> v.distance(targetPoint) < GeometryUtils.DOUBLE_EPS).collect(Collectors.toList()));
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
-		solver.initialize();
+		solver.solve();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 

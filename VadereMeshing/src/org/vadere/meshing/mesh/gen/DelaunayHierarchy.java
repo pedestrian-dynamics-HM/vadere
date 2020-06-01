@@ -189,7 +189,7 @@ public class DelaunayHierarchy<V extends IVertex, E extends IHalfEdge, F extends
     public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
     @Override
-    public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
+    public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {}
 
     @Override
     public void postFlipEdgeEvent(F f1, F f2) {}
@@ -396,6 +396,11 @@ public class DelaunayHierarchy<V extends IVertex, E extends IHalfEdge, F extends
     public Optional<F> locate(double x, double y) {
         return locate(base.getMesh().createPoint(x, y));
     }
+
+	@Override
+	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
+		throw new UnsupportedOperationException("not jet implemented");
+	}
 
 	@Override
 	public Type getType() {

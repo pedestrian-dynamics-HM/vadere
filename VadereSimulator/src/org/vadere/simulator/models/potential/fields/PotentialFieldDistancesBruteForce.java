@@ -46,7 +46,7 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 		this.cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		boolean isInitialized = false;
-		logger.info("initialize floor field (PotentialFieldDistancesBruteForce)");
+		logger.info("solve floor field (PotentialFieldDistancesBruteForce)");
 		if (cache.isNotEmpty()){
 			double ms = System.currentTimeMillis();
 			String cacheIdentifier = cache.distToIdentifier("BruteForce");
@@ -58,12 +58,12 @@ public class PotentialFieldDistancesBruteForce implements IPotentialField {
 					isInitialized = true;
 					logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
 				} catch (CacheException e){
-					logger.errorf("Error loading cache initialize manually. " + e);
+					logger.errorf("Error loading cache solve manually. " + e);
 				}
 			} else if(cacheObject.writable()) {
 				// no cache found
 				ms = System.currentTimeMillis();
-				logger.infof("No cache found for scenario initialize floor field");
+				logger.infof("No cache found for scenario solve floor field");
 				this.cellGrid.pointStream().forEach(this::computeDistanceToGridPoint);
 				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 				isInitialized = true;

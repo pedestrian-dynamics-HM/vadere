@@ -90,7 +90,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	// different options
 
 	// spilts long boundary edges
-	private boolean allowEdgeSplits = false;
+	private boolean allowEdgeSplits = true;
 
 	// edge collapse of shortest edges of poor non-boundary triangles
 	private boolean allowEdgeCollapse = false;
@@ -482,7 +482,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					quality = tmpQuality;
 				}
 				assert getMesh().isValid();
-				log.info("quality (" + nSteps + "):" + tmpQuality);
+				log.debug("quality (" + nSteps + "):" + tmpQuality);
 			}
 		}
 	}
@@ -568,16 +568,17 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					VPoint q1 = getMesh().toPoint(prev);
 					VPoint q2 = getMesh().toPoint(getMesh().getPrev(prev));
 
-					VPoint m = q1.add(q2).scalarMultiply(0.5);
+					VPoint m = GeometryUtils.projectOntoLine(p1.getX(), p1.getY(), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+					//VPoint m = q1.add(q2).scalarMultiply(0.5);
 
 					VPoint dir = m.subtract(p1).scalarMultiply(2);
 					VPoint q3 = getMesh().toPoint(p1).add(dir);
 					VPoint virtualForce = getForceVirtual(getMesh().toPoint(p1), q3);
 
 					// only take the part of the force which act perpendicular to the boundary edge (q1, q2)
-					IPoint projection = GeometryUtils.projectOnto(virtualForce.getX(), virtualForce.getY(), q2.getX() - q1.getX(), q2.getY() - q1.getY());
+					//IPoint projection = GeometryUtils.projectOnto(virtualForce.getX(), virtualForce.getY(), q2.getX() - q1.getX(), q2.getY() - q1.getY());
 
-					virtualForce = virtualForce.subtract(projection);
+					//virtualForce = virtualForce.subtract(projection);
 
 
 					/*VPoint dir = m.subtract(p1).scalarMultiply(1.4);
@@ -585,7 +586,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					VPoint virtualForce = getForce(getMesh().toPoint(p1), q3);*/
 
 					increaseVelocity(vertex, virtualForce);
-					increaseAbsVelocity(vertex, force.distanceToOrigin());
+					increaseAbsVelocity(vertex, virtualForce.distanceToOrigin());
 
 				}
 			}
@@ -1204,7 +1205,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 	/**
-	 * Tests if the inside projection is valid which is the case if the angle at the vertex (at the boundary)
+	 * Tests if the inside projection is valid which is the case if the angle3D at the vertex (at the boundary)
 	 * is greater than 180 degree or the result of the projection lies inside the segment spanned by the
 	 * vertex and its two neighbouring border vertices.
 	 *

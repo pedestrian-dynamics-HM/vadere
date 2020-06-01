@@ -14,8 +14,7 @@ import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
@@ -114,14 +113,14 @@ public class TestFFMNonUniformTriangulation {
 
 	    List<PVertex> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
 
-        EikonalSolver solver = new EikonalSolverFMMTriangulation(
+        EikonalSolver solver = new MeshEikonalSolverFMM(
                 new UnitTimeCostFunction(),
                 triangulation,
 		        targetVertices,
                 distanceFunc);
 		long ms = System.currentTimeMillis();
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         log.info("time: " + (System.currentTimeMillis() - ms));
         double maxError = 0;
@@ -166,11 +165,11 @@ public class TestFFMNonUniformTriangulation {
         log.info("max distance to boundary: " + triangulation.getMesh().getBoundaryVertices().stream().map(p -> Math.abs(distanceFunc.apply(p))).max(Comparator.comparingDouble(d -> d)));
         //log.info("L2-Error: " + computeL2Error(triangulation, distanceFunc));
         log.info("max error: " + maxError);
-        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
+        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
 
         log.info("L2-error: " + Math.sqrt(sum / counter));
         log.info("L2-error-2: " + Math.sqrt(triangulation.getMesh().getVertices().stream()
-                .map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(p))))
+                .map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p))))
                 .map(val -> val * val)
                 .reduce(0.0, (d1, d2) -> d1 + d2) / triangulation.getMesh().getNumberOfVertices()));
         //assertTrue(0.0 == solver.getValue(5, 5));
@@ -201,14 +200,14 @@ public class TestFFMNonUniformTriangulation {
 
         log.info(targetPoints);
 
-        EikonalSolver solver = new EikonalSolverFMMTriangulation(
+        EikonalSolver solver = new MeshEikonalSolverFMM(
                 new UnitTimeCostFunction(),
                 triangulation,
                 targetPoints,
                 p -> -(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0));
 
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         double maxError = 0;
         double sum = 0;
@@ -275,14 +274,14 @@ public class TestFFMNonUniformTriangulation {
 
         log.info(targetPoints);
 
-        EikonalSolver solver = new EikonalSolverFMMTriangulation(
+        EikonalSolver solver = new MeshEikonalSolverFMM(
                 new UnitTimeCostFunction(),
                 triangulation,
                 targetPoints,
                 p -> -(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0));
 
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         double maxError = 0;
         double sum = 0;
@@ -328,7 +327,7 @@ public class TestFFMNonUniformTriangulation {
     private double computeL2Error(@NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation, final IDistanceFunction distanceFunc) {
         double sum = 0.0;
         for(PVertex vertex : triangulation.getMesh().getVertices()) {
-            double diff = triangulation.getMesh().getDoubleData(vertex, EikonalSolverFMMTriangulation.namePotential) + distanceFunc.apply(vertex);
+            double diff = triangulation.getMesh().getDoubleData(vertex, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(vertex);
             sum += diff * diff;
         }
         return Math.sqrt(sum);
@@ -346,11 +345,11 @@ public class TestFFMNonUniformTriangulation {
                 .filter(p -> distanceFunc.apply(cellGrid.pointToCoord(p)) >= 0)
                 .forEach(p -> cellGrid.setValue(p, new CellState(0.0, PathFindingTag.Target)));
 
-        EikonalSolver solver = new EikonalSolverFMM(cellGrid, distanceFunc, false, new UnitTimeCostFunction(), 0.1, 1.0);
+        EikonalSolver solver = new org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM(cellGrid, distanceFunc, false, new UnitTimeCostFunction(), 0.1, 1.0);
 
 
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         double maxError = 0;
         double sum = 0.0;
@@ -425,13 +424,13 @@ public class TestFFMNonUniformTriangulation {
                 .filter(p -> (cellGrid.pointToCoord(p).distanceToOrigin()) > 10)
                 .forEach(p -> cellGrid.setValue(p, new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle)));
 
-        EikonalSolver solver = new EikonalSolverFMM(
+        EikonalSolver solver = new org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM(
                 cellGrid, p -> -(new VPoint(p.getX(), p.getY()).distanceToOrigin()-2.0),
                 false, new UnitTimeCostFunction(), 0.1, 1.0);
 
 
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         double maxError = 0;
         double sum = 0.0;

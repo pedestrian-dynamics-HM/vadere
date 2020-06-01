@@ -3,6 +3,8 @@ package org.vadere.gui.topographycreator.view;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.control.ActionGenerateMesh;
 import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.IViewportChangeListener;
 import org.vadere.gui.components.control.JViewportChangeListener;
@@ -14,6 +16,7 @@ import org.vadere.gui.components.view.InfoPanel;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioToolBar;
 import org.vadere.gui.projectview.control.ActionDeselect;
+import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.topographycreator.control.ActionBasic;
 import org.vadere.gui.topographycreator.control.ActionCopyElement;
@@ -81,7 +84,7 @@ public class TopographyWindow extends JPanel {
 	private UndoableEditSupport undoSupport;
 	private UndoManager undoManager;
 
-	public TopographyWindow(final Scenario currentScenario) {
+	public TopographyWindow(final Scenario currentScenario, @NotNull final ProjectViewModel model) {
 
 		toolbar = new ScenarioToolBar("Toolbar");
 		int toolbarSize = VadereConfig.getConfig().getInt("Gui.toolbar.size");
@@ -99,7 +102,7 @@ public class TopographyWindow extends JPanel {
 		undoManager = new UndoManager();
 		undoSupport.addUndoableEditListener(new UndoAdaptor(undoManager));
 
-		setTopography(new TopographyCreatorModel(currentScenario));
+		setTopography(new TopographyCreatorModel(currentScenario), model);
 	}
 
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
@@ -120,7 +123,7 @@ public class TopographyWindow extends JPanel {
 		return button;
 	}
 
-	private void setTopography(final TopographyCreatorModel panelModel) {
+	private void setTopography(final TopographyCreatorModel panelModel, @NotNull final ProjectViewModel model) {
 
 		this.panelModel = panelModel;
 		this.panelModel.setMouseSelectionMode(new SelectElementMode(panelModel, undoSupport));
@@ -423,6 +426,10 @@ public class TopographyWindow extends JPanel {
 				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
 				panelModel);
 
+		AbstractAction generateMesh = new ActionGenerateMesh(Messages.getString("ProjectView.btnGenerateMesh.tooltip"),
+				resources.getIcon("generate_mesh.png", iconWidth, iconHeight),
+				model);
+
 
 		/* create toolbar*/
 		addActionToToolbar(toolbar, selectShape, "select_shape_tooltip");
@@ -468,6 +475,7 @@ public class TopographyWindow extends JPanel {
 		addActionToToolbar(toolbar, resetScenarioAction, "TopographyCreator.btnNewTopography.tooltip");
 		addActionToToolbar(toolbar, saveScenarioAction, "TopographyCreator.btnQuickSave.tooltip");
 		addActionToToolbar(toolbar, polyImg, "TopographyCreator.btnGeneratePoly.tooltip");
+		addActionToToolbar(toolbar, generateMesh, "TopographyCreator.btnGenerateMesh.tooltip");
 
 		toolbar.addSeparator(new Dimension(5, 50));
 		addActionToToolbar(toolbar, undoAction, "TopographyCreator.btnUndo.tooltip");

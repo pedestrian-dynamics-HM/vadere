@@ -1,23 +1,31 @@
 package org.vadere.meshing.mesh.gen;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * This helper class renders a {@link IMesh} into a {@link BufferedImage} or a {@link Graphics2D}.
@@ -157,27 +165,31 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		Stroke stroke = graphics.getStroke();
 
 		double scale;
+		float minEdgeLen;
 		synchronized (mesh) {
 			if(bound == null) {
-				bound = mesh.getBound();
+				bound = GeometryUtils.boundRelative(mesh.getBound().getPath(), 0.05);
 			}
 
 			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 			faces = mesh./*clone().*/getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
+			minEdgeLen = (float)edges.stream().mapToDouble(e -> mesh.toLine(e).length()).min().orElse(0.0);
 		}
 
-		//graphics.translate(-bound.getMinX() * scale, height-bound.getMinY() * scale);
-		//graphics.scale(scale, -scale);
 
 		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
 		graphics.scale(scale, scale);
-		graphics.fill(bound);
+
+		//graphics.translate(-bound.getMinX() * scale, bound.getHeight() * scale);
+		//graphics.scale(scale, -scale);
+
+		//graphics.fill(bound);
 
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
-		graphics.setStroke(new BasicStroke(0.5f * (float)(1/scale)));
-		double ptdiameter = 3.0f * (float)(1/scale);
+		graphics.setStroke(new BasicStroke(minEdgeLen * 1.0f/15f));
+		double ptdiameter = minEdgeLen * 1.0f/2.0f;
 		//graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -197,6 +209,27 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 				}
 			}
 			graphics.fill(polygon);
+		}
+
+		List<E> edgest = mesh.streamEdges().filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
+		Random random = new Random(0);
+		for (E edge : edgest) {
+			V v = mesh.getVertex(edge);
+			List<Pair<V, V>> list = new ArrayList<>();
+			mesh.getVirtualSupport(v, mesh.getPrev(edge), list);
+
+			if(list.isEmpty()) {
+				VTriangle tri = mesh.toTriangle(mesh.getFace(edge));
+				graphics.setColor(Color.RED);
+				graphics.fill(tri);
+			} else {
+				/*for(Pair<V, V> pair : list) {
+					VTriangle tri = new VTriangle(mesh.toPoint(v), mesh.toPoint(pair.getLeft()), mesh.toPoint(pair.getRight()));
+					graphics.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+					graphics.fill(tri);
+				}*/
+			}
+
 		}
 
 		for(E edge : edges) {
@@ -224,6 +257,18 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(bound.getMinX() * scale, bound.getMinY() * scale);
 
+	}
+
+	private boolean isNonAcute(@NotNull final E edge, @NotNull final IMesh<V, E, F> mesh) {
+		VPoint p1 = mesh.toPoint(mesh.getPrev(edge));
+		VPoint p2 = mesh.toPoint(edge);
+		VPoint p3 = mesh.toPoint(mesh.getNext(edge));
+
+		double angle1 = GeometryUtils.angle(p1, p2, p3);
+
+		// non-acute triangle
+		double rightAngle = Math.PI/2;
+		return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
 	}
 
 	/*public void renderGraphics(@NotNull final Graphics2D graphics, final double width, final double height) {

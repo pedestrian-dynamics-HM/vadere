@@ -10,7 +10,7 @@ import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.util.logging.Logger;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class MeshTxtCacheObject extends AbstractCacheObject implements IMeshCach
 		try {
 			MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(() -> new PMesh());
 			InputStream fastInputStream = new FastBufferedInputStream(inputStream);
-			meshPolyReader.readMesh(fastInputStream, i -> EikonalSolverFMMTriangulation.namePotential);
+			meshPolyReader.readMesh(fastInputStream, i -> MeshEikonalSolverFMM.namePotential);
 		} catch (IOException e) {
 			throw new CacheException("Cannot load cache from TXT InputStream", e);
 		}
@@ -47,7 +47,7 @@ public class MeshTxtCacheObject extends AbstractCacheObject implements IMeshCach
 		try {
 			PrintWriter writer = new PrintWriter(new FastBufferedOutputStream(new FileOutputStream(cacheLocation)));
 			MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-			meshPolyWriter.to2DPoly(mesh, 1, i -> EikonalSolverFMMTriangulation.namePotential, v -> false, writer);
+			meshPolyWriter.to2DPoly(mesh, 1, i -> MeshEikonalSolverFMM.namePotential, v -> false, writer);
 		} catch (FileNotFoundException e) {
 			logger.errorf("cannot save cache %s", cacheLocation.getAbsolutePath());
 		}
