@@ -1,7 +1,7 @@
 {
   "name" : "02-Test-TargetChanger-ChangesTargetIfProbabilityIsOne",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -190,7 +190,7 @@
         "reachDistance" : 0.0,
         "nextTargetIsPedestrian" : false,
         "nextTarget" : [ 3 ],
-        "probabilityToChangeTarget" : 1.0
+        "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
@@ -213,7 +213,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
@@ -234,7 +235,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

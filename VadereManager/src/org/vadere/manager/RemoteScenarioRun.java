@@ -17,14 +17,17 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 	private final ReentrantLock lock;
 	private List<Subscription> subscriptions;
 	private boolean lastSimulationStep;
+	private double simulationStoppedEarlyAtTime;
 
 
 	public RemoteScenarioRun(Scenario scenario, Path outputDir, RunnableFinishedListener scenarioFinishedListener, Path scenarioPath, ScenarioCache scenarioCache) {
-		super(scenario, outputDir.toString(), scenarioFinishedListener, scenarioPath, scenarioCache);
+		// overwriteTimestampSetting. In RemoteScenarioRun the caller defines where the output should go.
+		super(scenario, outputDir.toString(), true,scenarioFinishedListener, scenarioPath, scenarioCache);
 		this.singleStepMode = true;
 		this.waitForLoopEnd = new Object();
 		this.lock = new ReentrantLock();
 		this.lastSimulationStep = false;
+		this.simulationStoppedEarlyAtTime = Double.MAX_VALUE;
 		addRemoteManagerListener(this);
 	}
 
@@ -72,8 +75,16 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		}
 	}
 
+	@Override
+	public void simulationStoppedEarlyListener(double time) {
+		simulationStoppedEarlyAtTime = time;
+	}
+
 	public boolean isLastSimulationStep() {
 		return lastSimulationStep;
 	}
 
+	public double getSimulationStoppedEarlyAtTime() {
+		return simulationStoppedEarlyAtTime;
+	}
 }

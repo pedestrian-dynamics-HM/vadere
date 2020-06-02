@@ -138,6 +138,17 @@ public class OSMBehaviorController {
         pedestrian.setTimeOfNextStep(stepEndTime);
     }
 
+    /**
+     * Maximize distance to the threat (a threat) and increase speed.
+     *
+     * Watch out: The focus is the behavioral change here and not the exact speed-up. The exact speed-up factor
+     * requires empirical data.
+     *
+     * In future: Requires data for calibration.
+     *
+     * @param pedestrian The pedestrian which escapes from a {@link Threat}.
+     * @param topography The topography which is used to derive the location of the {@link Threat}.
+     */
     public void changeToTargetRepulsionStrategyAndIncreaseSpeed(PedestrianOSM pedestrian, Topography topography) {
         if (pedestrian.getThreatMemory().isLatestThreatUnhandled()) {
             Threat threat = pedestrian.getThreatMemory().getLatestThreat();
@@ -149,7 +160,6 @@ public class OSMBehaviorController {
             pedestrian.setTargets(nextTarget);
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY);
 
-            // TODO: Maybe, sample speed-up from a distribution or define it as a configurable attribute.
             double escapeSpeed = pedestrian.getFreeFlowSpeed() * 2.0;
             pedestrian.setFreeFlowSpeed(escapeSpeed);
 
@@ -162,8 +172,8 @@ public class OSMBehaviorController {
      * A pedestrian selects the target which is closest to its source as safe zone.
      * Or if pedestrian has no target, select closest target as safe zone.
      *
-     * TODO: Clarify with Gerta if this is really a plausible assumption for safe zones.
-     *   An easier approach is to just use the closest target as safe zone.
+     * Watch out: This is our current definition of a safe zone. Maybe, this mus be
+     * adjusted in the future when more empirical data about safe zones is available.
      */
     public void changeTargetToSafeZone(PedestrianOSM pedestrian, Topography topography) {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {

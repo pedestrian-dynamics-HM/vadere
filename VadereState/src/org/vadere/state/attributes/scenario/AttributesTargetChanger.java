@@ -3,8 +3,8 @@ package org.vadere.state.attributes.scenario;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Attributes of "TargetChanger" object, used by "TargetChangerController" during simulation.
@@ -36,7 +36,9 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
      */
-    private double probabilityToChangeTarget = 0.0;
+    private LinkedList<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
+
+
 
     // Constructors
     public AttributesTargetChanger() {
@@ -51,16 +53,19 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.id = id;
     }
 
-    public AttributesTargetChanger(final VShape shape, final int id, double reachDistance, LinkedList<Integer> nextTarget, double probabilityToChangeTarget) {
+    public AttributesTargetChanger(final VShape shape, final int id, double reachDistance, LinkedList<Integer> nextTarget, LinkedList<Double> probabilitiesToChangeTarget) {
         this.shape = shape;
         this.id = id;
         this.reachDistance = reachDistance;
         this.nextTarget = nextTarget;
+        for (Double probabilityToChangeTarget : probabilitiesToChangeTarget){
 
-        if (probabilityToChangeTarget < 0.0 || probabilityToChangeTarget > 1.0) {
-            throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
+            if (probabilityToChangeTarget < 0.0 || probabilityToChangeTarget > 1.0) {
+                throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
+            }
         }
-        this.probabilityToChangeTarget = probabilityToChangeTarget;
+
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
     // Getters
@@ -85,7 +90,7 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         return nextTarget;
     }
 
-    public double getProbabilityToChangeTarget() {
+    public LinkedList<Double> getProbabilitiesToChangeTarget() {
         return probabilityToChangeTarget;
     }
 
@@ -113,11 +118,15 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.nextTarget = nextTarget;
     }
 
-    public void setProbabilityToChangeTarget(double probabilityToChangeTarget) {
-        if (probabilityToChangeTarget < 0.0 || probabilityToChangeTarget > 1.0) {
-            throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
+    public void setProbabilitiesToChangeTarget(LinkedList<Double> probabilitiesToChangeTarget) {
+
+        for (Double probabilityToChangeTarget : probabilitiesToChangeTarget){
+
+            if (probabilityToChangeTarget < 0.0 || probabilityToChangeTarget > 1.0) {
+                throw new IllegalArgumentException("Probability must be in range 0.0 to 1.0!");
+            }
         }
-        this.probabilityToChangeTarget = probabilityToChangeTarget;
+        this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
 }

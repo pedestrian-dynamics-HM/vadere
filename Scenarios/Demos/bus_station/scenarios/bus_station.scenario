@@ -1,7 +1,7 @@
 {
   "name" : "bus_station",
   "description" : "Scenario used for TGF19 contribution",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
@@ -307,7 +307,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 2, 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

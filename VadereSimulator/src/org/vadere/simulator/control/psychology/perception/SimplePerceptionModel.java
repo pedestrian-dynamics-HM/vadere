@@ -45,6 +45,8 @@ public class SimplePerceptionModel implements IPerceptionModel {
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
         List<Stimulus> changeTargetScriptedStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTargetScripted).collect(Collectors.toList());
 
+        // place List changepersonalspace here
+
         if (changeTargetScriptedStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetScriptedStimuli.get(0);
         } else if (changeTargetStimuli.size() >= 1) {
@@ -64,6 +66,7 @@ public class SimplePerceptionModel implements IPerceptionModel {
                 mostImportantStimulus = selectedWaitInArea;
             }
         }
+        else if(true){} // place changepersonalspace here
 
         return mostImportantStimulus;
     }

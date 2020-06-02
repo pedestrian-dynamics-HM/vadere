@@ -74,9 +74,13 @@ public class RemoteManager implements RunnableFinishedListener {
 			throw new TraCIException("Cannot create Scenario from given file.");
 		}
 		if (simCfg != null) {
-			scenario.getAttributesSimulation().setFixedSeed(simCfg.getSeed());
-			scenario.getAttributesSimulation().setUseFixedSeed(true);
-			logger.infof("received seed from traci client '%s'", Long.toString(simCfg.getSeed()));
+			if (simCfg.isUseVadereSeed()){
+				logger.infof("use Vadere Seed. (ignoring traci seed)", Long.toString(simCfg.getSeed()));
+			} else {
+				scenario.getAttributesSimulation().setFixedSeed(simCfg.getSeed());
+				scenario.getAttributesSimulation().setUseFixedSeed(true);
+				logger.infof("received seed from traci client '%s'", Long.toString(simCfg.getSeed()));
+			}
 		}
 		currentSimulationRun = new RemoteScenarioRun(scenario, outputDir, this, scenarioPath, scenarioCache);
 	}
@@ -141,6 +145,10 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		currentSimulationRun.nextStep(simTime);
 		return true;
+	}
+
+	public double getSimulationStoppedEarlyAtTime(){
+		return currentSimulationRun.getSimulationStoppedEarlyAtTime();
 	}
 
 	public boolean isClientCloseCommandReceived() {

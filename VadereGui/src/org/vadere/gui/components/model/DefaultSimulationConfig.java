@@ -23,6 +23,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	private boolean interpolatePositions = true;
 	private boolean showPedestrianIds = false;
+	private boolean showPedestrianInOutGroup = false;
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
@@ -31,6 +32,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showMeasurementArea = true;
 	private boolean showStairs = true;
 	private boolean showPedestrians = true;
+	private boolean showContacts = true;
+	private boolean contactsRecorded = false;
 	private boolean showWalkdirection = false;
 	private boolean showTargetPotentialField = false;
 	private boolean showTargetPotentielFieldMesh = false;
@@ -65,12 +68,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		}
 
 		this.showPedestrianIds = config.showPedestrianIds;
+		this.showPedestrianInOutGroup = config.showPedestrianInOutGroup;
 		this.gridWidth = config.gridWidth;
 		this.showDensity = config.showDensity;
 		this.showTargetPotentialField = config.showTargetPotentialField;
 		this.showWalkdirection = config.showWalkdirection;
 		this.showGrid = config.showGrid;
 		this.showPedestrians = config.showPedestrians;
+		this.showContacts = config.showContacts;
 		this.showLogo = config.showLogo;
 		this.showStairs = config.showStairs;
 		this.showGroups = config.showGroups;
@@ -101,6 +106,18 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showPedestrians;
 	}
 
+	public boolean isShowContacts() {
+		return showContacts;
+	}
+
+	public boolean isContactsRecorded() {
+		return contactsRecorded;
+	}
+
+	public void setContactsRecorded(boolean contactsRecorded) {
+		this.contactsRecorded = contactsRecorded;
+	}
+
 	public boolean isShowWalkdirection() {
 		return showWalkdirection;
 	}
@@ -116,6 +133,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowPedestrians(boolean showPedestrians) {
 		this.showPedestrians = showPedestrians;
+		setChanged();
+	}
+
+	public void setShowContacts(boolean showContacts) {
+		this.showContacts = showContacts;
 		setChanged();
 	}
 
@@ -332,8 +354,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showPedestrianIds;
 	}
 
+	public boolean isShowPedestrianInOutGroup() { return showPedestrianInOutGroup; }
+
 	public void setShowPedestrianIds(final boolean showPedestrianIds) {
 		this.showPedestrianIds = showPedestrianIds;
+	}
+
+	public void setShowPedestrianInOutGroup(final boolean showPedestrianInOutGroup) {
+		this.showPedestrianInOutGroup = showPedestrianInOutGroup;
 	}
 
 	public boolean isShowFaydedPedestrians() {

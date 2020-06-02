@@ -17,6 +17,8 @@ public class UnusedTargetsCheck extends AbstractScenarioCheck implements Topogra
 		Set<Integer> usedTargetIds = new HashSet<>();
 		topography.getSources()
 				.forEach(s -> usedTargetIds.addAll(s.getAttributes().getTargetIds()));
+		topography.getTargetChangers()
+				.forEach(s -> usedTargetIds.addAll(s.getAttributes().getNextTarget()));
 
 		topography.getTargets().forEach(t -> {
 			if (!usedTargetIds.contains(t.getId())) {

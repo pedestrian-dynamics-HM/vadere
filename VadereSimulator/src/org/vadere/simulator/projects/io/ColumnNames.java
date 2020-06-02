@@ -11,6 +11,7 @@ import tech.tablesaw.api.Table;
 
 public final class ColumnNames {
 	private Set<String> pedestrianIdKeys;
+	private Set<String> secondPedestrianIdKeys;
 	private Set<String> startX;
 	private Set<String> startY;
 	private Set<String> endX;
@@ -20,6 +21,7 @@ public final class ColumnNames {
 	private Set<String> groupSizeKeys;
 	private Set<String> startTimeKeys;
 	private Set<String> endTimeKeys;
+	private Set<String> durationKeys;
 	private Set<String> mostImportantStimulusKeys;
 	private Set<String> selfCategoryKeys;
 	private Set<String> groupMembershipKeys;
@@ -39,6 +41,7 @@ public final class ColumnNames {
 	private ColumnNames() {
 		keys = new ArrayList<>();
 		pedestrianIdKeys = new HashSet<>();
+		secondPedestrianIdKeys = new HashSet<>();
 		startX = new HashSet<>();
 		startY = new HashSet<>();
 		endX = new HashSet<>();
@@ -51,19 +54,30 @@ public final class ColumnNames {
 		groupMembershipKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
+		durationKeys = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
 		pedestrianIdKeys.add("pedestrianId");
+		pedestrianIdKeys.add("1stPedId");
+
+		secondPedestrianIdKeys.add("2ndPedId");
+
 
 		startTimeKeys.add("simTime");
 		startTimeKeys.add("time");
 		startTimeKeys.add("startTime");
+		startTimeKeys.add("startTimeStep");
+
 
 		endTimeKeys.add("endTime");
 
+		durationKeys.add("durationTimesteps");
+
 		startX.add("startX");
+		startX.add("xPath");
 		startY.add("startY");
+		startY.add("yPath");
 		endX.add("endX");
 		endY.add("endY");
 		targetIdKeys.add("targetId");
@@ -74,6 +88,7 @@ public final class ColumnNames {
 		groupMembershipKeys.add("groupMembership");
 
 		keys.add(pedestrianIdKeys);
+		keys.add(secondPedestrianIdKeys);
 		keys.add(startX);
 		keys.add(startY);
 		keys.add(endX);
@@ -86,6 +101,7 @@ public final class ColumnNames {
 		keys.add(groupMembershipKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
+		keys.add(durationKeys);
 	}
 
 	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
@@ -103,6 +119,12 @@ public final class ColumnNames {
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, pedestrianIdKeys);
+	}
+	public int getSecondPedestrianIdCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, secondPedestrianIdKeys);
+	}
+	public int getDurationCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, durationKeys);
 	}
 
 	public int getStartTimeCol(@NotNull final Table dataFrame) {

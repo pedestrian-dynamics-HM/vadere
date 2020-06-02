@@ -6,6 +6,7 @@
 
 ### Added
 
+- The TikZ snapshot button allows to export either the whole topography or only the current (scaled) view. This is useful when visualizing parts of bigger topographies.
 - Added "--version" to "vadere-console.jar".
 - Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
 - Added "Psychology" tab in GUI which shows all psychology-related attributes of a scenario (which are stored in JSON node "attributesPsychology").
@@ -65,7 +66,6 @@ Was previously known as `PedestrianFootStepProcessor`
   3. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=true`:
      Lookup `Vadere.cache.flobalCacheBaseDir` and use this as the base path for the relative 
      `cacheDir` path. `Vadere.cache.flobalCacheBaseDir` defaults to `${user.home}\.cache\vadere`
-  
 
 ## v1.4 (2019-09-05)
 

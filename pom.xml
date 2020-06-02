@@ -242,6 +242,12 @@
           <artifactId>py4j</artifactId>
           <version>0.10.8</version>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/com.github.davidmoten/rtree -->
+      <dependency>
+          <groupId>com.github.davidmoten</groupId>
+          <artifactId>rtree</artifactId>
+          <version>0.8.7</version>
+      </dependency>
   </dependencies>
 
 </project>

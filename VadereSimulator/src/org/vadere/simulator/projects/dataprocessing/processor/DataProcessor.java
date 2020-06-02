@@ -45,6 +45,8 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 
 	private int lastStep;
 
+	private boolean stopSimBeforeSimFinish;
+
 	protected DataProcessor() {
 		this(new String[] { });
 	}
@@ -54,6 +56,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		this.data = new TreeMap<>(); // TreeMap to avoid sorting data later
 
 		this.lastStep = 0;
+		this.stopSimBeforeSimFinish = false;
 	}
 
 
@@ -105,6 +108,10 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		this.data.put(key, value);
 	}
 
+	protected void removeKey(final K key) {
+		this.data.remove(key);
+	}
+
 	public void preLoop(final SimulationState state) { data.clear(); }
 
 	protected abstract void doUpdate(final SimulationState state);
@@ -112,10 +119,13 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	public final void update(final SimulationState state) {
 		int step = state.getStep();
 
-		if (this.lastStep < step) {
+		if (this.lastStep < step)  {
 			this.doUpdate(state);
 			this.lastStep = step;
 		}
+		// stop simulation if a criteria defined in your data processor is fulfilled
+		state.setSimStop(this.stopSimBeforeSimFinish);
+
 	}
 
 	public Optional<Model> getSubModel(SimulationState state, Class clazz){
@@ -146,6 +156,10 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 
 	public String getSimpleProcessorTypeName() {
 		return getClass().getSimpleName();
+	}
+
+	public void setStopSimBeforeSimFinish(boolean stopSimBeforeSimFinish) {
+		this.stopSimBeforeSimFinish = stopSimBeforeSimFinish;
 	}
 
 	@Override

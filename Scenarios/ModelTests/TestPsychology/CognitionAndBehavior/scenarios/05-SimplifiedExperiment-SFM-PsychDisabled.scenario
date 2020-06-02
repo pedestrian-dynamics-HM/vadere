@@ -1,44 +1,40 @@
 {
   "name" : "05-SimplifiedExperiment-SFM-PsychDisabled",
   "description" : "",
-  "release" : "1.11",
-  "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 7, 8, 9, 10 ]
+      "processors" : [ 3, 4, 5 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
-      "processors" : [ 3 ]
+      "processors" : [ 1 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
+      "processors" : [ 2 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 3
+      "id" : 1
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
+      "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
+        "pedestrianOverlapProcessorId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 7
+      "id" : 3
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 8
+      "id" : 4
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
-      "id" : 9
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
-      "id" : 10
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -220,7 +216,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -268,7 +267,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -316,7 +318,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -364,7 +369,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -412,7 +420,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -460,7 +471,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -508,7 +522,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -556,7 +573,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -604,7 +624,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -652,7 +675,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -700,7 +726,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -748,7 +777,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -796,7 +828,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -844,7 +879,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -892,7 +930,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -940,7 +981,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -988,7 +1032,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

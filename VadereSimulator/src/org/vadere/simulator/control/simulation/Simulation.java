@@ -288,6 +288,22 @@ public class Simulation {
 					c.postUpdate(simTimeInSec);
 				}
 
+				double stopTime = runTimeInSec;
+				if (this.simulationState.isSimStop()) {
+					// get stopTime if the simulation should finish before finish time. New finish time = stop time
+					stopTime = this.simTimeInSec;
+				}
+
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
+					// do nothing here. This is done after the  Remote Control Hook
+				} else {
+					// inform Remote Control Hook that simulation is stopped before
+					// static runTimeInSec is reached.
+					isRunSimulation = false;
+					remoteRunListeners.forEach(e-> e.simulationStoppedEarlyListener(simTimeInSec));
+					if (stopTime < runTimeInSec) {
+						logger.info("Run simulation until time t=" + stopTime +"s is reached."); }
+				}
 
 				// Single step hook
 				// Remote Control Hook
@@ -315,13 +331,10 @@ public class Simulation {
 					}
 				}
 
-
-
-				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
-				} else {
-					isRunSimulation = false;
 				}
+
 
 				//remove comment to fasten simulation for evacuation simulations
 				//if (topography.getElements(Pedestrian.class).size() == 0){

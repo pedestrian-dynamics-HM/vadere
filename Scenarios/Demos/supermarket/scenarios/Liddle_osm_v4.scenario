@@ -1,23 +1,32 @@
 {
-  "name" : "13-RiMEA11-ExitSelection-OSMEventDriven-PsychEnabled",
+  "name" : "Liddle_osm_v4",
   "description" : "",
-  "release" : "1.11",
-  "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 7, 8, 9, 10 ]
+      "processors" : [ 1, 2 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
+      "filename" : "overlap.csv",
       "processors" : [ 3 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "contacts.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "id" : 2
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
       "id" : 3
     }, {
@@ -28,17 +37,15 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 7
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 8
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
-      "id" : 9
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
-      "id" : 10
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.5,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -50,7 +57,7 @@
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "optimizationType" : "NELDER_MEAD",
-        "varyStepDirection" : true,
+        "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
@@ -100,19 +107,19 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 200.0,
+      "finishTime" : 30.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.5,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
-      "useFixedSeed" : true,
-      "fixedSeed" : 3213925745664992646,
-      "simulationSeed" : 1
+      "useFixedSeed" : false,
+      "fixedSeed" : 1,
+      "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : true,
+      "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
@@ -123,8 +130,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 14.0,
-          "height" : 18.0
+          "width" : 20.0,
+          "height" : 15.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -132,81 +139,51 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 7.2,
-            "y" : 5.0
-          }, {
-            "x" : 7.2,
-            "y" : 6.0
-          }, {
-            "x" : 0.5,
-            "y" : 6.0
-          }, {
-            "x" : 0.5,
-            "y" : 5.0
-          } ]
+          "x" : 3.0,
+          "y" : 9.0,
+          "width" : 5.0,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 3
+        "id" : 1
       }, {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 10.1,
-            "y" : 5.0
-          }, {
-            "x" : 10.1,
-            "y" : 6.0
-          }, {
-            "x" : 7.8,
-            "y" : 6.0
-          }, {
-            "x" : 7.8,
-            "y" : 5.0
-          } ]
+          "x" : 3.0,
+          "y" : 0.0,
+          "width" : 5.0,
+          "height" : 6.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 4
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 0.5,
-            "y" : 14.5
-          }, {
-            "x" : 11.6,
-            "y" : 14.5
-          }, {
-            "x" : 11.6,
-            "y" : 6.000000000000007
-          }, {
-            "x" : 10.7,
-            "y" : 6.0
-          }, {
-            "x" : 10.7,
-            "y" : 5.0
-          }, {
-            "x" : 12.6,
-            "y" : 5.0
-          }, {
-            "x" : 12.6,
-            "y" : 15.600000000000001
-          }, {
-            "x" : 0.5,
-            "y" : 15.600000000000001
-          } ]
-        },
-        "id" : 5
+        "id" : 2
       } ],
-      "measurementAreas" : [ ],
+      "measurementAreas" : [ {
+        "shape" : {
+          "x" : 8.5,
+          "y" : 6.0,
+          "width" : 1.0,
+          "height" : 3.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 1
+      }, {
+        "shape" : {
+          "x" : 8.0,
+          "y" : 5.6,
+          "width" : 2.0,
+          "height" : 4.0,
+          "type" : "RECTANGLE"
+        },
+        "id" : 2
+      } ],
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 6.4,
-          "y" : 2.4000000000000004,
-          "width" : 6.0,
-          "height" : 2.0,
+          "x" : 1.0,
+          "y" : 6.8,
+          "width" : 1.4,
+          "height" : 1.4,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -220,12 +197,12 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 2,
+        "id" : 3,
         "shape" : {
-          "x" : 2.5,
-          "y" : 8.0,
-          "width" : 3.95,
-          "height" : 4.74,
+          "x" : 14.0,
+          "y" : 2.5,
+          "width" : 5.0,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
@@ -248,8 +225,8 @@
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
         "speedDistributionStandardDeviation" : 0.26,
-        "minimumSpeed" : 0.5,
-        "maximumSpeed" : 2.2,
+        "minimumSpeed" : 0.01,
+        "maximumSpeed" : 5.0,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,

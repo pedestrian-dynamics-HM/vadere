@@ -1,70 +1,40 @@
 {
-  "name" : "16-Threat-ImitatingBehavior-SelfCatThreatModel",
+  "name" : "17-Threat-ImitatingBehavior-SelfCatThreatModel",
   "description" : "",
-  "release" : "1.11",
-  "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "density.txt",
-      "processors" : [ 1 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "out.txt",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "out1.txt",
-      "processors" : [ 4 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 6, 7, 8, 9 ]
+      "processors" : [ 3, 4, 5 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
+      "filename" : "overlaps.csv",
+      "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "overlapCount.txt",
+      "processors" : [ 2 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
-      "id" : 1,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 2,
-        "radius" : 1.5
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 2,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
-      "attributes" : {
-        "interpolate" : true
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 3
+      "id" : 1
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
+      "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.MaxOverlapProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesMaxOverlapProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
+        "pedestrianOverlapProcessorId" : 1
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 6
+      "id" : 3
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 7
+      "id" : 4
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepMostImportantStimulusProcessor",
-      "id" : 8
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
-      "id" : 9
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -94,7 +64,7 @@
           "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
           "submodels" : [ ]
         },
-        "probabilityInGroupMembership" : 0.0
+        "probabilityInGroupMembership" : 1.0
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -159,7 +129,37 @@
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 23.0,
+            "y" : 3.75
+          }, {
+            "x" : 24.5,
+            "y" : 3.75
+          }, {
+            "x" : 24.5,
+            "y" : 5.5
+          }, {
+            "x" : 23.0,
+            "y" : 5.5
+          }, {
+            "x" : 23.0,
+            "y" : 6.5
+          }, {
+            "x" : 25.5,
+            "y" : 6.5
+          }, {
+            "x" : 25.5,
+            "y" : 3.0
+          }, {
+            "x" : 23.0,
+            "y" : 3.0
+          } ]
+        },
+        "id" : 7
+      } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
@@ -318,7 +318,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -366,7 +369,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "IN_GROUP"
+          "groupMembership" : "IN_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -414,7 +420,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

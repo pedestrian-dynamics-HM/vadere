@@ -1,7 +1,7 @@
 {
   "name" : "hm_stairs",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.12",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -298,7 +298,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 2,
         "shape" : {
@@ -319,7 +320,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 3,
         "shape" : {
@@ -340,7 +342,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 4,
         "shape" : {
@@ -361,7 +364,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 5,
         "shape" : {
@@ -382,7 +386,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 6,
         "shape" : {
@@ -403,7 +408,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 7,
         "shape" : {
@@ -424,7 +430,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 8,
         "shape" : {
@@ -445,7 +452,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 9,
         "shape" : {
@@ -466,7 +474,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 12,
         "shape" : {
@@ -487,7 +496,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 13,
         "shape" : {
@@ -508,7 +518,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 14,
         "shape" : {
@@ -529,7 +540,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 15,
         "shape" : {
@@ -550,7 +562,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 16,
         "shape" : {
@@ -571,7 +584,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 17,
         "shape" : {
@@ -592,7 +606,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 18,
         "shape" : {
@@ -613,7 +628,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 19,
         "shape" : {
@@ -634,7 +650,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 22,
         "shape" : {
@@ -655,7 +672,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 23,
         "shape" : {
@@ -676,7 +694,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 24,
         "shape" : {
@@ -697,7 +716,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 25,
         "shape" : {
@@ -718,7 +738,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 26,
         "shape" : {
@@ -739,7 +760,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 27,
         "shape" : {
@@ -760,7 +782,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 28,
         "shape" : {
@@ -781,7 +804,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 29,
         "shape" : {
@@ -802,7 +826,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 30,
         "shape" : {
@@ -823,7 +848,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 31,
         "shape" : {
@@ -844,7 +870,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 32,
         "shape" : {
@@ -865,7 +892,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 33,
         "shape" : {
@@ -886,7 +914,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 34,
         "shape" : {
@@ -907,7 +936,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 35,
         "shape" : {
@@ -928,7 +958,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 36,
         "shape" : {
@@ -949,7 +980,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 37,
         "shape" : {
@@ -970,7 +1002,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 38,
         "shape" : {
@@ -991,7 +1024,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 39,
         "shape" : {
@@ -1012,7 +1046,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 40,
         "shape" : {
@@ -1033,7 +1068,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 41,
         "shape" : {
@@ -1054,7 +1090,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 42,
         "shape" : {
@@ -1075,7 +1112,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 43,
         "shape" : {
@@ -1096,7 +1134,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 44,
         "shape" : {
@@ -1117,7 +1156,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 45,
         "shape" : {
@@ -1138,7 +1178,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 46,
         "shape" : {
@@ -1159,7 +1200,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 47,
         "shape" : {
@@ -1180,7 +1222,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 48,
         "shape" : {
@@ -1201,7 +1244,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 49,
         "shape" : {
@@ -1222,7 +1266,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 20, 10, 11 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 50,
         "shape" : {
@@ -1243,7 +1288,8 @@
         "useFreeSpaceOnly" : false,
         "targetIds" : [ 10, 20, 21 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
