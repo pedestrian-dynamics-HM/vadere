@@ -179,11 +179,11 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		}
 
 
-		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
-		graphics.scale(scale, scale);
+		//graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
+		//graphics.scale(scale, scale);
 
-		//graphics.translate(-bound.getMinX() * scale, bound.getHeight() * scale);
-		//graphics.scale(scale, -scale);
+		graphics.translate(-bound.getMinX() * scale, (bound.getMinY()+bound.getHeight()) * scale);
+		graphics.scale(scale, -scale);
 
 		//graphics.fill(bound);
 
@@ -211,7 +211,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			graphics.fill(polygon);
 		}
 
-		List<E> edgest = mesh.streamEdges().filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
+		List<E> edgest = mesh.streamEdges().filter(e -> !mesh.isBoundary(e)).filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
 		Random random = new Random(0);
 		for (E edge : edgest) {
 			V v = mesh.getVertex(edge);

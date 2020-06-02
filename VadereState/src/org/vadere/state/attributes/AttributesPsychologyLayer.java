@@ -11,7 +11,7 @@ public class AttributesPsychologyLayer {
     // Constants
     // Watch out: Make sure these classes exist!
     public static final String DEFAULT_PERCEPTION_MODEL = "SimplePerceptionModel";
-    public static final String DEFAULT_COGNITION_MODEL = "CooperativeCognitionModel";
+    public static final String DEFAULT_COGNITION_MODEL = "SimpleCognitionModel";
 
     // Variables
     // Both should reference to concrete "IPerception" and "ICognition"

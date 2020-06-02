@@ -16,8 +16,12 @@ import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangul
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,36 +58,43 @@ public class RegularRefinement {
 		}
 
 		meshImprover.finish();
-		meshPanel = new PMeshPanel(dt.getMesh().clone(), 800, 800);
+		meshPanel = new PMeshPanel(triangulation.getMesh(), 800, 800);
 		meshPanel.display("Random Delaunay triangulation");
 		//meshPanel.repaint();
 
-		GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(triangulation, e -> triangulation.getMesh().toLine(e).length() > 0.5);
 
-		//while (!refinement.isFinished()) {
-			//Thread.sleep(2000);
-			//synchronized (triangulation.getMesh()) {
-				refinement.refine();
-			//}
-			//meshPanel.repaint();
-		//}
-		//meshPanel.repaint();
+		VPoint p = new VPoint(5,5);
+		double radius = 2.0;
 
-		PMeshPanel meshPanel3 = new PMeshPanel(dt.getMesh().clone(), 800, 800);
-		meshPanel3.display("Refined mesh");
+		GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(
+				triangulation,
+				e -> triangulation.getMesh().toLine(e).length() > 0.5 && triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) <= radius,
+				1);
 
-		//Thread.sleep(2000);
+		Predicate<PHalfEdge> edgeSplitPredicate = e ->
+				!triangulation.getMesh().isBoundary(e) &&
+						triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) < 3.0 &&
+						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
 
-		//refinement.coarse();
+		refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
+		refinement.refine();
+		meshPanel.repaint();
 
-		PMeshPanel meshPanel2 = new PMeshPanel(dt.getMesh().clone(), 800, 800);
-		meshPanel2.display("Coarsen mesh");
+		Thread.sleep(2000);
+		VPoint q = new VPoint(3,3);
+		Predicate<PVertex> coarsePredicate = v -> q.distance(v) > 3.0;
+		refinement.setCoarsePredicate(coarsePredicate);
+		refinement.coarse();
 
 
-		//meshPanel.repaint();
+		Thread.sleep(2000);
 
-		//Thread.sleep(2000);
-
+		edgeSplitPredicate = e ->
+				!triangulation.getMesh().isBoundary(e) &&
+						triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(q) < 3.0 &&
+						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
+		refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
+		refinement.refine();
 	}
 
 }

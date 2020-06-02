@@ -1,7 +1,8 @@
 {
-  "name" : "14-ThreatLong-SelfCatThreatModel",
+  "name" : "15-ThreatLong-SelfCatThreatModel",
   "description" : "",
   "release" : "1.11",
+  "commithash" : "8b612bace24cbe5d7fa92b4b47687a9726a2a719",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -253,7 +254,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       }, {
         "id" : 2,
         "shape" : {
@@ -274,7 +276,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ {
         "attributes" : {

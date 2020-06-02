@@ -48,6 +48,4 @@ public interface ITriangulation<V extends IVertex, E extends IHalfEdge, F extend
 	Optional<F> locateFace(@NotNull final IPoint point, final Object caller);
 
 	Optional<F> locateFace(@NotNull final double x, final double y, final Object caller);
-
-	Optional<F> locateFace(@NotNull final double x, final double y, final Object caller, boolean abortAtBoundary);
 }

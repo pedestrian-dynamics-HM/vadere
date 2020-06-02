@@ -398,11 +398,6 @@ public class DelaunayHierarchy<V extends IVertex, E extends IHalfEdge, F extends
     }
 
 	@Override
-	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
-		throw new UnsupportedOperationException("not jet implemented");
-	}
-
-	@Override
 	public Type getType() {
 		return Type.DELAUNAY_HIERARCHY;
 	}

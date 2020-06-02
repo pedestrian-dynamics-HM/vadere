@@ -215,6 +215,8 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 				initializeNarrowBand();
 				march();
 			} else if(needsUpdate()) {
+				//prepareMesh();
+
 				unsolve();
 				initializeNarrowBand();
 				march();

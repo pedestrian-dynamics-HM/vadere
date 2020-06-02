@@ -13,6 +13,8 @@ import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCa
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMParallel;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
@@ -35,6 +37,7 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class EikonalSolverProvider  {
 	private  static Logger logger = Logger.getLogger(IPotentialField.class);
@@ -133,35 +136,24 @@ public abstract class EikonalSolverProvider  {
 				default:
 					eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 			}
-		} else if(domain.getFloorFieldMesh() != null) {
-			IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
-
-			ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
-					attributesPotential.getTimeCostAttributes(),
-					attributesPedestrian,
-					topography,
-					targetId, triangulation);
-
-			/*ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
-					attributesPotential.getTimeCostAttributes(),
-					attributesPedestrian,
-					topography,
-					targetId, 1.0 / 0.1);*/
-
-			IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create(
-					topography,
-					attributesPotential.getTimeCostAttributes(),
-					attributesPedestrian,
-					targetId);
-
-			//topography.addMoveDynamicElementListener(new DensityUpdater<>(triangulation, loadingStrategy));
-			eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation/*,
-					topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
-			//eikonalSolver.solve();
-			//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, targetId)));
-			//System.out.println();
 		} else {
-			throw new UnsupportedOperationException("potential field has to be grid based.");
+			if(domain.getFloorFieldMesh() != null) {
+				IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
+
+				ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
+						attributesPotential.getTimeCostAttributes(),
+						attributesPedestrian,
+						topography,
+						targetId, triangulation);
+
+				eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
+					/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
+				//eikonalSolver.solve();
+				//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, targetId)));
+				//System.out.println();
+			} else {
+				throw new UnsupportedOperationException("Can not use mesh based floor field computation without a mesh!");
+			}
 		}
 		return eikonalSolver;
 	}

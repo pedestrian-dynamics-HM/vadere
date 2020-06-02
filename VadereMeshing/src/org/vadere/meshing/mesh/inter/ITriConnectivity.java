@@ -1749,15 +1749,10 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		return true;
 	}
 
-	@Override
 	default Optional<F> locate(final double x, final double y) {
-		return locate(x, y, false);
-	}
-
-	default Optional<F> locate(final double x, final double y, boolean abortAtBoundary) {
 		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
-			optFace = locateMarch(x, y, getMesh().getFace(), abortAtBoundary);
+			optFace = locateMarch(x, y, getMesh().getFace());
 		}
 		else if(getMesh().getNumberOfFaces() == 1) {
 			optFace = Optional.of(getMesh().getFace());
@@ -1782,10 +1777,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param x         x-coordinate of the location point
 	 * @param y         y-coordinate of the location point
 	 * @param startFace the face at which the search starts
-	 * @param abortAtBoundary
 	 * @return the face containing the point or empty() if there is none
 	 */
-	default Optional<F> locateMarch(final double x, final double y, @NotNull final F startFace, boolean abortAtBoundary) {
+	default Optional<F> locateMarch(final double x, final double y, @NotNull final F startFace) {
 		// there is no face.
 		if(getDimension() <= 0 ){
 			return Optional.empty();
@@ -1795,12 +1789,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			return marchLocate1D(x, y, startFace);
 		}
 		else {
-			return Optional.of(straightWalk2D(x, y, startFace, abortAtBoundary));
+			return Optional.of(straightWalk2D(x, y, startFace));
 		}
-	}
-
-	default Optional<F> locateMarch(final double x, final double y, @NotNull final F startFace) {
-		return locateMarch(x, y, startFace, false);
 	}
 
 	/**
@@ -1816,7 +1806,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the face containing the point or empty() if there is none
 	 */
 	default Optional<F> locateMarch(@NotNull final IPoint point, F startFace) {
-		return locateMarch(point.getX(), point.getY(), startFace, false);
+		return locateMarch(point.getX(), point.getY(), startFace);
 	}
 
 	/**
@@ -1895,14 +1885,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
-	default F straightWalk2D(final double x1, final double y1, @NotNull final F startFace, boolean abortAtBoundary) {
-		if(abortAtBoundary) {
-			return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e) && !isAtBoundary(e));
-		} else {
-			return straightWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
-		}
-	}
-
 	/**
 	 * <p>Marches to the face which contains the point defined by (x1, y1) starting inside the <tt>startFace</tt>.
 	 * Furthermore this method will gather all visited edges and requires O(n) time. However, if the face is close
@@ -1918,17 +1900,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face where the march start containing (x1,y1).
 	 * @return returns all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-    default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
-        return straightGatherWalk2D(x1, y1, startFace, false);
-    }
-
-	default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace, boolean abortAtBoundary) {
-    	if(abortAtBoundary) {
-		    return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e) && !isAtBoundary(e));
-	    }
-		else {
-		    return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
-	    }
+	default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
+    	return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
 	}
 
     default LinkedList<E> getIntersectingEdges(@NotNull final V vStart, @NotNull final V vEnd) {
@@ -2462,7 +2435,15 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			}
 		}
 
-		return outEdge;
+		if(outEdge == null) {
+			return outEdge;
+		}
+
+		if(getMesh().isBoundary(face) && isLeftOf(p.getX(), p.getY(), outEdge)) {
+			return rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+		} else {
+			return outEdge;
+		}
 	}
 
 	/**
@@ -2512,7 +2493,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			VPoint iPoint1 = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 
 			outEdge = walkAroundBoundaryStraight(inEdge, q, p, stopCondition, visitedEdges);
-
+			//outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
 			// the point outside
 			if(outEdge == null) {
 				return Optional.empty();
@@ -2683,7 +2664,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace     start face of the walk
 	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
 	 * @param directional   if true we walk in the direction of <tt>pDirection</tt> otherwise we walk to the face containing <tt>pDirection</tt>
-	 * @param abortAtBoundary
 	 * @return all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightGatherWalk2D(
@@ -2691,8 +2671,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			@NotNull final VPoint pDirection,
 			@NotNull final F startFace,
 			@NotNull final Predicate<E> stopCondition,
-			@NotNull final boolean directional,
-			final boolean abortAtBoundary) {
+			@NotNull final boolean directional) {
 		LinkedList<E> visitedEdges = new LinkedList<>();
 
 		assert contains(q.getX(), q.getY(), startFace);
@@ -2857,15 +2836,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		//log.debug("visited faces for location: " + visitedEdges.size());
 		return visitedEdges;
     }
-
-	default LinkedList<E> straightGatherWalk2D(
-			@NotNull final VPoint q,
-			@NotNull final VPoint pDirection,
-			@NotNull final F startFace,
-			@NotNull final Predicate<E> stopCondition,
-			@NotNull final boolean directional) {
-		return straightGatherWalk2D(q, pDirection, startFace, stopCondition, directional, false);
-	}
 
 	/**
 	 * <p>Marches / walks to the face which contains the point defined by (x1, y1) starting the walk
@@ -3191,7 +3161,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the closest half-edge of a face containing p = (x,y) if there is any face that contains p, otherwise empty().
 	 */
 	default Optional<E> getClosestEdge(final double x, final double y, final F startFace) {
-		Optional<F> optFace = locateMarch(x, y, startFace, false);
+		Optional<F> optFace = locateMarch(x, y, startFace);
 
 		if(optFace.isPresent()) {
 			return Optional.of(getMesh().closestEdge(optFace.get(), x, y));

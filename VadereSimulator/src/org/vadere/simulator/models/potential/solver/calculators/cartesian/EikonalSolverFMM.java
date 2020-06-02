@@ -72,11 +72,14 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 		// beginning.
 		// Be aware that in this case, the function "getValue" MUST be called,
 		// it is not possible to work with the cellGrid directly.
+		long ms = System.currentTimeMillis();
 		while (!narrowBand.isEmpty()) {
 			Point tmpPoint = narrowBand.poll();
 			cellGrid.getValue(tmpPoint).tag = PathFindingTag.Reached;
 			setNeighborDistances(tmpPoint);
 		}
+		long runTime = System.currentTimeMillis() - ms;
+		logger.debug("fmm on the gird run time = " + runTime);
 	}
 
 	/**

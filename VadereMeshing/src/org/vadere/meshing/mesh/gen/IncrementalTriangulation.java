@@ -845,11 +845,6 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
-	public Optional<F> locateFace(@NotNull double x, double y, Object caller, boolean abortAtBoundary) {
-		return pointLocator.locate(x, y, caller, abortAtBoundary);
-	}
-
-	@Override
 	public Optional<F> locateFace(@NotNull final double x, final double y) {
 		return pointLocator.locate(x, y);
 	}

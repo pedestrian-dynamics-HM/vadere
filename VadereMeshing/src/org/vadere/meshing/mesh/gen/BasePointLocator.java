@@ -61,11 +61,6 @@ public class BasePointLocator<V extends IVertex, E extends IHalfEdge, F extends 
     }
 
 	@Override
-	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
-		return triConnectivity.locate(x, y, abortAtBoundary);
-	}
-
-	@Override
 	public Type getType() {
 		return Type.BASE;
 	}

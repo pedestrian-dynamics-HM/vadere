@@ -112,10 +112,10 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 
 		solved = true;
 		double runTime = (System.currentTimeMillis() - ms);
-		logger.debug("fmm run time = " + runTime);
+		logger.debug("fim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
 		logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
-		logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
+		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
 	}
 
 	private void initialActiveList() {

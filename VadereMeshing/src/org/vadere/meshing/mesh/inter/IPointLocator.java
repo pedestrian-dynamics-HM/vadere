@@ -62,8 +62,6 @@ public interface IPointLocator<V extends IVertex, E extends IHalfEdge, F extends
 		return locate(x, y);
 	}
 
-	Optional<F> locate(final double x, final double y, final Object caller, boolean abortAtBoundary);
-
 	/**
 	 * Returns its type.
 	 *

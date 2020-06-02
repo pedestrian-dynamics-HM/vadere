@@ -84,10 +84,10 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		this.forkJoinPool = ForkJoinPool.commonPool();
-		this.nThreds = forkJoinPool.getPoolSize();
+		//this.nThreds = forkJoinPool.getParallelism();
 		logger.debug("parallel fim using " + nThreds + " threads.");
 		this.activeLists = new ArrayList<>(nThreds);
-		//this.forkJoinPool = new ForkJoinPool(nThreds);
+		this.forkJoinPool = new ForkJoinPool(nThreds);
 		this.atomicBooleans = getMesh().getObjectVertexContainer(identifier + "_" + nameAtomicBoolean, AtomicBoolean.class);
 
 		for(int i = 0; i < nThreds; i++) {

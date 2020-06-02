@@ -92,13 +92,13 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 	}
 
 	@Override
-	public Optional<F> locate(double x, double y, Object caller, boolean abortAtBoundary) {
+	public Optional<F> locate(double x, double y, Object caller) {
 		Optional<F> startFace = getStartFace(new VPoint(x, y));
 		if(startFace.isPresent()) {
-			return triangulation.locateMarch(x, y, startFace.get(), abortAtBoundary);
+			return triangulation.locateMarch(x, y, startFace.get());
 		}
 		else {
-			return triangulation.locate(x, y, abortAtBoundary);
+			return triangulation.locate(x, y);
 		}
 	}
 

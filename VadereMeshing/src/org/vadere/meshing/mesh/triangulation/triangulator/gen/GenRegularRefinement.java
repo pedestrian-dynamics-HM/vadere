@@ -11,6 +11,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.color.Colors;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
@@ -46,9 +47,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	/**
 	 * a predicate that decides whether or not an edge should be refined.
 	 */
-	private final Predicate<E> edgeRefinementPredicate;
-
-	private final Predicate<E> edgeAddToRefine;
+	private Predicate<E> edgeRefinementPredicate;
 
 	private boolean finished;
 	private boolean refined;
@@ -67,7 +66,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	private LinkedList<V> toCoarse;
 
-	private Predicate<V> removePredicate = v -> getLevel(v) > 0;
+	private Predicate<V> coarsePredicate = v -> getLevel(v) > 0;
 	private final static int sleepTime = 1;
 	private int maxLevel;
 
@@ -79,20 +78,33 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		this(triangulation, edgeRefinementPredicate, Integer.MAX_VALUE);
 	}
 
+	public void setEdgeRefinementPredicate(Predicate<E> edgeRefinementPredicate) {
+		this.edgeRefinementPredicate = edgeRefinementPredicate;
+	}
+
+	public void setCoarsePredicate(Predicate<V> coarsePredicate) {
+		this.coarsePredicate = coarsePredicate;
+	}
+
 	public GenRegularRefinement(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final Predicate<E> edgeRefinementPredicate,
 			int maxLevel
 			) {
 		this.triangulation = triangulation;
-		this.edgeRefinementPredicate = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
-		this.edgeAddToRefine = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
+		//this.edgeRefinementPredicate = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
+		//this.edgeAddToRefine = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
+
+		VPoint p = new VPoint(5,5);
+
+		this.edgeRefinementPredicate = e -> !getMesh().isBoundary(e) && getMesh().toTriangle(getMesh().getFace(e)).midPoint().distance(p) < 3.0 && (!isGreen(e) || getMesh().toLine(e).length() > 0.5);
+
 		this.finished = false;
 		this.coarse = false;
 		this.toRefine = new LinkedList<>();
 		this.toCoarse = new LinkedList<>();
 
-		var meshRenderer = new MeshRenderer<>(getMesh(), f -> false, f -> {
+		/*var meshRenderer = new MeshRenderer<>(getMesh(), f -> false, f -> {
 			if(isBlue(f)) {
 				return Colors.BLUE;
 			}
@@ -114,7 +126,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		});
 		debugPanel = new MeshPanel<>(meshRenderer, 1000, 1000);
 		debugPanel.display("debug");
-		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
+		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());*/
 	}
 
 	@Override
@@ -156,7 +168,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 					return;
 				}*/
 				E edge = toRefine.removeFirst();
-				if(edgeAddToRefine.test(edge)) {
+				if(edgeRefinementPredicate.test(edge)) {
 					refine(edge);
 				}
 
@@ -171,34 +183,34 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			//getMesh().getEdges().stream().filter(e -> isRR(e)).forEach(e -> refine(e));
 
 			// TODO make these steps optional: remove blue triangles and quad red triangles
-			getMesh().getEdges().stream().filter(e -> isRB(e)).forEach(e -> refine(e));
-			getMesh().getVertices().stream()
+			//getMesh().getEdges().stream().filter(e -> isRB(e)).forEach(e -> refine(e));
+			/*getMesh().getVertices().stream()
 					.filter(v -> getMesh().degree(v) == 4)
 					.filter(v -> getMesh().streamFaces(v).allMatch(f -> isRed(f)))
-					.forEach(v -> coarse(v));
+					.forEach(v -> coarse(v));*/
 
 		}
 	}
 
 
 	public boolean refine(@NotNull final Collection<E> edges) {
-		//toRefine.addAll(edges);
+		toRefine.addAll(edges);
 		boolean refined = false;
 		//int level = edges.stream().mapToInt(e -> getLevel(e)).max().getAsInt();
 		//setMaxLevel(level+1);
 
-		for(E edge : edges) {
+		/*for(E edge : edges) {
 			refine(edge);
 			refined = true;
-		}
+		}*/
 
-		/*do {
+		do {
 			E edge = toRefine.removeFirst();
 			if(edgeRefinementPredicate.test(edge)) {
 				refine(edge);
 				refined = true;
 			}
-		} while (!toRefine.isEmpty());*/
+		} while (!toRefine.isEmpty());
 
 		return refined;
 	}
@@ -213,7 +225,10 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			coarse = false;
 			while (!toCoarse.isEmpty()) {
 				V vertex = toCoarse.removeFirst();
-				coarse(vertex);
+				if(coarsePredicate.test(vertex)) {
+					coarse(vertex);
+				}
+
 
 				/*try {
 					Thread.sleep(sleepTime);
@@ -393,12 +408,12 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			}
 		}
 
-		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
+		/*debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		try {
 			Thread.sleep(sleepTime);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 	}
 
 	/**
@@ -475,13 +490,13 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		}
 
 		for(E e : getMesh().getEdgeIt(v)) {
-			if(edgeAddToRefine.test(e)) {
+			if(edgeRefinementPredicate.test(e)) {
 				toRefine.addLast(e);
 			}
 
 			//TODO: required?
 			E pe = getMesh().getPrev(e);
-			if(edgeAddToRefine.test(pe)) {
+			if(edgeRefinementPredicate.test(pe)) {
 				toRefine.addLast(getMesh().getPrev(pe));
 			}
 		}
@@ -579,7 +594,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			setGreen(twin);
 			//setGreen(getMesh().getNext(twin), toRefine);
 			//setGreen(getMesh().getPrev(twin), toRefine);
-			if(edgeAddToRefine.test(edge)) {
+			if(edgeRefinementPredicate.test(edge)) {
 				toRefine.addLast(edge);
 			}
 		}
@@ -620,7 +635,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 
 	private void setGreen(E edge) {
 		setColor(edge, Coloring.GREEN);
-		if(edgeAddToRefine.test(edge)) {
+		if(edgeRefinementPredicate.test(edge)) {
 			toRefine.addLast(edge);
 		}
 	}
@@ -676,7 +691,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		return isGreen(edge) && (getMesh().isBoundary(edge) || getLevel(face) == level);
 	}
 
-	private boolean isGreen(@NotNull E edge) {
+	public boolean isGreen(@NotNull E edge) {
 		return getColor(edge) == Coloring.GREEN;
 	}
 
