@@ -61,8 +61,8 @@
         "cacheDir" : "",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
-          "type" : "UNIT",
-          "obstacleDensityWeight" : 3.5,
+          "type" : "OBSTACLES",
+          "obstacleDensityWeight" : 0.3,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
@@ -307,7 +307,7 @@
         }
       } ],
       "targets" : [ {
-        "id" : 1,
+        "id" : 2,
         "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
@@ -381,7 +381,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 4,
+        "spawnNumber" : 2,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 200.0,
@@ -389,7 +389,38 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 0.2, 0.6, 0.1, 0.1 ],
+        "groupSizeDistribution" : [ 0.1, 0.3, 0.3, 0.2, 0.1 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 6,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 23.5,
+            "y" : 49.5
+          }, {
+            "x" : 23.5,
+            "y" : 46.0
+          }, {
+            "x" : 33.1,
+            "y" : 46.0
+          }, {
+            "x" : 34.96,
+            "y" : 49.5
+          } ]
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 2,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 200.0,
+        "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 2 ],
+        "groupSizeDistribution" : [ 0.1, 0.3, 0.3, 0.2, 0.1 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],

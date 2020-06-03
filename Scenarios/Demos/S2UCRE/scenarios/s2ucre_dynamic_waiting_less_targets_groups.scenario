@@ -62,7 +62,7 @@
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "NAVIGATION",
-          "obstacleDensityWeight" : 3.5,
+          "obstacleDensityWeight" : 2.0,
           "pedestrianSameTargetDensityWeight" : 3.5,
           "pedestrianOtherTargetDensityWeight" : 3.5,
           "pedestrianWeight" : 3.5,
