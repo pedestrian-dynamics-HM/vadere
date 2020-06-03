@@ -28,15 +28,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of group behavior model described in 'Pedestrian Group Behavior in a Cellular
- * Automaton' (bib-key: seitz-2014)
+ * Automaton' (bib-key: seitz-2014). The basic idea from seitz-2014:
+ * <quote>
+ * Firstly members walking ahead slow down and members falling behind slightly speed up to reach the group.
+ * </quote>
+ *
+ * Agents which are added to the topography (before the simulation starts) are assigned to
+ * groups directly in the {@link #preLoop(double)}. Agents which are spawned later on, are
+ * assigned to groups in the callback {@link #elementAdded(Pedestrian)}. The actual behavior
+ * of the central group model is implemented in the helper class {@link CentroidGroup}.
  */
 @ModelClass
 public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
-	private static Logger logger = Logger.getLogger(CentroidGroupModel.class);
-
 	private Random random;
-//	private Map<Pedestrian, CentroidGroup> pedestrianGroupMap;
 	private LinkedHashMap<Integer, CentroidGroup> groupsById;
 	private Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
 	private Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
