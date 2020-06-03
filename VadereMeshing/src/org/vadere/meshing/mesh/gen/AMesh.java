@@ -294,7 +294,7 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 			return Optional.ofNullable(null);
 		} else {
 			AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
-			assert dataArray.size() == vertices.size();
+			assert dataArray.size() == edges.size();
 			return Optional.ofNullable(dataArray.get(edge.getId()));
 		}
 	}
@@ -577,6 +577,12 @@ public class AMesh implements IMesh<AVertex, AHalfEdge, AFace>, Cloneable {
 		edges.add(edge);
 		for (ObjectArrayList edgeProperty : halfEdgesData.values()) {
 			edgeProperty.add(null);
+		}
+		for(DoubleArrayList edgeDoubleProperty : halfEdgesDoubleData.values()) {
+			edgeDoubleProperty.add(0.0);
+		}
+		for(BooleanArrayList edgeBooleanProperty : halfEdgesBooleanData.values()) {
+			edgeBooleanProperty.add(false);
 		}
 		numberOfEdges++;
 		return edge;

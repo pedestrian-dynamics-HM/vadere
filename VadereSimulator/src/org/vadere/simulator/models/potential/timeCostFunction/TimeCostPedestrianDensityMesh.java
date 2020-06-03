@@ -11,6 +11,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
+import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMesh;
@@ -22,6 +23,7 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 
+import java.awt.*;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -37,7 +39,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 
 	public static final String nameObstacleDensity = "agent_density";
 
-	private final ITimeCostFunction timeCostFunction;
+	private final ITimeCostFunctionMesh<V> timeCostFunction;
 	private final Topography topography;
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private final IVertexContainerDouble<V, E, F> densities;
@@ -46,7 +48,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private GenRegularRefinement<V, E, F> refiner;
 
 	private final double R = 0.7;
-	private final int influenceRadius = 5;
+	private final int influenceRadius = 9;
 	private final double a;
 	private final double Sp;
 	private final double c;
@@ -56,7 +58,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private int step;
 
 	public TimeCostPedestrianDensityMesh(
-			@NotNull final ITimeCostFunction timeCostFunction,
+			@NotNull final ITimeCostFunctionMesh<V> timeCostFunction,
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final IPedestrianLoadingStrategy loadingStrategy,
 			final AttributesAgent attributesAgent,
@@ -83,26 +85,29 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private void refineMesh() {
 		long ms = System.currentTimeMillis();
 		refiner.coarse();
+		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		refiner.refine();
 		long runTime = System.currentTimeMillis() - ms;
-		//refiner.getMesh().garbageCollection();
+		refiner.getMesh().garbageCollection();
 		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		System.out.println("runTime refinement = " + runTime);
 	}
 
 	private boolean coarse(@NotNull final V vertex) {
-		for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
+		return true;
+		/*for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
 			if(pedestrian.getPosition().distanceSq(triangulation.getMesh().toPoint(vertex)) > influenceRadius * influenceRadius) {
 				return true;
 			}
-		}
-		return false;
+		}*/
+		//return false;
 	}
 
 	private boolean refine(@NotNull final E e) {
+		//return refiner.getLevel(e) < 2;
 		if(!triangulation.getMesh().isBoundary(e)) {
 			VTriangle triangle = triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e));
-			if(!refiner.isGreen(e) || triangulation.getMesh().toLine(e).length() > 2.0) {
+			if(/*!refiner.isGreen(e) || */triangulation.getMesh().toLine(e).length() > 1.0) {
 				for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
 					if(pedestrian.getPosition().distanceSq(triangle.midPoint()) < influenceRadius * influenceRadius) {
 						return true;
@@ -121,7 +126,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 
 	@Override
 	public double costAt(@NotNull final V v, @Nullable final Object caller) {
-		return timeCostFunction.costAt(triangulation.getMesh().toPoint(v)) + densities.getValue(v);
+		return timeCostFunction.costAt(v) + densities.getValue(v);
 	}
 
 	@Override
@@ -147,6 +152,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 
 	@Override
 	public void update() {
+		timeCostFunction.update();
 		if(step % 10 == 0) {
 			//refineMesh();
 		}

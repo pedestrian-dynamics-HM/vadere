@@ -34,10 +34,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	final String identifier;
 	private int nUpdates = 0;
 
-	static {
-		logger.setDebug();
-	}
-
 	private boolean calculationFinished = false;
 
 	// Note: The order of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
@@ -216,7 +212,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 				march();
 			} else if(needsUpdate()) {
 				//prepareMesh();
-
 				unsolve();
 				initializeNarrowBand();
 				march();

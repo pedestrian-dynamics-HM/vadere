@@ -34,7 +34,7 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 	private final IVertexContainerDouble<V, E, F> densities;
 	private boolean updated;
 
-	private final double R = 0.7;
+	private final double R = 2;
 	private final int influenceRadius = 5;
 	private final double a;
 	private final double Sp;
