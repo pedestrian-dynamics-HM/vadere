@@ -45,7 +45,6 @@ public class Topography implements DynamicElementMover{
 
 	private IDistanceFunctionCached obstacleDistanceFunction;
 	private IReachablePointProvider reachablePointProvider;
-	private List<IMoveDynamicElementListener> moveDynamicElementListeners;
 
 	/** A possible empty string identifying a context object. */
 	private String contextId;
@@ -184,9 +183,6 @@ public class Topography implements DynamicElementMover{
 
 		this.dynamicElementIdCounter = new AtomicInteger(1);
 		this.contextId = "";
-
-		//TODO clone it?
-		this.moveDynamicElementListeners = new ArrayList<>();
 	}
 
 	/** Clean up a set by removing {@code null}. */
@@ -196,14 +192,6 @@ public class Topography implements DynamicElementMover{
 
 	public Topography() {
 		this(new AttributesTopography(), new AttributesAgent(), new AttributesCar());
-	}
-
-	public void addMoveDynamicElementListener(@NotNull final IMoveDynamicElementListener listener) {
-		this.moveDynamicElementListeners.add(listener);
-	}
-
-	public void removeMoveDynamicElementListener(@NotNull final IMoveDynamicElementListener listener) {
-		this.moveDynamicElementListeners.remove(listener);
 	}
 
 	public Rectangle2D.Double getBounds() {
@@ -391,14 +379,6 @@ public class Topography implements DynamicElementMover{
 	@Override
 	public <T extends DynamicElement> void moveElement(T element, final VPoint oldPosition) {
 		((DynamicElementContainer<T>) getContainer(element.getClass())).moveElement(element, oldPosition);
-
-		//TODO: this is an ugly cast
-		if(element instanceof Pedestrian) {
-			for(IMoveDynamicElementListener listener : moveDynamicElementListeners) {
-				listener.moveElement((Pedestrian)element, oldPosition);
-			}
-		}
-
 	}
 
 	/**
