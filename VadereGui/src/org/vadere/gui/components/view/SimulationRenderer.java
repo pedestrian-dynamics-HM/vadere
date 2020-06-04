@@ -108,7 +108,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         }
 
         if(model.config.isShowTargetPotentielFieldMesh()) {
-	        renderMesh(graphics, model.getDiscretization(), new VRectangle(model.getTopographyBound()));
+	        renderMesh(graphics, model.getFloorFieldMesh(), new VRectangle(model.getTopographyBound()));
         }
 
         renderSimulationContent(graphics);

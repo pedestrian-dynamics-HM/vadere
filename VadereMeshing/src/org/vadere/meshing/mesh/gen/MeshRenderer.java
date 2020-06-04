@@ -72,6 +72,8 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 
 	private BufferedImage bufferedImage = null;
 
+	private boolean renderFaces = true;
+
 
 	/**
 	 * Default constructor.
@@ -137,6 +139,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		this(mesh, f -> false, null);
 	}
 
+	public MeshRenderer(
+			@NotNull final IMesh<V, E, F> mesh, boolean renderFaces) {
+		this(mesh, f -> false, null);
+		this.renderFaces = renderFaces;
+	}
+
 	public void setMesh(@NotNull final IMesh<V, E, F> mesh) {
 		this.mesh = mesh;
 	}
@@ -155,38 +163,17 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		renderGraphics(graphics, width, height, null);
 	}
 
-	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height, VRectangle bound) {
-		/*Font currentFont = graphics.getFont();
-		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
-		graphics.setFont(newFont);
-		graphics.setColor(Color.GRAY);*/
-
+	public void renderPostTransform(@NotNull final Graphics2D graphics, VRectangle bound) {
+		//graphics.fill(bound);
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
-
-		double scale;
 		float minEdgeLen;
 		synchronized (mesh) {
-			if(bound == null) {
-				bound = GeometryUtils.boundRelative(mesh.getBound().getPath(), 0.05);
-			}
-
-			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
 			faces = mesh./*clone().*/getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
 			minEdgeLen = (float)edges.stream().mapToDouble(e -> mesh.toLine(e).length()).min().orElse(0.0);
 		}
-
-
-		//graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
-		//graphics.scale(scale, scale);
-
-		graphics.translate(-bound.getMinX() * scale, (bound.getMinY()+bound.getHeight()) * scale);
-		graphics.scale(scale, -scale);
-
-		//graphics.fill(bound);
-
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
 		graphics.setStroke(new BasicStroke(minEdgeLen * 1.0f/15f));
 		double ptdiameter = minEdgeLen * 1.0f/2.0f;
@@ -196,19 +183,21 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		/*int groupSize = 64;
 		ColorHelper colorHelper = new ColorHelper(faces.size());*/
 
-		for(F face : faces) {
-			VPolygon polygon = mesh.toPolygon(face);
+		if(renderFaces) {
+			for(F face : faces) {
+				VPolygon polygon = mesh.toPolygon(face);
 
-			if(alertPred.test(face)) {
-				graphics.setColor(new Color(200, 0, 0));
-			} else {
-				if(faceColorFunction != null) {
-					graphics.setColor(faceColorFunction.apply(face));
+				if(alertPred.test(face)) {
+					graphics.setColor(new Color(200, 0, 0));
 				} else {
-					graphics.setColor(Color.GRAY);
+					if(faceColorFunction != null) {
+						graphics.setColor(faceColorFunction.apply(face));
+					} else {
+						graphics.setColor(Color.GRAY);
+					}
 				}
+				graphics.fill(polygon);
 			}
-			graphics.fill(polygon);
 		}
 
 		List<E> edgest = mesh.streamEdges().filter(e -> !mesh.isBoundary(e)).filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
@@ -254,6 +243,27 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 
 		graphics.setColor(c);
 		graphics.setStroke(stroke);
+	}
+
+	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height, VRectangle bound) {
+		/*Font currentFont = graphics.getFont();
+		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
+		graphics.setFont(newFont);
+		graphics.setColor(Color.GRAY);*/
+
+		synchronized (mesh) {
+			if (bound == null) {
+				bound = GeometryUtils.boundRelative(mesh.getBound().getPath(), 0.05);
+			}
+		}
+
+		double scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+		//graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
+		//graphics.scale(scale, scale);
+
+		graphics.translate(-bound.getMinX() * scale, (bound.getMinY()+bound.getHeight()) * scale);
+		graphics.scale(scale, -scale);
+		renderPostTransform(graphics, bound);
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(bound.getMinX() * scale, bound.getMinY() * scale);
 

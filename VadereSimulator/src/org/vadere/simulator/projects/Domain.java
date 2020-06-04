@@ -41,5 +41,8 @@ public class Domain {
 	public Topography getTopography() {
 		return topography;
 	}
-	
+
+	public Domain clone() {
+		return new Domain(floorFieldMesh.clone(), backgroundMesh.clone(), topography.clone());
+	}
 }
