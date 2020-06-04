@@ -54,7 +54,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private final double c;
 
 	// to debug
-	private MeshPanel<V, E, F> debugPanel;
+	//private MeshPanel<V, E, F> debugPanel;
 	private int step;
 
 	public TimeCostPedestrianDensityMesh(
@@ -78,19 +78,19 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		Sp = (dia * dia * Math.sqrt(3)) * 0.5;
 		a = -1 / (2 * R * R);
 		c = 2 * Math.PI * R * R;
-		debugPanel = new MeshPanel<>(triangulation.getMesh(), 1000, 1000);
-		debugPanel.display("debug");
+		//debugPanel = new MeshPanel<>(triangulation.getMesh(), 1000, 1000);
+		//debugPanel.display("debug");
 	}
 
 	private void refineMesh() {
 		long ms = System.currentTimeMillis();
 		refiner.coarse();
-		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
+		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		refiner.refine();
 		long runTime = System.currentTimeMillis() - ms;
 		refiner.getMesh().garbageCollection();
-		debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
-		System.out.println("runTime refinement = " + runTime);
+		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
+		//System.out.println("runTime refinement = " + runTime);
 	}
 
 	private boolean coarse(@NotNull final V vertex) {

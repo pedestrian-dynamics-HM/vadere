@@ -51,7 +51,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		return config;
 	}
 
-	public IMesh<?, ?, ?> getDiscretization() {
+	public IMesh<?, ?, ?> getFloorFieldMesh() {
 		return new PMesh();
 	}
 
