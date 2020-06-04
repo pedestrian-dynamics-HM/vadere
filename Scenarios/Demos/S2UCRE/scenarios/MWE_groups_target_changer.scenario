@@ -99,7 +99,7 @@
     "attributesSimulation" : {
       "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.2,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -157,7 +157,7 @@
           "height" : 2.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -208,7 +208,7 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 3 ],
-        "groupSizeDistribution" : [ 0.2, 0.6, 0.1, 0.1 ],
+        "groupSizeDistribution" : [ 0.5, 0.5, 0.0, 0.1 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
