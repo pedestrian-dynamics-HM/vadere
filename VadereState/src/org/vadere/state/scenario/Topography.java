@@ -236,7 +236,7 @@ public class Topography implements DynamicElementMover{
 		return -obstacleDistanceFunction.apply(point);
 	}
 
-	public double distanceToObstacle(@NotNull final IPoint point, final Agent caller) {
+	public double distanceToObstacle(@NotNull final IPoint point, final Object caller) {
 		return -obstacleDistanceFunction.apply(point, caller);
 	}
 
