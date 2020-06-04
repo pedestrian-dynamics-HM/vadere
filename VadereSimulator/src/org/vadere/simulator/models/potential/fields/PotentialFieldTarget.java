@@ -156,7 +156,7 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		}*/
 
 		// point lies outside
-		if(domain.getTopography().distanceToObstacle(pos) <= 0) {
+		if(domain.getTopography().distanceToObstacle(pos, caller) <= 0) {
 			return Double.MAX_VALUE;
 		}
 

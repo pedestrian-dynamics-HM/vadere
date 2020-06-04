@@ -2377,8 +2377,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	default E rayCastingPolygon(@NotNull final E inEdge,
 	                            @NotNull final VPoint q,
 	                            @NotNull final VPoint p,
-	                            @NotNull final Predicate<E> stopCondition,
-	                            @NotNull final LinkedList<E> visitedEdges) {
+	                            @NotNull final Predicate<E> stopCondition) {
 
 		E outEdge = null;
 		E outIfInside = null;
@@ -2413,8 +2412,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	default E walkAroundBoundaryStraight(@NotNull final E inEdge,
 	                            @NotNull final VPoint q,
 	                            @NotNull final VPoint p,
-	                            @NotNull final Predicate<E> stopCondition,
-	                            @NotNull final LinkedList<E> visitedEdges) {
+	                            @NotNull final Predicate<E> stopCondition) {
 		E outEdge = null;
 		E outIfInside = null;
 		F face = getMesh().getFace(inEdge);
@@ -2440,7 +2438,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		}
 
 		if(getMesh().isBoundary(face) && isLeftOf(p.getX(), p.getY(), outEdge)) {
-			return rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			return rayCastingPolygon(inEdge, q, p, stopCondition);
 		} else {
 			return outEdge;
 		}
@@ -2478,7 +2476,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			@NotNull final VPoint q,
 			@NotNull final VPoint p,
 			@NotNull final Predicate<E> stopCondition,
-			@NotNull final LinkedList<E> visitedEdges) {
+			@Nullable final LinkedList<E> visitedEdges) {
 		E outEdge = null;
 		F face = getMesh().getFace(inEdge);
 
@@ -2492,8 +2490,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			V v2 = getMesh().getTwinVertex(inEdge);
 			VPoint iPoint1 = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
 
-			outEdge = walkAroundBoundaryStraight(inEdge, q, p, stopCondition, visitedEdges);
-			//outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			outEdge = walkAroundBoundaryStraight(inEdge, q, p, stopCondition);
+			//outEdge = rayCastingPolygon(inEdge, q, p, stopCondition);
 			// the point outside
 			if(outEdge == null) {
 				return Optional.empty();
@@ -2506,7 +2504,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			// we did no progress towards p => walking around does not work cause the boundary is not convex, therefore we use the expensive method
 			if(iPoint1.distanceSq(p) <= iPoint2.distanceSq(p)) {
 				// TODO this is too expensive!
-				outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+				outEdge = rayCastingPolygon(inEdge, q, p, stopCondition);
 			}
 
 			// the point outside
@@ -2566,7 +2564,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 					return Optional.of(getMesh().getTwin(nextOutEdge));
 				}
 				else {
-					visitedEdges.add(nextOutEdge);
+					if(visitedEdges != null) {
+						visitedEdges.add(nextOutEdge);
+					}
 					return Optional.empty();
 				}
 
@@ -2620,7 +2620,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightGatherWalk2D(final VPoint q, final VPoint p, final F startFace, final Predicate<E> stopCondition) {
-		return straightGatherWalk2D(q, p, startFace, stopCondition, false);
+		return straightGatherWalk2D(q, p, startFace, stopCondition, false, false);
 	}
 
 	/**
@@ -2643,7 +2643,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightGatherWalk2DDirectional(final VPoint q, final VPoint direction, final F startFace, final Predicate<E> stopCondition) {
-		return straightGatherWalk2D(q, direction, startFace, stopCondition, true);
+		return straightGatherWalk2D(q, direction, startFace, stopCondition, true, false);
 	}
 
 	/**
@@ -2664,6 +2664,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace     start face of the walk
 	 * @param stopCondition stop condition of the walk, i.e. the walk stops if the condition is no longer fulfilled
 	 * @param directional   if true we walk in the direction of <tt>pDirection</tt> otherwise we walk to the face containing <tt>pDirection</tt>
+	 * @param gather
 	 * @return all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightGatherWalk2D(
@@ -2671,7 +2672,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			@NotNull final VPoint pDirection,
 			@NotNull final F startFace,
 			@NotNull final Predicate<E> stopCondition,
-			@NotNull final boolean directional) {
+			final boolean directional,
+			final boolean gather) {
 		LinkedList<E> visitedEdges = new LinkedList<>();
 
 		assert contains(q.getX(), q.getY(), startFace);
@@ -2713,6 +2715,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			p = pDirection;
 			// if this is true we are already done
 			if(contains(pDirection.getX(), pDirection.getY(), startFace)) {
+				if(!gather) {
+					visitedEdges.clear();
+				}
 				visitedEdges.add(getMesh().getEdge(startFace));
 				return visitedEdges;
 			}
@@ -2737,6 +2742,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			throw new IllegalArgumentException("did not find any edge.");
 		}
 
+		if(!gather) {
+			visitedEdges.clear();
+		}
 		visitedEdges.addLast(inEdge);
 
 
@@ -2809,6 +2817,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 			if(optEdge.isPresent()) {
 				inEdge = optEdge.get();
+				if(!gather) {
+					visitedEdges.clear();
+				}
 				visitedEdges.addLast(inEdge);
 
 				// special case (1): hitting the border i.e. outer boundary

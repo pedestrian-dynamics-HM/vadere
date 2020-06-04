@@ -30,6 +30,10 @@ public interface PotentialFieldAgent extends Model {
 	@Override
 	default void update(double simTimeInSec) {}
 
+	default double getMaximalInfluenceRadius() {
+		return Double.POSITIVE_INFINITY;
+	}
+
 	/**
 	 * Computes the pedestrians possessing a potential that reaches into the
 	 * given relevantArea.

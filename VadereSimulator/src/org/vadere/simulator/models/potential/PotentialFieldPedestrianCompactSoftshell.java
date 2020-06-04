@@ -25,6 +25,7 @@ import java.util.Random;
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
 	private AttributesPotentialCompactSoftshell attributes;
+	private AttributesAgent attributesAgent;
 	private double intimateWidth; // radius of intimate zone \delta_{int}
 	private double personalWidth; // radius of personal width \delta_{per}
 	private double height; // intensity of repulsion \mu_p
@@ -32,12 +33,18 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 	public PotentialFieldPedestrianCompactSoftshell() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Domain topography,
+	public void initialize(List<Attributes> attributesList, Domain domain,
 	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialCompactSoftshell.class);
+		this.attributesAgent = domain.getTopography().getAttributesPedestrian();
 		this.intimateWidth = attributes.getPedPotentialIntimateSpaceWidth();
 		this.personalWidth = attributes.getPedPotentialPersonalSpaceWidth();
 		this.height = attributes.getPedPotentialHeight();
+	}
+
+	@Override
+	public double getMaximalInfluenceRadius() {
+		return Math.max(personalWidth, intimateWidth) + attributesAgent.getRadius();
 	}
 
 	@Override
