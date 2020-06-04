@@ -137,7 +137,7 @@ public class Simulation {
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
-			pc.setTopography(topography);
+			pc.setDomain(domain);
 		}
 	}
 

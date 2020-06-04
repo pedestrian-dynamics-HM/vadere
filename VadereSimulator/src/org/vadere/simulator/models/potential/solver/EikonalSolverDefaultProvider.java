@@ -4,7 +4,6 @@ import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
@@ -20,7 +19,7 @@ public class EikonalSolverDefaultProvider extends EikonalSolverProvider {
 		EikonalSolver eikonalSolver = buildBase(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
 
 		long ms = System.currentTimeMillis();
-		eikonalSolver.initialize();
+		eikonalSolver.solve();
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 
 		return eikonalSolver;

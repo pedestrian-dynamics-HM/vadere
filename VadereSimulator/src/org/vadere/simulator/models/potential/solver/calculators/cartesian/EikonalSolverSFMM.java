@@ -65,7 +65,7 @@ public class EikonalSolverSFMM extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void initialize() {
+	public void solve() {
 		for (Point point : targetPoints) {
 			setTargetNeighborsDistances(point);
 		}
@@ -112,7 +112,7 @@ public class EikonalSolverSFMM extends AGridEikonalSolver {
 		if (needsUpdate()) {
 			timeCostFunction.update();
 			resetDynamicPotentialField();
-			initialize();
+			solve();
 		}
 		// logger.info("ffm-runtime: " + (System.currentTimeMillis() - ms));
 		runtime = System.currentTimeMillis();

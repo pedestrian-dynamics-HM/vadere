@@ -78,7 +78,7 @@ public class PerformanceSFMM {
 	@BenchmarkMode(Mode.SingleShotTime) @OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public double testFMM(PerformanceSFMM.StateCellGrid stateCellGrid) {
 		EikonalSolverFMM ffm = new EikonalSolverFMM(stateCellGrid.cellGrid, stateCellGrid.distanceFunction, true, new UnitTimeCostFunction(), 0.1, 1.0);
-		ffm.initialize();
+		ffm.solve();
 		return stateCellGrid.cellGrid.getValue(0, 0).potential;
 	}
 
@@ -86,7 +86,7 @@ public class PerformanceSFMM {
 	@BenchmarkMode(Mode.SingleShotTime) @OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public double testSFMM(PerformanceSFMM.StateCellGrid stateCellGrid) {
 		EikonalSolverSFMM ffm = new EikonalSolverSFMM(stateCellGrid.cellGrid, stateCellGrid.distanceFunction, true, new UnitTimeCostFunction(), 0.1, 1.0);
-		ffm.initialize();
+		ffm.solve();
 		return stateCellGrid.cellGrid.getValue(0, 0).potential;
 	}
 }

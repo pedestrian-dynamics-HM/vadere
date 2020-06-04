@@ -12,7 +12,7 @@ import org.vadere.util.opencl.OpenCLException;
 class CLGaussianFilter extends GaussianFilter {
 
     private final CLConvolution convolution;
-    private Logger logger = Logger.getLogger(CLConvolution.class);
+    private Logger logger = Logger.getLogger(CLGaussianFilter.class);
 
     CLGaussianFilter(final Rectangle2D scenarioBounds, final double scale, final BiFunction<Integer, Integer, Float> f,
                      final boolean normalize) throws OpenCLException {
@@ -28,7 +28,7 @@ class CLGaussianFilter extends GaussianFilter {
 		    long ms = System.currentTimeMillis();
 		    outputMatrix = convolution.convolve(inputMatrix);
 		    ms = System.currentTimeMillis() - ms;
-		    logger.infof("filtering required " + ms + "[ms]");
+		    logger.debug("filtering required " + ms + "[ms]");
 	    } catch (OpenCLException e) {
 		    logger.error(e.getMessage());
 		    e.printStackTrace();

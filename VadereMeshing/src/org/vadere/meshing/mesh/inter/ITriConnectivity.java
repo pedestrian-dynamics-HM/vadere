@@ -1,6 +1,7 @@
 package org.vadere.meshing.mesh.inter;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
@@ -16,12 +17,15 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -83,12 +87,13 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 *
 	 * <p>Does not change the connectivity.</p>
 	 *
-	 * @param original  the original face
-	 * @param f1        one of the split results
-	 * @param f2        one of the split results
-	 * @param v         the vertex inserted
+	 * @param originalEdge  the original edge which is split
+	 * @param original      the original face
+	 * @param f1            one of the split results
+	 * @param f2            one of the split results
+	 * @param v             the vertex inserted
 	 */
-	default void splitEdgeEvent(@NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final V v) {}
+	default void splitEdgeEvent(@NotNull E originalEdge, @NotNull final F original, @NotNull final F f1, @NotNull final F f2, @NotNull final V v) {}
 
 	/**
 	 * <p>This will replace the point of a vertex. If the point has other coordinates than
@@ -218,6 +223,27 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		return getMesh().toLine(next).lengthSq() >= lenSq && getMesh().toLine(prev).lengthSq() >= lenSq;
 	}
 
+	default Set<V> getVertices(@NotNull final double x, final double y, final F startFace, @NotNull final Predicate<V> predicate) {
+		assert !getMesh().isBoundary(startFace) && getMesh().toTriangle(startFace).contains(x, y);
+		Set<V> set = new HashSet<>();
+		LinkedList<V> heap = new LinkedList();
+		for(V v : getMesh().getVertexIt(startFace)) {
+			heap.addLast(v);
+		}
+
+		while (!heap.isEmpty()) {
+			V candidate = heap.poll();
+			if(predicate.test(candidate) && !set.contains(candidate)) {
+				set.add(candidate);
+				for(V neighbour : getMesh().getAdjacentVertexIt(candidate)) {
+					heap.addLast(neighbour);
+				}
+			}
+		}
+
+		return set;
+	}
+
 	/**
 	 * <p>Inserts a point into the mesh which is contained in a boundary by connecting the boundaryEdge
 	 * to the point in O(1) time. This will create 4 new half-edges, one new vertex and one face.</p>
@@ -339,7 +365,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		V y = getMesh().getVertex(t1);
 		V z = getMesh().getVertex(t2);
 
-		//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+		//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
 
 		//return Utils.isInCircumscribedCycle(x, y, z, p);
 		//if(Utils.ccw(z,x,y) > 0) {
@@ -410,8 +436,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		E e1 = mesh.createEdge(v2, mesh.getFace(o0));
 		E t2 = null;
 		E t1 = mesh.createEdge(v, mesh.getFace(h0));
-		mesh.setEdge(v, t1);
 
+		mesh.setEdge(v, t1);
 		mesh.setTwin(e1, t1);
 
 		/*
@@ -425,8 +451,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			mesh.setEdge(v2, e1);
 		}
 
+		F f1 = null;
 		if(!mesh.isBoundary(h0)) {
-			F f1 = mesh.createFace();
+			f1 = mesh.createFace();
 
 			E h1 = mesh.getNext(h0);
 			E h2 = mesh.getNext(h1);
@@ -455,20 +482,19 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			mesh.setNext(e0, h2);
 			mesh.setNext(h2, t1);
 			mesh.setNext(t1, e0);
-
-			splitEdgeEvent(f0, f0, f1, v);
 		}
 		else {
 			mesh.setNext(mesh.getPrev(h0), t1);
 			mesh.setNext(t1, h0);
 		}
 
+		F f2 = null;
 		if(!mesh.isBoundary(o0)) {
 			E o1 = mesh.getNext(o0);
 			E o2 = mesh.getNext(o1);
 
 			V v3 = mesh.getVertex(o1);
-			F f2 = mesh.createFace();
+			f2 = mesh.createFace();
 
 			// face
 			E e2 = mesh.createEdge(v3, mesh.getFace(o0));
@@ -493,13 +519,22 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			mesh.setNext(o0, e2);
 			mesh.setNext(e2, o2);
 			mesh.setNext(o2, o0);
-
-			splitEdgeEvent(f3, f3, f2, v);
 		}
 		else {
 			mesh.setNext(e1, mesh.getNext(o0));
 			mesh.setNext(o0, e1);
 		}
+
+		// Event after the mesh connectivity is valid!
+		insertEvent(t1);
+		if(!mesh.isBoundary(h0)) {
+			splitEdgeEvent(h0, f0, f0, f1, v);
+		}
+
+		if(!mesh.isBoundary(o0)) {
+			splitEdgeEvent(o0, f3, f3, f2, v);
+		}
+
 
 		if(legalize) {
 			if(!mesh.isBoundary(h0)) {
@@ -624,7 +659,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			mesh.setNext(h2, t1);
 			mesh.setNext(t1, e0);
 
-			splitEdgeEvent(f0, f0, f1, v);
+			splitEdgeEvent(h0, f0, f0, f1, v);
 		}
 		else {
 			mesh.setNext(mesh.getPrev(h0), t1);
@@ -662,7 +697,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			mesh.setNext(e2, o2);
 			mesh.setNext(o2, o0);
 
-			splitEdgeEvent(f3, f3, f2, v);
+			splitEdgeEvent(o0, f3, f3, f2, v);
 		}
 		else {
 			mesh.setNext(e1, mesh.getNext(o0));
@@ -751,12 +786,14 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param legalize          if true the split will be legalized i.e. the mesh will be locally changed until it is legal
 	 * @return one (the halfEdge is a boundary edge) or two halfEdges such that the set of faces of these
 	 *         edges and their twins are the faces which took part / where modified / added by the split.
+	 *         Both edges ending in the inserted vertex i.e. getVertex(edge) returns the inserted vertex.
 	 */
 	default Pair<E, E> splitEdge(@NotNull final E halfEdge, final boolean legalize, @NotNull final Consumer<V> action) {
 		VPoint midPoint = getMesh().toLine(halfEdge).midPoint();
 		V v = getMesh().createVertex(midPoint.getX(), midPoint.getY());
+		Pair<E, E> result = splitEdge(v, halfEdge, legalize);
 		action.accept(v);
-		return splitEdge(v, halfEdge, legalize);
+		return result;
 	}
 
 
@@ -1444,7 +1481,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 *
 	 * Assumption:
 	 * <ul>
-	 *     <li>there is an counter clockwise angle smaller than 180 (PI) at v2 of the triangle (v1,v2,v3)</li>
+	 *     <li>there is an counter clockwise angle3D smaller than 180 (PI) at v2 of the triangle (v1,v2,v3)</li>
 	 *     <li>the boundaryEdge is a boundary edge</li>
 	 * </ul>
 	 *
@@ -1712,7 +1749,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		return true;
 	}
 
-	@Override
 	default Optional<F> locate(final double x, final double y) {
 		Optional<F> optFace;
 		if(getMesh().getNumberOfFaces() > 1) {
@@ -1864,9 +1900,9 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param startFace the face where the march start containing (x1,y1).
 	 * @return returns all visited edges in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
-    default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
-        return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
-    }
+	default LinkedList<E> straightGatherWalk2D(final double x1, final double y1, @NotNull final F startFace) {
+    	return straightGatherWalk2D(x1, y1, startFace, e -> !isRightOf(x1, y1, e));
+	}
 
     default LinkedList<E> getIntersectingEdges(@NotNull final V vStart, @NotNull final V vEnd) {
 		VPoint q = getMesh().toPoint(vStart);
@@ -1989,7 +2025,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
     }
 
 	/**
-	 * <p>Connects each (current) two consecutive border edge if they form an acute angle
+	 * <p>Connects each (current) two consecutive border edge if they form an acute angle3D
 	 * which smoothes the border of the mesh overall. This requires O(n) time, where n
 	 * is the number of border edges.</p>
 	 *
@@ -2042,7 +2078,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	/**
-	 * <p>Connects each (current) two consecutive border edge if they form an acute angle
+	 * <p>Connects each (current) two consecutive border edge if they form an acute angle3D
 	 * which smoothes the border of the mesh overall. This requires O(n) time, where n
 	 * is the number of border edges.</p>
 	 *
@@ -2323,7 +2359,21 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	//Ray casting
-
+	/**
+	 * This method returns the edge of a face (defined by its half-edge inEdge) which
+	 * 1) intersects the line (q,p) and
+	 * 2) its intersection point is the closest one with respect to p
+	 *
+	 * This is computational expensive because one iterates over all edges of the face (potentially a hole or the border).
+	 * But it is a robust method to walk through a non-convex hole or border!
+	 *
+	 * @param inEdge
+	 * @param q
+	 * @param p
+	 * @param stopCondition
+	 * @param visitedEdges
+	 * @return
+	 */
 	default E rayCastingPolygon(@NotNull final E inEdge,
 	                            @NotNull final VPoint q,
 	                            @NotNull final VPoint p,
@@ -2358,6 +2408,42 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		boolean isInside = count % 2 == 1;
 
 		return (isInside && !getMesh().isBorder(face) || !isInside && getMesh().isBorder(face)) ? null : outEdge;
+	}
+
+	default E walkAroundBoundaryStraight(@NotNull final E inEdge,
+	                            @NotNull final VPoint q,
+	                            @NotNull final VPoint p,
+	                            @NotNull final Predicate<E> stopCondition,
+	                            @NotNull final LinkedList<E> visitedEdges) {
+		E outEdge = null;
+		E outIfInside = null;
+		F face = getMesh().getFace(inEdge);
+
+		V v1 = getMesh().getVertex(inEdge);
+		V v2 = getMesh().getTwinVertex(inEdge);
+
+		double angle = GeometryUtils.angle2D(p.x-q.x, p.y-q.y,
+				getMesh().getX(v1) - getMesh().getX(v2), getMesh().getY(v1) - getMesh().getY(v2));
+
+		boolean walkForward = angle <= Math.PI * 0.5;
+
+		Iterable<E> iterable = walkForward ? getMesh().getEdgeIt(inEdge) : getMesh().getEdgeItReverse(inEdge);
+		for(E e : iterable) {
+			if(!e.equals(inEdge) && intersectsDirectional(p, q, e)) {
+				outEdge = e;
+				break;
+			}
+		}
+
+		if(outEdge == null) {
+			return outEdge;
+		}
+
+		if(getMesh().isBoundary(face) && isLeftOf(p.getX(), p.getY(), outEdge)) {
+			return rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+		} else {
+			return outEdge;
+		}
 	}
 
 	/**
@@ -2400,7 +2486,30 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		 * Special case: the face is a hole or the border!
 		 */
 		if(getMesh().isBoundary(face)) {
-			outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			//return Optional.empty();
+
+			V v1 = getMesh().getVertex(inEdge);
+			V v2 = getMesh().getTwinVertex(inEdge);
+			VPoint iPoint1 = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+
+			outEdge = walkAroundBoundaryStraight(inEdge, q, p, stopCondition, visitedEdges);
+			//outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			// the point outside
+			if(outEdge == null) {
+				return Optional.empty();
+			}
+
+			v1 = getMesh().getVertex(outEdge);
+			v2 = getMesh().getTwinVertex(outEdge);
+			VPoint iPoint2 = GeometryUtils.intersectionPoint(q.getX(), q.getY(), p.getX(), p.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+
+			// we did no progress towards p => walking around does not work cause the boundary is not convex, therefore we use the expensive method
+			if(iPoint1.distanceSq(p) <= iPoint2.distanceSq(p)) {
+				// TODO this is too expensive!
+				outEdge = rayCastingPolygon(inEdge, q, p, stopCondition, visitedEdges);
+			}
+
+			// the point outside
 			if(outEdge == null) {
 				return Optional.empty();
 			} else {
@@ -2490,8 +2599,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 		}
 	}
-
-
 
 	/**
 	 * <p>Marches / walks along the line defined by q and p from q to p starting inside the startFace.
@@ -3179,17 +3286,40 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		assert x.length == y.length && y.length == z.length && x.length == 3;
 
 		E edge = getMesh().getEdge(face);
-		x[0] = getMesh().getX(getMesh().getVertex(edge));
-		y[0] = getMesh().getY(getMesh().getVertex(edge));
-		z[0] = getMesh().getData(getMesh().getVertex(edge), name, Double.class).get();
+		V v = getMesh().getVertex(edge);
+		x[0] = getMesh().getX(v);
+		y[0] = getMesh().getY(v);
+		z[0] = getMesh().getDoubleData(v, name);
 
-		x[1] = getMesh().getX(getMesh().getVertex(getMesh().getNext(edge)));
-		y[1] = getMesh().getY(getMesh().getVertex(getMesh().getNext(edge)));
-		z[1] = getMesh().getData(getMesh().getVertex(getMesh().getNext(edge)), name, Double.class).get();
+		v = getMesh().getVertex(getMesh().getNext(edge));
+		x[1] = getMesh().getX(v);
+		y[1] = getMesh().getY(v);
+		z[1] = getMesh().getDoubleData(v, name);
 
-		x[2] = getMesh().getX(getMesh().getVertex(getMesh().getPrev(edge)));
-		y[2] = getMesh().getY(getMesh().getVertex(getMesh().getPrev(edge)));
-		z[2] = getMesh().getData(getMesh().getVertex(getMesh().getPrev(edge)), name, Double.class).get();
+		v = getMesh().getVertex(getMesh().getPrev(edge));
+		x[2] = getMesh().getX(v);
+		y[2] = getMesh().getY(v);
+		z[2] = getMesh().getDoubleData(v, name);
+	}
+
+	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, Function<V, Double> func){
+		assert x.length == y.length && y.length == z.length && x.length == 3;
+
+		E edge = getMesh().getEdge(face);
+		V v = getMesh().getVertex(edge);
+		x[0] = getMesh().getX(v);
+		y[0] = getMesh().getY(v);
+		z[0] = func.apply(v);
+
+		v = getMesh().getVertex(getMesh().getNext(edge));
+		x[1] = getMesh().getX(v);
+		y[1] = getMesh().getY(v);
+		z[1] = func.apply(v);
+
+		v = getMesh().getVertex(getMesh().getPrev(edge));
+		x[2] = getMesh().getX(v);
+		y[2] = getMesh().getY(v);
+		z[2] = func.apply(v);
 	}
 
 	/**
@@ -3199,17 +3329,57 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the quality of a face / triangle
 	 */
 	default double faceToQuality(final F face) {
-		VLine[] lines = getMesh().toTriangle(face).getLines();
-		double a = lines[0].length();
-		double b = lines[1].length();
-		double c = lines[2].length();
-		double part;
-		if(a != 0.0 && b != 0.0 && c != 0.0) {
-			part = ((b + c - a) * (c + a - b) * (a + b - c)) / (a * b * c);
+		assert getMesh().getEdges(face).size() == 3;
+		E edge = getMesh().getEdge(face);
+		IPoint p1 = getMesh().getVertex(edge);
+		IPoint p2 = getMesh().getVertex(getMesh().getNext(edge));
+		IPoint p3 = getMesh().getVertex(getMesh().getPrev(edge));
+
+		double quality = GeometryUtils.qualityInCircleOutCircle(p1, p2, p3);
+		return GeometryUtils.qualityInCircleOutCircle(p1, p2, p3);
+	}
+
+	default double faceToLongestEdgeQuality(final F face) {
+		E edge = getMesh().getEdge(face);
+		IPoint p1 = getMesh().getVertex(edge);
+		IPoint p2 = getMesh().getVertex(getMesh().getNext(edge));
+		IPoint p3 = getMesh().getVertex(getMesh().getPrev(edge));
+		return GeometryUtils.qualityLongestEdgeInCircle(p1, p2, p3);
+	}
+
+	default void getVirtualSupport(@NotNull final V v, @NotNull final E edge, @NotNull final List<Pair<V, V>> virtualSupport) {
+		//assert isNonAcute(getMesh().getVertex(edge), getMesh().getVertex(getMesh().getNext(edge)), getMesh().getVertex(getMesh().getPrev(edge)));
+
+		if(getMesh().isAtBoundary(edge)) {
+			return;
 		}
-		else {
-			throw new IllegalArgumentException(face + " is not a feasible triangle!");
+
+		E prev = getMesh().getPrev(edge);
+		E twin = getMesh().getTwin(edge);
+
+		V v1 = getMesh().getVertex(prev);
+		V v2 = getMesh().getVertex(edge);
+		V u = getMesh().getVertex(getMesh().getNext(twin));
+
+		if(!isNonAcute(u, v, v1)) {
+			virtualSupport.add(Pair.of(v1, u));
+		} else {
+			getVirtualSupport(v, getMesh().getNext(twin), virtualSupport);
 		}
-		return part;
+
+		if(!isNonAcute(v2, v, u)) {
+			virtualSupport.add(Pair.of(v2, u));
+		} else {
+			getVirtualSupport(v, getMesh().getPrev(twin), virtualSupport);
+		}
+
+	}
+
+	default boolean isNonAcute(V v1, V v2, V v3) {
+		double angle1 = GeometryUtils.angle(v1, v2, v3);
+
+		// non-acute triangle
+		double rightAngle = Math.PI/2;
+		return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
 	}
 }

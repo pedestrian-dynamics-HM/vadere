@@ -33,6 +33,21 @@ public class GeometryUtilsTest {
 	}
 
 	@Test
+	public void testSignedAreaQuadrilateral() {
+		double[] x = new double[]{0, 10, 10, 0};
+		double[] y = new double[]{0,0, 3, 3};
+		double[] z = new double[]{0, 0, 4, 4};
+
+		assertEquals(50, GeometryUtils.areaOfPolygon(x, y, z), GeometryUtils.DOUBLE_EPS);
+
+		x = new double[]{0+5, 10+5, 10+5, 0+5};
+		y = new double[]{0+5, 0+5, 3+5, 3+5};
+		z = new double[]{0+5, 0+5, 4+5, 4+5};
+
+		assertEquals(50, GeometryUtils.areaOfPolygon(x, y, z), GeometryUtils.DOUBLE_EPS);
+	}
+
+	@Test
 	public void testDistanceToLineSegment() {
 		VPoint p = new VPoint(0,0);
 		VPoint q = new VPoint(2, 0);

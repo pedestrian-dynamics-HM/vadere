@@ -34,7 +34,7 @@ public class BasePointLocator<V extends IVertex, E extends IHalfEdge, F extends 
 	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {}
 
 	@Override
 	public void postFlipEdgeEvent(final F f1, final F f2) {}

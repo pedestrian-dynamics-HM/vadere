@@ -15,7 +15,7 @@ import org.vadere.util.io.IOUtils;
 /**
  * Computes a time cost potential field based on obstacles and a rigid body that
  * can be rotated around its center. This creates a 3D time cost field (2 for
- * space, 1 for angle). see Sethian: Level Set Methods and Fast Marching
+ * space, 1 for angle3D). see Sethian: Level Set Methods and Fast Marching
  * Methods, p. 287ff
  * 
  */

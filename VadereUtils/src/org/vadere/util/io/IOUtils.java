@@ -33,6 +33,8 @@ public class IOUtils {
 
 	public static final String MESH_DIR = "meshes";
 
+	public static final String BACKGROUND_MESH_ENDING = "_background";
+
 	public static final String SCENARIO_DIR = "scenarios";
 
 	public static final String CORRUPT_DIR = "corrupt";

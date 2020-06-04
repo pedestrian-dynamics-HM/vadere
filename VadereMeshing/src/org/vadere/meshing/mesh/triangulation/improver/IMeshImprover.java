@@ -14,6 +14,7 @@ import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -182,6 +183,10 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 */
 	default double faceToQuality(final F face) {
 		return getTriangulation().faceToQuality(face);
+	}
+
+	default double faceToQuality(final F face, Function<F, Double> qualityMeasure) {
+		return qualityMeasure.apply(face);
 	}
 
 	default double faceToQuality(final E edge) {

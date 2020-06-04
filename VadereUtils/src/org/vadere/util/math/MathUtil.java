@@ -35,7 +35,7 @@ public class MathUtil {
 	}
 
 	/**
-	 * The two-norm of a vector.
+	 * The two-norm3D of a vector.
 	 * 
 	 * @param vector
 	 *        a double vector with arbitrary number of entries x1,x2,....
@@ -50,7 +50,7 @@ public class MathUtil {
 	}
 
 	/**
-	 * The one-norm of a vector.
+	 * The one-norm3D of a vector.
 	 * 
 	 * @param vector
 	 *        a double vector with arbitrary number of entries x1,x2,....
@@ -161,7 +161,7 @@ public class MathUtil {
 	}
 
 	/**
-	 * computes the "smallest distance on the circle" of the angle
+	 * computes the "smallest distance on the circle" of the angle3D
 	 * (x+v,x,x2-x)
 	 * 
 	 * @param x

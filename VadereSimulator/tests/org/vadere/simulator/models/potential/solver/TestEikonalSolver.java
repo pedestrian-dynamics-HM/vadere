@@ -68,7 +68,7 @@ public class TestEikonalSolver {
 		double ms = System.currentTimeMillis();
 		EikonalSolver eikonalSolverFMM = new EikonalSolverFMM(cellGrid,
 				distFunc, false, new UnitTimeCostFunction(), unknownPenalty, weight);
-		eikonalSolverFMM.initialize();
+		eikonalSolverFMM.solve();
 		testMaxError(eikonalSolverFMM);
 		double runtimeInMs = System.currentTimeMillis() - ms;
 		logger.info("FMM (not high accuracy) required " + runtimeInMs + "[ms]");
@@ -79,7 +79,7 @@ public class TestEikonalSolver {
 		double ms = System.currentTimeMillis();
 		EikonalSolver eikonalSolverFIM = new EikonalSolverFIM(cellGrid,
 				distFunc, false, new UnitTimeCostFunction(), unknownPenalty, weight);
-		eikonalSolverFIM.initialize();
+		eikonalSolverFIM.solve();
 		testMaxError(eikonalSolverFIM);
 		double runtimeInMs = System.currentTimeMillis() - ms;
 		logger.info("FIM (not high accuracy) required " + runtimeInMs + "[ms]");
@@ -90,7 +90,7 @@ public class TestEikonalSolver {
 		double ms = System.currentTimeMillis();
 		EikonalSolver eikonalSolverFSM = new EikonalSolverFSM(cellGrid,
 				distFunc, false, new UnitTimeCostFunction(), unknownPenalty, weight);
-		eikonalSolverFSM.initialize();
+		eikonalSolverFSM.solve();
 		testMaxError(eikonalSolverFSM);
 		double runtimeInMs = System.currentTimeMillis() - ms;
 		logger.info("FSM (not high accuracy) required " + runtimeInMs + "[ms]");

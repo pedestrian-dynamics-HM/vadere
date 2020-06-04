@@ -27,7 +27,7 @@ public class VisualTestGPUEdgeBased {
 	private static final Logger log = Logger.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
+	private static final IEdgeLengthFunction uniformEdgeLength = p -> 0.3;
 	private static final IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y, false);
 	private static final double initialEdgeLength =  1.5;
 
@@ -56,21 +56,23 @@ public class VisualTestGPUEdgeBased {
 			overAllTime.resume();
 			meshGenerator.improve();
 			overAllTime.suspend();
-			meshGenerator.refresh();
+			synchronized (meshGenerator.getMesh()) {
+				meshGenerator.refresh();
+			}
 			try {
-				Thread.sleep(100);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			distmeshPanel.repaint();
 		}
 		overAllTime.stop();
-
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
-		log.info("quality: " + meshGenerator.getQuality());
-		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		meshGenerator.finish();
+		System.out.println("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		System.out.println("#edges: " + meshGenerator.getMesh().getEdges().size());
+		System.out.println("#faces: " + meshGenerator.getMesh().getFaces().size());
+		System.out.println("quality: " + meshGenerator.getQuality());
+		System.out.println("overall time: " + overAllTime.getTime() + "[ms]");
 
 	}
 

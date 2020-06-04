@@ -165,12 +165,12 @@ public class StepCircleOptimizerCircleNelderMead extends StepCircleOptimizer {
 
 
 
-		double angle = 2.0/3.0*Math.PI;
+		double angle3D = 2.0/3.0*Math.PI;
 
 		VPoint dir = new VPoint(0, ped.getRadius());
 		VPoint p1 = ped.getPosition().add(dir);
-		VPoint p2 = ped.getPosition().add(dir.rotate(angle));
-		VPoint p3 = ped.getPosition().add(dir.rotate(-angle));
+		VPoint p2 = ped.getPosition().add(dir.rotate(angle3D));
+		VPoint p3 = ped.getPosition().add(dir.rotate(-angle3D));
 
 		simplices.add(new VTriangle(p1, p2, p3));*/
 

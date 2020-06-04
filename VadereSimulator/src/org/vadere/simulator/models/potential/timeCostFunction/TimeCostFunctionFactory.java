@@ -1,5 +1,9 @@
 package org.vadere.simulator.models.potential.timeCostFunction;
 
+import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.simulator.models.queuing.QueueingGamePedestrian;
@@ -10,7 +14,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.types.PedestrianAttitudeType;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
-import org.vadere.util.math.IDistanceFunction;
 
 /**
  * The TimeCostFunctionFactory creates the TimeCostFunctions with the currently
@@ -142,6 +145,79 @@ public class TimeCostFunctionFactory {
 			}
 		}
 	}
+
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> ITimeCostFunction create(
+			final AttributesTimeCost timeCostAttributes,
+			final AttributesAgent attributesPedestrian,
+			final Topography topography, final int targetId,
+			IIncrementalTriangulation<V, E, F> triangulation) {
+
+		switch (timeCostAttributes.getType()) {
+			case NAVIGATION: {
+				IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create(
+						topography,
+						timeCostAttributes,
+						attributesPedestrian,
+						targetId);
+
+				ITimeCostFunction unit = new UnitTimeCostFunction();
+
+				TimeCostObstacleDensityMesh<V, E, F> timeCostObstacleDensity = new TimeCostObstacleDensityMesh<>(
+						unit,
+						triangulation,
+						timeCostAttributes,
+						attributesPedestrian,
+						p -> -topography.distanceToObstacle(p)
+				);
+
+				TimeCostPedestrianDensityMesh<V, E, F> timeCostPedestrianDensityMesh = new TimeCostPedestrianDensityMesh<>(
+						timeCostObstacleDensity,
+						triangulation,
+						loadingStrategy,
+						attributesPedestrian,
+						topography
+				);
+				return timeCostPedestrianDensityMesh;
+			}
+			case QUEUEING: {
+				ITimeCostFunction unit = new UnitTimeCostFunction();
+
+				TimeCostObstacleDensityMesh<V, E, F> timeCostObstacleDensity = new TimeCostObstacleDensityMesh<>(
+						unit,
+						triangulation,
+						timeCostAttributes,
+						attributesPedestrian,
+						p -> -topography.distanceToObstacle(p)
+				);
+
+				TimeCostPedestrianDensityQueueingMesh<V, E, F> timeCostPedestrianDensityQueueingMesh = new TimeCostPedestrianDensityQueueingMesh<>(
+						timeCostObstacleDensity,
+						triangulation,
+						IPedestrianLoadingStrategy.create(timeCostAttributes.getQueueWidthLoading()),
+						attributesPedestrian,
+						topography
+				);
+				return timeCostPedestrianDensityQueueingMesh;
+			}
+			case OBSTACLES: {
+				ITimeCostFunction unit = new UnitTimeCostFunction();
+
+				TimeCostObstacleDensityMesh<V, E, F> timeCostObstacleDensity = new TimeCostObstacleDensityMesh<>(
+						unit,
+						triangulation,
+						timeCostAttributes,
+						attributesPedestrian,
+						p -> -topography.distanceToObstacle(p)
+				);
+				return timeCostObstacleDensity;
+			} case UNIT: return new UnitTimeCostFunction();
+			default: {
+				throw new IllegalArgumentException(timeCostAttributes.getType()
+						+ " - no such time-cost function exists!");
+			}
+		}
+	}
+
 
 	private static TimeCostObstacleDensity create(
 			final AttributesTimeCost timeCostAttributes,

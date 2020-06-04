@@ -46,6 +46,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 		} catch (IOException e) {
 			throw e;
 		}
+
 		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCacheHashCommand.build(
 				TraCICmd.GET_SIMULATION_VALUE, elementID, varID, varType, data));
 		RemoteManager rm = new TestRemoteManager() {

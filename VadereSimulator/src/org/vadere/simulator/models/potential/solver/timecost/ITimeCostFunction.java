@@ -18,6 +18,10 @@ public interface ITimeCostFunction {
 	 */
 	double costAt(IPoint p);
 
+	default double costAt(IPoint p, Object caller) {
+		return costAt(p);
+	}
+
 	/**
 	 * Prepares the dynamic timeCostFunction for the next step.
 	 */

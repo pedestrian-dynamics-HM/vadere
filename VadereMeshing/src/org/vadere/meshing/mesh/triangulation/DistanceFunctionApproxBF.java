@@ -1,11 +1,19 @@
 package org.vadere.meshing.mesh.triangulation;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -16,15 +24,34 @@ import org.vadere.util.math.IDistanceFunctionCached;
 import org.vadere.util.math.InterpolationUtil;
 import java.util.function.Function;
 
-public class DistanceFunctionApproxBF implements IDistanceFunctionCached {
-	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
+public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IDistanceFunctionCached {
+	private IIncrementalTriangulation<V, E, F> triangulation;
 
 	private static final String propName = "distObs";
 
 	public DistanceFunctionApproxBF(
+			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final IDistanceFunction exactDistanceFunc) {
+
+		this.triangulation = new IncrementalTriangulation<>(mesh);
+		this.triangulation.enableCache();
+		//TODO: maybe transform into an immutable triangulation / mesh!
+		triangulation.setCanIllegalPredicate(e -> true);
+
+		// compute and set the local feature size
+		var vertices = triangulation.getMesh().getVertices();
+
+		for(var v : vertices) {
+			double distance = exactDistanceFunc.apply(v);
+			triangulation.getMesh().setDoubleData(v, propName, distance);
+		}
+	}
+
+	public DistanceFunctionApproxBF(
 			@NotNull final PSLG pslg,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc,
-			@NotNull final IDistanceFunction exactDistanceFunc) {
+			@NotNull final IDistanceFunction exactDistanceFunc,
+			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 		/**
 		 * Add a bound around so the edge function is also defined outside.
@@ -32,8 +59,9 @@ public class DistanceFunctionApproxBF implements IDistanceFunctionCached {
 		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
-		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false, false);
+		var ruppertsTriangulator = new GenRuppertsTriangulator<V, E, F>(meshSupplier, boundedPSLG,10, circumRadiusFunc, false, false);
 		triangulation = ruppertsTriangulator.generate();
+		triangulation.enableCache();
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
 		triangulation.setCanIllegalPredicate(e -> true);
@@ -47,8 +75,8 @@ public class DistanceFunctionApproxBF implements IDistanceFunctionCached {
 		}
 	}
 
-	public DistanceFunctionApproxBF(@NotNull final PSLG pslg, @NotNull final IDistanceFunction exactDistanceFunc) {
-		this(pslg, p -> Double.POSITIVE_INFINITY, exactDistanceFunc);
+	public DistanceFunctionApproxBF(@NotNull final PSLG pslg, @NotNull final IDistanceFunction exactDistanceFunc, @NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+		this(pslg, p -> Double.POSITIVE_INFINITY, exactDistanceFunc, meshSupplier);
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 	}
 
@@ -75,12 +103,12 @@ public class DistanceFunctionApproxBF implements IDistanceFunctionCached {
 	}
 
 	@Override
-	public double apply(@NotNull IPoint p, Object caller) {
+	public double apply(@NotNull final IPoint p, Object caller) {
 		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY()), caller).get();
 		return apply(p, face);
 	}
 
-	private double apply(@NotNull final IPoint p, @NotNull final PFace face) {
+	private double apply(@NotNull final IPoint p, @NotNull final F face) {
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {

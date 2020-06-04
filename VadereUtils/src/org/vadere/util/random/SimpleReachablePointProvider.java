@@ -40,7 +40,7 @@ public class SimpleReachablePointProvider implements IReachablePointProvider {
 		IPoint p;
 		do {
 			p = iPointProvider.nextPoint();
-			double distance = distanceFunction.apply(p);
+			double distance = -distanceFunction.apply(p);
 			legalState = distance > 0 && obstacleDistPredicate.test(distance);
 		} while (!legalState);
 		return p;

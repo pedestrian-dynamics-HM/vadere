@@ -60,8 +60,33 @@ public class GenSpaceFillingCurve<V extends IVertex, E extends IHalfEdge, F exte
 		remove(anchor);
 	}
 
+	/**
+	 * <p>Replaces the anchor element by two elements i.e. consecutive elements left followed by right.</p>
+	 *
+	 * @param left      the left element
+	 * @param middle    the middle element
+	 * @param right     the right element
+	 * @param anchor    the replaced element
+	 */
+	public void replace(
+			@NotNull final SFCNode<V, E, F> left,
+			@NotNull final SFCNode<V, E, F> middle,
+			@NotNull final SFCNode<V, E, F> right,
+			@NotNull SFCNode<V, E, F> anchor) {
+		assert asList().contains(anchor);
+		insertNext(right, anchor);
+		insertNext(middle, anchor);
+		insertNext(left, anchor);
+		remove(anchor);
+	}
+
 	public SFCNode<V, E, F> getNode(@NotNull final E edge) {
 		return edgeToNode.get(edge);
+	}
+
+
+	public SFCNode<V, E, F> getNode(@NotNull final F face) {
+		return edgeToNode.get(face);
 	}
 
 	/**
@@ -81,7 +106,10 @@ public class GenSpaceFillingCurve<V extends IVertex, E extends IHalfEdge, F exte
 			anchor.next.prev = anchor.prev;
 		}
 
-		edgeToNode.remove(anchor.getEdge());
+		// maybe we already replaced the anchor in edgeToNode
+		if(edgeToNode.get(anchor.getEdge()).equals(anchor)) {
+			edgeToNode.remove(anchor.getEdge());
+		}
 		anchor.destroy();
 	}
 

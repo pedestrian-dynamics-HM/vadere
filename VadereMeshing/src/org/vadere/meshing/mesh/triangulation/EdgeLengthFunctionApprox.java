@@ -58,7 +58,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
 						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
 					var u = triangulation.getMesh().getTwinVertex(e);
-					double len = v.distance(u) * 0.9;
+					double len = v.distance(u) * (1.0 / Math.sqrt(2));
 					if(len < minEdgeLen) {
 						minEdgeLen = len;
 					}

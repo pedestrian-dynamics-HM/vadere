@@ -673,7 +673,10 @@ public abstract class DefaultRenderer {
 			@NotNull final Graphics2D g,
 			@NotNull final IMesh<?, ?, ?> mesh,
 			@NotNull final VRectangle bound) {
-		MeshRenderer<?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+
+		MeshRenderer<?, ?, ?> meshRenderer = new MeshRenderer<>(mesh, false);
+
+		meshRenderer.renderPostTransform(g, bound);
 		//meshRenderer.renderGraphics(g, bound);
 	}
 

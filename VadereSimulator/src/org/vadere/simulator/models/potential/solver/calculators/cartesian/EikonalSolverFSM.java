@@ -56,7 +56,7 @@ public class EikonalSolverFSM extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void initialize() {
+	public void solve() {
 		init();
 		loop();
 

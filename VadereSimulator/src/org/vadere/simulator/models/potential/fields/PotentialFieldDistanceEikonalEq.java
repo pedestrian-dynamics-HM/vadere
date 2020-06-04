@@ -48,7 +48,7 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 				bounds.getHeight(), attributesFloorField.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
 
 		boolean isInitialized = false;
-		logger.info("initialize floor field (PotentialFieldDistanceEikonalEq)");
+		logger.info("solve floor field (PotentialFieldDistanceEikonalEq)");
 		if (cache.isNotEmpty()){
 			double ms = System.currentTimeMillis();
 			String cacheIdentifier = cache.distToIdentifier("BruteForce");
@@ -60,12 +60,12 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 					isInitialized = true;
 					logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
 				} catch (CacheException e){
-					logger.errorf("Error loading cache initialize manually. " + e);
+					logger.errorf("Error loading cache solve manually. " + e);
 				}
 			} else if(cacheObject.writable()) {
 				// no cache found
 				ms = System.currentTimeMillis();
-				logger.infof("No cache found for scenario initialize floor field");
+				logger.infof("No cache found for scenario solve floor field");
 				compute(obstacles, attributesFloorField);
 				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 				isInitialized = true;
@@ -118,7 +118,7 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 		}
 
 		long ms = System.currentTimeMillis();
-		eikonalSolver.initialize();
+		eikonalSolver.solve();
 		logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 	}
 

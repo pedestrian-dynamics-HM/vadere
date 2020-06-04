@@ -2,10 +2,7 @@ package org.vadere.meshing.mesh.triangulation;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.ITriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
@@ -114,7 +111,7 @@ public class BowyerWatsonSlow {
 	    if(!finished) {
 		    execute();
 	    }
-        return triangles.parallelStream().map(triple -> pointsToTriangle(triple)).flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
+        return triangles.parallelStream().map(triple -> pointsToTriangle(triple)).flatMap(triangle -> triangle.streamLines()).collect(Collectors.toSet());
     }
 
 	private void init(final VRectangle bound) {
