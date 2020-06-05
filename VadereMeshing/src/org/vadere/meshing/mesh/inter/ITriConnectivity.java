@@ -3011,6 +3011,29 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		}
 	}
 
+	default boolean contains(final double x, final double y, @NotNull final F face) {
+		if(!getMesh().isBoundary(face)) {
+			E e1 = getMesh().getEdge(face);
+			V v1 = getMesh().getVertex(e1);
+			V v2 = getMesh().getTwinVertex(e1);
+			V v3 = getMesh().getVertex(getMesh().getNext(e1));
+
+			double x1 = getMesh().getX(v1);
+			double y1 = getMesh().getY(v1);
+			double x2 = getMesh().getX(v2);
+			double y2 = getMesh().getY(v2);
+			double x3 = getMesh().getX(v3);
+			double y3 = getMesh().getY(v3);
+
+			return !GeometryUtils.isRightOf(x1, y1, x2, y2, x, y) &&
+					!GeometryUtils.isRightOf(x2, y2, x3, y3, x, y) &&
+					!GeometryUtils.isRightOf(x3, y3, x1, y1, x, y);
+		} else {
+			return IPolyConnectivity.super.contains(x, y, face);
+		}
+	}
+
+
 	/*default V locateNearestNeighbour(double x1, double y1, F face) {
 		assert isInsideCircumscribedCycle(face, x1, y1);
 

@@ -372,9 +372,9 @@ public class CellGrid {
 			VPoint gridPointCoord = pointToCoord(gridPoint);
 
 			double z1 = getValue(gridPoint).potential;
-			double z2 = getValue(new Point(gridPoint.x + incX, gridPoint.y)).potential;
-			double z3 = getValue(new Point(gridPoint.x + incX, gridPoint.y + incY)).potential;
-			double z4 = getValue(new Point(gridPoint.x, gridPoint.y + incY)).potential;
+			double z2 = getValue(gridPoint.x + incX, gridPoint.y).potential;
+			double z3 = getValue(gridPoint.x + incX, gridPoint.y + incY).potential;
+			double z4 = getValue(gridPoint.x, gridPoint.y + incY).potential;
 
 			double t = (pos.getX() - gridPointCoord.x) / getResolution();
 			double u = (pos.getY() - gridPointCoord.y) / getResolution();

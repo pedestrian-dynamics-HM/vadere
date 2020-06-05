@@ -201,7 +201,7 @@ public class Simulation {
 		}
 
 		simulationState = initialSimulationState();
-		topographyController.preLoop(simTimeInSec);
+		topographyController.preLoop(simTimeInSec, scenarioStore.getAttributesList());
 		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 

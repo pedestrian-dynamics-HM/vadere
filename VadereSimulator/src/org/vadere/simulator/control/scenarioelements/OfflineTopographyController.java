@@ -47,7 +47,7 @@ public class OfflineTopographyController {
 	}
 
 	// add bounding box
-	protected void prepareTopography() {
+	protected void prepareTopography(final AttributesFloorField attributesFloorField) {
 		// add boundaries
 		if (domain.getTopography().isBounded() && !domain.getTopography().hasBoundary()) {
 			for(Obstacle obstacle : Topography.createObstacleBoundary(domain.getTopography())) {
@@ -73,7 +73,7 @@ public class OfflineTopographyController {
 			PotentialFieldDistancesBruteForce distanceField = new PotentialFieldDistancesBruteForce(
 					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					new VRectangle(getTopography().getBounds()),
-					new AttributesFloorField(), cache);
+					attributesFloorField, cache);
 
 			getTopography().setObstacleDistanceFunction(iPoint -> -distanceField.getPotential(iPoint, null));
 

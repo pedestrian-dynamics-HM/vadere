@@ -43,6 +43,6 @@ public class Domain {
 	}
 
 	public Domain clone() {
-		return new Domain(floorFieldMesh.clone(), backgroundMesh.clone(), topography.clone());
+		return new Domain(floorFieldMesh == null ? null : floorFieldMesh.clone(), backgroundMesh == null ? null : backgroundMesh.clone(), topography.clone());
 	}
 }

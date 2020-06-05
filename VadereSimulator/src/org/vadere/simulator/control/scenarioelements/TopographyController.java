@@ -1,10 +1,15 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.models.DynamicElementFactory;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
+import java.util.List;
 import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
@@ -22,8 +27,8 @@ public class TopographyController extends OfflineTopographyController {
 		return this.domain.getTopography();
 	}
 
-	public void preLoop(double simTimeInSec) {
-		prepareTopography();
+	public void preLoop(double simTimeInSec, List<Attributes> attributesList) {
+		prepareTopography(Model.findAttributes(attributesList, AttributesFloorField.class));
 		createAgentWrapperPedestrians();
 	}
 
