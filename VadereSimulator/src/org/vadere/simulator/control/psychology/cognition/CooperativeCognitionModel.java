@@ -28,22 +28,26 @@ public class CooperativeCognitionModel implements ICognitionModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians) {
         for (Pedestrian pedestrian : pedestrians) {
-            // TODO: Maybe, add following variables as attributes to new class "AttributesCognition".
-            int requiredFootSteps = 2;
-            double requiredSpeedInMetersPerSecondToBeCooperative = 0.05;
-
-            FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
-
-            // Adapt category only if we have seen some footsteps in the past
-            if (footstepHistory.size() >= requiredFootSteps) {
-                if (footstepHistory.getAverageSpeedInMeterPerSecond() <= requiredSpeedInMetersPerSecondToBeCooperative) {
-                    pedestrian.setSelfCategory(SelfCategory.COOPERATIVE);
-                } else {
-                    // TODO: Maybe, check if area directed to target is free for a step
-                    //   (only then change to "TARGET_ORIENTED").
-                    pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
-                }
+            if (pedestrianCannotMove(pedestrian)) {
+                pedestrian.setSelfCategory(SelfCategory.COOPERATIVE);
+            } else {
+                // Maybe, check if area directed to target is free for a step (only then change to "TARGET_ORIENTED").
+                pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             }
         }
+    }
+
+    private boolean pedestrianCannotMove(Pedestrian pedestrian) {
+        boolean cannotMove = false;
+
+        FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
+        int requiredFootSteps = 2;
+
+        if (footstepHistory.size() >= requiredFootSteps
+                && footstepHistory.getAverageSpeedInMeterPerSecond() <= 0.05) {
+            cannotMove = true;
+        }
+
+        return cannotMove;
     }
 }
