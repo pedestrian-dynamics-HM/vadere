@@ -1376,7 +1376,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		V v1 = getVertex(e1);
 		V v2 = getVertex(e2);
 		V v3 = getVertex(e3);
-		return GeometryUtils.getTriangleMidpoint(getX(v1), getX(v1), getX(v2), getY(v2), getX(v3), getY(v3));
+		return GeometryUtils.getTriangleMidpoint(getX(v1), getY(v1), getX(v2), getY(v2), getX(v3), getY(v3));
 	}
 
 	/**

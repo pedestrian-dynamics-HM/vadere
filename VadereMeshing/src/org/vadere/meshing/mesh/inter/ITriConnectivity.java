@@ -3015,8 +3015,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 		if(!getMesh().isBoundary(face)) {
 			E e1 = getMesh().getEdge(face);
 			V v1 = getMesh().getVertex(e1);
-			V v2 = getMesh().getTwinVertex(e1);
-			V v3 = getMesh().getVertex(getMesh().getNext(e1));
+			V v3 = getMesh().getTwinVertex(e1);
+			V v2 = getMesh().getVertex(getMesh().getNext(e1));
 
 			double x1 = getMesh().getX(v1);
 			double y1 = getMesh().getY(v1);
