@@ -68,7 +68,7 @@ public class ActionGenerateMesh extends AbstractAction {
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String meshString = meshPolyWriter.to2DPoly(mesh);
 
-		if(meshDir.exists()) {
+		if(!meshDir.exists()) {
 			meshDir.mkdir();
 		}
 
