@@ -4,16 +4,19 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 
 import java.util.List;
 import java.util.Random;
 
 public class TopographyController extends OfflineTopographyController {
 
+	private static Logger logger = Logger.getLogger(TopographyController.class);
 	private final Domain domain;
 	private final DynamicElementFactory dynamicElementFactory;
 
@@ -28,7 +31,16 @@ public class TopographyController extends OfflineTopographyController {
 	}
 
 	public void preLoop(double simTimeInSec, List<Attributes> attributesList) {
-		prepareTopography(Model.findAttributes(attributesList, AttributesFloorField.class));
+		// If there is no background mesh these attributes are used to constrcut a distance function by using a cellgrid of size defined by AttributesFloorField.
+		AttributesFloorField attributesFloorField;
+		try {
+			attributesFloorField = Model.findAttributes(attributesList, AttributesFloorField.class);
+		} catch (AttributesNotFoundException ex) {
+			logger.warn("no " + AttributesFloorField.class.getName() + " found, the default values are used instead.");
+			// if there is none use the default values.
+			attributesFloorField = new AttributesFloorField();
+		}
+		prepareTopography(attributesFloorField);
 		createAgentWrapperPedestrians();
 	}
 
