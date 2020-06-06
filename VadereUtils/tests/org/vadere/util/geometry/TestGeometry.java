@@ -118,11 +118,11 @@ public class TestGeometry {
 
 	/**
 	 * Orders a given list angular relative to a given point, starting with
-	 * angle 0.
+	 * angle3D 0.
 	 *
 	 * @param allPoints
 	 * @param center
-	 * @return an ordered DataPoint list with the angle of the point as data and
+	 * @return an ordered DataPoint list with the angle3D of the point as data and
 	 *         the original index set.
 	 */
 	private static List<DataPoint> orderByAngle(List<VPoint> allPoints,
@@ -133,7 +133,7 @@ public class TestGeometry {
 			Vector2D p = new Vector2D(allPoints.get(i));
 			orderedList.add(new DataPoint(p.x, p.y, GeometryUtils.angleTo(p, center)));
 		}
-		// sort by angle
+		// sort by angle3D
 		Collections.sort(orderedList, DataPoint.getComparator());
 
 		return orderedList;

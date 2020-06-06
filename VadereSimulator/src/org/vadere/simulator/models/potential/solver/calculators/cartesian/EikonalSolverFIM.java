@@ -118,7 +118,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void initialize() {
+	public void solve() {
 		init();
 		loop();
 

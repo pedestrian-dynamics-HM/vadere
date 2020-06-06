@@ -202,7 +202,7 @@ public class GeometryCleaner {
 		List<VPolygon> polygonList = new ArrayList<>();
 		polygonList.add(bound);
 
-		WeilerAtherton weilerAthertonAlg = new WeilerAtherton(polygons.stream().filter(poly -> bound.intersects(bound)).collect(Collectors.toList()));
+		WeilerAtherton weilerAthertonAlg = new WeilerAtherton(polygons.stream().filter(poly -> bound.intersects(poly)).collect(Collectors.toList()));
 		List<VPolygon> mergedPolygons = weilerAthertonAlg.cup();
 		List<VPolygon> holes = mergedPolygons.stream().filter(poly -> bound.containsShape(poly)).collect(Collectors.toList());
 		mergedPolygons.removeIf(poly -> bound.containsShape(poly));

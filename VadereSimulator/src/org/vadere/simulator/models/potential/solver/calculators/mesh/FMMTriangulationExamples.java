@@ -38,11 +38,11 @@ public class FMMTriangulationExamples {
 				new VPoint(32.300000000046566, 6.0),
 				new VPoint(36.40000000002328, 4.900000000372529));
 
-		EikonalSolver solver = new EikonalSolverFMMTriangulation(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation);
+		EikonalSolver solver = new MeshEikonalSolverFMM(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation);
 		log.info("start FFM");
-		solver.initialize();
+		solver.solve();
 		log.info("FFM finished");
-		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> triangulation.getMesh().getDoubleData(p, EikonalSolverFMMTriangulation.namePotential)));
+		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential)));
 	}
 
 	public static IIncrementalTriangulation<

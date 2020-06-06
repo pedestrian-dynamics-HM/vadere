@@ -1,15 +1,15 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.AFace;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
+import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.utils.cache.ScenarioCache;
@@ -47,7 +47,7 @@ public class OfflineTopographyController {
 	}
 
 	// add bounding box
-	protected void prepareTopography() {
+	protected void prepareTopography(final AttributesFloorField attributesFloorField) {
 		// add boundaries
 		if (domain.getTopography().isBounded() && !domain.getTopography().hasBoundary()) {
 			for(Obstacle obstacle : Topography.createObstacleBoundary(domain.getTopography())) {
@@ -56,34 +56,16 @@ public class OfflineTopographyController {
 		}
 
 		if(domain.getBackgroundMesh() != null) {
-			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(domain.getBackgroundMesh());
-			List<PVertex> boundaryVertices = triangulation.getMesh().getBoundaryVertices();
-			//IDistanceFunction distanceFunction = IDistanceFunction.create(new VRectangle(getTopography().getBounds()), getTopography().getObstacleShapes());
-			EikonalSolverFMMTriangulation eikonalSolver = new EikonalSolverFMMTriangulation<>("distance", new UnitTimeCostFunction(), triangulation, boundaryVertices);
-			eikonalSolver.initialize();
-
-			//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "distance_potential")));
-
-			IDistanceFunctionCached cachedDistanceFunction = new IDistanceFunctionCached() {
-				@Override
-				public double apply(@NotNull IPoint point, Object caller) {
-					return eikonalSolver.getPotential(point, caller);
-				}
-
-				@Override
-				public Double apply(IPoint point) {
-					return eikonalSolver.getPotential(point, null);
-				}
-			};
+			IDistanceFunction exactDistance = IDistanceFunction.create(new VRectangle(getTopography().getBounds()), getTopography().getObstacleShapes());
+			IDistanceFunctionCached distanceFunction = new DistanceFunctionApproxBF(domain.getBackgroundMesh(), exactDistance);
 
 			//TODO use the cached caller
 			//IDistanceFunction distanceFunction = p -> eikonalSolver.getPotential(p, null);
-			getTopography().setObstacleDistanceFunction(cachedDistanceFunction);
+			getTopography().setObstacleDistanceFunction(distanceFunction);
 			getTopography().setReachablePointProvider(SimpleReachablePointProvider.uniform(
 					random,
 					getTopography().getBounds(),
-					iPoint -> eikonalSolver.getPotential(iPoint, null)));
-
+					iPoint -> distanceFunction.apply(iPoint, null)));
 
 		} else {
 			// add distance function
@@ -91,15 +73,15 @@ public class OfflineTopographyController {
 			PotentialFieldDistancesBruteForce distanceField = new PotentialFieldDistancesBruteForce(
 					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					new VRectangle(getTopography().getBounds()),
-					new AttributesFloorField(), cache);
+					attributesFloorField, cache);
 
-			getTopography().setObstacleDistanceFunction(iPoint -> distanceField.getPotential(iPoint, null));
+			getTopography().setObstacleDistanceFunction(iPoint -> -distanceField.getPotential(iPoint, null));
 
 			// use PotentialFieldDistancesBruteForce as distance function
 			getTopography().setReachablePointProvider(SimpleReachablePointProvider.uniform(
 					random,
 					getTopography().getBounds(),
-					iPoint -> distanceField.getPotential(iPoint, null)));
+					iPoint -> -distanceField.getPotential(iPoint, null)));
 		}
 	}
 

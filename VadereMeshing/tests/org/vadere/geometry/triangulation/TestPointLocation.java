@@ -95,7 +95,11 @@ public class TestPointLocation {
 			double y = triangulation.getMesh().getBound().getMinY() + random.nextDouble() * triangulation.getMesh().getBound().getHeight();
 
 			//System.out.println("point location for (" + x + "," + y +")" );
+
 			Optional<PFace> face = triangulation.locateFace(new VPoint(x, y));
+
+			//System.out.println(triangulation.getMesh().toPolygon(face.get()).contains(x,y));
+
 			assertTrue( i + " point location failed for (" + x + "," + y + ")" + face.get(),
 					face.isPresent() &&
 							(triangulation.getMesh().isBorder(face.get()) && !triangulation.getMesh().toPolygon(face.get()).contains(x,y) ||

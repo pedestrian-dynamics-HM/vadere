@@ -92,6 +92,17 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 	}
 
 	@Override
+	public Optional<F> locate(double x, double y, Object caller) {
+		Optional<F> startFace = getStartFace(new VPoint(x, y));
+		if(startFace.isPresent()) {
+			return triangulation.locateMarch(x, y, startFace.get());
+		}
+		else {
+			return triangulation.locate(x, y);
+		}
+	}
+
+	@Override
 	public Type getType() {
 		return Type.JUMP_AND_WALK;
 	}
@@ -100,7 +111,7 @@ public class JumpAndWalk<V extends IVertex, E extends IHalfEdge, F extends IFace
 	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {}
 
 	@Override
 	public void postFlipEdgeEvent(F f1, F f2) {}

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -259,6 +260,12 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 */
 	V getVertex(@NotNull E halfEdge);
 
+
+	default V getOpposite(@NotNull E edge) {
+		assert getEdges(getFace(edge)).size() == 3;
+		return getVertex(getNext(edge));
+	}
+
 	/**
 	 * Returns the degree of a vertex i.e. the number of connected full-edges
 	 * in O(d) where d is the degree of the vertex.
@@ -269,6 +276,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	default int degree(@NotNull V vertex) {
 		return Iterators.size(getAdjacentVertexIt(vertex).iterator());
 	}
+
 
 	// TODO: this is for the delaunay-hierarchy only!
 	/**
@@ -309,6 +317,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return getData(vertex, name, Double.class).orElse(0.0);
 	}
 
+	default double getDoubleData(@NotNull final V vertex, @NotNull final int index) {
+		return getData(vertex, index+"", Double.class).orElse(0.0);
+	}
+
 	<CV> void setData(@NotNull final V vertex, @NotNull final String name, CV data);
 
 	default void setBooleanData(@NotNull final V vertex, @NotNull final String name, boolean data) {
@@ -317,6 +329,10 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 
 	default void setDoubleData(@NotNull final V vertex, @NotNull final String name, double data) {
 		setData(vertex, name, data);
+	}
+
+	default void setDoubleData(@NotNull final V vertex, @NotNull final int index, final double data) {
+		setData(vertex, index+"", data);
 	}
 
 	default void setIntegerData(@NotNull final V vertex, @NotNull final String name, int data) {
@@ -1360,7 +1376,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		V v1 = getVertex(e1);
 		V v2 = getVertex(e2);
 		V v3 = getVertex(e3);
-		return GeometryUtils.getTriangleMidpoint(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
+		return GeometryUtils.getTriangleMidpoint(getX(v1), getY(v1), getX(v2), getY(v2), getX(v3), getY(v3));
 	}
 
 	/**
@@ -1395,6 +1411,15 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		}
 		return Optional.empty();
 	}
+
+	/**
+	 * This method will triangulate all holes and mark them as holes.
+	 * Note that a triangulated hole becomes invalid if a vertex or edge of
+	 * this hole gets changes (moved, split, collapsed, removed, inserted)!
+	 */
+	/*default void fillHoles() {
+
+	}*/
 
 	/**
 	 * <p>Returns vertex of the triangulation of the face with the smallest distance to point.</p>
@@ -1493,6 +1518,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	default Iterable<E> getEdgeIt(@NotNull final E edge) {
 		return () -> new EdgeIterator<>(this, edge);
 	}
+
 
 	default Iterable<E> getEdgeItReverse(@NotNull final E edge) {
 		return () -> new EdgeIterator<>(this, edge, true);
@@ -1758,6 +1784,17 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	}
 
 	/**
+	 * Returns a list {@link List} of all edges of a face in O(k) where k is the number of
+	 * points / vertices / half-edges of the face.
+	 *
+	 * @param edge some edge of the face
+	 * @return a list {@link List} of all edges of a face.
+	 */
+	default List<E> getEdges(@NotNull final E edge) {
+		return Lists.newArrayList(new EdgeIterator(this, edge));
+	}
+
+	/**
 	 * Returns a list {@link List} of all vertices of a face in O(n) where n is the
 	 * number of faces.
 	 *
@@ -1997,6 +2034,15 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	default Optional<E> getEdge(@NotNull V v1, @NotNull V v2){
 		for(E edge : getEdgeIt(v1)) {
 			if(getTwinVertex(edge).equals(v2)) {
+				return Optional.of(edge);
+			}
+		}
+		return Optional.empty();
+	}
+
+	default Optional<E> getEdge(@NotNull final F face, @NotNull final VPoint v1, @NotNull final VPoint v2){
+		for(E edge : getEdgeIt(face)) {
+			if(toPoint(getTwinVertex(edge)).equals(v1) && toPoint(getVertex(edge)).equals(v2)) {
 				return Optional.of(edge);
 			}
 		}
@@ -2315,6 +2361,7 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		mesh.setNext(xz, zy);
 	}
 
+
 	/**
 	 * Constructs and returns a string which can be used to construct a matplotlib Triangulation
 	 * which is helpful to plot the mesh.
@@ -2330,36 +2377,36 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		Map<V, Integer> indexMap = new HashMap<>();
 
 		// [x1, x2, ...]
-		builder.append("x =[");
+		builder.append("X.append([");
 		for(int i = 0; i < vertices.size(); i++) {
 			V v = vertices.get(i);
 			indexMap.put(v, i);
 			builder.append(v.getX() + ",");
 		}
 		builder.delete(builder.length()-1, builder.length());
-		builder.append("]\n");
+		builder.append("])\n");
 
 		// [y1, y2, ...]
-		builder.append("y = [");
+		builder.append("Y.append([");
 		for(V v : vertices) {
 			builder.append(v.getY() + ",");
 		}
 		builder.delete(builder.length()-1, builder.length());
-		builder.append("]\n");
+		builder.append("])\n");
 
 		// [z1, z2, ...] z = value
 		if(evalPoint != null) {
-			builder.append("z = [");
+			builder.append("Z.append([");
 			for(V v : vertices) {
 				builder.append(evalPoint.apply(v) + ",");
 			}
 			builder.delete(builder.length()-1, builder.length());
-			builder.append("]\n");
+			builder.append("])\n");
 		}
 
 		// [[vId1, vId2, vId3], ...]
 		List<F> faces = getFaces();
-		builder.append("tris = [");
+		builder.append("TRIS.append([");
 		for(F face : faces) {
 			builder.append("[");
 			for(V v : getVertexIt(face)) {
@@ -2370,8 +2417,197 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 			builder.append("],");
 		}
 		builder.delete(builder.length()-1, builder.length());
-		builder.append("]\n");
+		builder.append("])\n");
 
 		return builder.toString();
 	}
+
+	// delete
+	default void getVirtualSupport(@NotNull final V v, @NotNull final E edge, @NotNull final List<Pair<V, V>> virtualSupport) {
+		//assert isNonAcute(getMesh().getVertex(edge), getMesh().getVertex(getMesh().getNext(edge)), getMesh().getVertex(getMesh().getPrev(edge)));
+
+		if(isAtBoundary(edge)) {
+			return;
+		}
+
+		E prev = getPrev(edge);
+		E twin = getTwin(edge);
+
+		V v1 = getVertex(prev);
+		V v2 = getVertex(edge);
+		V u = getVertex(getNext(twin));
+
+		if(!isNonAcute(u, v, v1)) {
+			virtualSupport.add(Pair.of(v1, u));
+		} else {
+			getVirtualSupport(v, getNext(twin), virtualSupport);
+		}
+
+		if(!isNonAcute(v2, v, u)) {
+			virtualSupport.add(Pair.of(v2, u));
+		} else {
+			getVirtualSupport(v, getPrev(twin), virtualSupport);
+		}
+	}
+
+	// delete
+	default boolean isNonAcute(V v1, V v2, V v3) {
+		double angle1 = GeometryUtils.angle(v1, v2, v3);
+
+		// non-acute triangle
+		double rightAngle = Math.PI/2;
+		return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
+	}
+
+	default boolean isNonAcute(@NotNull final E edge) {
+		VPoint p1 = toPoint(getPrev(edge));
+		VPoint p2 = toPoint(edge);
+		VPoint p3 = toPoint(getNext(edge));
+
+		double angle1 = GeometryUtils.angle(p1, p2, p3);
+
+		// non-acute triangle
+		double rightAngle = Math.PI/2;
+		return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
+	}
+
+
+	// Default-Container setter and getter
+	/*default double getCurvature(@NotNull final V vertex) {
+		return getDoubleData(vertex, "curvature");
+	}
+
+	default void setCurvature(@NotNull final V vertex, final double curvature) {
+		setDoubleData(vertex, "curvature", curvature);
+	}
+
+	default double getPotential(@NotNull final V vertex) {
+		return getDoubleData(vertex, "potential");
+	}
+
+	default void setPotential(@NotNull final V vertex, final double potential) {
+		setDoubleData(vertex, "potential", potential);
+	}
+
+	default boolean isBurned(@NotNull final V vertex) {
+		return getBooleanData(vertex, "burned");
+	}
+
+	default void setBurned(@NotNull final V vertex, final boolean burned) {
+		setBooleanData(vertex, "burned", burned);
+	}
+
+	default boolean isBurning(@NotNull final V vertex) {
+		return getBooleanData(vertex, "burning");
+	}
+
+	default void setBurning(@NotNull final V vertex, final boolean burning) {
+		setBooleanData(vertex, "burning", burning);
+	}
+
+	default boolean isTarget(@NotNull final V vertex) {
+		return getBooleanData(vertex, "target");
+	}
+
+	default void setTarget(@NotNull V vertex, boolean target) {
+		setBooleanData(vertex, "target", target);
+	}*/
+
+	default IEdgeContainerDouble<V, E, F> getDoubleEdgeContainer(@NotNull final String name) {
+		return new IEdgeContainerDouble<>() {
+			@Override
+			public double getValue(@NotNull final E edge) {
+				return getDoubleData(edge, name);
+			}
+
+			@Override
+			public void setValue(@NotNull final E edge, double value) {
+				setDoubleData(edge, name, value);
+			}
+		};
+	}
+
+	default IVertexContainerDouble<V, E, F> getDoubleVertexContainer(@NotNull final String name) {
+		return new IVertexContainerDouble<>() {
+			@Override
+			public double getValue(@NotNull V vertex) {
+				return getDoubleData(vertex, name);
+			}
+
+			@Override
+			public void setValue(@NotNull V vertex, double value) {
+				setDoubleData(vertex, name, value);
+			}
+
+			@Override
+			public void reset() {
+				for(V v : getVertices()) {
+					setValue(v, 0.0);
+				}
+			}
+		};
+	}
+
+	default IVertexContainerBoolean<V, E, F> getBooleanVertexContainer(@NotNull final String name) {
+		return new IVertexContainerBoolean<>() {
+			@Override
+			public boolean getValue(@NotNull final V vertex) {
+				return getBooleanData(vertex, name);
+			}
+
+			@Override
+			public void setValue(@NotNull final V vertex, final boolean value) {
+				setBooleanData(vertex, name, value);
+			}
+		};
+	}
+
+	default <CV> IVertexContainerObject<V, E, F, CV> getObjectVertexContainer(@NotNull final String name, final Class<CV> clazz) {
+
+		return new IVertexContainerObject<>() {
+
+			@Override
+			public CV getValue(@NotNull final V v) {
+				return getData(v, name, clazz).get();
+			}
+
+			@Override
+			public void setValue(@NotNull final V v, final CV value) {
+				setData(v, name, value);
+			}
+
+		};
+	}
+
+	default IEdgeContainerBoolean<V, E, F> getBooleanEdgeContainer(@NotNull final String name) {
+		return new IEdgeContainerBoolean<>() {
+			@Override
+			public boolean getValue(@NotNull final E edge) {
+				return getBooleanData(edge, name);
+			}
+
+			@Override
+			public void setValue(@NotNull final E edge, final boolean value) {
+				setBooleanData(edge, name, value);
+			}
+		};
+	}
+
+	default <CV> IEdgeContainerObject<V, E, F, CV> getObjectEdgeContainer(@NotNull final String name, final Class<CV> clazz) {
+
+		return new IEdgeContainerObject<>() {
+
+			@Override
+			public CV getValue(@NotNull final E edge) {
+				return getData(edge, name, clazz).get();
+			}
+
+			@Override
+			public void setValue(@NotNull final E edge, final CV value) {
+				setData(edge, name, value);
+			}
+
+		};
+	}
+
 }

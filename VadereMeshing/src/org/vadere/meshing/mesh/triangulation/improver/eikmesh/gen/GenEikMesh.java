@@ -88,17 +88,28 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private LinkedList<F> poorFaces;*/
 
 	// different options
-	private boolean allowEdgeSplits = false;
+
+	// spilts long boundary edges
+	private boolean allowEdgeSplits = true;
+
+	// edge collapse of shortest edges of poor non-boundary triangles
 	private boolean allowEdgeCollapse = false;
 
+	// removes short bounary edges
 	private boolean allowVertexCollapse = true;
-	private boolean allowFaceCollapse = true;
+
+	// removes low quality boundary faces
+	private boolean allowFaceCollapse = false;
+
+	// TODO: removes low quality boundary faces which is similar to allowFaceCollapse
 	private boolean removeLowBoundaryTriangles = false;
 	private boolean removeOutsideTriangles = false;
 	private boolean useVirtualEdges = true;
 
 	// if no PSLG set this to be true
 	private boolean smoothBorder;
+
+	// counter acts long boundary edges
 	private boolean freezeVertices = false;
 	//private boolean splitFaces = true;
 	//private boolean useFixPoints = false;
@@ -107,7 +118,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private static final Logger log = Logger.getLogger(GenEikMesh.class);
 
 	static {
-		log.setDebug();
+		//log.setDebug();
 	}
 
 
@@ -266,7 +277,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.nonEmptyBaseMode = false;
 		this.fixPoints = fixPoints;
 		this.pointToSlidingLine = new HashMap<>();
-		this.useSlidingLines = true;
+		this.useSlidingLines = !shapes.isEmpty();
 		this.smoothBorder = true;
 		this.removeOutsideTriangles = true;
 		this.refiner = new GenUniformRefinementTriangulatorSFC(
@@ -431,7 +442,14 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					getTriangulation().collapseBoundaryFaces(
 							f -> true,
 							e -> !isFixPoint(getMesh().getVertex(e)) && getTriangulation().isLargeAngle(e, Parameters.MAX_COLLAPSE_ANGLE),
-							v -> pointToSlidingLine.put(v, getMesh().toLine(getMesh().getBoundaryEdge(v).get())));
+							v -> {
+								if(useSlidingLines) {
+									E edge = getMesh().getBoundaryEdge(v).get();
+									if(isSlidePoint(getMesh().getVertex(getMesh().getNext(edge))) && isSlidePoint(getMesh().getVertex(getMesh().getPrev(edge)))) {
+										pointToSlidingLine.put(v, pointToSlidingLine.get(getMesh().getVertex(getMesh().getNext(edge))));
+									}
+								}
+							});
 				}
 				/*if(splitFaces) {
 					for(F f : getMesh().getFaces()) {
@@ -464,7 +482,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					quality = tmpQuality;
 				}
 				assert getMesh().isValid();
-				log.info("quality (" + nSteps + "):" + tmpQuality);
+				log.debug("quality (" + nSteps + "):" + tmpQuality);
 			}
 		}
 	}
@@ -549,12 +567,27 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 				if(getMesh().isAtBoundary(prev) || isSlidePoint(getMesh().getVertex(prev))) {
 					VPoint q1 = getMesh().toPoint(prev);
 					VPoint q2 = getMesh().toPoint(getMesh().getPrev(prev));
-					VPoint m = q1.add(q2).scalarMultiply(0.5);
-					VPoint dir = m.subtract(p1).scalarMultiply(1.4);
+
+					VPoint m = GeometryUtils.projectOntoLine(p1.getX(), p1.getY(), q1.getX(), q1.getY(), q2.getX(), q2.getY());
+					//VPoint m = q1.add(q2).scalarMultiply(0.5);
+
+					VPoint dir = m.subtract(p1).scalarMultiply(2);
 					VPoint q3 = getMesh().toPoint(p1).add(dir);
-					VPoint virtualForce = getForce(getMesh().toPoint(p1), q3);
+					VPoint virtualForce = getForceVirtual(getMesh().toPoint(p1), q3);
+
+					// only take the part of the force which act perpendicular to the boundary edge (q1, q2)
+					//IPoint projection = GeometryUtils.projectOnto(virtualForce.getX(), virtualForce.getY(), q2.getX() - q1.getX(), q2.getY() - q1.getY());
+
+					//virtualForce = virtualForce.subtract(projection);
+
+
+					/*VPoint dir = m.subtract(p1).scalarMultiply(1.4);
+					VPoint q3 = getMesh().toPoint(p1).add(dir);
+					VPoint virtualForce = getForce(getMesh().toPoint(p1), q3);*/
+
 					increaseVelocity(vertex, virtualForce);
-					increaseAbsVelocity(vertex, force.distanceToOrigin());
+					increaseAbsVelocity(vertex, virtualForce.distanceToOrigin());
+
 				}
 			}
 
@@ -573,6 +606,24 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		VPoint p1p2 = p1.subtract(p2);
 		double len = p1p2.distanceToOrigin();
 		double desiredLen = getDesiredEdgeLength(p1, p2);
+		double ratio = len / desiredLen;
+		double absForce = f.apply(ratio);
+		VPoint force = p1p2.setMagnitude(absForce * desiredLen);
+		return force;
+	}
+
+	/**
+	 * Computes the force for point p1 respect to point p2.
+	 * @param p1 the point of interest
+	 * @param p2 the second point
+	 *
+	 * @return the force for point p1 respect to point p2
+	 */
+	private VPoint getForceVirtual(@NotNull final VPoint p1, @NotNull final VPoint p2) {
+		// TODO: Get rid of VPoint
+		VPoint p1p2 = p1.subtract(p2);
+		double len = p1p2.distanceToOrigin();
+		double desiredLen = 0.9 * Math.sqrt(3) * getDesiredEdgeLength(p1, p2);
 		double ratio = len / desiredLen;
 		double absForce = f.apply(ratio);
 		VPoint force = p1p2.setMagnitude(absForce * desiredLen);
@@ -714,7 +765,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if the movement is legal, false otherwise
 	 */
 	private boolean isLegalMove(@NotNull final V vertex, double newX, double newY) {
-		if(vertex.distance(newX, newY) > GeometryUtils.DOUBLE_EPS) {
+		//if(vertex.distance(newX, newY) > GeometryUtils.DOUBLE_EPS) {
 
 			// TODO: at the boundary vertices can still overtake each other.
 			/*if(getMesh().isAtBoundary(vertex)) {
@@ -740,8 +791,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 					.filter(e -> !getMesh().isBoundary(e))
 					.map(e -> getMesh().getPrev(e))
 					.allMatch(e -> getTriangulation().isLeftOf(newX, newY, e));
-		}
-		return true;
+		//}
+		//return false;
 	}
 
 	/**
@@ -970,8 +1021,14 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private boolean isBreaking(@NotNull final V vertex) {
 		double force = getForce(vertex).distanceToOrigin();
 		double absForce = getAbsVelocity(vertex);
-		double desiredLen = edgeLengthFunc.apply(vertex) * Parameters.FSCALE * scalingFactor * 3 / 4;
-		return absForce > desiredLen && force / absForce < Parameters.MIN_FORCE_RATIO;
+		double forceMax = edgeLengthFunc.apply(vertex) * Parameters.FSCALE * scalingFactor * 3;
+		//TODO remove magic numbers
+		boolean breaking = absForce > forceMax * 0.3 && force < forceMax * 0.1;
+		/*if(breaking) {
+			System.out.println("test");
+		}*/
+		return breaking;
+		//return absForce > desiredLen && force / absForce < Parameters.MIN_FORCE_RATIO;
 	}
 
 
@@ -1148,7 +1205,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	}
 
 	/**
-	 * Tests if the inside projection is valid which is the case if the angle at the vertex (at the boundary)
+	 * Tests if the inside projection is valid which is the case if the angle3D at the vertex (at the boundary)
 	 * is greater than 180 degree or the result of the projection lies inside the segment spanned by the
 	 * vertex and its two neighbouring border vertices.
 	 *
@@ -1286,8 +1343,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 */
 	private void applyForce(final V vertex) {
 		IPoint velocity = getForce(vertex);
-		IPoint movement = velocity.scalarMultiply(delta);
-		move(vertex, vertex.getX() + movement.getX(), vertex.getY() + movement.getY());
+		double factor = 1.0;
+		IPoint movement = velocity.scalarMultiply(delta * factor);
+		while(!move(vertex, vertex.getX() + movement.getX(), vertex.getY() + movement.getY())) {
+			factor /= 2.0;
+			movement = velocity.scalarMultiply(delta * factor);
+		}
 	}
 
 	/**
@@ -1325,7 +1386,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			log.error("error!");
 		}
 
-		updateProjectionLines();
+		if(useSlidingLines) {
+			updateProjectionLines();
+		}
 	}
 
 	private void updateProjectionLines() {

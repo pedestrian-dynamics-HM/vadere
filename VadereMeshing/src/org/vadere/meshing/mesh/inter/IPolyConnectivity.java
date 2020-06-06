@@ -906,7 +906,12 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @return true if the point (x, y) is contained in the face, false otherwise
 	 */
 	default boolean contains(final double x, final double y, @NotNull final F face) {
-		return getMesh().streamEdges(face).noneMatch(edge -> isRightOf(x, y, edge));
+		for(E e : getMesh().getEdgeIt(face)) {
+			if(isRightOf(x, y, e)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -1017,7 +1022,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	default boolean isRightOf(final double x1, final double y1, @NotNull final E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
-		return GeometryUtils.isRightOf(v1.getX(), v1.getY(), v2.getX(), v2.getY(), x1, y1);
+		return GeometryUtils.isRightOf(getMesh().getX(v1), getMesh().getY(v1), getMesh().getX(v2), getMesh().getY(v2), x1, y1);
 	}
 
 	/**
@@ -1098,7 +1103,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	default boolean intersectsDirectional(@NotNull final IPoint p1, @NotNull final IPoint p2, E edge) {
 		V v1 = getMesh().getVertex(getMesh().getPrev(edge));
 		V v2 = getMesh().getVertex(edge);
-		return GeometryUtils.intersectHalfLineSegment(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+		return GeometryUtils.intersectHalfLineSegment(
+				p1.getX(), p1.getY(), p2.getX(), p2.getY(),
+				getMesh().getX(v1), getMesh().getY(v1), getMesh().getX(v2), getMesh().getY(v2));
 	}
 
 

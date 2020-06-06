@@ -23,13 +23,20 @@ import java.util.Random;
 public class PotentialFieldPedestrianOSM implements PotentialFieldAgent {
 
 	private AttributesPotentialOSM attributes;
+	private AttributesAgent attributesAgent;
 
 	public PotentialFieldPedestrianOSM() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Domain topography,
+	public void initialize(List<Attributes> attributesList, Domain domain,
 	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributes = Model.findAttributes(attributesList, AttributesPotentialOSM.class);
+		this.attributesAgent = domain.getTopography().getAttributesPedestrian();
+	}
+
+	@Override
+	public double getMaximalInfluenceRadius() {
+		return attributesAgent.getRadius() + attributes.getPedestrianRepulsionWidth();
 	}
 
 	@Override

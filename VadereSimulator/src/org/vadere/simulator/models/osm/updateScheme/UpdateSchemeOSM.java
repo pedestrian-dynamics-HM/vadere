@@ -42,7 +42,11 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 		}
 	}
 
-	static UpdateSchemeOSM create(@NotNull final UpdateType updateType, @NotNull final Topography topography, final Random random) {
+	static UpdateSchemeOSM create(
+			@NotNull final UpdateType updateType,
+			@NotNull final Topography topography,
+			final Random random,
+			final double maxAgentPotentialInfluenceRadius) {
 		switch (updateType) {
 			case SEQUENTIAL: return new UpdateSchemeSequential(topography);
 			case PARALLEL: return new UpdateSchemeParallel(topography);
@@ -51,7 +55,7 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 			//TODO: magic number!
 			case EVENT_DRIVEN_PARALLEL:
 			case EVENT_DRIVEN_CL:
-				return new UpdateSchemeEventDrivenParallel(topography, 1.4);
+				return new UpdateSchemeEventDrivenParallel(topography, maxAgentPotentialInfluenceRadius);
 			default: throw new IllegalArgumentException(updateType + " is not supported.");
 		}
 	}

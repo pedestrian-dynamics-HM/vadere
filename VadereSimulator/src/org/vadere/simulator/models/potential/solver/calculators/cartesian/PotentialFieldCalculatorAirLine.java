@@ -21,7 +21,7 @@ public class PotentialFieldCalculatorAirLine extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void initialize() {
+	public void solve() {
 
 		for (int x = 0; x < potentialField.getWidth(); ++x) {
 			for (int y = 0; y < potentialField.getHeight(); ++y) {

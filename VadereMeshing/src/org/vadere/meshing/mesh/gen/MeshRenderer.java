@@ -1,23 +1,31 @@
 package org.vadere.meshing.mesh.gen;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.visualization.ColorHelper;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * This helper class renders a {@link IMesh} into a {@link BufferedImage} or a {@link Graphics2D}.
@@ -63,6 +71,8 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 	@Nullable private Function<V, Color> vertexColorFunction;
 
 	private BufferedImage bufferedImage = null;
+
+	private boolean renderFaces = true;
 
 
 	/**
@@ -129,6 +139,12 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		this(mesh, f -> false, null);
 	}
 
+	public MeshRenderer(
+			@NotNull final IMesh<V, E, F> mesh, boolean renderFaces) {
+		this(mesh, f -> false, null);
+		this.renderFaces = renderFaces;
+	}
+
 	public void setMesh(@NotNull final IMesh<V, E, F> mesh) {
 		this.mesh = mesh;
 	}
@@ -147,56 +163,62 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		renderGraphics(graphics, width, height, null);
 	}
 
-	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height, VRectangle bound) {
-		/*Font currentFont = graphics.getFont();
-		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
-		graphics.setFont(newFont);
-		graphics.setColor(Color.GRAY);*/
-
+	public void renderPostTransform(@NotNull final Graphics2D graphics, VRectangle bound) {
+		//graphics.fill(bound);
 		Color c = graphics.getColor();
 		Stroke stroke = graphics.getStroke();
-
-		double scale;
+		float minEdgeLen;
 		synchronized (mesh) {
-			if(bound == null) {
-				bound = mesh.getBound();
-			}
-
-			scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
-			faces = mesh/*.clone()*/.getFaces();
+			faces = mesh./*clone().*/getFaces();
 			edges = mesh.getEdges();
 			vertices = mesh.getVertices();
+			minEdgeLen = (float)edges.stream().mapToDouble(e -> mesh.toLine(e).length()).min().orElse(0.0);
 		}
-
-		//graphics.translate(-bound.getMinX() * scale, height-bound.getMinY() * scale);
-		//graphics.scale(scale, -scale);
-
-		graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
-		graphics.scale(scale, scale);
-		graphics.fill(bound);
-
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
-		graphics.setStroke(new BasicStroke(0.5f * (float)(1/scale)));
-		double ptdiameter = 3.0f * (float)(1/scale);
+		graphics.setStroke(new BasicStroke(minEdgeLen * 1.0f/15f));
+		double ptdiameter = minEdgeLen * 1.0f/2.0f;
 		//graphics.setColor(Color.BLACK);
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		/*int groupSize = 64;
 		ColorHelper colorHelper = new ColorHelper(faces.size());*/
 
-		for(F face : faces) {
-			VPolygon polygon = mesh.toPolygon(face);
+		if(renderFaces) {
+			for(F face : faces) {
+				VPolygon polygon = mesh.toPolygon(face);
 
-			if(alertPred.test(face)) {
-				graphics.setColor(new Color(200, 0, 0));
-			} else {
-				if(faceColorFunction != null) {
-					graphics.setColor(faceColorFunction.apply(face));
+				if(alertPred.test(face)) {
+					graphics.setColor(new Color(200, 0, 0));
 				} else {
-					graphics.setColor(Color.GRAY);
+					if(faceColorFunction != null) {
+						graphics.setColor(faceColorFunction.apply(face));
+					} else {
+						graphics.setColor(Color.GRAY);
+					}
 				}
+				graphics.fill(polygon);
 			}
-			graphics.fill(polygon);
+		}
+
+		List<E> edgest = mesh.streamEdges().filter(e -> !mesh.isBoundary(e)).filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
+		Random random = new Random(0);
+		for (E edge : edgest) {
+			V v = mesh.getVertex(edge);
+			List<Pair<V, V>> list = new ArrayList<>();
+			mesh.getVirtualSupport(v, mesh.getPrev(edge), list);
+
+			if(list.isEmpty()) {
+				VTriangle tri = mesh.toTriangle(mesh.getFace(edge));
+				graphics.setColor(Color.RED);
+				graphics.fill(tri);
+			} else {
+				/*for(Pair<V, V> pair : list) {
+					VTriangle tri = new VTriangle(mesh.toPoint(v), mesh.toPoint(pair.getLeft()), mesh.toPoint(pair.getRight()));
+					graphics.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+					graphics.fill(tri);
+				}*/
+			}
+
 		}
 
 		for(E edge : edges) {
@@ -215,15 +237,48 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			} /*else if(mesh.isAtBoundary(vertex)) {
 				vc = Color.RED;
 			}*/
-			//graphics.setColor(vc);
-			//graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
+			graphics.setColor(vc);
+			graphics.fill(new Ellipse2D.Double(vertex.getX()-ptdiameter/2, vertex.getY()-ptdiameter/2, ptdiameter, ptdiameter));
 		}
 
 		graphics.setColor(c);
 		graphics.setStroke(stroke);
+	}
+
+	private void renderGraphics(@NotNull final Graphics2D graphics, final int width, final int height, VRectangle bound) {
+		/*Font currentFont = graphics.getFont();
+		Font newFont = currentFont.deriveFont(currentFont.getSize() * 0.064f);
+		graphics.setFont(newFont);
+		graphics.setColor(Color.GRAY);*/
+
+		synchronized (mesh) {
+			if (bound == null) {
+				bound = GeometryUtils.boundRelative(mesh.getBound().getPath(), 0.05);
+			}
+		}
+
+		double scale = Math.min(width / bound.getWidth(), height / bound.getHeight());
+		//graphics.translate(-bound.getMinX() * scale, -bound.getMinY() * scale);
+		//graphics.scale(scale, scale);
+
+		graphics.translate(-bound.getMinX() * scale, (bound.getMinY()+bound.getHeight()) * scale);
+		graphics.scale(scale, -scale);
+		renderPostTransform(graphics, bound);
 		graphics.scale(1.0 / scale, 1.0 / scale);
 		graphics.translate(bound.getMinX() * scale, bound.getMinY() * scale);
 
+	}
+
+	private boolean isNonAcute(@NotNull final E edge, @NotNull final IMesh<V, E, F> mesh) {
+		VPoint p1 = mesh.toPoint(mesh.getPrev(edge));
+		VPoint p2 = mesh.toPoint(edge);
+		VPoint p3 = mesh.toPoint(mesh.getNext(edge));
+
+		double angle1 = GeometryUtils.angle(p1, p2, p3);
+
+		// non-acute triangle
+		double rightAngle = Math.PI/2;
+		return angle1 > rightAngle + GeometryUtils.DOUBLE_EPS;
 	}
 
 	/*public void renderGraphics(@NotNull final Graphics2D graphics, final double width, final double height) {

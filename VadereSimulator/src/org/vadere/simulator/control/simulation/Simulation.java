@@ -137,7 +137,7 @@ public class Simulation {
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
-			pc.setTopography(topography);
+			pc.setDomain(domain);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class Simulation {
 		}
 
 		simulationState = initialSimulationState();
-		topographyController.preLoop(simTimeInSec);
+		topographyController.preLoop(simTimeInSec, scenarioStore.getAttributesList());
 		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 

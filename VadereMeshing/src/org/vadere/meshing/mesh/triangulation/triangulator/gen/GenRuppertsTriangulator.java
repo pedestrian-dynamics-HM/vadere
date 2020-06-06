@@ -82,13 +82,13 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	private IIncrementalTriangulation<V, E, F> triangulation;
 
 	/**
-	 * The minimal angle (in degree) Ruppert's algorithm should achieve, i.e. after termination no
-	 * triangle has an angle smaller than this angle.
+	 * The minimal angle3D (in degree) Ruppert's algorithm should achieve, i.e. after termination no
+	 * triangle has an angle3D smaller than this angle3D.
 	 */
 	private double minAngle;
 
 	/**
-	 * The angle which guarantees that Ruppert's algorithm terminates. If the {@link GenRuppertsTriangulator#minAngle}
+	 * The angle3D which guarantees that Ruppert's algorithm terminates. If the {@link GenRuppertsTriangulator#minAngle}
 	 * is smaller the algorithm might not terminate.
 	 */
 	public static double MIN_ANGLE_TO_TERMINATE = 20.6;
@@ -207,7 +207,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 //					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 					E e = triangulation.insert(circumCenter.getX(), circumCenter.getY());
 //					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
-					logger.info("inserted: " + circumCenter);
+					logger.debug("inserted: " + circumCenter);
 					for(F f : getMesh().getFaceIt(getMesh().getVertex(e))) {
 						if(isBad(f)) {
 							addBadTriangle(f);
@@ -352,7 +352,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 			VPoint p3 = l2.getVPoint2();
 
 			double angle = GeometryUtils.angle(p1, p2, p3);
-			// angle should be larger than 60 degree
+			// angle3D should be larger than 60 degree
 			assert GeometryUtils.isCW(p1, p2, p3) || angle >= 2 * Math.PI / 6 : p1 + "," + p2 + "," + p3;
 			if(angle <= 2 * Math.PI / 6 ){
 				return false;
@@ -532,7 +532,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
     }
 
 	private boolean isSkinny(@NotNull final F face, final double angle) {
-		double alpha = angle; // lowest angle in degree
+		double alpha = angle; // lowest angle3D in degree
 		double radAlpha = Math.toRadians(alpha);
 		VTriangle triangle = getMesh().toTriangle(face);
 
@@ -605,7 +605,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
 		//handleVertexInsertion(v);
 	}
 
@@ -619,7 +619,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		handleVertexInsertion(vertex);
 	}
 
-	private void handleVertexInsertion(V vertex) {
+	private void handleVertexInsertion(@NotNull final V vertex) {
 		for(E e : getMesh().getEdgeIt(vertex)) {
 			E prev = getMesh().getPrev(e);
 			if(segments.contains(prev) && isEncroached(prev)) {

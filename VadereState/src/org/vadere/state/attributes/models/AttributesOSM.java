@@ -67,7 +67,7 @@ public class AttributesOSM extends Attributes {
 
 	/**
 	 * Parameter of the optimization solver method: the number of points on the most outer circle. The number of points on any other circle will be
-	 * chosen based on the angle between two successive points on the most outer circle such that any angle between two successive points
+	 * chosen based on the angle3D between two successive points on the most outer circle such that any angle3D between two successive points
 	 * on any circle will be almost equal. Therefore the number of points on a circle decreases with its radius.
 	 * The positioned points will be used in different ways which depends on the {@link OptimizationType}.
 	 * <ul>

@@ -9,7 +9,7 @@ import java.util.function.Function;
 public class PotentialFieldCalculatorNone implements EikonalSolver {
 
 	@Override
-	public void initialize() {}
+	public void solve() {}
 
 	@Override
 	public void update() {}

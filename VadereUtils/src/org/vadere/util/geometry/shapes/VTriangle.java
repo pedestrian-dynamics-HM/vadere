@@ -125,6 +125,10 @@ public class VTriangle extends VPolygon {
         return incenter;
     }
 
+	public double getIncircleRadius(){
+		return GeometryUtils.getIncircleRaduis(p1, p2, p3);
+	}
+
     public VPoint getOrthocenter() {
 
         if(orthocenter == null) {
@@ -212,8 +216,12 @@ public class VTriangle extends VPolygon {
         return getCircumcenter().distance(point) < getCircumscribedRadius();
     }
 
-    public Stream<VLine> getLineStream() {
+    public Stream<VLine> streamLines() {
         return Arrays.stream(getLines());
+    }
+
+    public Stream<VPoint> streamPoints() {
+	    return Arrays.stream(new VPoint[]{p1, p2, p3});
     }
 
     public double getRadiusEdgeRatio() {
