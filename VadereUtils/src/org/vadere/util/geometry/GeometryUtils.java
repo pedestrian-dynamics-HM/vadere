@@ -1154,6 +1154,11 @@ public class GeometryUtils {
 		return result / 2.0;
 	}
 
+	public static double areaOfTriangle(@NotNull final double x1, double y1, double x2, double y2, double x3, double y3){
+		return Math.abs(x1 * (y2 - y3) - x2 * (y1 - y3) + x3 * (y1 - y2));
+	}
+
+
 	public static double areaOfPolygon(@NotNull final double x[], @NotNull final double y[]){
 		return Math.abs(signedAreaOfPolygon(x, y));
 	}

@@ -52,7 +52,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 
 		double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
 		double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
-		logger.debug("initial grid with a grid edge length equal to " + sideLength);
+		//logger.debug("initial grid with a grid edge length equal to " + sideLength);
 
 		int counter = 1;
 		// event driven update ignores time credits
@@ -84,8 +84,8 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				}
 			}
 
-			logger.debug("update " + updateAbleAgents.size() + " in parallel in round " + counter + ".");
-			logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");
+			//logger.debug("update " + updateAbleAgents.size() + " in parallel in round " + counter + ".");
+			//logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");
 			updateAbleAgents.parallelStream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());

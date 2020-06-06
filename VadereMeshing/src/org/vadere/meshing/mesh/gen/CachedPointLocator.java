@@ -74,13 +74,21 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	@Override
 	public Optional<F> locate(double x, double y, Object caller) {
 		Optional<F> optFace;
-		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
-			optFace = triConnectivity.locateMarch(x, y, cache.get(caller));
+		boolean contains = cache.containsKey(caller);
+		F starFace = null;
+
+		if(contains) {
+			starFace = cache.get(caller);
+		}
+
+		if(contains && !triConnectivity.getMesh().isDestroyed(starFace)) {
+			optFace = triConnectivity.locateMarch(x, y, starFace);
 		} else {
 			optFace = pointLocator.locate(x, y, false);
 		}
 
-		if(optFace.isPresent() && !triConnectivity.getMesh().isBoundary(optFace.get())) {
+		if(optFace.isPresent() && !(contains && optFace.get().equals(starFace)) &&
+				!triConnectivity.getMesh().isBoundary(optFace.get())) {
 			cache.put(caller, optFace.get());
 		}
 

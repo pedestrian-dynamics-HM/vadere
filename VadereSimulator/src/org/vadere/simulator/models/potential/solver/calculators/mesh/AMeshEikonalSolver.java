@@ -20,13 +20,16 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMe
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -348,7 +351,6 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			final double x,
 			final double y,
 			@Nullable final Object caller) {
-
 		Optional<F> optFace;
 		if(caller != null) {
 			optFace = triangulation.locateFace(x, y, caller);
