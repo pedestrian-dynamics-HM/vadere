@@ -1,13 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.inter.IVertexContainerInteger;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;

@@ -48,7 +48,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private GenRegularRefinement<V, E, F> refiner;
 
 	private final double R = 0.7;
-	private final int influenceRadius = 9;
+	private final int influenceRadius = 5;
 	private final double a;
 	private final double Sp;
 	private final double c;
@@ -94,20 +94,20 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	}
 
 	private boolean coarse(@NotNull final V vertex) {
-		return true;
-		/*for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
+		//return true;
+		for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
 			if(pedestrian.getPosition().distanceSq(triangulation.getMesh().toPoint(vertex)) > influenceRadius * influenceRadius) {
 				return true;
 			}
-		}*/
-		//return false;
+		}
+		return false;
 	}
 
 	private boolean refine(@NotNull final E e) {
 		//return refiner.getLevel(e) < 2;
 		if(!triangulation.getMesh().isBoundary(e)) {
 			VTriangle triangle = triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e));
-			if(/*!refiner.isGreen(e) || */triangulation.getMesh().toLine(e).length() > 1.0) {
+			if(/*!refiner.isGreen(e) || */triangulation.getMesh().toLine(e).length() > 5) {
 				for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
 					if(pedestrian.getPosition().distanceSq(triangle.midPoint()) < influenceRadius * influenceRadius) {
 						return true;
