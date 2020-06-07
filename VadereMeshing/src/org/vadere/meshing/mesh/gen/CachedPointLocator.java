@@ -8,9 +8,9 @@ import org.vadere.meshing.mesh.inter.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPointLocator<V, E, F> {
 
@@ -21,7 +21,7 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	public CachedPointLocator(@NotNull final IPointLocator<V, E, F> pointLocator, @NotNull final ITriConnectivity<V, E, F> triConnectivity) {
 		this.pointLocator = pointLocator;
 		this.triConnectivity = triConnectivity;
-		this.cache = new HashMap<>();
+		this.cache = new ConcurrentHashMap<>();
 	}
 
 	@Override
