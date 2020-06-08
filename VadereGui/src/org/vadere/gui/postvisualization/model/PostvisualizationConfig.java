@@ -10,7 +10,6 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 
-	private boolean recording = false;
 	private boolean showAllTrajectories = true;
 	private boolean showFaydedPedestrians = false;
 	private boolean loadTopographyInformationsOnly = false;
@@ -59,14 +58,6 @@ public class PostvisualizationConfig extends DefaultSimulationConfig {
 		this.fps = fps;
 		CONFIG.setProperty("PostVis.framesPerSecond", fps);
 		setChanged();
-	}
-
-	public void setRecording(boolean recording) {
-		this.recording = recording;
-	}
-
-	public boolean isRecording() {
-		return recording;
 	}
 
 	public boolean isLoadTopographyInformationsOnly() {

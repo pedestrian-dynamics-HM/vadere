@@ -13,6 +13,7 @@ import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
 import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
 import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
 import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionRecording;
 import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Messages;
@@ -216,6 +217,12 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				resources.getIcon("potentialField.png", iconWidth, iconHeight),
                 model);
 
+		ActionRecording recording = new ActionRecording(
+				"showPotentialField",
+				resources.getIcon("record.png", iconWidth, iconHeight),
+				renderer);
+
+
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
 		mainPanel.addRendererChangeListener(generateTikz);
@@ -234,7 +241,6 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		SwingUtils.addActionToToolbar(toolbar, drawMesh, Messages.getString("ProjectView.btnDrawMesh.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Messages.getString("ProjectView.btnShowGrid.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintDensity, Messages.getString("ProjectView.btnShowDensity.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
 		toolbar.addSeparator();
 
 		// Snapshot options
@@ -250,6 +256,10 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				resources.getIcon("camera.png", iconWidth, iconHeight), imgOptions);
 		JButton imgMenuBtn = SwingUtils.addActionToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
 		imgDialog.setParent(imgMenuBtn);
+
+		SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
+		JButton recordButton = SwingUtils.addActionToToolbar(toolbar, recording, Messages.getString("OnlineVis.btnRecord.tooltip"));
+		recording.setButton(recordButton);
 
 		toolbar.add(Box.createHorizontalGlue());
 

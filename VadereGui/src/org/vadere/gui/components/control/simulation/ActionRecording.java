@@ -1,13 +1,12 @@
-package org.vadere.gui.postvisualization.control;
+package org.vadere.gui.components.control.simulation;
 
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.utils.IRecorder;
 import org.vadere.gui.postvisualization.utils.MovRecorder;
 import org.vadere.gui.postvisualization.view.ImageSizeDialog;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
@@ -18,15 +17,15 @@ import java.io.IOException;
 public class ActionRecording extends ActionVisualization {
 	private static Logger logger = Logger.getLogger(ActionRecording.class);
 	private static final Configuration CONFIG = VadereConfig.getConfig();
-	private static Resources resources = Resources.getInstance("postvisualization");
+	private static Resources resources = Resources.getInstance("global");
 
-	private final PostvisualizationModel model;
+	private final SimulationModel model;
 	private JButton button;
 	private final int iconWidth;
 	private final int iconHeight;
 	private IRecorder recorder;
 
-	public ActionRecording(final String name, final Icon icon, final PostvisualizationRenderer renderer) {
+	public ActionRecording(final String name, final Icon icon, final SimulationRenderer renderer) {
 		super(name, icon, renderer.getModel());
 		this.iconWidth = CONFIG.getInt("ProjectView.icon.width.value");
 		this.iconHeight = CONFIG.getInt("ProjectView.icon.height.value");

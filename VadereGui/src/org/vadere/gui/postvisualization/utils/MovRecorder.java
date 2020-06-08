@@ -3,8 +3,10 @@ package org.vadere.gui.postvisualization.utils;
 
 import org.apache.commons.configuration2.Configuration;
 import org.jcodec.api.awt.SequenceEncoder;
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 import org.vadere.util.config.VadereConfig;
@@ -22,9 +24,8 @@ import java.util.Observable;
 public class MovRecorder implements IRecorder {
 	private static Logger logger = Logger.getLogger(MovRecorder.class);
 	private static final Configuration CONFIG = VadereConfig.getConfig();
-	private static Resources resources = Resources.getInstance("postvisualization");
 
-	private final PostvisualizationModel model;
+	private final SimulationModel model;
 	private ImageGenerator generator;
 	private SequenceEncoder enc;
 	private double simTimeInSec;
@@ -33,7 +34,7 @@ public class MovRecorder implements IRecorder {
 	private boolean finished;
 	private File outputFile;
 
-	public MovRecorder(final PostvisualizationRenderer renderer) {
+	public MovRecorder(final SimulationRenderer renderer) {
 		this.model = renderer.getModel();
 		this.imageSize = model.getWindowBound();
 		this.viewport = model.getViewportBound();

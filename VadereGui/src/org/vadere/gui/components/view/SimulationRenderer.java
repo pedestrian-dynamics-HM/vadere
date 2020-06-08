@@ -44,6 +44,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         this.agentRender = new AgentRender(model);
     }
 
+	public SimulationModel getModel() {
+		return model;
+	}
+
     @Override
     protected void renderPreTransformation(Graphics2D graphics2D, int width, int height) {
         if (model.isFloorFieldAvailable() && (model.config.isShowTargetPotentialField() || model.config.isShowPotentialField())) {
