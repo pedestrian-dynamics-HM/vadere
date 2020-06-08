@@ -1,6 +1,9 @@
 package org.vadere.simulator.models.osm;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math.exception.OutOfRangeException;
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
@@ -15,8 +18,7 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -41,8 +43,30 @@ import java.util.stream.Collectors;
  */
 public class OSMBehaviorController {
 
+    // Static Variables
     private static Logger logger = Logger.getLogger(OSMBehaviorController.class);
+    private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
+    // Member Variables
+    BinomialDistribution evasionDirectionDistribution;
+
+    // Constructors
+    public OSMBehaviorController() {
+        evasionDirectionDistribution = createEvasionDistribution(0, 0.8);
+    }
+
+    private BinomialDistribution createEvasionDistribution(int seed, double evadeRightProbability) {
+        if (evadeRightProbability < 0 || evadeRightProbability > 1) {
+            throw new OutOfRangeException(evadeRightProbability, 0, 1);
+        }
+
+        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+        randomGenerator.setSeed(seed);
+
+        return new BinomialDistribution(randomGenerator, BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, evadeRightProbability);
+    }
+
+    // Methods
     public void makeStepToTarget(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
         // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
         pedestrian.updateNextPosition();
@@ -136,6 +160,64 @@ public class OSMBehaviorController {
         */
 
         pedestrian.setTimeOfNextStep(stepEndTime);
+    }
+
+    /**
+     * 1. Use TargetAttractionAndEvasionStrategy to weight agents a little less
+     * 2. Use gradient to get walking direction of pedestrian
+     * 3. Sample "evasionDirectionDistribution" to evaluate evasion direction (right or left)
+     * 4. Call updateNextPosition() with adapted reachable area (use gradient and evasion direction for this)
+     * 5. Restore TargetAttractionStrategy
+     *
+     * @param pedestrian The pedestrian to evade
+     * @param topography The topography to be able to move the pedestrian within the topography
+     * @param timeStepInSec The current simulation time in second
+     */
+    public void evade(PedestrianOSM pedestrian, Topography topography, double timeStepInSec) {
+        pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_AND_EVASION_STRATEGY);
+
+        boolean evadeRight = evasionDirectionDistribution.sample() == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE;
+        VShape reachableArea = createIsoscelesTriangleAsReachableArea(pedestrian, evadeRight);
+
+        pedestrian.updateNextPosition(reachableArea);
+        makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
+        pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
+
+        pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
+    }
+
+    /**
+     * Use an isosceles triangle as reachable area where the isosceles legs represent pedestrian's step length
+     * and the angle between both legs is 30° deg. Both legs meet at pedestrian's current position.
+     * This triangle is rotated by using the targetGradient plus/minus some evasion offset of 45° deg.
+     *
+     * @param pedestrian The pedestrian to derive current position and walking direction (by using the gradient)
+     * @param evadeRight Decides if the isosceles triangle should be rotated by +45° deg or -45° deg
+     * @return The new reachable area for the pedestrian as isosceles triangle
+     */
+    public VShape createIsoscelesTriangleAsReachableArea(PedestrianOSM pedestrian, boolean evadeRight) {
+        double legAngleInRadians = Math.toRadians(15);
+        double stepSize = pedestrian.getDesiredStepSize();
+        double xCoord = stepSize * Math.cos(legAngleInRadians);
+        double yCoord = stepSize * Math.sin(legAngleInRadians);
+
+        Vector2D p1 = new Vector2D(0, 0);
+        Vector2D p2 = new Vector2D(xCoord, yCoord);
+        Vector2D p3 = new Vector2D(xCoord, -yCoord);
+
+        Vector2D targetGradient = pedestrian.getTargetGradient(pedestrian.getPosition());
+        Vector2D pedestrianWalkingDirection = new Vector2D(targetGradient.x * -1, targetGradient.y);
+        double walkingAngleRad = pedestrianWalkingDirection.angleToZero();
+        double evasionAngleRad = (evadeRight) ? -Math.toRadians(45) : +Math.toRadians(45);
+        double nextWalkingAngleRad = walkingAngleRad + evasionAngleRad;
+
+        Vector2D p1Rotated = p1.rotate(nextWalkingAngleRad);
+        Vector2D p2Rotated = p2.rotate(nextWalkingAngleRad);
+        Vector2D p3Rotated = p3.rotate(nextWalkingAngleRad);
+        VPoint base = pedestrian.getPosition();
+        VTriangle rotatedTriangleCounterClockwise = new VTriangle(base.add(p1Rotated), base.add(p3Rotated), base.add(p2Rotated));
+
+        return rotatedTriangleCounterClockwise;
     }
 
     /**
