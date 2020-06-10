@@ -23,6 +23,7 @@ import org.vadere.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
@@ -177,7 +178,7 @@ public class OSMBehaviorController {
         pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_AND_EVASION_STRATEGY);
 
         boolean evadeRight = evasionDirectionDistribution.sample() == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE;
-        VShape reachableArea = createIsoscelesTriangleAsReachableArea(pedestrian, evadeRight);
+        VShape reachableArea = createCircularReachableAreaInEvasionDirection(pedestrian, evadeRight);
 
         pedestrian.updateNextPosition(reachableArea);
         makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
@@ -186,6 +187,21 @@ public class OSMBehaviorController {
         pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
     }
 
+    public VShape createCircularReachableAreaInEvasionDirection(PedestrianOSM pedestrian, boolean evadeRight) {
+        Vector2D targetGradient = pedestrian.getTargetGradient(pedestrian.getPosition());
+        Vector2D pedestrianWalkingDirection = targetGradient.rotate(Math.toRadians(180));
+
+        double evasionAngleRad = (evadeRight) ? -Math.toRadians(45) : +Math.toRadians(45);
+        Vector2D nextWalkingDirection = pedestrianWalkingDirection.rotate(evasionAngleRad);
+
+        VPoint nextPositionNormedToZero = nextWalkingDirection.norm().scalarMultiply(pedestrian.getDesiredStepSize());
+        VPoint nextPosition = nextPositionNormedToZero.add(pedestrian.getPosition());
+
+        VCircle reachableArea = new VCircle(nextPosition, pedestrian.getRadius());
+        return reachableArea;
+    }
+
+    // TODO: Maybe, remove this method because low-level (optimization) code expects "reachableArea" to be of type "VCircle". :/
     /**
      * Use an isosceles triangle as reachable area where the isosceles legs represent pedestrian's step length
      * and the angle between both legs is 30° deg. Both legs meet at pedestrian's current position.
@@ -206,7 +222,7 @@ public class OSMBehaviorController {
         Vector2D p3 = new Vector2D(xCoord, -yCoord);
 
         Vector2D targetGradient = pedestrian.getTargetGradient(pedestrian.getPosition());
-        Vector2D pedestrianWalkingDirection = new Vector2D(targetGradient.x * -1, targetGradient.y);
+        Vector2D pedestrianWalkingDirection = targetGradient.rotate(Math.toRadians(180));
         double walkingAngleRad = pedestrianWalkingDirection.angleToZero();
         double evasionAngleRad = (evadeRight) ? -Math.toRadians(45) : +Math.toRadians(45);
         double nextWalkingAngleRad = walkingAngleRad + evasionAngleRad;

@@ -635,14 +635,14 @@ public class OSMBehaviorControllerTest {
     }
 
     @Test
-    public void createIsoscelesTriangleAsReachableAreaReturnsACorrectTriangleForPedestrian1() {
+    public void createCircularReachableAreaInEvasionDirectionWorksProperly() {
         createOppositeDirectionVariation1Topography();
 
         boolean evadeRight = true;
         OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
 
         // Ped1 walks from (0,0) to (-1,0) => walking direction (gradient) is roughly (-1, 0).
-        VShape reachableArea = controllerUnderTest.createIsoscelesTriangleAsReachableArea(pedestrian2, evadeRight);
+        VShape reachableArea = controllerUnderTest.createCircularReachableAreaInEvasionDirection(pedestrian2, evadeRight);
         // TODO Assert that coordinates match roughly the expectation.
     }
 }
