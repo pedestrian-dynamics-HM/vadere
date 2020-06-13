@@ -138,6 +138,6 @@ public class RunTimeCPU extends JFrame {
 	}
 
     public static void main(String[] args) {
-		stepUniformRing(0.05, 0.05, 0.05);
+    	stepUniformRing(0.05, 0.05, 0.05);
     }
 }

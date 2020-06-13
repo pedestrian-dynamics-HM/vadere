@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -28,6 +29,10 @@ import javax.swing.*;
 public class RunTimeCPU extends JFrame {
 
     private static final Logger log = Logger.getLogger(RunTimeCPU.class);
+
+	static {
+		log.setInfo();
+	}
 
 	/**
 	 * Each geometry is contained this bounding box.
@@ -79,7 +84,6 @@ public class RunTimeCPU extends JFrame {
 	private static void stepAdaptiveRingEikMesh(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
-		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
 		List<VShape> obstacles = new ArrayList<>();
 
 		double initialEdgeLength = startLen;
@@ -91,12 +95,18 @@ public class RunTimeCPU extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
+			final double currentEdgeLen = initialEdgeLength;
+			IEdgeLengthFunction adaptiveEdgeLength =  p -> currentEdgeLen + Math.max(-distanceFunc.apply(p), 0) * 0.4;
 			GenEikMesh<AVertex, AHalfEdge, AFace> meshGenerator = new GenEikMesh<>(
 					distanceFunc,
 					adaptiveEdgeLength,
 					initialEdgeLength,
 					bbox, obstacles,
 					supplier);
+
+			while (!meshGenerator.isInitialized()) {
+				meshGenerator.initialize();
+			}
 
 			StopWatch overAllTime = new StopWatch();
 
@@ -121,12 +131,12 @@ public class RunTimeCPU extends JFrame {
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
 			runTimes.add( overAllTime.getTime());
 
-			/*PSMeshingPanel<MeshPoint, AVertex<MeshPoint>, AHalfEdge<MeshPoint>, AFace<MeshPoint>> distmeshPanel = new PSMeshingPanel(meshGenerator.getMesh(), f -> false, 1000, 800, bbox);
+			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(),1000, 800);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			distmeshPanel.repaint();*/
+			distmeshPanel.repaint();
 
 			initialEdgeLength = initialEdgeLength * 0.5;
 
@@ -142,7 +152,7 @@ public class RunTimeCPU extends JFrame {
 	private static void stepAdaptiveRingDistMesh(double startLen, double endLen, double stepLen) {
 		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
-		IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
+		//IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 0.4;
 		List<VShape> obstacles = new ArrayList<>();
 
 		double initialEdgeLength = startLen;
@@ -154,6 +164,8 @@ public class RunTimeCPU extends JFrame {
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
+			final double currentEdgeLen = initialEdgeLength;
+			IEdgeLengthFunction adaptiveEdgeLength =  p -> currentEdgeLen + Math.max(-distanceFunc.apply(p), 0) * 0.1;
 			Distmesh meshGenerator = new Distmesh(distanceFunc,
 					adaptiveEdgeLength,
 					initialEdgeLength,
@@ -169,24 +181,24 @@ public class RunTimeCPU extends JFrame {
 				meshGenerator.step();
 				overAllTime.suspend();
 				steps++;
-			} while (!meshGenerator.hasMaximalSteps());
+			} while (steps <= 100);
 
 			log.info("#vertices: " + meshGenerator.getPoints().size());
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("#step: " + steps);
 			log.info("#tris: " + meshGenerator.getNumberOfReTriangulations());
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
-			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
+			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]\n");
 
 			nVertices.add(meshGenerator.getPoints().size());
 			runTimes.add( overAllTime.getTime());
 
-			/*PSDistmeshPanel distmeshPanel = new PSDistmeshPanel(meshGenerator, 1000, 800, bbox, t -> false);
+			DistmeshPanel distmeshPanel = new DistmeshPanel(meshGenerator, 1000, 800, bbox, t -> false);
 			JFrame frame = distmeshPanel.display();
 			frame.setVisible(true);
 			frame.setTitle("uniformRing()");
 			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			distmeshPanel.repaint();*/
+			distmeshPanel.repaint();
 
 			initialEdgeLength = initialEdgeLength * 0.5;
 
@@ -200,7 +212,8 @@ public class RunTimeCPU extends JFrame {
 	}
 
     public static void main(String[] args) {
-		stepAdaptiveRingDistMesh(0.1, 0.005, 0.01);
-	    //stepAdaptiveRingEikMesh(0.1, 0.005, 0.01);
+		//stepAdaptiveRingDistMesh(0.1, 0.005, 0.01);
+	    stepAdaptiveRingEikMesh(0.1, 0.005, 0.01);
+	    //stepAdaptiveRingEikMesh(0.005, 0.005, 0.01);
     }
 }

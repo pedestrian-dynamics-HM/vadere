@@ -1953,7 +1953,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightWalk2DGatherDirectional(@NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> additionalStopCondition) {
-		VPoint q = getMesh().toTriangle(face).midPoint();
+		VPoint q = getMesh().toMidpoint(face);
 		assert getMesh().toTriangle(face).contains(q);
 
 		Predicate<E> defaultStopCondion = e -> isRightOf(q.x, q.y, e);

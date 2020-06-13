@@ -50,9 +50,9 @@ import java.util.stream.Collectors;
 public class MeshQuantityPrinting {
 
 	public static void main(String... args) throws InterruptedException, IOException {
-		spaceFillingCurve2();
+		//spaceFillingCurve2();
 		//uniformMeshDiscFunction(0.10);
-		//uniformMeshDiscFunctionDistMesh(0.05);
+		uniformMeshDiscFunctionDistMesh(0.05);
 		//distMeshFail(0.05);
 		//delaunyTri("/poly/a.poly");
 	}
@@ -260,9 +260,9 @@ public class MeshQuantityPrinting {
 		int iteration = 1;
 		while (iteration < maxIteration+1) {
 			distmesh.improve();
-			if(iteration + 1 == maxIteration+1) {
+			/*if(iteration + 1 == maxIteration+1) {
 				distmesh.reTriangulate(true);
-			}
+			}*/
 			bufferedWriterIllegalEdges.write(iteration + " " + distmesh.getNumberOfIllegalTriangles() + "\n");
 			bufferedWriterQualities1.write(printQualities(iteration, distmesh, f -> GeometryUtils.qualityOf(f)));
 			bufferedWriterQualities2.write(printQualities(iteration, distmesh, f -> GeometryUtils.qualityLongestEdgeInCircle(f.p1, f.p2, f.p3)));

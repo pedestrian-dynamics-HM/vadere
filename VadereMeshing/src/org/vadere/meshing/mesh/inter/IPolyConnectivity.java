@@ -116,7 +116,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param vertex v
 	 */
 	default void adjustVertex(@NotNull final V vertex) {
-		getMesh().streamEdges(vertex).filter(edge -> isAtBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
+		getMesh().streamEdges(vertex).filter(edge -> getMesh().isBoundary(edge)).findAny().ifPresent(edge -> getMesh().setEdge(vertex, edge));
 	}
 
 	/**
@@ -632,14 +632,15 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param face                      they face which will be transformed into a hole
 	 * @param mergeCondition            the merge condition
 	 * @param deleteIsoletedVertices    if true isolated vertices, i.e. vertices without any edges, will be removed from the mesh
+	 * @param vertexAdjust              true means that boundary vertices will get their boundary edge as edge, false means there is no guarantee that this adjustment is made
 	 * @return  (optional) the hole or face itself it the face does not fulfill the merge condition
 	 *          or empty if due to the creation of the hole all faces will be removed!
 	 */
-	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
+	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices, final boolean vertexAdjust) {
 
 		if(mergeCondition.test(face)) {
 			getMesh().toHole(face);
-			shrinkBoundary(face, mergeCondition, deleteIsoletedVertices);
+			shrinkBoundary(face, mergeCondition, deleteIsoletedVertices, vertexAdjust);
 			return Optional.of(face);
 		}
 		else {
@@ -665,6 +666,10 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 		}*/
 	}
 
+	default Optional<F> createHole(@NotNull final F face, @NotNull final Predicate<F> mergeCondition, final boolean deleteIsoletedVertices) {
+		return createHole(face, mergeCondition, deleteIsoletedVertices, true);
+	}
+
 	/**
 	 * Shrinks the border as long as the removeCondition is satisfied i.e. a face will be removed if
 	 * it is at the border (during the shrinking process) and satisfies the condition. Like a virus this
@@ -675,9 +680,14 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 *
 	 * @param removeCondition           the remove condition
 	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
+	 * @param vertexAdjust              true means that boundary vertices will get their boundary edge as edge, false means there is no guarantee that this adjustment is made
 	 */
+	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices, final boolean vertexAdjust) {
+		shrinkBoundary(getMesh().getBorder(), removeCondition, deleteIsolatedVertices, vertexAdjust);
+	}
+
 	default void shrinkBorder(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
-		shrinkBoundary(getMesh().getBorder(), removeCondition, deleteIsolatedVertices);
+		shrinkBorder(removeCondition, deleteIsolatedVertices, true);
 	}
 
 	default void shrinkBoundary(final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
@@ -697,8 +707,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 *
 	 * @param removeCondition           the remove condition
 	 * @param deleteIsolatedVertices    true then isolated vertices (they are not connected to an edge) will be removed.
+	 * @param adjustVertices            true means that boundary vertices will get their boundary edge as edge, false means there is no guarantee that this adjustment is made
 	 */
-	default void shrinkBoundary(@NotNull final F boundary, final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
+	default void shrinkBoundary(@NotNull final F boundary, final Predicate<F> removeCondition, final boolean deleteIsolatedVertices, final boolean adjustVertices) {
 		assert getMesh().isBoundary(boundary);
 
 		List<F> boundaryFaces = getMesh().getFaces(boundary);
@@ -715,11 +726,15 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 							nextNeighbouringFaces.add(face);
 						}
 					}
-					removeFaceAtBoundary(neighbouringFace, boundary, deleteIsolatedVertices);
+					removeFaceAtBoundary(neighbouringFace, boundary, deleteIsolatedVertices, adjustVertices);
 				}
 			}
 			neighbouringFaces = nextNeighbouringFaces;
 		} while (!neighbouringFaces.isEmpty());
+	}
+
+	default void shrinkBoundary(@NotNull final F boundary, final Predicate<F> removeCondition, final boolean deleteIsolatedVertices) {
+		shrinkBoundary(boundary, removeCondition, deleteIsolatedVertices, true);
 	}
 
 	default void removeFacesAtBoundary(@NotNull final Predicate<F> mergePredicate, @NotNull final Predicate<F> errorPredicate) throws IllegalMeshException {
@@ -1215,8 +1230,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 * @param face                      the face that will be removed from the mesh
 	 * @param boundary                  the boundary which has to be a neighbouring boundary of the face
 	 * @param deleteIsolatedVertices    true means that all vertices with degree smaller equals 1 will be removed as well
+	 * @param adjustVertices            true means that boundary vertices will get their boundary edge as edge, false means there is no guarantee that this adjustment is made
 	 */
-	default void removeFaceAtBoundary(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
+	default void removeFaceAtBoundary(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices, final boolean adjustVertices) {
 		if(!getMesh().isDestroyed(face)) {
 
 			assert getMesh().streamFaces(face).filter(neighbour -> neighbour.equals(boundary)).count() > 0;
@@ -1357,7 +1373,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 					getMesh().destroyEdge(h1);
 
 					// adjust vertices such that we speed up the querry isBoundary(vertex).
-					vertices.stream().filter(getMesh()::isAlive).forEach(v -> adjustVertex(v));
+					if(adjustVertices) {
+						vertices.stream().filter(getMesh()::isAlive).forEach(v -> adjustVertex(v));
+					}
 				}
 			}
 
@@ -1371,6 +1389,9 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 		}
 	}
 
+	default void removeFaceAtBoundary(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
+		removeFaceAtBoundary(face, boundary, deleteIsolatedVertices);
+	}
 
 	/**
 	 * Removes a face from the mesh by removing all boundary edges of the face.

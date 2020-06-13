@@ -139,7 +139,7 @@ public class GeometryCleaner {
 		IDistanceFunction distanceFunction = IDistanceFunction.create(bound, polygons);
 
 		// 3. compute the segment-bounding simple polygon by using the distance function
-		Predicate<PFace> removePredicate = face -> distanceFunction.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0;
+		Predicate<PFace> removePredicate = face -> distanceFunction.apply(triangulation.getMesh().toMidpoint(face)) > 0;
 		triangulation.shrinkBorder(removePredicate, true);
 		VPolygon boundingPolygon = GeometryUtils.toPolygon(triangulation.getMesh().getPoints(triangulation.getMesh().getBorder()));
 
@@ -147,7 +147,7 @@ public class GeometryCleaner {
 		List<PFace> faces = triangulation.getMesh().getFaces();
 		for(PFace face : faces) {
 			if(!triangulation.getMesh().isBorder(face) && !triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
-				triangulation.createHole(face, f -> distanceFunction.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+				triangulation.createHole(face, f -> distanceFunction.apply(triangulation.getMesh().toMidpoint(f)) > 0, true);
 			}
 		}
 
