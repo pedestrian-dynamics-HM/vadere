@@ -30,10 +30,6 @@ public class RunTimeCPU extends JFrame {
 
     private static final Logger log = Logger.getLogger(RunTimeCPU.class);
 
-	static {
-		log.setInfo();
-	}
-
 	/**
 	 * Each geometry is contained this bounding box.
 	 */
@@ -90,6 +86,8 @@ public class RunTimeCPU extends JFrame {
 		double minInitialEdgeLength = endLen;
 
 		List<Integer> nVertices = new ArrayList<>();
+		List<Double> qualities = new ArrayList<>();
+		List<Double> minQualities = new ArrayList<>();
 		List<Long> runTimes = new ArrayList<>();
 		List<Double> initlialEdgeLengths = new ArrayList<>();
 
@@ -129,6 +127,8 @@ public class RunTimeCPU extends JFrame {
 			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
 
 			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			qualities.add(meshGenerator.getQuality());
+			minQualities.add(meshGenerator.getMinQuality());
 			runTimes.add( overAllTime.getTime());
 
 			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(),1000, 800);
@@ -147,6 +147,8 @@ public class RunTimeCPU extends JFrame {
 		System.out.println("#vertices: [" + nVertices.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 		System.out.println("runtime in ms: [" + runTimes.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 		System.out.println("init edge lengths: [" + initlialEdgeLengths.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("qualities: [" + qualities.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("min-qualities: [" + minQualities.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 	}
 
 	private static void stepAdaptiveRingDistMesh(double startLen, double endLen, double stepLen) {
@@ -159,13 +161,15 @@ public class RunTimeCPU extends JFrame {
 		double minInitialEdgeLength = endLen;
 
 		List<Integer> nVertices = new ArrayList<>();
+		List<Double> qualities = new ArrayList<>();
+		List<Double> minQualities = new ArrayList<>();
 		List<Long> runTimes = new ArrayList<>();
 		List<Double> initlialEdgeLengths = new ArrayList<>();
 
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
 			final double currentEdgeLen = initialEdgeLength;
-			IEdgeLengthFunction adaptiveEdgeLength =  p -> currentEdgeLen + Math.max(-distanceFunc.apply(p), 0) * 0.1;
+			IEdgeLengthFunction adaptiveEdgeLength =  p -> currentEdgeLen + Math.max(-distanceFunc.apply(p), 0) * 0.4;
 			Distmesh meshGenerator = new Distmesh(distanceFunc,
 					adaptiveEdgeLength,
 					initialEdgeLength,
@@ -182,6 +186,7 @@ public class RunTimeCPU extends JFrame {
 				overAllTime.suspend();
 				steps++;
 			} while (steps <= 100);
+			meshGenerator.reTriangulate();
 
 			log.info("#vertices: " + meshGenerator.getPoints().size());
 			log.info("quality: " + meshGenerator.getQuality());
@@ -192,6 +197,8 @@ public class RunTimeCPU extends JFrame {
 
 			nVertices.add(meshGenerator.getPoints().size());
 			runTimes.add( overAllTime.getTime());
+			qualities.add(meshGenerator.getQuality());
+			minQualities.add(meshGenerator.getMinQuality());
 
 			DistmeshPanel distmeshPanel = new DistmeshPanel(meshGenerator, 1000, 800, bbox, t -> false);
 			JFrame frame = distmeshPanel.display();
@@ -209,11 +216,13 @@ public class RunTimeCPU extends JFrame {
 		System.out.println("#vertices: [" + nVertices.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 		System.out.println("runtime in ms: [" + runTimes.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 		System.out.println("init edge lengths: [" + initlialEdgeLengths.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("qualities: [" + qualities.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("min-qualities: [" + minQualities.stream().map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
 	}
 
     public static void main(String[] args) {
-		//stepAdaptiveRingDistMesh(0.1, 0.005, 0.01);
-	    stepAdaptiveRingEikMesh(0.1, 0.005, 0.01);
+		stepAdaptiveRingDistMesh(0.2, 0.001, 0.001);
+	    stepAdaptiveRingEikMesh(0.2, 0.001, 0.001);
 	    //stepAdaptiveRingEikMesh(0.005, 0.005, 0.01);
     }
 }
