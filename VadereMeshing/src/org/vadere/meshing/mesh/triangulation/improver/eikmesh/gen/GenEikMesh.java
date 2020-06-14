@@ -651,6 +651,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		// TODO: Get rid of VPoint
 		VPoint p1p2 = p1.subtract(p2);
 		double len = p1p2.distanceToOrigin();
+		if(len <= GeometryUtils.DOUBLE_EPS) {
+			return new VPoint(0, 0);
+		}
 		double desiredLen = 0.9 * Math.sqrt(3) * getDesiredEdgeLength(p1, p2);
 		double ratio = len / desiredLen;
 		double absForce = f.apply(ratio);
@@ -1379,9 +1382,11 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		IPoint velocity = getForce(vertex);
 		double factor = 1.0;
 		IPoint movement = velocity.scalarMultiply(delta * factor);
-		while(!move(vertex, vertex.getX() + movement.getX(), vertex.getY() + movement.getY())) {
+		int count = 0;
+		while(!move(vertex, vertex.getX() + movement.getX(), vertex.getY() + movement.getY()) && count < 10) {
 			factor /= 2.0;
 			movement = velocity.scalarMultiply(delta * factor);
+			count++;
 		}
 	}
 

@@ -192,7 +192,7 @@ public class MeshQuantityPrinting {
 		bufferedWriterQualities2.write("iteration quality\n");
 
 		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
-		bufferedWriterAngles.write("iteration angle3D\n");
+		bufferedWriterAngles.write("iteration angle\n");
 
 		int init = 1;
 		while (!meshImprover.isInitialized()) {
@@ -255,7 +255,7 @@ public class MeshQuantityPrinting {
 		bufferedWriterQualities2.write("iteration quality\n");
 
 		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_dist.csv", dir);
-		bufferedWriterAngles.write("iteration angle3D\n");
+		bufferedWriterAngles.write("iteration angle\n");
 
 		int iteration = 1;
 		while (iteration < maxIteration+1) {

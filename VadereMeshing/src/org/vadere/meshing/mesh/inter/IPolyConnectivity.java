@@ -1390,7 +1390,7 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	default void removeFaceAtBoundary(@NotNull final F face, @NotNull final F boundary, final boolean deleteIsolatedVertices) {
-		removeFaceAtBoundary(face, boundary, deleteIsolatedVertices);
+		removeFaceAtBoundary(face, boundary, deleteIsolatedVertices, true);
 	}
 
 	/**

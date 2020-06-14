@@ -17,7 +17,7 @@ public class Parameters {
 	public final static boolean uniform = false;
 	public final static String method = "Distmesh"; // "Distmesh" or "Density"
     public final static double qualityMeasurement = 0.95;
-	public final static double qualityConvergence = 0.01;
+	public final static double qualityConvergence = 0.0;
     public final static double MINIMUM = 0.25;
     public final static double DENSITYWEIGHT = 2;
     public final static int NPOINTS = 100000;
@@ -26,5 +26,5 @@ public class Parameters {
     public final static int SEGMENTDIVISION = 0;
     //TODO increase this
     public final static int MAX_NUMBER_OF_STEPS = 200;
-	public final static int HIGHEST_LEGAL_TEST = 10;
+	public final static int HIGHEST_LEGAL_TEST = Integer.MAX_VALUE;
 }

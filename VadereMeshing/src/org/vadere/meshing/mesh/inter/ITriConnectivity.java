@@ -2734,7 +2734,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			 * this might happen if the line intersects a point, in this case both neighbouring edges are feasible
 			 */
 			if(inEdge == null) {
-				inEdge = getMesh().streamEdges(startFace).filter(e -> isLeftOf(p.getX(), p.getY(), e)).findAny().get();
+				Optional<E> optEdge = getMesh().streamEdges(startFace).filter(e -> isLeftOf(p.getX(), p.getY(), e)).findAny();
+				inEdge = optEdge.get();
 			}
 		}
 
