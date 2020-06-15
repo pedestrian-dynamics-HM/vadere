@@ -527,6 +527,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				List<F> sierpinksyFaceOrder = sfc.asList().stream().map(node -> getMesh().getFace(node.getEdge())).collect(Collectors.toList());
 				shrinkBorder();
 				createHoles();
+				adjustBoundaryVertexEdges();
 				//triangulation.smoothBorder();
 
 				sierpinksyFaceOrder.removeIf(face -> getMesh().isDestroyed(face) || getMesh().isHole(face));
@@ -617,8 +618,8 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 * Note the border is part of the whole boundary which is defined by the border and the holes.</p>
 	 */
 	private void shrinkBorder() {
-		Predicate<F> removePredicate = face -> distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0;
-		triangulation.shrinkBorder(removePredicate, true);
+		Predicate<F> removePredicate = face -> distFunc.apply(triangulation.getMesh().toMidpoint(face)) > 0;
+		triangulation.shrinkBorder(removePredicate, true, false);
 	}
 
 	@Override
@@ -652,6 +653,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 		GenConstrainSplitter<V, E, F> cdt = new GenConstrainSplitter<>(getTriangulation(), lines, GeometryUtils.DOUBLE_EPS, sfc);
 		cdt.generate(false);
+		getTriangulation().setCanIllegalPredicate(e -> true);
 		projections.putAll(cdt.getProjections());
 		constrains.addAll(cdt.getConstrains());
 
@@ -661,8 +663,20 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		List<F> faces = triangulation.getMesh().getFaces();
 		for(F face : faces) {
 			if(!triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
-				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+				triangulation.createHole(face, f -> distFunc.apply(triangulation.getMesh().toMidpoint(f)) > 0, true, false);
 			}
+		}
+	}
+
+	private void adjustBoundaryVertexEdges() {
+		for(F hole : getMesh().getHoles()) {
+			for(V v : getMesh().getVertexIt(hole)) {
+				triangulation.adjustVertex(v);
+			}
+		}
+
+		for(V v : getMesh().getVertexIt(getMesh().getBorder())) {
+			triangulation.adjustVertex(v);
 		}
 	}
 

@@ -5,6 +5,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -33,6 +34,7 @@ public class PredicateRefinement<V extends IVertex, E extends IHalfEdge, F exten
 
 	@Override
 	public boolean test(E e) {
+		//GeometryUtilsMesh.curvature(backgroundMesh.getMesh(), )
 		VLine line = refineMesh.getMesh().toLine(e);
 		double len = line.length();
 		double x[] = new double[3];

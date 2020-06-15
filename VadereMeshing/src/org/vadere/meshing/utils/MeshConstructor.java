@@ -16,20 +16,25 @@ import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.utils.color.Colors;
+import org.vadere.meshing.utils.io.IOUtils;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class MeshConstructor {
 	private static Logger logger = Logger.getLogger(MeshConstructor.class);
-
 
 	public IMesh<PVertex, PHalfEdge, PFace> pslgToCoarsePMesh(@NotNull final PSLG pslg, final boolean viszalize) {
 		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
@@ -67,10 +72,14 @@ public class MeshConstructor {
 		logger.info("construct distance function");
 		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
 
-		IEdgeLengthFunction edgeLengthFunction = p -> hmin + smoothness * Math.abs(((DistanceFunctionApproxBF) distanceFunctionApproximation).apply(p));
+		IEdgeLengthFunction edgeLengthFunction = p -> hmin + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction, p -> hmax);
 		edgeLengthFunctionApprox.smooth(smoothness);
 		logger.info("construct element size function");
+
+		//((DistanceFunctionApproxBF) distanceFunctionApproximation).printPython();
+		//edgeLengthFunctionApprox.printPython();
+
 		//edgeLengthFunctionApprox.printPython();
 
 
@@ -105,9 +114,41 @@ public class MeshConstructor {
 			while (!meshImprover.isFinished()) {
 				synchronized (meshImprover.getMesh()) {
 					meshImprover.improve();
+					logger.info("quality = " + meshImprover.getQuality());
 				}
 				meshPanel.repaint();
 			}
+			logger.info("generation completed.");
+			/*BufferedWriter meshWriter = null;
+
+			try {
+				File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+				BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+				bufferedWriterQualities1.write("iteration quality\n");
+
+				BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+				bufferedWriterQualities2.write("iteration quality\n");
+
+				BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+				bufferedWriterAngles.write("iteration angle\n");
+
+				bufferedWriterQualities1.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+				bufferedWriterQualities1.close();
+
+				bufferedWriterQualities2.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+				bufferedWriterQualities2.close();
+
+				bufferedWriterAngles.write(printAngles(200, meshImprover.getMesh()));
+				bufferedWriterAngles.close();
+
+				meshWriter = IOUtils.getWriter("kaiserslautern_mittel.tex", dir);
+				meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, e -> Color.BLACK, vertexColorFunction, 1.0f, true));
+				meshWriter.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
+
 		} else {
 			meshImprover.generate();
 		}
@@ -167,4 +208,34 @@ public class MeshConstructor {
 		return meshImprover.getMesh();
 	}
 
+
+	// delete this code
+	private static String printAngles(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh){
+		StringBuilder builder = new StringBuilder();
+		for(PFace face : mesh.getFaces()) {
+
+			for(PHalfEdge edge : mesh.getEdges(face)) {
+				VPoint p1 = mesh.toPoint(edge);
+				VPoint p2 = mesh.toPoint(mesh.getNext(edge));
+				VPoint p3 = mesh.toPoint(mesh.getPrev(edge));
+				builder.append(iteration);
+				builder.append(" ");
+				builder.append(GeometryUtils.angle(p1, p2, p3));
+				builder.append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private static String printQualities(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh, Function<PFace, Double> rho){
+		StringBuilder builder = new StringBuilder();
+		for(PFace face : mesh.getFaces()) {
+			double quality = rho.apply(face);
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(quality);
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
 }

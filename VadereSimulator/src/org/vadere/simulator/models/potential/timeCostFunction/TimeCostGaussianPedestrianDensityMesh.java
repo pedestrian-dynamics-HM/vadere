@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * @param <E>
  * @param <F>
  */
-public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITimeCostFunctionMesh<V> {
+public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITimeCostFunctionMesh<V> {
 
 	public static final String nameAgentDensity = "agent_density";
 
@@ -45,14 +45,18 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 	private boolean updated;
 	private GenRegularRefinement<V, E, F> refiner;
 
-	private final double influenceRadius = 7.0;
+	private final double R = 0.7;
+	private final int influenceRadius = 7;
+	private final double a;
+	private final double Sp;
+	private final double c;
 
 	// to debug
 	//private MeshPanel<V, E, F> debugPanel;
 	private int step;
 	private BufferedWriter meshWriter;
 
-	public TimeCostPedestrianDensityMesh(
+	public TimeCostGaussianPedestrianDensityMesh(
 			@NotNull final ITimeCostFunctionMesh<V> timeCostFunction,
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final IPedestrianLoadingStrategy loadingStrategy,
@@ -69,12 +73,15 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		this.refiner.setEdgeRefinementPredicate(e -> refine(e));
 		this.step = 0;
 		//TODO duplicated code
-
-		try {
+		double dia = attributesAgent.getRadius() * 2.0;
+		Sp = (dia * dia * Math.sqrt(3)) * 0.5;
+		a = -1 / (2 * R * R);
+		c = 2 * Math.PI * R * R;
+		/*try {
 			this.meshWriter = IOUtils.getWriter("floorField_densities.txt", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/"));
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 		//debugPanel = new MeshPanel<>(triangulation.getMesh(), 1000, 1000);
 		//debugPanel.display("debug");
@@ -114,6 +121,12 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 			}
 		}
 		return false;
+	}
+
+	private double density(final double x1, final double y1, final double x2, final double y2, @Nullable final Pedestrian ped) {
+		double dist = GeometryUtils.lengthSq(x1 - x2, y1 - y2);
+		double density = loadingStrategy.calculateLoading(ped) * (Sp / (c)) * Math.exp(a * dist);
+		return density;
 	}
 
 	@Override
@@ -166,18 +179,18 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 						mesh.getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
 				Set<V> closeVertices = triangulation.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
 				for (V v : closeVertices) {
-					double density = densities.getValue(v) + loadingStrategy.calculateLoading(element) / (influenceRadius * influenceRadius * Math.PI);
+					double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, mesh.getX(v), mesh.getY(v), element);
 					densities.setValue(v, density);
 				}
 			}
 		}
 
-		try {
-			this.meshWriter.write(triangulation.getMesh().toPythonValues(v -> densities.getValue(v) + triangulation.getMesh().getDoubleData(v, TimeCostObstacleDensityMesh.nameObstacleDensity)));
+		/*try {
+			this.meshWriter.write(triangulation.getMesh().toPythonTriangulation(v -> densities.getValue(v) + triangulation.getMesh().getDoubleData(v, TimeCostObstacleDensityMesh.nameObstacleDensity)));
 			this.meshWriter.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		//long runTime = System.currentTimeMillis() - ms;
 		//System.out.println("runTime of density computation = " + runTime);
 	}

@@ -321,7 +321,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 			// remove all faces outside the hole
 			VPolygon polygon = getMesh().toPolygon(hole);
-			Predicate<F> removePredicate = face -> !polygon.contains(getMesh().toTriangle(face).midPoint());
+			Predicate<F> removePredicate = face -> !polygon.contains(getMesh().toMidpoint(face));
 			cdt.getTriangulation().shrinkBorder(removePredicate, true);
 
 			IMesh<V, E, F> holeMesh = incrementalTriangulation.getMesh();

@@ -17,6 +17,7 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -36,7 +37,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 	private static final double MIN_CURVATURE = 0.1;
 
-	private static final double MAX_CURVATURE = 0.1;
+	private static final double MAX_CURVATURE = 0.3;
 
 	private static final double MIN_EDGE_LEN = 0.1;
 
@@ -46,6 +47,8 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 	private GenRegularRefinement<V, E, F> refiner;
 
+	private @NotNull IDistanceFunction distFunc;
+
 
 	public MeshEikonalSolverFMMIterative(@NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
@@ -53,6 +56,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 	                                     @NotNull final IDistanceFunction distFunc
 	) {
 		this(new MeshEikonalSolverFMM<>(timeCostFunction, triangulation, targetVertices, distFunc));
+		this.distFunc = distFunc;
 	}
 
 	public MeshEikonalSolverFMMIterative(@NotNull final MeshEikonalSolverFMM<V, E, F> solver) {
@@ -66,6 +70,8 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 		// (2) refine if necessary
 		final Predicate<E> predicate = new PredicateRefinement<>(triangulation, clone, MIN_EDGE_LEN, MAX_CURVATURE);
+		//final Predicate<E> predicate = new PredicateEdgeRefinement<>(solver, MIN_EDGE_LEN, MAX_CURVATURE);
+		//refiner = new GenRegularRefinement<>(triangulation, predicate, level);
 		refiner = new GenRegularRefinement<>(clone, predicate, level);
 		refiner.refine();
 		//refiner.coarse();
@@ -83,19 +89,25 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 	public void solve() {
 
 		if (!calculationFinished) {
+			List<V> list = solver.getTriangulation().getMesh().getBoundaryVertices();
 			solver.solve();
+			System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 			level = 1;
 			double lastMaxCurvature = 0;
 			maxCurrentCurvature = Double.MAX_VALUE;
 
-			while(maxCurrentCurvature > MAX_CURVATURE && !hasConverged(lastMaxCurvature, maxCurrentCurvature) && level < MAX_ITERATIONS) {
+			while (level < MAX_ITERATIONS) {
+			//while(maxCurrentCurvature > MAX_CURVATURE && !hasConverged(lastMaxCurvature, maxCurrentCurvature) && level < MAX_ITERATIONS) {
 				lastMaxCurvature = maxCurrentCurvature;
 				//System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 				maxCurrentCurvature = computeCurvature(solver.getTriangulation());
 				logger.debug("max curvature = " + maxCurrentCurvature);
+				solver.getTriangulation().removeTriEventListener(solver);
 				IIncrementalTriangulation<V, E, F> refinedTriangulation = refine(solver.getTriangulation());
 				solver = new MeshEikonalSolverFMM<>(solver, refinedTriangulation, refinedTriangulation.getMesh().getBoundaryVertices());
 				solver.solve();
+
+				System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 				level++;
 			}
 
