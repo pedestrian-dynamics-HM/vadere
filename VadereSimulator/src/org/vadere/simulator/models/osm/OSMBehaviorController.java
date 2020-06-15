@@ -21,6 +21,7 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.logging.Logger;
 
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -180,7 +181,13 @@ public class OSMBehaviorController {
         boolean evadeRight = evasionDirectionDistribution.sample() == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE;
         VShape reachableArea = createCircularReachableAreaInEvasionDirection(pedestrian, evadeRight);
 
-        pedestrian.updateNextPosition(reachableArea);
+        // TODO Only the colliding agents could evade tangentially.
+        //   Other evading agents could follow the foremost evading agent.
+        if (topographyContainsReachableArea(topography, reachableArea)) {
+            pedestrian.setNextPosition(reachableArea.getCentroid());
+        } else {
+            pedestrian.updateNextPosition(reachableArea);
+        }
         makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 
@@ -199,6 +206,16 @@ public class OSMBehaviorController {
 
         VCircle reachableArea = new VCircle(nextPosition, pedestrian.getRadius());
         return reachableArea;
+    }
+
+    private boolean topographyContainsReachableArea(Topography topography, VShape reachableArea) {
+        Rectangle2D.Double bounds = topography.getBounds();
+        double boundsWidth = topography.getBoundingBoxWidth();
+        Rectangle2D.Double validArea = new Rectangle2D.Double(bounds.x  + boundsWidth, bounds.y + boundsWidth, bounds.width - 2 * boundsWidth, bounds.height - 2 * boundsWidth);
+
+        boolean reachableAreaInsideBoundary = validArea.contains(reachableArea.getCentroid().x, reachableArea.getCentroid().y);
+
+        return reachableAreaInsideBoundary;
     }
 
     // TODO: Maybe, remove this method because low-level (optimization) code expects "reachableArea" to be of type "VCircle". :/

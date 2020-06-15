@@ -221,7 +221,7 @@
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
-        "searchRadius" : 1.0,
+        "searchRadius" : 4.0,
         "walkingDirectionCalculation" : "BY_TARGET_CENTER",
         "walkingDirectionSameIfAngleLessOrEqual" : 45.0
       },
