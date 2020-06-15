@@ -182,7 +182,9 @@ public class OSMBehaviorController {
         VShape reachableArea = createCircularReachableAreaInEvasionDirection(pedestrian, evadeRight);
 
         // TODO Only the colliding agents could evade tangentially.
-        //   Other evading agents could follow the foremost evading agent.
+        //   Other evading agents could follow the foremost evading agent by imitating SelfCategory.EVADE.
+        // TODO Use pedestrian.updateNextPosition(reachableArea) only and do not set position hard
+        //   to avoid zig-zag trajectories.
         if (topographyContainsReachableArea(topography, reachableArea)) {
             pedestrian.setNextPosition(reachableArea.getCentroid());
         } else {

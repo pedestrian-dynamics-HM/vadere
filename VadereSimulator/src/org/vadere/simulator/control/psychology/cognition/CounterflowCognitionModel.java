@@ -36,8 +36,12 @@ public class CounterflowCognitionModel implements ICognitionModel {
             if (pedestrian.hasNextTarget()) {
                 Pedestrian closestPedestrian = getClosestPedestrianWhichIsCloserToTarget(pedestrian, topography);
 
-                if (closestPedestrian != null && walkingDirectionDiffers(pedestrian, closestPedestrian)) {
-                    pedestrian.setSelfCategory(SelfCategory.EVADE);
+                if (closestPedestrian != null) {
+                    if (walkingDirectionDiffers(pedestrian, closestPedestrian)) {
+                        pedestrian.setSelfCategory(SelfCategory.EVADE);
+                    } else if (closestPedestrian.getSelfCategory() == SelfCategory.EVADE) {
+                        pedestrian.setSelfCategory(SelfCategory.EVADE); // Imitate behavior
+                    }
                 }
             }
         }
