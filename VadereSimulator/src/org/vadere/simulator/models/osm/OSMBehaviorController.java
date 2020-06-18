@@ -332,19 +332,19 @@ public class OSMBehaviorController {
             return null;
         }
 
-        List<Pedestrian> closestPedestrians = TopographyHelper.getNeighborsCloserToTarget(pedestrian, topography);
+        List<Pedestrian> neighborsCloserToTarget = TopographyHelper.getNeighborsCloserToTarget(pedestrian, topography);
 
-        if (closestPedestrians.size() > 0) {
-            for (Pedestrian closestPedestrian : closestPedestrians) {
-                if (closestPedestrian.hasNextTarget()) {
-                    boolean closestPedIsCooperative = closestPedestrian.getSelfCategory() == SelfCategory.COOPERATIVE;
-                    boolean walkingDirectionDiffers = TopographyHelper.walkingDirectionDiffers(pedestrian, closestPedestrian, topography);
+        if (neighborsCloserToTarget.size() > 0) {
+            for (Pedestrian neighbor : neighborsCloserToTarget) {
+                if (neighbor.hasNextTarget()) {
+                    boolean neighborIsCooperative = neighbor.getSelfCategory() == SelfCategory.COOPERATIVE;
+                    boolean walkingDirectionDiffers = TopographyHelper.walkingDirectionDiffers(pedestrian, neighbor, topography);
 
-                    if (closestPedIsCooperative && walkingDirectionDiffers) {
-                        return (PedestrianOSM)closestPedestrian;
+                    if (neighborIsCooperative && walkingDirectionDiffers) {
+                        return (PedestrianOSM)neighbor;
                     }
                 } else {
-                    return (PedestrianOSM)closestPedestrian;
+                    return (PedestrianOSM)neighbor;
                 }
             }
         }

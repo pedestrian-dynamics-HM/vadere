@@ -88,7 +88,7 @@ public class ThreatCognitionModel implements ICognitionModel {
             if (pedestrian.getGroupMembership() == GroupMembership.OUT_GROUP) {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             } else if (pedestrian.getGroupMembership() == GroupMembership.IN_GROUP) {
-                imitateThreatenedPedestrianIfPresent(pedestrian);
+                imitateThreatenedNeighborIfPresent(pedestrian);
             } else {
                 throw new IllegalArgumentException("Can only process \"IN_GROUP\" and \"OUT_GROUP\" group membership!");
             }
@@ -124,15 +124,15 @@ public class ThreatCognitionModel implements ICognitionModel {
      *
      * This behavior is triggered by method {@link #handleThreat(Pedestrian, Stimulus)}.
      */
-    private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
-        List<Pedestrian> threatenedPedestrians = TopographyHelper.getNeighborsWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA, topography);
-        List<Pedestrian> threatenedIngroupPeds = threatenedPedestrians.stream()
+    private void imitateThreatenedNeighborIfPresent(Pedestrian pedestrian) {
+        List<Pedestrian> threatenedNeighbors = TopographyHelper.getNeighborsWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA, topography);
+        List<Pedestrian> threatenedIngroupNeighbors = threatenedNeighbors.stream()
                 .filter(ped -> ped.getGroupMembership() == GroupMembership.IN_GROUP)
                 .collect(Collectors.toList());
 
-        if (threatenedIngroupPeds.isEmpty() == false) {
-            Pedestrian threatenedPedestrian = threatenedIngroupPeds.get(0);
-            Threat latestThreat = threatenedPedestrian.getThreatMemory().getLatestThreat();
+        if (threatenedIngroupNeighbors.isEmpty() == false) {
+            Pedestrian threatenedNeighbor = threatenedIngroupNeighbors.get(0);
+            Threat latestThreat = threatenedNeighbor.getThreatMemory().getLatestThreat();
 
             assert latestThreat != null;
 
