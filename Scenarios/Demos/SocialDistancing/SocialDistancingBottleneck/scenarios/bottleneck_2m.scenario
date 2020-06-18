@@ -25,7 +25,7 @@
       "processors" : [ 6 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "cont__1_0m.txt",
+      "filename" : "cont__1_75m.txt",
       "processors" : [ 7 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
@@ -35,6 +35,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
       "filename" : "cont__2_0m.txt",
       "processors" : [ 8 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "cont__2_25m.txt",
+      "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "cont__1_25m.txt",
+      "processors" : [ 10 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -70,7 +78,7 @@
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
       "attributes" : {
-        "maxDistanceForANearbyPedestrian" : 1.0,
+        "maxDistanceForANearbyPedestrian" : 1.75,
         "sampleEveryNthStep" : 1,
         "allowedAbsenceTimestepsIfContactReturns" : 0,
         "minTimespanOfContactTimesteps" : 1
@@ -81,6 +89,26 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
       "attributes" : {
         "maxDistanceForANearbyPedestrian" : 2.0,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 2.25,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.25,
         "sampleEveryNthStep" : 1,
         "allowedAbsenceTimestepsIfContactReturns" : 0,
         "minTimespanOfContactTimesteps" : 1
