@@ -1,12 +1,8 @@
-package org.vadere.simulator.control.psychology.perception;
+package org.vadere.simulator.control.psychology.perception.helper;
 
-import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.models.SubModelBuilder;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.util.reflection.DynamicClassInstantiator;
-
-import java.util.Random;
 
 /**
  * This class encapsulates the creation of a concrete {@link IPerceptionModel}

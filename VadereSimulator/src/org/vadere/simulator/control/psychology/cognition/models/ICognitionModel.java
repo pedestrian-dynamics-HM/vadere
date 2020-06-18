@@ -1,4 +1,4 @@
-package org.vadere.simulator.control.psychology.cognition;
+package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.state.psychology.cognition.SelfCategory;

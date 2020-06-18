@@ -1,10 +1,9 @@
-package org.vadere.simulator.control.psychology.cognition;
+package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTargetScripted;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 import java.util.LinkedList;

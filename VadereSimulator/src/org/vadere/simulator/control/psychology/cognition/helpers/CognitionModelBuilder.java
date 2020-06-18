@@ -1,5 +1,6 @@
-package org.vadere.simulator.control.psychology.cognition;
+package org.vadere.simulator.control.psychology.cognition.helper;
 
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
