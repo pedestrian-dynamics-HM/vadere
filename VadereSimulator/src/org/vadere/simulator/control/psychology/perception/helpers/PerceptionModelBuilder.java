@@ -1,4 +1,4 @@
-package org.vadere.simulator.control.psychology.perception.helper;
+package org.vadere.simulator.control.psychology.perception.helpers;
 
 import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;

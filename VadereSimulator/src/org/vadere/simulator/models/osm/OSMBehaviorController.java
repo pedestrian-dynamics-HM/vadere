@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
-import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
@@ -24,8 +24,6 @@ import org.vadere.util.logging.Logger;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
@@ -298,7 +296,7 @@ public class OSMBehaviorController {
         if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
 
             ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
-            Target closestTarget = findClosestTarget(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
+            Target closestTarget = TopographyHelper.findClosestTargetToSource(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
 
             assert closestTarget != null;
 
@@ -308,21 +306,6 @@ public class OSMBehaviorController {
 
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
         }
-    }
-
-    private Target findClosestTarget(Topography topography, ScenarioElement scenarioElement, Threat threat) {
-        VPoint sourceCentroid = scenarioElement.getShape().getCentroid();
-
-        List<Target> sortedTargets = topography.getTargets().stream()
-                .filter(target -> target.getId() != threat.getOriginAsTargetId())
-                .sorted((target1, target2) -> Double.compare(
-                        sourceCentroid.distance(target1.getShape().getCentroid()),
-                        sourceCentroid.distance(target2.getShape().getCentroid())))
-                .collect(Collectors.toList());
-
-        Target closestTarget = (sortedTargets.isEmpty()) ? null : sortedTargets.get(0);
-
-        return closestTarget;
     }
 
     public void changeTarget(PedestrianOSM pedestrian, Topography topography) {
@@ -349,19 +332,13 @@ public class OSMBehaviorController {
             return null;
         }
 
-        List<Pedestrian> closestPedestrians = getClosestPedestriansWhichAreCloserToTarget(pedestrian, topography);
+        List<Pedestrian> closestPedestrians = TopographyHelper.getNeighborsCloserToTarget(pedestrian, topography);
 
         if (closestPedestrians.size() > 0) {
             for (Pedestrian closestPedestrian : closestPedestrians) {
                 if (closestPedestrian.hasNextTarget()) {
                     boolean closestPedIsCooperative = closestPedestrian.getSelfCategory() == SelfCategory.COOPERATIVE;
-                    boolean walkingDirectionDiffers = false;
-
-                    double angleInRadian = calculateAngleBetweenWalkingDirections(pedestrian, closestPedestrian, topography);
-
-                    if (angleInRadian == -1 || Math.toDegrees(angleInRadian) > pedestrian.getAttributes().getWalkingDirectionSameIfAngleLessOrEqual()) {
-                        walkingDirectionDiffers = true;
-                    }
+                    boolean walkingDirectionDiffers = TopographyHelper.walkingDirectionDiffers(pedestrian, closestPedestrian, topography);
 
                     if (closestPedIsCooperative && walkingDirectionDiffers) {
                         return (PedestrianOSM)closestPedestrian;
@@ -373,122 +350,6 @@ public class OSMBehaviorController {
         }
 
         return null;
-    }
-
-    @NotNull
-    private List<Pedestrian> getClosestPedestriansWhichAreCloserToTarget(PedestrianOSM pedestrian, Topography topography) {
-        VPoint positionOfPedestrian = pedestrian.getPosition();
-
-        List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
-                .getObjects(positionOfPedestrian, pedestrian.getAttributes().getSearchRadius());
-
-        // Filter out "me" and pedestrians which are further away from target than "me".
-        closestPedestrians = closestPedestrians.stream()
-                .filter(candidate -> pedestrian.getId() != candidate.getId())
-                .filter(candidate -> pedestrian.getTargetPotential(candidate.getPosition()) < pedestrian.getTargetPotential(pedestrian.getPosition()))
-                .collect(Collectors.toList());
-
-        // Sort by distance away from "me".
-        closestPedestrians = closestPedestrians.stream()
-                .sorted((pedestrian1, pedestrian2) ->
-                        Double.compare(
-                                positionOfPedestrian.distance(pedestrian1.getPosition()),
-                                positionOfPedestrian.distance(pedestrian2.getPosition())
-                        ))
-                .collect(Collectors.toList());
-
-        return closestPedestrians;
-    }
-
-    private double calculateAngleBetweenWalkingDirections(PedestrianOSM pedestrian1, Pedestrian pedestrian2, Topography topography) {
-        double angleInRadian = -1;
-
-        switch (pedestrian1.getAttributes().getWalkingDirectionCalculation()) {
-            case BY_GRADIENT:
-                angleInRadian = calculateAngleBetweenTargetGradients(pedestrian1, (PedestrianOSM)pedestrian2);
-                break;
-            case BY_TARGET_CENTER:
-            case BY_TARGET_CLOSEST_POINT:
-                angleInRadian = calculateAngleBetweenTargets(pedestrian1, pedestrian2, topography);
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("Unsupported calculation type: \"%s\"",
-                        pedestrian1.getAttributes().getWalkingDirectionCalculation()));
-        }
-
-        return angleInRadian;
-    }
-
-    public double calculateAngleBetweenTargetGradients(PedestrianOSM pedestrian1, PedestrianOSM pedestrian2) {
-        double angleInRadian = -1;
-
-        Vector2D targetGradientPedestrian1 = pedestrian1.getTargetGradient(pedestrian1.getPosition());
-        Vector2D targetGradientPedestrian2 = pedestrian2.getTargetGradient(pedestrian2.getPosition());
-
-        double dotProduct = targetGradientPedestrian1.dotProduct(targetGradientPedestrian2);
-        double multipliedMagnitudes = targetGradientPedestrian1.distanceToOrigin() * targetGradientPedestrian2.distanceToOrigin();
-
-        angleInRadian = Math.acos(dotProduct / multipliedMagnitudes);
-
-        return angleInRadian;
-    }
-
-    /**
-     * Calculate the angle3D between the two vectors v1 and v2 where
-     * v1 = (TargetPedestrian1 - pedestrian1) and v2 = (TargetPedestrian2 - pedestrian2):
-     *
-     * <pre>
-     *     T2 o   o T1
-     *        ^   ^
-     *         \a/
-     *          x
-     *         / \
-     *     P1 o   o P2
-     *
-     *     T1: target of pedestrian 1
-     *     T2: target of pedestrian 2
-     *     P1: pedestrian 1
-     *     P2: pedestrian 2
-     *     a : angle3D between the two vectors
-     * </pre>
-     *
-     * This is required to decide if pedestrian1 and pedestrian2 can be swapped because they have different walking
-     * directions.
-     *
-     * @return An angle3D between 0 and <i>pi</i> radian or -1 if at least one of the given pedestrians has no target.
-     */
-    public double calculateAngleBetweenTargets(Pedestrian pedestrian1, Pedestrian pedestrian2, Topography topography) {
-        double angleInRadian = -1;
-
-        if (pedestrian1.hasNextTarget() && pedestrian2.hasNextTarget()) {
-            Target targetPed1 = topography.getTarget(pedestrian1.getNextTargetId());
-            Target targetPed2 = topography.getTarget(pedestrian2.getNextTargetId());
-
-            VPoint targetVectorPed1 = calculateVectorPedestrianToTarget(pedestrian1, targetPed1);
-            VPoint targetVectorPed2 = calculateVectorPedestrianToTarget(pedestrian2, targetPed2);
-
-            double dotProduct = targetVectorPed1.dotProduct(targetVectorPed2);
-            double multipliedMagnitudes = targetVectorPed1.distanceToOrigin() * targetVectorPed2.distanceToOrigin();
-
-            angleInRadian = Math.acos(dotProduct / multipliedMagnitudes);
-        }
-
-        return angleInRadian;
-    }
-
-    private VPoint calculateVectorPedestrianToTarget(Pedestrian pedestrian, Target target) {
-        VPoint vectorPedestrianToTarget = null;
-
-        if (pedestrian.getAttributes().getWalkingDirectionCalculation() == AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CENTER) {
-            vectorPedestrianToTarget = target.getShape().getCentroid().subtract(pedestrian.getPosition());
-        } else if (pedestrian.getAttributes().getWalkingDirectionCalculation() == AttributesAgent.WalkingDirectionCalculation.BY_TARGET_CLOSEST_POINT) {
-            VPoint closestTargetPoint = target.getShape().closestPoint(pedestrian.getPosition());
-            vectorPedestrianToTarget = closestTargetPoint.subtract(pedestrian.getPosition());
-        } else {
-            throw new IllegalArgumentException(String.format("Unsupported angle3D calculation type: \"%s\"", pedestrian.getAttributes().getWalkingDirectionCalculation()));
-        }
-
-        return vectorPedestrianToTarget;
     }
 
     /**

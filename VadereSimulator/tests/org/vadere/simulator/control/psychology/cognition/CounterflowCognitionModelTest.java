@@ -179,20 +179,4 @@ public class CounterflowCognitionModelTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void updateThrowsExceptionIfInvalidAngleCalculationTypeIsChosen() {
-        boolean usePedIdAsTargetId = true;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
-
-        pedestrians.get(0).getAttributes().setWalkingDirectionCalculation(AttributesAgent.WalkingDirectionCalculation.BY_GRADIENT);
-        movePedestrian(pedestrians.get(0), new VPoint(2.5,0), topography);
-        movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
-
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
-
-        counterflowCognitionModel.update(pedestrians);
-    }
-
 }
