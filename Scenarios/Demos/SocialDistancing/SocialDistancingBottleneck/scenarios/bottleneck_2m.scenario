@@ -33,7 +33,7 @@
       "processors" : [ 6 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "conts__2_0m.txt",
+      "filename" : "cont__2_0m.txt",
       "processors" : [ 8 ]
     } ],
     "processors" : [ {
