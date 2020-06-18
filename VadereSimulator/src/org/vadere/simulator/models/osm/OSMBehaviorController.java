@@ -185,6 +185,8 @@ public class OSMBehaviorController {
         //   Other evading agents could follow the foremost evading agent by imitating SelfCategory.EVADE.
         // TODO Use pedestrian.updateNextPosition(reachableArea) only and do not set position hard
         //   to avoid zig-zag trajectories.
+        // TODO If evasion region is outside topography, use smaller rotation angle (< 45° deg)
+        //   to force that agents evade only once and then keep their lane.
         if (topographyContainsReachableArea(topography, reachableArea)) {
             pedestrian.setNextPosition(reachableArea.getCentroid());
         } else {
