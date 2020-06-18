@@ -1,5 +1,6 @@
-package org.vadere.simulator.control.psychology.cognition;
+package org.vadere.simulator.control.psychology.cognition.models;
 
+import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -7,7 +8,6 @@ import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
@@ -59,7 +59,7 @@ public class ThreatCognitionModel implements ICognitionModel {
 
         // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
         // so that agents directly search a safe zone if they are blocked by a wall.
-        if (pedestrianIsBlockedByObstacle(pedestrian, topography)) {
+        if (TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography)) {
             pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
         }
     }
@@ -88,7 +88,7 @@ public class ThreatCognitionModel implements ICognitionModel {
             if (pedestrian.getGroupMembership() == GroupMembership.OUT_GROUP) {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             } else if (pedestrian.getGroupMembership() == GroupMembership.IN_GROUP) {
-                imitateThreatenedPedestrianIfPresent(pedestrian);
+                imitateThreatenedNeighborIfPresent(pedestrian);
             } else {
                 throw new IllegalArgumentException("Can only process \"IN_GROUP\" and \"OUT_GROUP\" group membership!");
             }
@@ -100,7 +100,7 @@ public class ThreatCognitionModel implements ICognitionModel {
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
         boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
-        boolean pedestrianIsBlockedByObstacle = pedestrianIsBlockedByObstacle(pedestrian, topography);
+        boolean pedestrianIsBlockedByObstacle = TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography);
 
         // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
         // so that agents directly search a safe zone if they are blocked by a wall.
@@ -109,28 +109,6 @@ public class ThreatCognitionModel implements ICognitionModel {
         } else {
             pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
         }
-    }
-
-    // TODO Write unit tests!
-    private boolean pedestrianIsBlockedByObstacle(Pedestrian pedestrian, Topography topography) {
-        boolean isBlocked = false;
-
-        int requiredFootSteps = 2;
-        double requiredSpeedToBeBlocked = 0.05;
-        double requiredDistanceToObstacle = 1.0;
-
-        FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
-
-        if (footstepHistory.size() >= requiredFootSteps) {
-            if (footstepHistory.getAverageSpeedInMeterPerSecond() <= requiredSpeedToBeBlocked) {
-                // Watch out: This is probably a very expensive call but Gerta suggests to include it to get a realistic behavior!
-                if (topography.distanceToObstacle(pedestrian.getPosition()) <= requiredDistanceToObstacle) {
-                    isBlocked = true;
-                }
-            }
-        }
-
-        return  isBlocked;
     }
 
 
@@ -146,15 +124,15 @@ public class ThreatCognitionModel implements ICognitionModel {
      *
      * This behavior is triggered by method {@link #handleThreat(Pedestrian, Stimulus)}.
      */
-    private void imitateThreatenedPedestrianIfPresent(Pedestrian pedestrian) {
-        List<Pedestrian> threatenedPedestrians = getClosestPedestriansWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA);
-        List<Pedestrian> threatenedIngroupPeds = threatenedPedestrians.stream()
+    private void imitateThreatenedNeighborIfPresent(Pedestrian pedestrian) {
+        List<Pedestrian> threatenedNeighbors = TopographyHelper.getNeighborsWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA, topography);
+        List<Pedestrian> threatenedIngroupNeighbors = threatenedNeighbors.stream()
                 .filter(ped -> ped.getGroupMembership() == GroupMembership.IN_GROUP)
                 .collect(Collectors.toList());
 
-        if (threatenedIngroupPeds.isEmpty() == false) {
-            Pedestrian threatenedPedestrian = threatenedIngroupPeds.get(0);
-            Threat latestThreat = threatenedPedestrian.getThreatMemory().getLatestThreat();
+        if (threatenedIngroupNeighbors.isEmpty() == false) {
+            Pedestrian threatenedNeighbor = threatenedIngroupNeighbors.get(0);
+            Threat latestThreat = threatenedNeighbor.getThreatMemory().getLatestThreat();
 
             assert latestThreat != null;
 
@@ -164,27 +142,4 @@ public class ThreatCognitionModel implements ICognitionModel {
         }
     }
 
-    private List<Pedestrian> getClosestPedestriansWithSelfCategory(Pedestrian pedestrian, SelfCategory expectedSelfCategory) {
-        VPoint positionOfPedestrian = pedestrian.getPosition();
-
-        List<Pedestrian> closestPedestrians = topography.getSpatialMap(Pedestrian.class)
-                .getObjects(positionOfPedestrian, pedestrian.getAttributes().getSearchRadius());
-
-        // Filter out "me" and pedestrians with unexpected "selfCategory".
-        closestPedestrians = closestPedestrians.stream()
-                .filter(candidate -> pedestrian.getId() != candidate.getId())
-                .filter(candidate -> candidate.getSelfCategory() == expectedSelfCategory)
-                .collect(Collectors.toList());
-
-        // Sort by distance away from "me".
-        closestPedestrians = closestPedestrians.stream()
-                .sorted((pedestrian1, pedestrian2) ->
-                        Double.compare(
-                                positionOfPedestrian.distance(pedestrian1.getPosition()),
-                                positionOfPedestrian.distance(pedestrian2.getPosition())
-                        ))
-                .collect(Collectors.toList());
-
-        return closestPedestrians;
-    }
 }

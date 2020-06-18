@@ -1,4 +1,4 @@
-package org.vadere.simulator.control.psychology.perception;
+package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;

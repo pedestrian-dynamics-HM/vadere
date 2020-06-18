@@ -19,5 +19,6 @@ public enum SelfCategory {
     INSIDE_THREAT_AREA,
     OUTSIDE_THREAT_AREA,
     WAIT,
-    CHANGE_TARGET
+    CHANGE_TARGET,
+    EVADE
 }

@@ -8,5 +8,6 @@ package org.vadere.simulator.models.potential.combinedPotentials;
  */
 public enum CombinedPotentialStrategy {
     TARGET_ATTRACTION_STRATEGY,
+    TARGET_ATTRACTION_AND_EVASION_STRATEGY,
     TARGET_REPULSION_STRATEGY
 }
