@@ -174,7 +174,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 85.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -182,7 +182,7 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 780837923490862686,
+      "fixedSeed" : 780837923490862685,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
@@ -207,9 +207,9 @@
       "obstacles" : [ {
         "shape" : {
           "x" : 3.0,
-          "y" : 11.0,
-          "width" : 5.0,
-          "height" : 9.5,
+          "y" : 11.1,
+          "width" : 6.0,
+          "height" : 9.4,
           "type" : "RECTANGLE"
         },
         "id" : 1
@@ -217,8 +217,8 @@
         "shape" : {
           "x" : 3.0,
           "y" : 0.5,
-          "width" : 5.0,
-          "height" : 9.5,
+          "width" : 6.0,
+          "height" : 9.4,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -248,9 +248,9 @@
       "sources" : [ {
         "id" : 3,
         "shape" : {
-          "x" : 20.0,
+          "x" : 43.5,
           "y" : 0.5,
-          "width" : 20.0,
+          "width" : 21.0,
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
