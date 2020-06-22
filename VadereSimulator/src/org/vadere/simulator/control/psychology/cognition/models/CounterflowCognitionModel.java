@@ -12,8 +12,7 @@ import java.util.Collection;
  * counter-flowing agents are detected. The locomotion layer must implemenet
  * the specific evasion behavior (e.g. tangentially).
  *
- * TODO: Maybe, combine this behavior also with {@link SelfCategory#COOPERATIVE} to avoid
- *   jams.
+ * Note: Maybe, combine this behavior also with {@link SelfCategory#COOPERATIVE} to avoid jams.
  */
 public class CounterflowCognitionModel implements ICognitionModel {
 

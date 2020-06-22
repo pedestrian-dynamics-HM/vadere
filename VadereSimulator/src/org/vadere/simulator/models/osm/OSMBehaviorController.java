@@ -174,26 +174,45 @@ public class OSMBehaviorController {
      * @param timeStepInSec The current simulation time in second
      */
     public void evade(PedestrianOSM pedestrian, Topography topography, double timeStepInSec) {
-        pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_AND_EVASION_STRATEGY);
+        // pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_AND_EVASION_STRATEGY);
 
         boolean evadeRight = evasionDirectionDistribution.sample() == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE;
-        VShape reachableArea = createCircularReachableAreaInEvasionDirection(pedestrian, evadeRight);
+        VShape reachableArea = createCircularReachableAreaInEvasionDirectionByTargetCentroid(pedestrian, evadeRight, topography);
 
-        // TODO Only the colliding agents could evade tangentially.
-        //   Other evading agents could follow the foremost evading agent by imitating SelfCategory.EVADE.
         // TODO Use pedestrian.updateNextPosition(reachableArea) only and do not set position hard
         //   to avoid zig-zag trajectories.
         // TODO If evasion region is outside topography, use smaller rotation angle (< 45° deg)
         //   to force that agents evade only once and then keep their lane.
+        /*
         if (topographyContainsReachableArea(topography, reachableArea)) {
             pedestrian.setNextPosition(reachableArea.getCentroid());
         } else {
+
+         */
             pedestrian.updateNextPosition(reachableArea);
-        }
+        // }
         makeStep(pedestrian, topography, pedestrian.getDurationNextStep());
         pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 
-        pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
+        // pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
+    }
+
+    public VShape createCircularReachableAreaInEvasionDirectionByTargetCentroid(PedestrianOSM pedestrian, boolean evadeRight, Topography topography) {
+        VPoint nextPosition = pedestrian.getPosition();
+
+        if (pedestrian.hasNextTarget()) {
+            Target currentTarget = topography.getTarget(pedestrian.getNextTargetId());
+
+            VPoint vectorToTarget = TopographyHelper.calculateVectorPedestrianToTarget(pedestrian, currentTarget);
+            double evasionAngleRad = (evadeRight) ? -Math.toRadians(45) : +Math.toRadians(45);
+            VPoint nextWalkingDirection = vectorToTarget.rotate(evasionAngleRad);
+
+            VPoint nextPositionNormedToZero = nextWalkingDirection.norm().scalarMultiply(pedestrian.getDesiredStepSize());
+            nextPosition = nextPositionNormedToZero.add(pedestrian.getPosition());
+        }
+
+        VCircle reachableArea = new VCircle(nextPosition, pedestrian.getRadius() * 1.5);
+        return reachableArea;
     }
 
     public VShape createCircularReachableAreaInEvasionDirection(PedestrianOSM pedestrian, boolean evadeRight) {
