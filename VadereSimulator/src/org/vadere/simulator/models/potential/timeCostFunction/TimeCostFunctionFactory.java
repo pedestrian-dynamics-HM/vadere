@@ -170,7 +170,7 @@ public class TimeCostFunctionFactory {
 						p -> -topography.distanceToObstacle(p)
 				);
 
-				TimeCostPedestrianDensityMesh<V, E, F> timeCostPedestrianDensityMesh = new TimeCostPedestrianDensityMesh<>(
+				TimeCostGaussianPedestrianDensityMesh<V, E, F> timeCostPedestrianDensityMesh = new TimeCostGaussianPedestrianDensityMesh<>(
 						timeCostObstacleDensity,
 						triangulation,
 						loadingStrategy,

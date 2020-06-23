@@ -226,16 +226,18 @@ public class GeometryUtils {
 	 * @return the circumcenter of a triangle
 	 */
 	public static VPoint getCircumcenter(@NotNull final IPoint p1, @NotNull final IPoint p2, @NotNull final IPoint p3) {
-
 		assert !p1.equals(p2) && !p1.equals(p3) && !p2.equals(p3);
+		return getCircumcenter(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
+	}
 
-		double d = 2 * (p1.getX() * (p2.getY() - p3.getY()) + p2.getX() * (p3.getY() - p1.getY()) + p3.getX() * (p1.getY() - p2.getY()));
-		double x = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p2.getY() - p3.getY())
-				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p3.getY() - p1.getY())
-				+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p1.getY() - p2.getY())) / d;
-		double y = ((p1.getX() * p1.getX() + p1.getY() * p1.getY()) * (p3.getX() - p2.getX())
-				+ (p2.getX() * p2.getX() + p2.getY() * p2.getY()) * (p1.getX() - p3.getX())
-				+ (p3.getX() * p3.getX() + p3.getY() * p3.getY()) * (p2.getX() - p1.getX())) / d;
+	public static VPoint getCircumcenter(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
+		double d = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+		double x = ((x1 * x1 + y1 * y1) * (y2 - y3)
+				+ (x2 * x2 + y2 * y2) * (y3 - y1)
+				+ (x3 * x3 + y3 * y3) * (y1 - y2)) / d;
+		double y = ((x1 * x1 + y1 * y1) * (x3 - x2)
+				+ (x2 * x2 + y2 * y2) * (x1 - x3)
+				+ (x3 * x3 + y3 * y3) * (x2 - x1)) / d;
 
 		return new VPoint(x,y);
 	}
@@ -1153,6 +1155,11 @@ public class GeometryUtils {
 		}
 		return result / 2.0;
 	}
+
+	public static double areaOfTriangle(@NotNull final double x1, double y1, double x2, double y2, double x3, double y3){
+		return Math.abs(x1 * (y2 - y3) - x2 * (y1 - y3) + x3 * (y1 - y2));
+	}
+
 
 	public static double areaOfPolygon(@NotNull final double x[], @NotNull final double y[]){
 		return Math.abs(signedAreaOfPolygon(x, y));

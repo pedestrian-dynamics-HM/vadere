@@ -24,12 +24,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class Curvature {
 
 	public static void main(String ... args) throws IOException, InterruptedException {
-		adaptoveEikonalSolver();
+		interativeEikonalSolver();
 	}
 
 	public static void interativeEikonalSolver() throws InterruptedException, IOException {
@@ -81,14 +84,24 @@ public class Curvature {
 		panel.repaint();
 
 		var tri = improver.getTriangulation();
-		for(int i = 0; i < 8; i++) {
+		for(int i = 0; i < 4; i++) {
+
+			var curTri = tri;
+			List<PVertex> list = tri.getMesh().getBoundaryVertices();
+			Set<PVertex> initialVertices = new HashSet<>();
+			initialVertices.addAll(list);
+			list.stream().forEach(v -> curTri.getMesh().getAdjacentVertexIt(v).forEach(u -> initialVertices.add(u)));
+
+			Set<PVertex> initialVertices2 = new HashSet<>();
+			initialVertices.stream().forEach(v -> curTri.getMesh().getAdjacentVertexIt(v).forEach(u -> initialVertices2.add(u)));
+			initialVertices2.addAll(initialVertices);
 
 			var solver = new MeshEikonalSolverFMM<>(
 					p -> 1,
 					//Arrays.asList(new VPoint(5, 5)),
 					tri,
-					tri.getMesh().getBoundaryVertices(),
-					p -> -distanceFunction.apply(p));
+					initialVertices2,
+					p -> Math.abs(distanceFunction.apply(p)));
 			solver.solve();
 			System.out.println(solver.getPotential(5,5));
 			meshWriter.write(tri.getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
@@ -107,7 +120,7 @@ public class Curvature {
 			}
 			System.out.println(maxCurvature);
 
-			final double minEdgeLen = 0.025;
+			final double minEdgeLen = 0.1;
 			final var pTri = tri;
 			Predicate<PHalfEdge> edgePredicate = e -> {
 				VLine line = pTri.getMesh().toLine(e);
@@ -121,7 +134,7 @@ public class Curvature {
 				pTri.getTriPoints(face, x, y, z, "curvature");
 				double totalArea = GeometryUtils.areaOfPolygon(x, y);
 				double curvature = InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
-				return len > minEdgeLen && curvature > 0.01;
+				return len > minEdgeLen && curvature > 0.25;
 			};
 
 			var triangulation = new IncrementalTriangulation<>(tri.getMesh().clone(), e -> true);
@@ -202,7 +215,7 @@ public class Curvature {
 				//Arrays.asList(new VPoint(5, 5)),
 				improver.getTriangulation(),
 				improver.getTriangulation().getMesh().getBoundaryVertices(),
-				p -> -distanceFunction.apply(p));
+				p -> Math.abs(distanceFunction.apply(p)));
 		solver.solve();
 		meshWriter.write(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 		meshWriter.close();

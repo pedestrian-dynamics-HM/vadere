@@ -106,6 +106,62 @@ public class GeometryUtilsMesh {
 		return new double[]{curvature, gaussianCurvature};
 	}
 
+	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> double[] curvature(@NotNull final IMesh<V, E, F> mesh,
+	                                                                                           @NotNull final Function<V, Double> f,
+	                                                                                           @NotNull final Predicate<V> valid,
+	                                                                                           @NotNull final E edge) {
+		double alpha = 0;
+		double beta = 0;
+		V v = mesh.getVertex(edge);
+		if(valid.test(v)) {
+			double vx = mesh.getX(v);
+			double vy = mesh.getY(v);
+			double vz = f.apply(v);
+
+			if(!mesh.isAtBoundary(edge)) {
+				V vi = mesh.getTwinVertex(edge);
+				V vj = mesh.getTwinVertex(mesh.getTwin(mesh.getNext(edge)));
+				V vk = mesh.getTwinVertex(mesh.getPrev(mesh.getTwin(edge)));
+
+				double vix = mesh.getX(vi);
+				double viy = mesh.getY(vi);
+				double viz = f.apply(vi);
+
+				double vjx = mesh.getX(vj);
+				double vjy = mesh.getY(vj);
+				double vjz = f.apply(vj);
+
+				if(valid.test(vi) && valid.test(vj) && valid.test(vk)) {
+					double eix = vix - vx;
+					double eiy = viy - vy;
+					double eiz = viz - vz;
+
+					double ejx = vjx - vx;
+					double ejy = vjy - vy;
+					double ejz = vjz - vz;
+
+					double ekx = mesh.getX(vk) - vx;
+					double eky = mesh.getY(vk) - vy;
+					double ekz = f.apply(vk) - vz;
+
+					alpha = GeometryUtils.angle3D(eix, eiy, eiz, ejx, ejy, ejz);
+					double[] ni = new double[]{ 0, 0, 0 };
+					double[] nk = new double[]{ 0, 0, 0 };
+
+					GeometryUtils.cross(new double[]{ eix, eiy, eiz}, new double[]{ ejx, ejy, ejz}, ni);
+					GeometryUtils.cross(new double[]{ ekx, eky, ekz }, new double[]{ eix, eiy, eiz}, nk);
+					GeometryUtils.norm3D(ni);
+					GeometryUtils.norm3D(nk);
+
+					double betai = GeometryUtils.angle3D(nk[0], nk[1], nk[2], ni[0], ni[1], ni[2]);
+					beta = Math.sqrt(eix * eix + eiy * eiy) * betai;
+				}
+			}
+		}
+
+		return new double[]{alpha, beta};
+	}
+
 	/*
 	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> double[] curvature(
 			@NotNull final IMesh<V, E, F> mesh,

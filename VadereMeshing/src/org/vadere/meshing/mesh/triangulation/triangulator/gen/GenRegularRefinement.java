@@ -96,10 +96,10 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		//this.edgeRefinementPredicate = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
 		//this.edgeAddToRefine = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
 
-		VPoint p = new VPoint(5,5);
+		//VPoint p = new VPoint(5,5);
 
-		this.edgeRefinementPredicate = e -> !getMesh().isBoundary(e) && getMesh().toTriangle(getMesh().getFace(e)).midPoint().distance(p) < 3.0 && (!isGreen(e) || getMesh().toLine(e).length() > 0.5);
-
+		//this.edgeRefinementPredicate = e -> !getMesh().isBoundary(e) && getMesh().toTriangle(getMesh().getFace(e)).midPoint().distance(p) < 3.0 && (!isGreen(e) || getMesh().toLine(e).length() > 0.5);
+		this.edgeRefinementPredicate = e -> getLevel(e) == (maxLevel-1) && (edgeRefinementPredicate.test(e));
 		this.finished = false;
 		this.coarse = false;
 		this.toRefine = new LinkedList<>();

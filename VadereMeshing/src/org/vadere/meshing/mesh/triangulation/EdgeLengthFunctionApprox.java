@@ -45,6 +45,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
 		triangulation = ruppertsTriangulator.generate();
+		triangulation.enableCache();
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
 		triangulation.setCanIllegalPredicate(e -> true);

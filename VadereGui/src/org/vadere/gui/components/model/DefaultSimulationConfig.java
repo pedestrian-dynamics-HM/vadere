@@ -21,6 +21,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private double densityStandardDerivation = CONFIG.getDouble("Density.standardDeviation");
 	private double pedestrianTorso = CONFIG.getDouble("Pedestrian.radius") * 2;
 
+	private boolean recording = false;
 	private boolean interpolatePositions = true;
 	private boolean showPedestrianIds = false;
 	private boolean showPedestrianInOutGroup = false;
@@ -377,4 +378,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
+	public void setRecording(boolean recording) {
+		this.recording = recording;
+	}
+
+	public boolean isRecording() {
+		return recording;
+	}
 }

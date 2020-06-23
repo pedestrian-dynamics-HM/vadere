@@ -13,6 +13,7 @@ import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -28,6 +29,7 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 	private IIncrementalTriangulation<V, E, F> triangulation;
 
 	private static final String propName = "distObs";
+	private IVertexContainerDouble<V, E, F> distances;
 
 	public DistanceFunctionApproxBF(
 			@NotNull final IMesh<V, E, F> mesh,
@@ -36,14 +38,14 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 		this.triangulation = new IncrementalTriangulation<>(mesh);
 		this.triangulation.enableCache();
 		//TODO: maybe transform into an immutable triangulation / mesh!
-		triangulation.setCanIllegalPredicate(e -> true);
-
+		this.triangulation.setCanIllegalPredicate(e -> true);
+		this.distances = triangulation.getMesh().getDoubleVertexContainer(propName);
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
 
 		for(var v : vertices) {
 			double distance = exactDistanceFunc.apply(v);
-			triangulation.getMesh().setDoubleData(v, propName, distance);
+			this.distances.setValue(v, distance);
 		}
 	}
 
@@ -60,18 +62,19 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 		PSLG boundedPSLG = pslg.conclose(bound);
 
 		var ruppertsTriangulator = new GenRuppertsTriangulator<V, E, F>(meshSupplier, boundedPSLG,10, circumRadiusFunc, false, false);
-		triangulation = ruppertsTriangulator.generate();
-		triangulation.enableCache();
+		this.triangulation = ruppertsTriangulator.generate();
+		this.triangulation.enableCache();
+		this.distances = triangulation.getMesh().getDoubleVertexContainer(propName);
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
-		triangulation.setCanIllegalPredicate(e -> true);
+		this.triangulation.setCanIllegalPredicate(e -> true);
 
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
 
 		for(var v : vertices) {
 			double distance = exactDistanceFunc.apply(v);
-			triangulation.getMesh().setDoubleData(v, propName, distance);
+			this.triangulation.getMesh().setDoubleData(v, propName, distance);
 		}
 	}
 
@@ -108,7 +111,39 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 		return apply(p, face);
 	}
 
+	private IMesh<V, E, F> getMesh() {
+		return triangulation.getMesh();
+	}
+
 	private double apply(@NotNull final IPoint p, @NotNull final F face) {
+		var mesh = triangulation.getMesh();
+
+		if(mesh.isBoundary(face)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		else {
+			E edge = getMesh().getEdge(face);
+			V v = getMesh().getVertex(edge);
+			double x1 = getMesh().getX(v);
+			double y1 = getMesh().getY(v);
+			double val1 = distances.getValue(v);
+
+			v = getMesh().getVertex(getMesh().getNext(edge));
+			double x2 = getMesh().getX(v);
+			double y2 = getMesh().getY(v);
+			double val2 = distances.getValue(v);
+
+			v = getMesh().getVertex(getMesh().getPrev(edge));
+			double x3 = getMesh().getX(v);
+			double y3 = getMesh().getY(v);
+			double val3 = distances.getValue(v);
+
+			double totalArea = GeometryUtils.areaOfTriangle(x1, y1, x2, y2, x3, y3);
+			return InterpolationUtil.barycentricInterpolation(x1, y1, val1, x2, y2, val2, x3, y3, val3, totalArea, p.getX(), p.getY());
+		}
+	}
+
+	/*private double apply(@NotNull final IPoint p, @NotNull final F face) {
 		var mesh = triangulation.getMesh();
 
 		if(mesh.isBoundary(face)) {
@@ -118,12 +153,9 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 			double x[] = new double[3];
 			double y[] = new double[3];
 			double z[] = new double[3];
-
-			triangulation.getTriPoints(face, x, y, z, propName);
-
+			triangulation.getTriPoints(face, x, y, z, distances);
 			double totalArea = GeometryUtils.areaOfPolygon(x, y);
-
 			return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
 		}
-	}
+	}*/
 }

@@ -26,8 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.swing.*;
 
 public class ActionGenerateMesh extends AbstractAction {
-	private static Logger logger = Logger.getLogger(ActionGeneratePNG.class);
-	private static final Configuration CONFIG = VadereConfig.getConfig();
+	private static Logger logger = Logger.getLogger(ActionGenerateMesh.class);
 	private final ProjectViewModel model;
 
 	public ActionGenerateMesh(final String name, Icon icon, final ProjectViewModel model) {
@@ -54,8 +53,19 @@ public class ActionGenerateMesh extends AbstractAction {
 			logger.info("generate poly");
 
 			MeshConstructor constructor = new MeshConstructor();
-			CompletableFuture.supplyAsync(() -> constructor.pslgToAdaptivePMesh(pslg, hmin, hmax, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""));
-			CompletableFuture.supplyAsync(() -> constructor.pslgToCoarsePMesh(pslg, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,IOUtils.BACKGROUND_MESH_ENDING));
+
+			CompletableFuture.supplyAsync(
+					() -> constructor.pslgToAdaptivePMesh(pslg, hmin, hmax, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
+					.exceptionally( ex ->  {
+						ex.printStackTrace();
+						return null;
+					});
+			CompletableFuture.supplyAsync(
+					() -> constructor.pslgToCoarsePMesh(pslg, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,IOUtils.BACKGROUND_MESH_ENDING))
+					.exceptionally( ex ->  {
+						ex.printStackTrace();
+						return null;
+					});
 		}
 	}
 

@@ -6,7 +6,10 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -145,16 +149,43 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
 		for(VShape shape : targetShapes) {
+			List<V> partilyInitialVertices = new ArrayList<>();
 			getMesh().streamVertices()
 					.filter(v -> shape.contains(getMesh().toPoint(v)))
 					.forEach(v -> {
 						for(V u : getMesh().getAdjacentVertexIt(v)) {
-							initialVertices.add(u);
+							partilyInitialVertices.add(u);
 							setAsInitialVertex(u);
 						}
-						initialVertices.add(v);
+						partilyInitialVertices.add(v);
 						setAsInitialVertex(v);
 					});
+
+			// this might happen if the target is very small or the mesh is to coarse!
+			if(partilyInitialVertices.isEmpty()) {
+				VPoint centroid = shape.getCentroid();
+				if(shape.contains(centroid)) {
+					Optional<F> optFace = triangulation.locate(centroid);
+					if(optFace.isPresent()) {
+						F face = optFace.get();
+						getMesh().streamVertices(face).forEach(v -> {
+							for(V u : getMesh().getAdjacentVertexIt(v)) {
+								partilyInitialVertices.add(u);
+								setAsInitialVertex(u);
+							}
+							partilyInitialVertices.add(v);
+							setAsInitialVertex(v);
+						});
+					} else {
+						throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
+					}
+				}
+				else {
+					throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
+				}
+			}
+
+			initialVertices.addAll(partilyInitialVertices);
 		}
 
 		setInitialVertices(initialVertices, IDistanceFunction.createToTargets(targetShapes));

@@ -1953,7 +1953,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return all visited faces in a first visited first in ordered queue, i.e. <tt>LinkedList</tt>.
 	 */
 	default LinkedList<E> straightWalk2DGatherDirectional(@NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> additionalStopCondition) {
-		VPoint q = getMesh().toTriangle(face).midPoint();
+		VPoint q = getMesh().toMidpoint(face);
 		assert getMesh().toTriangle(face).contains(q);
 
 		Predicate<E> defaultStopCondion = e -> isRightOf(q.x, q.y, e);
@@ -2734,7 +2734,8 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 			 * this might happen if the line intersects a point, in this case both neighbouring edges are feasible
 			 */
 			if(inEdge == null) {
-				inEdge = getMesh().streamEdges(startFace).filter(e -> isLeftOf(p.getX(), p.getY(), e)).findAny().get();
+				Optional<E> optEdge = getMesh().streamEdges(startFace).filter(e -> isLeftOf(p.getX(), p.getY(), e)).findAny();
+				inEdge = optEdge.get();
 			}
 		}
 
@@ -3013,6 +3014,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 	default boolean contains(final double x, final double y, @NotNull final F face) {
 		if(!getMesh().isBoundary(face)) {
+			//return getMesh().toImmutableTriangle(face).contains(x, y);
 			E e1 = getMesh().getEdge(face);
 			V v1 = getMesh().getVertex(e1);
 			V v3 = getMesh().getTwinVertex(e1);
@@ -3314,6 +3316,26 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 
 	default IPoint[] getPoints(F face) {
 		return getPoints(getMesh().getEdge(face));
+	}
+
+	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, @NotNull final IVertexContainerDouble<V, E, F> distances){
+		assert x.length == y.length && y.length == z.length && x.length == 3;
+
+		E edge = getMesh().getEdge(face);
+		V v = getMesh().getVertex(edge);
+		x[0] = getMesh().getX(v);
+		y[0] = getMesh().getY(v);
+		z[0] = distances.getValue(v);
+
+		v = getMesh().getVertex(getMesh().getNext(edge));
+		x[1] = getMesh().getX(v);
+		y[1] = getMesh().getY(v);
+		z[1] = distances.getValue(v);
+
+		v = getMesh().getVertex(getMesh().getPrev(edge));
+		x[2] = getMesh().getX(v);
+		y[2] = getMesh().getY(v);
+		z[2] = distances.getValue(v);
 	}
 
 	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, @NotNull final String name){

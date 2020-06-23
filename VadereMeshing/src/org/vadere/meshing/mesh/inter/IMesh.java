@@ -545,6 +545,9 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	 * @return (optional) a boundary edge
 	 */
 	default Optional<E> getBoundaryEdge(@NotNull final V vertex) {
+		if(isBoundary(getEdge(vertex))) {
+			return Optional.of(getEdge(vertex));
+		}
 		return streamEdges(vertex).filter(e -> isBoundary(e)).findAny();
 	}
 
@@ -1358,6 +1361,24 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		List<V> vertices = getVertices(face);
 		assert vertices.size() == 3 : "number of vertices of " + face + " is " + vertices.size();
 		return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
+	}
+
+	default VPoint toMidpoint(@NotNull final F face) {
+		assert getVertices(face).size() == 3 : "number of vertices of " + face + " is " + getVertices(face).size();
+		E edge = getEdge(face);
+		V v1 = getVertex(edge);
+		V v2 = getVertex(getNext(edge));
+		V v3 = getVertex(getPrev(edge));
+		return GeometryUtils.getTriangleMidpoint(getX(v1), getY(v1), getX(v2), getY(v2), getX(v3), getY(v3));
+	}
+
+	default VPoint toCircumcenter(@NotNull final F face) {
+		assert getVertices(face).size() == 3 : "number of vertices of " + face + " is " + getVertices(face).size();
+		E edge = getEdge(face);
+		V v1 = getVertex(edge);
+		V v2 = getVertex(getNext(edge));
+		V v3 = getVertex(getPrev(edge));
+		return GeometryUtils.getCircumcenter(getX(v1), getY(v1), getX(v2), getY(v2), getX(v3), getY(v3));
 	}
 
 	/**
@@ -2361,6 +2382,17 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		mesh.setNext(xz, zy);
 	}
 
+
+	default String toPythonValues(@NotNull final Function<V, Double> evalPoint) {
+		StringBuilder builder = new StringBuilder();
+		List<V> vertices = getVertices();
+		for(V v : vertices) {
+			builder.append(evalPoint.apply(v) + ",");
+		}
+		builder.delete(builder.length()-1, builder.length());
+		builder.append("\n");
+		return builder.toString();
+	}
 
 	/**
 	 * Constructs and returns a string which can be used to construct a matplotlib Triangulation

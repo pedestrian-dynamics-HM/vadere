@@ -12,6 +12,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
@@ -20,15 +21,19 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMe
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
@@ -37,10 +42,11 @@ import java.util.function.Function;
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
-public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> implements MeshEikonalSolver<V, E, F> {
+public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> implements MeshEikonalSolver<V, E, F>, ITriEventListener<V, E, F> {
 
 	@Nullable private ITimeCostFunction timeCostFunction;
 	@Nullable private ITimeCostFunctionMesh<V> meshTimeCostFunction;
+	@Nullable IDistanceFunction distanceFunction;
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private Collection<V> initialVertices;
 
@@ -83,6 +89,8 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		}
 
 		this.triangulation = triangulation;
+		this.triangulation.removeTriEventListener(this);
+		this.triangulation.addTriEventListener(this);
 
 		// get access to containers
 		this.burned = getMesh().getBooleanVertexContainer(identifier + "_" + nameBurned);
@@ -105,6 +113,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	 */
 	public void setInitialVertices(@NotNull final Collection<V> initialVertices, @NotNull final IDistanceFunction distanceFunction) {
 		this.initialVertices = initialVertices;
+		this.distanceFunction = distanceFunction;
 		for(V v : initialVertices) {
 			double dist = distanceFunction.apply(new VPoint(getMesh().toPoint(v)));
 			setPotential(v, dist);
@@ -121,6 +130,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			}
 			setTimeCost(v);
 		});
+		initialVertices = initialVertices.stream().filter(v -> !getMesh().isDestroyed(v)).collect(Collectors.toList());
 		solved = false;
 	}
 
@@ -218,7 +228,8 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			// this might happen for vertices which are close at the initialVertex!
 			if(list.isEmpty()) {
 				//logger.warn("could not find virtual support for non-acute triangle.");
-				potential = computePotential(edge, next, prev, -1.0);
+				//potential = computePotential(edge, next, prev, -1.0);
+				//potential = computePotential(edge, next, prev, getCosPhi(edge));
 			} else {
 				DoubleArrayList cosPhis = getVirtualSupportCosPhi(edge);
 
@@ -348,7 +359,6 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			final double x,
 			final double y,
 			@Nullable final Object caller) {
-
 		Optional<F> optFace;
 		if(caller != null) {
 			optFace = triangulation.locateFace(x, y, caller);
@@ -537,5 +547,16 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	protected DoubleArrayList getVirtualSupportCosPhi(@NotNull final E edge) {
 		return virtualSupportCosPhi.getValue(edge);
+	}
+
+	@Override
+	public void postInsertEvent(@NotNull final V vertex) {
+		double dist = distanceFunction.apply(getMesh().toPoint(vertex));
+		if(distanceFunction.apply(getMesh().toPoint(vertex)) <= 0) {
+			initialVertices.add(vertex);
+			setPotential(vertex, dist);
+			setBurned(vertex);
+			setAsInitialVertex(vertex);
+		}
 	}
 }
