@@ -7,8 +7,8 @@ import zipfile
 
 import numpy as np
 import pandas as pd
-from fabric import Connection
 
+from fabric import Connection
 from suqc.configuration import SuqcConfig
 from suqc.utils.general import create_folder, str_timestamp
 
@@ -52,19 +52,27 @@ class ServerConnection(object):
             SuqcConfig.store_server_config(host, user, port)
             server_cfg = SuqcConfig.load_cfg_file()["server"]
         else:
-            host, user, port = server_cfg["host"], server_cfg["user"], server_cfg["port"]
-        print(f"INFO: Trying to connect to ssh -p {port} {user}@{host} . "
-              f"Configure at {SuqcConfig.path_suq_config_file()}")
+            host, user, port = (
+                server_cfg["host"],
+                server_cfg["user"],
+                server_cfg["port"],
+            )
+        print(
+            f"INFO: Trying to connect to ssh -p {port} {user}@{host} . "
+            f"Configure at {SuqcConfig.path_suq_config_file()}"
+        )
         return server_cfg
 
     def _connect_server(self):
 
         server_cfg = self.read_server_config()
 
-        self._con: Connection = Connection(server_cfg["host"],
-                                           user=server_cfg["user"],
-                                           port=server_cfg["port"],
-                                           config=None)
+        self._con: Connection = Connection(
+            server_cfg["host"],
+            user=server_cfg["user"],
+            port=server_cfg["port"],
+            config=None,
+        )
 
         suqc_version = self.read_terminal_stdout(ServerConnection.READ_SUQC_VERSION)
 
@@ -72,15 +80,21 @@ class ServerConnection(object):
         numpy_version = self.read_terminal_stdout(ServerConnection.READ_NUMPY_VERSION)
         pandas_version = self.read_terminal_stdout(ServerConnection.READ_PANDAS_VERSION)
 
-        if numpy_version != str(np.__version__) or pandas_version != str(pd.__version__):
-            print("WARNING: local and remote version of dependencies do not match. "
-                  "This can result in incompatbility issues \n"
-                  f"(local) numpy=={np.__version__} vs. (remote) numpy=={numpy_version} \n"
-                  f"(local) pandas={pd.__version__} vs. (remote) numpy=={pandas_version}")
+        if numpy_version != str(np.__version__) or pandas_version != str(
+            pd.__version__
+        ):
+            print(
+                "WARNING: local and remote version of dependencies do not match. "
+                "This can result in incompatbility issues \n"
+                f"(local) numpy=={np.__version__} vs. (remote) numpy=={numpy_version} \n"
+                f"(local) pandas={pd.__version__} vs. (remote) pandas=={pandas_version}"
+            )
 
-        print(f"INFO: Connection established. Detected suqc=={suqc_version} on server. With dependency "
-              f"numpy=={numpy_version}, pandas={pandas_version} "
-              f"({server_cfg['host']}:{server_cfg['port']}) side.")
+        print(
+            f"INFO: Connection established. Detected suqc=={suqc_version} on server. With dependency "
+            f"numpy=={numpy_version}, pandas={pandas_version} "
+            f"({server_cfg['host']}:{server_cfg['port']}) side."
+        )
 
     def read_terminal_stdout(self, s: str) -> str:
         r = self._con.run(s)
@@ -133,10 +147,14 @@ class ServerRequest(object):
         return lpath
 
     def _default_result_pickle_path_remote(self):
-        return self._join_linux_path([self.remote_folder_path, "result.p"], is_folder=False)
+        return self._join_linux_path(
+            [self.remote_folder_path, "result.p"], is_folder=False
+        )
 
     def _default_argument_pickle_path_remote(self):
-        return self._join_linux_path([self.remote_folder_path, "arguments.p"], is_folder=False)
+        return self._join_linux_path(
+            [self.remote_folder_path, "arguments.p"], is_folder=False
+        )
 
     def _default_result_pickle_path_local(self, suitable_path):
         return os.path.join(suitable_path, "result.p")
@@ -147,14 +165,18 @@ class ServerRequest(object):
         assert self.remote_env_name is None
         assert self.remote_folder_path is None
         self.remote_env_name = "_".join(["output", str_timestamp()])
-        self.remote_folder_path = self._join_linux_path(["suqc_envs", self.remote_env_name], True)
+        self.remote_folder_path = self._join_linux_path(
+            ["suqc_envs", self.remote_env_name], True
+        )
 
     def _remote_input_folder(self):
         # input data is directly written to the remote folder
         return self.remote_folder_path
 
     def _transfer_local2remote(self, local_filepath, remove_local_file=False):
-        remote_target_path = self._join_linux_path([self.remote_folder_path, os.path.basename(local_filepath)], False)
+        remote_target_path = self._join_linux_path(
+            [self.remote_folder_path, os.path.basename(local_filepath)], False
+        )
         self.server.connection.put(local_filepath, self.remote_folder_path)
 
         if remove_local_file:
@@ -163,7 +185,9 @@ class ServerRequest(object):
         return remote_target_path
 
     def _compress_output(self):
-        compressed_filepath = self._join_linux_path([self.remote_folder_path, self.zip_filename], is_folder=False)
+        compressed_filepath = self._join_linux_path(
+            [self.remote_folder_path, self.zip_filename], is_folder=False
+        )
         s = f"""python3 -c 'import suqc; suqc.ServerRequest.zip_environment("{self.remote_folder_path}") '"""
         self.server.connection.run(s)
         return compressed_filepath
@@ -180,7 +204,9 @@ class ServerRequest(object):
         return local_filepath
 
     def _transfer_pickle_local2remote(self, pickle_content):
-        local_pickle_filepath = os.path.join(SuqcConfig.path_container_folder(), "arguments.p")
+        local_pickle_filepath = os.path.join(
+            SuqcConfig.path_container_folder(), "arguments.p"
+        )
         with open(local_pickle_filepath, "wb") as file:
             pickle.dump(pickle_content, file)
 
@@ -217,19 +243,25 @@ class ServerRequest(object):
             filepath = os.path.join(current_path, filename)
 
             if os.path.isdir(filepath):
-                ServerRequest.recursive_zipping(current_path=filepath,
-                                                arcname_prefix=os.path.join(arcname_prefix, filename),
-                                                zipobj=zipobj)
+                ServerRequest.recursive_zipping(
+                    current_path=filepath,
+                    arcname_prefix=os.path.join(arcname_prefix, filename),
+                    zipobj=zipobj,
+                )
             else:
                 file_ending = filename.split(".")[-1]
                 if file_ending not in exclude_file_endings:
-                    zipobj.write(filepath, arcname=os.path.join(arcname_prefix, filename))
+                    zipobj.write(
+                        filepath, arcname=os.path.join(arcname_prefix, filename)
+                    )
 
     @staticmethod
     def zip_environment(env_path):
         zip_path = os.path.join(env_path, ServerRequest.zip_filename)
-        zipobj = zipfile.ZipFile(zip_path, 'w')
-        ServerRequest.recursive_zipping(current_path=env_path, arcname_prefix="", zipobj=zipobj)
+        zipobj = zipfile.ZipFile(zip_path, "w")
+        ServerRequest.recursive_zipping(
+            current_path=env_path, arcname_prefix="", zipobj=zipobj
+        )
         zipobj.close()
 
     @classmethod
@@ -237,13 +269,15 @@ class ServerRequest(object):
     def _remote_run(cls, remote_pickle_arg_path):
         raise NotImplementedError("Base class")
 
-    def _attach_pickle_file_with_paths(self,
-                                       local_pickle_content,
-                                       local_model_obj,
-                                       remote_pickle_arg_path,
-                                       remote_pickle_res_path,
-                                       remote_env_name,
-                                       remote_model_path):
+    def _attach_pickle_file_with_paths(
+        self,
+        local_pickle_content,
+        local_model_obj,
+        remote_pickle_arg_path,
+        remote_pickle_res_path,
+        remote_env_name,
+        remote_model_path,
+    ):
 
         local_pickle_content["model"] = local_model_obj
         local_pickle_content["remote_pickle_arg_path"] = remote_pickle_arg_path
@@ -253,13 +287,15 @@ class ServerRequest(object):
         local_pickle_content["remote_model_path"] = remote_model_path
         return local_pickle_content
 
-    def _remote_ssh_logic(self,
-                          local_env_man,
-                          local_pickle_content,
-                          local_transfer_files,
-                          local_model_obj,
-                          class_name,
-                          transfer_output):
+    def _remote_ssh_logic(
+        self,
+        local_env_man,
+        local_pickle_content,
+        local_transfer_files,
+        local_model_obj,
+        class_name,
+        transfer_output,
+    ):
 
         self._default_remote_environment_setter()
 
@@ -268,7 +304,9 @@ class ServerRequest(object):
 
             # put model_path in list of files to transfer:
             remote_model_path = self._transfer_local2remote(local_model_obj.jar_path)
-            local_model_obj.jar_path = remote_model_path  # update the path for the remote server
+            local_model_obj.jar_path = (
+                remote_model_path  # update the path for the remote server
+            )
 
             for key, filepath in local_transfer_files.items():
                 assert os.path.exists(filepath)
@@ -277,12 +315,14 @@ class ServerRequest(object):
             remote_pickle_arg_path = self._default_argument_pickle_path_remote()
             remote_pickle_res_path = self._default_result_pickle_path_remote()
 
-            local_pickle_content = self._attach_pickle_file_with_paths(local_pickle_content=local_pickle_content,
-                                                                       local_model_obj=local_model_obj,
-                                                                       remote_pickle_arg_path=remote_pickle_arg_path,
-                                                                       remote_pickle_res_path=remote_pickle_res_path,
-                                                                       remote_env_name=self.remote_env_name,
-                                                                       remote_model_path=remote_model_path)
+            local_pickle_content = self._attach_pickle_file_with_paths(
+                local_pickle_content=local_pickle_content,
+                local_model_obj=local_model_obj,
+                remote_pickle_arg_path=remote_pickle_arg_path,
+                remote_pickle_res_path=remote_pickle_res_path,
+                remote_env_name=self.remote_env_name,
+                remote_model_path=remote_model_path,
+            )
 
             self._transfer_pickle_local2remote(local_pickle_content)
 
@@ -290,17 +330,28 @@ class ServerRequest(object):
             self.server.connection.run(s)
 
             # transfer_result
-            local_pickle_path = self._default_result_pickle_path_local(local_env_man.env_path)
-            remote_result = self._transfer_pickle_remote2local(remote_pickle_res_path, local_pickle_path)
+            local_pickle_path = self._default_result_pickle_path_local(
+                local_env_man.env_path
+            )
+            remote_result = self._transfer_pickle_remote2local(
+                remote_pickle_res_path, local_pickle_path
+            )
 
-            self._transfer_pickle_remote2local(remote_pickle_res_path,
-                                               self._default_result_pickle_path_local(local_env_man.env_path))
+            self._transfer_pickle_remote2local(
+                remote_pickle_res_path,
+                self._default_result_pickle_path_local(local_env_man.env_path),
+            )
 
             if transfer_output:
-                zipped_file_local = self._transfer_compressed_output_remote2local(local_env_man.env_path)
+                zipped_file_local = self._transfer_compressed_output_remote2local(
+                    local_env_man.env_path
+                )
                 self._uncompress_file2target(zipped_file_local, local_env_man.env_path)
 
             return remote_result
 
+
 if __name__ == "__main__":
-    ServerRequest.zip_environment("/home/daniel/Code/suq-controller/tutorial/testfolder")
+    ServerRequest.zip_environment(
+        "/home/daniel/Code/suq-controller/tutorial/testfolder"
+    )
