@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 
 # TODO: """ << INCLUDE DOCSTRING (one-line or multi-line) >> """
 
