@@ -1,7 +1,7 @@
 {
   "name" : "thick_wall_discrete_ok",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

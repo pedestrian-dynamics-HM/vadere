@@ -1,7 +1,7 @@
 {
   "name" : "03-SimplifiedExperiment-OSMEventDriven-PsychEnabled-PersonalSpacedAdapted",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
