@@ -5,4 +5,4 @@ from suqc.parameter.postchanges import PostScenarioChangesBase
 from suqc.qoi import *
 from suqc.request import *
 
-__version__ = "2.0"
+__version__ = "2.1"
