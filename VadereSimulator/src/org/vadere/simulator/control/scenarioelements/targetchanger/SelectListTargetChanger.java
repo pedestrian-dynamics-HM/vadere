@@ -26,7 +26,7 @@ public class SelectListTargetChanger extends BaseTargetChangerAlgorithm {
 
 		if (!inputIsValid) {
 			throw new IllegalArgumentException(String.format(
-					"The size of \"probabilitiesToChangeTarget\" must be 1 and totalTargets must be set. %s", TargetChangerAlgorithmType.SELECT_LIST) );
+					"The size of \"probabilitiesToChangeTarget\" must be 1 and nextTarget must be set. %s", TargetChangerAlgorithmType.SELECT_LIST) );
 		}
 	}
 

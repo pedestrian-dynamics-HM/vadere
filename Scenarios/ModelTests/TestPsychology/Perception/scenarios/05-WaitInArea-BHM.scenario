@@ -140,7 +140,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 1 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],

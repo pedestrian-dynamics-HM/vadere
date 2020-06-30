@@ -27,7 +27,7 @@ public class SortedSubListTargetChanger extends BaseTargetChangerAlgorithm {
 		int totalProbabilities = targetChanger.getAttributes().getProbabilitiesToChangeTarget().size();
 
 		checkProbabilityIsNormalized();
-		boolean inputIsValid = (totalProbabilities > 1) && (totalProbabilities == totalTargets);
+		boolean inputIsValid = (totalProbabilities >= 1) && (totalProbabilities == totalTargets);
 
 		if (!inputIsValid) {
 			throw new IllegalArgumentException(String.format(

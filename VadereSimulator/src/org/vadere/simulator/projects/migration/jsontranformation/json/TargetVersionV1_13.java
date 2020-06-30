@@ -42,6 +42,9 @@ public class TargetVersionV1_13 extends SimpleJsonTransformation {
 					if (probabilityToChangeTarget.size() < nextTarget.size()){
 						// use SELECT_LIST
 						changer.put("changeAlgorithmType", "SELECT_LIST");
+					} else if ((probabilityToChangeTarget.size() == nextTarget.size()) && (nextTarget.size() == 1)) {
+						// use SELECT_LIST
+						changer.put("changeAlgorithmType", "SELECT_LIST");
 					} else if (probabilityToChangeTarget.size() == nextTarget.size()){
 						// use SORTED_SUB_LIST
 						changer.put("changeAlgorithmType", "SORTED_SUB_LIST");
