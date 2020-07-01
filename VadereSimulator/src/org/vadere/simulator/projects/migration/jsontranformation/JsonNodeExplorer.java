@@ -30,11 +30,13 @@ public interface JsonNodeExplorer {
 		((ObjectNode) node).put(key, value);
 	}
 
-	default void remove(JsonNode root, String childName) throws MigrationException {
+	default JsonNode remove(JsonNode root, String childName) throws MigrationException {
 		ObjectNode parent = (ObjectNode) root;
-		if (parent.remove(childName) == null) {
+		JsonNode removed = parent.remove(childName);
+		if (removed == null) {
 			throw new MigrationException("Cannot delete childElement '" + childName + "' from parent " + root.asText());
 		}
+		return removed;
 	}
 
 	default void removeIfExists(JsonNode root, String childName) throws MigrationException {
@@ -187,6 +189,7 @@ public interface JsonNodeExplorer {
 		node.remove(oldName);
 	}
 
+
 	default ArrayList<JsonNode> getProcessorsByType(JsonNode node, String processorType) throws MigrationException {
 		Iterator<JsonNode> iter = iteratorProcessorsByType(node, processorType);
 		ArrayList<JsonNode>  ret = new ArrayList<>();
@@ -316,6 +319,29 @@ public interface JsonNodeExplorer {
 			}
 		}
 	}
+
+	default ArrayList<Double> getDoubleList(JsonNode root, String path) throws MigrationException {
+		JsonNode arrList = pathMustExist(root, path);
+		ArrayList<Double> dblList = new ArrayList<>();
+		if (!arrList.isArray())
+			throw new MigrationException("Node should be an Array Node.");
+		for (JsonNode n : arrList){
+			dblList.add(n.asDouble());
+		}
+		return  dblList;
+	}
+
+	default ArrayList<Integer> getIntegerList(JsonNode root, String path) throws MigrationException {
+		JsonNode arrList = pathMustExist(root, path);
+		ArrayList<Integer> intList = new ArrayList<>();
+		if (!arrList.isArray())
+			throw new MigrationException("Node should be an Array Node.");
+		for (JsonNode n : arrList){
+			intList.add(n.asInt());
+		}
+		return  intList;
+	}
+
 
 	default ArrayList<String> listOutputFileNames(JsonNode root) throws MigrationException {
 		JsonNode files = pathMustExist(root, "processWriters/files");

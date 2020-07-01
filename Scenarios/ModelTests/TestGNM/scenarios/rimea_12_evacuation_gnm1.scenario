@@ -1,7 +1,7 @@
 {
   "name" : "rimea_12_evacuation_gnm1",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

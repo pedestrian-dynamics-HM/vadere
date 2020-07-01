@@ -8,6 +8,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.control.HelpTextView;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.IScenarioChecker;
@@ -243,6 +244,20 @@ public class TextView extends JPanel implements IJsonView {
 									e1.printStackTrace();
 								}
 							}
+						}
+					})));
+
+			JMenu mnPresetHelpMenu = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+			presetMenuBar.add(mnPresetHelpMenu);
+
+			StimulusPresettings.PRESETTINGS_MAP.forEach(
+					(clazz, jsonString) -> mnPresetHelpMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							VDialogManager.showMessageDialogWithBodyAndTextEditorPane("Help", clazz.getName(),
+									HelpTextView.create(clazz.getName()), JOptionPane.INFORMATION_MESSAGE);
 						}
 					})));
 
