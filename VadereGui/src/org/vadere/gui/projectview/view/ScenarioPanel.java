@@ -1,6 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
+import org.vadere.gui.components.control.HelpTextView;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
@@ -154,6 +155,18 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
+					}
+				})));
+
+		JMenu mnHelpAttributesMenu = new JMenu(Messages.getString("Tab.Model.helpAttributesMenu.title"));
+		presetMenuBar.add(mnHelpAttributesMenu);
+		menusInTabs.add(mnHelpAttributesMenu);
+		attributeFactory.sortedAttributeStream().forEach(
+				attributesClassName -> mnHelpAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						VDialogManager.showMessageDialogWithBodyAndTextEditorPane("Help", attributesClassName,
+								HelpTextView.create(attributesClassName), JOptionPane.INFORMATION_MESSAGE);
 					}
 				})));
 		

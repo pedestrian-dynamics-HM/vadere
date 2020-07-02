@@ -1,7 +1,7 @@
 {
   "name" : "s2ucre_dynamic_waiting_less_targets_groups",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.13",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -456,7 +456,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -478,7 +478,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -500,7 +500,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -522,7 +522,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -544,7 +544,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 100, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -566,7 +566,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -588,7 +588,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       }, {
@@ -610,7 +610,7 @@
           } ]
         },
         "reachDistance" : 0.3,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
         "probabilityToChangeTarget" : [ 0.05 ]
       } ],
