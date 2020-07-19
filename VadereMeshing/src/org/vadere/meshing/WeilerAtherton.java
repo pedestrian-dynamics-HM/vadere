@@ -404,18 +404,22 @@ public class WeilerAtherton {
 		Set<PHalfEdge> subjectExitingEdges = subjectMesh
 				.streamEdges(subjectFace)
 				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), propNameIntersection, Boolean.class).get())
-				.filter(edge ->
+				.filter(edge -> !clipping.contains(subjectMesh.toLine(subjectMesh.getNext(edge)).midPoint()))
+				.filter(edge -> clipping.contains(subjectMesh.toLine(edge).midPoint()))
+				/*.filter(edge ->
 						contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge))) &&
-						!contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))))
+						!contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))))*/
 				.collect(Collectors.toSet());
 
 		Set<PHalfEdge> subjectEnteringEdges = subjectMesh
 				.streamEdges(subjectFace)
 				.filter(edge -> subjectMesh.getData(subjectMesh.getVertex(edge), propNameIntersection, Boolean.class).get())
-				.filter(edge ->
+				.filter(edge -> clipping.contains(subjectMesh.toLine(subjectMesh.getNext(edge)).midPoint()))
+				.filter(edge -> !clipping.contains(subjectMesh.toLine(edge).midPoint()))
+				/*.filter(edge ->
 						contains(clipping, subjectMesh.getPoint(subjectMesh.getNext(edge))) &&
 						!contains(clipping, subjectMesh.getPoint(subjectMesh.getPrev(edge)))
-				)
+				)*/
 				.collect(Collectors.toSet());
 
 		List<VPoint> points = new ArrayList<>();

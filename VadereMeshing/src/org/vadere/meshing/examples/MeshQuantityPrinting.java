@@ -8,24 +8,33 @@ import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
+import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PContrainedDelaunayTriangulator;
+import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VDisc;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -40,21 +49,428 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * This class was used to generate many plots for my dissertation.
+ */
 public class MeshQuantityPrinting {
 
 	public static void main(String... args) throws InterruptedException, IOException {
 		//spaceFillingCurve2();
 		//uniformMeshDiscFunction(0.10);
-		uniformMeshDiscFunctionDistMesh(0.05);
+		//uniformMeshDiscFunctionDistMesh(0.05);
 		//distMeshFail(0.05);
 		//delaunyTri("/poly/a.poly");
+		//eikMeshAirfoilPoly(0.005);
+		//eikMeshSupermarket(0.25);
+		//eikMeshKaiserslauternMittel(50000.0);
+		randomDelaunay();
+	}
+
+	public static void randomDelaunay() throws IOException, InterruptedException {
+		BufferedWriter meshWriter = null;
+		ArrayList<IPoint> points = new ArrayList<>();
+		Random random = new Random(1);
+		for (int i = 0; i < 100; i++) {
+			points.add(new VPoint(random.nextDouble() * 10, random.nextDouble() * 10));
+		}
+
+		PDelaunayTriangulator dt = new PDelaunayTriangulator(points);
+		dt.generate();
+
+		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		var meshImprover = new PEikMesh(
+				p -> 1.0,
+				dt.getTriangulation()
+		);
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+
+		// display the mesh
+		PMeshPanel meshPanel = new PMeshPanel(dt.getMesh(), 1000, 1000);
+		meshPanel.display("Random Delaunay triangulation");
+		while (!meshImprover.isFinished()) {
+			meshImprover.improve();
+			Thread.sleep(10);
+			meshPanel.repaint();
+		}
+
+		meshImprover.finish();
+		meshPanel.repaint();
+
+
+		points.clear();
+		points.addAll(meshImprover.getMesh().getBoundaryPoints());
+		for (int i = 0; i < 100-points.size(); i++) {
+			points.add(new VPoint(random.nextDouble() * 8, random.nextDouble() * 8));
+		}
+
+		dt = new PDelaunayTriangulator(points);
+		dt.generate();
+
+		bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		var meshImprover2 = new PEikMesh(
+				p -> 1.0,
+				dt.getTriangulation()
+		);
+
+
+		vertexColorFunction = v -> {
+			if(meshImprover2.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover2.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+		meshWriter = IOUtils.getWriter("randomDelaunay_before.tex", dir);
+		meshWriter.write(TexGraphGenerator.toTikz(meshImprover2.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+		meshWriter.close();
+
+		PMeshPanel meshPanel2 = new PMeshPanel(meshImprover2.getMesh(), 1000, 1000);
+		meshPanel2.display("Random Delaunay triangulation");
+		while (!meshImprover2.isFinished()) {
+			meshImprover2.improve();
+			Thread.sleep(10);
+			meshPanel2.repaint();
+		}
+		meshImprover2.finish();
+		meshPanel2.repaint();
+
+		dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+		meshWriter = IOUtils.getWriter("randomDelaunay_after.tex", dir);
+		meshWriter.write(TexGraphGenerator.toTikz(meshImprover2.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+		meshWriter.close();
+
+		BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+		bufferedWriterQualities1.write("iteration quality\n");
+
+		BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+		bufferedWriterQualities2.write("iteration quality\n");
+
+		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+		bufferedWriterAngles.write("iteration angle\n");
+
+		bufferedWriterQualities1.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+		bufferedWriterQualities1.close();
+
+		bufferedWriterQualities2.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+		bufferedWriterQualities2.close();
+
+		bufferedWriterAngles.write(printAngles(200, meshImprover2.getMesh()));
+		bufferedWriterAngles.close();
+	}
+
+	public static void kaiserslautern() throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+
+		IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+
+
+		// (3) use EikMesh to improve the mesh
+		double h0 = 5.0;
+		var meshImprover = new PEikMesh(
+				distanceFunction,
+				p -> h0 + 0.3 * Math.abs(distanceFunction.apply(p)),
+				h0,
+				new VRectangle(segmentBound.getBounds2D()),
+				pslg.getHoles()
+		);
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		meshImprover.generate();
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+
+		BufferedWriter meshWriter = null;
+		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+		meshWriter = IOUtils.getWriter("kaiserslautern.tex", dir);
+		meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+		meshWriter.close();
+
+		BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+		bufferedWriterQualities1.write("iteration quality\n");
+
+		BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+		bufferedWriterQualities2.write("iteration quality\n");
+
+		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+		bufferedWriterAngles.write("iteration angle\n");
+
+		bufferedWriterQualities1.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+		bufferedWriterQualities1.close();
+
+		bufferedWriterQualities2.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+		bufferedWriterQualities2.close();
+
+		bufferedWriterAngles.write(printAngles(200, meshImprover.getMesh()));
+		bufferedWriterAngles.close();
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void eikMeshAirfoilPoly(double h0) throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/airfoil.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+
+		VPolygon airfoil = pslg.getHoles().iterator().next();
+		IEdgeLengthFunction e = p -> h0 + Math.abs(airfoil.distance(p)) * 0.2;
+
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edge -> Double.POSITIVE_INFINITY, e);
+		edgeLengthFunctionApprox.smooth(0.2);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
+
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, pslg.getBoundingBox(), pslg.getAllPolygons(), () -> new PMesh());
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
+		meshPanel.display("Airfoil");
+		int it = 1;
+		while (it < 500) {
+			meshImprover.improve();
+			it++;
+			synchronized (meshImprover.getMesh()) {
+				meshPanel.repaint();
+			}
+			Thread.sleep(10);
+		}
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		BufferedWriter meshWriter = null;
+		try {
+			File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+			BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+			bufferedWriterQualities1.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+			bufferedWriterQualities2.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+			bufferedWriterAngles.write("iteration angle\n");
+
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.close();
+
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.close();
+
+			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
+			bufferedWriterAngles.close();
+
+			meshWriter = IOUtils.getWriter("airfoil.tex", dir);
+			meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+			meshWriter.close();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+		//meshImprover.generate();
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_airfoil_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+	}
+
+	public static void eikMeshSupermarket(double h0) throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/supermarket.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+
+		double smoothness = 0.4;
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+
+		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
+		edgeLengthFunctionApprox.smooth(smoothness);
+
+		//EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edge -> Double.POSITIVE_INFINITY, e);
+		//edgeLengthFunctionApprox.smooth(0.2);
+
+		var meshImprover = new PEikMesh(
+				distanceFunctionApproximation,
+				edgeLengthFunction,
+				h0,
+				pslg.getBoundingBox(),
+				pslg.getAllPolygons()
+		);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1400, 1400);
+		meshPanel.display("Supermarket");
+		int it = 1;
+		while (it < 500) {
+			meshImprover.improve();
+			it++;
+			synchronized (meshImprover.getMesh()) {
+				meshPanel.repaint();
+			}
+			Thread.sleep(10);
+		}
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		BufferedWriter meshWriter = null;
+		try {
+			File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+			BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+			bufferedWriterQualities1.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+			bufferedWriterQualities2.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+			bufferedWriterAngles.write("iteration angle\n");
+
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.close();
+
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.close();
+
+			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
+			bufferedWriterAngles.close();
+
+			meshWriter = IOUtils.getWriter("supermarket.tex", dir);
+			meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+			meshWriter.close();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+		//meshImprover.generate();
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_airfoil_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+	}
+
+	public static void eikMeshKaiserslauternMittel(double h0) throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_mittel.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+
+		double smoothness = 0.3;
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+
+		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
+		edgeLengthFunctionApprox.smooth(smoothness);
+
+		//EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edge -> Double.POSITIVE_INFINITY, e);
+		//edgeLengthFunctionApprox.smooth(0.2);
+
+		var meshImprover = new PEikMesh(
+				distanceFunctionApproximation,
+				edgeLengthFunctionApprox,
+				h0,
+				pslg.getBoundingBox(),
+				pslg.getAllPolygons()
+		);
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		meshPanel.display("Kaiserslautern");
+		int it = 1;
+		while (it < 500) {
+			meshImprover.improve();
+			it++;
+			synchronized (meshImprover.getMesh()) {
+				meshPanel.repaint();
+			}
+			Thread.sleep(10);
+		}
+
+		Function<PVertex, Color> vertexColorFunction = v -> {
+			if(meshImprover.isSlidePoint(v)){
+				return Colors.BLUE;
+			} else if(meshImprover.isFixPoint(v)) {
+				return Colors.RED;
+			} else {
+				return Color.BLACK;
+			}
+		};
+
+		BufferedWriter meshWriter = null;
+		try {
+			File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+			BufferedWriter bufferedWriterQualities1 = IOUtils.getWriter("qualities1_eik.csv", dir);
+			bufferedWriterQualities1.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterQualities2 = IOUtils.getWriter("qualities2_eik.csv", dir);
+			bufferedWriterQualities2.write("iteration quality\n");
+
+			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
+			bufferedWriterAngles.write("iteration angle\n");
+
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.close();
+
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.close();
+
+			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
+			bufferedWriterAngles.close();
+
+			meshWriter = IOUtils.getWriter("kaiserslautern_mittel.tex", dir);
+			meshWriter.write(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> Colors.YELLOW, edge -> Color.BLACK, vertexColorFunction, 1.0f, true));
+			meshWriter.close();
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+		//meshImprover.generate();
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_airfoil_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
 	}
 
 	private static void spaceFillingCurve() throws InterruptedException, IOException {

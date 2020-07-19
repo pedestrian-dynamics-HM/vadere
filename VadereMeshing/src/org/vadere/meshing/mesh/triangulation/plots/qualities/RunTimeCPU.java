@@ -12,12 +12,18 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
+import org.vadere.meshing.utils.color.Colors;
+import org.vadere.meshing.utils.io.IOUtils;
+import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +97,7 @@ public class RunTimeCPU extends JFrame {
 		List<Long> runTimes = new ArrayList<>();
 		List<Double> initlialEdgeLengths = new ArrayList<>();
 
+		int count = 1;
 		while (initialEdgeLength >= minInitialEdgeLength) {
 			initlialEdgeLengths.add(initialEdgeLength);
 			final double currentEdgeLen = initialEdgeLength;
@@ -130,6 +137,18 @@ public class RunTimeCPU extends JFrame {
 			qualities.add(meshGenerator.getQuality());
 			minQualities.add(meshGenerator.getMinQuality());
 			runTimes.add( overAllTime.getTime());
+
+
+			try {
+				File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/");
+				BufferedWriter meshWriter = null;
+				meshWriter = IOUtils.getWriter("ring_eik_"+count+".tex", dir);
+				meshWriter.write(TexGraphGenerator.toTikz(meshGenerator.getMesh(), 1.0f, true));
+				meshWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			count++;
 
 			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(),1000, 800);
 			JFrame frame = distmeshPanel.display();
@@ -221,8 +240,8 @@ public class RunTimeCPU extends JFrame {
 	}
 
     public static void main(String[] args) {
-		stepAdaptiveRingDistMesh(0.2, 0.001, 0.001);
-	    stepAdaptiveRingEikMesh(0.2, 0.001, 0.001);
+		//stepAdaptiveRingDistMesh(0.2, 0.001, 0.001);
+	    stepAdaptiveRingEikMesh(0.2, 0.02, 0.001);
 	    //stepAdaptiveRingEikMesh(0.005, 0.005, 0.01);
     }
 }

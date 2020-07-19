@@ -161,6 +161,11 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			@NotNull final IEdgeLengthFunction edgeLengthFunc,
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			final boolean refine) {
+		this.fixpointC = triangulation.getMesh().getBooleanVertexContainer(propFixPoint);
+		this.constraintC = triangulation.getMesh().getBooleanEdgeContainer(propConstrained);
+		this.velocityXC = triangulation.getMesh().getDoubleVertexContainer(propVelocityX);
+		this.velocityYC = triangulation.getMesh().getDoubleVertexContainer(propVelocityY);
+		this.absVelocityC = triangulation.getMesh().getDoubleVertexContainer(propAbsVelocity);
 		this.shapes = new ArrayList<>();
 		this.bound = null;
 		this.edgeLengthFunc = edgeLengthFunc;
@@ -187,11 +192,6 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.useSlidingLines = true;
 		this.smoothBorder = false;
 
-		this.fixpointC = triangulation.getMesh().getBooleanVertexContainer(propFixPoint);
-		this.constraintC = triangulation.getMesh().getBooleanEdgeContainer(propConstrained);
-		this.velocityXC = triangulation.getMesh().getDoubleVertexContainer(propVelocityX);
-		this.velocityYC = triangulation.getMesh().getDoubleVertexContainer(propVelocityY);
-		this.absVelocityC = triangulation.getMesh().getDoubleVertexContainer(propAbsVelocity);
 	}
 
 	/**
@@ -364,7 +364,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			deps = 0.0001 * initialEdgeLen;
 
 			computeFixPoints();
-			refiner.getConstrains().forEach(e -> setConstraint(e, true));
+			if(hasRefiner()) {
+				refiner.getConstrains().forEach(e -> setConstraint(e, true));
+			}
 
 			if(useSlidingLines) {
 				computeSlidingLines();
@@ -783,7 +785,8 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * @return true if and only if the vertex is a sliding point
 	 */
 	public boolean isSlidePoint(@NotNull V vertex) {
-		return /*getMesh().isAtBoundary(vertex) &&*/ !isFixPoint(vertex) && pointToSlidingLine.containsKey(vertex);
+		boolean slidePoint = /*getMesh().isAtBoundary(vertex) &&*/ !isFixPoint(vertex) && pointToSlidingLine.containsKey(vertex);
+		return slidePoint;
 	}
 
 	/**

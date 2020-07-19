@@ -90,7 +90,7 @@ public class MeshConstructor {
 		double h0 = hmin;
 		var meshImprover = new PEikMesh(
 				distanceFunctionApproximation,
-				p -> edgeLengthFunctionApprox.apply(p),
+				edgeLengthFunctionApprox,
 				h0,
 				pslg.getBoundingBox(),
 				polygons
@@ -206,36 +206,5 @@ public class MeshConstructor {
 			meshImprover.generate();
 		}
 		return meshImprover.getMesh();
-	}
-
-
-	// delete this code
-	private static String printAngles(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh){
-		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
-
-			for(PHalfEdge edge : mesh.getEdges(face)) {
-				VPoint p1 = mesh.toPoint(edge);
-				VPoint p2 = mesh.toPoint(mesh.getNext(edge));
-				VPoint p3 = mesh.toPoint(mesh.getPrev(edge));
-				builder.append(iteration);
-				builder.append(" ");
-				builder.append(GeometryUtils.angle(p1, p2, p3));
-				builder.append("\n");
-			}
-		}
-		return builder.toString();
-	}
-
-	private static String printQualities(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh, Function<PFace, Double> rho){
-		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
-			double quality = rho.apply(face);
-			builder.append(iteration);
-			builder.append(" ");
-			builder.append(quality);
-			builder.append("\n");
-		}
-		return builder.toString();
 	}
 }
