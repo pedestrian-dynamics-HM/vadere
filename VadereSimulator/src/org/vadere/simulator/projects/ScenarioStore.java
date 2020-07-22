@@ -3,6 +3,7 @@ package org.vadere.simulator.projects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.strategy.StrategyModel;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesPsychology;
@@ -31,6 +32,7 @@ public class ScenarioStore {
 	private String name;
 	private String description;
 	private String mainModel;
+	private String strategyModel;
 	private List<Attributes> attributesList;
 	private AttributesSimulation attributesSimulation;
 	private AttributesPsychology attributesPsychology;
@@ -38,15 +40,16 @@ public class ScenarioStore {
 	private StimulusInfoStore stimulusInfoStore;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-			final AttributesSimulation attributesSimulation, final Topography topography) {
-		this(name, description, mainModel, attributesModel, attributesSimulation, new AttributesPsychology(), topography, new StimulusInfoStore());
+						 final AttributesSimulation attributesSimulation, final Topography topography, String strategyModel) {
+		this(name, description, mainModel, attributesModel, attributesSimulation, new AttributesPsychology(), topography, new StimulusInfoStore(), strategyModel);
 	}
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-	                     final AttributesSimulation attributesSimulation, final AttributesPsychology attributesPsychology, final Topography topography, final StimulusInfoStore stimulusInfoStore) {
+	                     final AttributesSimulation attributesSimulation, final AttributesPsychology attributesPsychology, final Topography topography, final StimulusInfoStore stimulusInfoStore, String strategyModel ) {
 		this.name = name;
 		this.description = description;
 		this.mainModel = mainModel;
+		this.strategyModel = strategyModel;
 		this.attributesList = attributesModel;
 		this.attributesSimulation = attributesSimulation;
 		this.attributesPsychology = attributesPsychology;
@@ -65,7 +68,7 @@ public class ScenarioStore {
 	}
 
 	public ScenarioStore(final String name) {
-		this(name, "", null, new ArrayList<>(), new AttributesSimulation(), new Topography());
+		this(name, "", null, new ArrayList<>(), new AttributesSimulation(), new Topography(), null);
 	}
 
 	public AttributesCar getAttributesCar() {
@@ -147,6 +150,10 @@ public class ScenarioStore {
 
 	public String getMainModel() {
 		return mainModel;
+	}
+
+	public String getStrategyModel(){
+		return strategyModel;
 	}
 
 	public String getName() {

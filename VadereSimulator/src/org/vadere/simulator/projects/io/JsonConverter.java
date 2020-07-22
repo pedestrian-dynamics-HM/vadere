@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
+import org.vadere.simulator.models.strategy.StrategyModel;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;
@@ -59,10 +60,13 @@ public class JsonConverter {
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
 		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
 
+		String strategyModel = scenarioNode.get("strategyModel").asText();
+
 		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription,
 				mainModel, attributesModel,
 				attributesSimulation, attributesPsychology,
-				topography, stimulusInfoStore);
+				topography, stimulusInfoStore,
+				strategyModel);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
@@ -109,6 +113,7 @@ public class JsonConverter {
 		ObjectNode vadereNode = StateJsonConverter.createObjectNode();
 
 		vadereNode.put(StateJsonConverter.MAIN_MODEL_KEY, scenarioStore.getMainModel());
+		vadereNode.put("strategyModel", scenarioStore.getStrategyModel());
 
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		vadereNode.set("attributesModel", attributesModelNode);
@@ -148,6 +153,7 @@ public class JsonConverter {
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode));
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode),
+				scenarioStore.getStrategyModel());
 	}
 }
