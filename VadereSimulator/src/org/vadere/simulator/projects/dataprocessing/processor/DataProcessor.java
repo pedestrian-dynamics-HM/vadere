@@ -104,6 +104,11 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return data.get(key);
 	}
 
+	public int getLastStep()
+	{
+		return this.lastStep;
+	}
+
 	protected void putValue(final K key, final V value) {
 		this.data.put(key, value);
 	}

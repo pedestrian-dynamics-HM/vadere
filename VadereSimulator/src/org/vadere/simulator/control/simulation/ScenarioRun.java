@@ -17,9 +17,11 @@ import org.vadere.simulator.control.psychology.perception.models.IPerceptionMode
 import org.vadere.simulator.control.psychology.perception.helpers.PerceptionModelBuilder;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.strategy.helpers.StrategyModelBuilder;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
+import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -178,6 +180,8 @@ public class ScenarioRun implements Runnable {
 
 				IPerceptionModel perceptionModel = PerceptionModelBuilder.instantiateModel(scenarioStore);
 				ICognitionModel cognitionModel = CognitionModelBuilder.instantiateModel(scenarioStore);
+				IStrategyModel strategyModel = StrategyModelBuilder.instantiateModel(scenarioStore);
+
 
 				// ensure all elements have unique id before attributes are sealed
 				scenario.getTopography().generateUniqueIdIfNotSet();
@@ -190,7 +194,7 @@ public class ScenarioRun implements Runnable {
 						passiveCallbacks, random,
 						processorManager, simulationResult,
 						remoteRunListeners, singleStepMode,
-						scenarioCache);
+						scenarioCache, strategyModel);
 			}
 
 			simulation.run();

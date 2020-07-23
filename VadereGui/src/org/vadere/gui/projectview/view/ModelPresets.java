@@ -100,7 +100,7 @@ public class ModelPresets {
 	private void registerModelPreset(Class<? extends MainModel> mainModelClass,
 			List<Class<? extends Attributes>> attributesClasses) {
 
-		ModelDefinition definition = new ModelDefinition(mainModelClass.getName(), null);
+		ModelDefinition definition = new ModelDefinition(mainModelClass.getName(), "123" , null);
 		definition.createAndSetDefaultAttributes(attributesClasses);
 		modelDefinitionPresets.add(definition);
 	}

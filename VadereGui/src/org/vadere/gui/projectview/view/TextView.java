@@ -180,6 +180,7 @@ public class TextView extends JPanel implements IJsonView {
 							case MODEL:
 								ModelDefinition modelDefinition = JsonConverter.deserializeModelDefinition(json);
 								currentScenario.getScenarioStore().setMainModel(modelDefinition.getMainModel());
+								currentScenario.getScenarioStore().setStrategyModel(modelDefinition.getStrategyModel());
 								currentScenario.setAttributesModel(modelDefinition.getAttributesList());
 								break;
 							case SIMULATION:

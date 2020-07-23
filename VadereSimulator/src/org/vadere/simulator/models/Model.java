@@ -5,8 +5,10 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.data.FindByClass;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -24,7 +26,7 @@ public interface Model {
 	 * list and creating sub models. It also sets attributes recursively for its sub models.
 	 */
 	void initialize(List<Attributes> attributesList, Domain domain,
-	                AttributesAgent attributesPedestrian, Random random);
+					AttributesAgent attributesPedestrian, Random random);
 
 	void preLoop(final double simTimeInSec);
 

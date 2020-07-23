@@ -3,7 +3,6 @@ package org.vadere.simulator.projects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.models.strategy.StrategyModel;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesPsychology;
@@ -126,6 +125,10 @@ public class ScenarioStore {
 
 	public void setMainModel(final String mainModel) {
 		this.mainModel = mainModel;
+	}
+
+	public void setStrategyModel(final String strategyModel) {
+		this.strategyModel = strategyModel;
 	}
 
 	public void setName(final String name) {

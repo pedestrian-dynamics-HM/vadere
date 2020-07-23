@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
-import org.vadere.simulator.models.strategy.StrategyModel;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;
@@ -41,7 +40,9 @@ public class JsonConverter {
 			@SuppressWarnings("unused")
 			MainModel dummyToProvokeClassCast = instantiator.createObject(mainModelString);
 		}
-		return new ModelDefinition(mainModelString, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
+		String strategyModel = node.get("strategyModel").asText();
+
+		return new ModelDefinition(mainModelString, strategyModel, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
 	}
 
 	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
