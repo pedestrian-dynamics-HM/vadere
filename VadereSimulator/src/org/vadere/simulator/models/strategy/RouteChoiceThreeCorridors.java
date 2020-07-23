@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.strategy;
 
-import org.apache.commons.math.distribution.DiscreteDistribution;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.scenario.Pedestrian;
@@ -8,12 +7,11 @@ import org.vadere.state.scenario.Pedestrian;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.apache.tools.ant.taskdefs.rmic.DefaultRmicAdapter.rand;
 
 public class RouteChoiceThreeCorridors implements INavigationModel {
 
 
-    @Override
+
     public void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager) {
 
         if (simTimeInSec > 0.0) {
@@ -52,7 +50,6 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
             }
 
 
-
             List<Pedestrian> newAgents  =  pedestrians.stream().filter(p-> p.getFootstepHistory().getFootSteps().size() == 0).collect(Collectors.toList());
             int numberOfNewAgents = (int) newAgents.size();
 
@@ -81,34 +78,34 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
 
 
-  /*  public void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager) {
+//    @Override
+//   public void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager) {
 
-        if (simTimeInSec > 0.0) {
-            // get data from dataprocessors if necessary
-            double density1 = getDensityFromDataProcessor(5, processorManager);
-            double density2 = getDensityFromDataProcessor(6, processorManager);
-            double density3 = getDensityFromDataProcessor(7, processorManager);
-            double density = getDensityFromDataProcessor(8, processorManager);
-
-            LinkedList<Integer> nextTargets = new LinkedList<Integer>();
-            int newTarget = 2003;
-
-            if (density > 10.0){
-                newTarget = 2002;}
-
-            if (density > 20.0){
-                newTarget = 2001;}
-
-            for (Pedestrian pedestrian : pedestrians) {
-                if (pedestrian.getFootstepHistory().size() == 0) {
-                    nextTargets.add(newTarget);
-                    pedestrian.setTargets(nextTargets);
-                }
-            }
-
-        }
-
-    }*/
+//        if (simTimeInSec > 0.0) {
+//            // get data from dataprocessors if necessary
+//            double density1 = getDensityFromDataProcessor(5, processorManager);
+//            double density2 = getDensityFromDataProcessor(6, processorManager);
+//            double density3 = getDensityFromDataProcessor(7, processorManager);
+//            double density = getDensityFromDataProcessor(8, processorManager);
+//
+//            LinkedList<Integer> nextTargets = new LinkedList<Integer>();
+//            int newTarget = 2003;
+//
+//            if (density > 10.0){
+//                newTarget = 2002;}
+//
+//            if (density > 20.0){
+//                newTarget = 2001;}
+//
+//            for (Pedestrian pedestrian : pedestrians) {
+//                if (pedestrian.getFootstepHistory().size() == 0) {
+//                    nextTargets.add(newTarget);
+//                    pedestrian.setTargets(nextTargets);
+//                }
+//            }
+//
+//        }
+//    }
 
 
     private double getDensityFromDataProcessor(int processorId, ProcessorManager processorManager) {
