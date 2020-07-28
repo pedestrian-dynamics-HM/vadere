@@ -1,12 +1,17 @@
 package org.vadere.simulator.models.strategy;
 
+import net.sourceforge.jFuzzyLogic.plot.JFuzzyChart;
+import net.sourceforge.jFuzzyLogic.rule.Rule;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.scenario.Pedestrian;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import net.sourceforge.jFuzzyLogic.FIS; // http://jfuzzylogic.sourceforge.net/html/index.html
 
 public class RouteChoiceThreeCorridors implements INavigationModel {
 
@@ -14,12 +19,26 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
     public void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager) {
 
+        String fileName = "/home/christina/repos/vadere/VadereSimulator/src/org/vadere/simulator/models/strategy/fcl/tipper.fcl";
+
+        FIS fis = FIS.load(fileName, true); // Load from 'FCL' file
+        fis.setVariable("density", 30); // Set inputs
+        fis.setVariable("densityCor1", 70);
+        fis.setVariable("densityCor2", 70);
+        fis.setVariable("densityCor3", 70);
+        fis.evaluate(); // Evaluate
+        System.out.println("Output value:" + fis.getVariable("corridor").getValue()); // Show output variable
+
+        // Show each rule (and degree of support)
+        for( Rule r : fis.getFunctionBlock("tipper").getFuzzyRuleBlock("No1").getRules() ) System.out.println(r);
+
+
         if (simTimeInSec > 0.0) {
             // get data from dataprocessors if necessary
             LinkedList<Double> densities = new LinkedList<Double>();
-            densities.add( getDensityFromDataProcessor(5, processorManager) );
-            densities.add( getDensityFromDataProcessor(6, processorManager) );
-            densities.add( getDensityFromDataProcessor(7, processorManager) );
+            densities.add(getDensityFromDataProcessor(5, processorManager));
+            densities.add(getDensityFromDataProcessor(6, processorManager));
+            densities.add(getDensityFromDataProcessor(7, processorManager));
 
             double density = getDensityFromDataProcessor(8, processorManager);
 
@@ -29,7 +48,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
             LinkedList<Integer> factorsNorm = new LinkedList<Integer>();
             double sum = 0;
 
-            if (density > maxDensity){
+            if (density > maxDensity) {
                 for (Double d : densities) {
                     remainingCapacity = maxDensity - d;
 
@@ -41,8 +60,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
                     sum += fac;
                 }
 
-            }
-            else{
+            } else {
                 factors.add(0.0);
                 factors.add(0.0);
                 factors.add(1.0);
@@ -50,27 +68,47 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
             }
 
 
-            List<Pedestrian> newAgents  =  pedestrians.stream().filter(p-> p.getFootstepHistory().getFootSteps().size() == 0).collect(Collectors.toList());
+            List<Pedestrian> newAgents = pedestrians.stream().filter(p -> p.getFootstepHistory().getFootSteps().size() == 0).collect(Collectors.toList());
             int numberOfNewAgents = (int) newAgents.size();
 
-            int[] target = {2001,2002,2003};
-            int c = 0;
-            for (Double f : factors){
-                int n = (int) (f/sum*numberOfNewAgents);
-                for (int i = 0; i < n; i++){
-                    factorsNorm.add( target[c] );
+            System.out.println(simTimeInSec);
+
+/*            if (numberOfNewAgents > 0) {
+                if (numberOfNewAgents == 1){ sum = 1.0;}
+
+                int[] target = {2001, 2002, 2003};
+                int c;
+
+                boolean check = false;
+
+                while (!check) {
+                    c = 0;
+                    for (Double f : factors) {
+                        int n = (int) (f / sum * numberOfNewAgents);
+                        for (int i = 0; i < n; i++) {
+                            System.out.println("Add " + target[c] );
+                            factorsNorm.add(target[c]);
+                            if (factorsNorm.size() >= numberOfNewAgents) {
+                                check = true;
+                                break;
+                            }
+                        }
+                        c += 1;
+                    }
                 }
-                c += 1;
-            }
 
-            LinkedList<Integer> nextTargets = new LinkedList<Integer>();
 
-            c = 0;
-            for (Pedestrian pedestrian : newAgents) {
-                nextTargets.add(factorsNorm.get(c));
-                pedestrian.setTargets(nextTargets);
-                c+=1;
-            }
+                System.out.println(" ---- > Number " + numberOfNewAgents + ", targets " + factorsNorm);
+
+                LinkedList<Integer> nextTargets = new LinkedList<Integer>();
+
+                c = 0;
+                for (Pedestrian pedestrian : newAgents) {
+                    nextTargets.add(factorsNorm.get(c));
+                    pedestrian.setTargets(nextTargets);
+                    c += 1;
+                }
+            }*/
 
         }
 
