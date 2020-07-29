@@ -13,5 +13,5 @@ public interface IStrategyModel {
     void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager);
 
 
-
+    void initialize(double simTimeInSec);
 }

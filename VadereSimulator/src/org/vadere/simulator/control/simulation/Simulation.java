@@ -215,6 +215,8 @@ public class Simulation {
 			m.preLoop(simTimeInSec);
 		}
 
+		strategyModel.initialize(simTimeInSec);
+
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
 		}

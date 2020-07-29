@@ -10,7 +10,7 @@
 									pcingola@users.sourceforge.net
 */
 
-FUNCTION_BLOCK tipper	// Block definition (there may be more than one block per file)
+FUNCTION_BLOCK streamControl	// Block definition (there may be more than one block per file)
 
 VAR_INPUT				// Define input variables
 	density : REAL;
@@ -24,34 +24,34 @@ VAR_OUTPUT				// Define output variable
 END_VAR
 
 FUZZIFY density
-	TERM low := (0, 1) (10, 0) ;
-	TERM medium := (8, 0) (10,1) (20,1) (22,0);
-	TERM high := (20, 0) (100, 1);
+	TERM low := (0, 1) (0.25, 0) ;
+    TERM medium := (0.2, 0) (0.3,1)  (0.4,0);
+    TERM high := (0.3, 0) (4.5, 1);
 END_FUZZIFY
 
 FUZZIFY densityCor1
-	TERM low := (0, 1) (10, 0) ;
-    TERM medium := (8, 0) (10,1) (20,1) (22,0);
-    TERM high := (20, 0) (100, 1);
+	TERM low := (0, 1) (0.25, 0) ;
+    TERM medium := (0.2, 0) (0.3,1)  (0.4,0);
+    TERM high := (0.3, 0) (4.5, 1);
 END_FUZZIFY
 
 FUZZIFY densityCor2
-	TERM low := (0, 1) (10, 0) ;
-    TERM medium := (8, 0) (10,1) (20,1) (22,0);
-    TERM high := (20, 0) (100, 1);
+	TERM low := (0, 1) (0.25, 0) ;
+    TERM medium := (0.2, 0) (0.3,1)  (0.4,0);
+    TERM high := (0.3, 0) (4.5, 1);
 END_FUZZIFY
 
 FUZZIFY densityCor3
-	TERM low := (0, 1) (10, 0) ;
-    TERM medium := (8, 0) (10,1) (20,1) (22,0);
-    TERM high := (20, 0) (100, 1);
+	TERM low := (0, 1) (0.25, 0) ;
+    TERM medium := (0.2, 0) (0.3,1)  (0.4,0);
+    TERM high := (0.3, 0) (4.5, 1);
 END_FUZZIFY
 
 DEFUZZIFY corridor	//
-	TERM use1 := (0,0) (1,1) (2,0);
-	TERM use2 := (1,0) (2,1) (3,0);
-	TERM use3 := (2,0) (3,1) (4,0);
-	TERM sendAway := (3,0) (4,1) (5,0);
+	TERM use3 := (2000,0) (2001,1) (2002,0);
+	TERM use2 := (2001,0) (2002,1) (2003,0);
+	TERM use1 := (2002,0) (2003,1) (2004,0);
+	TERM sendAway := (2003,0) (2004,1) (2005,0);
 	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
 	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
 END_DEFUZZIFY
@@ -62,7 +62,10 @@ RULEBLOCK No1
 	ACCU : MAX;			// Use 'max' accumulation method
 
 	RULE 1 : IF density IS high AND densityCor1 is high AND densityCor2 is high AND densityCor3 is high THEN corridor IS sendAway;
-	RULE 2 : If density IS low OR density is medium AND densityCor1 IS low OR densityCor1 is medium THEN corridor IS use1;
+	RULE 2 : If densityCor1 IS high AND densityCor2 is low THEN corridor is use2;
+	RULE 3 : If densityCor1 IS high AND densityCor2 is high THEN corridor is use3;
+	RULE 3 : If densityCor1 IS low OR densityCor1 IS medium THEN corridor is use1;
+
 END_RULEBLOCK
 
 END_FUNCTION_BLOCK

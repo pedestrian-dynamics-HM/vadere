@@ -41,28 +41,32 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2001
+        "measurementAreaId" : 2001,
+        "countsInsteadOfDensity" : false
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2002
+        "measurementAreaId" : 2002,
+        "countsInsteadOfDensity" : false
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2003
+        "measurementAreaId" : 2003,
+        "countsInsteadOfDensity" : false
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 1000
+        "measurementAreaId" : 1000,
+        "countsInsteadOfDensity" : false
       }
     } ],
     "isTimestamped" : false,
@@ -158,15 +162,6 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 55.0,
-          "y" : 3.5,
-          "width" : 25.0,
-          "height" : 36.5,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
-      }, {
-        "shape" : {
           "x" : 35.0,
           "y" : 3.5,
           "width" : 17.0,
@@ -192,6 +187,36 @@
           "type" : "RECTANGLE"
         },
         "id" : 7
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 55.0,
+            "y" : 40.0
+          }, {
+            "x" : 79.5,
+            "y" : 40.0
+          }, {
+            "x" : 79.5,
+            "y" : 3.5
+          }, {
+            "x" : 74.4,
+            "y" : 3.5
+          }, {
+            "x" : 74.4,
+            "y" : 20.0
+          }, {
+            "x" : 59.9,
+            "y" : 20.0
+          }, {
+            "x" : 59.9,
+            "y" : 3.5
+          }, {
+            "x" : 54.9,
+            "y" : 3.5
+          } ]
+        },
+        "id" : 8
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -308,6 +333,23 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 2004,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 62.4,
+          "y" : 17.4,
+          "width" : 9.0,
+          "height" : 2.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ {
         "id" : 4,
@@ -361,7 +403,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
         "distributionParameters" : [ 0.6 ],
-        "spawnNumber" : 1,
+        "spawnNumber" : 5,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
