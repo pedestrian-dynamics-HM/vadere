@@ -281,7 +281,7 @@ public class TextView extends JPanel implements IJsonView {
 		switch (attributeType) {
 		case MODEL:
 			textfileTextarea.setText(StateJsonConverter.serializeMainModelAttributesModelBundle(
-					scenario.getModelAttributes(), scenario.getScenarioStore().getMainModel()));
+					scenario.getModelAttributes(), scenario.getScenarioStore().getMainModel(), scenario.getScenarioStore().getStrategyModel()));
 			break;
 		case SIMULATION:
 			textfileTextarea

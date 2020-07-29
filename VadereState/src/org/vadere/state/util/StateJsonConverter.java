@@ -359,9 +359,11 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
 
-	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel)
+	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel, String strategyModel)
 			throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
+
+		node.put("strategyModel",strategyModel);
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);
