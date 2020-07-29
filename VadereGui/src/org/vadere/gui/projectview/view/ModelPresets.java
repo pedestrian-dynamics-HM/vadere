@@ -77,13 +77,13 @@ public class ModelPresets {
 		// Behavioural Heuristics Model
 		list.clear();
 		list.add(AttributesBHM.class);
-		registerModelPreset(BehaviouralHeuristicsModel.class, list);
+		registerModelPreset(BehaviouralHeuristicsModel.class, list );
 
 		// Biomechanics Model
 		list.clear();
 		list.add(AttributesBMM.class);
 		list.add(AttributesBHM.class);
-		registerModelPreset(BiomechanicsModel.class, list);
+		registerModelPreset(BiomechanicsModel.class, list );
 
 		// SelfCatThreat Model
 		list.clear();
@@ -98,9 +98,9 @@ public class ModelPresets {
 	}
 
 	private void registerModelPreset(Class<? extends MainModel> mainModelClass,
-			List<Class<? extends Attributes>> attributesClasses) {
+									 List<Class<? extends Attributes>> attributesClasses) {
 
-		ModelDefinition definition = new ModelDefinition(mainModelClass.getName(), "123" , null);
+		ModelDefinition definition = new ModelDefinition(mainModelClass.getName(), null , null);
 		definition.createAndSetDefaultAttributes(attributesClasses);
 		modelDefinitionPresets.add(definition);
 	}

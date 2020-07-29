@@ -247,6 +247,8 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException { // may also throw one of the instantiator's exceptions
 
 		ObjectNode node = mapper.createObjectNode();
+
+		node.put("strategyModel", modelDefinition.getStrategyModel());
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
 		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
 		return prettyWriter.writeValueAsString(node);
@@ -363,7 +365,12 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
 
-		node.put("strategyModel",strategyModel);
+		if (strategyModel.equals("null")){
+			node.set("strategyModel",null);}
+		else{
+			node.put("strategyModel",strategyModel.replaceAll("\"", ""));
+		}
+
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);

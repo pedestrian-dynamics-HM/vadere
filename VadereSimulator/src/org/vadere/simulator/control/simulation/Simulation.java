@@ -214,8 +214,9 @@ public class Simulation {
 		for (Model m : models) {
 			m.preLoop(simTimeInSec);
 		}
-
-		strategyModel.initialize(simTimeInSec);
+		if (strategyModel != null){
+			strategyModel.initialize(simTimeInSec);
+		}
 
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
@@ -424,13 +425,14 @@ public class Simulation {
 
 	private void updateStrategyLayer(double simTimeInSec) {
 
-		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		if (strategyModel != null) {
+			Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
-		if (simTimeInSec == startTimeInSec)
-		{
-			strategyModel.update(simTimeInSec, pedestrians, null);
+			if (simTimeInSec == startTimeInSec) {
+				strategyModel.update(simTimeInSec, pedestrians, null);
+			}
+			strategyModel.update(simTimeInSec, pedestrians, processorManager);
 		}
-		strategyModel.update(simTimeInSec, pedestrians, processorManager);
 
 
 	}

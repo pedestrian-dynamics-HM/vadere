@@ -8,6 +8,7 @@ import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.topographycreator.view.TopographyWindow;
+import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.models.ModelHelper;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -133,6 +134,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
 								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 							try {
+								String strategyModelString = scenario.getScenarioStore().getStrategyModel();
+								modelDefinition.setStrategyModel(strategyModelString);
 								attributesModelView.setText(StateJsonConverter.serializeModelPreset(modelDefinition));
 							} catch (Exception e1) {
 								e1.printStackTrace();

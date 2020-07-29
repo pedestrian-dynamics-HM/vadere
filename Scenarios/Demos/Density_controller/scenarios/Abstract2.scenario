@@ -1,5 +1,5 @@
 {
-  "name" : "AbstractThreeCorridors",
+  "name" : "Abstract2",
   "description" : "",
   "release" : "1.13",
   "processWriters" : {
@@ -74,7 +74,7 @@
   },
   "scenario" : {
     "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
-    "strategyModel" : "\"RouteChoiceThreeCorridors\"",
+    "strategyModel" : null,
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
@@ -354,8 +354,8 @@
         "id" : 5001,
         "absorbing" : false,
         "shape" : {
-          "x" : 64.6,
-          "y" : 10.2,
+          "x" : 64.2,
+          "y" : 14.0,
           "width" : 5.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
@@ -410,8 +410,8 @@
       }, {
         "id" : 9,
         "shape" : {
-          "x" : 60.1,
-          "y" : 4.2,
+          "x" : 60.0,
+          "y" : 9.3,
           "width" : 14.1,
           "height" : 4.0,
           "type" : "RECTANGLE"

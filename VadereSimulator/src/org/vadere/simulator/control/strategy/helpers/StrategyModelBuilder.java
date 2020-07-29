@@ -11,12 +11,17 @@ public class StrategyModelBuilder {
 
     public static IStrategyModel instantiateModel(ScenarioStore scenarioStore) {
         String simpleClassName = scenarioStore.getStrategyModel();
-        String classSearchPath = "org.vadere.simulator.models.strategy";
-        String fullyQualifiedClassName = classSearchPath + JAVA_PACKAGE_SEPARATOR + simpleClassName;
+        if (simpleClassName != null) {
+            String classSearchPath = "org.vadere.simulator.models.strategy";
+            String fullyQualifiedClassName = classSearchPath + JAVA_PACKAGE_SEPARATOR + simpleClassName.replaceAll("\"","");
 
-        DynamicClassInstantiator<IStrategyModel> instantiator = new DynamicClassInstantiator<>();
-        IStrategyModel strategyModel = instantiator.createObject(fullyQualifiedClassName);
+            DynamicClassInstantiator<IStrategyModel> instantiator = new DynamicClassInstantiator<>();
+            IStrategyModel strategyModel = instantiator.createObject(fullyQualifiedClassName);
 
-        return strategyModel;
+            return strategyModel;
+        }
+        else{
+            return null;
+        }
     }
 }
