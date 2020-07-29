@@ -55,9 +55,9 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
     private int getTargetFromFuzzyController(double density,double densityCor1,double densityCor2,double densityCor3) {
 
         fis.setVariable("density", density); // Set inputs
-        fis.setVariable("densityCor1", densityCor1);
+        fis.setVariable("densityCor1", densityCor3);
         fis.setVariable("densityCor2", densityCor2);
-        fis.setVariable("densityCor3", densityCor3);
+        fis.setVariable("densityCor3", densityCor1);
         fis.evaluate(); // Evaluate
 
         double corridor = fis.getVariable("corridor").getValue();
