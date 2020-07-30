@@ -1,7 +1,7 @@
 {
   "name" : "AbstractThreeCorridors",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -73,11 +73,7 @@
     "isWriteMetaData" : false
   },
   "scenario" : {
-	"attributesStrategy" : {
-	  "useStrategyModel" : false,
-      "strategyModel" : "RouteChoiceThreeCorridors"
-	},
-	"mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
+    "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
@@ -150,6 +146,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : "RouteChoiceThreeCorridors"
     },
     "topography" : {
       "attributes" : {
@@ -357,8 +357,8 @@
         "id" : 5001,
         "absorbing" : false,
         "shape" : {
-          "x" : 64.6,
-          "y" : 10.2,
+          "x" : 64.5,
+          "y" : 14.0,
           "width" : 5.0,
           "height" : 5.0,
           "type" : "RECTANGLE"
@@ -413,8 +413,8 @@
       }, {
         "id" : 9,
         "shape" : {
-          "x" : 60.1,
-          "y" : 4.2,
+          "x" : 60.0,
+          "y" : 10.0,
           "width" : 14.1,
           "height" : 4.0,
           "type" : "RECTANGLE"

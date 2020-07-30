@@ -129,6 +129,10 @@ public abstract class StateJsonConverter {
 		return mapper.treeToValue(node, AttributesPsychology.class);
 	}
 
+	public static AttributesStrategyModel deserializeAttributesStrategyModel(String json) throws IOException {
+		return deserializeObjectFromJson(json, AttributesStrategyModel.class);
+	}
+
 	public static AttributesStrategyModel deserializeAttributesStrategyModelFromNode(JsonNode node)
 			throws JsonProcessingException {
 		return mapper.treeToValue(node, AttributesStrategyModel.class);
@@ -356,6 +360,11 @@ public abstract class StateJsonConverter {
 	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
 			throws JsonProcessingException {
 		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
+	}
+
+	public static String serializeAttributesStrategyModel(AttributesStrategyModel attributesStrategyModel)
+			throws JsonProcessingException {
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesStrategyModel, JsonNode.class));
 	}
 
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {

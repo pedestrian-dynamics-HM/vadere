@@ -10,6 +10,7 @@ import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.io.IOUtils;
@@ -138,6 +139,10 @@ public class Scenario {
 		return scenarioStore.getAttributesPsychology();
 	}
 
+	public AttributesStrategyModel getAttributesStrategyModel() {
+		return scenarioStore.getAttributesStrategyModel();
+	}
+
 	public Topography getTopography() {
 		return scenarioStore.getTopography();
 	}
@@ -156,6 +161,10 @@ public class Scenario {
 
 	public void setAttributesPsychology(@NotNull final AttributesPsychology attributesPsychology) {
 		this.scenarioStore.setAttributesPsychology(attributesPsychology);
+	}
+
+	public void setAttributesStrategy(@NotNull final AttributesStrategyModel attributesStrategyModel) {
+		this.scenarioStore.setAttributesStrategyModel(attributesStrategyModel);
 	}
 
 	public void setTopography(@NotNull final Topography topography) {
