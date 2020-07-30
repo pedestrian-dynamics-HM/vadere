@@ -147,7 +147,6 @@ public abstract class StateJsonConverter {
 		return deserializeTopographyFromNode(mapper.readTree(json));
 	}
 
-
 	public static Topography deserializeTopographyFromNode(JsonNode node) throws IllegalArgumentException {
 		TopographyStore store = mapper.convertValue(node, TopographyStore.class);
 		Topography topography = new Topography(store.attributes, store.attributesPedestrian, store.attributesCar);
@@ -247,8 +246,6 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException { // may also throw one of the instantiator's exceptions
 
 		ObjectNode node = mapper.createObjectNode();
-
-		node.put("strategyModel", modelDefinition.getStrategyModel());
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
 		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
 		return prettyWriter.writeValueAsString(node);
@@ -361,16 +358,9 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
 
-	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel, String strategyModel)
+	public static String serializeMainModelAttributesModelBundle(List<Attributes> attributesList, String mainModel)
 			throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
-
-		if (strategyModel.equals("null")){
-			node.set("strategyModel",null);}
-		else{
-			node.put("strategyModel",strategyModel.replaceAll("\"", ""));
-		}
-
 		node.put(MAIN_MODEL_KEY, mainModel);
 		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);

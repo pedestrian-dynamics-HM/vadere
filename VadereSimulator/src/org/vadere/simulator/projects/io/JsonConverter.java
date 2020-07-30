@@ -3,7 +3,6 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
-import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;
@@ -41,18 +40,8 @@ public class JsonConverter {
 			@SuppressWarnings("unused")
 			MainModel dummyToProvokeClassCast = instantiator.createObject(mainModelString);
 		}
-
-		JsonNode strategyModel = node.get("strategyModel");
-		String strategyModelString = null;
-		if (!strategyModel.isNull()){
-			strategyModelString = strategyModel.toString();
-		}
-
-		return new ModelDefinition(mainModelString, strategyModelString, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
+		return new ModelDefinition(mainModelString, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
 	}
-
-
-
 
 	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
 		JsonNode rootNode = node;
@@ -70,13 +59,10 @@ public class JsonConverter {
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
 		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
 
-		String strategyModel = scenarioNode.get("strategyModel").asText();
-
 		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription,
 				mainModel, attributesModel,
 				attributesSimulation, attributesPsychology,
-				topography, stimulusInfoStore,
-				strategyModel);
+				topography, stimulusInfoStore);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
@@ -123,7 +109,6 @@ public class JsonConverter {
 		ObjectNode vadereNode = StateJsonConverter.createObjectNode();
 
 		vadereNode.put(StateJsonConverter.MAIN_MODEL_KEY, scenarioStore.getMainModel());
-		vadereNode.put("strategyModel", scenarioStore.getStrategyModel());
 
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		vadereNode.set("attributesModel", attributesModelNode);
@@ -163,7 +148,6 @@ public class JsonConverter {
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode),
-				scenarioStore.getStrategyModel());
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode));
 	}
 }

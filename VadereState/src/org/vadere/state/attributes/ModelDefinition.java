@@ -12,16 +12,12 @@ import org.vadere.util.reflection.DynamicClassInstantiator;
 public class ModelDefinition {
 
 	private String mainModel;
-	private String strategyModel;
 	private List<Attributes> attributesModel;
 
-	public ModelDefinition(String mainModel, String strategyModel, List<Attributes> attributesModel) {
+	public ModelDefinition(String mainModel, List<Attributes> attributesModel) {
 		this.mainModel = mainModel;
-		this.strategyModel = strategyModel;
 		this.attributesModel = attributesModel;
 	}
-
-
 
 	public void createAndSetDefaultAttributes(List<Class<? extends Attributes>> attributesClasses) {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
@@ -35,17 +31,9 @@ public class ModelDefinition {
 		return mainModel;
 	}
 
-	public String getStrategyModel() {
-		return strategyModel;
-	}
-
 	public void setMainModel(String mainModel) {
 		this.mainModel = mainModel;
 	}
-	public void setStrategyModel(String strategyModel) {
-		this.strategyModel = strategyModel;
-	}
-
 
 	public List<Attributes> getAttributesList() {
 		return attributesModel;
