@@ -1,23 +1,45 @@
 package org.vadere.state.attributes;
 
-public class AttributesStrategyModel {
+import java.util.Objects;
 
-    private String strategyModel = null;
+public class AttributesStrategyModel extends Attributes {
+
+    /**
+     * Store the members of this class under this key in the JSON file.
+     */
+    public static final String JSON_KEY = "attributesStrategy";
+
+    private boolean useStrategyModel;
+    private String strategyModel;
 
     // Constructors
-    public AttributesStrategyModel() {
+    public AttributesStrategyModel(){
+        this.useStrategyModel = false;
+        this.strategyModel = null;
     }
 
-    public AttributesStrategyModel(String strategyModel) {
+    public AttributesStrategyModel(boolean useStrategyModel, String strategyModel) {
+        this.useStrategyModel = useStrategyModel;
         this.strategyModel = strategyModel;
     }
 
-    // Getter
+    // getter and setters
     public String getStrategyModel() {
-        return this.strategyModel;
+        return strategyModel;
     }
 
     public void setStrategyModel(String strategyModel) {
         this.strategyModel = strategyModel;
     }
+
+    public boolean isUseStrategyModel() {
+        return useStrategyModel;
+    }
+
+    public void setUseStrategyModel(boolean useStrategyModel) {
+        this.useStrategyModel = useStrategyModel;
+    }
 }
+
+
+

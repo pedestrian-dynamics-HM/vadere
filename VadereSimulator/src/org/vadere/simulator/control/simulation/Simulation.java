@@ -425,7 +425,7 @@ public class Simulation {
 
 	private void updateStrategyLayer(double simTimeInSec) {
 
-		if (strategyModel != null) {
+		if (scenarioStore.getAttributesStrategyModel().isUseStrategyModel()) {
 			Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 			if (simTimeInSec == startTimeInSec) {

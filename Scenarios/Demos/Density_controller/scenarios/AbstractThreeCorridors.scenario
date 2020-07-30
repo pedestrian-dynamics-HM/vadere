@@ -73,8 +73,11 @@
     "isWriteMetaData" : false
   },
   "scenario" : {
-    "mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
-    "strategyModel" : "\"RouteChoiceThreeCorridors\"",
+	"attributesStrategy" : {
+	  "useStrategyModel" : false,
+      "strategyModel" : "RouteChoiceThreeCorridors"
+	},
+	"mainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesOSM" : {
         "stepCircleResolution" : 4,
