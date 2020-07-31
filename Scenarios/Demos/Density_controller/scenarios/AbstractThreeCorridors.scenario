@@ -148,7 +148,7 @@
       }
     },
     "attributesStrategy" : {
-      "useStrategyModel" : false,
+      "useStrategyModel" : true,
       "strategyModel" : "RouteChoiceThreeCorridors"
     },
     "topography" : {

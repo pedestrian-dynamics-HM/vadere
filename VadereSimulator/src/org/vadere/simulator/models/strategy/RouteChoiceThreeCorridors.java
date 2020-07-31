@@ -1,17 +1,13 @@
 package org.vadere.simulator.models.strategy;
 
-import net.sourceforge.jFuzzyLogic.plot.JFuzzyChart;
-import net.sourceforge.jFuzzyLogic.rule.Rule;
+import net.sourceforge.jFuzzyLogic.FIS;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import net.sourceforge.jFuzzyLogic.FIS; // http://jfuzzylogic.sourceforge.net/html/index.html
 
 public class RouteChoiceThreeCorridors implements INavigationModel {
 

@@ -36,26 +36,26 @@
       </testResources>
     <plugins>
 
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-install-plugin</artifactId>
-            <version>2.5</version>
-            <executions>
-                <execution>
-                    <phase>initialize</phase>
-                    <goals>
-                        <goal>install-file</goal>
-                    </goals>
-                    <configuration>
-                        <groupId>net.sourceforge.jFuzzyLogic</groupId>
-                        <artifactId>jFuzzyLogic</artifactId>
-                        <version>1.0</version>
-                        <packaging>jar</packaging>
-                        <file>../lib/jFuzzyLogic.jar</file>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+<!--        <plugin>-->
+<!--            <groupId>org.apache.maven.plugins</groupId>-->
+<!--            <artifactId>maven-install-plugin</artifactId>-->
+<!--            <version>2.5</version>-->
+<!--            <executions>-->
+<!--                <execution>-->
+<!--                    <phase>initialize</phase>-->
+<!--                    <goals>-->
+<!--                        <goal>install-file</goal>-->
+<!--                    </goals>-->
+<!--                    <configuration>-->
+<!--                        <groupId>net.sourceforge.jFuzzyLogic</groupId>-->
+<!--                        <artifactId>jFuzzyLogic</artifactId>-->
+<!--                        <version>1.0</version>-->
+<!--                        <packaging>jar</packaging>-->
+<!--                        <file>../lib/jFuzzyLogicA.jar</file>-->
+<!--                    </configuration>-->
+<!--                </execution>-->
+<!--            </executions>-->
+<!--        </plugin>-->
 
 
         <plugin>
@@ -140,11 +140,19 @@
   	</dependency>
 
 <!-- module dependencies -->
-    <dependency>
+ <!--   <dependency>
         <groupId>net.sourceforge.jFuzzyLogic</groupId>
         <artifactId>jFuzzyLogic</artifactId>
         <version>1.0</version>
-    </dependency>
+    </dependency>-->
+
+  <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>net.sourceforge.jFuzzyLogic</artifactId>
+      <scope>system</scope>
+      <version>1.0</version>
+      <systemPath>/home/christina/repos/vadere/lib/jFuzzyLogic.jar</systemPath>
+  </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
