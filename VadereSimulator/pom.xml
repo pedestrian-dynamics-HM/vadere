@@ -36,28 +36,6 @@
       </testResources>
     <plugins>
 
-<!--        <plugin>-->
-<!--            <groupId>org.apache.maven.plugins</groupId>-->
-<!--            <artifactId>maven-install-plugin</artifactId>-->
-<!--            <version>2.5</version>-->
-<!--            <executions>-->
-<!--                <execution>-->
-<!--                    <phase>initialize</phase>-->
-<!--                    <goals>-->
-<!--                        <goal>install-file</goal>-->
-<!--                    </goals>-->
-<!--                    <configuration>-->
-<!--                        <groupId>net.sourceforge.jFuzzyLogic</groupId>-->
-<!--                        <artifactId>jFuzzyLogic</artifactId>-->
-<!--                        <version>1.0</version>-->
-<!--                        <packaging>jar</packaging>-->
-<!--                        <file>../lib/jFuzzyLogicA.jar</file>-->
-<!--                    </configuration>-->
-<!--                </execution>-->
-<!--            </executions>-->
-<!--        </plugin>-->
-
-
         <plugin>
             <groupId>com.nativelibs4java</groupId>
             <artifactId>maven-javacl-plugin</artifactId>
@@ -140,11 +118,6 @@
   	</dependency>
 
 <!-- module dependencies -->
- <!--   <dependency>
-        <groupId>net.sourceforge.jFuzzyLogic</groupId>
-        <artifactId>jFuzzyLogic</artifactId>
-        <version>1.0</version>
-    </dependency>-->
 
   <dependency>
       <groupId>net.sourceforge</groupId>

@@ -1,5 +1,5 @@
 {
-  "name" : "AbstractThreeCorridors",
+  "name" : "AbstractThreeCorridors_normal",
   "description" : "",
   "release" : "1.14",
   "processWriters" : {
@@ -148,7 +148,7 @@
       }
     },
     "attributesStrategy" : {
-      "useStrategyModel" : true,
+      "useStrategyModel" : false,
       "strategyModel" : "RouteChoiceThreeCorridors"
     },
     "topography" : {

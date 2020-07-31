@@ -28,7 +28,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
         if (simTimeInSec > 0.0) {
 
-            System.out.println(simTimeInSec);
+            // System.out.println(simTimeInSec);
 
             double densityCor1 = getDensityFromDataProcessor(5, processorManager);
             double densityCor2 = getDensityFromDataProcessor(6, processorManager);
@@ -37,10 +37,14 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
             LinkedList<Integer> nextTargets = new LinkedList<Integer>();
             int target = getTargetFromFuzzyController(density,densityCor1,densityCor2,densityCor3);
+            nextTargets.add(target);
+            if (target == 2004) {
+                nextTargets.add(2001);
+            }
+            nextTargets.add(1);
 
             List<Pedestrian> newAgents = pedestrians.stream().filter(p -> p.getFootstepHistory().getFootSteps().size() == 0).collect(Collectors.toList());
             for (Pedestrian pedestrian : newAgents) {
-                nextTargets.add(target);
                 pedestrian.setTargets(nextTargets);
             }
 
@@ -59,9 +63,9 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
         double corridor = fis.getVariable("corridor").getValue();
         int result = (int) Math.round(corridor);
 
-        System.out.println("Densities: " + density + " " + densityCor1 + " " + densityCor2 +" " + densityCor3); // Show output variable
+        //System.out.println("Densities: " + density + " " + densityCor1 + " " + densityCor2 +" " + densityCor3); // Show output variable
 
-        System.out.println("Output value:" + corridor + ", rounded :" + result); // Show output variable
+        //System.out.println("Output value:" + corridor + ", rounded :" + result); // Show output variable
 
         // Show each rule (and degree of support)
         //for( Rule r : fis.getFunctionBlock("streamControl").getFuzzyRuleBlock("No1").getRules() ) System.out.println(r);
