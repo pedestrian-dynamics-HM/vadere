@@ -119,14 +119,6 @@
 
 <!-- module dependencies -->
 
-  <dependency>
-      <groupId>net.sourceforge</groupId>
-      <artifactId>jFuzzyLogic</artifactId>
-      <scope>system</scope>
-      <version>1.0</version>
-      <systemPath>${basedir}/src/libs/jFuzzyLogic.jar</systemPath>
-  </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>state</artifactId>
