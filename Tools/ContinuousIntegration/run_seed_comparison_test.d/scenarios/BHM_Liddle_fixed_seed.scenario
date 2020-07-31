@@ -1,7 +1,7 @@
 {
   "name" : "BHM_Liddle_fixed_seed",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -43,7 +43,8 @@
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 1
+        "measurementAreaId" : 1,
+        "countsInsteadOfDensity" : true
       }
     } ],
     "isTimestamped" : true,
@@ -107,6 +108,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
