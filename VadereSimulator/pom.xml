@@ -147,11 +147,11 @@
     </dependency>-->
 
   <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>net.sourceforge.jFuzzyLogic</artifactId>
+      <groupId>net.sourceforge</groupId>
+      <artifactId>jFuzzyLogic</artifactId>
       <scope>system</scope>
       <version>1.0</version>
-      <systemPath>/home/christina/repos/vadere/lib/jFuzzyLogic.jar</systemPath>
+      <systemPath>${basedir}/src/libs/jFuzzyLogic.jar</systemPath>
   </dependency>
 
     <dependency>
