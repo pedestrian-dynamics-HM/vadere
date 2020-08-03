@@ -41,32 +41,28 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2001,
-        "countsInsteadOfDensity" : false
+        "measurementAreaId" : 2001
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2002,
-        "countsInsteadOfDensity" : false
+        "measurementAreaId" : 2002
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2003,
-        "countsInsteadOfDensity" : false
+        "measurementAreaId" : 2003
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor",
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 1000,
-        "countsInsteadOfDensity" : false
+        "measurementAreaId" : 1000
       }
     } ],
     "isTimestamped" : false,

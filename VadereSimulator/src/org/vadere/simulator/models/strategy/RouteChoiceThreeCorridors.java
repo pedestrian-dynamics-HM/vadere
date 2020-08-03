@@ -5,6 +5,7 @@ import com.github.cschen1205.fuzzylogic.*;
 import com.github.cschen1205.fuzzylogic.memberships.*;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.*;
@@ -135,15 +136,15 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
 
 
-
-
-
     private double getDensityFromDataProcessor(int processorId, ProcessorManager processorManager) {
         double density = -1.0;
         if (processorManager != null) {
-            TreeMap data = (TreeMap) processorManager.getProcessor(processorId).getData();
+            AreaDensityCountingProcessor a = (AreaDensityCountingProcessor) processorManager.getProcessor(processorId);
+            TreeMap data = (TreeMap) a.getData();
+            double area = a.getMeasurementArea().asPolygon().getArea();
             if (data.size() > 0) {
-                density = (double)  data.lastEntry().getValue();
+                density = (double) (Integer) data.lastEntry().getValue();
+                density = density/area;
             }
         }
         return density;

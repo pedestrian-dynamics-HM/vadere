@@ -1,7 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
@@ -21,7 +20,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
  */
 
 @DataProcessorClass(label = "AreaDensityCountingProcessor")
-public class AreaDensityCountingProcessor extends AreaDataProcessor<Double>  {
+public class AreaDensityCountingProcessor extends AreaDataProcessor<Integer>  {
 
     public AreaDensityCountingProcessor() {
         super("areaDensityCounting");
@@ -46,20 +45,14 @@ public class AreaDensityCountingProcessor extends AreaDataProcessor<Double>  {
             }
         }
 
-        double result;
-        if (getAttributes().getCountsInsteadOfDensity()) { result = pedCount; }
-        else {
-            double measurementAreaSize = getMeasurementArea().asPolygon().getArea();
-            result =  pedCount/measurementAreaSize; }
-
-        this.putValue(new TimestepKey(state.getStep()),result);
+        this.putValue(new TimestepKey(state.getStep()), pedCount);
     }
 
     @Override
-    public AttributesAreaDensityCountingProcessor getAttributes() {
+    public AttributesProcessor getAttributes() {
         if(super.getAttributes() == null) {
             setAttributes(new AttributesAreaDensityCountingProcessor());
         }
-        return (AttributesAreaDensityCountingProcessor) super.getAttributes();
+        return super.getAttributes();
     }
 }
