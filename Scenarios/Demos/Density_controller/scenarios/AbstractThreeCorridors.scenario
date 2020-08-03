@@ -125,7 +125,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 300.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -213,9 +213,9 @@
       } ],
       "measurementAreas" : [ {
         "shape" : {
-          "x" : 68.5,
+          "x" : 73.5,
           "y" : 40.0,
-          "width" : 10.0,
+          "width" : 5.0,
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
@@ -259,7 +259,7 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 20.0,
+        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -327,7 +327,7 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 40.0,
+        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,

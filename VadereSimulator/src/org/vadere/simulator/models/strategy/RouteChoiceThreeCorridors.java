@@ -48,42 +48,33 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
         density1.addMembership("high", new FuzzyGrade(0.2, 5));
         rie.addFuzzySet(density1.getName(), density1);
 
-//        density2 = new FuzzySet("density2", -4, 4, 0.05);
-//        density2.addMembership("low", new FuzzyReverseGrade(0, 0.25));
-//        density2.addMembership("high", new FuzzyGrade(0.2, 5));
-//        rie.addFuzzySet(density2.getName(), density2);
-//
-//        density3 = new FuzzySet("density3", -4, 4, 0.05);
-//        density3.addMembership("low", new FuzzyReverseGrade(0, 0.25));
-//        density3.addMembership("high", new FuzzyGrade(0.2, 5));
-//        rie.addFuzzySet(density3.getName(), density3);
-//
+        density2 = new FuzzySet("density2", -4, 4, dX);
+        density2.addMembership("low", new FuzzyReverseGrade(0, 0.25));
+        density2.addMembership("high", new FuzzyGrade(0.2, 5));
+        rie.addFuzzySet(density2.getName(), density2);
 
 
-        Rule rule=new Rule("Rule 1");
-        rule.addAntecedent(new Clause(density, "Is", "low"));
-        rule.addAntecedent(new Clause(density1, "Is", "low"));
-        rule.setConsequent(new Clause(corridor, "Is", "use1"));
-        rie.addRule(rule);
+        Rule rule;
+        String ruleName;
+        String[] d0 = {"high","high","high","high","low","low","low","low"};
+        String[] d1 = {"high","high","low","low","high","high","low","low"};
+        String[] d2 = {"high","low","high","low","high","low","high","low"};
+        String[] re = {"wait","wait","wait","wait","use3","use2","use1","use1"};
 
-        Rule rule2=new Rule("Rule 2");
-        rule2.addAntecedent(new Clause(density, "Is", "high"));
-        rule2.addAntecedent(new Clause(density1, "Is", "low"));
-        rule2.setConsequent(new Clause(corridor, "Is", "use3"));
-        rie.addRule(rule2);
 
-        Rule rule3=new Rule("Rule 3");
-        rule3.addAntecedent(new Clause(density, "Is", "high"));
-        rule3.addAntecedent(new Clause(density1, "Is", "high"));
-        rule3.setConsequent(new Clause(corridor, "Is", "wait"));
-        rie.addRule(rule3);
+        for (int i = 0; i < d0.length; i++) {
 
-        Rule rule4=new Rule("Rule 4");
-        rule4.addAntecedent(new Clause(density, "Is", "low"));
-        rule4.addAntecedent(new Clause(density1, "Is", "high"));
-        rule4.setConsequent(new Clause(corridor, "Is", "use3"));
-        rie.addRule(rule4);
-        
+            ruleName = "Rule " + (i+1);
+            rule = new Rule(ruleName);
+
+            rule.addAntecedent(new Clause(density, "Is", d0[i]));
+            rule.addAntecedent(new Clause(density1, "Is", d1[i]));
+            rule.addAntecedent(new Clause(density2, "Is", d2[i]));
+            rule.setConsequent(new Clause(corridor, "Is", re[i]));
+            rie.addRule(rule);
+        }
+
+
     }
 
 
@@ -97,19 +88,18 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
             double densityC0 = getDensityFromDataProcessor(8, processorManager);
             double densityC1 = getDensityFromDataProcessor(5, processorManager);
             double densityC2 = getDensityFromDataProcessor(6, processorManager);
-            double densityC3 = getDensityFromDataProcessor(7, processorManager);
+            //double densityC3 = getDensityFromDataProcessor(7, processorManager);
 
             density.setX(densityC0);
             density1.setX(densityC1);
-            //density2.setX(densityC2);
-            //density3.setX(densityC3);
+            density2.setX(densityC2);
             rie.Infer(corridor);
 
             double targetD = corridor.getX();
             int target;
 
             if (Double.isNaN(targetD)) {
-                target = 2002;
+                target = 2003;
             }
             else{
                 target = (int) Math.round(targetD);
