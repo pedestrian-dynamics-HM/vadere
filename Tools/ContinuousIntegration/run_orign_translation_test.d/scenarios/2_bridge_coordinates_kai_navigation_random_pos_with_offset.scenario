@@ -193,7 +193,7 @@
             "y" : 5933436.907734532
           } ]
         },
-        "id" : -1
+        "id" : 3
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -253,7 +253,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 4,
         "shape" : {
           "x" : 564304.3,
           "y" : 5933435.5,

@@ -43,8 +43,7 @@
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 1,
-        "countsInsteadOfDensity" : true
+        "measurementAreaId" : 1
       }
     } ],
     "isTimestamped" : true,
