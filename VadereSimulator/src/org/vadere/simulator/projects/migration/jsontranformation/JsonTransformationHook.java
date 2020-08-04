@@ -1,6 +1,5 @@
 package org.vadere.simulator.projects.migration.jsontranformation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.vadere.simulator.projects.migration.MigrationException;

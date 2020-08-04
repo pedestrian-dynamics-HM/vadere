@@ -17,9 +17,6 @@
 
     <build>
             <plugins>
-
-
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
@@ -121,26 +118,11 @@
 
     <!-- global dependencies! -->
   <dependencies>
-      <!--<dependency>
-          <groupId>net.sourceforge.jFuzzyLogic</groupId>
-          <artifactId>jFuzzyLogic</artifactId>
-          <version>1.0</version>
-          <scope>system</scope>
-          <systemPath>${basedir}/lib/jFuzzyLogic.jar</systemPath>
-      </dependency>-->
-      <!-- https://mvnrepository.com/artifact/net.sourceforge.jFuzzyLogic/jFuzzyLogic -->
-<!--      <dependency>-->
-<!--          <groupId>net.sourceforge.jFuzzyLogic</groupId>-->
-<!--          <artifactId>jFuzzyLogic</artifactId>-->
-<!--          <version>1.2.1</version>-->
-<!--      </dependency>-->
-
       <dependency>
           <groupId>com.github.cschen1205</groupId>
           <artifactId>java-fuzzy-logic</artifactId>
           <version>1.0.1</version>
       </dependency>
-
       <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>

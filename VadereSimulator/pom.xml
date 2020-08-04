@@ -35,7 +35,6 @@
           </testResource>
       </testResources>
     <plugins>
-
         <plugin>
             <groupId>com.nativelibs4java</groupId>
             <artifactId>maven-javacl-plugin</artifactId>
@@ -108,8 +107,6 @@
         <platform.dependency>windows-x86_64</platform.dependency>
     </properties>-->
 
-
-
   <dependencies>
   	<dependency>
   		<groupId>commons-codec</groupId>
@@ -118,7 +115,6 @@
   	</dependency>
 
 <!-- module dependencies -->
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>state</artifactId>
