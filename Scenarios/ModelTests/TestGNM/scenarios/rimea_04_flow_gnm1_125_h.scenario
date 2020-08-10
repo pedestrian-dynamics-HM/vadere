@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_gnm1_125_h",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -70,6 +70,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 public enum AttributeType {
-	SIMULATION, MODEL, PSYCHOLOGY, PEDESTRIAN, CAR, TOPOGRAPHY, OUTPUTPROCESSOR, PERCEPTION;
+	SIMULATION, MODEL, PSYCHOLOGY, PEDESTRIAN, CAR, TOPOGRAPHY, OUTPUTPROCESSOR, PERCEPTION, STRATEGY;
 
 	public final static String simulationAttributes = "simulation attributes";
 	public final static String modelAttributes = "panelModel attributes";
@@ -10,6 +10,8 @@ public enum AttributeType {
 	public final static String scenarioAttributes = "scenario attributes";
 	public final static String carAttributes = "car attributes";
 	public final static String stimulusAttributes = "stimulus attributes";
+	public final static String strategyAttributes = "strategy attributes";
+
 
 	public static AttributeType fromName(String name) {
 		switch (name) {
@@ -27,6 +29,8 @@ public enum AttributeType {
 				return CAR;
 			case stimulusAttributes:
 				return PERCEPTION;
+			case strategyAttributes:
+				return STRATEGY;
 			default:
 				throw new IllegalArgumentException("name " + name + " does not match any attribute type.");
 		}

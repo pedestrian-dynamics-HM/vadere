@@ -11,10 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesPsychology;
-import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.ModelDefinition;
+import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -97,6 +94,8 @@ public abstract class StateJsonConverter {
 		return mapper.valueToTree(map);
 	}
 
+
+
 	private static class TopographyStore {
 		AttributesTopography attributes = new AttributesTopography();
 		AttributesAgent attributesPedestrian = new AttributesAgent();
@@ -128,6 +127,15 @@ public abstract class StateJsonConverter {
 	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
 			throws JsonProcessingException {
 		return mapper.treeToValue(node, AttributesPsychology.class);
+	}
+
+	public static AttributesStrategyModel deserializeAttributesStrategyModel(String json) throws IOException {
+		return deserializeObjectFromJson(json, AttributesStrategyModel.class);
+	}
+
+	public static AttributesStrategyModel deserializeAttributesStrategyModelFromNode(JsonNode node)
+			throws JsonProcessingException {
+		return mapper.treeToValue(node, AttributesStrategyModel.class);
 	}
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
@@ -354,6 +362,11 @@ public abstract class StateJsonConverter {
 		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
 	}
 
+	public static String serializeAttributesStrategyModel(AttributesStrategyModel attributesStrategyModel)
+			throws JsonProcessingException {
+		return prettyWriter.writeValueAsString(mapper.convertValue(attributesStrategyModel, JsonNode.class));
+	}
+
 	public static String serializeTopography(Topography topography) throws JsonProcessingException {
 		return prettyWriter.writeValueAsString(serializeTopographyToNode(topography));
 	}
@@ -374,6 +387,11 @@ public abstract class StateJsonConverter {
 	public static ObjectNode serializeStimuliToNode(StimulusInfoStore stimulusInfoStore) {
 		return mapper.valueToTree(stimulusInfoStore);
 	}
+
+	public static ObjectNode serializeAttributesStrategyModelToNode(AttributesStrategyModel attributesStrategyModel) {
+		return mapper.valueToTree(attributesStrategyModel);
+	}
+
 
 	public static String serializeObjectPretty(Object object) {
 		try {

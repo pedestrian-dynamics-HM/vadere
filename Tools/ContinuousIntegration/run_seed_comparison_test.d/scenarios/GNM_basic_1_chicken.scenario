@@ -1,7 +1,7 @@
 {
   "name" : "GNM_basic_1_chicken",
   "description" : "",
-  "release" : "1.13",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -81,6 +81,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
