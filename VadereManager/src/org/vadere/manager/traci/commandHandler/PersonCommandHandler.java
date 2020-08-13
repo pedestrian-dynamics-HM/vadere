@@ -210,8 +210,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		remoteManager.accessState((manager, state) -> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
-			if (checkIfPedestrianExists(ped, cmd))
-				cmd.setResponse(responseOK(PersonVar.SPEED.type, ped.getFreeFlowSpeed()));
+			if (checkIfPedestrianExists(ped, cmd)){
+				double speed = ped.getFootstepHistory().getAverageSpeedInMeterPerSecond();
+				cmd.setResponse(responseOK(PersonVar.SPEED.type, Double.isNaN(speed) ? 0.0 : speed));
+			}
 		});
 		return cmd;
 	}
@@ -366,7 +368,15 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ANGLE, name = "getAngle")
 	public TraCICommand process_getAngle(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		// return dummy value
-		cmd.setResponse(responseOK(PersonVar.ANGLE.type, 0.0));
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd)){
+				double angle = ped.getFootstepHistory().getNorthBoundHeadingAngleDeg();
+				cmd.setResponse(responseOK(PersonVar.ANGLE.type, angle));
+			}
+		});
 		return cmd;
 	}
 
