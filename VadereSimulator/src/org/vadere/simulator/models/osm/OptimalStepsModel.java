@@ -211,7 +211,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 						}
 						);
 			*/}
-			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
+			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random, getPotentialFieldAgent().getMaximalInfluenceRadius());
 		}
 	}
 

@@ -25,7 +25,7 @@ import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.control.ActionOpenFile;
 import org.vadere.gui.postvisualization.control.ActionPause;
 import org.vadere.gui.postvisualization.control.ActionPlay;
-import org.vadere.gui.postvisualization.control.ActionRecording;
+import org.vadere.gui.components.control.simulation.ActionRecording;
 import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
 import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
 import org.vadere.gui.postvisualization.control.ActionStop;

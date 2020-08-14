@@ -1,8 +1,8 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -137,7 +137,7 @@ public class Simulation {
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
-			pc.setTopography(topography);
+			pc.setDomain(domain);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class Simulation {
 		}
 
 		simulationState = initialSimulationState();
-		topographyController.preLoop(simTimeInSec);
+		topographyController.preLoop(simTimeInSec, scenarioStore.getAttributesList());
 		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 

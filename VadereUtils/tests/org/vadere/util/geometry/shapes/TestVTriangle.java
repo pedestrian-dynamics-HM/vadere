@@ -18,7 +18,7 @@ public class TestVTriangle {
     private double coorTop = Math.sqrt( Math.pow(radiusShould,2) + Math.pow(coor,2)  );
     private VTriangle vTriangle_symY_60degree = new VTriangle(new VPoint(-coor,-radiusShould), new VPoint(coor,-radiusShould), new VPoint(0.,coorTop) );
 
-    // create y-symmetric 45°-45°-90°-triangle (90°-angle is split by y-axis)
+    // create y-symmetric 45°-45°-90°-triangle (90°-angle3D is split by y-axis)
     private VPoint vPoint1 = new VPoint(-1.,0.);
     private VPoint vPoint2 = new VPoint(1.,0.);
     private VPoint vPoint3 = new VPoint(0.,1);

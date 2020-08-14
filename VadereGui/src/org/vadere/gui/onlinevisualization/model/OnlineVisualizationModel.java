@@ -14,9 +14,11 @@ import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
+import org.vadere.meshing.mesh.gen.AMesh;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.voronoi.VoronoiDiagram;
@@ -37,8 +39,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	private IPotentialField potentialFieldTarget = null;
 
 	private IPotentialField potentialField = null;
-
-	private Function<Agent, IMesh<?, ?, ?>> discretizations = null;
 
 	private Agent agent = null;
 
@@ -63,7 +63,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	 * The observation area to display. Updated by popDrawData() with the latest
 	 * observation area snapshot.
 	 */
-	private Topography topography;
+	private Domain domain;
 
 	public OnlineVisualizationModel() {
 		super(new DefaultSimulationConfig());
@@ -75,21 +75,21 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	@Override
 	public Collection<Agent> getAgents() {
-		if (topography == null) {
+		if (domain == null || domain.getTopography() == null) {
 			return new ArrayList<>();
 		}
 		Collection<Agent> result = new LinkedList<>();
-		result.addAll(topography.getElements(Agent.class));
+		result.addAll(domain.getTopography().getElements(Agent.class));
 		return result;
 	}
 
 	@Override
 	public Collection<Pedestrian> getPedestrians() {
-		if (topography == null) {
+		if (domain == null) {
 			return new ArrayList<>();
 		}
 		Collection<Pedestrian> result = new LinkedList<>();
-		result.addAll(topography.getElements(Pedestrian.class));
+		result.addAll(domain.getTopography().getElements(Pedestrian.class));
 		return result;
 	}
 
@@ -100,15 +100,18 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	@Override
 	public Topography getTopography() {
-		return topography;
+		if(domain == null) {
+			return null;
+		}
+		return domain.getTopography();
 	}
 
 	@Override
 	public Iterator<ScenarioElement> iterator() {
-		if (topography == null) {
+		if (domain == null) {
 			return new ArrayList<ScenarioElement>().iterator();
 		}
-		return new TopographyIterator(topography);
+		return new TopographyIterator(domain.getTopography());
 	}
 
 	/**
@@ -130,7 +133,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
             potentialFieldTarget = observationAreaSnapshot.potentialFieldTarget;
 			potentialField = observationAreaSnapshot.potentialField;
 			agent = observationAreaSnapshot.selectedAgent;
-			discretizations = observationAreaSnapshot.discretizations;
 
 			/*
 			 * if(topography == null ||
@@ -139,30 +141,30 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			 * }
 			 */
 
-			if (topography == null) {
-				topography = observationAreaSnapshot.scenario;
+			if (domain == null) {
+				domain = observationAreaSnapshot.domain;
 				// recalculate GUI (fireChangeViewportEvent will synchronize on model which is also
 				// needed by some awt event. Therefore do this in EDT (Event Dispatching Thread)
 				EventQueue.invokeLater(() -> {
-					fireChangeViewportEvent(new Rectangle2D.Double(topography.getBounds().x, topography.getBounds().y,
-							topography.getBounds().width, topography.getBounds().height));
+					fireChangeViewportEvent(new Rectangle2D.Double(getTopography().getBounds().x, getTopography().getBounds().y,
+							getTopography().getBounds().width, getTopography().getBounds().height));
 				});
 			} else {
-				topography = observationAreaSnapshot.scenario;
+				domain = observationAreaSnapshot.domain;
 			}
 
 			if (getSelectedElement() instanceof Car) {
 				int carId = getSelectedElement().getId();
-				Car car = topography.getElement(Car.class, carId);
+				Car car = domain.getTopography().getElement(Car.class, carId);
 				setSelectedElement(car);
 			} else if (getSelectedElement() instanceof Pedestrian) {
 				int pedId = getSelectedElement().getId();
-				Pedestrian ped = topography.getElement(Pedestrian.class, pedId);
+				Pedestrian ped = domain.getTopography().getElement(Pedestrian.class, pedId);
 				setSelectedElement(ped);
 			}
 
 			if (isVoronoiDiagramAvailable() && isVoronoiDiagramVisible()) {
-				getVoronoiDiagram().computeVoronoiDiagram(topography.getPedestrianDynamicElements().getElements()
+				getVoronoiDiagram().computeVoronoiDiagram(domain.getTopography().getPedestrianDynamicElements().getElements()
 								.stream()
 								.map(ped -> ped.getPosition())
 								.collect(Collectors.toList()));
@@ -186,7 +188,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		selectedElement = null;
 
 		voronoiDiagram = null;
-		topography = null;
+		domain = null;
 		simTimeInSec = 0.0;
 	}
 
@@ -225,12 +227,12 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	}
 
 	@Override
-	public IMesh<?, ?, ?> getDiscretization() {
-		if(agent != null && discretizations != null && config.isShowTargetPotentielFieldMesh() && agent.equals(getSelectedElement())) {
-			return discretizations.apply(agent);
+	public IMesh<?, ?, ?> getFloorFieldMesh() {
+		if(domain.getFloorFieldMesh() != null) {
+			return domain.getFloorFieldMesh();
+		} else {
+			return new AMesh();
 		}
-
-		return new PMesh();
 	}
 
 	@Override
@@ -263,6 +265,6 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 
 	@Override
 	public boolean isAlive(int pedId) {
-		return topography.getPedestrianDynamicElements().idExists(pedId);
+		return domain.getTopography().getPedestrianDynamicElements().idExists(pedId);
 	}
 }

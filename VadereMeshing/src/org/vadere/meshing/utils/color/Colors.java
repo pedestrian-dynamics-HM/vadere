@@ -9,4 +9,5 @@ public class Colors {
 	public static final Color RED_SMOTH = new Color(0.76863f,0.30588f, 0.32157f);
 	public static final Color VIOLET = new Color(0.5058823529411764f, 0.4470588235294118f, 0.6980392156862745f);
 	public static final Color BLUE = new Color(0.2980392156862745f, 0.4470588235294118f, 0.7901960784313725f);
+	public static final Color YELLOW = new Color(1.0f, 0.996078431372549f, 0.6392156862745098f);
 }

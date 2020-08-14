@@ -6,7 +6,6 @@ import org.vadere.simulator.utils.cache.ICacheObject;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
@@ -36,7 +35,7 @@ public class EikonalSolverCacheProvider extends EikonalSolverProvider {
 		   floor field initialization and log errors.
 		 */
 		boolean isInitialized = false;
-		logger.info("initialize floor field");
+		logger.info("solve floor field");
 		if (attributesPotential.isUseCachedFloorField() && cache.isNotEmpty()){
 			long ms = System.currentTimeMillis();
 			ICacheObject cacheObject = cache.getCacheForTarget(targetId);
@@ -45,8 +44,8 @@ public class EikonalSolverCacheProvider extends EikonalSolverProvider {
 				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms] (cache load time)"));
 			} else if (cacheObject.writable()) {
 				ms = System.currentTimeMillis();
-				logger.infof("No cache found for scenario initialize floor field");
-				eikonalSolver.initialize();
+				logger.infof("No cache found for scenario solve floor field");
+				eikonalSolver.solve();
 				isInitialized = true;
 
 				logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
@@ -59,7 +58,7 @@ public class EikonalSolverCacheProvider extends EikonalSolverProvider {
 
 		if (!isInitialized){
 			long ms = System.currentTimeMillis();
-			eikonalSolver.initialize();
+			eikonalSolver.solve();
 			logger.info("floor field initialization time:" + (System.currentTimeMillis() - ms + "[ms]"));
 		}
 	}

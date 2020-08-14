@@ -37,10 +37,10 @@ public class ParticleSwarmOptimizer extends StepCircleOptimizer {
 		double stepSize = circle.getRadius();
 
 		List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(pedestrian, (VCircle) reachableArea, random);
-		// maximum possible angle of movement relative to ankerAngle
+		// maximum possible angle3D of movement relative to ankerAngle
 		double angle;
 
-		// smallest possible angle of movement
+		// smallest possible angle3D of movement
 		double anchorAngle;
 
 		ICircleSector circleSector;

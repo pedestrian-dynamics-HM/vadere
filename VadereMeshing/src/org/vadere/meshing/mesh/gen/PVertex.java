@@ -75,7 +75,6 @@ public class PVertex implements IVertex {
 		return point.toString();
 	}
 
-
 	// TODO: make it protected since it is a non-deep copy. Therefore the IVertex should maybe not be a IPoint!?
 
 	@Override
@@ -107,7 +106,7 @@ public class PVertex implements IVertex {
     public PVertex clone() {
 	    try {
 		    PVertex clone = (PVertex)super.clone();
-		    clone.point = (IPoint)point.clone();
+		    clone.point = point.clone();
 		    clone.lock = new ReentrantLock();
 		    return clone;
 	    } catch (CloneNotSupportedException e) {

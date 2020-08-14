@@ -59,6 +59,7 @@ public class AVertex implements IVertex, Cloneable {
 		this.id = id;
 		this.lock = new ReentrantLock();
 		this.destroyed = false;
+		this.halfEdge = -1;
 	}
 
 	protected void setPoint(@NotNull final IPoint point) {
@@ -112,11 +113,6 @@ public class AVertex implements IVertex, Cloneable {
 
 	Lock getLock() {
 		return lock;
-	}
-
-	@Override
-	public int hashCode() {
-		return point.hashCode();
 	}
 
 	@Override

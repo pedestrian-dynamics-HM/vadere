@@ -8,9 +8,9 @@ import org.vadere.meshing.mesh.inter.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IPointLocator<V, E, F> {
 
@@ -21,7 +21,7 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	public CachedPointLocator(@NotNull final IPointLocator<V, E, F> pointLocator, @NotNull final ITriConnectivity<V, E, F> triConnectivity) {
 		this.pointLocator = pointLocator;
 		this.triConnectivity = triConnectivity;
-		this.cache = new HashMap<>();
+		this.cache = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -74,13 +74,21 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	@Override
 	public Optional<F> locate(double x, double y, Object caller) {
 		Optional<F> optFace;
-		if(cache.containsKey(caller) && !triConnectivity.getMesh().isDestroyed(cache.get(caller))) {
-			optFace = triConnectivity.locateMarch(x, y, cache.get(caller));
-		} else {
-			optFace = pointLocator.locate(x, y);
+		boolean contains = cache.containsKey(caller);
+		F starFace = null;
+
+		if(contains) {
+			starFace = cache.get(caller);
 		}
 
-		if(optFace.isPresent() && !triConnectivity.getMesh().isBoundary(optFace.get())) {
+		if(contains && !triConnectivity.getMesh().isDestroyed(starFace)) {
+			optFace = triConnectivity.locateMarch(x, y, starFace);
+		} else {
+			optFace = pointLocator.locate(x, y, false);
+		}
+
+		if(optFace.isPresent() && !(contains && optFace.get().equals(starFace)) &&
+				!triConnectivity.getMesh().isBoundary(optFace.get())) {
 			cache.put(caller, optFace.get());
 		}
 
@@ -106,7 +114,7 @@ public class CachedPointLocator<V extends IVertex, E extends IHalfEdge, F extend
 	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {}
 
 	@Override
-	public void postSplitHalfEdgeEvent(F original, F f1, F f2, V v) {}
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {}
 
 	@Override
 	public void postFlipEdgeEvent(F f1, F f2) {}

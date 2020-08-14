@@ -32,6 +32,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		this.lastPedestrianPositions = new HashMap<>();
 	}
 
+	@Override
 	public PostvisualizationModel getModel() {
 		return model;
 	}

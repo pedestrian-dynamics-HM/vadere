@@ -1,34 +1,26 @@
 
 package org.vadere.simulator.models.potential.solver;
 
-import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.AFace;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
+import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.impl.PMeshPanel;
-import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
-import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
-import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMParallel;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
+import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.simulator.projects.Scenario;
-import org.vadere.simulator.utils.pslg.PSLGConverter;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Obstacle;
@@ -38,21 +30,12 @@ import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
 import org.vadere.util.data.cellgrid.FloorDiscretizer;
 import org.vadere.util.data.cellgrid.PathFindingTag;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.DistanceFunctionTarget;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,10 +51,10 @@ public abstract class EikonalSolverProvider  {
 			final AttributesFloorField attributesPotential);
 
 	protected EikonalSolver buildBase(final Domain domain, @NotNull final List<VShape> targetShapes) {
-		var triangulation = new IncrementalTriangulation<>(domain.getBackgroundMesh());
+		var triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
 
 		ITimeCostFunction timeCost = new UnitTimeCostFunction();
-		EikonalSolver eikonalSolver = new EikonalSolverFMMTriangulation(
+		EikonalSolver eikonalSolver = new MeshEikonalSolverFMM(
 				targetShapes,
 				timeCost,
 				triangulation);
@@ -153,14 +136,24 @@ public abstract class EikonalSolverProvider  {
 				default:
 					eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 			}
-		} else if(domain.getBackgroundMesh() != null) {
-			IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(domain.getBackgroundMesh());
-			eikonalSolver = new EikonalSolverFMMTriangulation<>("target_" + targetId, targetShapes, new UnitTimeCostFunction(), triangulation);
-			//eikonalSolver.initialize();
-			//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "target_"+targetId+"_potential")));
-			//System.out.println();
 		} else {
-			throw new UnsupportedOperationException("potential field has to be grid based.");
+			if(domain.getFloorFieldMesh() != null) {
+				IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
+
+				ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
+						attributesPotential.getTimeCostAttributes(),
+						attributesPedestrian,
+						topography,
+						targetId, triangulation);
+
+				eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
+					/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
+				//eikonalSolver.solve();
+				//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, targetId)));
+				//System.out.println();
+			} else {
+				throw new UnsupportedOperationException("Can not use mesh based floor field computation without a mesh!");
+			}
 		}
 		return eikonalSolver;
 	}

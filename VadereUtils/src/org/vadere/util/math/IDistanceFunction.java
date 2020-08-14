@@ -16,8 +16,8 @@ import java.util.function.Function;
  * @author Benedikt Zoennchen
  *
  * A signed distance function d.
- * d(x) greater than 0 then x is outside
- * d(x) smaller or equals 0 then x is inside
+ * d(x) greater than 0 if x is outside
+ * d(x) smaller or equals 0 if x is inside
  */
 @FunctionalInterface
 public interface IDistanceFunction extends Function<IPoint, Double> {

@@ -13,6 +13,7 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.CLGatherer;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.opencl.CLInfo;
+import org.vadere.util.opencl.CLOperation;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -34,16 +35,13 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMeshHE {
+public class CLDistMeshHE extends CLOperation {
 
     private static Logger log = Logger.getLogger(CLDistMeshHE.class);
 
-    // CL ids
-    private long clPlatform;
-    private long clDevice;
-    private long clContext;
-    private long clQueue;
-    private long clProgram;
+    static {
+        log.setDebug();
+    }
 
     // CL kernel ids
     private long clKernelForces;
@@ -125,11 +123,10 @@ public class CLDistMeshHE {
     private AMesh mesh;
 
     private boolean doublePrecision = true;
-    private boolean profiling = false;
-
     private boolean hasToRead = false;
 
     public CLDistMeshHE(@NotNull AMesh mesh) {
+        super(CL_DEVICE_TYPE_GPU);
         this.mesh = mesh;
         this.mesh.garbageCollection();
         if(doublePrecision) {
@@ -150,77 +147,6 @@ public class CLDistMeshHE {
 
         for(int i = 0; i < numberOfEdges; i++) {
             this.edgeLabels.put(i, 0);
-        }
-    }
-
-    private void initCallbacks() {
-        contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-        {
-            log.warn("[LWJGL] cl_context_callback");
-            log.warn("\tInfo: " + memUTF8(errinfo));
-        });
-
-        programCB = CLProgramCallback.create((program, user_data) ->
-        {
-        	try {
-		        log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-		        String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
-		        if (!message.isEmpty()) {
-			        log.info("BUILD LOG:\n----\n"+message+"\n-----");
-		        }
-	        }
-	        catch (OpenCLException e) {
-        		log.error(e);
-        		e.printStackTrace();
-	        }
-        });
-    }
-
-    private void initCL() throws OpenCLException {
-        try (MemoryStack stack = stackPush()) {
-            // helper for the memory allocation in java
-            //stack = MemoryStack.stackPush();
-            IntBuffer errcode_ret = stack.callocInt(1);
-            IntBuffer numberOfPlatforms = stack.mallocInt(1);
-            IntBuffer numberOfDevices = stack.mallocInt(1);
-
-            clGetPlatformIDs(null, numberOfPlatforms);
-            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-            clGetPlatformIDs(platformIDs, numberOfPlatforms);
-            clPlatform = platformIDs.get(0);
-
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
-            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
-
-            clDevice = deviceIDs.get(0);
-            printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
-
-            PointerBuffer ctxProps = stack.mallocPointer(3);
-            ctxProps.put(CL_CONTEXT_PLATFORM)
-                    .put(clPlatform)
-                    .put(NULL)
-                    .flip();
-
-            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-
-            if(profiling) {
-                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
-            }
-            else {
-                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-            }
-
-            CLInfo.checkCLError(errcode_ret);
-
-            PointerBuffer pp = stack.mallocPointer(1);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-            maxGroupSize = pp.get(0);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
-            maxComputeUnits = pp.get(0);
-            log.info("MAX_GRP_SIZE = " + maxGroupSize);
-            log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
         }
     }
 
@@ -252,10 +178,16 @@ public class CLDistMeshHE {
 
             clKernelLengths = clCreateKernel(clProgram, "computeLengths", errcode_ret);
             CLInfo.checkCLError(errcode_ret);
+
             PointerBuffer pp = stack.mallocPointer(1);
             clGetKernelWorkGroupInfo(clKernelLengths, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, pp, null);
             prefdWorkGroupSizeMultiple = pp.get(0);
             log.info("PREF_WORK_GRP_SIZE_MUL = " + prefdWorkGroupSizeMultiple);
+
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+            maxGroupSize = pp.get(0);
+            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
+            maxComputeUnits = pp.get(0);
 
             clKernelPartialSF = clCreateKernel(clProgram, "computePartialSF", errcode_ret);
             CLInfo.checkCLError(errcode_ret);
@@ -356,7 +288,7 @@ public class CLDistMeshHE {
             clSetKernelArg1p(clKernelForces, 4, clScalingFactor);
             clSetKernelArg1p(clKernelForces, 5, clForces);
 
-           // clSetKernelArg1i(clKernelMove, 0, numberOfVertices);
+            // clSetKernelArg1i(clKernelMove, 0, numberOfVertices);
             clSetKernelArg1p(clKernelMove, 0, clVertices);
             clSetKernelArg1p(clKernelMove, 1, clBorderVertices);
             clSetKernelArg1p(clKernelMove, 2, clForces);
@@ -444,12 +376,12 @@ public class CLDistMeshHE {
         }
     }*/
 
-    public boolean step() {
+    public boolean step() throws OpenCLException {
         return step(true);
     }
 
     // TODO: think about the use of only 1 work-group!!! It might be bad! solution: use global barrier? force computation? flip hangs after some time?
-    public boolean step(final boolean flipAll) {
+    public boolean step(final boolean flipAll) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
 
             /*
@@ -528,25 +460,6 @@ public class CLDistMeshHE {
         return false;
     }
 
-    private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
-        if(profiling) {
-            long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
-            clWaitForEvents(clEvent);
-            long eventAddr = clEvent.get();
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, retSize);
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
-            clEvent.clear();
-            // in nanaSec
-            log.info(name + " event time " + "0x"+eventAddr + ": " + (endTime.getLong() - startTime.getLong()) + " ns");
-            endTime.clear();
-            startTime.clear();
-            return result;
-        }
-        else {
-            return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
-        }
-    }
-
     private void readResultFromGPU() {
         try (MemoryStack stack = stackPush()) {
             if(doublePrecision) {
@@ -606,7 +519,8 @@ public class CLDistMeshHE {
         return tmp;
     }
 
-    private void clearCL() {
+    @Override
+    protected void clearCL() throws OpenCLException {
         clReleaseMemObject(clVertices);
         clReleaseMemObject(clBorderVertices);
         clReleaseMemObject(clEdges);
@@ -634,11 +548,7 @@ public class CLDistMeshHE {
         clReleaseKernel(clKernelLabelEdges);
         clReleaseKernel(clKernelLabelEdgesUpdate);
 
-        contextCB.free();
-        programCB.free();
-        clReleaseCommandQueue(clQueue);
-        clReleaseProgram(clProgram);
-        clReleaseContext(clContext);
+        super.clearCL();
     }
 
     private void clearHost() {
@@ -679,7 +589,7 @@ public class CLDistMeshHE {
         //printResult();
     }
 
-    public void finish() {
+    public void finish() throws OpenCLException {
         refresh();
         //updateMesh();
         clearCL();
@@ -735,6 +645,4 @@ public class CLDistMeshHE {
     private static void printDeviceInfo(long device, String param_name, int param) throws OpenCLException {
         System.out.println("\t" + param_name + " = " + CLInfo.getDeviceInfoStringUTF8(device, param));
     }
-
-
 }

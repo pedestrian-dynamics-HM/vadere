@@ -26,7 +26,7 @@ public class VisualTestGPUVertexBased {
 	private static final Logger log = Logger.getLogger(RunTimeGPUEdgeBased.class);
 
 	private static final VRectangle bbox = new VRectangle(-11, -11, 22, 22);
-	private static final IEdgeLengthFunction uniformEdgeLength = p -> 1.0;
+	private static final IEdgeLengthFunction uniformEdgeLength = p -> 0.5;
 	private static final IPointConstructor<EikMeshPoint> pointConstructor = (x, y) -> new EikMeshPoint(x, y, false);
 	private static final double initialEdgeLength =  0.5;
 
@@ -62,15 +62,16 @@ public class VisualTestGPUVertexBased {
 				e.printStackTrace();
 			}
 			distmeshPanel.repaint();
+			//System.out.println("wtf");
 		}
 		overAllTime.stop();
 		meshGenerator.finish();
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
-		log.info("quality: " + meshGenerator.getQuality());
-		log.info("overall time: " + overAllTime.getTime() + "[ms]");
+		System.out.println("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		System.out.println("#edges: " + meshGenerator.getMesh().getEdges().size());
+		System.out.println("#faces: " + meshGenerator.getMesh().getFaces().size());
+		System.out.println("quality: " + meshGenerator.getQuality());
+		System.out.println("overall time: " + overAllTime.getTime() + "[ms]");
 	}
 
 	public static void main(String[] args) throws OpenCLException {

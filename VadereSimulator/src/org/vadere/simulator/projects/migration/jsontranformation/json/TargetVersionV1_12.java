@@ -22,11 +22,11 @@ public class TargetVersionV1_12 extends SimpleJsonTransformation {
 
 	@Override
 	protected void initDefaultHooks() {
-		addPostHookFirst(this::targetChangerUseProbabilityToChangeTargettList);
+		addPostHookFirst(this::targetChangerUseProbabilityToChangeTargetList);
 		addPostHookLast(this::sort);
 	}
 
-	public JsonNode targetChangerUseProbabilityToChangeTargettList(JsonNode node) throws MigrationException {
+	public JsonNode targetChangerUseProbabilityToChangeTargetList(JsonNode node) throws MigrationException {
 
 		// targetChangers may be missing if an old scenario was never opened since the targetChangers where introduced
 		// This is ok, since a targetChangers node will be inserted if the scenario is read.

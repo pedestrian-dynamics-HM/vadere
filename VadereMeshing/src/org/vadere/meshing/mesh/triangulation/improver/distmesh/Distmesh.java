@@ -9,8 +9,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.meshing.ConstantLineIterator;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.MLine;
+import org.vadere.util.geometry.shapes.MPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -24,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,6 +42,7 @@ public class Distmesh {
 	private Set<EikMeshPoint> points = new HashSet<>();
 	private Set<MLine<EikMeshPoint>> lines = new HashSet<>();
 	private List<VTriangle> triangles = new ArrayList<>();
+	private List<Triple<MPoint, MPoint, MPoint>> triangleT = new ArrayList<>();
 	private final IDistanceFunction distanceFunc;
 	private final IEdgeLengthFunction relativeDesiredEdgeLengthFunc;
 	private VRectangle regionBoundingBox;
@@ -48,6 +52,7 @@ public class Distmesh {
 	private GeometryFactory fact;
 	private int nTriangulations;
 	private Set<EikMeshPoint> fixPoints;
+	private Random random = new Random(0);
 
 	// Parameters
 	private double initialEdgeLen;
@@ -102,8 +107,12 @@ public class Distmesh {
 		return steps >= Parameters.MAX_NUMBER_OF_STEPS;
 	}
 
-	private void reTriangulate() {
-		if(true || firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
+	public void reTriangulate() {
+		reTriangulate(false);
+	}
+
+	public void reTriangulate(boolean force) {
+		if(force || firstStep || maxMovementLen / initialEdgeLen > Parameters.TOL) {
 			firstStep = false;
 			nTriangulations++;
 
@@ -118,6 +127,7 @@ public class Distmesh {
 
 				HashMap<EikMeshPoint, EikMeshPoint> meshPoints = new HashMap();
 				triangles = new ArrayList<>();
+				triangleT = new ArrayList<>();
 				lines = new HashSet<>();
 				for (int i = 0; i < multiTris.getNumGeometries(); i++) {
 					Polygon tri = (Polygon) multiTris.getGeometryN(i);
@@ -154,6 +164,7 @@ public class Distmesh {
 						}
 
 						triangles.add(triangle);
+						triangleT.add(Triple.of(p1, p2, p3));
 						lines.add(new MLine<>(p1, p2));
 						lines.add(new MLine<>(p2, p3));
 						lines.add(new MLine<>(p3, p1));
@@ -166,6 +177,25 @@ public class Distmesh {
 			//log.debug("#edges: " + lines.size());
 			//log.debug("#points: " + points.size());
 		}
+	}
+
+	public int getNumberOfIllegalTriangles() {
+		int count = 0;
+		for(Triple<MPoint, MPoint, MPoint> triangle1 : triangleT) {
+			MPoint p1 = triangle1.getLeft();
+			MPoint p2 = triangle1.getMiddle();
+			MPoint p3 = triangle1.getRight();
+
+			for(MPoint point : points) {
+				if(!point.equals(p1) && !point.equals(p2) && !point.equals(p3)) {
+					if(GeometryUtils.isInsideCircle(p1, p2, p3, point.getX(), point.getY(), GeometryUtils.DOUBLE_EPS)) {
+						count++;
+						break;
+					}
+				}
+			}
+		}
+		return count;
 	}
 
 	public void improve() {
@@ -390,7 +420,7 @@ public class Distmesh {
 		 * The probability for the rejection increases for large desired edge length!
 		 */
 		Set<EikMeshPoint> generatedPoints = gridPoints.stream()
-				.filter(vertex -> Math.random() < pointDensityFunc.apply(vertex) / max)
+				.filter(vertex -> random.nextDouble() < pointDensityFunc.apply(vertex) / max)
 				.collect(Collectors.toSet());
 
 		fixPoints = getFixPoints();
@@ -474,10 +504,8 @@ public class Distmesh {
 		if(builder == null) {
 			return new ArrayList();
 		}
-		List<VTriangle> triangles = new ArrayList<>();
 		synchronized (this) {
-			triangles.addAll(this.triangles);
+			return triangleT.stream().map(triple -> new VTriangle(new VPoint(triple.getLeft()), new VPoint(triple.getMiddle()), new VPoint(triple.getRight()))).collect(Collectors.toList());
 		}
-		return triangles;
 	}
 }

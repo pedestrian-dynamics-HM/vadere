@@ -54,7 +54,7 @@ public class AttributesAgent extends AttributesDynamicElement {
 	// instantaneous walking direction.
 	private WalkingDirectionCalculation walkingDirectionCalculation = WalkingDirectionCalculation.BY_TARGET_CENTER;
 
-	/* angle in degree which is used to decide if two pedestrians move into the same direction, for instance:
+	/* angle3D in degree which is used to decide if two pedestrians move into the same direction, for instance:
 	 *
 	 * <pre>
 	 *     T2 o   o T1
@@ -68,10 +68,10 @@ public class AttributesAgent extends AttributesDynamicElement {
 	 *     T2: target of pedestrian 2
 	 *     P1: pedestrian 1
 	 *     P2: pedestrian 2
-	 *     a : angle between the two vectors
+	 *     a : angle3D between the two vectors
 	 * </pre>
 	 *
-	 * If the calculated angle "a" is equal or below this threshold, it is assumed that both pedestrians move into
+	 * If the calculated angle3D "a" is equal or below this threshold, it is assumed that both pedestrians move into
 	 * the same direction and both cannot be swapped.
 	 */
 	private double walkingDirectionSameIfAngleLessOrEqual = 45.0;

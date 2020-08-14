@@ -45,6 +45,7 @@ public class Manager {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 

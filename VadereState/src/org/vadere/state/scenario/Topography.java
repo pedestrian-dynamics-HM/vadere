@@ -43,7 +43,7 @@ public class Topography implements DynamicElementMover{
 	/** Transient to prevent JSON serialization. */
 	private static Logger logger = Logger.getLogger(Topography.class);
 
-	private IDistanceFunction obstacleDistanceFunction;
+	private IDistanceFunctionCached obstacleDistanceFunction;
 	private IReachablePointProvider reachablePointProvider;
 
 	/** A possible empty string identifying a context object. */
@@ -157,11 +157,22 @@ public class Topography implements DynamicElementMover{
 		this.cars = new DynamicElementContainer<>(bounds, CELL_SIZE);
 		recomputeCells = false;
 
-		this.obstacleDistanceFunction = point ->  obstacles.stream()
-				.map(Obstacle::getShape)
-				.map(shape -> shape.distance(point))
-				.min(Double::compareTo)
-				.orElse(Double.MAX_VALUE);
+		this.obstacleDistanceFunction = new IDistanceFunctionCached() {
+			@Override
+			public double apply(@NotNull IPoint point, Object caller) {
+				return -obstacles.stream()
+						.map(Obstacle::getShape)
+						.map(shape -> shape.distance(point))
+						.min(Double::compareTo)
+						.orElse(Double.MAX_VALUE);
+			}
+
+			@Override
+			public Double apply(IPoint point) {
+				return apply(point, null);
+			}
+		};
+
 
 		// some meaningful default value if used before simulation is started.
 		// will be replaced in the preeLoop like the obstacleDistanceFunction
@@ -222,15 +233,11 @@ public class Topography implements DynamicElementMover{
 	}
 
 	public double distanceToObstacle(@NotNull IPoint point) {
-		return this.obstacleDistanceFunction.apply(point);
+		return -obstacleDistanceFunction.apply(point);
 	}
 
-	public double distanceToObstacle(@NotNull final IPoint point, final Agent caller) {
-		if(obstacleDistanceFunction instanceof IDistanceFunctionCached) {
-			return ((IDistanceFunctionCached)obstacleDistanceFunction).apply(point, caller);
-		} else {
-			return distanceToObstacle(point);
-		}
+	public double distanceToObstacle(@NotNull final IPoint point, final Object caller) {
+		return -obstacleDistanceFunction.apply(point, caller);
 	}
 
 	public IDistanceFunction getObstacleDistanceFunction() {
@@ -241,12 +248,26 @@ public class Topography implements DynamicElementMover{
 		return reachablePointProvider;
 	}
 
-	public void setReachablePointProvider(@NotNull IReachablePointProvider reachablePointProvider) {
+	public void setReachablePointProvider(@NotNull final IReachablePointProvider reachablePointProvider) {
 		this.reachablePointProvider = reachablePointProvider;
 	}
 
-	public void setObstacleDistanceFunction(@NotNull IDistanceFunction obstacleDistanceFunction) {
+	public void setObstacleDistanceFunction(@NotNull final IDistanceFunctionCached obstacleDistanceFunction) {
 		this.obstacleDistanceFunction = obstacleDistanceFunction;
+	}
+
+	public void setObstacleDistanceFunction(@NotNull final IDistanceFunction obstacleDistanceFunction) {
+		this.obstacleDistanceFunction = new IDistanceFunctionCached() {
+			@Override
+			public double apply(@NotNull IPoint point, Object caller) {
+				return obstacleDistanceFunction.apply(point);
+			}
+
+			@Override
+			public Double apply(IPoint point) {
+				return obstacleDistanceFunction.apply(point);
+			}
+		};
 	}
 
 	public boolean containsTarget(final Predicate<Target> targetPredicate) {

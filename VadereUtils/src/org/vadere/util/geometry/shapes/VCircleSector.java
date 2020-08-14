@@ -14,7 +14,7 @@ import java.util.Optional;
  * @author Benedikt Zoennchen
  *
  * A VCircleSector is a part of a disc. The disc is defined by the center and the radius and the
- * part by the minimum and maximum angle.
+ * part by the minimum and maximum angle3D.
  */
 public class VCircleSector implements ICircleSector {
 

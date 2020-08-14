@@ -2,13 +2,51 @@ package org.vadere.util.io;
 
 import com.google.common.collect.Iterables;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CollectionUtils {
+
+	public static<T> List<List<T>> split(@NotNull final List<T> list, final int n) {
+		List<List<T>> lists;
+		if(n >= list.size()) {
+			lists = new ArrayList<>(list.size());
+			for(int i = 0; i < n; i++) {
+				ArrayList<T> subList = new ArrayList<>();
+				subList.add(list.get(i));
+			}
+		} else {
+			int chunks = list.size() / n;
+			int[] index = new int[n+1];
+			index[0] = 0;
+
+			for(int i = 1; i < n; i++) {
+				index[i] = index[i-1] + chunks;
+			}
+
+			index[n] = list.size();
+
+			lists = IntStream.range(0, n)
+					.mapToObj(i -> list.subList(index[i], index[i + 1]))
+					.collect(Collectors.toList());
+		}
+
+
+		return lists;
+	}
+
+	public static<T> List<List<T>> split(@NotNull final Collection<T> list, final int n) {
+		return split(list.stream().collect(Collectors.toList()), n);
+	}
+
 
 	/**
 	 * Select objects from a list that have the given class type.
