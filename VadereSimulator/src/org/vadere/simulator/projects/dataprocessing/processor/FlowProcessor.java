@@ -15,7 +15,7 @@ import java.util.OptionalDouble;
  *
  */
 @DataProcessorClass()
-public class FlowProcessor extends DataProcessor<NoDataKey, Double> {
+public class FlowProcessor extends NoDataKeyProcessor<Double> {
     private PedestrianLineCrossProcessor pedLineCross;
 
     public FlowProcessor() {

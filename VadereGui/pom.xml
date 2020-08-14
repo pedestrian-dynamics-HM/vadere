@@ -148,7 +148,14 @@
 	<artifactId>TableLayout</artifactId>
 	<version>20050920</version>
 </dependency>
-  
+
+<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
+<dependency>
+  <groupId>org.jfree</groupId>
+  <artifactId>jfreechart</artifactId>
+  <version>1.5.0</version>
+</dependency>
+
 <!-- movie & screenshot -->
   <dependency>
       <groupId>org.jcodec</groupId>
