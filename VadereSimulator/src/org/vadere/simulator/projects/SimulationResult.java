@@ -29,6 +29,14 @@ public class SimulationResult {
 		this.data = new TreeMap<>();
 	}
 
+	public String getScenarioName(){
+		return this.scenarioName;
+	}
+
+	public TreeMap<String,Object> getData(){
+		return this.data;
+	}
+
 	public void addData(@NotNull final String header, @NotNull final Object value) {
 		assert !data.containsKey(header);
 		if(data.containsKey(header)) {

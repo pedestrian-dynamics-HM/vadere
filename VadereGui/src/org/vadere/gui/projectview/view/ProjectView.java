@@ -4,37 +4,7 @@ package org.vadere.gui.projectview.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
-import org.vadere.gui.projectview.control.ActionAddScenario;
-import org.vadere.gui.projectview.control.ActionCloneScenario;
-import org.vadere.gui.projectview.control.ActionCloseApplication;
-import org.vadere.gui.projectview.control.ActionCreateProject;
-import org.vadere.gui.projectview.control.ActionDeleteOutputDirectories;
-import org.vadere.gui.projectview.control.ActionDeleteScenarios;
-import org.vadere.gui.projectview.control.ActionEditScenarioDescription;
-import org.vadere.gui.projectview.control.ActionGenerateScenarioFromOutputFile;
-import org.vadere.gui.projectview.control.ActionInterruptScenarios;
-import org.vadere.gui.projectview.control.ActionLoadProject;
-import org.vadere.gui.projectview.control.ActionLoadRecentProject;
-import org.vadere.gui.projectview.control.ActionNextTimeStep;
-import org.vadere.gui.projectview.control.ActionOpenInExplorer;
-import org.vadere.gui.projectview.control.ActionOutputToScenario;
-import org.vadere.gui.projectview.control.ActionPauseScenario;
-import org.vadere.gui.projectview.control.ActionRenameOutputFile;
-import org.vadere.gui.projectview.control.ActionRenameProject;
-import org.vadere.gui.projectview.control.ActionRenameScenario;
-import org.vadere.gui.projectview.control.ActionResumeNormalSpeed;
-import org.vadere.gui.projectview.control.ActionRunAllScenarios;
-import org.vadere.gui.projectview.control.ActionRunOutput;
-import org.vadere.gui.projectview.control.ActionRunSelectedScenarios;
-import org.vadere.gui.projectview.control.ActionSaveAsProject;
-import org.vadere.gui.projectview.control.ActionSaveProject;
-import org.vadere.gui.projectview.control.ActionSeeDiscardChanges;
-import org.vadere.gui.projectview.control.ActionShowAboutDialog;
-import org.vadere.gui.projectview.control.ActionToClipboard;
-import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
-import org.vadere.gui.projectview.control.IProjectChangeListener;
-import org.vadere.gui.projectview.control.ShowResultDialogAction;
-import org.vadere.gui.projectview.control.ToggleScenarioManagerAction;
+import org.vadere.gui.projectview.control.*;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.gui.projectview.model.ProjectViewModel.ScenarioBundle;
@@ -91,6 +61,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 */
 	private ProjectViewModel model;
 
+	private final int n_repetitions = 10;
+
 	/**
 	 * GUI elements (part of the view) of the {@link ProjectView}
 	 *
@@ -104,6 +76,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private VTable scenarioTable;
 	private VTable outputTable;
 	private JButton btnRunSelectedScenario;
+	private JButton btnRunRepeatedlyScenario;
 	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
@@ -337,6 +310,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scenariosRunning = flag;
 		btnRunAllScenarios.setVisible(!flag);
 		btnRunSelectedScenario.setVisible(!flag);
+		btnRunRepeatedlyScenario.setVisible(!flag);
 		btnStopRunningScenarios.setVisible(flag);
 		btnPauseRunningScenarios.setVisible(flag);
 		btnNextSimulationStep.setVisible(flag);
@@ -729,6 +703,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				new ActionDeleteScenarios(Messages.getString("ProjectView.mntmDelete.text"), model, scenarioTable);
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
 				Messages.getString("ProjectView.mntmRunSelectetTests.text"), model, scenarioTable);
+		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
+				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
 		ActionSeeDiscardChanges seeDiscardChangesAction = new ActionSeeDiscardChanges(
 				Messages.getString("ActionSeeDiscardChanges.menu.title"), model, scenarioTable);
 
@@ -780,6 +756,17 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		toolBar.add(btnRunSelectedScenario);
 		addToProjectSpecificActions(runSelectedScenarios);
 		mainButtonsGroup.add(btnRunSelectedScenario);
+
+		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
+				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
+		runRepeatedlyScenarios.putValue(Action.SHORT_DESCRIPTION,
+				Messages.getString("ProjectView.btnRunRepeatedlyTest.toolTipText"));
+		runRepeatedlyScenarios.putValue(Action.LARGE_ICON_KEY,
+				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
+		btnRunRepeatedlyScenario = new JButton(runRepeatedlyScenarios);
+		toolBar.add(btnRunRepeatedlyScenario);
+		addToProjectSpecificActions(runRepeatedlyScenarios);
+		mainButtonsGroup.add(btnRunRepeatedlyScenario);
 
 		Action interruptScenariosAction =
 				new ActionInterruptScenarios(Messages.getString("ProjectView.btnStopRunningTests.text"), model);
