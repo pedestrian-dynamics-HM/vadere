@@ -496,6 +496,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		PersonVar var = PersonVar.fromId(getCmd.getVariableIdentifier());
 		Method m = getHandler(getCmd.getTraCICmd(), var);
 
+		logger.tracef("invokeHandler: PersonCommandHandler.%s [CMD: %s VAR: %s]",
+				m.getName(),
+				cmd.getTraCICmd().logShort(),
+				var.toString());
 		return invokeHandler(m, this, getCmd, remoteManager);
 	}
 

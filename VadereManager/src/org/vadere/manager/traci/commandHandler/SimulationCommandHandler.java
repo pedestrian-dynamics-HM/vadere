@@ -265,6 +265,10 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 		Method m = getHandler(cmd.getTraCICmd(), var);
 
+		logger.tracef("invokeHandler: SimulationCommandHandler.%s [CMD: %s VAR: %s]",
+				m.getName(),
+				cmd.getTraCICmd().logShort(),
+				var.toString());
 		return  invokeHandler(m, this, cmd, remoteManager);
 
 	}
