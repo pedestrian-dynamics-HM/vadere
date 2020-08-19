@@ -77,7 +77,8 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesMeshProcessor",
       "attributes" : {
         "measurementAreaId" : 1,
-        "edgeLength" : 1.5
+        "edgeLength" : 1.5,
+        "displayMesh" : false
       }
     } ],
     "isTimestamped" : true,
