@@ -23,6 +23,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "AreaDensityCounting.txt",
       "processors" : [ 8 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepKeyIdOutputFile",
+      "filename" : "MeshDensityCounting.txt",
+      "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "Mesh.txt",
+      "processors" : [ 10 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
