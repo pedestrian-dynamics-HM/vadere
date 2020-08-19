@@ -17,6 +17,7 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.IOUtils;
+import org.vadere.meshing.utils.io.movie.MovRecorder;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -46,7 +47,7 @@ public class MeshConstructor {
 
 		if(viszalize) {
 			var meshRenderer = new MeshRenderer<>(ruppertsTriangulator.getMesh(), f -> false, f -> Colors.YELLOW, e -> Color.BLACK, v -> Color.BLACK);
-			var meshPanel = new PMeshPanel(meshRenderer, 500, 500);
+			var meshPanel = new PMeshPanel(meshRenderer, 1024, 1024);
 			meshPanel.display("Ruppert's algorithm");
 			while(!ruppertsTriangulator.isFinished()) {
 				synchronized (ruppertsTriangulator.getMesh()) {
@@ -71,11 +72,13 @@ public class MeshConstructor {
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
 		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		((DistanceFunctionApproxBF) distanceFunctionApproximation).printPython();
 
 		IEdgeLengthFunction edgeLengthFunction = p -> hmin + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction, p -> hmax);
 		edgeLengthFunctionApprox.smooth(smoothness);
 		logger.info("construct element size function");
+		edgeLengthFunctionApprox.printPython();
 
 		//((DistanceFunctionApproxBF) distanceFunctionApproximation).printPython();
 		//edgeLengthFunctionApprox.printPython();
@@ -110,6 +113,14 @@ public class MeshConstructor {
 			var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Colors.YELLOW, e -> Color.BLACK, vertexColorFunction);
 			var meshPanel = new PMeshPanel(meshRenderer, 500, 500);
 			meshPanel.display("EikMesh h0 = " + h0);
+
+			/*try {
+				MovRecorder<PVertex, PHalfEdge, PFace> movRecorder = new MovRecorder<>(meshImprover, meshRenderer, 500, 500);
+				movRecorder.record();
+				movRecorder.finish();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
 
 			while (!meshImprover.isFinished()) {
 				synchronized (meshImprover.getMesh()) {

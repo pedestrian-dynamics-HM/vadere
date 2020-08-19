@@ -13,6 +13,7 @@ import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCa
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverDFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMParallel;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
@@ -146,8 +147,11 @@ public abstract class EikonalSolverProvider  {
 						topography,
 						targetId, triangulation);
 
-				eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
-					/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
+				eikonalSolver = new MeshEikonalSolverDFMM<>(targetId+"", targetShapes, timeCost, triangulation
+						/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
+
+				//eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
+				//	/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
 				//eikonalSolver.solve();
 				//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, targetId)));
 				//System.out.println();

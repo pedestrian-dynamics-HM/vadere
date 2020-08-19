@@ -8,6 +8,7 @@ import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.LinkedCellsGrid;
@@ -16,6 +17,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,23 +40,42 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 	private LinkedCellsGrid<PedestrianOSM> linkedCellsGrid;
 	private boolean[][] locked;
 	private double pedestrianPotentialWidth;
+	private int iteration = 0;
+	private ArrayList<ArrayList<Integer>> histgram;
+	private BufferedWriter bufferedWriter;
 
 	public UpdateSchemeEventDrivenParallel(@NotNull final Topography topography, @NotNull final double pedestrianPotentialWidth) {
 		super(topography);
 		this.topography = topography;
 		this.pedestrianPotentialWidth = pedestrianPotentialWidth;
+
+		/*this.histgram = new ArrayList<>();
+		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/parallelOSM/");
+		try {
+			bufferedWriter = IOUtils.getWriter("histogram.csv", dir);
+			bufferedWriter.write("iteration round\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 	}
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
+//		histgram.add(new ArrayList<>());
+//		ArrayList<Integer> histo = histgram.get(iteration);
 		topography.getElements(PedestrianOSM.class).parallelStream().forEach(pedestrianOSM -> pedestrianOSM.clearStrides());
 
 		double maxStepSize = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredStepSize()).max().orElse(0);
 		double maxDesiredSpeed = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredSpeed()).max().orElse(0);
 
 		double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
-		double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
+		//double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
+		double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0 * 0.4;
 		//logger.debug("initial grid with a grid edge length equal to " + sideLength);
+
+		for(PedestrianOSM ped : pedestrianEventsQueue) {
+			ped.updateCount = -1;
+		}
 
 		int counter = 1;
 		// event driven update ignores time credits
@@ -70,6 +93,7 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				// lock cell of the agent
 				if(!locked[gridPos[0]][gridPos[1]]) {
 					updateAbleAgents.add(ped);
+					ped.updateCount = counter;
 
 					// lock neighbours
 					for(int y = -1; y <= 1; y++) {
@@ -81,11 +105,13 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 					}
 				} else {
 					notUpdateAbleAgents.add(ped);
+					ped.updateCount = -1;
 				}
 			}
 
-			//logger.debug("update " + updateAbleAgents.size() + " in parallel in round " + counter + ".");
-			//logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");
+			/*logger.debug("update " + updateAbleAgents.size() + " in parallel in round " + counter + ".");
+			histo.add(updateAbleAgents.size());
+			logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");*/
 			updateAbleAgents.parallelStream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
@@ -96,5 +122,22 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			pedestrianEventsQueue.addAll(updateAbleAgents);
 			counter++;
 		} while (!pedestrianEventsQueue.isEmpty() && pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec);
+		iteration++;
+
+		/*try {
+			StringBuilder builder = new StringBuilder();
+			for(int round = 1; round <= histo.size(); round++) {
+				for(int i = 0; i < histo.get(round-1); i++) {
+					builder.append(iteration);
+					builder.append(" ");
+					builder.append(round);
+					builder.append("\n");
+				}
+			}
+			bufferedWriter.write(builder.toString());
+			bufferedWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 	}
 }

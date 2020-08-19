@@ -41,7 +41,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	final String identifier;
 
 	static {
-		logger.setInfo();
+		logger.setDebug();
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	private int iteration = 0;
 	private int nUpdates = 0;
 
-	private IDistanceFunction distToDest;
+	//private IDistanceFunction distToDest;
 
 	// Note: The updateOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
 
@@ -76,12 +76,12 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	public MeshEikonalSolverDFMM(@NotNull final String identifier,
 	                             @NotNull final Collection<VShape> targetShapes,
 	                             @NotNull final ITimeCostFunction timeCostFunction,
-	                             @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                             @NotNull final Collection<VShape> destinations
+	                             @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                             //@NotNull final Collection<VShape> destinations
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
-		this.distToDest = IDistanceFunction.createToTargets(destinations);
+		//this.distToDest = IDistanceFunction.createToTargets(destinations);
 		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
 		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
 
@@ -231,6 +231,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		}
 
 		//System.out.println(burned.size());
+		// reconstruct narrow-band!
 		Iterator<V> descendingIt =  orderBurned.descendingIterator();
 		while (descendingIt.hasNext()) {
 			V v = descendingIt.next();
@@ -247,11 +248,11 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 			}
 		}
 
-		for(V v: speedChanged) {
+		/*for(V v: speedChanged) {
 			for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
 				updatePotentialOfNeighbours(neighbour);
 			}
-		}
+		}*/
 
 		this.order = orderBurned;
 
@@ -259,6 +260,26 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 			setPotential(bandMember.getLeft(), bandMember.getValue());
 			narrowBand.add(bandMember.getLeft());
 		}*/
+	}
+
+	private boolean requiresUpdate(@NotNull final V v) {
+		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
+			if(hasChanged(neighbour)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	protected void updatePotential(@NotNull final V vertex) {
+		if(requiresUpdate(vertex)) {
+			super.updatePotential(vertex);
+		}
+	}
+
+	private boolean hasChanged(@NotNull final V v) {
+		return !solved || Math.abs(getOldPotential(v) - getPotential(v)) > MathUtil.EPSILON;
 	}
 
 	/*private double recomputePotential(@NotNull final V vertex) {

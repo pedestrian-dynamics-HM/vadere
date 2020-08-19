@@ -645,7 +645,7 @@ public class MeshExamples {
 		panel.repaint();*/
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
-		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 
@@ -784,7 +784,7 @@ public class MeshExamples {
 
 		logger.info(TexGraphGenerator.toTikz(meshImprover.getMesh()));*/
 
-		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 	}

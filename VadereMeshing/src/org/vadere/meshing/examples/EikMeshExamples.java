@@ -416,7 +416,7 @@ public class EikMeshExamples {
 		// display the mesh
 		//meshPanel.display("Geometry defined by a distance function (ring)");
 
-		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 
@@ -488,7 +488,7 @@ public class EikMeshExamples {
 		// display the mesh
 		meshPanel.display("Edge length function");*/
 
-		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 	}
