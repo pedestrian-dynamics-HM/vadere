@@ -11,11 +11,17 @@ import java.util.Collections;
 
 /**
  * @author Mario Teixeira Parente
+ * @author Marion Gödel
+ * EvacuationTimeProcessor measures the time difference between the first agent entering the simulation
+ * (using PedestrianStartTimeProcessor) and the last agent leaving the simulation (PedestrianEndTimeProcessor).
+ * In previous versions, the PedestrianEvacuationTimeProcessor has been used for this instead.
+ * todo check if all sources have finished spawning.
  *
  */
 @DataProcessorClass()
 public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
-    private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
+    private PedestrianStartTimeProcessor pedestrianStartTimeProcessor;
+    private PedestrianEndTimeProcessor pedestrianEndTimeProcessor;
     private int numberOfAgentsInScenario = 0;
 
     public EvacuationTimeProcessor() {
@@ -25,23 +31,31 @@ public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
 
     @Override
     protected void doUpdate(final SimulationState state) {
-        this.pedEvacTimeProc.update(state);
+        this.pedestrianStartTimeProcessor.update(state);
+        this.pedestrianEndTimeProcessor.update(state);
         this.numberOfAgentsInScenario = state.getTopography().getPedestrianDynamicElements().getElements().size();
     }
 
     @Override
     public void postLoop(final SimulationState state) {
-        this.pedEvacTimeProc.postLoop(state);
+        this.pedestrianStartTimeProcessor.postLoop(state);
+        this.pedestrianEndTimeProcessor.postLoop(state);
 
-        double result = 0.0;
+        double result = Double.NaN;
 
         // check if any agents are still in the simulation
         // seems like the topography is empty after the simulation, so I saved the last value in numberOfAgentsInScenario
+        // todo only the SourceController knows if the source has finished spawning, but we have no access (part of Simulation)
         if(numberOfAgentsInScenario == 0){
-            if (this.pedEvacTimeProc.getValues().size() > 0) {
-                result = this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+            if (this.pedestrianEndTimeProcessor.getValues().size() > 0) {
+                double maxPedEndTime = this.pedestrianEndTimeProcessor.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
                         ? Double.NaN
-                        : Collections.max(this.pedEvacTimeProc.getValues());
+                        : Collections.max(this.pedestrianEndTimeProcessor.getValues());
+
+                double minPedStartTime = this.pedestrianEndTimeProcessor.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+                        ? Double.NaN
+                        : Collections.min(this.pedestrianEndTimeProcessor.getValues());
+                result = maxPedEndTime - minPedStartTime;
             }
         }else{
             result = -1;
@@ -54,7 +68,9 @@ public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
     public void init(final ProcessorManager manager) {
         super.init(manager);
         AttributesEvacuationTimeProcessor att = (AttributesEvacuationTimeProcessor) this.getAttributes();
-        this.pedEvacTimeProc = (PedestrianEvacuationTimeProcessor) manager.getProcessor(att.getPedestrianEvacuationTimeProcessorId());
+        this.pedestrianStartTimeProcessor = (PedestrianStartTimeProcessor) manager.getProcessor(att.getPedestrianStartTimeProcessorId());
+        this.pedestrianEndTimeProcessor = (PedestrianEndTimeProcessor) manager.getProcessor(att.getPedestrianEndTimeProcessorId());
+
     }
 
     @Override
