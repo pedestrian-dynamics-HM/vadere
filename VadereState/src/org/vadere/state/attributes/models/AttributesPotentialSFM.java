@@ -10,11 +10,11 @@ import org.vadere.state.attributes.Attributes;
 @ModelAttributeClass
 public class AttributesPotentialSFM extends Attributes {
 
-	private double pedestrianBodyPotential = 2.72;
-	private double pedestrianRecognitionDistance = 0.3;
+	private double pedestrianBodyPotential = 2.1; // V_{\alpha \beta}^0, default from helbing-1995
+	private double pedestrianRecognitionDistance = 0.3; // sigma, default from helbing-1995
 
-	private double obstacleBodyPotential = 20.1;
-	private double obstacleRepulsionStrength = 0.25;
+	private double obstacleBodyPotential = 10.0; // U_{\alpha B}^0, default from helbing-1995
+	private double obstacleRepulsionStrength = 0.2; // R, default from helbing-1995
 
 	// Getters...
 
