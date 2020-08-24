@@ -472,6 +472,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getCoordinateReference(String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_getTime(String[] args) throws IOException {
 		TraCIResponse res = simulationapi.getTime();
 		System.out.println(res.toString());

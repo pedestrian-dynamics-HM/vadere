@@ -16,6 +16,7 @@ import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCompoundPayload;
 import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
@@ -250,6 +251,23 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	}
 
 
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.COORD_REF,
+			name = "getCoordinateReference", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
+	public TraCICommand process_GetCoordinateReference(TraCIGetCommand cmd, RemoteManager remoteManager){
+		remoteManager.accessState((manager, state) -> {
+			ReferenceCoordinateSystem coord =
+					state.getScenarioStore().getTopography()
+							.getAttributes().getReferenceCoordinateSystem();
+			coord.initialize();
+			CompoundObject o = CoordRef.asCompoundObject(
+					coord.getEpsgCode(),
+					coord.getTranslation()
+			);
+			cmd.setResponse(responseOK(SimulationVar.COORD_REF.type, o));
+		});
+
+		return cmd;
+	}
 
 
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager) {
