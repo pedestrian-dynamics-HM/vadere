@@ -26,7 +26,7 @@ import org.vadere.util.parallel.ParallelWorkerUtil;
 import java.util.*;
 
 @ModelClass(isMainModel = true)
-public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
+public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> implements PotentialFieldModel {
 
 	private AttributesSFM attributes;
 	private GradientProvider floorGradient;
@@ -186,6 +186,21 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> {
 	@Override
 	public List<Model> getSubmodels() {
 		return models;
+	}
+	
+	@Override
+	public IPotentialFieldTarget getPotentialFieldTarget() {
+		return potentialFieldTarget;
+	}
+
+	@Override
+	public PotentialFieldObstacle getPotentialFieldObstacle() {
+		return potentialFieldObstacle;
+	}
+
+	@Override
+	public PotentialFieldAgent getPotentialFieldAgent() {
+		return potentialFieldPedestrian;
 	}
 
 }
