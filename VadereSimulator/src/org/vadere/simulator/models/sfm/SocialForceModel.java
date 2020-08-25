@@ -6,6 +6,7 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.models.potential.FloorGradientProviderFactory;
+import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
