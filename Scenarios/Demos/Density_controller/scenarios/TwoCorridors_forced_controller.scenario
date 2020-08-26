@@ -88,14 +88,6 @@
         "edgeLength" : 1.5,
         "displayMesh" : false
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.ReadAndSetControllerInput",
-      "id" : 11,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesReadAndSetControllerInput",
-      "attributes" : {
-        "controllerInputFile" : "Scenarios/Demos/Density_controller/scenarios/TwoCorridors_forced_controller_input.csv",
-        "useFile" : true
-      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -176,8 +168,8 @@
       }
     },
     "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : "RouteChoiceThreeCorridors"
+      "useStrategyModel" : true,
+      "strategyModel" : "ReadSetControllerInputs"
     },
     "topography" : {
       "attributes" : {
