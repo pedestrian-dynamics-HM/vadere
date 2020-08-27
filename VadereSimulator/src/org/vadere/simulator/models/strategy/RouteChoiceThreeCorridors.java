@@ -6,6 +6,7 @@ import com.github.cschen1205.fuzzylogic.memberships.*;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor;
+import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.*;
@@ -22,6 +23,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
     private FuzzySet density1;
     private FuzzySet density2;
     private FuzzySet density3;
+    private AttributesStrategyModel attributesStrategyModel;
 
 
     @Override
@@ -123,7 +125,10 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
     }
 
-
+    @Override
+    public void build(AttributesStrategyModel attr) {
+        attributesStrategyModel = attr;
+    }
 
 
     private double getDensityFromDataProcessor(int processorId, ProcessorManager processorManager) {
