@@ -3,6 +3,7 @@ package org.vadere.simulator.control.strategy.helpers;
 
 import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 public class StrategyModelBuilder {
@@ -17,6 +18,8 @@ public class StrategyModelBuilder {
 
             DynamicClassInstantiator<IStrategyModel> instantiator = new DynamicClassInstantiator<>();
             IStrategyModel strategyModel = instantiator.createObject(fullyQualifiedClassName);
+
+            strategyModel.build(scenarioStore.getAttributesStrategyModel());
             return strategyModel;
         }
         else{
