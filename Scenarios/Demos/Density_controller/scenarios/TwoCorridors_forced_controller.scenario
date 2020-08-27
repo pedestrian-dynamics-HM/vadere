@@ -169,7 +169,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : true,
-      "strategyModel" : "ReadSetControllerInputs"
+      "strategyModel" : "ReadSetControllerInputs",
+      "arguments" : [ "Scenarios/Demos/Density_controller/scenarios/TwoCorridors_forced_controller_input.csv" ],
+      "requiredDataProcessorIds" : [ 10 ]
     },
     "topography" : {
       "attributes" : {
