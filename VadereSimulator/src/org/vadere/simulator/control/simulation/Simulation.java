@@ -18,7 +18,6 @@ import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -228,7 +227,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, strategyModel);
 		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
@@ -287,7 +286,7 @@ public class Simulation {
 				updateCallbacks(simTimeInSec);
 
 				step++;
-				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, strategyModel);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -374,7 +373,7 @@ public class Simulation {
 	}
 
 	private SimulationState initialSimulationState() {
-		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
+		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel, strategyModel );
 
 		return state;
 	}
@@ -426,12 +425,11 @@ public class Simulation {
 	private void updateStrategyLayer(double simTimeInSec) {
 
 		if (scenarioStore.getAttributesStrategyModel().isUseStrategyModel()) {
-			Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 			if (simTimeInSec == startTimeInSec) {
-				strategyModel.update(simTimeInSec, pedestrians, null);
+				strategyModel.update(simTimeInSec, topography, null);
 			}
-			strategyModel.update(simTimeInSec, pedestrians, processorManager);
+			strategyModel.update(simTimeInSec, topography, processorManager);
 		}
 
 
