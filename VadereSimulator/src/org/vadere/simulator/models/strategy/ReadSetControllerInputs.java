@@ -6,13 +6,28 @@ import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-// https://github.com/cschen1205/java-fuzzy-logic
+/**
+ * The ReadSetControllerInputs is directly connected to
+ * 1. the *.scenario file Scenarios/Demos/Density_controller/scenarios/TwoCorridors_forced_controller.scenario
+ * 2 .the *.csv file Scenarios/Demos/Density_controller/scenarios/TwoCorridors_forced_controller_input.csv
+ *
+ * The ReadSetControllerInputs class serves as a simple script which allows to proceed
+ * external multidimensional controller input which can not be passed as a parameter.
+ *
+ * In the scenario, there are two corridors.
+ * The time dependent parameter "percentageLeft" controls how many agents use the left corridor.
+ * If percentageLeft=0, the agents use the right and shorter path only (default OSM behavior)
+ * If percentageLeft=1, the agents use the left corridor only.
+ * @author  Christina Mayr
+ * @since   2020-08-28
+ */
 
 
 public class ReadSetControllerInputs implements INavigationModel {
@@ -22,7 +37,9 @@ public class ReadSetControllerInputs implements INavigationModel {
     private String filePath;
     private ArrayList<Pedestrian> newAgents = new ArrayList<Pedestrian>();
     private ArrayList<Pedestrian> processedAgents = new ArrayList<Pedestrian>();
-    double ratioReal = -1.0;
+    double ratioReal = 0.0;
+
+    private static Logger logger = Logger.getLogger(ReadSetControllerInputs.class);
 
 
     @Override
@@ -35,10 +52,8 @@ public class ReadSetControllerInputs implements INavigationModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(this.controllerInputs[0][0]);
 
     }
-
 
 
     public void update(double simTimeInSec, Topography top, ProcessorManager processorManager) {
@@ -75,7 +90,7 @@ public class ReadSetControllerInputs implements INavigationModel {
             }
 
             processedAgents.addAll(newAgents);
-            newAgents = new ArrayList<Pedestrian>();
+            newAgents.clear();
 
         }
 
@@ -85,11 +100,12 @@ public class ReadSetControllerInputs implements INavigationModel {
 
     private void printAgentIds(double simTimeInSec) {
 
-        System.out.format("Time: %.1f, \t controll agents: ", simTimeInSec);
+        String info = "Time: " + String.format("%5.1fs", simTimeInSec) + ": Agents in control area: ";
+
         for (Pedestrian agent : newAgents) {
-            System.out.print(" " + agent.getId());
+            info += " " + agent.getId();
         }
-        System.out.print("\n");
+        logger.info(info);
     }
 
     @Override

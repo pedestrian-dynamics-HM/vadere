@@ -18,7 +18,7 @@ public class SimulationState {
 	private final String name;
 	private final MainModel mainModel;
 	private boolean simStop = false;
-	private IStrategyModel strategyModel;
+	private final IStrategyModel strategyModel;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
@@ -26,7 +26,7 @@ public class SimulationState {
 							  final double simTimeInSec,
 							  final int step,
 							  @Nullable final MainModel mainModel,
-							  IStrategyModel strategyModel) {
+							  final IStrategyModel strategyModel) {
 		this.name = name;
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
@@ -38,13 +38,14 @@ public class SimulationState {
 
 	@Deprecated
 	public SimulationState(final Map<Integer, VPoint> pedestrianPositionMap, final Topography topography,
-						   final double simTimeInSec, final int step, IStrategyModel strategyModel) {
+						   final double simTimeInSec, final int step, final IStrategyModel strategyModel) {
 		this.name = "";
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
 		this.scenarioStore = null;
 		this.mainModel = null;
+		this.strategyModel = null;
 	}
 
 	// public access to getters
