@@ -39,6 +39,15 @@ public interface JsonNodeExplorer {
 		return removed;
 	}
 
+	default JsonNode add(JsonNode root, String childName, int v) throws MigrationException {
+		ObjectNode parent = (ObjectNode) root;
+		JsonNode added = parent.put(childName,v);
+		if (added == null) {
+			throw new MigrationException("Cannot add childElement '" + childName + "' to parent " + root.asText());
+		}
+		return added;
+	}
+
 	default void removeIfExists(JsonNode root, String childName) throws MigrationException {
 		if (hasChild(root, childName)){
 			remove(root, childName);
@@ -371,5 +380,33 @@ public interface JsonNodeExplorer {
 			pArr.add(pId);
 		}
 
+	}
+
+
+	/** Get the next free ID to assign to a new processor
+	 *
+	 * @param node
+	 * @return
+	 * @throws MigrationException
+	 */
+	default Integer getFreeId(JsonNode node) throws MigrationException {
+		Iterator<JsonNode> iter = iteratorProcessor(node);
+		ArrayList<Integer> ids = new ArrayList<>();
+		while (iter.hasNext()){
+			ObjectNode p = (ObjectNode)iter.next();
+			ids.add(p.get("id").asInt());
+		}
+		return ids.stream().max(Integer::compareTo).orElse(0) + 1;
+	}
+
+	/** Generate a iterator for the processors
+	 *
+	 * @param node
+	 * @return Iterator
+	 * @throws MigrationException
+	 */
+	default Iterator<JsonNode> iteratorProcessor(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "processWriters/processors");
+		return new JsonFilterIterator(tChanger, n->true);
 	}
 }

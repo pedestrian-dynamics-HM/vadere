@@ -28,8 +28,11 @@ public class EvacuationTimeProcessorTestEnv extends ProcessorTestEnv<NoDataKey, 
 	@Override
 	void initializeDependencies() {
 		AttributesEvacuationTimeProcessor attr = (AttributesEvacuationTimeProcessor) testedProcessor.getAttributes();
-		int pedEvacTimeProcId = addDependentProcessor(PedestrianEvacuationTimeProcessorTestEnv::new);
-		attr.setPedestrianEvacuationTimeProcessorId(pedEvacTimeProcId);
+		int pedStartTimeProcId = addDependentProcessor(PedestrianStartTimeProcessorTestEnv::new);
+		int pedEndTimeProcId = addDependentProcessor(PedestrianEndTimeProcessorTestEnv::new);
+		attr.setPedestrianStartTimeProcessorId(pedStartTimeProcId);
+		attr.setPedestrianEndTimeProcessorId(pedEndTimeProcId);
+
 	}
 
 	void loadSimulationStateMocksNaN() {

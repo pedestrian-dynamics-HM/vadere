@@ -52,9 +52,9 @@ public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
                         ? Double.NaN
                         : Collections.max(this.pedestrianEndTimeProcessor.getValues());
 
-                double minPedStartTime = this.pedestrianEndTimeProcessor.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+                double minPedStartTime = this.pedestrianStartTimeProcessor.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
                         ? Double.NaN
-                        : Collections.min(this.pedestrianEndTimeProcessor.getValues());
+                        : Collections.min(this.pedestrianStartTimeProcessor.getValues());
                 result = maxPedEndTime - minPedStartTime;
             }
         }else{

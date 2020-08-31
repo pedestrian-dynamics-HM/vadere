@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_labratory_2group",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -35,14 +35,15 @@
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 8
+        "pedestrianStartTimeProcessorId" : 0,
+        "pedestrianEndTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
       "id" : 8,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 9
+        "pedestrianStartTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
@@ -59,6 +60,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupSizeProcessor",
       "id" : 13
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 14
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

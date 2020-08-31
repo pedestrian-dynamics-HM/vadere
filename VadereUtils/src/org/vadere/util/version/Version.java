@@ -45,8 +45,8 @@ public enum Version {
 	V1_11(1, 11),
 	V1_12(1, 12),
 	V1_13(1, 13),
-	V1_14(1,14);
-
+	V1_14(1,14),
+	V1_15(1,15);
 
 	private static Logger logger = Logger.getLogger(Version.class);
 	private static final String VERSION_CONTROL_INFO_FILE = "/current_commit_hash.txt";

@@ -1,7 +1,7 @@
 {
   "name" : "TwoCorridors_forced_5050",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -53,14 +53,15 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 6
+        "pedestrianStartTimeProcessorId" : 0,
+        "pedestrianEndTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
       "id" : 6,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 7
+        "pedestrianStartTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
@@ -88,6 +89,9 @@
         "edgeLength" : 1.5,
         "displayMesh" : false
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 11
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
