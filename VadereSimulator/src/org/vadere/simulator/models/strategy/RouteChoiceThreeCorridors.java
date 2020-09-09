@@ -6,7 +6,9 @@ import com.github.cschen1205.fuzzylogic.memberships.*;
 import org.vadere.simulator.control.strategy.models.navigation.INavigationModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingProcessor;
+import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,17 +24,18 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
     private FuzzySet density1;
     private FuzzySet density2;
     private FuzzySet density3;
+    private AttributesStrategyModel attributesStrategyModel;
 
 
     @Override
     public void initialize(double simTimeInSec) {
 
-        this.rie=new RuleInferenceEngine();
+        this.rie = new RuleInferenceEngine();
 
         double dX = 0.05;
 
         corridor = new FuzzySet("corridor", 2001, 2004, dX);
-        corridor.addMembership("use3", new FuzzyReverseGrade(2001,2002));
+        corridor.addMembership("use3", new FuzzyReverseGrade(2001, 2002));
         corridor.addMembership("use2", new FuzzyTriangle(2001, 2002, 2003));
         corridor.addMembership("use1", new FuzzyTriangle(2002, 2003, 2004));
         corridor.addMembership("wait", new FuzzyGrade(2003, 2004));
@@ -56,15 +59,15 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
         Rule rule;
         String ruleName;
-        String[] d0 = {"high","high","high","high","low","low","low","low"};
-        String[] d1 = {"high","high","low","low","high","high","low","low"};
-        String[] d2 = {"high","low","high","low","high","low","high","low"};
-        String[] re = {"wait","wait","wait","wait","use3","use2","use1","use1"};
+        String[] d0 = {"high", "high", "high", "high", "low", "low", "low", "low"};
+        String[] d1 = {"high", "high", "low", "low", "high", "high", "low", "low"};
+        String[] d2 = {"high", "low", "high", "low", "high", "low", "high", "low"};
+        String[] re = {"wait", "wait", "wait", "wait", "use3", "use2", "use1", "use1"};
 
 
         for (int i = 0; i < d0.length; i++) {
 
-            ruleName = "Rule " + (i+1);
+            ruleName = "Rule " + (i + 1);
             rule = new Rule(ruleName);
 
             rule.addAntecedent(new Clause(density, "Is", d0[i]));
@@ -77,9 +80,15 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
     }
 
+    @Override
+    public Object getStrategyInfoForDataProcessor() {
+        return null;
+    }
 
 
-    public void update(double simTimeInSec, Collection<Pedestrian> pedestrians, ProcessorManager processorManager) {
+    public void update(double simTimeInSec, Topography top, ProcessorManager processorManager) {
+
+        Collection<Pedestrian> pedestrians = top.getElements(Pedestrian.class);
 
 
         if (simTimeInSec > 0.0) {
@@ -100,8 +109,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
             if (Double.isNaN(targetD)) {
                 target = 2003;
-            }
-            else{
+            } else {
                 target = (int) Math.round(targetD);
             }
 
@@ -123,7 +131,10 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
 
     }
 
-
+    @Override
+    public void build(AttributesStrategyModel attr) {
+        attributesStrategyModel = attr;
+    }
 
 
     private double getDensityFromDataProcessor(int processorId, ProcessorManager processorManager) {
@@ -134,7 +145,7 @@ public class RouteChoiceThreeCorridors implements INavigationModel {
             double area = a.getMeasurementArea().asPolygon().getArea();
             if (data.size() > 0) {
                 density = (double) (Integer) data.lastEntry().getValue();
-                density = density/area;
+                density = density / area;
             }
         }
         return density;

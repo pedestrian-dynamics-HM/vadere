@@ -19,6 +19,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "densities.csv",
       "processors" : [ 5, 6, 7, 8 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "pedestrianDensities.txt",
+      "processors" : [ 9, 10 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -63,6 +67,31 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
         "measurementAreaId" : 1000
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 11,
+        "radius" : 1.5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityGaussianProcessor",
+      "id" : 10,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 11,
+        "scale" : 10.0,
+        "standardDeviation" : 0.7,
+        "obstacleDensity" : true
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
+      "id" : 11,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
+      "attributes" : {
+        "interpolate" : true
       }
     } ],
     "isTimestamped" : false,
@@ -145,7 +174,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : false,
-      "strategyModel" : "RouteChoiceThreeCorridors"
+      "strategyModel" : "RouteChoiceThreeCorridors",
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {
