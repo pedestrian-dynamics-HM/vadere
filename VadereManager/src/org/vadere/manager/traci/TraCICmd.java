@@ -115,6 +115,6 @@ public enum TraCICmd {
 	}
 
 	public String logShort() {
-		return String.format("{%s:0x%02X%s}", name(), id, type);
+		return String.format("{%s: 0x%02X%s}", name(), id, type);
 	}
 }

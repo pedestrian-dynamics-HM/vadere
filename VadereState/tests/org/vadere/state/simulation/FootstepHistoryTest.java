@@ -303,4 +303,23 @@ public class FootstepHistoryTest {
             assertEquals(expectedValue, actualX, ALLOWED_DOUBLE_ERROR);
         }
     }
+
+    @Test
+    public void getHeadingAngleDegTest(){
+        footstepHistory.add(new FootStep(new VPoint(1,1), new VPoint(3,2), 1, 2 ));
+        double ret = footstepHistory.getNorthBoundHeadingAngleDeg();
+        assertEquals(63.434, ret, 0.01);
+        footstepHistory.removeLast();
+        footstepHistory.add(new FootStep(new VPoint(10,10), new VPoint(5,10), 1, 2 ));
+        ret = footstepHistory.getNorthBoundHeadingAngleDeg(); // move to west. expect 270
+        assertEquals(270.0, ret, 0.01);
+        footstepHistory.removeLast();
+        ret = footstepHistory.getNorthBoundHeadingAngleDeg();
+        assertEquals(0.0, ret, 0.01);
+
+        // assume North heading if FootSteps are the same.
+        footstepHistory.add(new FootStep(new VPoint(10,10), new VPoint(10,10), 1, 2 ));
+        ret = footstepHistory.getNorthBoundHeadingAngleDeg();
+        assertEquals(0.0, ret, 0.01);
+    }
 }

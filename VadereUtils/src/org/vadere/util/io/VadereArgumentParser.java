@@ -52,7 +52,7 @@ public class VadereArgumentParser {
         return namespace;
     }
 
-    private boolean versionIsRequested(String[] args) {
+    protected boolean versionIsRequested(String[] args) {
         boolean versionRequrested = false;
 
         for (String currentArgument : args) {

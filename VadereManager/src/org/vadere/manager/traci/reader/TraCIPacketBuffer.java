@@ -1,9 +1,11 @@
 package org.vadere.manager.traci.reader;
 
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.commandHandler.CommandExecutor;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.response.StatusResponse;
 import org.vadere.manager.traci.response.TraCIResponse;
+import org.vadere.util.logging.Logger;
 
 import java.nio.ByteBuffer;
 
@@ -15,6 +17,8 @@ import java.nio.ByteBuffer;
  * must be removed before!
  */
 public class TraCIPacketBuffer extends TraCIByteBuffer {
+
+	private static Logger logger = Logger.getLogger(TraCIPacketBuffer.class);
 
 	protected TraCIPacketBuffer(byte[] buf) {
 		super(buf);
@@ -41,7 +45,7 @@ public class TraCIPacketBuffer extends TraCIByteBuffer {
 			return null;
 
 		int cmdLen = getCommandDataLen();
-
+		logger.tracef("read next command with length %d", cmdLen);
 		return TraCICommand.create(readByteBuffer(cmdLen));
 	}
 

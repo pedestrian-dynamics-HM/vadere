@@ -1,6 +1,8 @@
 package org.vadere.state.simulation;
 
 import org.jetbrains.annotations.Nullable;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -67,6 +69,46 @@ public class FootstepHistory {
         }
 
         return oldestFootStep;
+    }
+
+    /**
+     *  Heading based on  TraCI angle
+     *  * - measured in degree
+     *  * - 0 is headed north
+     *  * - clockwise orientation (i.e. 90 heads east, 180 heads south, etc.)
+     *  * - range from 0 to 360.
+     *
+     * @return Heading angle based on last FootStep.
+     */
+    public double getNorthBoundHeadingAngleDeg(){
+        return getNorthBoundHeadingAngle(1, true);
+    }
+
+    public double getNorthBoundHeadingAngleRad(){
+        return getNorthBoundHeadingAngle(1, false);
+    }
+
+    public double getNorthBoundHeadingAngle(int histLength, boolean degree){
+        if (footSteps.size() < histLength)
+            return 0.0; // not enough data. Return North heading.
+
+        VPoint currentLocation = footSteps.get(footSteps.size() -1).getEnd();
+        VPoint pastLocation = footSteps.get(footSteps.size() - histLength).getStart();
+        Vector2D heading = new Vector2D(currentLocation.x - pastLocation.x, currentLocation.y - pastLocation.y);
+        if (Math.abs(heading.getLength() -0.0) < 0.0001){
+            //Footstep to small
+            return 0.0; // assume North heading
+        }
+
+        // TraCI Angle defined as Clockwise with North as 0 deg.
+        // clockwise: | 2PI - angle |
+        // 0 at North: + PI
+        // mod 2PI for [0, 2PI]
+        double angel = (Math.abs(2*Math.PI - heading.angleToZero()) + 0.5*Math.PI) % (2* Math.PI); // angle with y-axis
+
+        if (degree)
+            return  angel*(180/Math.PI);
+        return angel;
     }
 
     @Nullable
