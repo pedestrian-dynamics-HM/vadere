@@ -4,7 +4,13 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.tools.ant.filters.StringInputStream;
+import org.vadere.meshing.examples.EikMeshPoly;
+import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
+import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
+import org.vadere.simulator.utils.pslg.PSLGConverter;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.entrypoints.cmd.SubCommandRunner;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -22,7 +28,10 @@ import org.vadere.util.logging.Logger;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +47,9 @@ public class UtilsSubCommand implements SubCommandRunner {
 		methods.put("getHash", Pair.of("[-i: file, -o: ignored]", this::getHash));
 		methods.put("binCache", Pair.of("[-i: file, -o: directory]",this::calculateBinCache));
 		methods.put("txtCache", Pair.of("[-i: file, -o: directory]",this::calculateTextCache));
+		methods.put("getMesh", Pair.of("[-i: scenario file, -o: output file (*.poly, *.tex)]", this::mesh));
 	}
+
 
 	public String[] methodsString(){
 		Set<String> mSet = methods.keySet();
@@ -149,5 +160,34 @@ public class UtilsSubCommand implements SubCommandRunner {
 					, attFF);
 		}
 
+	}
+
+	private void mesh(Namespace ns, ArgumentParser argumentParser) throws IOException, InterruptedException {
+		Scenario scenario = createScenario(ns.getString("input"));
+		if (ns.getString("output") == null){
+			logger.errorf("need output folder for this method");
+			System.exit(-1);
+		}
+		String output = ns.getString("output");
+		String[] suffix = output.split("\\.");
+		int last = suffix.length -1;
+		List<String> allowedSuffix = Arrays.asList("tex", "poly");
+		if (!allowedSuffix.contains(suffix[last])){
+			logger.errorf("only supports .tex and .poly! You provided: %s", output);
+			System.exit(-1);
+		}
+
+		PSLGConverter pslgConverter = new PSLGConverter();
+		PSLG pslg = pslgConverter.toPSLG(scenario.getTopography());
+		String polyString = PSLGGenerator.toPSLG(pslg.getSegmentBound(), pslg.getHoles());
+		System.out.println(polyString);
+		pslg = PSLGGenerator.toPSLG(new StringInputStream(polyString));
+		PEikMesh mesh = EikMeshPoly.meshPoly(pslg, false);
+
+		if(suffix[last].equals("tex")){
+			EikMeshPoly.writeTex(mesh, output);
+		} else {
+			EikMeshPoly.writePoly(mesh, output);
+		}
 	}
 }

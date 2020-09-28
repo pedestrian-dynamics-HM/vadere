@@ -326,8 +326,9 @@ public class TexGraphGenerator {
 			Color c = coloring.apply(face);
 			String colorName = faceColorBidiMap.get(c);
 			//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
+			IPoint first = mesh.streamVertices(face).findFirst().get().scalarMultiply(scaling);
+
+			String poly = mesh.streamVertices(face).map(v-> v.scalarMultiply(scaling)).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			if(edgeColorFunction != null) {
@@ -343,8 +344,10 @@ public class TexGraphGenerator {
 			Color c = edgeColorFunction != null ? edgeColorFunction.apply(edge) : DEFAULT_EDGE_COLOR;
 			String colorName = edgeColorBidiMap.get(c);
 			VLine line = mesh.toLine(edge);
+			VPoint start = line.getVPoint1().scalarMultiply(scaling);
+			VPoint end = line.getVPoint2().scalarMultiply(scaling);
 			//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-			builder.append("\\draw[color="+colorName+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
+			builder.append("\\draw[color="+colorName+"]("+toString(start.x)+","+toString(start.y)+") -- ("+toString(end.x)+","+toString(end.y)+");\n");
 		}
 
 
@@ -353,7 +356,7 @@ public class TexGraphGenerator {
 				Color c = vertexColorFunction != null ? vertexColorFunction.apply(vertex) : DEFAULT_VERTEX_COLOR;
 				String colorName = vertexColorBidiMap.get(c);
 				//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-				builder.append("\\draw[color="+colorName+", fill="+colorName+"Fill]("+toString(vertex.getX())+","+toString(vertex.getY())+") circle (\\circleSize);\n");
+				builder.append("\\draw[color="+colorName+", fill="+colorName+"Fill]("+toString(vertex.scalarMultiply(scaling).getX())+","+toString(vertex.scalarMultiply(scaling).getY())+") circle (\\circleSize);\n");
 			}
 		}
 

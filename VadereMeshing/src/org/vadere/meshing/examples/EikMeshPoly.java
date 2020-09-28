@@ -10,6 +10,7 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
+import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.utils.color.Colors;
@@ -40,16 +41,19 @@ public class EikMeshPoly {
 		}
 
 		for (String fileName : args) {
-			meshPoly(fileName);
+			var improver = meshPoly(getPSLG(fileName),true);
+			writeTex(improver, fileName + ".tex");
+			writePoly(improver, fileName + "_tri.poly");
 		}
 	}
 
-	public static void meshPoly(@NotNull final String fileName) throws IOException, InterruptedException {
+	private static PSLG getPSLG(@NotNull  String fileName) throws IOException {
 		final InputStream inputStream = new FileInputStream(new File(fileName));
+		return  PSLGGenerator.toPSLG(inputStream);
+	}
 
-		System.out.println(String.format("Meshing %s...", fileName));
+	public static PEikMesh meshPoly(@NotNull final PSLG pslg, boolean showGui) throws IOException, InterruptedException {
 
-		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
 		edgeLengthFunctionApprox.smooth(0.4);
 		edgeLengthFunctionApprox.printPython();
@@ -81,7 +85,33 @@ public class EikMeshPoly {
 				polygons
 		);
 
-		Function<PVertex, Color> vertexColorFunction = v -> {
+		Predicate<PFace> alertPredicate = f ->{
+			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
+		};
+
+		if (showGui){
+
+			var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction(meshImprover));
+			var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
+			meshPanel.display("Combined distance functions " + h0);
+			meshImprover.improve();
+			while (!meshImprover.isFinished()) {
+				synchronized (meshImprover.getMesh()) {
+					meshImprover.improve();
+				}
+				//Thread.sleep(500);
+				meshPanel.repaint();
+			}
+			//meshImprover.generate();
+		} else {
+			meshImprover.generate();
+		}
+
+		return meshImprover;
+	}
+
+	private static Function<PVertex, Color> vertexColorFunction(final PEikMesh meshImprover){
+		return v -> {
 			if(meshImprover.isSlidePoint(v)){
 				return Colors.BLUE;
 			} else if(meshImprover.isFixPoint(v)) {
@@ -90,32 +120,6 @@ public class EikMeshPoly {
 				return Color.BLACK;
 			}
 		};
-
-		Predicate<PFace> alertPredicate = f ->{
-			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
-		};
-
-		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
-		var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
-		meshPanel.display("Combined distance functions " + h0);
-		meshImprover.improve();
-		while (!meshImprover.isFinished()) {
-			synchronized (meshImprover.getMesh()) {
-				meshImprover.improve();
-			}
-			//Thread.sleep(500);
-			meshPanel.repaint();
-		}
-		//meshImprover.generate();
-
-
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), fileName + ".tex");
-		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
-
-		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-		String[] splitName = fileName.split("\\.");
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName + "_tri.poly");
-
 	}
 
 	public static void displayPolyFile(@NotNull final String fileName) throws IOException {
@@ -132,6 +136,18 @@ public class EikMeshPoly {
 		var mesh = meshPolyWriter.readMesh(inputStream);
 		var meshPanel = new PMeshPanel(mesh, 1000, 800);
 		meshPanel.display("");
+	}
+
+	public static void writeTex(final PEikMesh meshImprover, final String fileName) throws IOException {
+		write(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue,
+				null, vertexColorFunction(meshImprover),0.02f, true), fileName);
+		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
+	}
+
+	public static void writePoly(final PEikMesh meshImprover, final String fileName) throws IOException {
+		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
+		String[] splitName = fileName.split("\\.");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName);
 	}
 
 	private static void write(final String string, final String filename) throws IOException {
