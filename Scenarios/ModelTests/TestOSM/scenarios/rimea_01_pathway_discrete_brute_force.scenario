@@ -1,7 +1,7 @@
 {
   "name" : "rimea_01_pathway_discrete_brute_force",
   "description" : "numberOfCircles = 4, stepCircleResolution = 30, DISCRETE",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

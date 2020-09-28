@@ -1,7 +1,7 @@
 {
   "name" : "warteschlange_ein_ziel",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -32,14 +32,15 @@
       "id" : 2,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 3
+        "pedestrianStartTimeProcessorId" : 0,
+        "pedestrianEndTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
       "id" : 3,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 4
+        "pedestrianStartTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
@@ -47,6 +48,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
       "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 6
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
