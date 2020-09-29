@@ -1,4 +1,4 @@
-package org.vadere.simulator.control.psychology.perception;
+package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.state.psychology.perception.types.ElapsedTime;

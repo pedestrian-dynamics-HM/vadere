@@ -1,10 +1,11 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.*;
+import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -79,6 +80,7 @@ public class Simulation {
 	private final MainModel mainModel;
 	private final IPerceptionModel perceptionModel;
 	private final ICognitionModel cognitionModel;
+	private final IStrategyModel strategyModel;
 
 	/** Hold the topography in an extra field for convenience. */
 	private final Topography topography;
@@ -88,6 +90,7 @@ public class Simulation {
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
 
+
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
 					  ICognitionModel cognitionModel, double startTimeInSec,
 					  final String name, ScenarioStore scenarioStore,
@@ -95,12 +98,14 @@ public class Simulation {
 					  List<PassiveCallback> passiveCallbacks, Random random,
 					  ProcessorManager processorManager, SimulationResult simulationResult,
 					  List<RemoteRunListener> remoteRunListeners, boolean singleStepMode,
-					  ScenarioCache scenarioCache) {
+					  ScenarioCache scenarioCache, IStrategyModel strategyModel) {
 
 		this.name = name;
 		this.mainModel = mainModel;
 		this.perceptionModel = perceptionModel;
 		this.cognitionModel = cognitionModel;
+		this.strategyModel = strategyModel;
+
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
@@ -208,6 +213,9 @@ public class Simulation {
 		for (Model m : models) {
 			m.preLoop(simTimeInSec);
 		}
+		if (strategyModel != null){
+			strategyModel.initialize(simTimeInSec);
+		}
 
 		for (PassiveCallback c : passiveCallbacks) {
 			c.preLoop(simTimeInSec);
@@ -219,7 +227,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, strategyModel);
 		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
@@ -278,7 +286,7 @@ public class Simulation {
 				updateCallbacks(simTimeInSec);
 
 				step++;
-				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, strategyModel);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -365,13 +373,16 @@ public class Simulation {
 	}
 
 	private SimulationState initialSimulationState() {
-		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
+		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel, strategyModel );
 
 		return state;
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+
 		updateScenarioElements(simTimeInSec);
+
+		updateStrategyLayer(simTimeInSec);
 
 		updatePsychologyLayer(simTimeInSec);
 
@@ -411,6 +422,20 @@ public class Simulation {
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}
 
+	private void updateStrategyLayer(double simTimeInSec) {
+
+		if (scenarioStore.getAttributesStrategyModel().isUseStrategyModel()) {
+
+			if (simTimeInSec == startTimeInSec) {
+				strategyModel.update(simTimeInSec, topography, null);
+			}
+			strategyModel.update(simTimeInSec, topography, processorManager);
+		}
+
+
+	}
+
+
 	private void updatePsychologyLayer(double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
@@ -423,6 +448,8 @@ public class Simulation {
 			pedestrians.stream().forEach(pedestrian -> pedestrian.setMostImportantStimulus(elapsedTime));
 		}
 	}
+
+
 
 	private void updateLocomotionLayer(double simTimeInSec) {
 		for (Model m : models) {

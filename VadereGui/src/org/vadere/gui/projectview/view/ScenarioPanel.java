@@ -1,6 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
+import org.vadere.gui.components.control.HelpTextView;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindow;
@@ -38,6 +39,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
 	private TextView attributesSimulationView; // Simulation tab
+	private TextView attributesStrategyFileView; // Strategy tab
 	private TextView attributesModelView; // Model tab
 	private TextView attributesPsychologyView; // Psychology tab
 	private TextView topographyFileView; // Topography tab
@@ -156,6 +158,18 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
+
+		JMenu mnHelpAttributesMenu = new JMenu(Messages.getString("Tab.Model.helpAttributesMenu.title"));
+		presetMenuBar.add(mnHelpAttributesMenu);
+		menusInTabs.add(mnHelpAttributesMenu);
+		attributeFactory.sortedAttributeStream().forEach(
+				attributesClassName -> mnHelpAttributesMenu.add(new JMenuItem(new AbstractAction(attributesClassName) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						VDialogManager.showMessageDialogWithBodyAndTextEditorPane("Help", attributesClassName,
+								HelpTextView.create(attributesClassName), JOptionPane.INFORMATION_MESSAGE);
+					}
+				})));
 		
 		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
@@ -197,6 +211,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		attributesPsychologyView.isEditable(true);
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
 
+
 		topographyFileView = new TextView("ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
@@ -204,6 +219,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
 		perceptionFileView.isEditable(true);
 		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
+
+		attributesStrategyFileView =
+				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.STRATEGY);
+		attributesStrategyFileView.isEditable(true);
+		tabbedPane.addTab(Messages.getString("Tab.Strategy.title"), attributesStrategyFileView);
 
 		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
@@ -297,6 +317,9 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		this.perceptionFileView.setVadereScenario(scenario);
 		this.perceptionFileView.isEditable(isEditable);
+
+		this.attributesStrategyFileView.setVadereScenario(scenario);
+		this.attributesStrategyFileView.isEditable(isEditable);
 
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);

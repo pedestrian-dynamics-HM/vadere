@@ -2,15 +2,15 @@
 
 import os
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-from suqc.configuration import SuqcConfig
 from suqc import __version__
+from suqc.configuration import SuqcConfig
 
 # To generate a new requirements.txt file run in console (install vis 'pip3 install pipreqs'):
 # pipreqs --use-local --force /home/daniel/REPOS/suq-controller
 
-with open('requirements.txt', "r") as f:
+with open("requirements.txt", "r") as f:
     requirements = f.read().splitlines()
 
 # Writes a file that gives information about the version such that "suqc.__version__" provides the current version,
@@ -27,7 +27,7 @@ setup(
     url="www.vadere.org",
     packages=find_packages(),
     install_requires=requirements,
-    data_files=[('suqc', ["suqc/PACKAGE.txt"])]
+    data_files=[("suqc", ["suqc/PACKAGE.txt"])],
 )
 
 os.remove(SuqcConfig.path_package_indicator_file())

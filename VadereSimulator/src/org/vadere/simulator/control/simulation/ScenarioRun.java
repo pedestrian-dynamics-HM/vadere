@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.simulation;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,16 +11,17 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.context.VadereContext;
-import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
-import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.helpers.CognitionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
+import org.vadere.simulator.control.psychology.perception.helpers.PerceptionModelBuilder;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.strategy.helpers.StrategyModelBuilder;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
+import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -36,7 +36,6 @@ import org.vadere.util.logging.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
@@ -181,6 +180,8 @@ public class ScenarioRun implements Runnable {
 
 				IPerceptionModel perceptionModel = PerceptionModelBuilder.instantiateModel(scenarioStore);
 				ICognitionModel cognitionModel = CognitionModelBuilder.instantiateModel(scenarioStore);
+				IStrategyModel strategyModel = StrategyModelBuilder.instantiateModel(scenarioStore);
+
 
 				// ensure all elements have unique id before attributes are sealed
 				scenario.getTopography().generateUniqueIdIfNotSet();
@@ -193,7 +194,7 @@ public class ScenarioRun implements Runnable {
 						passiveCallbacks, random,
 						processorManager, simulationResult,
 						remoteRunListeners, singleStepMode,
-						scenarioCache);
+						scenarioCache, strategyModel);
 			}
 
 			simulation.run();

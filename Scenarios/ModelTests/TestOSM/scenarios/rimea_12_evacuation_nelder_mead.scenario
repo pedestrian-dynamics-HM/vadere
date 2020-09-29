@@ -1,7 +1,7 @@
 {
   "name" : "rimea_12_evacuation_nelder_mead",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -108,6 +108,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

@@ -30,9 +30,9 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.SEND_FILE.id, ControlCommandHandler.instance::process_load_file);
 		cmdMap.put(TraCICmd.GET_PERSON_VALUE.id, PersonCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_PERSON_STATE.id, PersonCommandHandler.instance::processSet);
+		cmdMap.put(TraCICmd.SUB_PERSON_VARIABLE.id, PersonCommandHandler.instance::processValueSub);
 		cmdMap.put(TraCICmd.GET_VADERE_VALUE.id, VadereCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_VADERE_STATE.id, VadereCommandHandler.instance::processSet);
-		cmdMap.put(TraCICmd.SUB_PERSON_VARIABLE.id, PersonCommandHandler.instance::processValueSub);
 		cmdMap.put(TraCICmd.GET_SIMULATION_VALUE.id, SimulationCommandHandler.instance::processGet);
 		cmdMap.put(TraCICmd.SET_SIMULATION_STATE.id, SimulationCommandHandler.instance::processSet);
 		cmdMap.put(TraCICmd.SUB_SIMULATION_VALUE.id, SimulationCommandHandler.instance::processValueSub);
@@ -67,6 +67,7 @@ public class CommandExecutor {
 			return TraCIPacket.createErr(cmd.getTraCICmd().id, e.getMessageForClient());
 		}
 
+		logger.tracef("return response for: %s", cmd.getTraCICmd().logShort());
 		return response;
 	}
 }

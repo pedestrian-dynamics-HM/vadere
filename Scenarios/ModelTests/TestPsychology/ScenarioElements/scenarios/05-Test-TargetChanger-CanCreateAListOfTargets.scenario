@@ -1,7 +1,7 @@
 {
   "name" : "05-Test-TargetChanger-CanCreateAListOfTargets",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -111,6 +111,10 @@
         "cognition" : "CooperativeCognitionModel"
       }
     },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
+    },
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -205,7 +209,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : false,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
         "nextTarget" : [ 3, 4 ],
         "probabilityToChangeTarget" : [ 1.0, 0.5 ]
       } ],

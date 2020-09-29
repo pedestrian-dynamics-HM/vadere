@@ -8,6 +8,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.control.HelpTextView;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.IScenarioChecker;
@@ -199,6 +200,10 @@ public class TextView extends JPanel implements IJsonView {
 								StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
 								currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
 								break;
+							case STRATEGY:
+								currentScenario
+										.setAttributesStrategy(StateJsonConverter.deserializeAttributesStrategyModel(json));
+								break;
 							default:
 								throw new RuntimeException("attribute type not implemented.");
 						}
@@ -246,6 +251,20 @@ public class TextView extends JPanel implements IJsonView {
 						}
 					})));
 
+			JMenu mnPresetHelpMenu = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+			presetMenuBar.add(mnPresetHelpMenu);
+
+			StimulusPresettings.PRESETTINGS_MAP.forEach(
+					(clazz, jsonString) -> mnPresetHelpMenu.add(new JMenuItem(new AbstractAction(clazz.getSimpleName()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							VDialogManager.showMessageDialogWithBodyAndTextEditorPane("Help", clazz.getName(),
+									HelpTextView.create(clazz.getName()), JOptionPane.INFORMATION_MESSAGE);
+						}
+					})));
+
 			panelTop.add(presetMenuBar);
 		}
 	}
@@ -286,6 +305,10 @@ public class TextView extends JPanel implements IJsonView {
 		case PERCEPTION:
 			StimulusInfoStore stimulusInfoStore = scenario.getScenarioStore().getStimulusInfoStore();
 			textfileTextarea.setText(StateJsonConverter.serializeStimuli(stimulusInfoStore));
+			break;
+		case STRATEGY:
+			textfileTextarea
+					.setText(StateJsonConverter.serializeAttributesStrategyModel(scenario.getAttributesStrategyModel()));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");

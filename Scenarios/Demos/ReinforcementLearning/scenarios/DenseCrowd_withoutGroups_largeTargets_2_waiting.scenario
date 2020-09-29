@@ -1,7 +1,7 @@
 {
   "name" : "DenseCrowd_withoutGroups_largeTargets_2_waiting",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.14",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -94,6 +94,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
@@ -294,7 +298,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -342,7 +349,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -390,7 +400,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],

@@ -116,8 +116,11 @@ public abstract class CommandHandler<VAR extends Enum> {
 	}
 
 
-	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager,
-										TraCICmdHandler traCICmdHandler, TraCICmd getCommand, TraCICmd apiCmdResponse) {
+	public TraCICommand processValueSub(TraCICommand rawCmd,
+										RemoteManager remoteManager,
+										TraCICmdHandler traCICmdHandler,
+										TraCICmd getCommand,
+										TraCICmd apiCmdResponse) {
 		TraCIValueSubscriptionCommand cmd = (TraCIValueSubscriptionCommand) rawCmd;
 
 		List<TraCIGetCommand> getCommands = new ArrayList<>();

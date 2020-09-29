@@ -10,6 +10,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.gui.projectview.utils.SimpleDocumentListener;
+import org.vadere.gui.topographycreator.view.JLinkLabel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
@@ -636,7 +637,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 0;
 			c.gridy = 0;
 			c.gridwidth = 3;
-			panel.add(new JLabel("<html><b>" + dataProcessor.getSimpleProcessorTypeName() + "</b></html>"), c);
+			panel.add(new JLinkLabel(dataProcessor.getClass().getName(), "<html><b>", "</b></html>"), c);
 			c.gridwidth = 1;
 
 			c.gridx = 0;
@@ -645,7 +646,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 1;
 			c.gridy = 1;
-			panel.add(new JLabel(extractSimpleName(getDataKeyForDataProcessor(dataProcessor))), c);
+			panel.add(new JLinkLabel(getDataKeyForDataProcessor(dataProcessor).getTypeName()), c);
 
 			c.gridx = 2;
 			c.gridy = 1;

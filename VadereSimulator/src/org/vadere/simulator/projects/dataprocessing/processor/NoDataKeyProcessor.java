@@ -28,6 +28,7 @@ public abstract class NoDataKeyProcessor<V> extends DataProcessor<NoDataKey, V> 
 
 	@Override
 	public void postLoopAddResultInfo(@NotNull final SimulationState state, @NotNull final SimulationResult result){
-		result.addData(getSimulationResultHeader(), getValue(NoDataKey.key()));
+		result.addData(getSimulationResultHeader() + " (PID" + getId() + ")", getValue(NoDataKey.key()));
 	}
+
 }

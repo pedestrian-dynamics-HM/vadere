@@ -142,7 +142,8 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 
 		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);
 		var meshPanel = new PMeshPanel(meshRenderer, 300, 300);
-		meshPanel.display();
+
+		if (getAttributes().isDisplayMesh()) meshPanel.display();
 	}
 
 	@Override
