@@ -2,17 +2,22 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
+import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionTri;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -22,7 +27,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-
+// TODO this is experimental code!
 public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdge, F extends IFace> implements EikonalSolver, ITriEventListener<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(MeshEikonalSolverFMMIterative.class);
@@ -39,9 +44,9 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 	private static final double MAX_CURVATURE = 0.3;
 
-	private static final double MIN_EDGE_LEN = 0.1;
+	private static final double MIN_EDGE_LEN = 0.001;
 
-	private static final int MAX_ITERATIONS = 4;
+	private static final int MAX_ITERATIONS = 3;
 
 	private int level = 0;
 
@@ -49,14 +54,33 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 	private @NotNull IDistanceFunction distFunc;
 
+	private Collection<V> points = null;
+
+	private Collection<? extends IPoint> pointList;
+
+	private ITimeCostFunction timeCostFunction;
+
 
 	public MeshEikonalSolverFMMIterative(@NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                                     @NotNull final Collection<V> targetVertices,
 	                                     @NotNull final IDistanceFunction distFunc
 	) {
-		this(new MeshEikonalSolverFMM<>(timeCostFunction, triangulation, targetVertices, distFunc));
+		this(new MeshEikonalSolverFMM<>(timeCostFunction, triangulation, targetVertices));
 		this.distFunc = distFunc;
+		this.points = targetVertices;
+		this.timeCostFunction = timeCostFunction;
+	}
+
+	public MeshEikonalSolverFMMIterative(@NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final List<? extends IPoint> points,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                                     @NotNull final IDistanceFunction distFunc
+	) {
+		this(new MeshEikonalSolverFMM<>(timeCostFunction, points, triangulation));
+		this.distFunc = distFunc;
+		this.pointList = points;
+		this.timeCostFunction = timeCostFunction;
 	}
 
 	public MeshEikonalSolverFMMIterative(@NotNull final MeshEikonalSolverFMM<V, E, F> solver) {
@@ -69,10 +93,11 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 		IIncrementalTriangulation<V, E, F> clone = new IncrementalTriangulation<>(triangulation.getMesh().clone(), e -> true);
 
 		// (2) refine if necessary
-		final Predicate<E> predicate = new PredicateRefinement<>(triangulation, clone, MIN_EDGE_LEN, MAX_CURVATURE);
+		final Predicate<E> predicate = new PredicateRefinement<>(triangulation, clone, MIN_EDGE_LEN, 0.3);
 		//final Predicate<E> predicate = new PredicateEdgeRefinement<>(solver, MIN_EDGE_LEN, MAX_CURVATURE);
 		//refiner = new GenRegularRefinement<>(triangulation, predicate, level);
 		refiner = new GenRegularRefinement<>(clone, predicate, level);
+		//refiner = new GenRegularRefinement<>(clone, level);
 		refiner.refine();
 		//refiner.coarse();
 
@@ -104,15 +129,44 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 				logger.debug("max curvature = " + maxCurrentCurvature);
 				solver.getTriangulation().removeTriEventListener(solver);
 				IIncrementalTriangulation<V, E, F> refinedTriangulation = refine(solver.getTriangulation());
-				solver = new MeshEikonalSolverFMM<>(solver, refinedTriangulation, refinedTriangulation.getMesh().getBoundaryVertices());
+				//solver = new MeshEikonalSolverFMM<>(getTimeCostFunction(), refinedTriangulation, refinedTriangulation.getMesh().getBoundaryVertices());
+				solver = new MeshEikonalSolverFMM<>(getTimeCostFunction(), pointList, refinedTriangulation);
 				solver.solve();
 
 				System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 				level++;
 			}
 
+			/*var background = solver.getTriangulation().clone();
+			computeCurvature(background);
+			double minEdgeLen = background.getMesh().getMinEdgeLen();
+			double maxEdgeLen = background.getMesh().getMaxEdgeLen();
+
+			EdgeLengthFunctionTri h = new EdgeLengthFunctionTri(refiner.getTriangulation().clone());
+			h.smooth(0.3);
+
+			//IEdgeLengthFunction h1 = p -> Math.min(maxEdgeLen, minEdgeLen + 0.3 * (1 / background.getInterpolatedValue(p.getX(), p.getY(), MeshEikonalSolverFMMIterative.nameCurvature)));
+
+			GenEikMesh<V, E, F> eikMesh = new GenEikMesh<>(h, solver.getTriangulation());
+			MeshPanel<V, E, F> panel = new MeshPanel<>(eikMesh.getMesh(), 1000, 1000);
+			panel.display();
+			while (!eikMesh.isFinished()) {
+				eikMesh.improve();
+				panel.repaint();
+			}
+
+			solver = new MeshEikonalSolverFMM<>(solver, eikMesh.getTriangulation(), eikMesh.getTriangulation().getMesh().getBoundaryVertices());
+			solver.solve();
+
+			System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));*/
+
 			calculationFinished = true;
 		}
+	}
+
+	@Override
+	public ITimeCostFunction getTimeCostFunction() {
+		return timeCostFunction;
 	}
 
 	private boolean hasConverged(double lastMaxCurvature, double thisMaxCurvature) {

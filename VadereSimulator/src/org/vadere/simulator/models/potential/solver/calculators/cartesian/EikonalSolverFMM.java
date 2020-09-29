@@ -33,6 +33,7 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 	/** only for logging */
 	protected static Logger logger = Logger.getLogger(EikonalSolverFMM.class);
 	protected long runtime = 0;
+	private int updates = 0;
 
     /**
      * Initializes the FM potential calculator with a time cost function F > 0.
@@ -79,7 +80,8 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 			setNeighborDistances(tmpPoint);
 		}
 		long runTime = System.currentTimeMillis() - ms;
-		logger.debug("fmm on the gird run time = " + runTime);
+		logger.debug("fmm on the gird run time = " + runTime + ", #updates = " + updates);
+		System.out.println("fmm on the gird run time = " + runTime + ", #updates = " + updates);
 	}
 
 	/**
@@ -145,12 +147,13 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 			if (cellGrid.isValidPoint(neighbor)) {
 				if (cellGrid.getValue(neighbor).tag == PathFindingTag.Undefined) {
 					distance = computeGodunovDifference(neighbor, cellGrid);
+					updates++;
 					cellGrid.setValue(neighbor, new CellState(distance,
 							PathFindingTag.Reachable));
 					narrowBand.add(neighbor);
 				} else if (cellGrid.getValue(neighbor).tag == PathFindingTag.Reachable) {
 					distance = computeGodunovDifference(neighbor, cellGrid);
-
+					updates++;
 					if (distance < cellGrid.getValue(neighbor).potential) {
 						narrowBand.remove(neighbor);
 						cellGrid.getValue(neighbor).potential = distance;

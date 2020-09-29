@@ -12,14 +12,13 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
-import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 
 import java.io.BufferedWriter;
 import java.io.File;

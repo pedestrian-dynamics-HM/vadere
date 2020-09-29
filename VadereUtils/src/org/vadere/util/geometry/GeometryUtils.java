@@ -1390,8 +1390,11 @@ public class GeometryUtils {
 	 * @return the (smallest possible) angle3D at C from the triangle ACB.
 	 */
 	public static double angle(@NotNull final IPoint A, @NotNull final IPoint C, @NotNull final IPoint B) {
-		double phi1 = angleTo(A, C);
-		double phi2 = angleTo(B, C);
+		return angle(A.getX(), A.getY(), C.getX(), C.getY(), B.getX(), B.getY());
+	}
+	public static double angle(final double xa, final double ya, final double xc, final double yc, final double xb, final double yb) {
+		double phi1 = angleTo(xa, ya, xc, yc);
+		double phi2 = angleTo(xb, yb, xc, yc);
 		double phi = Math.abs(phi1 - phi2);
 		return Math.min(phi, 2 * Math.PI - phi);
 	}

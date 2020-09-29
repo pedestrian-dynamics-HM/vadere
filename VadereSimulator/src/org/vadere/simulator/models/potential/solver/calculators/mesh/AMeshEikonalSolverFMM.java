@@ -12,7 +12,7 @@ import java.util.PriorityQueue;
 
 public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
-	private PriorityQueue<V> narrowBand;
+	protected PriorityQueue<V> narrowBand;
 
 	public AMeshEikonalSolverFMM(
 			@NotNull final String identifier,

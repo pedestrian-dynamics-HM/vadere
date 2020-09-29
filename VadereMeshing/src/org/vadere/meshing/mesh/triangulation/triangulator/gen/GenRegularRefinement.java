@@ -89,6 +89,26 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 
 	public GenRegularRefinement(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			final int level
+			) {
+
+		this.triangulation = triangulation;
+		this.maxLevel = level;
+		//this.edgeRefinementPredicate = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
+		//this.edgeAddToRefine = e -> getLevel(e) == (maxLevel-1) && edgeRefinementPredicate.test(e);
+
+		//VPoint p = new VPoint(5,5);
+
+		//this.edgeRefinementPredicate = e -> !getMesh().isBoundary(e) && getMesh().toTriangle(getMesh().getFace(e)).midPoint().distance(p) < 3.0 && (!isGreen(e) || getMesh().toLine(e).length() > 0.5);
+		this.edgeRefinementPredicate = e -> getLevel(e) < level;
+		this.finished = false;
+		this.coarse = false;
+		this.toRefine = new LinkedList<>();
+		this.toCoarse = new LinkedList<>();
+	}
+
+	public GenRegularRefinement(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final Predicate<E> edgeRefinementPredicate,
 			int maxLevel
 			) {
@@ -759,7 +779,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if the triangle is red, false otherwise
 	 */
 	public boolean isRed(@NotNull final F face) {
-		assert getMesh().getVertices(face).size() == 3;
+		//assert getMesh().getVertices(face).size() == 3;
 		E e1 = getMesh().getEdge(face);
 		E e2 = getMesh().getNext(e1);
 		E e3 = getMesh().getNext(e2);

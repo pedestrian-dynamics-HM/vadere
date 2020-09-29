@@ -54,8 +54,15 @@ public class ActionGenerateMesh extends AbstractAction {
 
 			MeshConstructor constructor = new MeshConstructor();
 
-			CompletableFuture.supplyAsync(
+			/*CompletableFuture.supplyAsync(
 					() -> constructor.pslgToAdaptivePMesh(pslg, hmin, hmax, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
+					.exceptionally( ex ->  {
+						ex.printStackTrace();
+						return null;
+					});*/
+
+			CompletableFuture.supplyAsync(
+					() -> constructor.pslgToUniformPMesh(pslg, hmin, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
 					.exceptionally( ex ->  {
 						ex.printStackTrace();
 						return null;

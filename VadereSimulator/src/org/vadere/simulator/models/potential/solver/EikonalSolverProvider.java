@@ -13,6 +13,7 @@ import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCa
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverIFIM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverDFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMParallel;
@@ -128,6 +129,9 @@ public abstract class EikonalSolverProvider  {
 				case NONE:
 					eikonalSolver = new PotentialFieldCalculatorNone();
 					break;
+				case INFORMED_FAST_ITERATIVE_METHOD:
+					eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+					break;
 				case FAST_ITERATIVE_METHOD:
 					eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 					break;
@@ -147,14 +151,12 @@ public abstract class EikonalSolverProvider  {
 						topography,
 						targetId, triangulation);
 
-				eikonalSolver = new MeshEikonalSolverDFMM<>(targetId+"", targetShapes, timeCost, triangulation
+				eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
 						/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
 
 				//eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
 				//	/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
 				//eikonalSolver.solve();
-				//System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, targetId)));
-				//System.out.println();
 			} else {
 				throw new UnsupportedOperationException("Can not use mesh based floor field computation without a mesh!");
 			}

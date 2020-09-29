@@ -93,7 +93,7 @@ public interface MeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	default double computeCosPhi(@NotNull final V p1, @NotNull final V p, @NotNull final V p2) {
-		return Math.cos(GeometryUtils.angle3D(getMesh().getX(p1), getMesh().getY(p1), getMesh().getX(p), getMesh().getY(p), getMesh().getX(p2), getMesh().getY(p2)));
+		return Math.cos(GeometryUtils.angle(getMesh().getX(p1), getMesh().getY(p1), getMesh().getX(p), getMesh().getY(p), getMesh().getX(p2), getMesh().getY(p2)));
 	}
 
 	/**

@@ -4,7 +4,7 @@ import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.color.Colors;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;

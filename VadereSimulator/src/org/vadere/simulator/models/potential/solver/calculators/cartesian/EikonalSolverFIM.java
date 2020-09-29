@@ -34,7 +34,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 	private boolean isActiveList[][];
     private final CellGrid cellGrid;
 	private final double epsilon;
-
+	private int nUpdates;
 
 	private LinkedList<Point> activeList;
 
@@ -61,8 +61,21 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 		}
 	}
 
+	protected void resetDynamicPotentialField() {
+		for (CellState data : cellGrid.getRawBuffer()) {
+			data.potential = Double.MAX_VALUE;
+
+			if (data.tag == PathFindingTag.Reached) {
+				data.tag = PathFindingTag.Undefined;
+			} else if (data.tag == PathFindingTag.Target) {
+				data.potential = 0.0;
+			}
+		}
+	}
+
 	private void init() {
 		// set distances of the target neighbor points
+		resetDynamicPotentialField();
 		targetPoints.stream()
 				.flatMap(p -> cellGrid.getLegitNeumannNeighborhood(p).stream())
 				.filter(neighbor -> cellGrid.getValue(neighbor).tag != PathFindingTag.Obstacle)
@@ -93,6 +106,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 				cellGrid.getValue(activePoint).potential = q;
 
 				// converged
+				nUpdates++;
 				if (Math.abs(p - q) <= epsilon) {
 					for (Point neighbour : cellGrid.getLegitNeumannNeighborhood(activePoint)) {
 						if (cellGrid.getValue(neighbour).tag != PathFindingTag.NARROW
@@ -115,6 +129,9 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 			}
 			activeList.addAll(newActiveList);
 		}
+
+		System.out.println("#update / #vertices: " + nUpdates + " / " + cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Reached).count());
+		nUpdates = 0;
 	}
 
 	@Override
@@ -140,11 +157,14 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void update() {}
+	public void update() {
+		timeCostFunction.update();
+		solve();
+	}
 
 	@Override
 	public boolean needsUpdate() {
-		return false;
+		return timeCostFunction.needsUpdate();
 	}
 
 	@Override

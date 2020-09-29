@@ -227,9 +227,9 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			List<Pair<V, V>> list = getVirtualSupport(edge);
 			// this might happen for vertices which are close at the initialVertex!
 			if(list.isEmpty()) {
-				//logger.warn("could not find virtual support for non-acute triangle.");
+				logger.warn("could not find virtual support for non-acute triangle.");
 				//potential = computePotential(edge, next, prev, -1.0);
-				//potential = computePotential(edge, next, prev, getCosPhi(edge));
+				potential = computePotential(edge, next, prev, getCosPhi(edge));
 			} else {
 				DoubleArrayList cosPhis = getVirtualSupportCosPhi(edge);
 

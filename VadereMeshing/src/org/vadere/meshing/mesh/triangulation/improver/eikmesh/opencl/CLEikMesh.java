@@ -13,7 +13,7 @@ import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefineme
 import org.vadere.meshing.opencl.CLDistMesh;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.util.geometry.shapes.*;

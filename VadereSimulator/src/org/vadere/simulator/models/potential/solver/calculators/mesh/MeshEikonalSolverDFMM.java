@@ -5,6 +5,7 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
@@ -16,7 +17,6 @@ import org.vadere.util.math.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +35,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 
 	private static Logger logger = Logger.getLogger(MeshEikonalSolverDFMM.class);
 
+	public static final String nameSpeedChanged = "speedChanged";
 	public static final String nameOldSpeed = "oldTimeCosts";
 	public static final String nameOldPotential = "oldPotential";
 
@@ -56,14 +57,17 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 
 	private IVertexContainerDouble<V, E, F> oldPotential;
 	private IVertexContainerDouble<V, E, F> oldTimeCosts;
+	private IVertexContainerBoolean<V, E, F> speedChange;
 
-	private LinkedList<V> updateOrder;
+	private LinkedList<V> prevOrder;
 	private int iteration = 0;
 	private int nUpdates = 0;
+	private int avoidedUpdates = 0;
+	private double maxValidOldPotential = 0;
 
 	//private IDistanceFunction distToDest;
 
-	// Note: The updateOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
+	// Note: The prevOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
 
 	/**
 	 * Constructor for certain target shapes.
@@ -84,10 +88,11 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		//this.distToDest = IDistanceFunction.createToTargets(destinations);
 		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
 		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
+		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + speedChange);
 
 		this.timeCostFunction = timeCostFunction;
 		this.order = new LinkedList<>();
-		this.updateOrder = new LinkedList<>();
+		this.prevOrder = new LinkedList<>();
 
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
@@ -112,6 +117,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		double ms = System.currentTimeMillis();
 		getTriangulation().enableCache();
 		nUpdates = 0;
+		avoidedUpdates = 0;
 
 		if(!solved || needsUpdate()) {
 			if(!solved) {
@@ -121,7 +127,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 				march();
 			} else if(needsUpdate()) {
 				partiallyUnsolve();
-				initializeNarrowBand();
+				//initializeNarrowBand();
 				march();
 			}
 		}
@@ -130,6 +136,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fmm run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
+		logger.debug("#nUpdates avoided = " + avoidedUpdates);
 		logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
 	}
 
@@ -157,22 +164,33 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 
 
 	protected void march() {
-		while(!isEmpty()) {
+		double currentPotential = 0;
+		int count = 0;
+		while(!isEmpty() || !prevOrder.isEmpty()) {
+			if(isEmpty()) {
+				count++;
+				partiallyUnsolve(prevOrder, currentPotential);
+				reInitialNarrowBand(prevOrder);
+				logger.debug("partially unsolve: " + count + ", nb: " + narrowBand.size() + ", order: " + order.size());
+				continue;
+			}
 			V vertex = pop();
-			updateOrder.addLast(vertex);
+			currentPotential = getPotential(vertex);
 			setBurned(vertex);
-			order.addLast(vertex);
-			nUpdates++;
+			order.add(vertex);
+			//nUpdates++;
 			updatePotentialOfNeighbours(vertex);
 		}
+		prevOrder = order;
+		order = new LinkedList<>();
 	}
 
 	protected void march(@NotNull final V v) {
 		while(!isEmpty() && !isBurned(v)) {
 			V vertex = pop();
-			updateOrder.addLast(vertex);
+			prevOrder.addLast(vertex);
 			setBurned(vertex);
-			order.addLast(vertex);
+			order.add(vertex);
 			nUpdates++;
 			updatePotentialOfNeighbours(vertex);
 		}
@@ -194,32 +212,94 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		solved = false;
 	}
 
-	protected void partiallyUnsolve() {
-		getMesh().streamVerticesParallel().forEach(v -> setTimeCost(v));
+	protected boolean isNeighbourBurned(@NotNull final V v) {
+		if(isBurned(v)) {
+			return false;
+		}
 
-		double maxValidOldPotential = Double.MAX_VALUE;
-		List<V> speedChanged = new ArrayList<>();
+		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
+			if(isBurned(neighbour)){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected void reInitialNarrowBand(@NotNull final LinkedList<V> preorder) {
+		while(!preorder.isEmpty() && isNeighbourBurned(preorder.peek())) {
+			V v = preorder.poll();
+			updatePotential(v);
+			//push(v);
+		}
+	}
+
+	protected void partiallyUnsolve(@NotNull final LinkedList<V> preorder, final double currentPotential) {
+		//maxValidOldPotential = Double.MAX_VALUE;
+		while(!preorder.isEmpty() && getOldPotential(preorder.peek()) <= currentPotential) {
+			V v = preorder.poll();
+			//order.add(v);
+		}
+		//find the max valid potential
+		while(!preorder.isEmpty() && (isInitialVertex(preorder.peek()) || !hasSpeedChanged(preorder.peek()))) {
+			V v = preorder.poll();
+			if(!isBurned(v)) {
+				setBurned(v);
+				setPotential(v, getOldPotential(v));
+				order.add(v);
+			}
+		}
+		/*if(!preorder.isEmpty()) {
+			maxValidOldPotential = getOldPotential(preorder.peek());
+		}*/
+	}
+
+	protected void partiallyUnsolve() {
+		getMesh().streamVerticesParallel().forEach(v -> {
+
+			if(!isInitialVertex(v)) {
+				setUndefined(v);
+				setOldPotential(v, getPotential(v));
+				setPotential(v, Double.MAX_VALUE);
+				setOldTimeCost(v, getTimeCost(v));
+			}
+			// update new time cost
+			setTimeCost(v);
+			if(!isInitialVertex(v) && Math.abs(getOldTimeCost(v) - getTimeCost(v)) > MathUtil.EPSILON){
+				setSpeedChanged(v, true);
+			} else {
+				setSpeedChanged(v, false);
+			}
+		});
+
+		/*getMesh().streamVerticesParallel().forEach(v -> setSpeedChanged(v, false));
+		getMesh().streamVerticesParallel().forEach(v -> setOldPotential(v, getPotential(v)));
+
+		maxValidOldPotential = Double.MAX_VALUE;
 
 		//TODO: parallel computation due to reduction
 		for(V v : getMesh().getVertices()) {
 			if(!isInitialVertex(v)) {
 				if(Math.abs(getOldTimeCost(v) - getTimeCost(v)) > MathUtil.EPSILON){
 					maxValidOldPotential = Math.min(maxValidOldPotential, getPotential(v));
-					//setPotential(v, Double.MAX_VALUE);
-					speedChanged.add(v);
+					setSpeedChanged(v, true);
 				}
 
-				setOldPotential(v, getPotential(v));
+				//setOldPotential(v, getPotential(v));
 				setUndefined(v);
 				setPotential(v, Double.MAX_VALUE);
 			}
-		}
+		}*/
 
 		getTriangulation().getMesh().streamVerticesParallel().forEach(v -> {
 			setOldTimeCost(v, getTimeCost(v));
 		});
 
-		LinkedList<V> orderBurned = new LinkedList<>();
+		/*while (!order.isEmpty() && isInInitialNarrowBand(order.peek(), maxValidOldPotential)) {
+			updatePotential(order.poll());
+		}*/
+
+		/*LinkedList<V> orderBurned = new LinkedList<>();
 		for(V v : order) {
 			if(getOldPotential(v) <= maxValidOldPotential) {
 				setBurned(v);
@@ -230,8 +310,6 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 			}
 		}
 
-		//System.out.println(burned.size());
-		// reconstruct narrow-band!
 		Iterator<V> descendingIt =  orderBurned.descendingIterator();
 		while (descendingIt.hasNext()) {
 			V v = descendingIt.next();
@@ -246,7 +324,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 			if(endOfNarrowBand) {
 				break;
 			}
-		}
+		}*/
 
 		/*for(V v: speedChanged) {
 			for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
@@ -254,17 +332,24 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 			}
 		}*/
 
-		this.order = orderBurned;
-
 		/*for(Pair<V, Double> bandMember : initialNarrowBand) {
 			setPotential(bandMember.getLeft(), bandMember.getValue());
 			narrowBand.add(bandMember.getLeft());
 		}*/
 	}
 
+	private boolean isInInitialNarrowBand(@NotNull final V v, final double maxValidOldPotential) {
+		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
+			if(isBurned(neighbour)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private boolean requiresUpdate(@NotNull final V v) {
 		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
-			if(hasChanged(neighbour)) {
+			if(hasChanged(getOldPotential(v), neighbour)) {
 				return true;
 			}
 		}
@@ -272,14 +357,26 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	@Override
-	protected void updatePotential(@NotNull final V vertex) {
+	protected double recomputePotential(@NotNull V vertex) {
 		if(requiresUpdate(vertex)) {
-			super.updatePotential(vertex);
+			nUpdates++;
+			return super.recomputePotential(vertex);
 		}
+		avoidedUpdates++;
+		return getOldPotential(vertex);
 	}
 
-	private boolean hasChanged(@NotNull final V v) {
-		return !solved || Math.abs(getOldPotential(v) - getPotential(v)) > MathUtil.EPSILON;
+
+	private boolean hasChanged(@NotNull final double oldPotential, @NotNull final V neighbor) {
+		if(!solved) {
+			return true;
+		}
+
+		if(isUndefined(neighbor) && oldPotential < getOldPotential(neighbor)) {
+			return false;
+		}
+
+		return Math.abs(getOldPotential(neighbor) - getPotential(neighbor)) > MathUtil.EPSILON;
 	}
 
 	/*private double recomputePotential(@NotNull final V vertex) {
@@ -326,6 +423,14 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 
 		return potential;
 	}*/
+
+	boolean hasSpeedChanged(@NotNull final V v) {
+		return speedChange.getValue(v);
+	}
+
+	void setSpeedChanged(@NotNull final V v, final boolean value) {
+		speedChange.setValue(v, value);
+	}
 
 	double getOldPotential(@NotNull final V vertex) {
 		return oldPotential.getValue(vertex);

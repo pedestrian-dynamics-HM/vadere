@@ -11,28 +11,20 @@ import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
-import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.utils.color.Colors;
-import org.vadere.meshing.utils.io.IOUtils;
-import org.vadere.meshing.utils.io.movie.MovRecorder;
-import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class MeshConstructor {
 	private static Logger logger = Logger.getLogger(MeshConstructor.class);
@@ -166,7 +158,7 @@ public class MeshConstructor {
 		return meshImprover.getMesh();
 	}
 
-	public IMesh<PVertex, PHalfEdge, PFace> pslgToUniformPMesh(@NotNull final PSLG pslg, final double hmin, final double hmax, final boolean viszalize) {
+	/*public IMesh<PVertex, PHalfEdge, PFace> pslgToUniformPMesh(@NotNull final PSLG pslg, final double hmin, final double hmax, final boolean viszalize) {
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, p -> Double.POSITIVE_INFINITY, p -> hmax);
 		edgeLengthFunctionApprox.smooth(0.4);
 		logger.info("construct element size function");
@@ -187,6 +179,53 @@ public class MeshConstructor {
 		var meshImprover = new PEikMesh(
 				distanceFunctionApproximation,
 				p -> edgeLengthFunctionApprox.apply(p),
+				h0,
+				pslg.getBoundingBox(),
+				polygons
+		);
+
+		if(viszalize) {
+			Function<PVertex, Color> vertexColorFunction = v -> {
+				if(meshImprover.isSlidePoint(v)){
+					return Colors.BLUE;
+				} else if(meshImprover.isFixPoint(v)) {
+					return Colors.RED;
+				} else {
+					return Color.BLACK;
+				}
+			};
+
+			var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Colors.YELLOW, e -> Color.BLACK, vertexColorFunction);
+			var meshPanel = new PMeshPanel(meshRenderer, 500, 500);
+			meshPanel.display("EikMesh uniform h0 = " + h0);
+
+			while (!meshImprover.isFinished()) {
+				synchronized (meshImprover.getMesh()) {
+					meshImprover.improve();
+				}
+				meshPanel.repaint();
+			}
+		} else {
+			meshImprover.generate();
+		}
+		return meshImprover.getMesh();
+	}*/
+
+	public IMesh<PVertex, PHalfEdge, PFace> pslgToUniformPMesh(@NotNull final PSLG pslg, final double h0, final boolean viszalize) {
+		Collection<VPolygon> holes = pslg.getHoles();
+		VPolygon segmentBound = pslg.getSegmentBound();
+		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
+		logger.info("construct distance function");
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+
+
+		Collection<VPolygon> polygons = pslg.getAllPolygons();
+		//polygons.add(targetShape);
+
+		// (3) use EikMesh to improve the mesh
+		var meshImprover = new PEikMesh(
+				distanceFunctionApproximation,
+				p -> h0,
 				h0,
 				pslg.getBoundingBox(),
 				polygons

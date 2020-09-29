@@ -40,9 +40,22 @@ public class GeometryUtilsMesh {
 		return InterpolationUtil.barycentricInterpolation(v1, v2, v3, function, x, y);
 	}
 
+	/**
+	 * Computes and returns the mean and gaussian curvature.
+	 *
+	 * @param mesh
+	 * @param v
+	 * @param f
+	 * @param valid
+	 * @param <V>
+	 * @param <E>
+	 * @param <F>
+	 * @return
+	 */
 	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> double[] curvature(
 			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final V v, Function<V, Double> f,
+			@NotNull final V v,
+			Function<V, Double> f,
 			@NotNull final Predicate<V> valid) {
 
 		double vx = mesh.getX(v);
@@ -98,7 +111,7 @@ public class GeometryUtilsMesh {
 		}
 
 		double gaussianCurvature = 2*Math.PI - alpha;
-		double curvature = 1.0/4.0 * beta;
+		double curvature = 1.0/2.0 * beta;
 
 		//double meanGaussianCurvature = gaussianCurvature / area;
 		//double meanMurvature = curvature / area;
@@ -154,7 +167,7 @@ public class GeometryUtilsMesh {
 					GeometryUtils.norm3D(nk);
 
 					double betai = GeometryUtils.angle3D(nk[0], nk[1], nk[2], ni[0], ni[1], ni[2]);
-					beta = Math.sqrt(eix * eix + eiy * eiy) * betai;
+					beta = 1/2 * Math.sqrt(eix * eix + eiy * eiy) * betai;
 				}
 			}
 		}

@@ -13,7 +13,7 @@ import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSet
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.*;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;

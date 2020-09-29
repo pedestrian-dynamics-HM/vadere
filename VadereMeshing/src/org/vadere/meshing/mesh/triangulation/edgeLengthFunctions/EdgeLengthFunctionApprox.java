@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation;
+package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -21,9 +21,6 @@ import java.util.function.Function;
 public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
-
-
-	private static final String propName = "edgeLength";
 
 	public EdgeLengthFunctionApprox(
 			@NotNull final PSLG pslg,
@@ -81,28 +78,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	public void smooth(double g) {
 		assert g > 0;
-		// smooth the function based such that it is g-Lipschitz
-		var mesh = triangulation.getMesh();
-		PriorityQueue<PVertex> heap = new PriorityQueue<>(
-				Comparator.comparingDouble(v1 -> mesh.getDoubleData(v1, propName))
-		);
-		heap.addAll(mesh.getVertices());
-
-		while (!heap.isEmpty()) {
-			var v = heap.poll();
-			double hv = mesh.getDoubleData(v, propName);
-			for (var u : mesh.getAdjacentVertexIt(v)) {
-				double hu = mesh.getDoubleData(u, propName);
-				double min = Math.min(hu, hv + g * v.distance(u));
-
-				// update heap
-				if (min < hu) {
-					heap.remove(u);
-					mesh.setDoubleData(u, propName, min);
-					heap.add(u);
-				}
-			}
-		}
+		smooth(g, triangulation);
 	}
 
 	@Override
