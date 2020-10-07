@@ -483,6 +483,13 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getPedCounts(String[] args) throws IOException {
+		TraCIResponse res = simulationapi.getPedCounts();
+		System.out.println(res.toString());
+	}
+
+
+	@Override
 	public void simulationapi_getSimSte(String[] args) throws IOException {
 
 	}

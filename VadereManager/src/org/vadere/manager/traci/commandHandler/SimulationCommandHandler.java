@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -142,6 +139,14 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.VAR_DELTA_T,
+			name = "getPedCounts", ignoreElementId = true)
+	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager) {
+
+		cmd.setResponse(responseOK(SimulationVar.CURR_SIM_TIME.type, -10.123));
+		return cmd;
+	}
+
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.SIM_CONFIG,
 			name = "setSimConfig", ignoreElementId = true)
@@ -202,6 +207,25 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
+/*	// get data from MeshDensityCountsProcessor
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.PED_COUNTS,
+			name = "getPedCounts", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
+	public TraCICommand process_GetPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager){
+
+		remoteManager.accessState((manager, state) -> {
+			double time = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
+
+			List<String> list = Arrays.asList("one", "two", "three");
+
+			Pair<Double, List<String>> test = new Pair<Double, List<String>>(time, list);
+
+			cmd.setResponse(responseOK(SimulationVar.PED_COUNTS.type, test ));
+		});
+
+		return cmd;
+	}*/
+
+
 	public void  calcArrivedDeparted(RemoteManager remoteManager){
 
 		remoteManager.accessState((manager, state) -> {
@@ -228,6 +252,10 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		});
 	}
 
+
+
+
+
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.POSITION_CONVERSION,
 			name = "getPositionConversion", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
 	public TraCICommand process_PostionConversion(TraCIGetCommand cmd, RemoteManager remoteManager) {
@@ -249,7 +277,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 		return cmd;
 	}
-
 
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.COORD_REF,
 			name = "getCoordinateReference", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
