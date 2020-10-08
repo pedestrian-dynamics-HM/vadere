@@ -139,13 +139,30 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.VAR_DELTA_T,
-			name = "getPedCounts", ignoreElementId = true)
-	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager) {
+//	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.PED_COUNTS,
+//			name = "getPedCounts", ignoreElementId = true)
+//	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager) {
+//
+//		cmd.setResponse(responseOK(SimulationVar.PED_COUNTS.type, -10.123));
+//		return cmd;
+//	}
 
-		cmd.setResponse(responseOK(SimulationVar.CURR_SIM_TIME.type, -10.123));
+	// get data from MeshDensityCountsProcessor
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.PED_COUNTS,
+			name = "getPedCounts", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
+	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager){
+
+		remoteManager.accessState((manager, state) -> {
+			// BigDecimal to ensure correct comparison in omentpp
+			double time = 0.0;
+			List<String> list = Arrays.asList("one", "two", "three");
+			Pair<Double, List<String>> test = new Pair<>(time, list);
+			cmd.setResponse(responseOK(SimulationVar.PED_COUNTS.type, test ));
+		});
+
 		return cmd;
 	}
+
 
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.SIM_CONFIG,
@@ -207,23 +224,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
-/*	// get data from MeshDensityCountsProcessor
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.PED_COUNTS,
-			name = "getPedCounts", dataTypeStr = "ArrayList<String>", ignoreElementId = true)
-	public TraCICommand process_GetPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager){
-
-		remoteManager.accessState((manager, state) -> {
-			double time = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
-
-			List<String> list = Arrays.asList("one", "two", "three");
-
-			Pair<Double, List<String>> test = new Pair<Double, List<String>>(time, list);
-
-			cmd.setResponse(responseOK(SimulationVar.PED_COUNTS.type, test ));
-		});
-
-		return cmd;
-	}*/
 
 
 	public void  calcArrivedDeparted(RemoteManager remoteManager){
