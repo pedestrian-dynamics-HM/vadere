@@ -99,7 +99,7 @@
         "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
         "optimizationType" : "NELDER_MEAD",
-        "varyStepDirection" : true,
+        "varyStepDirection" : false,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
