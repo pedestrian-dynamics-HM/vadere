@@ -1,7 +1,7 @@
 {
   "name" : "rimea_06_corner_gnm1",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

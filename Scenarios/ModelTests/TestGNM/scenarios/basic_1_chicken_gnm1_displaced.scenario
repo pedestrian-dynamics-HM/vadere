@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_gnm1_displaced",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

@@ -2,17 +2,28 @@ package org.vadere.state.attributes.processor;
 
 /**
  * @author Mario Teixeira Parente
+ * @author Marion Gödel
  */
 
 public class AttributesEvacuationTimeProcessor extends AttributesProcessor {
-	private int pedestrianEvacuationTimeProcessorId;
+    private int pedestrianStartTimeProcessorId;
+    private int pedestrianEndTimeProcessorId;
 
-    public int getPedestrianEvacuationTimeProcessorId() {
-        return this.pedestrianEvacuationTimeProcessorId;
+    public int getPedestrianStartTimeProcessorId() {
+        return this.pedestrianStartTimeProcessorId;
     }
 
-    public void setPedestrianEvacuationTimeProcessorId(int pedestrianEvacuationTimeProcessorId) {
+    public int getPedestrianEndTimeProcessorId() {
+        return this.pedestrianEndTimeProcessorId;
+    }
+
+    public void setPedestrianStartTimeProcessorId(int pedestrianStartTimeProcessorId) {
         checkSealed();
-        this.pedestrianEvacuationTimeProcessorId = pedestrianEvacuationTimeProcessorId;
+        this.pedestrianStartTimeProcessorId = pedestrianStartTimeProcessorId;
+    }
+
+    public void setPedestrianEndTimeProcessorId(int pedestrianEndTimeProcessorId) {
+        checkSealed();
+        this.pedestrianEndTimeProcessorId = pedestrianEndTimeProcessorId;
     }
 }

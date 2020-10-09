@@ -1,7 +1,7 @@
 {
   "name" : "labyrinth",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -39,18 +39,22 @@
       "id" : 4,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 5
+        "pedestrianStartTimeProcessorId" : 0,
+        "pedestrianEndTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 6
+        "pedestrianStartTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 7
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

@@ -1,7 +1,7 @@
 {
   "name" : "T-240-050-240_OSM_",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

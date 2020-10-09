@@ -1,7 +1,7 @@
 {
   "name" : "rimea_09_public_room_2_exits",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -21,7 +21,7 @@
       "id" : 1,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianStartTimeProcessorId" : 2
+        "pedestrianStartTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
@@ -31,7 +31,8 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
       "attributes" : {
-        "pedestrianEvacuationTimeProcessorId" : 1
+        "pedestrianStartTimeProcessorId" : 0,
+        "pedestrianEndTimeProcessorId" : 0
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
@@ -56,6 +57,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 10
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEndTimeProcessor",
+      "id" : 11
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

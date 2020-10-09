@@ -1,7 +1,7 @@
 {
   "name" : "mf_detailed",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -110,6 +110,10 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
+    },
+    "attributesStrategy" : {
+      "useStrategyModel" : false,
+      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

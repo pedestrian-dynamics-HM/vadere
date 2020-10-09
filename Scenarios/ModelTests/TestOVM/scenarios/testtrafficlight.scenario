@@ -1,7 +1,7 @@
 {
   "name" : "testtrafficlight",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

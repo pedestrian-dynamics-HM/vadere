@@ -14,9 +14,15 @@ import java.util.StringJoiner;
 
 public class PedestrianEndTimeProcessorTestEnv extends ProcessorTestEnv<PedestrianIdKey, Double> {
 
+
 	PedestrianEndTimeProcessorTestEnv() {
-		super(PedestrianEndTimeProcessor.class, PedestrianIdKey.class);
+		this(1);
 	}
+
+	PedestrianEndTimeProcessorTestEnv(int nextProcessorId) {
+		super(PedestrianEndTimeProcessor.class, PedestrianIdKey.class, nextProcessorId);
+	}
+
 
 	List<Pedestrian> getPeds(Integer[] ids) {
 		List<Pedestrian> peds = new ArrayList<>();
