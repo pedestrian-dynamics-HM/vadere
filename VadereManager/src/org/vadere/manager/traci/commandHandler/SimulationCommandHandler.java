@@ -9,6 +9,7 @@ import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -23,7 +24,9 @@ import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -139,14 +142,36 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.VAR_DELTA_T,
-			name = "getPedCounts", ignoreElementId = true)
-	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager) {
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.CURR_SIM_TIME,
+			name = "setSimStep",  dataTypeStr = "Double", ignoreElementId = true)
+	public TraCICommand process_setSimStep(TraCISetCommand cmd, RemoteManager remoteManager) {
+		// compare with process_setFreeFlowSpeed
 
-		cmd.setResponse(responseOK(SimulationVar.CURR_SIM_TIME.type, -10.123));
+		remoteManager.accessState((manager, state) -> {
+			String tmp = cmd.getVariableValue().toString();
+			double data = Double.parseDouble(tmp);
+			state.setSimTimeInSec(data);
+			cmd.setOK();
+		});
+
 		return cmd;
 	}
 
+
+
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var  = SimulationVar.PED_COUNTS,
+			name = "getPedCounts", ignoreElementId = true)
+	public TraCICommand process_getPedCounts(TraCIGetCommand cmd, RemoteManager remoteManager) {
+
+		remoteManager.accessState((manager, state) -> {
+			// return all targets the given element contains.
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(1);
+			cmd.setResponse(responseOK(SimulationVar.PED_COUNTS.type, ped.getTargets().stream().map(i -> Integer.toString(i)).collect(Collectors.toList())));
+		});
+		return cmd;
+	}
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.SIM_CONFIG,
 			name = "setSimConfig", ignoreElementId = true)

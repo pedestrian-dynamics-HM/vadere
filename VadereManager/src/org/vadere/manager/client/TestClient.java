@@ -439,6 +439,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 	// simulationapi
 
+	public void simulationapi_setSimStep(String[] args) throws IOException {
+
+	}
+
+
 	@Override
 	public void simulationapi_getHash(String[] args) throws IOException {
 

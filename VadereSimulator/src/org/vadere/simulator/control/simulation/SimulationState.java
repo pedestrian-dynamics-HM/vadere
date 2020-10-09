@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class SimulationState {
 	private final Topography topography;
-	private final double simTimeInSec;
+	private double simTimeInSec;
 	private final ScenarioStore scenarioStore;
 	private final int step;
 	private final String name;
@@ -88,6 +88,11 @@ public class SimulationState {
 
 	public boolean isSimStop() {
 		return simStop;
+	}
+
+	public void setSimTimeInSec(double simTimeInSec)
+	{
+		this.simTimeInSec = simTimeInSec;
 	}
 
 	public IStrategyModel getStrategyModel(){

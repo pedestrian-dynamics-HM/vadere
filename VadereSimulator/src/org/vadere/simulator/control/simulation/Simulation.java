@@ -564,6 +564,8 @@ public class Simulation {
 		this.startTimeInSec = startTimeInSec;
 	}
 
+
+
 	public StimulusController getStimulusController(){
 		return stimulusController;
 	}
