@@ -32,14 +32,15 @@ import java.util.*;
 
 public class ReadSetControllerInputs implements INavigationModel {
 
-    private double[][] controllerInputs;
-    private int counter = 0;
-    private String filePath;
-    private ArrayList<Pedestrian> newAgents = new ArrayList<Pedestrian>();
-    private ArrayList<Pedestrian> processedAgents = new ArrayList<Pedestrian>();
-    double ratioReal = 0.0;
+    public double[][] controllerInputs;
+    public int counter = 0;
+    public String filePath;
+    public ArrayList<Pedestrian> newAgents = new ArrayList<Pedestrian>();
+    public ArrayList<Pedestrian> processedAgents = new ArrayList<Pedestrian>();
+    public Double ratioReal = 0.0;
 
-    private static Logger logger = Logger.getLogger(ReadSetControllerInputs.class);
+    public static Logger logger = Logger.getLogger(ReadSetControllerInputs.class);
+
 
 
     @Override
@@ -98,7 +99,7 @@ public class ReadSetControllerInputs implements INavigationModel {
 
     }
 
-    private void printAgentIds(double simTimeInSec) {
+    public void printAgentIds(double simTimeInSec) {
 
         String info = "Time: " + String.format("%5.1fs", simTimeInSec) + ": Agents in control area: ";
 
@@ -114,7 +115,7 @@ public class ReadSetControllerInputs implements INavigationModel {
 
     }
 
-    private void getAgentsInControllerArea(Topography topography) {
+    public void getAgentsInControllerArea(Topography topography) {
 
         MeasurementArea m = topography.getMeasurementArea(555);
         Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
