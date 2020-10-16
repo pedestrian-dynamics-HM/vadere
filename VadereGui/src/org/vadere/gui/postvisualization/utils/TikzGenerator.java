@@ -154,7 +154,7 @@ public class TikzGenerator {
 
 		tikzStyles += "trajectory/.style={line width=1},\n";
 		tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", model.getConfig().getPedestrianTorso());
-		tikzStyles += "walkdirection/.style={},\n";
+		tikzStyles += "walkdirection/.style={black, line width=1},\n";
 		tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
 		tikzStyles += "group/.style={},\n";
 		tikzStyles += "voronoi/.style={black, line width=1}\n";
@@ -416,43 +416,44 @@ public class TikzGenerator {
 
 	/**
 	 * Draw a small direction triangle which points in the direction of of the last step.
-	 * The previous step is not always the step one time step earlier. If the agent did not
-	 * move in the last time step.
+	 * If the agent did not move in the last simulation step, no triangle is drawn.
 	 *
 	 * @param agent
 	 * @return		tikz code for small direction triangle.
 	 */
 	private String drawWalkingDirection(final Agent agent){
 		String tikzCode= "";
+
 		PostvisualizationModel postVisModel = (PostvisualizationModel)model;
-		int currentTimeStep = postVisModel.getStep();
-		// ensure their is a current timeStep and its not the first. (If the first there is no previous)
-		if (currentTimeStep > 1){
-			int previousTimeStep = currentTimeStep-1;
-			Trajectory trajectory = postVisModel.getTrajectory(agent.getId());
-			if (trajectory != null){
-				Agent currAgent = trajectory.getAgent(currentTimeStep).orElse(null);
-				Agent prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
-				while (currAgent != null && prevAgent !=null && currAgent.getPosition().equals(prevAgent.getPosition())){
-					previousTimeStep = previousTimeStep -1;
-					prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
-					if (previousTimeStep < 1){
-						// pedestrian never moved. Cannot draw walking direction.
-						prevAgent = null;
-					}
-				}
-				if (currAgent != null && prevAgent !=null){
-					Vector2D direction = new Vector2D(new VPoint(
-							currAgent.getPosition().x - prevAgent.getPosition().x,
-							currAgent.getPosition().y - prevAgent.getPosition().y));
-					direction.normalize(1);
-					double r = currAgent.getRadius();
-					VPoint p1 = currAgent.getPosition().add(direction.rotate(Math.PI/2).normalize(0.93*r));
-					VPoint p2 = currAgent.getPosition().add(direction.rotate(-Math.PI/2).normalize(0.93*r));
-					VPoint p3 = currAgent.getPosition().add(direction.normalize(1.8*r));
-					String directionStr = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
-					tikzCode = String.format(Locale.US, directionStr, p1.x, p1.y, p3.x, p3.y, p2.x, p2.y);
-				}
+
+		// If step == 1, there is no previous one and we cannot derive a walking direction!
+		// Otherwise, use the last footstep in our data table for the given agent.
+		if (postVisModel.getStep() > 1) {
+			TableTrajectoryFootStep trajectories = postVisModel.getTrajectories();
+			Table dataFrame = postVisModel.getAppearedPedestrians();
+			Table trajectorySlice = dataFrame
+					.where(dataFrame.intColumn(trajectories.pedIdCol).isEqualTo(agent.getId()));
+
+			if (trajectorySlice.rowCount() >= 1) {
+				// New rows are added to the end of the table.
+				Table latestFootstep = trajectorySlice.last(1);
+				int row = 0;
+
+				double startX = latestFootstep.doubleColumn(trajectories.startXCol).getDouble(row);
+				double startY = latestFootstep.doubleColumn(trajectories.startYCol).getDouble(row);
+				double endX = latestFootstep.doubleColumn(trajectories.endXCol).getDouble(row);
+				double endY = latestFootstep.doubleColumn(trajectories.endYCol).getDouble(row);
+
+				Vector2D direction = new Vector2D(new VPoint(
+						endX - startX,
+						endY - startY));
+				direction.normalize(1);
+				double r = agent.getRadius();
+				VPoint p1 = agent.getPosition().add(direction.rotate(Math.PI/2).normalize(0.93*r));
+				VPoint p2 = agent.getPosition().add(direction.rotate(-Math.PI/2).normalize(0.93*r));
+				VPoint p3 = agent.getPosition().add(direction.normalize(1.8*r));
+				String directionStr = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
+				tikzCode = String.format(Locale.US, directionStr, p1.x, p1.y, p3.x, p3.y, p2.x, p2.y);
 			}
 		}
 		return tikzCode;
