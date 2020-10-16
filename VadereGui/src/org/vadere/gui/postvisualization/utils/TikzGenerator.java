@@ -82,6 +82,7 @@ public class TikzGenerator {
 		String tikzCodeScenarioElements = convertScenarioElementsToTikz(exportOption);
 
 		String tikzOutput = "" +
+				"\\RequirePackage{luatex85}\n" +
 				"\\documentclass{standalone}\n" +
 				"\\usepackage{tikz}\n\n" +
 				tikzCodeColorDefinitions +
@@ -187,6 +188,17 @@ public class TikzGenerator {
 				topography.getBounds().x + topography.getBounds().width,
 				topography.getBounds().y + topography.getBounds().height);
 
+		if (config.isShowTargetChangers()) {
+			generatedCode += "% Target Changers\n";
+			for (TargetChanger targetChanger : topography.getTargetChangers()) {
+				VPoint centroid = targetChanger.getShape().getCentroid();
+				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
+				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
+			}
+		} else {
+			generatedCode += "% Target Changers (not enabled in config)\n";
+		}
+
 		if (config.isShowSources()) {
 			generatedCode += "% Sources\n";
 			for (Source source : topography.getSources()) {
@@ -207,17 +219,6 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
-		}
-
-		if (config.isShowTargetChangers()) {
-			generatedCode += "% Target Changers\n";
-			for (TargetChanger targetChanger : topography.getTargetChangers()) {
-				VPoint centroid = targetChanger.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
-				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
-			}
-		} else {
-			generatedCode += "% Target Changers (not enabled in config)\n";
 		}
 
 		if (config.isShowAbsorbingAreas()) {
