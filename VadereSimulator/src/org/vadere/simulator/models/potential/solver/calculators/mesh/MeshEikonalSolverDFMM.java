@@ -88,7 +88,7 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		//this.distToDest = IDistanceFunction.createToTargets(destinations);
 		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
 		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
-		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + speedChange);
+		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 
 		this.timeCostFunction = timeCostFunction;
 		this.order = new LinkedList<>();

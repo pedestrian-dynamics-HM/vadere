@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;

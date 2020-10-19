@@ -33,9 +33,9 @@ import java.util.stream.IntStream;
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
-public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
+public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
-	private static Logger logger = Logger.getLogger(MeshEikonalSolverFIMParallel.class);
+	private static Logger logger = Logger.getLogger(MeshEikonalSolverFIMLockFree.class);
 	public final String nameAtomicBoolean = "nameAtomic";
 	private int nThreds = 1;
 	private Random random = new Random(1);
@@ -72,11 +72,10 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 */
-	public MeshEikonalSolverFIMParallel(@NotNull final String identifier,
+	public MeshEikonalSolverFIMLockFree(@NotNull final String identifier,
 	                                    @NotNull final Collection<VShape> targetShapes,
 	                                    @NotNull final ITimeCostFunction timeCostFunction,
-	                                    @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                                    @NotNull final Collection<VShape> destinations
+	                                    @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;

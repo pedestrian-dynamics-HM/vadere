@@ -51,11 +51,12 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 
 	protected void initializeNarrowBand() {
 		for(V vertex : getInitialVertices()) {
-			for(V v : getMesh().getAdjacentVertexIt(vertex)) {
+			narrowBand.add(vertex);
+			/*for(V v : getMesh().getAdjacentVertexIt(vertex)) {
 				if(isUndefined(v)) {
 					updatePotential(v);
 				}
-			}
+			}*/
 		}
 	}
 

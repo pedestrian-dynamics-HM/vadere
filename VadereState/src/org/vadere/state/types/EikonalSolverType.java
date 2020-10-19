@@ -19,6 +19,10 @@ public enum EikonalSolverType {
 	 * Solvers on an triangle mesh
 	 */
 	FAST_MARCHING_TRI,
+	FAST_ITERATIVE_METHOD_TRI_LOCK_FREE,
+	FAST_ITERATIVE_METHOD_TRI,
+	INFORMED_FAST_ITERATIVE_METHOD_TRI,
+	INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE,
 
 	/**
 	 * No solver at all

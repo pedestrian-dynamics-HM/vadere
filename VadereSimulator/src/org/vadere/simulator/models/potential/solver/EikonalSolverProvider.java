@@ -14,14 +14,14 @@ import org.vadere.simulator.models.potential.solver.calculators.cartesian.Eikona
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverIFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverDFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMParallel;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMLockFree;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIMLockFree;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
-import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -39,7 +39,6 @@ import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class EikonalSolverProvider  {
 	private  static Logger logger = Logger.getLogger(IPotentialField.class);
@@ -151,8 +150,23 @@ public abstract class EikonalSolverProvider  {
 						topography,
 						targetId, triangulation);
 
-				eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
-						/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
+				switch (createMethod) {
+					case INFORMED_FAST_ITERATIVE_METHOD_TRI:
+						eikonalSolver = new MeshEikonalSolverIFIM<>(targetId+"", targetShapes, timeCost, triangulation);
+						break;
+					case FAST_ITERATIVE_METHOD_TRI:
+						eikonalSolver = new MeshEikonalSolverFIM<>(targetId+"", targetShapes, timeCost, triangulation);
+						break;
+					case FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
+						eikonalSolver = new MeshEikonalSolverFIMLockFree<>(targetId+"", targetShapes, timeCost, triangulation);
+						break;
+					case INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
+						eikonalSolver = new MeshEikonalSolverIFIMLockFree<>(targetId+"", targetShapes, timeCost, triangulation);
+						break;
+					default:
+						eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation);
+						break;
+				}
 
 				//eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
 				//	/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);

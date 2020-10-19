@@ -51,6 +51,7 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 
 	private int iteration = 0;
 	private int nUpdates = 0;
+	private final double epsilon = 0;
 
 
 	// Note: The updateOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
@@ -66,8 +67,8 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 	public MeshEikonalSolverFIM(@NotNull final String identifier,
 	                            @NotNull final Collection<VShape> targetShapes,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                            @NotNull final Collection<VShape> destinations
+	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            //@NotNull final Collection<VShape> destinations
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
@@ -118,13 +119,20 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
 	}
 
-	private void initialActiveList() {
+	/*private void initialActiveList() {
 		for(V vertex : getInitialVertices()) {
 			for(V v : getMesh().getAdjacentVertexIt(vertex)) {
 				if(isUndefined(v)) {
 					updatePotential(v);
 				}
 			}
+		}
+	}*/
+
+	private void initialActiveList() {
+		for(V vertex : getInitialVertices()) {
+			activeList.addLast(vertex);
+			//setPotential(vertex, 0);
 		}
 	}
 
@@ -135,14 +143,17 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 			while(listIterator.hasNext()) {
 				V x = listIterator.next();
 				double p = getPotential(x);
-				double q =  Math.min(p, recomputePotential(x));
+				double q = p;
 
-				// not converged
-				if(!isBurned(x) && p > q) {
+				if(!isInitialVertex(x)) {
+					nUpdates++;
+					q =  Math.min(p, recomputePotential(x));
 					setPotential(x, q);
 				}
-				// converged
-				else {
+
+				if (Math.abs(p - q) <= epsilon) {
+					setBurned(x);
+					setUnburning(x);
 					// check adjacent neighbors
 					for(V xn : getMesh().getAdjacentVertexIt(x)) {
 						if(getPotential(xn) > getPotential(x) && !isBurining(xn)) {
@@ -156,7 +167,6 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 						}
 					}
 					listIterator.remove();
-					nUpdates++;
 					setBurned(x);
 					setUnburning(x);
 				}

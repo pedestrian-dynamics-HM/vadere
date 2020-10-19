@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IEdgeContainerBoolean;
@@ -116,7 +117,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		this.distanceFunction = distanceFunction;
 		for(V v : initialVertices) {
 			double dist = distanceFunction.apply(new VPoint(getMesh().toPoint(v)));
-			setPotential(v, dist);
+			setPotential(v, Math.max(0, dist));
 			setBurned(v);
 			setAsInitialVertex(v);
 		}
@@ -124,14 +125,12 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	protected void unsolve() {
 		triangulation.getMesh().streamVerticesParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
-			if(!isInitialVertex(v)) {
-				setUndefined(v);
-				setPotential(v, Double.MAX_VALUE);
-			}
+			setUndefined(v);
+			setPotential(v, Double.MAX_VALUE);
 			setTimeCost(v);
 		});
 		initialVertices = initialVertices.stream().filter(v -> !getMesh().isDestroyed(v)).collect(Collectors.toList());
-		solved = false;
+		//solved = false;
 	}
 
 	protected void prepareMesh() {
@@ -156,6 +155,12 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {
 		return timeCostFunction != null ? timeCostFunction : meshTimeCostFunction;
+	}
+
+	@Override
+	public void update() {
+		getTimeCostFunction().update();
+		solve();
 	}
 
 	protected boolean isLazy() {
@@ -210,6 +215,34 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		return potential;
 	}
 
+	protected Triple<Double, V, V> recomputePotentialAndDefiningSimplex(@NotNull final V vertex) {
+		// loop over all, check whether the point is contained and update its
+		// value accordingly
+		double potential = Double.MAX_VALUE;
+		V v1 = null;
+		V v2 = null;
+
+		for(E edge : getMesh().getEdgeIt(vertex)) {
+			if(!getMesh().isBoundary(edge)) {
+				Triple<Double, V, V> triple = computePotentialAndDefinigSimplex(edge);
+
+				if(triple.getLeft() < potential) {
+					potential = triple.getLeft();
+					v1 = triple.getMiddle();
+					v2 = triple.getRight();
+				}
+			}
+		}
+		if(potential <= getPotential(v1)) {
+			v1 = null;
+		}
+		if(potential <= getPotential(v2)) {
+			v2 = null;
+		}
+
+		return Triple.of(potential, v1, v2);
+	}
+
 	/**
 	 * Updates a point (the point where the edge ends) given a triangle (which is the face of the edge).
 	 * The point can only be updated if the triangle triangleContains it and the other two points are in the frozen band.
@@ -227,7 +260,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			List<Pair<V, V>> list = getVirtualSupport(edge);
 			// this might happen for vertices which are close at the initialVertex!
 			if(list.isEmpty()) {
-				logger.warn("could not find virtual support for non-acute triangle.");
+				//logger.warn("could not find virtual support for non-acute triangle.");
 				//potential = computePotential(edge, next, prev, -1.0);
 				potential = computePotential(edge, next, prev, getCosPhi(edge));
 			} else {
@@ -245,6 +278,42 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		}
 
 		return potential;
+	}
+
+	private Triple<Double, V, V> computePotentialAndDefinigSimplex(@NotNull final E edge) {
+		E next = getMesh().getNext(edge);
+		E prev = getMesh().getPrev(edge);
+		V v1 = getMesh().getVertex(next);
+		V v2 = getMesh().getVertex(prev);
+
+		double potential = Double.MAX_VALUE;
+
+		/*if(isNonAcute(edge)) {
+			V v = getMesh().getVertex(edge);
+			List<Pair<V, V>> list = getVirtualSupport(edge);
+			// this might happen for vertices which are close at the initialVertex!
+			if(list.isEmpty()) {
+				//logger.warn("could not find virtual support for non-acute triangle.");
+				//potential = computePotential(edge, next, prev, -1.0);
+				potential = computePotential(edge, next, prev, getCosPhi(edge));
+			} else {
+				DoubleArrayList cosPhis = getVirtualSupportCosPhi(edge);
+
+				for(int i = 0; i < list.size(); i++) {
+					Pair<V, V> pair = list.get(i);
+					double cosPhi = cosPhis.getDouble(i);
+					double q = computePotential(v, pair.getLeft(), pair.getRight(), cosPhi, localSover);
+					if(q < potential) {
+						potential = q;
+						v1 = pair.getLeft();
+						v2 = pair.getRight();
+					}
+				}
+			}
+		} else {*/
+			potential = computePotential(edge, next, prev, getCosPhi(edge));
+		//}
+		return Triple.of(potential, v1, v2);
 	}
 
 	protected List<Pair<V, V>> computeVirtualSupport(@NotNull final E edge) {
