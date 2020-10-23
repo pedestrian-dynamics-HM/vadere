@@ -82,6 +82,7 @@ public class TikzGenerator {
 		String tikzCodeScenarioElements = convertScenarioElementsToTikz(exportOption);
 
 		String tikzOutput = "" +
+				"\\RequirePackage{luatex85}\n" +
 				"\\documentclass{standalone}\n" +
 				"\\usepackage{tikz}\n\n" +
 				tikzCodeColorDefinitions +
@@ -153,7 +154,7 @@ public class TikzGenerator {
 
 		tikzStyles += "trajectory/.style={line width=1},\n";
 		tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", model.getConfig().getPedestrianTorso());
-		tikzStyles += "walkdirection/.style={},\n";
+		tikzStyles += "walkdirection/.style={black, line width=1},\n";
 		tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
 		tikzStyles += "group/.style={},\n";
 		tikzStyles += "voronoi/.style={black, line width=1}\n";
@@ -187,6 +188,17 @@ public class TikzGenerator {
 				topography.getBounds().x + topography.getBounds().width,
 				topography.getBounds().y + topography.getBounds().height);
 
+		if (config.isShowTargetChangers()) {
+			generatedCode += "% Target Changers\n";
+			for (TargetChanger targetChanger : topography.getTargetChangers()) {
+				VPoint centroid = targetChanger.getShape().getCentroid();
+				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
+				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
+			}
+		} else {
+			generatedCode += "% Target Changers (not enabled in config)\n";
+		}
+
 		if (config.isShowSources()) {
 			generatedCode += "% Sources\n";
 			for (Source source : topography.getSources()) {
@@ -207,17 +219,6 @@ public class TikzGenerator {
 			}
 		} else {
 			generatedCode += "% Targets (not enabled in config)\n";
-		}
-
-		if (config.isShowTargetChangers()) {
-			generatedCode += "% Target Changers\n";
-			for (TargetChanger targetChanger : topography.getTargetChangers()) {
-				VPoint centroid = targetChanger.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
-				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
-			}
-		} else {
-			generatedCode += "% Target Changers (not enabled in config)\n";
 		}
 
 		if (config.isShowAbsorbingAreas()) {
@@ -289,6 +290,14 @@ public class TikzGenerator {
             generatedCode += drawAgents(config);
         } else {
             generatedCode += "% Agents (not enabled in config)\n";
+        }
+
+        if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
+            for (Agent agent : model.getAgents()) {
+                if (model.isAlive(agent.getId())) {
+                    generatedCode += drawWalkingDirection(agent);
+                }
+            }
         }
 
         if (config.isShowPedestrianIds()) {
@@ -415,43 +424,44 @@ public class TikzGenerator {
 
 	/**
 	 * Draw a small direction triangle which points in the direction of of the last step.
-	 * The previous step is not always the step one time step earlier. If the agent did not
-	 * move in the last time step.
+	 * If the agent did not move in the last simulation step, no triangle is drawn.
 	 *
 	 * @param agent
 	 * @return		tikz code for small direction triangle.
 	 */
 	private String drawWalkingDirection(final Agent agent){
 		String tikzCode= "";
+
 		PostvisualizationModel postVisModel = (PostvisualizationModel)model;
-		int currentTimeStep = postVisModel.getStep();
-		// ensure their is a current timeStep and its not the first. (If the first there is no previous)
-		if (currentTimeStep > 1){
-			int previousTimeStep = currentTimeStep-1;
-			Trajectory trajectory = postVisModel.getTrajectory(agent.getId());
-			if (trajectory != null){
-				Agent currAgent = trajectory.getAgent(currentTimeStep).orElse(null);
-				Agent prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
-				while (currAgent != null && prevAgent !=null && currAgent.getPosition().equals(prevAgent.getPosition())){
-					previousTimeStep = previousTimeStep -1;
-					prevAgent = trajectory.getAgent(previousTimeStep).orElse(null);
-					if (previousTimeStep < 1){
-						// pedestrian never moved. Cannot draw walking direction.
-						prevAgent = null;
-					}
-				}
-				if (currAgent != null && prevAgent !=null){
-					Vector2D direction = new Vector2D(new VPoint(
-							currAgent.getPosition().x - prevAgent.getPosition().x,
-							currAgent.getPosition().y - prevAgent.getPosition().y));
-					direction.normalize(1);
-					double r = currAgent.getRadius();
-					VPoint p1 = currAgent.getPosition().add(direction.rotate(Math.PI/2).normalize(0.93*r));
-					VPoint p2 = currAgent.getPosition().add(direction.rotate(-Math.PI/2).normalize(0.93*r));
-					VPoint p3 = currAgent.getPosition().add(direction.normalize(1.8*r));
-					String directionStr = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
-					tikzCode = String.format(Locale.US, directionStr, p1.x, p1.y, p3.x, p3.y, p2.x, p2.y);
-				}
+
+		// If step == 1, there is no previous one and we cannot derive a walking direction!
+		// Otherwise, use the last footstep in our data table for the given agent.
+		if (postVisModel.getStep() > 1) {
+			TableTrajectoryFootStep trajectories = postVisModel.getTrajectories();
+			Table dataFrame = postVisModel.getAppearedPedestrians();
+			Table trajectorySlice = dataFrame
+					.where(dataFrame.intColumn(trajectories.pedIdCol).isEqualTo(agent.getId()));
+
+			if (trajectorySlice.rowCount() >= 1) {
+				// New rows are added to the end of the table.
+				Table latestFootstep = trajectorySlice.last(1);
+				int row = 0;
+
+				double startX = latestFootstep.doubleColumn(trajectories.startXCol).getDouble(row);
+				double startY = latestFootstep.doubleColumn(trajectories.startYCol).getDouble(row);
+				double endX = latestFootstep.doubleColumn(trajectories.endXCol).getDouble(row);
+				double endY = latestFootstep.doubleColumn(trajectories.endYCol).getDouble(row);
+
+				Vector2D direction = new Vector2D(new VPoint(
+						endX - startX,
+						endY - startY));
+				direction.normalize(1);
+				double r = agent.getRadius();
+				VPoint p1 = agent.getPosition().add(direction.rotate(Math.PI/2).normalize(0.93*r));
+				VPoint p2 = agent.getPosition().add(direction.rotate(-Math.PI/2).normalize(0.93*r));
+				VPoint p3 = agent.getPosition().add(direction.normalize(1.8*r));
+				String directionStr = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
+				tikzCode = String.format(Locale.US, directionStr, p1.x, p1.y, p3.x, p3.y, p2.x, p2.y);
 			}
 		}
 		return tikzCode;
@@ -463,11 +473,6 @@ public class TikzGenerator {
 
         for (Agent agent : model.getAgents()) {
         	if (agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
-
-				if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
-					generatedCode += drawWalkingDirection(agent);
-				}
-
 		        if (model.getConfig().isShowGroups()) {
 					generatedCode += drawAgentWithGroupSettings(agent);
 				} else {
