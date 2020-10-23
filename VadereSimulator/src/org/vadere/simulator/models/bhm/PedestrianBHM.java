@@ -184,7 +184,8 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			// do nothing
 		} else if (selfCategory == SelfCategory.EVADE) {
-			// TODO: Force tangential or sideways evasion using BHM's internal methods.
+			// TODO: Force tangential or sideways evasion using BHM's internal methods
+			//  or by implementing "Navigation" interface myself and always evade to the right hand side.
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);
