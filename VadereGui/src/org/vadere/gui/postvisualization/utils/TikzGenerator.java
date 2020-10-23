@@ -292,6 +292,14 @@ public class TikzGenerator {
             generatedCode += "% Agents (not enabled in config)\n";
         }
 
+        if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
+            for (Agent agent : model.getAgents()) {
+                if (model.isAlive(agent.getId())) {
+                    generatedCode += drawWalkingDirection(agent);
+                }
+            }
+        }
+
         if (config.isShowPedestrianIds()) {
 			generatedCode += "% Agent Ids\n";
 
@@ -465,11 +473,6 @@ public class TikzGenerator {
 
         for (Agent agent : model.getAgents()) {
         	if (agent instanceof Pedestrian && (model.config.isShowFaydedPedestrians() || model.isAlive(agent.getId()))) {
-
-				if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
-					generatedCode += drawWalkingDirection(agent);
-				}
-
 		        if (model.getConfig().isShowGroups()) {
 					generatedCode += drawAgentWithGroupSettings(agent);
 				} else {
