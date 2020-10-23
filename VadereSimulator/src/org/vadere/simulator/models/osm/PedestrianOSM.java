@@ -366,10 +366,6 @@ public class PedestrianOSM extends Pedestrian {
 			this.combinedPotentialStrategy = new TargetAttractionStrategy(this.potentialFieldTarget,
 						this.potentialFieldObstacle,
 						this.potentialFieldPedestrian);
-		} else if (newStrategy == CombinedPotentialStrategy.TARGET_ATTRACTION_AND_EVASION_STRATEGY) {
-			this.combinedPotentialStrategy = new TargetAttractionAndEvasionStrategy(this.potentialFieldTarget,
-					this.potentialFieldObstacle,
-					this.potentialFieldPedestrian);
 		} else if (newStrategy == CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY) {
 			this.combinedPotentialStrategy = new TargetRepulsionStrategy(this.potentialFieldTarget,
 					this.potentialFieldObstacle,

@@ -183,7 +183,10 @@ public class PedestrianBHM extends Pedestrian {
 			makeStep();
 		} else if (selfCategory == SelfCategory.WAIT) {
 			// do nothing
-		} else {
+		} else if (selfCategory == SelfCategory.EVADE) {
+			// TODO: Force tangential or sideways evasion using BHM's internal methods.
+		}
+		else {
 			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);
 		}
 

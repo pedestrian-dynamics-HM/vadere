@@ -14,8 +14,6 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -385,28 +383,4 @@ public class OSMBehaviorControllerTest {
         assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
     }
 
-    @Test
-    public void createIsoscelesTriangleAsReachableAreaReturnsTriangleTypes() {
-        createOppositeDirectionVariation1Topography();
-
-        boolean evadeRight = true;
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-
-        for (int i = 0; i < 5; i++) {
-            VShape reachableArea = controllerUnderTest.createIsoscelesTriangleAsReachableArea(pedestrian1, evadeRight);
-            assertTrue(reachableArea instanceof VTriangle);
-        }
-    }
-
-    @Test
-    public void createCircularReachableAreaInEvasionDirectionWorksProperly() {
-        createOppositeDirectionVariation1Topography();
-
-        boolean evadeRight = true;
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
-
-        // Ped1 walks from (0,0) to (-1,0) => walking direction (gradient) is roughly (-1, 0).
-        VShape reachableArea = controllerUnderTest.createCircularReachableAreaInEvasionDirection(pedestrian2, evadeRight);
-        // TODO Assert that coordinates match roughly the expectation.
-    }
 }
