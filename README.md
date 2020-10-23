@@ -17,6 +17,10 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 If you are using Vadere for your publication, please cite: http://dx.doi.org/10.17815/CD.2019.21. 
 
+### Vadere Units 
+
+All measurements in Vadere are in SI units. That means, meters for the positions in the GUI and Topography, and meter/second for speeds. 
+
 ## Contact
 
 If you have questions about Vadere, have found a software bug or have a suggestion for improvements, please feel free to either
