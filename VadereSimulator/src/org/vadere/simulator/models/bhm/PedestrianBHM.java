@@ -114,6 +114,8 @@ public class PedestrianBHM extends Pedestrian {
 		return potentialFieldTarget != null;
 	}
 
+	public IPotentialFieldTarget getPotentialFieldTarget() { return potentialFieldTarget; }
+
 	private void setEvasionStrategy() {
 
 		if (attributesBHM.isSwitchBehaviour()) {
