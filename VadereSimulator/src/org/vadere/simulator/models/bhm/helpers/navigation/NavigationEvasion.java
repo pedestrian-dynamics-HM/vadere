@@ -1,7 +1,8 @@
-package org.vadere.simulator.models.bhm;
+package org.vadere.simulator.models.bhm.helpers.navigation;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -11,6 +12,7 @@ import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -24,18 +26,16 @@ import java.util.stream.Collectors;
  *     <li>Wait.</li>
  * </ol>
  */
-public class NavigationEvasion implements Navigation {
+public class NavigationEvasion implements INavigation {
 
     private static Logger logger = Logger.getLogger(NavigationEvasion.class);
 
-    private final PedestrianBHM me;
-    private final Topography topography;
-    private final AttributesBHM attributesBHM;
+    private PedestrianBHM me;
+    private Topography topography;
 
-    public NavigationEvasion(PedestrianBHM me, Topography topography) {
-        this.me = me;
+    public void initialize(PedestrianBHM pedestrianBHM, Topography topography, Random random) {
+        this.me = pedestrianBHM;
         this.topography = topography;
-        this.attributesBHM = me.getAttributesBHM();
     }
 
     @Override

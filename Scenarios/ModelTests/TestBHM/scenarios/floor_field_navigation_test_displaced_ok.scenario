@@ -28,12 +28,13 @@
         "stepLengthDeviation" : true,
         "navigationCluster" : false,
         "navigationFollower" : false,
+        "followerProximityNavigation" : true,
+        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
         "sidewaysEvasion" : true,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
-        "followerProximityNavigation" : false,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -100,7 +101,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : false,
-      "strategyModel" : null
+      "strategyModel" : null,
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {

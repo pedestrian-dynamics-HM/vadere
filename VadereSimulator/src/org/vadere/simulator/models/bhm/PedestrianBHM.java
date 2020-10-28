@@ -2,6 +2,9 @@ package org.vadere.simulator.models.bhm;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.bhm.helpers.navigation.INavigation;
+import org.vadere.simulator.models.bhm.helpers.navigation.NavigationBuilder;
+import org.vadere.simulator.models.bhm.helpers.navigation.NavigationEvasion;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -35,10 +38,10 @@ public class PedestrianBHM extends Pedestrian {
 	private VPoint lastPosition;
 	private VPoint targetDirection;
 
-	private final transient Navigation navigation;
+	private final transient INavigation navigation;
 	private final transient List<DirectionAddend> directionAddends;
 
-	protected int action;
+	public int action;
 
 	private boolean evadesTangentially;
 	private boolean evadesSideways;
@@ -75,27 +78,8 @@ public class PedestrianBHM extends Pedestrian {
 
 
 		// model building ...
-
-		// TODO: Implement a model builder class similar to "CognitionModelBuilder".
-		//  Select a "Navigation" class by passing a simple string.
-		this.navigation = new NavigationEvasion(this, topography);
-		/*
-		if (attributesBHM.isNavigationCluster()) {
-			this.navigation = new NavigationCluster(this, topography, random);
-			if (attributesBHM.isNavigationFollower()) {
-				logger.warn("Only one navigation heuristic can be chosen."
-						+ "Choosing cluster navigation.");
-			}
-		} else if (attributesBHM.isNavigationFollower()) {
-			this.navigation = new NavigationFollower(this, topography, random);
-			if (attributesBHM.isNavigationCluster()) {
-				logger.warn("Only one navigation heuristic can be chosen."
-						+ "Choosing follower navigation.");
-			}
-		} else {
-			this.navigation = new NavigationProximity(this, random);
-		}
-		*/
+		String navigationModel = attributesBHM.getNavigationModel();
+		this.navigation = NavigationBuilder.instantiateModel(navigationModel, this, topography, random);
 
 		if (attributesBHM.isDirectionWallDistance()) {
 			directionAddends.add(new DirectionAddendObstacle(this));
@@ -192,7 +176,7 @@ public class PedestrianBHM extends Pedestrian {
 			// do nothing
 		} else if (selfCategory == SelfCategory.EVADE) {
 			// TODO: Force tangential or sideways evasion using BHM's internal methods
-			//  or by implementing "Navigation" interface myself and always evade to the right hand side.
+			//  or by implementing "INavigation" interface myself and always evade to the right hand side.
 			nextPosition = navigation.getNavigationPosition();
 			makeStep();
 		}
@@ -229,7 +213,7 @@ public class PedestrianBHM extends Pedestrian {
 		}
 	}
 
-	VPoint stepAwayFromCollision(final Pedestrian collisionPed) {
+	public VPoint stepAwayFromCollision(final Pedestrian collisionPed) {
 		return getPosition().subtract(collisionPed.getPosition()).norm().scalarMultiply(stepLength).add(getPosition());
 	}
 
@@ -258,7 +242,7 @@ public class PedestrianBHM extends Pedestrian {
 
 	// target direction methods...
 
-	VPoint computeTargetStep() {
+	public VPoint computeTargetStep() {
 		return UtilsBHM.getTargetStep(this, getPosition(), getTargetDirection());
 	}
 
@@ -316,7 +300,7 @@ public class PedestrianBHM extends Pedestrian {
 		}
 	}
 
-	VPoint computeMovementProjection() {
+	public VPoint computeMovementProjection() {
 		return getPosition().add(getTargetDirection().scalarMultiply(
 				stepLength * attributesBHM.getPlannedStepsAhead()));
 	}
@@ -351,7 +335,7 @@ public class PedestrianBHM extends Pedestrian {
 	/**
 	 * Check collisions on the path.
 	 */
-	boolean collidesWithPedestrianOnPath(VPoint position) {
+	public boolean collidesWithPedestrianOnPath(VPoint position) {
 		Pedestrian collision = findCollisionPedestrian(position, true);
 
 		return collision != null;
@@ -361,7 +345,7 @@ public class PedestrianBHM extends Pedestrian {
 	 * If findAny is false, return the first collision on the path to position.
 	 * If findAny is true, return the first collision that was found (could be any).
 	 */
-	Pedestrian findCollisionPedestrian(VPoint position, boolean findAny) {
+	public Pedestrian findCollisionPedestrian(VPoint position, boolean findAny) {
 
 		Pedestrian result = null;
 		double minDistance = Double.MAX_VALUE;
@@ -417,7 +401,7 @@ public class PedestrianBHM extends Pedestrian {
 	/**
 	 * This does not check collisions on the path, just collisions with position!
 	 */
-	List<Obstacle> detectObstacleProximity(@NotNull VPoint position, double proximity) {
+	public List<Obstacle> detectObstacleProximity(@NotNull VPoint position, double proximity) {
 
 		Collection<Obstacle> obstacles = topography.getObstacles();
 		List<Obstacle> result = new LinkedList<>();

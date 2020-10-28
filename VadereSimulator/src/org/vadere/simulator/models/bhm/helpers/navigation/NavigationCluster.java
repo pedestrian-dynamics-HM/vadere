@@ -1,5 +1,7 @@
-package org.vadere.simulator.models.bhm;
+package org.vadere.simulator.models.bhm.helpers.navigation;
 
+import org.vadere.simulator.models.bhm.PedestrianBHM;
+import org.vadere.simulator.models.bhm.UtilsBHM;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -11,20 +13,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class NavigationCluster implements Navigation {
+public class NavigationCluster implements INavigation {
 
 	private static Logger logger = Logger.getLogger(NavigationCluster.class);
 
-	private final Topography topography;
-	private final AttributesBHM attributesBHM;
-	private final PedestrianBHM me;
-	private final NavigationProximity proximityNavigation;
+	private Topography topography;
+	private AttributesBHM attributesBHM;
+	private PedestrianBHM me;
+	private NavigationProximity proximityNavigation;
 
-	public NavigationCluster(PedestrianBHM me, Topography topography, Random random) {
-		this.me = me;
+	@Override
+	public void initialize(PedestrianBHM pedestrianBHM, Topography topography, Random random) {
+		this.me = pedestrianBHM;
 		this.topography = topography;
 		this.attributesBHM = me.getAttributesBHM();
-		this.proximityNavigation = new NavigationProximity(me, random);
+		this.proximityNavigation = new NavigationProximity();
+		proximityNavigation.initialize(me, topography, random);
 	}
 
 	@Override

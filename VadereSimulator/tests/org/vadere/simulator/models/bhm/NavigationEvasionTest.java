@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.bhm;
 
 import org.junit.Test;
+import org.vadere.simulator.models.bhm.helpers.navigation.NavigationEvasion;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -8,7 +9,6 @@ import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VCircle;

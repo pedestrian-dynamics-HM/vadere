@@ -28,12 +28,13 @@
         "stepLengthDeviation" : true,
         "navigationCluster" : false,
         "navigationFollower" : false,
+        "followerProximityNavigation" : true,
+        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : false,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
-        "followerProximityNavigation" : false,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -100,7 +101,9 @@
     },
     "attributesStrategy" : {
       "useStrategyModel" : false,
-      "strategyModel" : null
+      "strategyModel" : null,
+      "arguments" : [ ],
+      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {
@@ -122,7 +125,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 1.0,
@@ -131,7 +134,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       }, {
         "shape" : {
           "x" : 1.0,
@@ -140,7 +143,7 @@
           "height" : 19.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 4
       }, {
         "shape" : {
           "x" : 1.0,
@@ -149,7 +152,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 5
       }, {
         "shape" : {
           "x" : 33.0,
@@ -158,7 +161,7 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 6
       }, {
         "shape" : {
           "x" : 2.5,
@@ -167,7 +170,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 7
       }, {
         "shape" : {
           "x" : 2.5,
@@ -176,7 +179,7 @@
           "height" : 16.4,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 8
       }, {
         "shape" : {
           "x" : 2.5,
@@ -185,7 +188,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 9
       }, {
         "shape" : {
           "x" : 24.0,
@@ -194,7 +197,7 @@
           "height" : 12.5,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 10
       }, {
         "shape" : {
           "x" : 20.1,
@@ -203,7 +206,7 @@
           "height" : 11.4,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 11
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -228,7 +231,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 12,
         "shape" : {
           "x" : 16.0,
           "y" : 2.0,

@@ -1,9 +1,12 @@
-package org.vadere.simulator.models.bhm;
+package org.vadere.simulator.models.bhm.helpers.navigation;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
+import org.vadere.simulator.models.bhm.UtilsBHM;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -14,16 +17,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public class NavigationProximity implements Navigation {
+public class NavigationProximity implements INavigation {
 
 	private static Logger logger = Logger.getLogger(NavigationProximity.class);
 
-	private final Random random;
-	private final AttributesBHM attributesBHM;
-	private final PedestrianBHM me;
+	private Random random;
+	private AttributesBHM attributesBHM;
+	private PedestrianBHM me;
 
-	public NavigationProximity(PedestrianBHM me, Random random) {
-		this.me = me;
+	public void initialize(PedestrianBHM pedestrianBHM, Topography topography, Random random) {
+		this.me = pedestrianBHM;
 		this.random = random;
 		this.attributesBHM = me.getAttributesBHM();
 	}
