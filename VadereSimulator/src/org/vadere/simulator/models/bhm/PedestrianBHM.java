@@ -76,6 +76,10 @@ public class PedestrianBHM extends Pedestrian {
 
 		// model building ...
 
+		// TODO: Implement a model builder class similar to "CognitionModelBuilder".
+		//  Select a "Navigation" class by passing a simple string.
+		this.navigation = new NavigationEvasion(this, topography);
+		/*
 		if (attributesBHM.isNavigationCluster()) {
 			this.navigation = new NavigationCluster(this, topography, random);
 			if (attributesBHM.isNavigationFollower()) {
@@ -91,6 +95,7 @@ public class PedestrianBHM extends Pedestrian {
 		} else {
 			this.navigation = new NavigationProximity(this, random);
 		}
+		*/
 
 		if (attributesBHM.isDirectionWallDistance()) {
 			directionAddends.add(new DirectionAddendObstacle(this));
@@ -188,6 +193,8 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (selfCategory == SelfCategory.EVADE) {
 			// TODO: Force tangential or sideways evasion using BHM's internal methods
 			//  or by implementing "Navigation" interface myself and always evade to the right hand side.
+			nextPosition = navigation.getNavigationPosition();
+			makeStep();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);

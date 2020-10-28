@@ -262,7 +262,7 @@ public class NavigationEvasionTest {
     }
 
     @Test
-    public void getNavigationPositionReturnsTangentialPositionHalfSpeedIfNotOccupied() {
+    public void getNavigationPositionReturnsTangentialPositionHalfSpeedIfFullSpeedOccupied() {
         createOppositeDirectionVariation1Topography();
 
         // Occupy tangential/full speed position
@@ -279,6 +279,30 @@ public class NavigationEvasionTest {
         VPoint newPosition = navigationUnderTest.getNavigationPosition();
 
         VPoint expectedTangentialHalfSpeedPosition = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-45)).scalarMultiply(pedestrian1.getStepLength() * 0.5));
+
+        assertEquals(expectedTangentialHalfSpeedPosition.x, newPosition.x, ALLOWED_DOUBLE_ERROR);
+        assertEquals(expectedTangentialHalfSpeedPosition.y, newPosition.y, ALLOWED_DOUBLE_ERROR);
+    }
+
+    @Test
+    public void getNavigationPositionReturnsSidestepPositionHalfSpeedIfTangentialOccupied() {
+        createOppositeDirectionVariation1Topography();
+
+        // Occupy tangential full and half speed position
+        VPoint oldPosition = pedestrian1.getPosition();
+        VPoint walkingDirection = new VPoint(-1 ,0);
+
+        VPoint tangentialPositionFullSpeed = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-45)).scalarMultiply(pedestrian1.getStepLength()));
+        VPoint tangentialPositionHalfSpeed = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-45)).scalarMultiply(pedestrian1.getStepLength() * 0.5));
+
+        int startPedestrianId = 3;
+        List<PedestrianBHM> pedestrians = createTwoPedestrianBHM(tangentialPositionFullSpeed, tangentialPositionHalfSpeed, startPedestrianId, topography);
+        pedestrians.stream().forEach(pedestrian -> topography.addElement(pedestrian));
+
+        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        VPoint newPosition = navigationUnderTest.getNavigationPosition();
+
+        VPoint expectedTangentialHalfSpeedPosition = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-90)).scalarMultiply(pedestrian1.getStepLength() * 0.5));
 
         assertEquals(expectedTangentialHalfSpeedPosition.x, newPosition.x, ALLOWED_DOUBLE_ERROR);
         assertEquals(expectedTangentialHalfSpeedPosition.y, newPosition.y, ALLOWED_DOUBLE_ERROR);
