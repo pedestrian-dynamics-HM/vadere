@@ -12,11 +12,11 @@ import org.vadere.util.version.Version;
 /**
  * Remove node "threatMemory" under "scenario.topography.dynamicElements.psychologyStatus"
  */
-@MigrationTransformation(targetVersionLabel = "1.14")
-public class TargetVersionV1_14 extends SimpleJsonTransformation {
+@MigrationTransformation(targetVersionLabel = "1.15")
+public class TargetVersionV1_15 extends SimpleJsonTransformation {
 
-	public TargetVersionV1_14(){
-		super(Version.V1_14);
+	public TargetVersionV1_15(){
+		super(Version.V1_15);
 	}
 
 	@Override
@@ -30,13 +30,11 @@ public class TargetVersionV1_14 extends SimpleJsonTransformation {
 		String useStrategyModelKey = "attributesStrategy";
 
 		JsonNode scenarioNode = path(node, "scenario");
-		JsonNode strategyModel = path(scenarioNode, useStrategyModelKey);
 
-		if (strategyModel.isMissingNode()) {
+		if (hasChild(scenarioNode, useStrategyModelKey)) {
 
 			ObjectNode n = (ObjectNode) scenarioNode;
-			JsonNode attributesStrategyNode = StateJsonConverter.serializeAttributesStrategyModelToNode(new AttributesStrategyModel());
-			n.set(useStrategyModelKey, attributesStrategyNode );
+			n.remove(useStrategyModelKey);
 
 		}
 

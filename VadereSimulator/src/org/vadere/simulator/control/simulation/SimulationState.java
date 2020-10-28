@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
-import org.vadere.simulator.control.strategy.models.IStrategyModel;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.scenario.Topography;
@@ -18,34 +17,30 @@ public class SimulationState {
 	private final String name;
 	private final MainModel mainModel;
 	private boolean simStop = false;
-	private final IStrategyModel strategyModel;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
 							  final ScenarioStore scenarioStore,
 							  final double simTimeInSec,
 							  final int step,
-							  @Nullable final MainModel mainModel,
-							  final IStrategyModel strategyModel) {
+							  @Nullable final MainModel mainModel) {
 		this.name = name;
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
 		this.scenarioStore = scenarioStore;
 		this.mainModel = mainModel;
-		this.strategyModel = strategyModel;
 	}
 
 	@Deprecated
 	public SimulationState(final Map<Integer, VPoint> pedestrianPositionMap, final Topography topography,
-						   final double simTimeInSec, final int step, final IStrategyModel strategyModel) {
+						   final double simTimeInSec, final int step) {
 		this.name = "";
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
 		this.scenarioStore = null;
 		this.mainModel = null;
-		this.strategyModel = null;
 	}
 
 	// public access to getters
@@ -88,10 +83,6 @@ public class SimulationState {
 
 	public boolean isSimStop() {
 		return simStop;
-	}
-
-	public IStrategyModel getStrategyModel(){
-		return strategyModel;
 	}
 
 

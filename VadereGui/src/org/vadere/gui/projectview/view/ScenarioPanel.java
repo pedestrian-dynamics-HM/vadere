@@ -39,7 +39,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	// tabs
 	private List<JMenu> menusInTabs = new ArrayList<>();
 	private TextView attributesSimulationView; // Simulation tab
-	private TextView attributesStrategyFileView; // Strategy tab
 	private TextView attributesModelView; // Model tab
 	private TextView attributesPsychologyView; // Psychology tab
 	private TextView topographyFileView; // Topography tab
@@ -220,11 +219,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		perceptionFileView.isEditable(true);
 		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
 
-		attributesStrategyFileView =
-				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.STRATEGY);
-		attributesStrategyFileView.isEditable(true);
-		tabbedPane.addTab(Messages.getString("Tab.Strategy.title"), attributesStrategyFileView);
-
 		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		
@@ -317,9 +311,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		this.perceptionFileView.setVadereScenario(scenario);
 		this.perceptionFileView.isEditable(isEditable);
-
-		this.attributesStrategyFileView.setVadereScenario(scenario);
-		this.attributesStrategyFileView.isEditable(isEditable);
 
 		this.dataProcessingGUIview.setVadereScenario(scenario);
 		this.dataProcessingGUIview.isEditable(isEditable);

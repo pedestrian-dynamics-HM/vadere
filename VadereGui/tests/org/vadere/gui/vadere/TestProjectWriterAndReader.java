@@ -11,7 +11,6 @@ import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.io.JsonConverter;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesPotentialCompact;
@@ -48,9 +47,9 @@ public class TestProjectWriterAndReader {
 		attributes.add(new AttributesFloorField());
 		attributes.add(new AttributesPotentialOSM());
 		LinkedList<Scenario> tests = new LinkedList<>();
-		tests.add(new Scenario(new ScenarioStore(testName + "1", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography(), new AttributesStrategyModel())));
-		tests.add(new Scenario(new ScenarioStore(testName + "2", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography(), new AttributesStrategyModel())));
-		tests.add(new Scenario(new ScenarioStore(testName + "3", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography(), new AttributesStrategyModel())));
+		tests.add(new Scenario(new ScenarioStore(testName + "1", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
+		tests.add(new Scenario(new ScenarioStore(testName + "2", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
+		tests.add(new Scenario(new ScenarioStore(testName + "3", "", OptimalStepsModel.class.getName(), attributes, new AttributesSimulation(), new Topography())));
 		testProject = new VadereProject(testProjectName, tests, Paths.get("."));
 	}
 

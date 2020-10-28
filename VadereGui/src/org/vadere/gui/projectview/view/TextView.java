@@ -200,10 +200,6 @@ public class TextView extends JPanel implements IJsonView {
 								StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuli(json);
 								currentScenario.getScenarioStore().setStimulusInfoStore(stimulusInfoStore);
 								break;
-							case STRATEGY:
-								currentScenario
-										.setAttributesStrategy(StateJsonConverter.deserializeAttributesStrategyModel(json));
-								break;
 							default:
 								throw new RuntimeException("attribute type not implemented.");
 						}
@@ -305,10 +301,6 @@ public class TextView extends JPanel implements IJsonView {
 		case PERCEPTION:
 			StimulusInfoStore stimulusInfoStore = scenario.getScenarioStore().getStimulusInfoStore();
 			textfileTextarea.setText(StateJsonConverter.serializeStimuli(stimulusInfoStore));
-			break;
-		case STRATEGY:
-			textfileTextarea
-					.setText(StateJsonConverter.serializeAttributesStrategyModel(scenario.getAttributesStrategyModel()));
 			break;
 		default:
 			throw new RuntimeException("attribute type not implemented.");
