@@ -1,6 +1,7 @@
-package org.vadere.simulator.models.bhm;
+package org.vadere.simulator.models.bhm.helpers.targetdirection;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.geometry.shapes.VPoint;
 

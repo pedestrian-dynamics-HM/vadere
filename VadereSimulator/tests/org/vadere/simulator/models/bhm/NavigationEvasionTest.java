@@ -120,7 +120,8 @@ public class NavigationEvasionTest {
     public void getCurrentTargetDirectionNormedByGradientReturnsNormedGradient() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         // Ped1 walks from (0,0) to (-1,0) => target gradient is (1, 0) => walking direction (gradient) is roughly (-1, 0).
         VPoint nextWalkingDirection = navigationUnderTest.getCurrentTargetDirectionNormedByGradient();
@@ -133,7 +134,8 @@ public class NavigationEvasionTest {
     public void getNextPositionUsesCurrentPedestrianPosition() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         // Ped1 stands at (0,0).
         VPoint currentWalkingDirection = new VPoint(0, 0);
@@ -151,7 +153,8 @@ public class NavigationEvasionTest {
     public void getNextPositionUsesCurrentWalkingDirection() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         // Ped1 stands at (0,0).
         VPoint currentWalkingDirection = new VPoint(1, 2);
@@ -171,7 +174,8 @@ public class NavigationEvasionTest {
     public void getNextPositionUsesCurrentGivenStepLength() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         // Ped1 stands at (0,0).
         VPoint currentWalkingDirection = new VPoint(1, 1);
@@ -191,7 +195,8 @@ public class NavigationEvasionTest {
     public void getNextPositionRotatesWalkingDirectionCounterClockwiseByDefault() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         VPoint currentWalkingDirection = new VPoint(1, 0);
         double rotationAngleInDegCcw = 90;
@@ -211,7 +216,8 @@ public class NavigationEvasionTest {
     public void getNextPositionRotatesClockwiseIfAngleIsNegative() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         VPoint currentWalkingDirection = new VPoint(1, 0);
         double rotationAngleInDegCcw = -90;
@@ -231,7 +237,8 @@ public class NavigationEvasionTest {
     public void getNextPositionRotates180DegCorrectly() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
 
         VPoint currentWalkingDirection = new VPoint(1, 0);
         double rotationAngleInDegCcw = 180;
@@ -250,7 +257,9 @@ public class NavigationEvasionTest {
     public void getNavigationPositionReturnsTangentialPositionFullSpeedIfNotOccupied() {
         createOppositeDirectionVariation1Topography();
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
+
         VPoint newPosition = navigationUnderTest.getNavigationPosition();
 
         VPoint oldPosition = pedestrian1.getPosition();
@@ -275,7 +284,9 @@ public class NavigationEvasionTest {
         List<PedestrianBHM> pedestrians = createTwoPedestrianBHM(tangentialPosition, tangentialPosition, startPedestrianId, topography);
         pedestrians.stream().forEach(pedestrian -> topography.addElement(pedestrian));
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
+
         VPoint newPosition = navigationUnderTest.getNavigationPosition();
 
         VPoint expectedTangentialHalfSpeedPosition = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-45)).scalarMultiply(pedestrian1.getStepLength() * 0.5));
@@ -299,7 +310,9 @@ public class NavigationEvasionTest {
         List<PedestrianBHM> pedestrians = createTwoPedestrianBHM(tangentialPositionFullSpeed, tangentialPositionHalfSpeed, startPedestrianId, topography);
         pedestrians.stream().forEach(pedestrian -> topography.addElement(pedestrian));
 
-        NavigationEvasion navigationUnderTest = new NavigationEvasion(pedestrian1, topography);
+        NavigationEvasion navigationUnderTest = new NavigationEvasion();
+        navigationUnderTest.initialize(pedestrian1, topography, null);
+
         VPoint newPosition = navigationUnderTest.getNavigationPosition();
 
         VPoint expectedTangentialHalfSpeedPosition = oldPosition.add(walkingDirection.norm().rotate(Math.toRadians(-90)).scalarMultiply(pedestrian1.getStepLength() * 0.5));
