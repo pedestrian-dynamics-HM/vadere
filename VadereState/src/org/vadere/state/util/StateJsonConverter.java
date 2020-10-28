@@ -129,15 +129,6 @@ public abstract class StateJsonConverter {
 		return mapper.treeToValue(node, AttributesPsychology.class);
 	}
 
-	public static AttributesStrategyModel deserializeAttributesStrategyModel(String json) throws IOException {
-		return deserializeObjectFromJson(json, AttributesStrategyModel.class);
-	}
-
-	public static AttributesStrategyModel deserializeAttributesStrategyModelFromNode(JsonNode node)
-			throws JsonProcessingException {
-		return mapper.treeToValue(node, AttributesStrategyModel.class);
-	}
-
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
 		List<Attributes> attributesList = new LinkedList<>();

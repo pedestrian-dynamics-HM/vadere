@@ -24,8 +24,7 @@ public class StimulusControllerTest {
                 null,
                 null,
                 null,
-                store,
-                null);
+                store);
     }
 
     private ScenarioStore getScenarioStoreContainingRecurringStimulus(boolean isRecurring) {
@@ -36,7 +35,7 @@ public class StimulusControllerTest {
                 null,
                 null,
                 null,
-                getStimulusInfoStoreContainingRecurringStimulus(isRecurring), null);
+                getStimulusInfoStoreContainingRecurringStimulus(isRecurring));
     }
 
     private StimulusInfoStore getStimulusInfoStoreContainingRecurringStimulus(boolean isRecurring) {
@@ -119,7 +118,7 @@ public class StimulusControllerTest {
                 null,
                 null,
                 null,
-                stimulusInfoStoreWithBothStimuli, null);
+                stimulusInfoStoreWithBothStimuli);
 
         StimulusController stimulusController = new StimulusController(scenarioStoreContainingOneTimeAndRecurringStimulus);
 

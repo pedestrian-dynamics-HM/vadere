@@ -119,11 +119,6 @@
     <!-- global dependencies! -->
   <dependencies>
       <dependency>
-          <groupId>com.github.cschen1205</groupId>
-          <artifactId>java-fuzzy-logic</artifactId>
-          <version>1.0.1</version>
-      </dependency>
-      <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
           <version>25.0-jre</version>

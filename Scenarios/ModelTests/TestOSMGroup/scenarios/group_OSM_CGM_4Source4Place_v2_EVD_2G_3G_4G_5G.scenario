@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_4Source4Place_v2_EVD_2G_3G_4G_5G",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -109,10 +109,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

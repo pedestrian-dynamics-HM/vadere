@@ -49,7 +49,6 @@ public class JsonConverter {
 
 		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get(AttributesSimulation.JSON_KEY));
 		AttributesPsychology attributesPsychology = StateJsonConverter.deserializeAttributesPsychologyFromNode(scenarioNode.get(AttributesPsychology.JSON_KEY));
-		AttributesStrategyModel attributesStrategyModel = StateJsonConverter.deserializeAttributesStrategyModelFromNode(scenarioNode.get(AttributesStrategyModel.JSON_KEY));
 
 
 		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
@@ -62,7 +61,7 @@ public class JsonConverter {
 		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription,
 				mainModel, attributesModel,
 				attributesSimulation, attributesPsychology,
-				topography, stimulusInfoStore, attributesStrategyModel);
+				topography, stimulusInfoStore);
 		Scenario scenarioRunManager = new Scenario(scenarioStore);
 
 		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
@@ -115,8 +114,6 @@ public class JsonConverter {
 
 		vadereNode.set(AttributesSimulation.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class));
 		vadereNode.set(AttributesPsychology.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class));
-		vadereNode.set(AttributesStrategyModel.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesStrategyModel(), JsonNode.class));
-
 
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		vadereNode.set("topography", topographyNode);
@@ -137,7 +134,6 @@ public class JsonConverter {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
 		JsonNode attributesPsychologyNode = StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class);
 
-		ObjectNode attributesStrategyNode = StateJsonConverter.serializeAttributesStrategyModelToNode(scenarioStore.getAttributesStrategyModel());
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		ObjectNode stimulusNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
@@ -153,8 +149,7 @@ public class JsonConverter {
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode),
-				StateJsonConverter.deserializeAttributesStrategyModelFromNode(attributesStrategyNode)
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode)
 				);
 	}
 }
