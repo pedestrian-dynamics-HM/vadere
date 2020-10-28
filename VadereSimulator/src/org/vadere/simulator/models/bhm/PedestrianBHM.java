@@ -4,10 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.bhm.helpers.navigation.INavigation;
 import org.vadere.simulator.models.bhm.helpers.navigation.NavigationBuilder;
-import org.vadere.simulator.models.bhm.helpers.targetdirection.TargetDirection;
-import org.vadere.simulator.models.bhm.helpers.targetdirection.TargetDirectionClose;
-import org.vadere.simulator.models.bhm.helpers.targetdirection.TargetDirectionEuclidean;
-import org.vadere.simulator.models.bhm.helpers.targetdirection.TargetDirectionGeoGradient;
+import org.vadere.simulator.models.bhm.helpers.targetdirection.*;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -178,12 +175,10 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			// do nothing
 		} else if (selfCategory == SelfCategory.EVADE) {
-			// TODO: Force tangential or sideways evasion using BHM's internal methods
-			//  or by implementing "INavigation" interface myself and always evade to the right hand side.
+			// TODO: Instantiate "NavigationEvasion" on the fly and calculate position.
 			nextPosition = navigation.getNavigationPosition();
 			makeStep();
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);
 		}
 

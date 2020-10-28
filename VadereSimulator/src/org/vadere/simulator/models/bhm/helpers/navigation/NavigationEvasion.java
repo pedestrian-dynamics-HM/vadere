@@ -3,7 +3,6 @@ package org.vadere.simulator.models.bhm.helpers.navigation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.simulator.models.bhm.PedestrianBHM;
-import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;

@@ -6,15 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
+      "processors" : [ 1, 2, 3 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -23,15 +15,8 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
       "id" : 3
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -93,7 +78,7 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "cognition" : "CounterflowCognitionModel"
       }
     },
     "attributesStrategy" : {
