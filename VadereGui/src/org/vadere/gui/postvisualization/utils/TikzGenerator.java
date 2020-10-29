@@ -11,7 +11,6 @@ import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
-import org.vadere.state.simulation.Trajectory;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
@@ -28,6 +27,8 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.awt.geom.PathIterator.*;
 
@@ -54,11 +55,15 @@ public class TikzGenerator {
 
 	public enum EXPORT_OPTION { EXPORT_WHOLE_TOPOGRAPHY, EXPORT_CURRENT_VIEWPORT };
 
+	// Static Variables
 	private final static Logger logger = Logger.getLogger(TikzGenerator.class);
+
+	// Member Variables
 	private final SimulationRenderer renderer;
 	private final SimulationModel<? extends DefaultSimulationConfig> model;
 	private final String[] translationTable;
 
+	// Constructors
 	public TikzGenerator(final SimulationRenderer renderer,
 						 final SimulationModel<? extends DefaultSimulationConfig> model) {
 		this.renderer = renderer;
@@ -109,6 +114,7 @@ public class TikzGenerator {
 		}
 	}
 
+	// TODO: Move style methods to new class "TikzStyleGenerator" (maybe, with only static methods).
 	private String generateTikzColorDefinitions(SimulationModel<? extends DefaultSimulationConfig> model) {
 		String colorDefinitions = "% Color Definitions\n";
 
@@ -188,6 +194,7 @@ public class TikzGenerator {
 				topography.getBounds().x + topography.getBounds().width,
 				topography.getBounds().y + topography.getBounds().height);
 
+		// TODO: Maybe, extract method createTikzCodeForScenarioElement(boolean enabled, List<ScenarioElement> elements, String labelPrefix, String fillColor)!
 		if (config.isShowTargetChangers()) {
 			generatedCode += "% Target Changers\n";
 			for (TargetChanger targetChanger : topography.getTargetChangers()) {
@@ -292,11 +299,14 @@ public class TikzGenerator {
             generatedCode += "% Agents (not enabled in config)\n";
         }
 
-        if (config.isShowWalkdirection() && model instanceof PostvisualizationModel) {
-            for (Agent agent : model.getAgents()) {
-                if (model.isAlive(agent.getId())) {
-                    generatedCode += drawWalkingDirection(agent);
-                }
+        if (config.isShowWalkdirection()) {
+        	List<Agent> aliveAgents = model.getAgents().stream().filter(agent -> model.isAlive(agent.getId())).collect(Collectors.toList());
+            for (Agent agent : aliveAgents) {
+				if (model instanceof PostvisualizationModel) {
+					generatedCode += drawWalkingDirectionUsingTrajectoryFile(agent);
+				} else {
+					generatedCode += drawWalkingDirectionUsingFootstepHistory((Pedestrian)agent);
+				}
             }
         }
 
@@ -429,7 +439,7 @@ public class TikzGenerator {
 	 * @param agent
 	 * @return		tikz code for small direction triangle.
 	 */
-	private String drawWalkingDirection(final Agent agent){
+	private String drawWalkingDirectionUsingTrajectoryFile(final Agent agent) {
 		String tikzCode= "";
 
 		PostvisualizationModel postVisModel = (PostvisualizationModel)model;
@@ -452,19 +462,48 @@ public class TikzGenerator {
 				double endX = latestFootstep.doubleColumn(trajectories.endXCol).getDouble(row);
 				double endY = latestFootstep.doubleColumn(trajectories.endYCol).getDouble(row);
 
-				Vector2D direction = new Vector2D(new VPoint(
-						endX - startX,
-						endY - startY));
-				direction.normalize(1);
-				double r = agent.getRadius();
-				VPoint p1 = agent.getPosition().add(direction.rotate(Math.PI/2).normalize(0.93*r));
-				VPoint p2 = agent.getPosition().add(direction.rotate(-Math.PI/2).normalize(0.93*r));
-				VPoint p3 = agent.getPosition().add(direction.normalize(1.8*r));
-				String directionStr = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
-				tikzCode = String.format(Locale.US, directionStr, p1.x, p1.y, p3.x, p3.y, p2.x, p2.y);
+				List<VPoint> trianglePoints = calculateTrianglePointsForWalkingDirection(startX, startY, endX, endY,
+						agent.getPosition(), agent.getRadius());
+				tikzCode = createWalkingDirectionTikzString(trianglePoints);
 			}
 		}
 		return tikzCode;
+	}
+
+	private String drawWalkingDirectionUsingFootstepHistory(final Pedestrian agent) {
+		String tikzCode= "";
+
+		if (agent.getFootstepHistory().size() > 0) {
+			FootStep footStep = agent.getFootstepHistory().getYoungestFootStep();
+
+			List<VPoint> trianglePoints = calculateTrianglePointsForWalkingDirection(footStep.getStart().x, footStep.getStart().y,
+					footStep.getEnd().x, footStep.getEnd().y,
+					agent.getPosition(), agent.getRadius());
+			tikzCode = createWalkingDirectionTikzString(trianglePoints);
+		}
+
+		return tikzCode;
+	}
+
+	private List<VPoint> calculateTrianglePointsForWalkingDirection(double startX, double startY, double endX, double endY, VPoint basePoint, double normalizeFactor) {
+		Vector2D direction = new Vector2D(new VPoint(
+				endX - startX,
+				endY - startY));
+
+		VPoint p1 = basePoint.add(direction.rotate(Math.PI/2).normalize(0.93 * normalizeFactor));
+		VPoint p2 = basePoint.add(direction.rotate(-Math.PI/2).normalize(0.93 * normalizeFactor));
+		VPoint p3 = basePoint.add(direction.normalize(1.8 * normalizeFactor));
+
+		return Arrays.asList(p1, p2, p3);
+	}
+
+	private String createWalkingDirectionTikzString(List<VPoint> trianglePoints) {
+		String tikzTemplate = "\\draw[walkdirection] (%f,%f) -- (%f,%f) -- (%f,%f);\n";
+
+		return String.format(Locale.US, tikzTemplate,
+				trianglePoints.get(0).x, trianglePoints.get(0).y,
+				trianglePoints.get(2).x, trianglePoints.get(2).y,
+				trianglePoints.get(1).x, trianglePoints.get(1).y);
 	}
 
     @NotNull
