@@ -59,7 +59,7 @@ public class NavigationEvasion implements INavigation {
             VPoint possiblePosition = getNextPosition(currentWalkingDirection, rotation, stepLengthTrial);
 
             if (collideWithPedestrian(possiblePosition, me.getRadius(), closePedestrians) == false) {
-                if (me.collidesWithObstacle(possiblePosition) == false) {
+                if (me.collidesWithObstacle(possiblePosition, -0.1) == false) {
                     nextPosition = possiblePosition;
                     break;
                 }

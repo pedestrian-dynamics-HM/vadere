@@ -1,5 +1,5 @@
 {
-  "name" : "BHM-Defaults-WithFloorField",
+  "name" : "BHM-Defaults-WithFloorField_CounterflowCognitionModel",
   "description" : "",
   "release" : "1.14",
   "processWriters" : {
@@ -96,7 +96,7 @@
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : false,
+      "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CounterflowCognitionModel"

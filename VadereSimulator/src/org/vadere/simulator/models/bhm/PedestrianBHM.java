@@ -4,8 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.bhm.helpers.navigation.INavigation;
 import org.vadere.simulator.models.bhm.helpers.navigation.NavigationBuilder;
+import org.vadere.simulator.models.bhm.helpers.navigation.NavigationEvasion;
 import org.vadere.simulator.models.bhm.helpers.targetdirection.*;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -175,8 +177,9 @@ public class PedestrianBHM extends Pedestrian {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			// do nothing
 		} else if (selfCategory == SelfCategory.EVADE) {
-			// TODO: Instantiate "NavigationEvasion" on the fly and calculate position.
-			nextPosition = navigation.getNavigationPosition();
+			INavigation evasionNavigation = new NavigationEvasion();
+			evasionNavigation.initialize(this, topography, null);
+			nextPosition = evasionNavigation.getNavigationPosition();
 			makeStep();
 		} else {
 			throw new IllegalArgumentException("Unsupported SelfCategory: " + selfCategory);
@@ -334,9 +337,24 @@ public class PedestrianBHM extends Pedestrian {
 	 * Check collisions on the path.
 	 */
 	public boolean collidesWithPedestrianOnPath(VPoint position) {
+		boolean isCollision = false;
+
 		Pedestrian collision = findCollisionPedestrian(position, true);
 
-		return collision != null;
+		if (collision != null &&  otherPedIsCloserToTarget(this, collision)) {
+			isCollision = true;
+		}
+
+		return isCollision;
+	}
+
+	private boolean otherPedIsCloserToTarget(PedestrianBHM me, Pedestrian  other) {
+		IPotentialFieldTarget myTargetPotential = me.getPotentialFieldTarget();
+
+		double myDistanceToTarget = myTargetPotential.getPotential(me.getPosition(), me);
+		double otherDistanceToTarget = myTargetPotential.getPotential(other.getPosition(), other);
+
+		return otherDistanceToTarget < myDistanceToTarget;
 	}
 
 	/**
@@ -390,6 +408,15 @@ public class PedestrianBHM extends Pedestrian {
 	 */
 	public boolean collidesWithObstacle(VPoint position) {
 		if (detectObstacleProximity(position, getRadius()).isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	// TODO: Think if method works as expected. If so, above method should use "collidesWithObstacle(pos, 0)"!
+	public boolean collidesWithObstacle(VPoint position, double allowedMargin) {
+		if (detectObstacleProximity(position, getRadius() + allowedMargin).isEmpty()) {
 			return false;
 		} else {
 			return true;

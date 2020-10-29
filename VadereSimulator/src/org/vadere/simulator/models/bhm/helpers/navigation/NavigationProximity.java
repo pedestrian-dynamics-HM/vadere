@@ -3,6 +3,7 @@ package org.vadere.simulator.models.bhm.helpers.navigation;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.simulator.models.bhm.UtilsBHM;
+import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
@@ -80,6 +81,15 @@ public class NavigationProximity implements INavigation {
 		//return newEnd;
 	}
 
+	private boolean otherPedIsCloserToTarget(PedestrianBHM me, Pedestrian  other) {
+		IPotentialFieldTarget myTargetPotential = me.getPotentialFieldTarget();
+
+		double myDistanceToTarget = myTargetPotential.getPotential(me.getPosition(), me);
+		double otherDistanceToTarget = myTargetPotential.getPotential(other.getPosition(), other);
+
+		return otherDistanceToTarget < myDistanceToTarget;
+	}
+
 	@Override
 	public VPoint getNavigationPosition() {
 
@@ -98,7 +108,7 @@ public class NavigationProximity implements INavigation {
 		if (me.evadesTangentially()) {
 			Pedestrian collisionPed = me.findCollisionPedestrian(result, false);
 
-			if (collisionPed != null) {
+			if (collisionPed != null && otherPedIsCloserToTarget(me, collisionPed)) {
 				targetDirection = false;
 
 				// walk away if currently in a collision
