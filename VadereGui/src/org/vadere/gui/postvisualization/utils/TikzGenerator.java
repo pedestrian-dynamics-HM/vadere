@@ -26,8 +26,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.awt.geom.PathIterator.*;
@@ -82,8 +83,9 @@ public class TikzGenerator {
 		translationTable[SEG_CLOSE] = "";
 	}
 
+	// Methods
 	public void generateTikz(final File file, EXPORT_OPTION exportOption) {
-		String tikzCodeColorDefinitions = generateTikzColorDefinitions(model);
+		String tikzCodeColorDefinitions = TikzStyleGenerator.generateTikzColorDefinitions(model.getConfig());
 		String tikzCodeScenarioElements = convertScenarioElementsToTikz(exportOption);
 
 		String tikzOutput = "" +
@@ -95,16 +97,16 @@ public class TikzGenerator {
                 "% Change scaling to [x=1mm,y=1mm] if TeX reports \"Dimension too large\".\n" +
 				"\\begin{tikzpicture}\n" +
 				"[x=1cm,y=1cm,\n" +
-				generateTikzStyles() +
+				TikzStyleGenerator.generateTikzStyles(model.getConfig().getPedestrianTorso()) +
 				"]\n" +
 				tikzCodeScenarioElements +
 				"\\end{tikzpicture}\n" +
 				"\\end{document}\n";
 
-		// TODO: maybe uses Java's resources notation (in general, writing the file should be done by the caller not here).
+		// TODO: Maybe uses Java's resources notation (in general, writing the file should be done by the caller not here).
 		try {
 			file.createNewFile();
-			Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+			Writer out = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
 			out.write(tikzOutput);
 			out.flush();
 			logger.info("generate new TikZ: " + file.getAbsolutePath());
@@ -112,60 +114,6 @@ public class TikzGenerator {
 			logger.error(e1.getMessage());
 			e1.printStackTrace();
 		}
-	}
-
-	// TODO: Move style methods to new class "TikzStyleGenerator" (maybe, with only static methods).
-	private String generateTikzColorDefinitions(SimulationModel<? extends DefaultSimulationConfig> model) {
-		String colorDefinitions = "% Color Definitions\n";
-
-		String colorTextPattern = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
-
-		Color sourceColor = model.getConfig().getSourceColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
-
-		Color targetColor = model.getConfig().getTargetColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
-
-		Color targetChangerColor = model.getConfig().getTargetChangerColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "TargetChangerColor", targetChangerColor.getRed(), targetChangerColor.getGreen(), targetChangerColor.getBlue());
-
-		Color absorbingAreaColor = model.getConfig().getAbsorbingAreaColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "AbsorbingAreaColor", absorbingAreaColor.getRed(), absorbingAreaColor.getGreen(), absorbingAreaColor.getBlue());
-
-		Color obstacleColor = model.getConfig().getObstacleColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
-
-		Color stairColor = model.getConfig().getStairColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
-
-		Color measurementAreaColor = model.getConfig().getMeasurementAreaColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "MeasurementAreaColor", measurementAreaColor.getRed(), measurementAreaColor.getGreen(), measurementAreaColor.getBlue());
-
-		Color agentColor = model.getConfig().getPedestrianDefaultColor();
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
-
-		colorDefinitions += String.format(Locale.US, colorTextPattern, "AgentIdColor", 255, 127, 0); // This orange color is hard-coded in "DefaultRenderer".
-		colorDefinitions += "\n";
-
-		double opacityBetweenZeroAndOne = model.getConfig().getMeasurementAreaAlpha() / 255.0;
-		colorDefinitions += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
-
-		colorDefinitions += "\n";
-
-		return colorDefinitions;
-	}
-
-	private String generateTikzStyles() {
-		String tikzStyles = "";
-
-		tikzStyles += "trajectory/.style={line width=1},\n";
-		tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", model.getConfig().getPedestrianTorso());
-		tikzStyles += "walkdirection/.style={black, line width=1},\n";
-		tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
-		tikzStyles += "group/.style={},\n";
-		tikzStyles += "voronoi/.style={black, line width=1}\n";
-
-		return tikzStyles;
 	}
 
 	private String convertScenarioElementsToTikz(EXPORT_OPTION exportOption) {
