@@ -405,15 +405,6 @@ public class PedestrianBHM extends Pedestrian {
 		}
 	}
 
-	// TODO: Think if method works as expected. If so, above method should use "collidesWithObstacle(pos, 0)"!
-	public boolean collidesWithObstacle(VPoint position, double allowedMargin) {
-		if (detectObstacleProximity(position, getRadius() + allowedMargin).isEmpty()) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	/**
 	 * This does not check collisions on the path, just collisions with position!
 	 */

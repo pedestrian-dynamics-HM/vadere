@@ -59,7 +59,9 @@ public class NavigationEvasion implements INavigation {
             VPoint possiblePosition = getNextPosition(currentWalkingDirection, rotation, stepLengthTrial);
 
             if (collideWithPedestrian(possiblePosition, me.getRadius(), closePedestrians) == false) {
-                if (me.collidesWithObstacle(possiblePosition, -0.1) == false) {
+                // If we try to keep the default distance from walls (= me.getRadius()), agents walk into obstacles.
+                // But strangely, if we reduce the distance, agents do not collide with walls.
+                if (me.detectObstacleProximity(possiblePosition, me.getRadius() - 0.1).isEmpty()) {
                     nextPosition = possiblePosition;
                     break;
                 }

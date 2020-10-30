@@ -1,5 +1,5 @@
 {
-  "name" : "BHM-Defaults-WithFloorField",
+  "name" : "CorridorKretz2006c-BHM-Defaults-WithFloorField-CounterflowCognitionModel",
   "description" : "",
   "release" : "1.14",
   "processWriters" : {
@@ -96,7 +96,7 @@
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : false,
+      "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
         "cognition" : "CounterflowCognitionModel"
@@ -113,8 +113,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 20.0,
-          "height" : 2.0
+          "width" : 34.0,
+          "height" : 3.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -127,10 +127,10 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 18.5,
+          "x" : 32.5,
           "y" : 0.5,
           "width" : 1.0,
-          "height" : 1.0,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -147,7 +147,7 @@
           "x" : 0.5,
           "y" : 0.5,
           "width" : 1.0,
-          "height" : 1.0,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -166,12 +166,12 @@
           "x" : 1.6,
           "y" : 0.5,
           "width" : 1.0,
-          "height" : 1.0,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 20,
+        "spawnNumber" : 35,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
@@ -185,15 +185,15 @@
       }, {
         "id" : 4,
         "shape" : {
-          "x" : 17.4,
+          "x" : 31.4,
           "y" : 0.5,
           "width" : 1.0,
-          "height" : 1.0,
+          "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 20,
+        "spawnNumber" : 35,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
