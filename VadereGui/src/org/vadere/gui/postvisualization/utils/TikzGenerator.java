@@ -34,7 +34,10 @@ import java.util.stream.Collectors;
 import static java.awt.geom.PathIterator.*;
 
 /**
- * Convert the (Java) scenario description into a TikZ representation.
+ * Convert the (Java) scenario elements to a TikZ representation.
+ *
+ * The conversion is done by using a simple Java-to-TikZ translation table.
+ * This generator loops over all scenario elements and converts them to TikZ code.
  *
  * Usually, each (Java) scenario element is represented as a path via
  * @see PathIterator This PathSeparator must be converted into its TikZ
@@ -133,8 +136,8 @@ public class TikzGenerator {
 				exportBounds.getX() + exportBounds.getWidth(),
 				exportBounds.getY() + exportBounds.getHeight());
 
-		// Draw background elements first, then other scenario elements.
-		generatedCode += "% Ground\n";
+		// Draw background elements first, then other scenario elements on top.
+		generatedCode += "% Background\n";
 		String groundTextPattern = (config.isShowGrid()) ? "\\draw[help lines] (%f,%f) grid (%f,%f);\n" : "\\fill[white] (%f,%f) rectangle (%f,%f);\n";
 		generatedCode += String.format(Locale.US, groundTextPattern,
 				topography.getBounds().x,
@@ -142,61 +145,11 @@ public class TikzGenerator {
 				topography.getBounds().x + topography.getBounds().width,
 				topography.getBounds().y + topography.getBounds().height);
 
-		// TODO: Maybe, extract method createTikzCodeForScenarioElement(boolean enabled, List<ScenarioElement> elements, String labelPrefix, String fillColor)!
-		if (config.isShowTargetChangers()) {
-			generatedCode += "% Target Changers\n";
-			for (TargetChanger targetChanger : topography.getTargetChangers()) {
-				VPoint centroid = targetChanger.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (TargetChanger%d) at (%f,%f); %% Centroid: TargetChanger %d\n", targetChanger.getId(), centroid.x, centroid.y, targetChanger.getId());
-				generatedCode += String.format(Locale.US, "\\fill[TargetChangerColor] %s;\n", generatePathForScenarioElement(targetChanger));
-			}
-		} else {
-			generatedCode += "% Target Changers (not enabled in config)\n";
-		}
-
-		if (config.isShowSources()) {
-			generatedCode += "% Sources\n";
-			for (Source source : topography.getSources()) {
-				VPoint centroid = source.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (Source%d) at (%f,%f); %% Centroid: Source %d\n", source.getId(), centroid.x, centroid.y, source.getId());
-				generatedCode += String.format(Locale.US, "\\fill[SourceColor] %s;\n", generatePathForScenarioElement(source));
-			}
-		} else {
-			generatedCode += "% Sources (not enabled in config)\n";
-		}
-
-		if (config.isShowTargets()) {
-			generatedCode += "% Targets\n";
-			for (Target target : topography.getTargets()) {
-				VPoint centroid = target.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (Target%d) at (%f,%f); %% Centroid: Target %d\n", target.getId(), centroid.x, centroid.y, target.getId());
-				generatedCode += String.format(Locale.US, "\\fill[TargetColor] %s;\n", generatePathForScenarioElement(target));
-			}
-		} else {
-			generatedCode += "% Targets (not enabled in config)\n";
-		}
-
-		if (config.isShowAbsorbingAreas()) {
-			generatedCode += "% Absorbing Areas\n";
-			for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
-				VPoint centroid = absorbingArea.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (AbsorbingArea%d) at (%f,%f); %% Centroid: AbsorbingArea %d\n", absorbingArea.getId(), centroid.x, centroid.y, absorbingArea.getId());
-				generatedCode += String.format(Locale.US, "\\fill[AbsorbingAreaColor] %s;\n", generatePathForScenarioElement(absorbingArea));
-			}
-		} else {
-			generatedCode += "% Absorbing Areas (not enabled in config)\n";
-		}
-
-		if (config.isShowObstacles()) {
-			generatedCode += "% Obstacles\n";
-			for (Obstacle obstacle : topography.getObstacles()) {
-				VPoint centroid = obstacle.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (Obstacle%d) at (%f,%f); %% Centroid: Obstacle %d\n", obstacle.getId(), centroid.x, centroid.y, obstacle.getId());
-				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
-			}
-		} else {
-			generatedCode += "% Obstacles (not enabled in config)\n";
-		}
+		generatedCode += createTikzCodeForScenarioElement(config.isShowTargetChangers(), topography.getTargetChangers(), "TargetChanger", "TargetChangerColor");
+		generatedCode += createTikzCodeForScenarioElement(config.isShowSources(), topography.getSources(), "Source", "SourceColor");
+		generatedCode += createTikzCodeForScenarioElement(config.isShowTargets(), topography.getTargets(), "Target", "TargetColor");
+		generatedCode += createTikzCodeForScenarioElement(config.isShowAbsorbingAreas(), topography.getAbsorbingAreas(), "AbsorbingArea", "AbsorbingAreaColor");
+		generatedCode += createTikzCodeForScenarioElement(config.isShowObstacles(), topography.getObstacles(), "Obstacle", "ObstacleColor");
 
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";
@@ -274,7 +227,7 @@ public class TikzGenerator {
         	int id=1;
 			for(Obstacle obstacle : Topography.createObstacleBoundary(topography)) {
 				VPoint centroid = obstacle.getShape().getCentroid();
-				generatedCode += String.format(Locale.US, "\\coordinate (BoundaryObstacle%d) at (%f,%f); %% Centroid: BoundaryObstacle %d\n", id, centroid.x, centroid.y, obstacle.getId());
+				generatedCode += String.format(Locale.US, "\\coordinate (TopographyBoundary%d) at (%f,%f); %% Centroid: TopographyBoundary %d\n", id, centroid.x, centroid.y, obstacle.getId());
 				generatedCode += String.format(Locale.US, "\\fill[ObstacleColor] %s;\n", generatePathForScenarioElement(obstacle));
 				id++;
 			}
@@ -308,13 +261,72 @@ public class TikzGenerator {
 		return exportBounds;
 	}
 
+	private String createTikzCodeForScenarioElement(boolean enabled, List<? extends ScenarioElement> scenarioElements, String labelPrefix, String fillColor) {
+		String generatedCode = String.format("%% %s(s) (not enabled in config)\n", labelPrefix);
+
+		if (enabled) {
+			generatedCode = String.format("%% %s(s)\n", labelPrefix);
+			for (ScenarioElement element : scenarioElements) {
+				VPoint centroid = element.getShape().getCentroid();
+
+				generatedCode += String.format(Locale.US, "\\coordinate (%s%d) at (%f,%f); %% Centroid: %s%d\n",
+						labelPrefix, element.getId(),
+						centroid.x, centroid.y,
+						labelPrefix, element.getId());
+
+				generatedCode += String.format(Locale.US, "\\fill[%s] %s;\n", fillColor, generatePathForScenarioElement(element));
+			}
+		}
+
+		return generatedCode;
+	}
+
+	private String generatePathForScenarioElement(ScenarioElement element) {
+		return generatePathForShape(element.getShape());
+	}
+
+	private String generatePathForShape(Shape shape) {
+		String generatedPath = "";
+
+		AffineTransform noTransformation = new AffineTransform();
+		PathIterator pathIterator = shape.getPathIterator(noTransformation);
+
+		while (!pathIterator.isDone()) {
+			float[] coords = new float[6];
+			int type = pathIterator.currentSegment(coords);
+
+			generatedPath += convertJavaToTikzPath(type, coords);
+			pathIterator.next();
+		}
+
+		return generatedPath.trim();
+	}
+
+	private String convertJavaToTikzPath(int type, float[] coords) {
+		if (type < SEG_MOVETO || type > SEG_CLOSE) {
+			throw new IllegalStateException(String.format(Locale.US, "Cannot process path segment type: %d (coordinates: %s)", type, Arrays.toString(coords)));
+		}
+
+		String convertedPath = translationTable[type];
+
+		if (type == SEG_MOVETO) {
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
+		} else if (type == SEG_LINETO) {
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
+		} else if (type == SEG_QUADTO) {
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3]);
+		} else if (type == SEG_CUBICTO) {
+			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+		}
+
+		return convertedPath;
+	}
+
 	private String drawTrajectories(PostvisualizationConfig config, PostvisualizationModel model) {
 		// Use a thread-safe string implementation because streams are used here.
 		final StringBuffer generatedCode = new StringBuffer("");
 
 		if (config.isShowTrajectories()) {
-			generatedCode.append(String.format(Locale.US, "%% Trajectory of all Agents at simTimeInSec %f\n",model.getSimTimeInSec()));
-
 			Collection<Agent> agents = model.getAgents();
 
 			TableTrajectoryFootStep trajectories = model.getTrajectories();
@@ -537,23 +549,6 @@ public class TikzGenerator {
 		return String.format("{rgb,255: red,%d; green,%d; blue,%d}", color.getRed(), color.getGreen(), color.getBlue());
 	}
 
-	private String generatePathForScenarioElement(ScenarioElement element) {
-		String generatedPath = "";
-
-		AffineTransform noTransformation = new AffineTransform();
-		PathIterator pathIterator = element.getShape().getPathIterator(noTransformation);
-
-		while (!pathIterator.isDone()) {
-			float[] coords = new float[6];
-			int type = pathIterator.currentSegment(coords);
-
-			generatedPath += convertJavaToTikzPath(type, coords);
-			pathIterator.next();
-		}
-
-		return generatedPath.trim();
-	}
-
 	private String generatePathForStairs(Stairs element) {
 		String generatedPath = "";
 
@@ -571,23 +566,6 @@ public class TikzGenerator {
 
 		return generatedPath.trim();
 	}
-
-    private String generatePathForShape(Shape shape) {
-        String generatedPath = "";
-
-        AffineTransform noTransformation = new AffineTransform();
-        PathIterator pathIterator = shape.getPathIterator(noTransformation);
-
-        while (!pathIterator.isDone()) {
-            float[] coords = new float[6];
-            int type = pathIterator.currentSegment(coords);
-
-            generatedPath += convertJavaToTikzPath(type, coords);
-            pathIterator.next();
-        }
-
-        return generatedPath.trim();
-    }
 
 	private String drawVoronoiDiagram(final VoronoiDiagram voronoiDiagram) {
 		String voronoiDiagramAsTikz = "";
@@ -659,23 +637,4 @@ public class TikzGenerator {
 		return voronoiDiagramAsTikz;
 	}
 
-	private String convertJavaToTikzPath(int type, float[] coords) {
-		if (type < SEG_MOVETO || type > SEG_CLOSE) {
-			throw new IllegalStateException(String.format(Locale.US, "Cannot process path segment type: %d (coordinates: %s)", type, Arrays.toString(coords)));
-		}
-
-		String convertedPath = translationTable[type];
-
-		if (type == SEG_MOVETO) {
-			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
-		} else if (type == SEG_LINETO) {
-			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1]);
-		} else if (type == SEG_QUADTO) {
-			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3]);
-		} else if (type == SEG_CUBICTO) {
-			convertedPath = String.format(Locale.US, convertedPath, coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
-		}
-
-		return convertedPath;
-	}
 }
