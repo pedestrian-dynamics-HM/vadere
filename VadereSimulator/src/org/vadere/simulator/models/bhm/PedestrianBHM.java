@@ -101,7 +101,7 @@ public class PedestrianBHM extends Pedestrian {
 		}
 	}
 
-	private boolean isPotentialFieldInUse() {
+	public boolean isPotentialFieldInUse() {
 		return potentialFieldTarget != null;
 	}
 
@@ -341,20 +341,11 @@ public class PedestrianBHM extends Pedestrian {
 
 		Pedestrian collision = findCollisionPedestrian(position, true);
 
-		if (collision != null &&  otherPedIsCloserToTarget(this, collision)) {
+		if (collision != null && TopographyHelper.otherPedestrianIsCloserToTarget(topography,this, collision)) {
 			isCollision = true;
 		}
 
 		return isCollision;
-	}
-
-	private boolean otherPedIsCloserToTarget(PedestrianBHM me, Pedestrian  other) {
-		IPotentialFieldTarget myTargetPotential = me.getPotentialFieldTarget();
-
-		double myDistanceToTarget = myTargetPotential.getPotential(me.getPosition(), me);
-		double otherDistanceToTarget = myTargetPotential.getPotential(other.getPosition(), other);
-
-		return otherDistanceToTarget < myDistanceToTarget;
 	}
 
 	/**

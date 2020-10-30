@@ -1,6 +1,7 @@
 package org.vadere.simulator.utils.topography;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -125,6 +126,28 @@ public class TopographyHelper {
                 .collect(Collectors.toList());
 
         return closestPedestrians;
+    }
+
+    public static boolean otherPedestrianIsCloserToTarget(Topography topography, PedestrianBHM me, Pedestrian  other) {
+        boolean otherIsCloserToTarget = false;
+
+        if (me.isPotentialFieldInUse()) { // Use geodetic distance
+            double myDistanceToTarget = me.getPotentialFieldTarget().getPotential(me.getPosition(), me);
+            double otherDistanceToTarget = me.getPotentialFieldTarget().getPotential(other.getPosition(), other);
+
+            otherIsCloserToTarget = otherDistanceToTarget < myDistanceToTarget;
+        } else { // Use Euclidean distance
+            Target myTarget = topography.getTarget(me.getNextTargetId());
+
+            if (myTarget != null) {
+                double myDistanceToTarget = myTarget.getShape().distanceToCenter(me.getPosition());
+                double otherDistanceToTarget = myTarget.getShape().distanceToCenter(other.getPosition());
+
+                otherIsCloserToTarget = otherDistanceToTarget < myDistanceToTarget;
+            }
+        }
+
+        return otherIsCloserToTarget;
     }
 
     public static boolean pedestrianIsBlockedByObstacle(Pedestrian pedestrian, Topography topography) {
