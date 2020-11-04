@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_ok",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -28,13 +28,12 @@
         "stepLengthDeviation" : true,
         "navigationCluster" : false,
         "navigationFollower" : false,
-        "followerProximityNavigation" : true,
-        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : false,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
+        "followerProximityNavigation" : false,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -99,12 +98,6 @@
         "cognition" : "CooperativeCognitionModel"
       }
     },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null,
-      "arguments" : [ ],
-      "requiredDataProcessorIds" : [ ]
-    },
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -125,7 +118,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 2
+        "id" : -1
       }, {
         "shape" : {
           "x" : 1.0,
@@ -134,7 +127,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 3
+        "id" : -1
       }, {
         "shape" : {
           "x" : 1.0,
@@ -143,7 +136,7 @@
           "height" : 19.5,
           "type" : "RECTANGLE"
         },
-        "id" : 4
+        "id" : -1
       }, {
         "shape" : {
           "x" : 1.0,
@@ -152,7 +145,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 5
+        "id" : -1
       }, {
         "shape" : {
           "x" : 33.0,
@@ -161,7 +154,7 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "id" : 6
+        "id" : -1
       }, {
         "shape" : {
           "x" : 2.5,
@@ -170,7 +163,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 7
+        "id" : -1
       }, {
         "shape" : {
           "x" : 2.5,
@@ -179,7 +172,7 @@
           "height" : 16.4,
           "type" : "RECTANGLE"
         },
-        "id" : 8
+        "id" : -1
       }, {
         "shape" : {
           "x" : 2.5,
@@ -188,7 +181,7 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 9
+        "id" : -1
       }, {
         "shape" : {
           "x" : 24.0,
@@ -197,7 +190,7 @@
           "height" : 12.5,
           "type" : "RECTANGLE"
         },
-        "id" : 10
+        "id" : -1
       }, {
         "shape" : {
           "x" : 20.1,
@@ -206,7 +199,7 @@
           "height" : 11.4,
           "type" : "RECTANGLE"
         },
-        "id" : 11
+        "id" : -1
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -231,7 +224,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 12,
+        "id" : -1,
         "shape" : {
           "x" : 16.0,
           "y" : 2.0,

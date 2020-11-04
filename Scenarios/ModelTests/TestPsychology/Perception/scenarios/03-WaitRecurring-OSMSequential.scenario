@@ -1,7 +1,7 @@
 {
   "name" : "03-WaitRecurring-OSMSequential",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -95,10 +95,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

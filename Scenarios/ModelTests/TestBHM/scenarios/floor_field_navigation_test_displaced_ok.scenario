@@ -1,7 +1,7 @@
 {
   "name" : "floor_field_navigation_test_displaced_ok",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -28,13 +28,12 @@
         "stepLengthDeviation" : true,
         "navigationCluster" : false,
         "navigationFollower" : false,
-        "followerProximityNavigation" : true,
-        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
         "sidewaysEvasion" : true,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
+        "followerProximityNavigation" : false,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -98,12 +97,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null,
-      "arguments" : [ ],
-      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {

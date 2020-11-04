@@ -66,7 +66,7 @@ public class OfflineSimulation {
 				.map(t -> t.getAgent(step.getStepNumber()))
 				.filter(opt -> opt.isPresent()).forEach(opt -> topography.addElement(opt.get()));
 		return new SimulationState(vadere.getName(), topography, vadere.getScenarioStore(),
-				(step.getStepNumber()-1) * vadere.getAttributesSimulation().getSimTimeStepLength(), step.getStepNumber(), null, null);
+				(step.getStepNumber()-1) * vadere.getAttributesSimulation().getSimTimeStepLength(), step.getStepNumber(),  null);
 	}
 
 	private void prepareOutput() {
