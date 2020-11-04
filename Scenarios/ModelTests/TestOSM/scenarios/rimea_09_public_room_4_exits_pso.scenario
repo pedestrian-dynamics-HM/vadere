@@ -1,7 +1,7 @@
 {
   "name" : "rimea_09_public_room_4_exits_pso",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -144,10 +144,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {

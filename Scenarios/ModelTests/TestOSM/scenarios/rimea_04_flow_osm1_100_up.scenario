@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_100_up",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -99,10 +99,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
