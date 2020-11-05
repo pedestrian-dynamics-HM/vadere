@@ -28,13 +28,13 @@ public class InfoPanel extends JPanel implements Observer {
 
 	private final IDefaultModel defaultModel;
 	private JLabel lblScenarioSizeLabel;
-	private JLabel lblGridResulutionLabel;
+	private JLabel lblGridResolutionLabel;
 	private JLabel lblCursorPositionLabel;
 	private JLabel lblScaleFactorLabel;
 	private JLabel lblScenarioHashLabel;
 
 	private JLabel lblScenarioSizeValue;
-	private JLabel lblGridResulutionValue;
+	private JLabel lblGridResolutionValue;
 	private JLabel lblCursorPositionValue;
 	private JLabel lblScaleFactorValue;
 	private JLabel lblScenarioHashValue;
@@ -45,19 +45,19 @@ public class InfoPanel extends JPanel implements Observer {
 		this.defaultModel = defaultModel;
 		setLayout(new FlowLayout(FlowLayout.LEFT));
 		lblScenarioSizeLabel = new JLabel(Messages.getString("InfoPanel.ScenarioSize.label") + ":");
-		lblGridResulutionLabel = new JLabel(Messages.getString("InfoPanel.GridResolution.label") + ":");
+		lblGridResolutionLabel = new JLabel(Messages.getString("InfoPanel.GridResolution.label") + ":");
 		lblCursorPositionLabel = new JLabel(Messages.getString("InfoPanel.CursorPosition.label") + ":");
 		lblScaleFactorLabel = new JLabel(Messages.getString("InfoPanel.ScaleFactor.label") + ":");
 		lblScenarioHashLabel = new JLabel(Messages.getString("InfoPanel.ScenarioHash.label") + ":");
 
 		lblScaleFactorValue = new JLabel();
 		lblScenarioSizeValue = new JLabel();
-		lblGridResulutionValue = new JLabel();
+		lblGridResolutionValue = new JLabel();
 		lblCursorPositionValue = new JLabel();
 		lblScenarioHashValue = new JLabel();
 
-		add(lblGridResulutionLabel);
-		add(lblGridResulutionValue);
+		add(lblGridResolutionLabel);
+		add(lblGridResolutionValue);
 
 		add(lblScenarioSizeLabel);
 		add(lblScenarioSizeValue);
@@ -82,15 +82,39 @@ public class InfoPanel extends JPanel implements Observer {
 				clipboard.setContents(stringSelection, null);
 			}
 		});
+
+		setToolTips();
+	}
+
+	private void setToolTips() {
+		String unitLengthText = String.format("%s: [%s]",
+				Messages.getString("Units.title"),
+				Messages.getString("Units.length"));
+
+		lblScenarioSizeLabel.setToolTipText(unitLengthText);
+		lblScenarioSizeValue.setToolTipText(unitLengthText);
+
+		lblGridResolutionLabel.setToolTipText(unitLengthText);
+		lblGridResolutionValue.setToolTipText(unitLengthText);
+
+		lblCursorPositionLabel.setToolTipText(unitLengthText);
+		lblCursorPositionValue.setToolTipText(unitLengthText);
+
+		String unitDimensionlessText = String.format("%s: [%s]",
+				Messages.getString("Units.title"),
+				Messages.getString("Units.dimensionless"));
+
+		lblScaleFactorLabel.setToolTipText(unitDimensionlessText);
+		lblScaleFactorValue.setToolTipText(unitDimensionlessText);
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		if (defaultModel.getTopography() != null) {
-			lblGridResulutionValue.setText(String.format("%3.2f | ", defaultModel.getGridResolution()));
 			Rectangle2D.Double topographyBound = defaultModel.getTopographyBound();
 
-			lblScenarioSizeValue.setText(String.format("%3.2f %3.2f | ", (float) topographyBound.getWidth(),
+			lblGridResolutionValue.setText(String.format("%3.2f [m] | ", defaultModel.getGridResolution()));
+			lblScenarioSizeValue.setText(String.format("(%3.2f x %3.2f) [m] | ", (float) topographyBound.getWidth(),
 					(float) topographyBound.getHeight()));
 			lblCursorPositionValue
 					.setText(String.format("%3.2f %3.2f | ", (float) defaultModel.getMousePosition().getX(),
