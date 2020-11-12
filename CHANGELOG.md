@@ -2,7 +2,7 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-## In Progress:
+## v1.15 (2020-11-12)
 
 ### Added
 
@@ -44,6 +44,10 @@
 
 ### Changed
 
+- Refactored EikMesh code.
+- Refactored psychology-related code and added several test scenarios.
+- Refactored TikZ generator code.
+- The behavioral heuristics model (BHM) can now be used with a floor field. I.e., BHM agents are able to derive the geodetic distance to their targets instead of using the Euclidean distance.
 - The "Time" slider in the PostVis uses the resolution of the "Res." slider instead of using a fixed step size of 0.4 seconds.
 - The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
