@@ -4,10 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Stairs;
+import org.vadere.state.psychology.cognition.GroupMembership;
+import org.vadere.state.scenario.*;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -359,6 +357,13 @@ public abstract class DefaultRenderer {
 		g.setColor(c);
 	}
 
+	protected void renderPedestrianInOutGroup(final Graphics2D g, Pedestrian pedestrian) {
+		Color groupMembershipColor = defaultModel.getConfig().getGroupMembershipColor(pedestrian.getGroupMembership());
+		g.setColor(groupMembershipColor);
+		g.setStroke(new BasicStroke(getSelectedShapeBorderLineWidth()));
+		draw(pedestrian.getShape(), g);
+	}
+
 
 	protected static void drawArrow(Graphics2D g2, double theta, double x0, double y0) {
 		float barb = 0.3f;
@@ -668,7 +673,10 @@ public abstract class DefaultRenderer {
 			@NotNull final Graphics2D g,
 			@NotNull final IMesh<?, ?, ?> mesh,
 			@NotNull final VRectangle bound) {
-		MeshRenderer<?, ?, ?> meshRenderer = new MeshRenderer<>(mesh);
+
+		MeshRenderer<?, ?, ?> meshRenderer = new MeshRenderer<>(mesh, false);
+
+		meshRenderer.renderPostTransform(g, bound);
 		//meshRenderer.renderGraphics(g, bound);
 	}
 

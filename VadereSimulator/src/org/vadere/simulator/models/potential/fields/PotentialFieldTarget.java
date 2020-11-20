@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.potential.fields;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.projects.Domain;
@@ -132,7 +133,10 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		}
 
 		int targetId = agent.getNextTargetId();
+		return getPotential(pos, targetId, agent);
+	}
 
+	private double getPotential(@NotNull final IPoint pos, final int targetId, @Nullable final Object caller) {
 		// the agent has reached his current target
 		if (domain.getTopography().getTarget(targetId).getShape().contains(pos)) {
 			return 0.0;
@@ -143,12 +147,17 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		// Since we iterate over ALL obstacle shapes which might be complex polygons
 		// this loop can be very computational expensive.
 		// TODO: introduce a data structure such that we only have to check one or a view shapes.
-		if(attributes.getCreateMethod().isUsingCellGrid()) {
+		/*if(attributes.getCreateMethod().isUsingCellGrid()) {
 			for (ScenarioElement b : domain.getTopography().getObstacles()) {
 				if (b.getShape().contains(pos)) {
 					return Double.MAX_VALUE;
 				}
 			}
+		}*/
+
+		// point lies outside
+		if(domain.getTopography().distanceToObstacle(pos, caller) <= 0) {
+			return Double.MAX_VALUE;
 		}
 
 		/* Find minimal potential of given targets. */
@@ -161,7 +170,17 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 		}
 
 		EikonalSolver eikonalSolver = optEikonalSolver.get();
-		return eikonalSolver.getPotential(pos, agent);
+		if(caller == null) {
+			return eikonalSolver.getPotential(pos);
+		} else {
+			return eikonalSolver.getPotential(pos, caller);
+		}
+
+	}
+
+	@Override
+	public double getPotential(@NotNull final IPoint pos, final int targetId) {
+		return getPotential(pos, targetId, null);
 	}
 
 	/**

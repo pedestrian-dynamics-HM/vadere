@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
-import org.vadere.state.scenario.Topography;
+import org.vadere.simulator.projects.Domain;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public interface PassiveCallback {
 
 	void postUpdate(double simTimeInSec);
 
-	void setTopography(Topography scenario);
+	void setDomain(Domain scenario);
 
 	default void setPotentialFieldTarget(@Nullable IPotentialFieldTarget potentialFieldTarget){}
 

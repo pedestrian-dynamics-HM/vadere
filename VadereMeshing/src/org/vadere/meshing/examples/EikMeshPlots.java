@@ -1,15 +1,24 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
+import org.vadere.meshing.utils.color.Colors;
+import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -17,16 +26,21 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Script to construct Tikz-Plots for different edge length functions and geometries
@@ -62,6 +76,8 @@ public class EikMeshPlots {
 
 		//uniformRing(0.3);
 		randomDelaunay();
+		//discSubtractRect2(0.1);
+		//squareInSquare(0.1);
 	}
 
 	public static void randomDelaunay() throws IOException, InterruptedException {
@@ -73,7 +89,7 @@ public class EikMeshPlots {
 
 		PDelaunayTriangulator dt = new PDelaunayTriangulator(points);
 		dt.generate();
-		write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_before");
+		//write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_before");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
 		var meshImprover = new PEikMesh(
@@ -93,7 +109,7 @@ public class EikMeshPlots {
 		meshImprover.finish();
 		meshPanel.repaint();
 
-		var meshImprover2 = new PEikMesh(
+		/*var meshImprover2 = new PEikMesh(
 				p -> 0.05 + 0.2 * Math.sqrt(p.getY() * p.getY() / 20.0 + p.getX() * p.getX() / 20.0),
 				dt.getTriangulation(),
 				true
@@ -105,10 +121,8 @@ public class EikMeshPlots {
 			meshPanel.repaint();
 			System.out.println("imp");
 		}
-		System.out.println("end");
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_after");
-
-
+		System.out.println("end");*/
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_after");
 	}
 
 	public static void kaiserslautern() throws IOException, InterruptedException {
@@ -255,6 +269,46 @@ public class EikMeshPlots {
 		meshPanel.display("A");
 	}
 
+	/*
+	102 -0.3 -0.4
+103 1.3 -0.4
+104 1.3 0.4
+105 -0.3 0.4
+	 */
+
+	/*public static void eikMeshAirfoil(double h0) throws IOException, InterruptedException {
+		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/airfoil.poly");
+		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
+
+		VRectangle rectangle = new VRectangle(-0.3, -0.4, 1.6, 0.8);
+
+		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg);
+		edgeLengthFunctionApprox.smooth(0.05);
+		IDistanceFunction distanceFunction = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
+
+		IDistanceFunction aifoil = p -> {
+			double x = p.getX();
+			double y = 5 * (0.2969 * Math.sqrt(x) - 0.1260 * x - 0.3516 * x * x + 0.2843 * x * x * x - 0.1015 * x * x * x * x);
+		};
+
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, rectangle, Arrays.asList(rectangle), () -> new PMesh());
+		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
+		meshPanel.display("Airfoil");
+		int it = 1;
+		while (it < 200) {
+			meshImprover.improve();
+			it++;
+			synchronized (meshImprover.getMesh()) {
+				meshPanel.repaint();
+			}
+			Thread.sleep(100);
+		}
+		//meshImprover.generate();
+		//write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_airfoil_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+	}*/
+
 	public static void distanceFuncCombination(double h0) throws IOException {
 		// define your holes
 		VRectangle rect = new VRectangle(-0.5, -0.5, 1, 1);
@@ -299,6 +353,42 @@ public class EikMeshPlots {
 				h0,
 				GeometryUtils.boundRelative(boundary.getPath()),
 				Arrays.asList(rect)
+		);
+
+		// generate the mesh
+		meshImprover.generate();
+
+		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
+
+		// (optional) define the gui to display the mesh
+		PMeshPanel meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800);
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f -> lightBlue, 10.0f)), "eikmesh_disc_rect_non_uniform_" + Double.toString(h0).replace('.', '_'));
+
+		// display the mesh
+		meshPanel.display("Combined distance functions " + h0);
+	}
+
+	public static void squareInSquare(double h0) throws IOException {
+		// define your holes
+		VRectangle innerRect = new VRectangle(-1, -1, 2, 2);
+		VRectangle outerRect = new VRectangle(-3, -3, 6, 6);
+
+		//IDistanceFunction d_in = IDistanceFunction.create(innerRect);
+		//IDistanceFunction d_out = IDistanceFunction.create(outerRect);
+
+		//IDistanceFunction d_in = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1;
+		IDistanceFunction d_in = p -> p.distanceToOrigin() - 1;
+		IDistanceFunction d_out = IDistanceFunction.create(outerRect);
+		IDistanceFunction d = IDistanceFunction.substract(d_out, d_in);
+
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh(
+				d,
+				h -> h0,
+				Collections.EMPTY_LIST,
+				h0,
+				GeometryUtils.boundRelative(outerRect.getPath()),
+				Arrays.asList(outerRect),
+				() -> new PMesh()
 		);
 
 		// generate the mesh
@@ -484,4 +574,70 @@ public class EikMeshPlots {
 				"\\end{document}";
 	}
 
+
+
+
+	private static String printQualities(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh, Function<PFace, Double> rho){
+		StringBuilder builder = new StringBuilder();
+		for(PFace face : mesh.getFaces()) {
+			double quality = rho.apply(face);
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(quality);
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
+
+	private static String printQualities(int iteration, Distmesh mesh, Function<VTriangle, Double> rho){
+		StringBuilder builder = new StringBuilder();
+		for(VTriangle triangle : mesh.getTriangles()) {
+			double quality = rho.apply(triangle);
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(quality);
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
+
+	private static String printAngles(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh){
+		StringBuilder builder = new StringBuilder();
+		for(PFace face : mesh.getFaces()) {
+
+			for(PHalfEdge edge : mesh.getEdges(face)) {
+				VPoint p1 = mesh.toPoint(edge);
+				VPoint p2 = mesh.toPoint(mesh.getNext(edge));
+				VPoint p3 = mesh.toPoint(mesh.getPrev(edge));
+				builder.append(iteration);
+				builder.append(" ");
+				builder.append(GeometryUtils.angle(p1, p2, p3));
+				builder.append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private static String printAngles(int iteration, Distmesh distmesh){
+		StringBuilder builder = new StringBuilder();
+		for(VTriangle face : distmesh.getTriangles()) {
+
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(GeometryUtils.angle(face.p1, face.p2, face.p3));
+			builder.append("\n");
+
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(GeometryUtils.angle(face.p3, face.p1, face.p2));
+			builder.append("\n");
+
+			builder.append(iteration);
+			builder.append(" ");
+			builder.append(GeometryUtils.angle(face.p2, face.p3, face.p1));
+			builder.append("\n");
+
+		}
+		return builder.toString();
+	}
 }

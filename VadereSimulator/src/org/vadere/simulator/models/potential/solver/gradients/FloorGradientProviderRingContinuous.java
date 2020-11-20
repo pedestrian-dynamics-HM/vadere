@@ -83,7 +83,7 @@ public class FloorGradientProviderRingContinuous implements GradientProvider {
 			return;
 		}
 
-		// find angle
+		// find angle3D
 		double phi = Math.atan2(localPos[1], localPos[0]) + Math.PI;
 
 		// if the direction should be clockwise, invert phi
@@ -91,7 +91,7 @@ public class FloorGradientProviderRingContinuous implements GradientProvider {
 			phi = -phi;
 		}
 
-		// compute gradient based on angle
+		// compute gradient based on angle3D
 		grad[0] = -Math.sin(phi);
 		grad[1] = Math.cos(phi);
 

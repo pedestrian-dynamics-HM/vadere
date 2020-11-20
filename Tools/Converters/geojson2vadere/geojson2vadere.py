@@ -12,10 +12,6 @@
 #
 # 4. Insert output into "topography" tab of Vadere.
 #
-# Watch out: before running this script, install its dependencies using pip: 
-#
-#   pip install -r requirements.txt
-#
 # Example GeoJSON file:
 #
 #   {
@@ -164,7 +160,7 @@ def create_vadere_obstacle_from_vertices(vertices):
     return vadere_obstacle_as_string
 
 def create_vadere_topography_with_obstacles(obstacles, width, height):
-    with open("vadere_topography_template.txt", "r") as template_file:
+    with open("vadere_topography.template", "r") as template_file:
         vadere_topography_template = template_file.read()
 
     vadere_topography_string = Template(vadere_topography_template).substitute(obstacles=obstacles, width=width, height=height)

@@ -1,7 +1,7 @@
 {
   "name" : "NarrowCorridor_3_targets_2_waiting",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -229,7 +229,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 6 ],
         "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ {
         "attributes" : {
@@ -270,7 +271,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -318,7 +322,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : "TARGET_ORIENTED",
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

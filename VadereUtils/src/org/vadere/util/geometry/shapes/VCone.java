@@ -17,7 +17,7 @@ public class VCone {
 
 	public VCone(@NotNull final VPoint position, @NotNull final VPoint direction, double angle) {
 		if(angle <= 0 || angle >= Math.PI) {
-			throw new IllegalArgumentException("angle of a cone has to be greater than 0 and smaller than pi.");
+			throw new IllegalArgumentException("angle3D of a cone has to be greater than 0 and smaller than pi.");
 		}
 
 		this.position = position;

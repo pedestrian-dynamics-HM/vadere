@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_long_corr_4Group",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -158,7 +158,8 @@
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 5 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN"
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

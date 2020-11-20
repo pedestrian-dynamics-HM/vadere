@@ -59,7 +59,7 @@ public class QueueDetector extends EikonalSolverFMM {
     }
 
     @Override
-    public void initialize() {
+    public void solve() {
         IPedestrianLoadingStrategy loadingStrategy = IPedestrianLoadingStrategy.create();
         IGaussianFilter filter = IGaussianFilter.create(
                 topography.getBounds(),
@@ -85,7 +85,7 @@ public class QueueDetector extends EikonalSolverFMM {
         });
         orderedPoints.clear();
         filter.destroy();
-        super.initialize();
+        super.solve();
     }
 
     @Override

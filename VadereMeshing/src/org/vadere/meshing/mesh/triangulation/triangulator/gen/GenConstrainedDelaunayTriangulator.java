@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +57,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	private final Map<V, VLine> projectionMap;
 	private boolean generated;
 	private boolean conforming;
+	private boolean allowSegmentFaces;
 
 	public GenConstrainedDelaunayTriangulator(
 			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
@@ -75,9 +77,18 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final Collection<VLine> constrains,
 			final boolean confirming) {
+		this(triangulation, constrains, confirming, true);
+	}
+
+	public GenConstrainedDelaunayTriangulator(
+			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final Collection<VLine> constrains,
+			final boolean confirming,
+			final boolean allowSegmentFaces) {
 
 		this.conforming = confirming;
 		this.constrains = constrains;
+		this.allowSegmentFaces = allowSegmentFaces;
 		this.points = Collections.EMPTY_LIST;
 		this.vConstrains = new ArrayList<>(constrains.size());
 		this.eConstrains = new HashSet<>(constrains.size());
@@ -116,6 +127,10 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 			}
 		}
 
+		if(!allowSegmentFaces) {
+			split();
+		}
+
 		if(conforming) {
 			reinforceConformingCriteria();
 		}
@@ -125,6 +140,23 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		}
 
 		return triangulation;
+	}
+
+	private void split() {
+		List<E> edges = getMesh().getEdges();
+		for(E edge : edges) {
+			if(!eConstrains.contains(edge)) {
+				V v1 = getMesh().getVertex(edge);
+				V v2 = getMesh().getTwinVertex(edge);
+				if(isSegmentVertex(v1) && isSegmentVertex(v2)) {
+					getTriangulation().splitEdge(edge, true);
+				}
+			}
+		}
+	}
+
+	private boolean isSegmentVertex(@NotNull final V v) {
+		return getMesh().streamEdges(v).anyMatch(e -> eConstrains.contains(e));
 	}
 
 	// TODO: this is slow!

@@ -59,16 +59,16 @@ public class MeshExamples {
 		}*/
 		//eikMeshRandom();
 		//eikMeshGreenland();
-		ruppertsTriangulationKaiserslauternLarge();
+		//ruppertsTriangulationKaiserslauternLarge();
 		//ruppertsTriangulationPoly();
 		//ruppertsTriangulationPolyGreenland();
 //		delaunayTriangulation();
 		//dirichletRefinment();
 //		delaunayRefinment();
-		//constrainedDelaunayTriangulation();
+//		constrainedDelaunayTriangulation();
 		//eikMeshKaiserslautern();
 		//eikMeshKaiserslauternApprox();
-		//eikMeshA();
+		eikMeshA();
 		//eikMeshEik();
 	}
 
@@ -274,15 +274,15 @@ public class MeshExamples {
 		};
 
 		PMeshPanel panel = new PMeshPanel(dt.getMesh(), 1000, 1000);
-		//panel.display(" Voronoi Vertex Insertion");
+		panel.display(" Voronoi Vertex Insertion");
 
 		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
 		var eikMesh = new PEikMesh(
-				p -> 1.0 + Math.abs(bound.distance(p)),
+				p -> 1.0 /*+ Math.abs(bound.distance(p))*/,
 				dt.getTriangulation()
 		);
 
-		/*System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
 		while (!eikMesh.isFinished()) {
 			try {
 				Thread.sleep(30);
@@ -294,11 +294,11 @@ public class MeshExamples {
 				eikMesh.improve();
 			}
 			panel.repaint();
-		}*/
+		}
 
-		var recorder = new MovRecorder<>(eikMesh, panel.getMeshRenderer(), 1024, 800, eikMesh.getMesh().getBound());
-		recorder.record();
-		recorder.finish();
+		//var recorder = new MovRecorder<>(eikMesh, panel.getMeshRenderer(), 1024, 800, eikMesh.getMesh().getBound());
+		//recorder.record();
+		//recorder.finish();
 
 		//System.out.println(TexGraphGenerator.toTikz(eikMesh.getMesh()));
 		//System.out.println("finished");
@@ -580,7 +580,7 @@ public class MeshExamples {
 		//IDistanceFunction d = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
 		PEikMesh meshImprover = new PEikMesh(pslg.getSegmentBound(), 0.04, pslg.getHoles());
 
-		var panel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
+		var panel = new PMeshPanel(meshImprover.getMesh(), 500, 500);
 		panel.display("EikMesh");
 
 		while (!meshImprover.isFinished()) {
@@ -922,7 +922,7 @@ public class MeshExamples {
 
 
 	private static boolean  isLowOfQuality(@NotNull final VTriangle triangle) {
-		double alpha = 30; // lowest angle in degree
+		double alpha = 30; // lowest angle3D in degree
 		double radAlpha = Math.toRadians(alpha);
 
 		return GeometryUtils.angle(triangle.p1, triangle.p2, triangle.p3) < radAlpha

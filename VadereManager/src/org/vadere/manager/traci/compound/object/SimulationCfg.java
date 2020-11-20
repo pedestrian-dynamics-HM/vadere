@@ -22,10 +22,11 @@ public class SimulationCfg {
 	private String outputScalarFile;
 	private String outputVecFile;
 	private long seed;
+	private boolean useVadereSeed;
 
 	public SimulationCfg(CompoundObject obj) {
-		if (obj.size() != 9) {
-			throw new TraCIException("Expected at least 9 elements");
+		if (obj.size() != 10) {
+			throw new TraCIException("Expected at least 10 elements");
 		}
 		configName = (String) obj.getData(0, TraCIDataType.STRING);
 		experiment = (String) obj.getData(1, TraCIDataType.STRING);
@@ -36,6 +37,12 @@ public class SimulationCfg {
 		outputScalarFile = (String) obj.getData(6, TraCIDataType.STRING);
 		outputVecFile = (String) obj.getData(7, TraCIDataType.STRING);
 		seed = Long.valueOf((int) obj.getData(8, TraCIDataType.INTEGER));
+		int useVadereSeedVal = (Integer) obj.getData(9, TraCIDataType.U_BYTE);
+		if (useVadereSeedVal == 1){
+			useVadereSeed = true;
+		} else {
+			useVadereSeed = false;
+		}
 	}
 
 	public static CompoundObject asCompoundObject(String configName,
@@ -46,11 +53,13 @@ public class SimulationCfg {
 												  String repetition,
 												  String outputScalarFile,
 												  String outputVecFile,
-												  long seed) {
+												  long seed,
+												  boolean useVadereSeed) {
 		return CompoundObjectBuilder.builder()
 				.rest()
 				.add(TraCIDataType.STRING, 8)
 				.add(TraCIDataType.INTEGER)
+				.add(TraCIDataType.U_BYTE)
 				.build(configName,
 						experiment,
 						dateTime,
@@ -59,23 +68,15 @@ public class SimulationCfg {
 						repetition,
 						outputScalarFile,
 						outputVecFile,
-						seed);
+						seed,
+						useVadereSeed);
 	}
 
 	public String outputPath() {
-		if (outputVecFile.endsWith(".vec")) {
-			return outputVecFile.substring(0, outputVecFile.length() - 4);
-		}
-		if (outputScalarFile.endsWith(".sca")) {
-			return outputScalarFile.substring(0, outputScalarFile.length() - 4);
-		}
-		return String.format("%s/%s/%s/%s_vars_%s_rep_%s",
+		return String.format("%s/%s_%s/vadere.d",
 				resultRootDir,
 				configName,
-				experiment,
-				dateTime,
-				iterationVariables,
-				repetition
+				experiment
 		);
 	}
 
@@ -151,25 +152,34 @@ public class SimulationCfg {
 		this.seed = seed;
 	}
 
+	public boolean isUseVadereSeed() {
+		return useVadereSeed;
+	}
+
+	public void setUseVadereSeed(boolean useVadereSeed) {
+		this.useVadereSeed = useVadereSeed;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		SimulationCfg that = (SimulationCfg) o;
 		return seed == that.seed &&
-				configName.equals(that.configName) &&
-				experiment.equals(that.experiment) &&
-				dateTime.equals(that.dateTime) &&
-				resultRootDir.equals(that.resultRootDir) &&
-				iterationVariables.equals(that.iterationVariables) &&
-				repetition.equals(that.repetition) &&
-				outputScalarFile.equals(that.outputScalarFile) &&
-				outputVecFile.equals(that.outputVecFile);
+				useVadereSeed == that.useVadereSeed &&
+				Objects.equals(configName, that.configName) &&
+				Objects.equals(experiment, that.experiment) &&
+				Objects.equals(dateTime, that.dateTime) &&
+				Objects.equals(resultRootDir, that.resultRootDir) &&
+				Objects.equals(iterationVariables, that.iterationVariables) &&
+				Objects.equals(repetition, that.repetition) &&
+				Objects.equals(outputScalarFile, that.outputScalarFile) &&
+				Objects.equals(outputVecFile, that.outputVecFile);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(configName, experiment, dateTime, resultRootDir, iterationVariables, repetition, outputScalarFile, outputVecFile, seed);
+		return Objects.hash(configName, experiment, dateTime, resultRootDir, iterationVariables, repetition, outputScalarFile, outputVecFile, seed, useVadereSeed);
 	}
 
 	@Override
@@ -184,6 +194,7 @@ public class SimulationCfg {
 				", outputScalarFile='" + outputScalarFile + '\'' +
 				", outputVecFile='" + outputVecFile + '\'' +
 				", seed=" + seed +
+				", useVadereSeed=" + useVadereSeed +
 				'}';
 	}
 }

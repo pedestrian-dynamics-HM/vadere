@@ -457,9 +457,34 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getDepartedPedestrianId(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void simulationapi_getArrivedPedestrianIds(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void simulationapi_getPositionConversion(String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void simulationapi_getCoordinateReference(String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_getTime(String[] args) throws IOException {
 		TraCIResponse res = simulationapi.getTime();
 		System.out.println(res.toString());
+	}
+
+	@Override
+	public void simulationapi_getSimSte(String[] args) throws IOException {
+
 	}
 
 	@Override
@@ -599,6 +624,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void simulationapi_getNetworkBound(String[] args) throws IOException {
+
+	}
+
 	// vadere api
 
 	@Override
@@ -655,4 +685,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		System.out.println(res.toString());
 	}
 
+	@Override
+	public void personapi_setInformation(String[] args) throws IOException {
+
+	}
 }

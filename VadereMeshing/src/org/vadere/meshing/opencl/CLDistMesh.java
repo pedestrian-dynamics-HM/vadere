@@ -2,6 +2,7 @@ package org.vadere.meshing.opencl;
 
 import org.apache.commons.lang3.time.StopWatch;
 
+import org.lwjgl.system.Configuration;
 import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
@@ -16,6 +17,7 @@ import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.CLGatherer;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.opencl.CLInfo;
+import org.vadere.util.opencl.CLOperation;
 import org.vadere.util.opencl.CLUtils;
 import org.vadere.util.opencl.OpenCLException;
 
@@ -28,27 +30,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.opencl.CL10.*;
-import static org.lwjgl.opencl.CL10.clEnqueueNDRangeKernel;
 import static org.lwjgl.opencl.CL11.CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memUTF8;
 
 /**
  * @author Benedikt Zoennchen
  *
  * DistMesh GPU implementation.
  */
-public class CLDistMesh {
+public class CLDistMesh extends CLOperation {
 
     private static Logger log = Logger.getLogger(CLDistMesh.class);
-
-    // CL ids
-    private long clPlatform;
-    private long clDevice;
-    private long clContext;
-    private long clQueue;
-    private long clProgram;
 
     // CL kernel ids
     private long clKernelForces;
@@ -69,10 +62,6 @@ public class CLDistMesh {
 
     //private long clKernelRemoveTriangles;
     //private long clKernelCheckTriangles;
-
-    // CL callbacks
-    private CLContextCallback contextCB;
-    private CLProgramCallback programCB;
 
 
     // data on the host
@@ -140,18 +129,19 @@ public class CLDistMesh {
     private AMesh mesh;
 
     private boolean doublePrecision = true;
-    private boolean profiling = true;
 
     private List<IPoint> result;
     private boolean hasToRead = false;
 
-    public CLDistMesh(@NotNull AMesh mesh) {
-        /*if(profiling) {
+    public CLDistMesh(@NotNull final AMesh mesh) {
+    	super(CL_DEVICE_TYPE_GPU);
+    	profiling = true;
+        if(profiling) {
             Configuration.DEBUG.set(true);
             Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
             Configuration.DEBUG_STACK.set(true);
             Configuration.DEBUG_STACK.set(true);
-        }*/
+        }
 
         this.mesh = mesh;
         this.mesh.garbageCollection();
@@ -188,126 +178,21 @@ public class CLDistMesh {
         this.result = mesh.streamPoints().collect(Collectors.toList());
     }
 
-    private void initCallbacks() {
-        contextCB = CLContextCallback.create((errinfo, private_info, cb, user_data) ->
-        {
-            log.warn("[LWJGL] cl_context_callback");
-            log.warn("\tInfo: " + memUTF8(errinfo));
-        });
-
-        programCB = CLProgramCallback.create((program, user_data) ->
-        {
-        	try {
-		        log.info("The cl_program [0x"+program+"] was built " + (CLInfo.getProgramBuildInfoInt(program, clDevice, CL_PROGRAM_BUILD_STATUS) == CL_SUCCESS ? "successfully" : "unsuccessfully"));
-		        String message = CLInfo.getProgramBuildInfoStringASCII(program, clDevice, CL_PROGRAM_BUILD_LOG);
-		        if (!message.isEmpty()) {
-			        log.info("BUILD LOG:\n----\n"+message+"\n-----");
-		        }
-	        }
-	        catch (OpenCLException e) {
-        		log.error(e.getMessage());
-	        }
-        });
-    }
-
-    private void initCL() throws OpenCLException {
-        try (MemoryStack stack = stackPush()) {
-            // helper for the memory allocation in java
-            //stack = MemoryStack.stackPush();
-            IntBuffer errcode_ret = stack.callocInt(1);
-
-            IntBuffer numberOfPlatforms = stack.mallocInt(1);
-            clGetPlatformIDs(null, numberOfPlatforms);
-            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-            clGetPlatformIDs(platformIDs, numberOfPlatforms);
-
-            clPlatform = platformIDs.get(0);
-
-            IntBuffer numberOfDevices = stack.mallocInt(1);
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
-            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
-
-            clDevice = deviceIDs.get(0);
-
-            printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
-
-            PointerBuffer ctxProps = stack.mallocPointer(3);
-            ctxProps.put(CL_CONTEXT_PLATFORM)
-                    .put(clPlatform)
-                    .put(NULL)
-                    .flip();
-
-            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-
-            if(profiling) {
-                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
-            }
-            else {
-                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-            }
-
-            CLInfo.checkCLError(errcode_ret);
-
-            PointerBuffer pp = stack.mallocPointer(1);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-            maxGroupSize = pp.get(0);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
-            maxComputeUnits = pp.get(0);
-            log.info("MAX_GRP_SIZE = " + maxGroupSize);
-            log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
-        }
-    }
-
     private void buildProgram() throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
             // helper for the memory allocation in java
             //stack = MemoryStack.stackPush();
             IntBuffer errcode_ret = stack.mallocInt(1);
 
-            IntBuffer numberOfPlatforms = stack.mallocInt(1);
-            clGetPlatformIDs(null, numberOfPlatforms);
-            PointerBuffer platformIDs = stack.mallocPointer(numberOfPlatforms.get(0));
-            clGetPlatformIDs(platformIDs, numberOfPlatforms);
-
-            clPlatform = platformIDs.get(0);
-
-            IntBuffer numberOfDevices = stack.mallocInt(1);
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, null, numberOfDevices);
-            PointerBuffer deviceIDs = stack.mallocPointer(numberOfDevices.get(0));
-            clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, deviceIDs, numberOfDevices);
-
-            clDevice = deviceIDs.get(0);
-
-            printDeviceInfo(clDevice, "CL_DEVICE_NAME", CL_DEVICE_NAME);
-
-            PointerBuffer ctxProps = stack.mallocPointer(3);
-            ctxProps.put(CL_CONTEXT_PLATFORM)
-                    .put(clPlatform)
-                    .put(NULL)
-                    .flip();
-
-            clContext = clCreateContext(ctxProps, clDevice, contextCB, NULL, errcode_ret);
-            CLInfo.checkCLError(errcode_ret);
-
-            if (profiling) {
-                clQueue = clCreateCommandQueue(clContext, clDevice, CL_QUEUE_PROFILING_ENABLE, errcode_ret);
-            } else {
-                clQueue = clCreateCommandQueue(clContext, clDevice, 0, errcode_ret);
-            }
-
-            CLInfo.checkCLError(errcode_ret);
-
-            PointerBuffer pp = stack.mallocPointer(1);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
-            maxGroupSize = pp.get(0);
-            clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
-            maxComputeUnits = pp.get(0);
-            log.info("MAX_GRP_SIZE = " + maxGroupSize);
-            log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
-            PointerBuffer clProgramStrings = stack.mallocPointer(1);
-            PointerBuffer clProgramLengths = stack.mallocPointer(1);
+	        PointerBuffer pp = stack.mallocPointer(1);
+	        clGetDeviceInfo(clDevice, CL_DEVICE_MAX_WORK_GROUP_SIZE, pp, null);
+	        maxGroupSize = pp.get(0);
+	        clGetDeviceInfo(clDevice, CL_DEVICE_MAX_COMPUTE_UNITS, pp, null);
+	        maxComputeUnits = pp.get(0);
+	        log.info("MAX_GRP_SIZE = " + maxGroupSize);
+	        log.info("MAX_COMPUTE_UNITS = " + maxComputeUnits);
+	        PointerBuffer clProgramStrings = stack.mallocPointer(1);
+	        PointerBuffer clProgramLengths = stack.mallocPointer(1);
 
             try {
                 if (doublePrecision) {
@@ -318,7 +203,6 @@ public class CLDistMesh {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
 
             clProgramStrings.put(0, source);
             clProgramLengths.put(0, source.remaining());
@@ -554,12 +438,12 @@ public class CLDistMesh {
         }
     }*/
 
-    public boolean step() {
+    public boolean step() throws OpenCLException {
         return step(true);
     }
 
     // TODO: think about the use of only 1 work-group!!! It might be bad! solution: use global barrier? force computation? flip hangs after some time?
-    public boolean step(final boolean flipAll) {
+    public boolean step(final boolean flipAll) throws OpenCLException {
         try (MemoryStack stack = stackPush()) {
              /*
              * DistMesh-Loop
@@ -643,25 +527,6 @@ public class CLDistMesh {
             clFinish(clQueue);
 
             return false;
-        }
-    }
-
-    private long enqueueNDRangeKernel(final String name, long command_queue, long kernel, int work_dim, PointerBuffer global_work_offset, PointerBuffer global_work_size, PointerBuffer local_work_size, PointerBuffer event_wait_list, PointerBuffer event) {
-        if(profiling) {
-            long result = clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, clEvent);
-            clWaitForEvents(clEvent);
-            long eventAddr = clEvent.get();
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_START, startTime, retSize);
-            clGetEventProfilingInfo(eventAddr, CL_PROFILING_COMMAND_END, endTime, retSize);
-            clEvent.clear();
-            // in nanaSec
-            log.info(name + " event time " + "0x"+eventAddr + ": " + (endTime.getLong() - startTime.getLong()) + " ns");
-            endTime.clear();
-            startTime.clear();
-            return result;
-        }
-        else {
-            return clEnqueueNDRangeKernel(command_queue, kernel, work_dim, global_work_offset, global_work_size, local_work_size, event_wait_list, event);
         }
     }
 
@@ -861,7 +726,8 @@ public class CLDistMesh {
         return tmp;
     }
 
-    private void clearCL() {
+    @Override
+    protected void clearCL() throws OpenCLException {
         clReleaseMemObject(clVertices);
         clReleaseMemObject(clEdges);
         clReleaseMemObject(clTwins);
@@ -888,13 +754,7 @@ public class CLDistMesh {
         clReleaseKernel(clKernelRepair);
         clReleaseKernel(clKernelLabelEdges);
         clReleaseKernel(clKernelLabelEdgesUpdate);
-
-        clReleaseProgram(clProgram);
-        clReleaseCommandQueue(clQueue);
-        clReleaseContext(clContext);
-
-        contextCB.close();
-        programCB.close();
+	    super.clearCL();
     }
 
     private void clearHost() {
@@ -955,11 +815,10 @@ public class CLDistMesh {
         //printResult();
     }
 
-    public void finish() {
+    public void finish() throws OpenCLException {
         refresh();
         clearHost();
         clearCL();
-
     }
 
     private void printTri() {

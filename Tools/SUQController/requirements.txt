@@ -1,5 +1,5 @@
 setuptools>=39.1.0
 fabric==2.4.0
-pandas>=0.24.0,<1.0.0
+pandas>=1.0.3
 numpy>=1.17.0
 scikit-learn>=0.21.0

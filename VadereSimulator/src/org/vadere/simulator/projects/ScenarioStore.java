@@ -38,7 +38,7 @@ public class ScenarioStore {
 	private StimulusInfoStore stimulusInfoStore;
 
 	public ScenarioStore(final String name, final String description, final String mainModel, final List<Attributes> attributesModel,
-			final AttributesSimulation attributesSimulation, final Topography topography) {
+						 final AttributesSimulation attributesSimulation, final Topography topography) {
 		this(name, description, mainModel, attributesModel, attributesSimulation, new AttributesPsychology(), topography, new StimulusInfoStore());
 	}
 
@@ -109,6 +109,7 @@ public class ScenarioStore {
 		this.attributesPsychology = attributesPsychology;
 	}
 
+
 	public void removeAttributesIf(@NotNull final Predicate<Attributes> predicate) {
 		attributesList.removeIf(predicate);
 	}
@@ -124,6 +125,7 @@ public class ScenarioStore {
 	public void setMainModel(final String mainModel) {
 		this.mainModel = mainModel;
 	}
+
 
 	public void setName(final String name) {
 		this.name = name;
@@ -148,6 +150,7 @@ public class ScenarioStore {
 	public String getMainModel() {
 		return mainModel;
 	}
+
 
 	public String getName() {
 		return name;

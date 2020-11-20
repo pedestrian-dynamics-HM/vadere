@@ -17,7 +17,7 @@ public class JGaussianFilter extends GaussianFilter {
 		long ms = System.currentTimeMillis();
 		outputMatrix = Convolution.convolveSeperate(inputMatrix, kernel, kernel, matrixWidth, matrixHeight, kernelWidth);
 		ms = System.currentTimeMillis() - ms;
-		IGaussianFilter.logger.infof("filtering required " + ms + "[ms]");
+		IGaussianFilter.logger.debug("filtering required " + ms + "[ms]");
 	}
 
     @Override

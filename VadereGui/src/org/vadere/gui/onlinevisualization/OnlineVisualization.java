@@ -9,6 +9,7 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.control.simulation.PassiveCallback;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -25,7 +26,7 @@ public class OnlineVisualization implements PassiveCallback {
 	 */
 	public class ObservationAreaSnapshotData {
 		public final double simTimeInSec;
-		public final Topography scenario;
+		public final Domain domain;
 		public final IPotentialField potentialFieldTarget;
 		public final Agent selectedAgent;
 		public final IPotentialField potentialField;
@@ -33,13 +34,13 @@ public class OnlineVisualization implements PassiveCallback {
 
 		public ObservationAreaSnapshotData(
 				final double simTimeInSec,
-				@NotNull final Topography scenario,
+				@NotNull final Domain scenario,
 				@Nullable final IPotentialField potentialFieldTarget,
 				@Nullable final IPotentialField potentialField,
 				@Nullable final Agent selectedAgent,
 				@Nullable final Function<Agent, IMesh<?, ?, ?>> discretizations) {
 			this.simTimeInSec = simTimeInSec;
-			this.scenario = scenario;
+			this.domain = scenario;
 			this.potentialFieldTarget = potentialFieldTarget;
 			this.potentialField = potentialField;
 			this.selectedAgent = selectedAgent;
@@ -50,7 +51,7 @@ public class OnlineVisualization implements PassiveCallback {
 	private MainPanel window;
 	private OnlineVisualisationWindow onlineVisualisationPanel;
 	private OnlineVisualizationModel model;
-	private Topography scenario;
+	private Domain domain;
 
 	/**
 	 * Target potential.
@@ -75,8 +76,8 @@ public class OnlineVisualization implements PassiveCallback {
 	}
 
 	@Override
-	public void setTopography(final Topography scenario) {
-		this.scenario = scenario;
+	public void setDomain(final Domain domain) {
+		this.domain = domain;
 	}
 
     @Override
@@ -146,7 +147,7 @@ public class OnlineVisualization implements PassiveCallback {
 				pedPotentialField = IPotentialField.copyAgentField(potentialField, selectedAgent, new VRectangle(model.getTopographyBound()), 0.1);
 			}
 
-			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, scenario.clone(), pft, pedPotentialField, selectedAgent, discretizations);
+			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, domain.clone(), pft, pedPotentialField, selectedAgent, discretizations);
 			model.pushObservationAreaSnapshot(data);
 		}
 	}

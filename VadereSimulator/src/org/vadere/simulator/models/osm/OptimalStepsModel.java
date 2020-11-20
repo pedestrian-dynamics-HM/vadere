@@ -211,7 +211,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 						}
 						);
 			*/}
-			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random);
+			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random, getPotentialFieldAgent().getMaximalInfluenceRadius());
 		}
 	}
 
@@ -237,11 +237,19 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	 */
 	@Override
 	public <T extends DynamicElement> PedestrianOSM createElement(VPoint position, int id, Class<T> type) {
+			return createElement(position, id, this.attributesPedestrian, type);
+	}
+
+	@Override
+	public <T extends DynamicElement> PedestrianOSM createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+		AttributesAgent aAttr = (AttributesAgent)attr;
+
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
 		AttributesAgent pedAttributes = new AttributesAgent(
-				this.attributesPedestrian, registerDynamicElementId(domain.getTopography(), id));
+				aAttr, registerDynamicElementId(domain.getTopography(), id));
 
 		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
 		return pedestrianOSM;

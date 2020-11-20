@@ -44,7 +44,7 @@ public class PotentialFieldObstacleOSM implements PotentialFieldObstacle {
 		double repulsion = 0;
 		//for (Obstacle obstacle : obstacles) {
 
-			double distance = domain.getTopography().distanceToObstacle(pos) - pedestrian.getRadius();
+			double distance = domain.getTopography().distanceToObstacle(pos, pedestrian) - pedestrian.getRadius();
 
 			// Shapes of pedestrians are assumed to be circles.
 			/*double distance = obstacle.getShape().distance(pos)

@@ -16,6 +16,7 @@ public class SimulationState {
 	private final int step;
 	private final String name;
 	private final MainModel mainModel;
+	private boolean simStop = false;
 
 	protected SimulationState(final String name,
 							  final Topography topography,
@@ -29,7 +30,6 @@ public class SimulationState {
 		this.step = step;
 		this.scenarioStore = scenarioStore;
 		this.mainModel = mainModel;
-
 	}
 
 	@Deprecated
@@ -75,4 +75,15 @@ public class SimulationState {
 	public Optional<MainModel> getMainModel() {
 		return Optional.ofNullable(mainModel);
 	}
+
+	public  void setSimStop(boolean stop){
+		if (!this.simStop)
+			this.simStop = stop;
+	}
+
+	public boolean isSimStop() {
+		return simStop;
+	}
+
+
 }

@@ -8,7 +8,7 @@
     "type" : "RECTANGLE"
   },
   "reachDistance" : 0.0,
-  "nextTargetIsPedestrian" : false,
+  "changeAlgorithmType" : "SELECT_ELEMENT",
   "nextTarget" : [-1],
-  "probabilityToChangeTarget" : 0.0
+  "probabilityToChangeTarget" : [0.3]
 }

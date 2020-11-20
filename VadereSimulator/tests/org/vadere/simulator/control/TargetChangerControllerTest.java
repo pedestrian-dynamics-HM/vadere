@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
@@ -115,7 +116,9 @@ public class TargetChangerControllerTest {
     }
 
     private AttributesTargetChanger createAttributesWithFixedRectangle() {
-        return new AttributesTargetChanger(new VRectangle(4, 1, 2, 8), 1);
+        AttributesTargetChanger a =new AttributesTargetChanger(new VRectangle(4, 1, 2, 8), 1);
+        a.setNextTarget(createIntegerList(-1));
+        return a;
     }
 
     private TargetChangerController createTargetChangerController(TargetChanger targetChanger) {
@@ -159,11 +162,13 @@ public class TargetChangerControllerTest {
     @Test
     public void updateChangesTargetListOfAffectedPedestrianIfProbabilityIsOne() {
         LinkedList<Integer> nextTarget = createIntegerList(2);
-        double probability = 1.0;
+
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -187,11 +192,11 @@ public class TargetChangerControllerTest {
         pedestrians.get(1).setNextTargetListIndex(nextTargetIndex);
 
         LinkedList<Integer> nextTarget = createIntegerList(2);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -207,11 +212,11 @@ public class TargetChangerControllerTest {
     @Test
     public void updateDoesNotChangeTargetListOfAffectedPedestrianIfProbabilityIsZero() {
         LinkedList<Integer> nextTarget = createIntegerList(2);
-        double probability = 0.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(0.0)); // must be 0
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -229,12 +234,13 @@ public class TargetChangerControllerTest {
     @Test
     public void targetChangerWithListOfTargetsAndStaticTargets() {
         LinkedList<Integer> nextTarget = createIntegerList(2, 1);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0,1.0)); // must be 1
         pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SORTED_SUB_LIST);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -249,15 +255,40 @@ public class TargetChangerControllerTest {
     }
 
     @Test
-    public void targetChangerWithListOfTargetsAndDynamicTargets() { //must choose first element
-        LinkedList<Integer> nextTarget = createIntegerList(1, 2);
-        double probability = 1.0;
+    public void targetChangerSkipFirstTargetInListOftaticTargets() {
+        LinkedList<Integer> nextTarget = createIntegerList(2, 1);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(0.0,1.0)); // must be 1
         pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SORTED_SUB_LIST);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListEqual(pedestrians.get(1).getTargets(), createIntegerList( 1));
+    }
+
+
+
+    @Test
+    public void targetChangerWithListOfTargetsAndDynamicTargets() { //must choose first element
+        LinkedList<Integer> nextTarget = createIntegerList(1);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -272,14 +303,119 @@ public class TargetChangerControllerTest {
     }
 
     @Test
-    public void updateAddsTargetPedestrianToTopographyIfTargetIsDynamic() {
-        LinkedList<Integer> nextTarget = createIntegerList(1);
-        double probability = 1.0;
+    public void targetChangerSelectOneOffList() { //must choose first element
+        LinkedList<Integer> nextTarget = createIntegerList(1, 2, 3);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(0.0, 0.0, 1.0)); // must be 1
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), 3);
+    }
+
+    @Test
+    public void targetChangerSelectOneOffListOrDoNothing() { //must choose first element
+        LinkedList<Integer> nextTarget = createIntegerList(1, 2, 3);
+        // probability size == nextTarget.size + 1. Last probability means change nothing.
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(0.0, 0.0, 0.0, 1.0)); // must be 1
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertListContainsSingleTarget(pedestrians.get(0).getTargets(), createIntegerList(1));
+        assertListContainsSingleTarget(pedestrians.get(1).getTargets(), createIntegerList(1));
+    }
+
+    @Test
+    public void targetChangerSelectOneOffListRelativeProb() { //must choose first element
+        LinkedList<Integer> nextTarget = createIntegerList(2, 3,4);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(10.0, 10.0, 20.0)); // (.25, .25, .50)
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        Pedestrian p = pedestrians.get(1);
+        ArrayList<Integer> targets = new ArrayList<>();
+        TargetChangerAlgorithm alg = controllerUnderTest.getChangerAlgorithm();
+        for(int i = 0; i < 10000; i++){
+            p.setTargets(createIntegerList(1));
+            alg.setAgentTargetList(p);
+            assertEquals(1, p.getTargets().size());
+            targets.add(p.getTargets().getFirst());
+        }
+        Map<Integer, Long> counts = targets.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+        assertEquals(0.25, (double)counts.get(2)/10000, 0.01);
+        assertEquals(0.25, (double)counts.get(3)/10000, 0.01);
+        assertEquals(0.5, (double)counts.get(4)/10000, 0.01);
+    }
+
+    @Test
+    public void targetChangerSelectOneOffListSameRelativeProb() { //must choose first element
+        LinkedList<Integer> nextTarget = createIntegerList(2, 3,4);
+        LinkedList<Double> probability = new LinkedList<Double>(); // (.33, .33, .33)
+        pedestrians.forEach(p -> p.setTargets(createIntegerList(1)));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+        Pedestrian p = pedestrians.get(1);
+        ArrayList<Integer> targets = new ArrayList<>();
+        TargetChangerAlgorithm alg = controllerUnderTest.getChangerAlgorithm();
+        for(int i = 0; i < 10000; i++){
+            p.setTargets(createIntegerList(1));
+            alg.setAgentTargetList(p);
+            assertEquals(1, p.getTargets().size());
+            targets.add(p.getTargets().getFirst());
+        }
+        Map<Integer, Long> counts = targets.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+        assertEquals(0.33, (double)counts.get(2)/10000, 0.01);
+        assertEquals(0.33, (double)counts.get(3)/10000, 0.01);
+        assertEquals(0.33, (double)counts.get(4)/10000, 0.01);
+    }
+
+    @Test
+    public void updateAddsTargetPedestrianToTopographyIfTargetIsDynamic() {
+        LinkedList<Integer> nextTarget = createIntegerList(1);
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(nextTarget);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -296,12 +432,12 @@ public class TargetChangerControllerTest {
     @Test
     public void updateChangesTargetListOfAffectedPedestrianIfTargetIsDynamic() {
         LinkedList<Integer> nextTarget = createIntegerList(1);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -320,12 +456,12 @@ public class TargetChangerControllerTest {
     @Test
     public void updateModifiesFollowersIfTargetIsDynamic() {
         LinkedList<Integer> nextTarget = createIntegerList(1);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -342,7 +478,8 @@ public class TargetChangerControllerTest {
     @Test
     public void updateModifiesPedestrianWithExistingFollwersIfTargetIsDynamic() {
         LinkedList<Integer> nextTarget = createIntegerList(1);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
+
 
         // Add two new agents were one follows the other.
         List<Pedestrian> newPedestrians = createTwoPedestrianWithTargetT1(3);
@@ -359,8 +496,8 @@ public class TargetChangerControllerTest {
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -377,12 +514,12 @@ public class TargetChangerControllerTest {
     @Test
     public void updateUseStaticTargetAsFallbackIfNoPedestrianIsFoundIfTargetIsDynamic() {
         LinkedList<Integer> nextTarget = createIntegerList(3);
-        double probability = 1.0;
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0)); // must be 1
 
         AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
         attributesTargetChanger.setNextTarget(nextTarget);
-        attributesTargetChanger.setNextTargetIsPedestrian(true);
-        attributesTargetChanger.setProbabilityToChangeTarget(probability);
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
@@ -398,6 +535,87 @@ public class TargetChangerControllerTest {
 
         List<Target> targetPedestrians = topography.getTargets().stream().filter(target -> target instanceof TargetPedestrian).collect(Collectors.toList());
         assertEquals(0, targetPedestrians.size());
+    }
+
+    // check IllegalArgumentException in nextTarget and probability size setup for each algorithm
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkFollowPedestrianTarget(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1,2,3));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(Arrays.asList(1.0)));
+
+        // only one nextTarget needed
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkFollowPedestrianTargetWronProb(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1,2,3));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.FOLLOW_PERSON);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(Arrays.asList(1.1)));
+
+        // only one nextTarget needed
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkSelectElementTargetToFew(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1, 2, 3, 4));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(
+                Arrays.asList(0.7, 0.5)));
+
+        // to few probabilities. (same size or one more than nextTargets)
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkSelectElementTargetToMany(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1, 2, 3, 4));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_ELEMENT);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(
+                Arrays.asList(0.7, 0.5, 0.1, 0.1, 0.0, 0.0)));
+
+        // to many probabilities. (same size or one more than nextTargets)
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkListTarget(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1, 2, 3, 4));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_LIST);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(
+                Arrays.asList(0.7, 0.5)));
+
+        // only one probability.
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkSubListTarget(){
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setNextTarget(createIntegerList(1, 2, 3, 4));
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SORTED_SUB_LIST);
+        attributesTargetChanger.setProbabilitiesToChangeTarget(new LinkedList<Double>(
+                Arrays.asList(0.7, 1.0, 0.3)));
+
+        // must be same number
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = createTargetChangerController(targetChanger);
+
+
     }
 
     private void assertListContainsSingleTarget(LinkedList<Integer> targetList, Integer targetId) {

@@ -1,8 +1,8 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -88,6 +88,7 @@ public class Simulation {
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
 
+
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
 					  ICognitionModel cognitionModel, double startTimeInSec,
 					  final String name, ScenarioStore scenarioStore,
@@ -101,6 +102,8 @@ public class Simulation {
 		this.mainModel = mainModel;
 		this.perceptionModel = perceptionModel;
 		this.cognitionModel = cognitionModel;
+
+
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
@@ -137,7 +140,7 @@ public class Simulation {
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
-			pc.setTopography(topography);
+			pc.setDomain(domain);
 		}
 	}
 
@@ -201,7 +204,7 @@ public class Simulation {
 		}
 
 		simulationState = initialSimulationState();
-		topographyController.preLoop(simTimeInSec);
+		topographyController.preLoop(simTimeInSec, scenarioStore.getAttributesList());
 		isRunSimulation = true;
 		simTimeInSec = startTimeInSec;
 
@@ -288,6 +291,22 @@ public class Simulation {
 					c.postUpdate(simTimeInSec);
 				}
 
+				double stopTime = runTimeInSec;
+				if (this.simulationState.isSimStop()) {
+					// get stopTime if the simulation should finish before finish time. New finish time = stop time
+					stopTime = this.simTimeInSec;
+				}
+
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
+					// do nothing here. This is done after the  Remote Control Hook
+				} else {
+					// inform Remote Control Hook that simulation is stopped before
+					// static runTimeInSec is reached.
+					isRunSimulation = false;
+					remoteRunListeners.forEach(e-> e.simulationStoppedEarlyListener(simTimeInSec));
+					if (stopTime < runTimeInSec) {
+						logger.info("Run simulation until time t=" + stopTime +"s is reached."); }
+				}
 
 				// Single step hook
 				// Remote Control Hook
@@ -316,11 +335,10 @@ public class Simulation {
 				}
 
 
-				if (runTimeInSec + startTimeInSec > simTimeInSec + 1e-7) {
+				if (stopTime + startTimeInSec > simTimeInSec + 1e-7) {
 					simTimeInSec += Math.min(attributesSimulation.getSimTimeStepLength(), runTimeInSec + startTimeInSec - simTimeInSec);
-				} else {
-					isRunSimulation = false;
 				}
+
 
 				//remove comment to fasten simulation for evacuation simulations
 				//if (topography.getElements(Pedestrian.class).size() == 0){
@@ -357,6 +375,7 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+
 		updateScenarioElements(simTimeInSec);
 
 		updatePsychologyLayer(simTimeInSec);
@@ -397,6 +416,7 @@ public class Simulation {
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}
 
+
 	private void updatePsychologyLayer(double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
@@ -409,6 +429,8 @@ public class Simulation {
 			pedestrians.stream().forEach(pedestrian -> pedestrian.setMostImportantStimulus(elapsedTime));
 		}
 	}
+
+
 
 	private void updateLocomotionLayer(double simTimeInSec) {
 		for (Model m : models) {

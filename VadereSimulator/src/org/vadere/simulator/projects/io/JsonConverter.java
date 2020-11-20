@@ -3,15 +3,12 @@ package org.vadere.simulator.projects.io;
 import java.io.IOException;
 import java.util.List;
 
+import org.vadere.state.attributes.*;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
-import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesPsychology;
-import org.vadere.state.attributes.AttributesSimulation;
-import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
@@ -52,8 +49,11 @@ public class JsonConverter {
 
 		AttributesSimulation attributesSimulation = StateJsonConverter.deserializeAttributesSimulationFromNode(scenarioNode.get(AttributesSimulation.JSON_KEY));
 		AttributesPsychology attributesPsychology = StateJsonConverter.deserializeAttributesPsychologyFromNode(scenarioNode.get(AttributesPsychology.JSON_KEY));
+
+
 		JsonNode attributesModelNode = scenarioNode.get("attributesModel");
-		String mainModel = scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull() ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
+		String mainModel = (!scenarioNode.has(StateJsonConverter.MAIN_MODEL_KEY) ||
+				scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull()) ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
 		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
 		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
@@ -99,9 +99,9 @@ public class JsonConverter {
 	private static void serializeMeta(ObjectNode node, boolean commitHashIncluded, ScenarioStore scenarioStore) {
 		node.put("name", scenarioStore.getName());
 		node.put("description", scenarioStore.getDescription());
-		node.put("release", HashGenerator.releaseNumber());
+		node.put("release", Version.releaseNumber());
 		if (commitHashIncluded)
-			node.put("commithash", HashGenerator.commitHash());
+			node.put("commithash", Version.getVersionControlCommitHash());
 	}
 
 	private static ObjectNode serializeVadereNode(ScenarioStore scenarioStore) {
@@ -133,10 +133,12 @@ public class JsonConverter {
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
 		JsonNode attributesPsychologyNode = StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class);
+
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		ObjectNode stimulusNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
 		JsonNode stimulusInfosArrayNode = stimulusNode.get("stimulusInfos");
+
 
 		if (stimulusInfosArrayNode == null) {
 			throw new IOException("Cannot clone scenario: No stimuli found!");
@@ -147,6 +149,7 @@ public class JsonConverter {
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode));
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode)
+				);
 	}
 }

@@ -19,6 +19,7 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
+import org.w3c.dom.Attr;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -90,14 +91,22 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	 * @return single Car-Object
 	 */
 	public <T extends DynamicElement> Agent createElement(VPoint position, int id, Class<T> type) {
+		return createElement(position, id, this.elementAttributes, type);
+	}
+
+	public <T extends DynamicElement> Agent createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+		AttributesCar aAttr = (AttributesCar)attr;
+
 		if (!Car.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("OVM cannot initialize " + type.getCanonicalName());
-		AttributesCar carAttributes = new AttributesCar(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
+		AttributesCar carAttributes = new AttributesCar(aAttr, registerDynamicElementId(domain.getTopography(), id));
 		Car result = new Car(carAttributes, random);
 		result.setPosition(position);
 		// result.setVelocity(result.getCarAttrributes().getDirection());
 		return result;
 	}
+
 
 	@Override
 	public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {

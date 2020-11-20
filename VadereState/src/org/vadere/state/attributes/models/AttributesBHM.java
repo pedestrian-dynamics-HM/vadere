@@ -18,15 +18,17 @@ public class AttributesBHM extends Attributes {
 	private double stepLengthSD = 0.036;
 	private boolean stepLengthDeviation = false;
 
+	// TODO: Remove boolean navigation variables (including migration). Instead, use new "NavigationBuilder".
 	private boolean navigationCluster = false;
 	private boolean navigationFollower = false;
-	private boolean directionWallDistance = false;
+	private boolean followerProximityNavigation = true;
+	private String navigationModel = "NavigationProximity";
 
+	private boolean directionWallDistance = false;
 	private boolean tangentialEvasion = true;
 	private boolean sidewaysEvasion = false;
 	private boolean onlyEvadeContraFlow = false;
 	private boolean makeSmallSteps = false;
-	private boolean followerProximityNavigation = true;
 
 	private boolean differentBehaviour = false;
 	private LinkedList<Double> differentEvasionBehaviourPercentage = new LinkedList<>();
@@ -78,6 +80,12 @@ public class AttributesBHM extends Attributes {
 		return navigationFollower;
 	}
 
+	public boolean isFollowerProximityNavigation() {
+		return followerProximityNavigation;
+	}
+
+	public String getNavigationModel() { return navigationModel; }
+
 	public boolean isDirectionWallDistance() {
 		return directionWallDistance;
 	}
@@ -98,9 +106,6 @@ public class AttributesBHM extends Attributes {
 		return makeSmallSteps;
 	}
 
-	public boolean isFollowerProximityNavigation() {
-		return followerProximityNavigation;
-	}
 
 	public double getEvasionDetourThreshold() {
 		return evasionDetourThreshold;

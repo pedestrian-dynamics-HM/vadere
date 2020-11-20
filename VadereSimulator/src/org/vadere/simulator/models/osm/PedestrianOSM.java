@@ -4,11 +4,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
-import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.ICombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetAttractionStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.simulator.models.potential.combinedPotentials.*;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
 import org.vadere.simulator.models.osm.stairOptimization.StairStepOptimizer;
@@ -23,9 +20,6 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
 ;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.*;
 
@@ -189,6 +183,40 @@ public class PedestrianOSM extends Pedestrian {
 				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
 				// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
 				// stairs @position: " + nextPosition);
+			}
+		}
+
+	}
+
+	public void updateNextPosition(VShape reachableArea) {
+
+		if (!hasNextTarget() || getDurationNextStep() > getAttributesOSM().getMaxStepDuration()) {
+			this.nextPosition = getPosition();
+		} else if (isCurrentTargetAnAgent() == false && topography.getTarget(getNextTargetId()).getShape().contains(getPosition())) {
+			this.nextPosition = getPosition();
+		} else {
+			// get stairs object an agent may be on - remains null if agent is on area
+			Stairs stairs = null;
+			for (Stairs singleStairs : topography.getStairs()) {
+				if (singleStairs.getShape().contains(getPosition())) {
+					stairs = singleStairs;
+					break;
+				}
+			}
+
+			if (stairs == null) { // --> agent is on area
+				refreshRelevantPedestrians();
+				nextPosition = stepCircleOptimizer.getNextPosition(this, reachableArea);
+
+				if(attributesOSM.isMinimumStepLength() && getPosition().distance(nextPosition) < minStepLength) {
+					nextPosition = getPosition();
+				}
+			} else {
+				stairStepOptimizer = new StairStepOptimizer(stairs);
+				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
+
+				refreshRelevantPedestrians();
+				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
 			}
 		}
 

@@ -51,6 +51,7 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 	void recompute();
 	void addTriEventListener(@NotNull final ITriEventListener<V, E, F> triEventListener);
 	void removeTriEventListener(@NotNull final ITriEventListener<V, E, F> triEventListener);
+	void fillHoles(@NotNull final IMeshSupplier<V, E, F> meshSupplier);
 
 	boolean isIllegal(@NotNull E edge, @NotNull V p, double eps);
 
@@ -91,7 +92,8 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 	E insertVertex(final V vertex);
 	void insertVertices(final Collection<? extends V> points);
 	E insertVertex(@NotNull V vertex, @NotNull F face);
-
+	E insertVertex(@NotNull V vertex, boolean legalize);
+	E insertVertex(@NotNull final V vertex, @NotNull final F face, boolean legalize);
 
 	void insert(final Collection<? extends IPoint> points);
 
@@ -256,7 +258,7 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 	/**
 	 * Generates a background mesh using Ruppert's algorithm.
 	 *
-	 * Assumption there is no angle smaller than 60 degree between two contrains.
+	 * Assumption there is no angle3D smaller than 60 degree between two contrains.
 	 *
 	 * @param meshSupplier
 	 * @param pslg

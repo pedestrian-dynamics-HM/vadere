@@ -68,6 +68,11 @@ public abstract class IOOutput {
 		Table result = reader.readFile();
 		return result;
 	}
+	public static Table readContactData(final Path contactDataFilePath) throws IOException {
+		ContactDataReader reader = new ContactDataReader(contactDataFilePath);
+		Table result = reader.readFile();
+		return result;
+	}
 
 	/**
 	 * Check if the trajectory file of the project is valid by only reading the first line of the file.

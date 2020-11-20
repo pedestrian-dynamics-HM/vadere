@@ -31,7 +31,7 @@ public class TestOutputFile {
 					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
 			testScenario = JsonConverter.deserializeScenarioRunManager(json);
 			topography = testScenario.getTopography();
-			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), null);
+			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), null, null);
 			modelBuilder.createModelAndRandom();
 			mainModel = modelBuilder.getModel();
 		} catch (Exception e) {

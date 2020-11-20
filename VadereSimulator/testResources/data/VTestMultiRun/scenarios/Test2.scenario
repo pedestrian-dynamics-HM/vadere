@@ -1,7 +1,7 @@
 {
   "name" : "Test2",
   "description" : "",
-  "release" : "1.11",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

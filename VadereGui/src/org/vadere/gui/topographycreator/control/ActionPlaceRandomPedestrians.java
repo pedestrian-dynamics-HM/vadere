@@ -1,110 +1,85 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.apache.commons.math3.distribution.UniformIntegerDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
-import org.vadere.gui.topographycreator.model.TopographyElementFactory;
 import org.vadere.gui.topographycreator.view.ActionRandomPedestrianDialog;
+import org.vadere.gui.topographycreator.view.ActionRandomPedestrianDialog.TARGET_OPTION;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.types.ScenarioElementType;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 import org.vadere.util.random.SimpleReachablePointProvider;
 
+import javax.swing.*;
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
-import java.util.function.Supplier;
-
-import javax.swing.*;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
 
 public class ActionPlaceRandomPedestrians extends TopographyAction {
 
-	private final UndoableEditSupport undoSupport;
-	private final double dotRadius;
+	private static Logger logger = Logger.getLogger(ActionPlaceRandomPedestrians.class);
+	private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
+
+	private final double agentRadius;
 
 	public ActionPlaceRandomPedestrians(String name, ImageIcon icon, IDrawPanelModel panelModel,
 										 UndoableEditSupport undoSupport) {
 		super(name, icon, panelModel);
-		this.undoSupport = undoSupport;
-		this.dotRadius = new AttributesAgent().getRadius();
+		this.agentRadius = new AttributesAgent().getRadius();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		ActionRandomPedestrianDialog dialog = new ActionRandomPedestrianDialog();
-		if (dialog.getValue()){
-			IDrawPanelModel model = getScenarioPanelModel();
 
-			int numOfPeds = dialog.getNumOfPeds();
-			Supplier<LinkedList<Integer>> targetSupplier = getTargetSupplier(dialog);
+		if (dialog.showDialog() && dialog.isValid()) {
+			Topography topography = getScenarioPanelModel().getTopography();
+
 			Random random = dialog.getRandom();
+			Rectangle2D.Double legalBound = dialog.getBoundaryRectangle();
+			SimpleReachablePointProvider pointProvider = SimpleReachablePointProvider.uniform(random, legalBound, topography.getObstacleDistanceFunction());
 
-			Rectangle2D.Double topographyBound = model.getTopographyBound();
-			Rectangle2D.Double legalBound = new Rectangle2D.Double(topographyBound.x + 0.8, topographyBound.y + 0.8,
-					topographyBound.width -1.6, topographyBound.height -1.6);
+			double groupMembershipRatio = dialog.getGroupMembershipRatio();
+			BinomialDistribution binomialDistribution = new BinomialDistribution(BINOMIAL_DISTRIBUTION_SUCCESS_VALUE, groupMembershipRatio);
 
-			SimpleReachablePointProvider provider = SimpleReachablePointProvider.uniform(random, legalBound, model.getTopography().getObstacleDistanceFunction());
+			int firstPedId = dialog.getFirstPedId();
+			int numOfPeds = dialog.getNumOfPeds();
+			int createdPeds = 0;
 
+			for (int i = 0; i < numOfPeds; i++) {
+				IPoint point = pointProvider.stream(dist ->  dist > 0.25).findFirst().get();
+				VCircle newPosition = new VCircle(point.getX(), point.getY(), this.agentRadius);
 
-			int placedPedestrians = 0;
-			while (placedPedestrians < numOfPeds){
-
-				IPoint p = provider.stream(dist ->  dist > 0.25).findFirst().get();
-				getScenarioPanelModel().setSelectionShape(new VCircle(p.getX(), p.getY(), this.dotRadius));
-
-				if (!checkOverlap(model.getSelectionShape())){
-					// no overlap with existing pedestrians found. --> use this point
-
-					ScenarioElementType type = getScenarioPanelModel().getCurrentType();
-					UndoableEdit edit = new EditDrawShape(getScenarioPanelModel(), type);
-					undoSupport.postEdit(edit);
-
-					model.getCurrentType();
-					model.hideSelection();
-					AgentWrapper element = (AgentWrapper)TopographyElementFactory.getInstance().createScenarioShape(model.getCurrentType(), model.getSelectionShape());
-					element.getAgentInitialStore().setTargets(targetSupplier.get());
-					model.addShape(element);
-					model.setSelectedElement(element);
-
-					placedPedestrians++;
+				if (checkOverlap(newPosition) == false) {
+					int pedId = firstPedId + i;
+					Pedestrian pedestrian = createPedestrian(dialog, topography, random, binomialDistribution, point, pedId);
+					addPedestrianToTopography(pedestrian);
+					createdPeds++;
 				}
 			}
-		}
 
-		new ActionSelectSelectShape("select shape mode", getScenarioPanelModel(), undoSupport).actionPerformed(null);
-		getScenarioPanelModel().notifyObservers();
-	}
-
-	// if no target is given via the dialog select a single random target existing in the topography.
-	private Supplier<LinkedList<Integer>> getTargetSupplier(ActionRandomPedestrianDialog dialog){
-		if (dialog.useRandomTargets()){
-			Integer[] targets = getScenarioPanelModel().getTopography().getTargets()
-					.stream()
-					.map(Target::getId)
-					.toArray(Integer[]::new);
-			return new Supplier<LinkedList<Integer>>() {
-
-				UniformIntegerDistribution dist =
-						new UniformIntegerDistribution(new JDKRandomGenerator(dialog.getRandom().nextInt()), 0, targets.length -1);
-				@Override
-				public LinkedList<Integer> get() {
-					LinkedList<Integer> ret = new LinkedList<>();
-					ret.add(targets[dist.sample()]);
-					return ret;
-				}
-			};
+			if (numOfPeds != createdPeds) {
+				showWarning(numOfPeds, createdPeds);
+			}
 		} else {
-			return dialog::getSelectedTargets;
+			logger.warn("Dialog canceled or input invalid!");
 		}
+
+		getScenarioPanelModel().notifyObservers();
 	}
 
 	private boolean checkOverlap(VShape newPedestrian){
@@ -119,4 +94,61 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 
 		return pedOverlap  || targetOverlap;
 	}
+
+	@NotNull
+	private Pedestrian createPedestrian(ActionRandomPedestrianDialog dialog, Topography topography, Random random, BinomialDistribution binomialDistribution, IPoint point, int id) {
+		AttributesAgent attributesAgent = new AttributesAgent(
+				topography.getAttributesPedestrian(),
+				id);
+
+		Pedestrian pedestrian = new Pedestrian(attributesAgent, random);
+		pedestrian.setPosition(new VPoint(point));
+		pedestrian.setTargets(getTargetList(dialog.getTargetOption(), dialog.getTargetList()));
+
+		if (binomialDistribution.sample() == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE) {
+			pedestrian.setGroupMembership(GroupMembership.IN_GROUP);
+		} else {
+			pedestrian.setGroupMembership(GroupMembership.OUT_GROUP);
+		}
+
+		return pedestrian;
+	}
+
+	private LinkedList<Integer> getTargetList(TARGET_OPTION selectedOption, LinkedList<Integer> dialogList) {
+		LinkedList<Integer> targetList = new LinkedList<>();
+
+		if (selectedOption == TARGET_OPTION.EMPTY) {
+			// Nothing to do here.
+		}  else if (selectedOption == TARGET_OPTION.RANDOM) {
+			List<Target> targets = getScenarioPanelModel().getTopography().getTargets();
+			Random random = new Random();
+			Target randomTarget = targets.get(random.nextInt(targets.size()));
+
+			targetList.add(randomTarget.getId());
+
+		} else if (selectedOption == TARGET_OPTION.USE_LIST) {
+			targetList.addAll(dialogList);
+		}
+
+		return targetList;
+	}
+
+	private void addPedestrianToTopography(Pedestrian pedestrian) {
+		AgentWrapper agentWrapper = new AgentWrapper(pedestrian);
+		getScenarioPanelModel().addShape(agentWrapper);
+		getScenarioPanelModel().setElementHasChanged(agentWrapper);
+	}
+
+	private void showWarning(int numOfPeds, int createdPeds) {
+		String message = String.format("%s: %d\n%s: %d",
+				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.requested.text"), numOfPeds,
+				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.placed.text"), createdPeds);
+
+		VDialogManager.showWarning(
+				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.title"),
+				message
+		);
+	}
+
+
 }

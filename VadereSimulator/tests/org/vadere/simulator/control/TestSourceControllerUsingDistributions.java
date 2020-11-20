@@ -83,7 +83,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	public void testSpawnRateGreaterThanUpdateRate() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(1)
-				.setSpawnIntervalForConstantDistribution(0.3);
+				.setDistributionParams(0.3);
 		initialize(builder);
 
 		// per update only one "spawn action" is performed.

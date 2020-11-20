@@ -6,6 +6,14 @@
 
 ### Added
 
+### Changed
+
+## v1.15 (2020-11-12)
+
+### Added
+
+- The TikZ snapshot button allows to export either the whole topography or only the current (scaled) view. This is useful when visualizing parts of bigger topographies.
+- Added "--version" to "vadere-console.jar".
 - Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
 - Added "Psychology" tab in GUI which shows all psychology-related attributes of a scenario (which are stored in JSON node "attributesPsychology").
 - Add `PedestrianPotentialProcessor` which writes out different potentials (TARGET (target potential), OBSTACLE (obstacle potential), PEDESTRIAN (agent potential), ALL (sum of all)) configureable via its `Attributes`. It only writes those potentials if the used main model for the simulation is a `PotentialFieldModel`.
@@ -19,7 +27,7 @@
   * Hover over hash to see full value
   * Left-Click to copy full hash to clipboard.
 - TraCI commands: 
-  * getHash: return Scenario hash for given scenario 
+  * getHash: return scenario hash for given scenario 
   * CompoundObject implementation to allow complex get/set commands (i.e. create pedestrian hat 
     random location during simulation run)
 - osm2vadere converter:
@@ -42,6 +50,10 @@
 
 ### Changed
 
+- Refactored EikMesh code.
+- Refactored psychology-related code and added several test scenarios.
+- Refactored TikZ generator code.
+- The behavioral heuristics model (BHM) can now be used with a floor field. I.e., BHM agents are able to derive the geodetic distance to their targets instead of using the Euclidean distance.
 - The "Time" slider in the PostVis uses the resolution of the "Res." slider instead of using a fixed step size of 0.4 seconds.
 - The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  
@@ -64,7 +76,6 @@ Was previously known as `PedestrianFootStepProcessor`
   3. `cacheDir` is relative and  `Vadere.cache.useGlobalCacheBaseDir=true`:
      Lookup `Vadere.cache.flobalCacheBaseDir` and use this as the base path for the relative 
      `cacheDir` path. `Vadere.cache.flobalCacheBaseDir` defaults to `${user.home}\.cache\vadere`
-  
 
 ## v1.4 (2019-09-05)
 

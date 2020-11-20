@@ -26,7 +26,7 @@ public class PotentialFieldCalculatorDijkstra extends AGridEikonalSolver {
 	}
 
 	@Override
-	public void initialize() {
+	public void solve() {
 
 		ComparatorPotentialFieldValue comparator = new ComparatorPotentialFieldValue(
 				potentialField);

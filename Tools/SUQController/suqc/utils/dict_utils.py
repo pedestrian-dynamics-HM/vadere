@@ -6,6 +6,7 @@ from functools import reduce
 from typing import List
 
 import numpy as np
+from suqc.opp.config_parser import OppConfigFileBase
 
 SYMBOL_KEY_CHAINING = "."
 
@@ -13,7 +14,7 @@ SYMBOL_KEY_CHAINING = "."
 def _deep_dict_breadth_first(d: dict, key: str):
 
     cur_level = 0
-    level_found = 100**100
+    level_found = 100 ** 100
     stack = [(cur_level, [], d)]
 
     final_path = None
@@ -36,7 +37,7 @@ def _deep_dict_breadth_first(d: dict, key: str):
             elif isinstance(v, dict):
                 path = deepcopy(cur_path)
                 path.append(k)
-                stack.append((cur_level+1, path, v))
+                stack.append((cur_level + 1, path, v))
         else:
             stack = stack[1:]
 
@@ -49,26 +50,31 @@ def key_split(key: str):
 
 
 def _handle_chained_keys(d, key, check_final_leaf, check_unique_key):
-    key_chain = key.split(SYMBOL_KEY_CHAINING)      # get the user specified key chain
-    cur_d = deepcopy(d)                             # start with the root dict
-    cur_p = list()                                  # cur_p = current path
+    key_chain = key.split(SYMBOL_KEY_CHAINING)  # get the user specified key chain
+    cur_d = deepcopy(d)  # start with the root dict
+    cur_p = list()  # cur_p = current path
 
     if len(key_chain) == 2 and key_chain[0] == "":  # special case if value follows root
-        val, path = _deep_dict_breadth_first(d, key_chain[1])  # look directly breath first for the target value
+        val, path = _deep_dict_breadth_first(
+            d, key_chain[1]
+        )  # look directly breath first for the target value
         return val, path
     else:
 
-        if key_chain[0] == "":                              # remove unnecessary root and remove empty
+        if key_chain[0] == "":  # remove unnecessary root and remove empty
             key_chain = key_chain[1:]
 
-        for k in key_chain[:-1]:                            # do breath first for all path-descriptive keys
+        for k in key_chain[:-1]:  # do breath first for all path-descriptive keys
             d_, p_ = _deep_dict_breadth_first(cur_d, k)
             cur_d = deepcopy(d_)
             cur_p += p_
 
-        val, p_ = deep_dict_lookup(cur_d, key_chain[-1],    # carry out depth first for last sub-dictionary
-                                   check_final_leaf=check_final_leaf,
-                                   check_unique_key=check_unique_key)
+        val, p_ = deep_dict_lookup(
+            cur_d,
+            key_chain[-1],  # carry out depth first for last sub-dictionary
+            check_final_leaf=check_final_leaf,
+            check_unique_key=check_unique_key,
+        )
 
     cur_p += p_
     return val, cur_p
@@ -92,22 +98,30 @@ def _split_subselection_key(selection):
 
 def _get_selected_json(json_elements: List[dict], selection):
 
-    selection = selection.lstrip("[").rstrip("]")  # Remove potential syntax elements for sub-selection
+    selection = selection.lstrip("[").rstrip(
+        "]"
+    )  # Remove potential syntax elements for sub-selection
 
     key_selection, val_selection = _split_subselection_key(selection)
 
     json_selected = None
     for el in json_elements:
-        val, _ = deep_dict_lookup(el, key_selection, check_final_leaf=True, check_unique_key=True)
+        val, _ = deep_dict_lookup(
+            el, key_selection, check_final_leaf=True, check_unique_key=True
+        )
 
         if val_selection == val:
             if json_selected is not None:
-                raise KeyError(f"There are multiple selections with {key_selection}=={val_selection} in list "
-                               f"{json_elements}.")
+                raise KeyError(
+                    f"There are multiple selections with {key_selection}=={val_selection} in list "
+                    f"{json_elements}."
+                )
             json_selected = el
 
     if json_selected is None:
-        raise KeyError(f"No json with the selection {selection} could be found in \n {json_elements} ")
+        raise KeyError(
+            f"No json with the selection {selection} could be found in \n {json_elements} "
+        )
 
     return json_selected
 
@@ -119,15 +133,19 @@ def _handle_subselection_keys(d, key, check_final_leaf, check_unique_key):
     keychain = re.split(pattern="[\[\]]", string=key)
 
     assert len(keychain) == 3, "For now only one sub-selection supported in the key."
-    keychain2array = keychain[0].rstrip(SYMBOL_KEY_CHAINING)  # remove trailing separator
+    keychain2array = keychain[0].rstrip(
+        SYMBOL_KEY_CHAINING
+    )  # remove trailing separator
 
     if not keychain2array:  # check for empty string
-        raise KeyError(f"The key {key} is invalid, the uniquely identifying path to the list of jsons has to be given in"
-                       f"front. This means the key is not allowed to start with a [ ] condition.")
+        raise KeyError(
+            f"The key {key} is invalid, the uniquely identifying path to the list of jsons has to be given in"
+            f"front. This means the key is not allowed to start with a [ ] condition."
+        )
 
-    subjsons, path2array = _handle_chained_keys(d, keychain2array,
-                                                check_final_leaf,
-                                                check_unique_key)
+    subjsons, path2array = _handle_chained_keys(
+        d, keychain2array, check_final_leaf, check_unique_key
+    )
 
     # TODO: actually I need to guarantee that the array is full of dicts (json)
     assert isinstance(subjsons, list), "The path to sub-selection is no array."
@@ -137,14 +155,18 @@ def _handle_subselection_keys(d, key, check_final_leaf, check_unique_key):
 
     if not selarraypath:
         # check if selected array path is empty (i.e. a conditional key chain element [a==1] appears last
-        raise KeyError(f"The key {key} is invalid, the selection of a json in a list (i.e. inside brackets \"[ ]\" "
-                       f"cannot be last.")
+        raise KeyError(
+            f'The key {key} is invalid, the selection of a json in a list (i.e. inside brackets "[ ]" '
+            f"cannot be last."
+        )
 
     # get the json from the selection (it is one in a list where the condition is true)
     json_selected = _get_selected_json(subjsons, selection)
 
     # carry out the path in this selected json
-    val, element_path = _handle_chained_keys(json_selected, selarraypath, check_final_leaf, check_unique_key)
+    val, element_path = _handle_chained_keys(
+        json_selected, selarraypath, check_final_leaf, check_unique_key
+    )
 
     final_path = path2array + [f"[{selection}]"] + element_path
 
@@ -171,32 +193,41 @@ def deep_dict_lookup(d: dict, key: str, check_final_leaf=True, check_unique_key=
 
     value = None
 
-    current_path = []         # store the absolute path to the variable as a list of keys
-    path_to_value = None      # path to the final key
+    current_path = []  # store the absolute path to the variable as a list of keys
+    path_to_value = None  # path to the final key
 
     stack = [iter(d.items())]
     while stack:
-        for k, v in stack[-1]:               # go through (sub-) directories
+        for k, v in stack[-1]:  # go through (sub-) directories
             current_path.append(k)
-            if k == key:                     # if this is the key we are looking for...
-                if check_unique_key:         # keep looking at all keys in 'd', to check if there is a conflict
-                    if value is not None:    # here was already another value -> not unique
-                        raise ValueError(f"There is a conflict (two or more) of key {key} in the dictionary. \n {d}",
-                                         f"1. path: {path_to_value} \n"
-                                         f"2. path: {current_path}")
-                    path_to_value = deepcopy(current_path)  # deepcopy because lists are mutable
-                    value = v                # set to final value
+            if k == key:  # if this is the key we are looking for...
+                if (
+                    check_unique_key
+                ):  # keep looking at all keys in 'd', to check if there is a conflict
+                    if (
+                        value is not None
+                    ):  # here was already another value -> not unique
+                        raise ValueError(
+                            f"There is a conflict (two or more) of key {key} in the dictionary. \n {d}",
+                            f"1. path: {path_to_value} \n" f"2. path: {current_path}",
+                        )
+                    path_to_value = deepcopy(
+                        current_path
+                    )  # deepcopy because lists are mutable
+                    value = v  # set to final value
                 else:
                     # if the integrity is not checked, return immediately the key and path
                     if check_final_leaf and isinstance(v, dict):
-                        raise ValueError(f"Value to return for key {key} is not a leaf (i.e. value) but a "
-                                         f"sub-dictionary.")
+                        raise ValueError(
+                            f"Value to return for key {key} is not a leaf (i.e. value) but a "
+                            f"sub-dictionary."
+                        )
                     return v, deepcopy(current_path)
 
-            if isinstance(v, dict):          # fill stack with more subdicts
+            if isinstance(v, dict):  # fill stack with more subdicts
                 stack.append(iter(v.items()))
                 break
-            else:                            # remove last key again from list
+            else:  # remove last key again from list
                 current_path = current_path[:-1]
         else:
             # if/else statement: if loop ended normally then run this: remove last key from path and remove this
@@ -206,24 +237,27 @@ def deep_dict_lookup(d: dict, key: str, check_final_leaf=True, check_unique_key=
 
     if value is None:
         raise KeyError(f"Key {key} not found. \n {d}")
-    return value, path_to_value  # NOTE: there is another return in the loop, when check_integrity is False
+    return (
+        value,
+        path_to_value,
+    )  # NOTE: there is another return in the loop, when check_integrity is False
 
 
 def all_nested_keys(d: dict):
-        """Returns all keys present in the dictionary."""
+    """Returns all keys present in the dictionary."""
 
-        all_keys = []
-        stack = [iter(d.items())]
-        while stack:
-            for k, v in stack[-1]:
-                all_keys.append(k)
-                if isinstance(v, dict):
-                    stack.append(iter(v.items()))
-                    break
-            else:
-                stack.pop()
+    all_keys = []
+    stack = [iter(d.items())]
+    while stack:
+        for k, v in stack[-1]:
+            all_keys.append(k)
+            if isinstance(v, dict):
+                stack.append(iter(v.items()))
+                break
+        else:
+            stack.pop()
 
-        return all_keys
+    return all_keys
 
 
 def get_dict_value_keylist(d: dict, path: list, last_key: str):
@@ -273,27 +307,44 @@ def change_value(d: dict, path: list, last_key: str, exist_val, new_value):
     if type(exist_val) != type(new_value):
 
         # check for numerical types (casting between float and integer)
-        if isinstance(exist_val, numbers.Number) and isinstance(new_value, numbers.Number):
+        if isinstance(exist_val, numbers.Number) and isinstance(
+            new_value, numbers.Number
+        ):
 
             new_value = _avoid_numpy_types(new_value)
 
             # pass cases, where numpy floating point wrappers were removed
-            if isinstance(exist_val, float) and isinstance(new_value, float) or \
-                    isinstance(exist_val, int) and isinstance(new_value, int):
-                pass # all good now
+            if (isinstance(exist_val, float) and isinstance(new_value, float)) or (
+                isinstance(exist_val, int) and isinstance(new_value, int)
+            ):
+                pass  # all good now
             else:  # print warning in cases where e.g. the existing value is an int and the new value is a float
-                print(f"WARNING: key {last_key} at path {path} has type {type(exist_val)} but the new value has type "
-                      f"{type(new_value)}. The value is not casted.")
+                print(
+                    f"WARNING: key {last_key} at path {path} has type {type(exist_val)} but the new value has type "
+                    f"{type(new_value)}. The value is not casted."
+                )
         else:
-            print(f"WARNING: There is a type casting from type {type(new_value)} (set value) to type {exist_val} "
-                  f"(existing value)")
+            print(
+                f"WARNING: There is a type casting from type {type(new_value)} (set value) to type {exist_val} "
+                f"(existing value)"
+            )
             try:
-                new_value = type(exist_val)(new_value)  # try to cast, if it failes raise error
+                new_value = type(exist_val)(
+                    new_value
+                )  # try to cast, if it failes raise error
             except ValueError as e:
                 print(f"Type-cast failed for key {last_key} at path {path}.")
                 raise e
 
     return set_dict_value_keylist(d, path, last_key, new_value)
+
+
+def change_dict_ini(ini_object: OppConfigFileBase, changes: dict):
+
+    for key, value in changes.items():
+        ini_object[key] = value
+
+    return ini_object
 
 
 def change_dict(json_dict: dict, changes: dict):
@@ -310,9 +361,17 @@ def change_dict(json_dict: dict, changes: dict):
 
         # Security check:
         check_val, _ = deep_dict_lookup(json_dict, key_chain)
-        assert check_val == new_val, f"Something went wrong with setting a new value " \
-                                     f"in the scenario! " \
-                                     f"Check val={check_val} vs. new_val={new_val}."
+        assert check_val == new_val, (
+            f"Something went wrong with setting a new value "
+            f"in the scenario! "
+            f"Check val={check_val} vs. new_val={new_val}."
+        )
+        check_val, _ = deep_dict_lookup(json_dict, key_chain)
+        assert check_val == new_val, (
+            f"Something went wrong with setting a new value "
+            f"in the scenario! "
+            f"Check val={check_val} vs. new_val={new_val}."
+        )
 
     return json_dict
 
@@ -320,6 +379,7 @@ def change_dict(json_dict: dict, changes: dict):
 if __name__ == "__main__":
 
     import json
+
     with open("New_SimpleHKHKJ.scenario", "r") as f:
         d2 = json.load(f)
 
@@ -328,10 +388,11 @@ if __name__ == "__main__":
     print(val)
     print(path)
 
-    new_d = change_dict(d2, changes={"dynamicElements.[attributes.id==-1].position.x": 100})
+    new_d = change_dict(
+        d2, changes={"dynamicElements.[attributes.id==-1].position.x": 100}
+    )
 
     print(new_d)
-
 
     exit()
 
@@ -340,5 +401,5 @@ if __name__ == "__main__":
 
     print(change_dict(d1, {"a.b": 3}))
 
-    #print(deep_subdict(d, ["c"]))
-    #print(abs_path_key(d, "a|c|x"))
+    # print(deep_subdict(d, ["c"]))
+    # print(abs_path_key(d, "a|c|x"))

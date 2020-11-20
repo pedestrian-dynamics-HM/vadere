@@ -13,7 +13,21 @@ research group at the [Munich University of Applied Sciences](https://www.hm.edu
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview). 
+The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview).
+
+If you are using Vadere for your publication, please cite: http://dx.doi.org/10.17815/CD.2019.21. 
+
+### Vadere Units 
+
+All measurements in Vadere are in SI units. That means, meters for the positions in the GUI and Topography, and meter/second for speeds. 
+
+## Contact
+
+If you have questions about Vadere, have found a software bug or have a suggestion for improvements, please feel free to either
+
+* [open an issue](https://gitlab.lrz.de/vadere/vadere/issues) (Note: you require an LRZ account), or
+* send an e-mail with your enquiry to our mailing list [vadere@lists.lrz.de](vadere@lists.lrz.de)
+
 
 ## Pipeline Status
 
@@ -26,7 +40,7 @@ The Vadere framework includes a mesh generator for unstructured high-quality 2D 
 
 ### Dependencies
 
-* Java 11 or above (OpenJDK recommended -> see the official [Java website](https://jdk.java.net/))
+* Java 11 or above (OpenJDK recommended -> see [here](http://www.vadere.org/getting-started/) for more information)
 * OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details)
 
 ### Pre-Built Releases
@@ -44,9 +58,12 @@ The ZIP file contains:
 * **vadere-console.jar** - provides the command line version of Vadere and allows easy integration into other applications.
 * **Scenarios** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
-### Run the Application
+### Getting Started
 
-Open a terminal and enter `path/to/openjdk/java -jar vadere-gui.jar`.
+Either run the Vadere simulator by
+
+- Double-clicking `vadere-gui.jar` (after installing [Java](http://www.vadere.org/getting-started/))
+- Entering `path/to/openjdk/java -jar vadere-gui.jar`
 
 ### Run Built-In Examples
 

@@ -1,16 +1,23 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.scenario.*;
+import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
+import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.TargetChanger;
+import org.vadere.state.scenario.TargetChangerListener;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Change target id of an agent which enters the corresponding {@link TargetChanger} area.
@@ -33,32 +40,32 @@ public class TargetChangerController {
     private static final Logger log = Logger.getLogger(TargetChangerController.class);
     private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
+
     // Member Variables
     public final TargetChanger targetChanger;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
-    int seed;
-    BinomialDistribution binomialDistribution;
+
+    private Random random;
+    private TargetChangerAlgorithm changerAlgorithm;
 
     // Constructors
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
+        this.changerAlgorithm = TargetChangerAlgorithm.create(targetChanger, topography);
+        this.changerAlgorithm.throwExceptionOnInvalidInput(targetChanger);
+        this.changerAlgorithm.init(random);
+
         this.targetChanger = targetChanger;
         this.topography = topography;
         this.processedAgents = new HashMap<>();
-
-        seed = random.nextInt();
-        JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
-        randomGenerator.setSeed(seed);
-
-        double probabilityToChangeTarget = targetChanger.getAttributes().getProbabilityToChangeTarget();
-        int trials = BINOMIAL_DISTRIBUTION_SUCCESS_VALUE; // I.e., possible outcomes are 0 and 1 when calling "sample()".
-        binomialDistribution = new BinomialDistribution(randomGenerator, trials, probabilityToChangeTarget);
+        this.random = random;
     }
 
     // Getters
     public Map<Integer, Agent> getProcessedAgents() {
         return processedAgents;
     }
+
 
     // Public Methods
     public void update(double simTimeInSec) {
@@ -74,20 +81,8 @@ public class TargetChangerController {
 
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
-
-                int binomialDistributionSample = binomialDistribution.sample();
-                boolean changeTarget = (binomialDistributionSample == BINOMIAL_DISTRIBUTION_SUCCESS_VALUE);
-
-                if (changeTarget) {
-                    if (targetChanger.getAttributes().isNextTargetIsPedestrian()) {
-                        useDynamicTargetForAgentOrUseStaticAsFallback(agent);
-                    } else {
-                        useStaticTargetForAgent(agent);
-                    }
-                }
-
+                changerAlgorithm.setAgentTargetList(agent);
                 notifyListenersTargetChangerAreaReached(agent);
-
                 processedAgents.put(agent.getId(), agent);
             }
         }
@@ -126,52 +121,17 @@ public class TargetChangerController {
         }
     }
 
-    private void useDynamicTargetForAgentOrUseStaticAsFallback(Agent agent) {
-        int nextTarget = (targetChanger.getAttributes().getNextTarget().size() > 0)
-                ? targetChanger.getAttributes().getNextTarget().get(0)
-                : Attributes.ID_NOT_SET;
-
-        Collection<Pedestrian> allPedestrians = topography.getElements(Pedestrian.class);
-        List<Pedestrian> pedsWithCorrectTargetId = allPedestrians.stream()
-                .filter(pedestrian -> pedestrian.getTargets().contains(nextTarget))
-                .collect(Collectors.toList());
-
-        if (pedsWithCorrectTargetId.size() > 0) {
-            // Try to use a pedestrian which has already some followers
-            // to avoid calculating multiple dynamic floor fields.
-            List<Pedestrian> pedsWithFollowers = pedsWithCorrectTargetId.stream()
-                    .filter(pedestrian -> pedestrian.getFollowers().isEmpty() == false)
-                    .collect(Collectors.toList());
-
-            Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);
-            agentFollowsOtherPedestrian(agent, pedToFollow);
-        } else {
-            useStaticTargetForAgent(agent);
-        }
-    }
-
-    private void agentFollowsOtherPedestrian(Agent agent, Pedestrian pedToFollow) {
-        // Create the necessary TargetPedestrian wrapper object.
-        // The simulation loop creates the corresponding controller objects
-        // in the next simulation loop based on the exisiting targets in the topography.
-        TargetPedestrian targetPedestrian = new TargetPedestrian(pedToFollow);
-        topography.addTarget(targetPedestrian);
-
-        // Make "agent" a follower of "pedToFollow".
-        agent.setSingleTarget(targetPedestrian.getId(), true);
-        pedToFollow.getFollowers().add(agent);
-    }
-
-    private void useStaticTargetForAgent(Agent agent) {
-        agent.setTargets(targetChanger.getAttributes().getNextTarget());
-        agent.setNextTargetListIndex(0);
-        agent.setIsCurrentTargetAnAgent(false);
-    }
-
     private void notifyListenersTargetChangerAreaReached(final Agent agent) {
         for (TargetChangerListener listener : targetChanger.getTargetChangerListeners()) {
             listener.reachedTargetChanger(targetChanger, agent);
         }
     }
 
+    public TargetChangerAlgorithm getChangerAlgorithm() {
+        return changerAlgorithm;
+    }
+
+    public void setChangerAlgorithm(TargetChangerAlgorithm changerAlgorithm) {
+        this.changerAlgorithm = changerAlgorithm;
+    }
 }

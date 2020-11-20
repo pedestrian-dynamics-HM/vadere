@@ -161,6 +161,10 @@ public class PSLG {
 		return GeometryUtils.boundRelative(allPoints);
 	}
 
+	public ImmutableSet<VPoint> getAllPoints() {
+		return allPoints;
+	}
+
 	private VPolygon protect(final double lfs, @NotNull final VPolygon polygon, @NotNull final Set<VCircle> protectionDiscs, boolean isHole) {
 		List<VPoint> points = polygon.getPath();
 		List<VPoint> newpoints = new ArrayList<>(points.size() + 5);

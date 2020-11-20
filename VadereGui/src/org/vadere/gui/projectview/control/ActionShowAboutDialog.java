@@ -4,7 +4,7 @@ import javax.swing.*;
 
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.simulator.projects.io.HashGenerator;
+import org.vadere.util.version.Version;
 
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
@@ -20,12 +20,17 @@ public class ActionShowAboutDialog extends AbstractAction {
 
 	@Override
 	public void actionPerformed(final ActionEvent event) {
+		String releaseVersion = String.format("%s: %s", Messages.getString("ProjectView.version.release"), Version.releaseNumber());
+		String versionControlInfo = String.format("%s: %s", Messages.getString("ProjectView.version.commit"), Version.getVersionControlCommitHash());
+		String license = String.format("%s: %s", Messages.getString("ProjectView.license.text"), "GNU Lesser General Public License (LGPL)");
+
 		String text = "";
 		text += "<html>";
-		text += "<font size =\"3\"><em>" + MessageFormat.format(Messages.getString("ProjectView.version"), HashGenerator.releaseNumber()) + "</em></font><br>";
+		text += "<font size =\"3\"><em>" + releaseVersion + "</em></font><br>";
+		text += "<font size =\"3\"><em>" + versionControlInfo + "</em></font><br>";
+		text += "<font size =\"3\"><em>" + license + "</em></font><br>";
 		text += "<br>";
-		text += "<font size =\"3\">www.vadere.org</font><br>";
-		text += "<font size =\"3\">" + MessageFormat.format(Messages.getString("ProjectView.license.text"), "GNU Lesser General Public License (<em>LGPL</em>).") + "</font>";
+		text += "<font size =\"3\">www.vadere.org</font>";
 		text += "</html>";
 
 		JOptionPane.showMessageDialog(null,

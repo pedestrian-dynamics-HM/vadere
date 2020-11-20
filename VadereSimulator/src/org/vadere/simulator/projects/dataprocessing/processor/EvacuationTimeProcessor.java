@@ -16,6 +16,7 @@ import java.util.Collections;
 @DataProcessorClass()
 public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
     private PedestrianEvacuationTimeProcessor pedEvacTimeProc;
+    private int numberOfAgentsInScenario = 0;
 
     public EvacuationTimeProcessor() {
         super("evacuationTime");
@@ -25,6 +26,7 @@ public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
     @Override
     protected void doUpdate(final SimulationState state) {
         this.pedEvacTimeProc.update(state);
+        this.numberOfAgentsInScenario = state.getTopography().getPedestrianDynamicElements().getElements().size();
     }
 
     @Override
@@ -33,10 +35,16 @@ public class EvacuationTimeProcessor extends NoDataKeyProcessor<Double> {
 
         double result = 0.0;
 
-        if (this.pedEvacTimeProc.getValues().size() > 0) {
-            result = this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
-                    ? Double.NaN
-                    : Collections.max(this.pedEvacTimeProc.getValues());
+        // check if any agents are still in the simulation
+        // seems like the topography is empty after the simulation, so I saved the last value in numberOfAgentsInScenario
+        if(numberOfAgentsInScenario == 0){
+            if (this.pedEvacTimeProc.getValues().size() > 0) {
+                result = this.pedEvacTimeProc.getValues().stream().anyMatch(tevac -> tevac == Double.NaN)
+                        ? Double.NaN
+                        : Collections.max(this.pedEvacTimeProc.getValues());
+            }
+        }else{
+            result = -1;
         }
 
         this.putValue(NoDataKey.key(), result);

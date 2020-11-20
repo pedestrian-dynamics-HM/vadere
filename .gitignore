@@ -1,12 +1,12 @@
 # Build artifacts, log and preference files
-*.out
+javac.*.args
 *.preferences.xml
 **/current_commit_hash.txt
+**/log.out
+**/*.log.gz
 bin/
 swing-inspector-linux-1.2.3/
 target/
-javac.*.args
-
 
 # C extensions
 *.so
@@ -26,7 +26,6 @@ VadereGui/*.svg
 VadereGui/*.mov
 VadereGui/testResources/**/*.legacy
 VadereUtils/testreports/*.txt
-VadereSimulator/resources/current_commit_hash.txt
 VadereSimulator/testResources/**/*.legacy
 
 # Python (byte-compiled, optimized, DLL files etc.)

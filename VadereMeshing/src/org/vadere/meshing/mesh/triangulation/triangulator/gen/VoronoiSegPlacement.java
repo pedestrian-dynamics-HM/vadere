@@ -81,18 +81,18 @@ public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F exten
 		VPoint x;
 		if(!getMesh().isBoundary(getMesh().getTwinFace(shortestEdge))) {
 			VPoint cc = getMesh().toTriangle(getMesh().getTwinFace(shortestEdge)).getCircumcenter();
-			e = c.subtract(cc).norm();
+			e = c.subtract(cc).norm3D();
 			x = midpoint.add(e.scalarMultiply(d));
 		} else {
 			if(c.distanceSq(midpoint) < GeometryUtils.DOUBLE_EPS) {
 				x = midpoint;
 			} else {
-				// would otherwise result in a very large angle at the boundary
+				// would otherwise result in a very large angle3D at the boundary
 				if(d / Math.sqrt((3*pq * pq)) < 0.8) {
 					x = midpoint;
 				}
 				else {
-					e = c.subtract(midpoint).norm();
+					e = c.subtract(midpoint).norm3D();
 					x = midpoint.add(e.scalarMultiply(d));
 				}
 			}

@@ -9,6 +9,7 @@ import net.sourceforge.argparse4j.internal.HelpScreenException;
 import org.vadere.manager.server.AbstractVadereServer;
 import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.server.VadereSingleClientServer;
+import org.vadere.util.io.VadereArgumentParser;
 import org.vadere.util.logging.Logger;
 
 import java.net.InetAddress;
@@ -24,11 +25,11 @@ public class Manager {
 	public static void main(String[] args) {
 		Logger.setMainArguments(args);
 		logger = Logger.getLogger(Manager.class);
-		ArgumentParser p = createArgumentParser();
+		VadereArgumentParser p = createArgumentParser();
 		Namespace ns;
 
 		try {
-			ns = p.parseArgs(args);
+			ns = p.parseArgsAndProcessInitialOptions(args);
 
 			ServerSocket serverSocket = new ServerSocket(ns.getInt("port"), 50, InetAddress.getByName(ns.getString("bind")));
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
@@ -45,35 +46,35 @@ public class Manager {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 
-	private static ArgumentParser createArgumentParser() {
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("Vadere Server")
-				.defaultHelp(true)
-				.description("Runs the VADERE pedestrian simulator as a server.");
+	private static VadereArgumentParser createArgumentParser() {
+		VadereArgumentParser vadereArgumentParser = new VadereManagerArgumentParser();
+		ArgumentParser parser = vadereArgumentParser.getArgumentParser();
 
 		addOptionsToParser(parser);
 
-		return parser;
+		return vadereArgumentParser;
 	}
 
 	private static void addOptionsToParser(ArgumentParser parser) {
 		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-		parser.addArgument("--loglevel")
-				.required(false)
-				.type(String.class)
-				.dest("loglevel")
-				.choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
-				.setDefault("INFO")
-				.help("Set Log Level.");
-
-		// no action required call to  Logger.setMainArguments(args) already configured Logger.
-		parser.addArgument("--logname")
-				.required(false)
-				.type(String.class)
-				.dest("logname")
-				.help("Write log to given file.");
+//		parser.addArgument("--loglevel")
+//				.required(false)
+//				.type(String.class)
+//				.dest("loglevel")
+//				.choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
+//				.setDefault("INFO")
+//				.help("Set Log Level.");
+//
+//		// no action required call to  Logger.setMainArguments(args) already configured Logger.
+//		parser.addArgument("--logname")
+//				.required(false)
+//				.type(String.class)
+//				.dest("logname")
+//				.help("Write log to given file.");
 
 
 		// no action required call to  Logger.setMainArguments(args) already configured Logger.

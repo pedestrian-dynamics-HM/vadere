@@ -60,8 +60,8 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setSpawnIntervalForConstantDistribution(double spawnDelay) {
-		this.distributionParams = new double[]{spawnDelay};
+	public SourceTestAttributesBuilder setDistributionParams(double parameter) {
+		this.distributionParams = new double[]{parameter};
 		return this;
 	}
 

@@ -152,10 +152,17 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 
 	@Override
 	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Class<T> type) {
+		return createElement(position, id, this.elementAttributes, type);
+	}
+
+	public <T extends DynamicElement> Pedestrian createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+
+		AttributesAgent aAttr = (AttributesAgent)attr;
+
 		if (!Pedestrian.class.isAssignableFrom(type))
 			throw new IllegalArgumentException("GNM cannot initialize " + type.getCanonicalName());
 
-		AttributesAgent pedAttributes = new AttributesAgent(elementAttributes, registerDynamicElementId(domain.getTopography(), id));
+		AttributesAgent pedAttributes = new AttributesAgent(aAttr, registerDynamicElementId(domain.getTopography(), id));
 		Pedestrian result = create(position, pedAttributes);
 		return result;
 	}

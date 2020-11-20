@@ -25,7 +25,7 @@ import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.control.ActionOpenFile;
 import org.vadere.gui.postvisualization.control.ActionPause;
 import org.vadere.gui.postvisualization.control.ActionPlay;
-import org.vadere.gui.postvisualization.control.ActionRecording;
+import org.vadere.gui.components.control.simulation.ActionRecording;
 import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
 import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
 import org.vadere.gui.postvisualization.control.ActionStop;
@@ -33,6 +33,7 @@ import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.projectview.control.ActionDeselect;
+import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
@@ -160,6 +161,8 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 
 		int iconHeight = VadereConfig.getConfig().getInt("ProjectView.icon.height.value");
 		int iconWidth = VadereConfig.getConfig().getInt("ProjectView.icon.width.value");
+
+		// Player controls
 		playButton = addActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
@@ -171,6 +174,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				"PostVis.btnStop.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 
+		// Pedestrian-related options
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_pedestrian", resources.getIcon("pedestrian.png", iconWidth, iconHeight),
 						model) {
@@ -179,9 +183,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.config.setShowPedestrians(!model.config.isShowPedestrians());
 						model.notifyObservers();
 					}
-
 				}, "ProjectView.btnShowPedestrian.tooltip");
-
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
 						resources.getIcon("trajectories.png", iconWidth, iconHeight), model) {
@@ -190,10 +192,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.config.setShowTrajectories(!model.config.isShowTrajectories());
 						model.notifyObservers();
 					}
-
-
 				}, "ProjectView.btnShowTrajectories.tooltip");
-
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_direction",
 						resources.getIcon("walking_direction.png", iconWidth, iconHeight), model) {
@@ -202,34 +201,37 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.config.setShowWalkdirection(!model.config.isShowWalkdirection());
 						model.notifyObservers();
 					}
-
-
 				}, "ProjectView.btnShowWalkingDirection.tooltip");
-
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_groups",
 						resources.getIcon("group.png", iconWidth, iconHeight), model) {
-
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						model.config.setShowGroups(!model.config.isShowGroups());
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowGroupInformation.tooltip");
+		addActionToToolbar(toolbar,
+				new ActionVisualization("show_contacts", resources.getIcon("contacts.png", iconWidth, iconHeight),
+						model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!model.config.isContactsRecorded()) {
+							JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
+									Messages.getString("PostVis.ShowContactsErrorMessage.text"));
+						} else {
+							model.config.setShowContacts(!model.config.isShowContacts());
+							model.notifyObservers();
+						}
+					}
+				}, "ProjectView.btnShowContacts.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
 
+		// "Measuring" tools
 		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
 				"ProjectView.btnDrawVoronoiDiagram.tooltip");
-
-		toolbar.addSeparator(new Dimension(5, 50));
-
-		addActionToToolbar(
-				toolbar,
-				new ActionShowPotentialField("show_potentialField", resources.getIcon("potentialField.png", iconWidth,
-						iconHeight), model),
-				"ProjectView.btnShowPotentialfield.tooltip");
-
 		addActionToToolbar(toolbar,
 				new ActionVisualization("show_grid", resources.getIcon("grid.png", iconWidth, iconHeight), model) {
 					@Override
@@ -237,10 +239,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.config.setShowGrid(!model.config.isShowGrid());
 						model.notifyObservers();
 					}
-
-
 				}, "ProjectView.btnShowGrid.tooltip");
-
 		addActionToToolbar(
 				toolbar,
 				new ActionVisualization("show_density", resources.getIcon("density.png", iconWidth, iconHeight),
@@ -250,19 +249,20 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.config.setShowDensity(!model.config.isShowDensity());
 						model.notifyObservers();
 					}
-
-
 				}, "ProjectView.btnShowDensity.tooltip");
+		addActionToToolbar(
+				toolbar,
+				new ActionShowPotentialField("show_potentialField", resources.getIcon("potentialField.png", iconWidth,
+						iconHeight), model),
+				"ProjectView.btnShowPotentialfield.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
 
-
-		// toolbar.addSeparator(new Dimension(5, 50));
-
+		// Recording and snapshot options
 		ActionRecording recordAction = new ActionRecording("record", resources.getIcon("record.png", iconWidth,
 				iconHeight), renderer);
 		JButton recordButton = addActionToToolbar(toolbar, recordAction, "PostVis.btnRecord.tooltip");
 		recordAction.setButton(recordButton);
 
-		toolbar.addSeparator(new Dimension(5, 50));
 		ArrayList<Action> imgOptions = new ArrayList<>();
 		AbstractAction pngImg = new ActionGeneratePNG(Messages.getString("ProjectView.btnPNGSnapshot.tooltip"), resources.getIcon("camera_png.png", iconWidth, iconHeight),
 				renderer, model);
@@ -276,15 +276,11 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), resources.getIcon("camera_poly.png", iconWidth, iconHeight),
 				model);
 
-
-		// add new ImageGenerator Action ...
-
 		imgOptions.add(pngImg);
 		imgOptions.add(svgImg);
 		imgOptions.add(tikzImg);
 		imgOptions.add(inetImg);
 		imgOptions.add(polyImg);
-		// add Action to List ....
 
 		ActionVisualizationMenu imgDialog = new ActionVisualizationMenu(
 				"camera_menu",
@@ -381,15 +377,23 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		return menuBar;
 	}
 
-	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
 
 		try {
-			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			if (contactsTrajectoryFile != null) {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+			} else {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			}
 			model.notifyObservers();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
+		loadOutputFile(trajectoryFile, null, scenario);
 	}
 
 	public void loadOutputFile(final Scenario scenario) {

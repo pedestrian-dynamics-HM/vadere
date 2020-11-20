@@ -95,10 +95,12 @@ public class VadereCommandHandlerTest extends CommandHandlerTest {
 			protected void mockIt() {
 				String scenario = "scenario002";
 				Topography topo = mock(Topography.class, Mockito.RETURNS_DEEP_STUBS);
+				Random rnd = mock(Random.class, Mockito.RETURNS_DEEP_STUBS);
+				when(rnd.nextInt()).thenReturn(42);
 				when(topo.getContextId()).thenReturn(scenario);
 				when(simState.getTopography()).thenReturn(topo);
 				VadereContext ctx = VadereContext.get(simState.getTopography());
-				ctx.put("random", mock(Random.class, Mockito.RETURNS_DEEP_STUBS));
+				ctx.put("random", rnd);
 				VadereContext.add(scenario, ctx);
 			}
 		};

@@ -12,7 +12,7 @@ import java.util.Random;
 
 /**
  * Interface for a simulation model.
- * The <code>initialize</code> method must be called before usage!
+ * The <code>solve</code> method must be called before usage!
  * This interface defines a callbacks for the simulation loop.
  * It's implementations define the major part of the simulation model's logic.
  *

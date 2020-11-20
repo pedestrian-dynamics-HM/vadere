@@ -2,12 +2,14 @@ package org.vadere.simulator.projects.migration;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenConstrainedDelaunayTriangulator;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.PlanarGraphGenerator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -37,17 +39,21 @@ public class GeometryCleaner {
 
 	private final static Logger logger = Logger.getLogger(GeometryCleaner.class);
 	private final VRectangle boundingBox;
-	private final VRectangle bound;
+	private final VPolygon bound;
 	private final List<VPolygon> polygons;
 	private final double tol;
 
-	public GeometryCleaner(@NotNull final VRectangle bound, @NotNull final Collection<VPolygon> polygons, final double tol) {
+	public GeometryCleaner(@NotNull final VPolygon bound, @NotNull final Collection<VPolygon> polygons, final double tol) {
 		this.bound = bound;
 		this.polygons = new ArrayList<>(polygons);
 		this.tol = tol;
 		List<VPoint> points = polygons.stream().flatMap(poly -> poly.getPath().stream()).collect(Collectors.toList());
 		points.addAll(bound.getPath());
 		this.boundingBox = GeometryUtils.boundRelative(points);
+	}
+
+	public GeometryCleaner(@NotNull final VRectangle bound, @NotNull final Collection<VPolygon> polygons, final double tol) {
+		this(new VPolygon(bound), polygons, tol);
 	}
 
 	/**
@@ -100,9 +106,9 @@ public class GeometryCleaner {
 	 *
 	 * @return a list of non-intersecting lines
 	 */
-	private Collection<VLine> removeIntersectingLines(@NotNull final List<VPolygon> polygons, @NotNull final VRectangle bound) {
+	private Collection<VLine> removeIntersectingLines(@NotNull final List<VPolygon> polygons, @NotNull final VPolygon bound) {
 		List<VLine> lines = polygons.stream().flatMap(p -> p.getLinePath().stream()).collect(Collectors.toList());
-		for(VLine line : bound.getLines()) {
+		for(VLine line : bound.getLinePath()) {
 			lines.add(line);
 		}
 
@@ -133,7 +139,7 @@ public class GeometryCleaner {
 		IDistanceFunction distanceFunction = IDistanceFunction.create(bound, polygons);
 
 		// 3. compute the segment-bounding simple polygon by using the distance function
-		Predicate<PFace> removePredicate = face -> distanceFunction.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0;
+		Predicate<PFace> removePredicate = face -> distanceFunction.apply(triangulation.getMesh().toMidpoint(face)) > 0;
 		triangulation.shrinkBorder(removePredicate, true);
 		VPolygon boundingPolygon = GeometryUtils.toPolygon(triangulation.getMesh().getPoints(triangulation.getMesh().getBorder()));
 
@@ -141,7 +147,7 @@ public class GeometryCleaner {
 		List<PFace> faces = triangulation.getMesh().getFaces();
 		for(PFace face : faces) {
 			if(!triangulation.getMesh().isBorder(face) && !triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
-				triangulation.createHole(face, f -> distanceFunction.apply(triangulation.getMesh().toTriangle(f).midPoint()) > 0, true);
+				triangulation.createHole(face, f -> distanceFunction.apply(triangulation.getMesh().toMidpoint(f)) > 0, true);
 			}
 		}
 
@@ -176,6 +182,34 @@ public class GeometryCleaner {
 		logger.debug("start polygon merging");
 		Pair<VPolygon, List<VPolygon>> mergedPolygons = mergePolygons(lines, magnetResult);
 		return mergedPolygons;
+	}
+
+	public VPolygon subtract(@NotNull final VPolygon subject, @NotNull final List<VPolygon> subtractors) {
+		List<VPolygon> polygonList = new ArrayList<>();
+		polygonList.add(subject);
+		polygonList.addAll(subtractors);
+		WeilerAtherton weilerAthertonAlg = new WeilerAtherton(polygonList);
+		return weilerAthertonAlg.subtraction().get();
+	}
+
+	/**
+	 * This method cuts out all polygons {@link GeometryCleaner#polygons} which partly intersects the {@link GeometryCleaner#bound}.
+	 * Note that all polygons which are contained in the measurement will not be cut out and will be returned instead.
+	 *
+	 * @return the cut result and a list of {@link VPolygon} of polygons which are contained in the measurement area (i.e. holes).
+	 */
+	public Pair<VPolygon, List<VPolygon>> cutObstacles() {
+		List<VPolygon> polygonList = new ArrayList<>();
+		polygonList.add(bound);
+
+		WeilerAtherton weilerAthertonAlg = new WeilerAtherton(polygons.stream().filter(poly -> bound.intersects(poly)).collect(Collectors.toList()));
+		List<VPolygon> mergedPolygons = weilerAthertonAlg.cup();
+		List<VPolygon> holes = mergedPolygons.stream().filter(poly -> bound.containsShape(poly)).collect(Collectors.toList());
+		mergedPolygons.removeIf(poly -> bound.containsShape(poly));
+
+		polygonList.addAll(mergedPolygons);
+		weilerAthertonAlg = new WeilerAtherton(polygonList);
+		return Pair.of(weilerAthertonAlg.subtraction().get(), holes);
 	}
 
 }

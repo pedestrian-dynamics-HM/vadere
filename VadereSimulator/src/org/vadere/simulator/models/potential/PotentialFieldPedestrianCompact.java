@@ -51,17 +51,29 @@ public class PotentialFieldPedestrianCompact implements PotentialFieldAgent {
 	}
 
 	private AttributesPotentialCompact attributes;
+	private AttributesAgent attributesAgent;
 	private double width;
 	private double height;
 
 	public PotentialFieldPedestrianCompact() {}
 
 	@Override
-	public void initialize(List<Attributes> attributesList, Domain topography,
+	public void initialize(List<Attributes> attributesList, Domain domain,
 	                       AttributesAgent attributesPedestrian, Random random) {
 		this.attributes  = Model.findAttributes(attributesList, AttributesPotentialCompact.class);
+		this.attributesAgent = domain.getTopography().getAttributesPedestrian();
 		this.width = attributes.getPedPotentialWidth();
 		this.height = attributes.getPedPotentialHeight();
+	}
+
+	@Override
+	public double getMaximalInfluenceRadius() {
+		if(attributes.isUseHardBodyShell()) {
+			return width + attributesAgent.getRadius();
+		}
+		else {
+			return width;
+		}
 	}
 
 	@Override

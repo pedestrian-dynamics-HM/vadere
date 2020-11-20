@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;

@@ -142,17 +142,17 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
         return nSteps >= MAX_STEPS;
     }
 
-    public void step() {
+    public void step() throws OpenCLException {
         step(true);
     }
 
-    public boolean step(boolean flipAll) {
+    public boolean step(boolean flipAll) throws OpenCLException {
         hasToRead = true;
         nSteps++;
         return clDistMesh.step(flipAll);
     }
 
-    public void finish() {
+    public void finish() throws OpenCLException {
         clDistMesh.finish();
     }
 
@@ -239,7 +239,11 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
 
     @Override
     public void improve() {
-        step();
+        try {
+            step();
+        } catch (OpenCLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

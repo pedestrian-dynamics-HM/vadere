@@ -2,24 +2,20 @@ package org.vadere.simulator.control.simulation;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.AFace;
+import org.vadere.meshing.mesh.gen.AHalfEdge;
+import org.vadere.meshing.mesh.gen.AMesh;
+import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
-import org.vadere.simulator.context.Context;
+import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.context.VadereContext;
-import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
-import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.helpers.CognitionModelBuilder;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
+import org.vadere.simulator.control.psychology.perception.helpers.PerceptionModelBuilder;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.control.scenarioelements.TargetChangerController;
-import org.vadere.simulator.control.psychology.cognition.CognitionModelBuilder;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
-import org.vadere.simulator.control.psychology.perception.PerceptionModelBuilder;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
@@ -33,14 +29,13 @@ import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
-import org.vadere.state.psychology.perception.types.Timeframe;
-import org.vadere.state.psychology.perception.types.WaitInArea;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -152,7 +147,9 @@ public class ScenarioRun implements Runnable {
 				scenarioStore.getTopography().reset();
 				initializeVadereContext();
 
-				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, loadBackgroundMesh().orElse(null));
+				AMesh floorFieldMesh = loadFloorFieldMesh().orElse(null);
+				AMesh backgroundMesh = loadBackgrounddMesh().orElse(null);
+				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, floorFieldMesh, backgroundMesh);
 				modelBuilder.createModelAndRandom();
 
 				final MainModel mainModel = modelBuilder.getModel();
@@ -171,10 +168,17 @@ public class ScenarioRun implements Runnable {
 				if (processorManager != null && !processorManager.isEmpty()) {
 					createAndSetOutputDirectory();
 					scenario.saveToOutputPath(outputPath);
+					if(floorFieldMesh != null) {
+						writeFloorFieldMeshToOutput(floorFieldMesh);
+					}
+					if(backgroundMesh != null) {
+						writeBackgroundMeshToOutput(backgroundMesh);
+					}
 				}
 
 				IPerceptionModel perceptionModel = PerceptionModelBuilder.instantiateModel(scenarioStore);
 				ICognitionModel cognitionModel = CognitionModelBuilder.instantiateModel(scenarioStore);
+
 
 				// ensure all elements have unique id before attributes are sealed
 				scenario.getTopography().generateUniqueIdIfNotSet();
@@ -203,20 +207,45 @@ public class ScenarioRun implements Runnable {
 		}
 	}
 
-	private Optional<PMesh> loadBackgroundMesh() {
-		// TODO: Refactor this code and place it somewhere else.
-		PMesh mesh = null;
+	private Optional<AMesh> loadFloorFieldMesh() {
+		return loadMesh(scenario.getName()+".poly");
+	}
+
+	private Optional<AMesh> loadBackgrounddMesh() {
+		return loadMesh(scenario.getName()+IOUtils.BACKGROUND_MESH_ENDING+".poly");
+	}
+
+	private Optional<AMesh> loadMesh(@NotNull final String fileName) {
+		AMesh mesh = null;
 		try {
-			var meshReader = new MeshPolyReader<>(() -> new PMesh());
-			Path path = scenarioFilePath.getParent().resolve(IOUtils.MESH_DIR + "/" + scenario.getName()+".poly");
-			mesh = (PMesh) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
+			var meshReader = new MeshPolyReader<>(() -> new AMesh());
+			Path path = scenarioFilePath.getParent().resolve(IOUtils.MESH_DIR + "/" + fileName);
+			mesh = (AMesh) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
 		} catch (FileNotFoundException e) {
-			logger.info("no background mesh " + scenario.getName() + ".poly was found.");
+			logger.info("no mesh " + fileName + " was found.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return Optional.ofNullable(mesh);
+	}
+
+	private void writeFloorFieldMeshToOutput(@NotNull final AMesh mesh) {
+		writeMeshToOutput(outputPath, scenario.getName()+".poly", mesh);
+	}
+
+	private void writeBackgroundMeshToOutput(@NotNull final AMesh mesh) {
+		writeMeshToOutput(outputPath, scenario.getName()+IOUtils.BACKGROUND_MESH_ENDING+".poly", mesh);
+	}
+
+	private void writeMeshToOutput(@NotNull final Path output, @NotNull final String fileName, @NotNull final AMesh mesh) {
+		try (PrintWriter out = new PrintWriter(Paths.get(output.toString(), fileName).toString())) {
+			MeshPolyWriter<AVertex, AHalfEdge, AFace> meshWriter = new MeshPolyWriter<>();
+			meshWriter.to2DPoly(mesh, 0, null, v -> false, out);
+			logger.info("write mesh to " + fileName + ".");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void simulationFailed(Throwable e) {

@@ -57,9 +57,9 @@ public class InterpolationUtil {
 	}
 
 	public static double barycentricInterpolation(
-			@NotNull final double x1, final double y1, final double val1,
-			@NotNull final double x2, final double y2, final double val2,
-			@NotNull final double x3, final double y3, final double val3,
+			final double x1, final double y1, final double val1,
+			final double x2, final double y2, final double val2,
+			final double x3, final double y3, final double val3,
 			final double totalArea,
 			final double x, final double y){
 
@@ -79,9 +79,13 @@ public class InterpolationUtil {
 			value = val3;
 		}
 		else {
-			double area1 = GeometryUtils.areaOfPolygon(new double[]{x,x2,x3}, new double[]{y,y2,y3});
-			double area2 = GeometryUtils.areaOfPolygon(new double[]{x1,x,x3}, new double[]{y1,y,y3});
-			double area3 = GeometryUtils.areaOfPolygon(new double[]{x1,x2,x}, new double[]{y1,y2,y});
+			//double area1 = GeometryUtils.areaOfPolygon(new double[]{x,x2,x3}, new double[]{y,y2,y3});
+			//double area2 = GeometryUtils.areaOfPolygon(new double[]{x1,x,x3}, new double[]{y1,y,y3});
+			//double area3 = GeometryUtils.areaOfPolygon(new double[]{x1,x2,x}, new double[]{y1,y2,y});
+
+			double area1 = GeometryUtils.areaOfTriangle(x, y, x2, y2, x3, y3);
+			double area2 = GeometryUtils.areaOfTriangle(x1, y1, x, y, x3, y3);
+			double area3 = GeometryUtils.areaOfTriangle(x1, y1, x2, y2, x, y);
 
 			if(area1 > 0.0) {
 				double percentP1 = area1 / totalArea;

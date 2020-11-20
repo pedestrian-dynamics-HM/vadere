@@ -13,8 +13,10 @@ import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
+import org.vadere.manager.traci.compound.CompoundObject;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.Vector3D;
@@ -208,8 +210,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		remoteManager.accessState((manager, state) -> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
-			if (checkIfPedestrianExists(ped, cmd))
-				cmd.setResponse(responseOK(PersonVar.SPEED.type, ped.getFreeFlowSpeed()));
+			if (checkIfPedestrianExists(ped, cmd)){
+				double speed = ped.getFootstepHistory().getAverageSpeedInMeterPerSecond();
+				cmd.setResponse(responseOK(PersonVar.SPEED.type, Double.isNaN(speed) ? 0.0 : speed));
+			}
 		});
 		return cmd;
 	}
@@ -364,7 +368,15 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ANGLE, name = "getAngle")
 	public TraCICommand process_getAngle(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		// return dummy value
-		cmd.setResponse(responseOK(PersonVar.ANGLE.type, 0.0));
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
+
+			if (checkIfPedestrianExists(ped, cmd)){
+				double angle = ped.getFootstepHistory().getNorthBoundHeadingAngleDeg();
+				cmd.setResponse(responseOK(PersonVar.ANGLE.type, angle));
+			}
+		});
 		return cmd;
 	}
 
@@ -388,6 +400,26 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 								.map(i -> Integer.toString(i))
 								.collect(Collectors.toList())
 				));
+		});
+		return cmd;
+	}
+
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.INFORMATION_ITEM, name = "setInformation")
+	public TraCICommand process_setStimulus(TraCISetCommand cmd, RemoteManager remoteManager) {
+		CompoundObject data = (CompoundObject) cmd.getVariableValue();
+		double start_t = (double)data.getData(0, TraCIDataType.DOUBLE);
+		double obsolete_at = (double)data.getData(1, TraCIDataType.DOUBLE);
+		String information = (String)data.getData(2, TraCIDataType.STRING);
+
+//		LinkedList<Integer> data = tmp.stream().map(Integer::parseInt).collect(Collectors.toCollection(LinkedList::new));
+		remoteManager.accessState((manager, state) -> {
+			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
+					.getElement(Integer.parseInt(cmd.getElementId()));
+			if (checkIfPedestrianExists(ped, cmd)) {
+				KnowledgeItem s = new KnowledgeItem(start_t, obsolete_at, information);
+				ped.getKnowledgeBase().addInformation(s);
+				cmd.setOK();
+			}
 		});
 		return cmd;
 	}
@@ -464,6 +496,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		PersonVar var = PersonVar.fromId(getCmd.getVariableIdentifier());
 		Method m = getHandler(getCmd.getTraCICmd(), var);
 
+		logger.tracef("invokeHandler: PersonCommandHandler.%s [CMD: %s VAR: %s]",
+				m.getName(),
+				cmd.getTraCICmd().logShort(),
+				var.toString());
 		return invokeHandler(m, this, getCmd, remoteManager);
 	}
 

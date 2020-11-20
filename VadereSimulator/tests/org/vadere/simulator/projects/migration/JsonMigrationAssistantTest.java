@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.simulator.entrypoints.Version;
+import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
 import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 import org.vadere.state.util.StateJsonConverter;

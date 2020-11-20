@@ -12,7 +12,7 @@ import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.EikonalSolverFMMTriangulation;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
@@ -62,9 +62,9 @@ public class TestFFMUniformTriangulation {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}*/
-        EikonalSolver solver = new EikonalSolverFMMTriangulation(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);
+        EikonalSolver solver = new MeshEikonalSolverFMM(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);
         log.info("start FFM");
-        solver.initialize();
+        solver.solve();
         log.info("FFM finished");
         try {
             //System.out.println(getClass().getClassLoader().getResource("./potentialField.csv").getFile());

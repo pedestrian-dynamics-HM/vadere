@@ -5,19 +5,22 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
+import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenConstrainedDelaunayTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
@@ -26,9 +29,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -298,6 +304,115 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		}
 	}
 
+	public void fillHoles(@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+		for(F hole : getMesh().getHoles()) {
+			List<IPoint> points = getMesh().getPoints(hole);
+			IncrementalTriangulation<V, E, F> incrementalTriangulation = new IncrementalTriangulation<>(
+					meshSupplier.get(),
+					IPointLocator.Type.JUMP_AND_WALK,
+					GeometryUtils.boundRelative(points),
+					e -> true);
+
+			List<VLine> constrians = getMesh().streamEdges(hole).map(e -> getMesh().toLine(e)).collect(Collectors.toList());
+
+			// generate a contrained delaunay triangulation
+			GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(incrementalTriangulation, constrians, false, false);
+			cdt.generate(true);
+
+			// remove all faces outside the hole
+			VPolygon polygon = getMesh().toPolygon(hole);
+			Predicate<F> removePredicate = face -> !polygon.contains(getMesh().toMidpoint(face));
+			cdt.getTriangulation().shrinkBorder(removePredicate, true);
+
+			IMesh<V, E, F> holeMesh = incrementalTriangulation.getMesh();
+			Map<V, V> vertexToVertex = new HashMap<>();
+			Map<F, F> faceToFace = new HashMap<>();
+			Map<E, E> edgeToEdge = new HashMap<>();
+
+			E edge = getMesh().getEdge(hole);
+			VPoint p2 = getMesh().toPoint(getMesh().getTwinVertex(edge));
+			VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
+			E otherEdge = getMesh().getEdge(holeMesh.getBorder(), p1, p2).get();
+
+
+			List<E> edges = getMesh().getEdges(edge).stream().map(e -> getMesh().getTwin(e)).collect(Collectors.toList());
+			List<E> otherEdges = holeMesh.getEdges(otherEdge);
+			otherEdges.add(otherEdges.remove(0));
+			Collections.reverse(otherEdges);
+			assert edges.size() == otherEdges.size();
+
+			// copy elements
+			for(int i = 0; i < edges.size(); i++) {
+				E e = edges.get(i);
+				E o = otherEdges.get(i);
+				vertexToVertex.put(holeMesh.getVertex(o), getMesh().getVertex(e));
+			}
+
+			for(V v : holeMesh.getVertices()) {
+				if(!getMesh().isAtBoundary(v)) {
+					// maybe clone the vertex?
+					vertexToVertex.put(v, getMesh().insertVertex(holeMesh.getX(v), holeMesh.getY(v)));
+				}
+			}
+
+			for(E e : holeMesh.getEdges()) {
+				V v = holeMesh.getVertex(e);
+				edgeToEdge.put(e, getMesh().createEdge(vertexToVertex.get(v)));
+			}
+
+			for(F face : holeMesh.getFaces()) {
+				faceToFace.put(face, getMesh().createFace());
+			}
+			//faceToFace.put(holeMesh.getBorder(), )
+
+			// copy connectivity
+			for(E o : holeMesh.getEdges()) {
+				E e = edgeToEdge.get(o);
+				getMesh().setTwin(e, edgeToEdge.get(holeMesh.getTwin(o)));
+				getMesh().setNext(e, edgeToEdge.get(holeMesh.getNext(o)));
+				getMesh().setPrev(e, edgeToEdge.get(holeMesh.getPrev(o)));
+				getMesh().setVertex(e, vertexToVertex.get(holeMesh.getVertex(o)));
+
+				if(!holeMesh.isBoundary(holeMesh.getFace(o))) {
+					getMesh().setFace(e, faceToFace.get(holeMesh.getFace(o)));
+				}
+			}
+
+			for(F o : holeMesh.getFaces()) {
+				F e = faceToFace.get(o);
+				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			}
+
+			for(V o : holeMesh.getVertices()) {
+				V e = vertexToVertex.get(o);
+				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			}
+
+			// merge internal
+			for(int i = 0; i < edges.size(); i++) {
+				E e = edges.get(i);
+				E o = edgeToEdge.get(otherEdges.get(i));
+
+				E twin = getMesh().getTwin(e);
+				V tv = getMesh().getVertex(twin);
+				E ve = getMesh().getEdge(tv);
+				E oTwin = holeMesh.getTwin(o);
+
+				if(ve.equals(twin)) {
+					getMesh().setEdge(tv, oTwin);
+				}
+
+				getMesh().setTwin(e, oTwin);
+				getMesh().destroyEdge(twin);
+				getMesh().destroyEdge(o);
+			}
+
+			// destroy the hole-mesh
+			holeMesh.clear();
+			getMesh().destroyFace(hole);
+		}
+	}
+
 	@Override
 	public void enableCache() {
 		if(!pointLocator.isCached()) {
@@ -397,8 +512,13 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		return insertVertex(getMesh().createVertex(point), face);
 	}
 
-	@Override
 	public E insertVertex(@NotNull final V vertex, @NotNull final F face) {
+		return insertVertex(vertex, face, true);
+	}
+
+
+	@Override
+	public E insertVertex(@NotNull final V vertex, @NotNull final F face, boolean legalize) {
 		if(!initialized) {
 			init();
 		}
@@ -419,18 +539,18 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		}
 		if(GeometryUtils.isOnEdge(p1, p2, vertex, edgeCoincidenceTolerance)) {
 			//log.info("splitEdge()");
-			E newEdge = getAnyEdge(splitEdge(vertex, edge, true));
+			E newEdge = getAnyEdge(splitEdge(vertex, edge, legalize));
 			insertEvent(newEdge);
 			return newEdge;
 		}
 		else {
 			//log.info("splitTriangle()");
-			if(!contains(vertex.getX(), vertex.getY(), face)) {
+			/*if(!contains(vertex.getX(), vertex.getY(), face)) {
 				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), face));
-			}
+			}*/
 			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
-			E newEdge = splitTriangle(face, vertex,  true);
+			E newEdge = splitTriangle(face, vertex,  legalize);
 			insertEvent(newEdge);
 			return newEdge;
 		}
@@ -468,13 +588,18 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public E insertVertex(V vertex) {
+		return insertVertex(vertex, true);
+	}
+
+	@Override
+	public E insertVertex(V vertex, boolean legalize) {
 		if(!initialized) {
 			init();
 		}
 
 		if(contains(vertex)) {
 			F face = pointLocator.locatePoint(vertex);
-			return insertVertex(vertex, face);
+			return insertVertex(vertex, face, legalize);
 		}
 		else {
 			throw new IllegalArgumentException(vertex + " is not contained in " + bound);
@@ -555,14 +680,29 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}*/
 
 
+	private boolean isVirtualVertex(@NotNull final V v) {
+		return virtualVertices.contains(v);
+	}
+
 
 	@Override
 	public void finish() {
 		if(!finalized) {
-			// we have to use other halfedges than he1 and he2 since they might be deleted
-			// if we deleteBoundaryFace he0!
-
+			// remove the super triangle properly!
 			if(!useMeshForBound) {
+				// flip all edges
+				List<E> toLegalize = new ArrayList<>();
+				for(V virtualPoint : virtualVertices) {
+
+					for(E edge : getMesh().getEdges(virtualPoint)) {
+						V vertex = getMesh().getVertex(getMesh().getNext(edge));
+						if(isLeftOf(vertex.getX(), vertex.getY(), getMesh().getNext(getMesh().getTwin(edge)))) {
+							flip(edge);
+							toLegalize.add(edge);
+						}
+					}
+				}
+
 				for(V virtualPoint : virtualVertices) {
 					if(!mesh.isDestroyed(virtualPoint)) {
 						List<F> faces1 = mesh.getFaces(virtualPoint);
@@ -570,7 +710,15 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 						faces1.forEach(f -> removeFaceAtBorder(f, true));
 					}
 				}
+
+				for(E edge : toLegalize) {
+					if(!getMesh().isDestroyed(edge)) {
+						legalize(edge);
+					}
+				}
 			}
+
+			//assert getMesh().streamEdges().noneMatch(e -> isIllegal(e));
 
 			/*if(!mesh.isDestroyed(p1)) {
 				List<F> faces2 = mesh.getFaces(p1);
@@ -692,6 +840,16 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
+	public Optional<F> locateFace(@NotNull final double x, final double y, final Object caller) {
+		return pointLocator.locate(x, y, caller);
+	}
+
+	@Override
+	public Optional<F> locateFace(@NotNull final double x, final double y) {
+		return pointLocator.locate(x, y);
+	}
+
+	@Override
 	public Set<F> getFaces() {
 		return streamFaces().collect(Collectors.toSet());
 	}
@@ -763,8 +921,20 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	 */
 	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p) {
-		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			return isDelaunayIllegal(edge, p);
+		// TODO: duplicated code
+		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			V v1 = getMesh().getVertex(edge);
+			V v2 = getMesh().getTwinVertex(edge);
+
+			/*if(isVirtualVertex(v1)) {
+				E e = getMesh().getNext(getMesh().getTwin(edge));
+				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
+			} else if(isVirtualVertex(v2)) {
+				E e = getMesh().getPrev(getMesh().getTwin(edge));
+				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
+			} else {*/
+				return isDelaunayIllegal(edge, p);
+			//}
 		}
 
 		return false;
@@ -773,8 +943,19 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p, final double eps) {
-		if(!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			return isDelaunayIllegal(edge, p, eps);
+		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			// special case for infinity vertices for which the arc of their circumcircle becomes a line!
+			//V v1 = getMesh().getVertex(edge);
+			//V v2 = getMesh().getTwinVertex(edge);
+
+			/*if(isVirtualVertex(v1)) {
+				return isLeftOf(p.getX(), p.getY(), getMesh().getNext(getMesh().getTwin(edge)));
+			} else if(isVirtualVertex(v2)) {
+				return isLeftOf(p.getX(), p.getY(), getMesh().getPrev(getMesh().getTwin(edge)));
+			} else {
+			*/
+				return isDelaunayIllegal(edge, p, eps);
+			//}
 		}
 
 		return false;
@@ -792,7 +973,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			V y = mesh.getVertex(t1);
 			V z = mesh.getVertex(t2);
 
-			//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			if (Utils.ccw(x,y,z) > 0
@@ -803,7 +984,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		return false;
 	}*/
 
-	public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
+	/*public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
 		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
 			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
 			//V p = mesh.getVertex(mesh.getNext(edge));
@@ -815,7 +996,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			V y = mesh.getVertex(t1);
 			V z = mesh.getVertex(t2);
 
-			//return Utils.angle(x, y, z) + Utils.angle(x, p, z) > Math.PI;
+			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
 
 			//return Utils.isInCircumscribedCycle(x, y, z, p);
 			//if(Utils.ccw(z,x,y) > 0) {
@@ -826,7 +1007,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			//}
 		}
 		return false;
-	}
+	}*/
 
 	/*public static <P extends IPoint> boolean isIllegalEdge(final E edge){
 		P p = edge.getNext().getEnd();
@@ -874,6 +1055,21 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		//}
 	}
 
+	/*@Override
+	/*@Override
+	public void legalizeNonRecursive(@NotNull final E edge, final V p) {
+		boolean found = false;
+		do {
+			found = false;
+			for(E e : getMesh().getEdges()) {
+				if(isIllegal(e)) {
+					flip(e);
+					found = true;
+				}
+			}
+		} while (found);
+	}*/
+
 	@Override
 	public void flipEdgeEvent(final F f1, final F f2) {
 		pointLocator.postFlipEdgeEvent(f1, f2);
@@ -891,10 +1087,10 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	@Override
-	public void splitEdgeEvent(F original, F f1, F f2, V v) {
-		pointLocator.postSplitHalfEdgeEvent(original, f1, f2,v );
+	public void splitEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
+		pointLocator.postSplitHalfEdgeEvent(originalEdge, original, f1, f2,v );
 		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitHalfEdgeEvent(original, f1, f2, v);
+			triEventListener.postSplitHalfEdgeEvent(originalEdge, original, f1, f2, v);
 		}
 	}
 
@@ -1004,7 +1200,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		BowyerWatsonSlow bw3 = new BowyerWatsonSlow(points);
 		bw3.execute();
 		Set<VLine> edges3 = bw3.getTriangles().stream()
-				.flatMap(triangle -> triangle.getLineStream()).collect(Collectors.toSet());
+				.flatMap(triangle -> triangle.streamLines()).collect(Collectors.toSet());
 		System.out.println(System.currentTimeMillis() - ms);
 
 		JFrame window3 = new JFrame();

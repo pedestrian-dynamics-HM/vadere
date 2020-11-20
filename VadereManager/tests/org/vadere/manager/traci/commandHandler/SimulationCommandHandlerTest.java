@@ -46,6 +46,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 		} catch (IOException e) {
 			throw e;
 		}
+
 		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCacheHashCommand.build(
 				TraCICmd.GET_SIMULATION_VALUE, elementID, varID, varType, data));
 		RemoteManager rm = new TestRemoteManager() {
@@ -92,7 +93,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 				when(simState.getSimTimeInSec()).thenReturn(retVal);
 			}
 		};
-		TraCICommand ret = simCmdHandler.process_getSimTime(cmd, rm, var);
+		TraCICommand ret = simCmdHandler.process_getSimTime(cmd, rm);
 		checkGET_OK(ret);
 		testGetValue(ret, varID, varType, elementID, retVal);
 		

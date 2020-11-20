@@ -13,6 +13,7 @@ import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
 import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
 import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
 import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
+import org.vadere.gui.components.control.simulation.ActionRecording;
 import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.utils.Messages;
@@ -216,33 +217,33 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 				resources.getIcon("potentialField.png", iconWidth, iconHeight),
                 model);
 
+		ActionRecording recording = new ActionRecording(
+				"showPotentialField",
+				resources.getIcon("record.png", iconWidth, iconHeight),
+				renderer);
+
+
 		mainPanel.addRendererChangeListener(generatePNG);
 		mainPanel.addRendererChangeListener(generateSVG);
 		mainPanel.addRendererChangeListener(generateTikz);
 		mainPanel.addRendererChangeListener(generateINETenv);
 		mainPanel.addRendererChangeListener(showPotentialField);
 
-
-		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction,
-				Messages.getString("ProjectView.btnShowPedestrian.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintTrajectories,
-				Messages.getString("ProjectView.btnShowTrajectories.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintArrowAction,
-				Messages.getString("ProjectView.btnShowWalkingDirection.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction,
-				Messages.getString("ProjectView.btnShowGroupInformation.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram,
-				Messages.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, drawMesh,
-				Messages.getString("ProjectView.btnDrawMesh.tooltip"));
-
+		// Pedestrian-related options
+		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction, Messages.getString("ProjectView.btnShowPedestrian.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintTrajectories, Messages.getString("ProjectView.btnShowTrajectories.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintArrowAction, Messages.getString("ProjectView.btnShowWalkingDirection.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction, Messages.getString("ProjectView.btnShowGroupInformation.tooltip"));
 		toolbar.addSeparator();
 
+		// "Measuring" tools
+		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram, Messages.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, drawMesh, Messages.getString("ProjectView.btnDrawMesh.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Messages.getString("ProjectView.btnShowGrid.tooltip"));
 		SwingUtils.addActionToToolbar(toolbar, paintDensity, Messages.getString("ProjectView.btnShowDensity.tooltip"));
-
 		toolbar.addSeparator();
 
+		// Snapshot options
 		ArrayList<Action> imgOptions = new ArrayList<>();
 		imgOptions.add(generatePNG);
 		imgOptions.add(generateSVG);
@@ -253,16 +254,16 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(
 				"camera_menu",
 				resources.getIcon("camera.png", iconWidth, iconHeight), imgOptions);
-		JButton imgMenuBtn =
-				SwingUtils.addActionToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
+		JButton imgMenuBtn = SwingUtils.addActionToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
 		imgDialog.setParent(imgMenuBtn);
 
-        SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
+		JButton recordButton = SwingUtils.addActionToToolbar(toolbar, recording, Messages.getString("OnlineVis.btnRecord.tooltip"));
+		recording.setButton(recordButton);
 
 		toolbar.add(Box.createHorizontalGlue());
 
-		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog,
-				Messages.getString("ProjectView.btnSettings.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog, Messages.getString("ProjectView.btnSettings.tooltip"));
 
 		splitPaneForTopographyAndJsonPane = new JSplitPane();
 		splitPaneForTopographyAndJsonPane.setResizeWeight(0.8);

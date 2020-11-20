@@ -14,6 +14,7 @@ import java.util.Observer;
 
 public class AdjustPanel extends JPanel implements Observer {
 
+	// Member Variables
 	private final JSlider slider;
 
 	private final JSpinner sVelocity;
@@ -28,8 +29,14 @@ public class AdjustPanel extends JPanel implements Observer {
 	private final SpinnerModel sModelTimeStep;
 	private final SpinnerModel sModelTimeResolution;
 
+	private final JLabel lblVelocity;
+	private final JLabel lblTime;
+	private final JLabel lblStep;
+	private final JLabel lblTimeResolution;
+
 	private final PostvisualizationModel model;
 
+	// Constructtors
 	public AdjustPanel(final PostvisualizationModel model) {
 		this.model = model;
 
@@ -58,20 +65,27 @@ public class AdjustPanel extends JPanel implements Observer {
 		sTime.setPreferredSize(new Dimension(70, 30));
 		sTimeResolution.setPreferredSize(new Dimension(70, 30));
 
+		String labelTemplate = "%s [%s]:";
+		lblVelocity = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblVelocity.text"), "fps"));
+		lblTime = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblTime"), "s"));
+		lblStep = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblStep.text"), "-"));
+		lblTimeResolution = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblTimeResolution.text"), "s"));
+
 		// Arrange the GUI components according to a column-based layout
 		FormLayout layout = new FormLayout(
 				"2dlu, default:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu", // col
 				"2dlu, default, 2dlu"); // rows
 		setLayout(layout);
+
 		CellConstraints cc = new CellConstraints();
 		add(slider, cc.xy(2, 2));
-		add(new JLabel(Messages.getString("AdjustPanel.lblVelocity.text")), cc.xy(4, 2));
+		add(lblVelocity, cc.xy(4, 2));
 		add(sVelocity, cc.xy(6, 2));
-		add(new JLabel(Messages.getString("AdjustPanel.lblTime")), cc.xy(8, 2));
+		add(lblTime, cc.xy(8, 2));
 		add(sTime, cc.xy(10, 2));
-		add(new JLabel(Messages.getString("AdjustPanel.lblStep.text")), cc.xy(12, 2));
+		add(lblStep, cc.xy(12, 2));
 		add(sStep, cc.xy(14, 2));
-		add(new JLabel(Messages.getString("AdjustPanel.lblTimeResolution.text")), cc.xy(16, 2));
+		add(lblTimeResolution, cc.xy(16, 2));
 		add(sTimeResolution, cc.xy(18, 2));
 
 		sVelocity.addChangeListener(e -> {
@@ -105,6 +119,34 @@ public class AdjustPanel extends JPanel implements Observer {
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
+
+		setToolTips();
+	}
+
+	private void setToolTips() {
+		String unitFramesText = String.format("%s: [%s]",
+				Messages.getString("Units.title"),
+				Messages.getString("Units.fps"));
+
+		lblVelocity.setToolTipText(unitFramesText);
+		sVelocity.setToolTipText(unitFramesText);
+
+		String unitTimeText = String.format("%s: [%s]",
+				Messages.getString("Units.title"),
+				Messages.getString("Units.time"));
+
+		lblTime.setToolTipText(unitTimeText);
+		sTime.setToolTipText(unitTimeText);
+
+		lblTimeResolution.setToolTipText(unitTimeText);
+		sTimeResolution.setToolTipText(unitTimeText);
+
+		String unitSimStepText = String.format("%s: [%s]",
+				Messages.getString("Units.title"),
+				Messages.getString("Units.simStep"));
+
+		lblStep.setToolTipText(unitSimStepText);
+		sStep.setToolTipText(unitSimStepText);
 	}
 
 	@Override

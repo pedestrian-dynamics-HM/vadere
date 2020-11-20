@@ -49,6 +49,9 @@ public class AHalfEdge implements IHalfEdge, Cloneable {
 		this.id = id;
 	    this.end = end;
 		this.face = face;
+		this.previous = -1;
+		this.next = -1;
+		this.twin = -1;
 		this.destroyed = false;
 	}
 
@@ -56,6 +59,9 @@ public class AHalfEdge implements IHalfEdge, Cloneable {
 		this.id = id;
 	    this.end = end;
 		this.face = -1;
+		this.previous = -1;
+		this.next = -1;
+		this.twin = -1;
 		this.destroyed = false;
 	}
 
@@ -159,10 +165,11 @@ public class AHalfEdge implements IHalfEdge, Cloneable {
 
 		if (!end.equals(halfEdge.end)) return false;
 		return face != null ? face.equals(halfEdge.face) : halfEdge.face == null;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public int hashCode() {
+		super.hashCode()
 		int result = end.hashCode();
 		result = 31 * result + (face != null ? face.hashCode() : 0);
 		return result;

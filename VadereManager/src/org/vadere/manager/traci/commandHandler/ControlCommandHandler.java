@@ -84,7 +84,9 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		logger.debugf("%s: execute %d subscriptions",
 				TraCICmd.SIM_STEP.name(),
 				remoteManager.getSubscriptions().size());
-		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+		remoteManager.getSubscriptions().forEach(sub -> {
+			sub.executeSubscription(remoteManager);
+		});
 
 		// remove subscriptions no longer valid
 		remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);
@@ -97,6 +99,15 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 			response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
 		});
 		cmd.setResponse(response);
+
+		// check RemoteManager if simulation is ended prematurely. This can happen if the
+		// a finish state is reached earlier than the given simulation time. In this case
+		// inform the TraCI client about this instead of giving it the Subscription results.
+		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
+			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
+			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
+			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+		}
 
 		logger.debug("process_simStep done.");
 		return cmd;

@@ -138,4 +138,12 @@ public class VDialogManager {
 		return true;
 	}
 
+	public static void showWarning(String title, String message) {
+		JOptionPane.showMessageDialog(
+				ProjectView.getMainWindow(),
+				message,
+				title,
+				JOptionPane.WARNING_MESSAGE);
+	}
+
 }

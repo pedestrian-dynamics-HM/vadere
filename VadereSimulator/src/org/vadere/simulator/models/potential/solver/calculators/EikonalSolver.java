@@ -25,7 +25,7 @@ public interface EikonalSolver {
 	 * Computes potentials on basis of the given data. Should be called from
 	 * outside only once for initialization.
 	 */
-	void initialize();
+	void solve();
 
 	/**
 	 * Recomputes the potentials. May be called every simulation step. May
