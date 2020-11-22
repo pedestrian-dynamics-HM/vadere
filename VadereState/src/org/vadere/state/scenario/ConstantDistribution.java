@@ -1,6 +1,5 @@
 package org.vadere.state.scenario;
 
-import org.apache.commons.math3.distribution.ConstantRealDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import java.util.List;
 
@@ -15,7 +14,7 @@ public class ConstantDistribution implements SpawnDistribution {
     private static final long serialVersionUID = 1L;
 
     private int spawnNumber;
-    private int outstandingAgents;
+    private int remainingAgents;
     private double updateFrequency;
 
 
@@ -24,7 +23,7 @@ public class ConstantDistribution implements SpawnDistribution {
 
         //rng is not required, everything is deterministic
         this.spawnNumber = spawnNumber;
-        this.outstandingAgents = 0;
+        this.remainingAgents = 0;
         this.updateFrequency = distributionParameters.get(0);
 
         // Only a single parameter is required and read for ConstantDistributionLegacy
@@ -40,13 +39,13 @@ public class ConstantDistribution implements SpawnDistribution {
     }
 
     @Override
-    public int getOutstandingSpawnNumber() {
-        return this.outstandingAgents;
+    public int getRemainingSpawnAgents() {
+        return this.remainingAgents;
     }
 
     @Override
-    public void setOutstandingAgents(int outstandingAgents){
-        this.outstandingAgents = outstandingAgents;
+    public void setRemainingSpawnAgents(int remainingAgents){
+        this.remainingAgents = remainingAgents;
     }
 
     @Override

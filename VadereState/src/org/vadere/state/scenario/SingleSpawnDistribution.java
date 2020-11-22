@@ -5,12 +5,12 @@ public class SingleSpawnDistribution implements SpawnDistribution {
 
     private int spawnNumber;
     private double spawnTime;
-    private int outstandingAgents;
+    private int remainingAgents;
 
     public SingleSpawnDistribution(int spawnNumber, double spawnTime){
         this.spawnNumber = spawnNumber;
         this.spawnTime = spawnTime;
-        this.outstandingAgents = 0;
+        this.remainingAgents = 0;
     }
 
     @Override
@@ -24,13 +24,13 @@ public class SingleSpawnDistribution implements SpawnDistribution {
     }
 
     @Override
-    public void setOutstandingAgents(int outstandingAgents){
-        this.outstandingAgents = outstandingAgents;
+    public void setRemainingSpawnAgents(int remainingAgents){
+        this.remainingAgents = remainingAgents;
     }
 
     @Override
-    public int getOutstandingSpawnNumber(){
-        return this.outstandingAgents;
+    public int getRemainingSpawnAgents(){
+        return this.remainingAgents;
     }
 
 }

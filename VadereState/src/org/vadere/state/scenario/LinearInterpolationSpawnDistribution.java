@@ -15,7 +15,7 @@ public class LinearInterpolationSpawnDistribution implements SpawnDistribution {
     private double spawnFrequency;
     private TruncatedNormalDistribution truncNormalDist;
     private RandomGenerator randomGenerator;
-    private int outstandingAgents = 0;
+    private int remainingAgents = 0;
 
 
     public LinearInterpolationSpawnDistribution(RandomGenerator rng, List<Double> distributionParameters){
@@ -45,17 +45,14 @@ public class LinearInterpolationSpawnDistribution implements SpawnDistribution {
 
     @Override
     public int getSpawnNumber(double timeCurrentEvent){
-        int spawnNumber = (int) Math.round(this.interpolator.value(timeCurrentEvent));  // + this.truncNormalDist.sample());
+        int spawnNumber = (int) Math.round(this.interpolator.value(timeCurrentEvent)+ this.truncNormalDist.sample());
         spawnNumber = Math.max(0, spawnNumber);
-
-        //System.out.println("timeCurrentEvent " + timeCurrentEvent + " spawn number = " + spawnNumber);
-
         return spawnNumber;
     }
 
     @Override
-    public int getOutstandingSpawnNumber(){
-        // Agents that could not be spawned (e.g. because the Source is too small) are not taken to the next update
+    public int getRemainingSpawnAgents(){
+        // Agents that could not be spawned (e.g. because the source is too small) are not taken to the next update
         return 0;
     }
 
@@ -64,9 +61,8 @@ public class LinearInterpolationSpawnDistribution implements SpawnDistribution {
         return timeCurrentEvent + spawnFrequency;
     }
 
-
-
     @Override
-    public void setOutstandingAgents(int outstandingAgents) {
+    public void setRemainingSpawnAgents(int remainingAgents) {
+        this.remainingAgents = remainingAgents;
     }
 }

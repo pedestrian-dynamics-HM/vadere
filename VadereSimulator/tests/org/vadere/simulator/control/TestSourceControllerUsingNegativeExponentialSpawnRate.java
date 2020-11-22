@@ -1,3 +1,5 @@
+
+/*
 package org.vadere.simulator.control;
 
 import org.junit.Test;
@@ -37,3 +39,4 @@ public class TestSourceControllerUsingNegativeExponentialSpawnRate extends TestS
         assertEquals(meanIterArrival, 1/arrivalRatePerSec,0.1);
     }
 }
+*/

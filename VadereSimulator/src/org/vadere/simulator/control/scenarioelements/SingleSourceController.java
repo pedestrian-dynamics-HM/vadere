@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.simulator.control.simulation.Simulation;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
@@ -98,10 +97,10 @@ public class SingleSourceController extends SourceController {
 				}
 
 				// Report nr. of agents that could not be spawned -- it is up to SpawnDistribution if it
-				// wants to try to spawn the agents im the next update.
-				int outstandingAgents = numberToSpawn - spawnPoints.size();
-				assert (outstandingAgents >= 0);
-				this.distribution.setOutstandingAgents(outstandingAgents);
+				// wants to try to spawn the agents in the next update.
+				int remainingAgents = numberToSpawn - spawnPoints.size();
+				assert (remainingAgents >= 0);
+				this.distribution.setRemainingSpawnAgents(remainingAgents);
 
 				for (VPoint spawnPoint : spawnPoints) {
 					if (!isMaximumNumberOfSpawnedElementsReached()) {
@@ -225,7 +224,7 @@ public class SingleSourceController extends SourceController {
 
 		// The concrete distribution implements how to proceed with agents that could not all be spawned
 		// e.g. because the source is too small
-		numberToSpawn = this.distribution.getOutstandingSpawnNumber();
+		numberToSpawn = this.distribution.getRemainingSpawnAgents();
 
 		while (timeOfNextEvent <= simTimeInSec) {
 			numberToSpawn += distribution.getSpawnNumber(timeOfNextEvent);

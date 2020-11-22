@@ -4,7 +4,7 @@ public interface SpawnDistribution {
 
     int getSpawnNumber(double timeCurrentEvent);
     double getNextSpawnTime(double timeCurrentEvent);
-    int getOutstandingSpawnNumber();
-    void setOutstandingAgents(int outstandingAgents);
+    int getRemainingSpawnAgents();
+    void setRemainingSpawnAgents(int remainingAgents);
 
 }
