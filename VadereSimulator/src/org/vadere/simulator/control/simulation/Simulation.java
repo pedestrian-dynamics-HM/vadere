@@ -223,7 +223,6 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
-		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -237,7 +236,10 @@ public class Simulation {
 			processorManager.postLoop(this.simulationState);
 		}
 
-		// notify remoteManger that simulation ended. If a command waited for the next
+		// Models and processors require the latest topography for post processing.
+		// Therefore, reset topography afterwards (I guess resetting the topography was introduced by Stefan).
+		topographyController.postLoop(this.simTimeInSec);
+		// Notify remoteManger that simulation ended. If a command waited for the next
 		// simulation step notify it and execute command with current SimulationState.
 		setWaitForSimCommand(true); // its save to read the state now.
 		remoteRunListeners.forEach(RemoteRunListener::lastSimulationStepFinishedListener);

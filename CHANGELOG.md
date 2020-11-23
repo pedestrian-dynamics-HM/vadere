@@ -6,7 +6,11 @@
 
 ### Added
 
+- Added new output processor "PedestrianTargetReachTimeProcessor" to log the time when an agent reaches its target.
+
 ### Changed
+
+- In `postLoop()` of `Simulation.java`, clear the topography as very last step so that models and output processors can use it before.
 
 ## v1.15 (2020-11-12)
 
