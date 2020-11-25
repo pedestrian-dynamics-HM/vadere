@@ -44,6 +44,17 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	}
 
 	@Override
+	public boolean contains(VCircle otherShape) {
+		double x_c = otherShape.getCentroid().x;
+		double y_c = otherShape.getCentroid().y;
+		double r_c = otherShape.getRadius();
+		return ((this.x  + r_c) < x_c) &&		// x < (x_c - r_c)
+				((this.y + r_c) < y_c) &&		// y < (y_c - r_c)
+				((this.x + this.width) > (x_c + r_c)) &&
+				((this.y + this.height) > (y_c + r_c));
+	}
+
+	@Override
 	public double distance(IPoint point) {
 		VPoint closestPoint = closestPoint(point);
 
