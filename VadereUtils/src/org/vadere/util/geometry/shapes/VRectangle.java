@@ -45,13 +45,14 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 
 	@Override
 	public boolean contains(VCircle otherShape) {
-		double x_c = otherShape.getCentroid().x;
-		double y_c = otherShape.getCentroid().y;
-		double r_c = otherShape.getRadius();
-		return ((this.x  + r_c) < x_c) &&		// x < (x_c - r_c)
-				((this.y + r_c) < y_c) &&		// y < (y_c - r_c)
-				((this.x + this.width) > (x_c + r_c)) &&
-				((this.y + this.height) > (y_c + r_c));
+		double centerX = otherShape.getCentroid().x;
+		double centerY = otherShape.getCentroid().y;
+		double radius = otherShape.getRadius();
+
+		boolean circleFitsIntoHorizontally = (centerX > (this.x + radius)) && ((this.x + this.width) > (centerX + radius));
+		boolean circleFitsIntoVertically = (centerY > (this.y + radius)) && ((this.y + this.height) > (centerY + radius));
+
+		return circleFitsIntoHorizontally && circleFitsIntoVertically;
 	}
 
 	@Override
