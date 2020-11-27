@@ -76,12 +76,26 @@ public interface VShape extends Shape, Cloneable, Geometry {
 		return thisShape.isEmpty();
 	}
 
+	// numerical not stable for comparision with VCircle.
+	// use contains(VCircle otherShape)
 	default boolean containsShape(VShape otherShape) {
+		if (otherShape instanceof  VCircle){
+			return this.contains((VCircle)otherShape);
+		}
 		Area thisArea = new Area(this);
 		Area otherArea = new Area(otherShape);
 		thisArea.intersect(otherArea);
 		return thisArea.equals(otherArea);
 
+	}
+
+	// todo: remove default implementation and implement specific performance optimized and numerical stable versions.
+	default boolean contains(VCircle otherShape){
+		// override in specific shapes for more performance optimized implementations
+		Area thisArea = new Area(this);
+		Area otherArea = new Area(otherShape);
+		thisArea.intersect(otherArea);
+		return thisArea.equals(otherArea);
 	}
 
 	/**
