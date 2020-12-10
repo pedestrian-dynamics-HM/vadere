@@ -56,6 +56,12 @@ public class TraCISetCommand extends TraCICommand {
 		return variableId;
 	}
 
+
+	public int getVariableIdentifier() {
+		return variableId;
+	}
+
+
 	public String getElementId() {
 		return elementId;
 	}
