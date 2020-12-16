@@ -265,7 +265,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			);
 			cmd.setResponse(responseOK(SimulationVar.COORD_REF.type, o));
 		});
-
 		return cmd;
 	}
 

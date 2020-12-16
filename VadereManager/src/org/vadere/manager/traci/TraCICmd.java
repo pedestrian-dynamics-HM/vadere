@@ -1,18 +1,23 @@
 package org.vadere.manager.traci;
 
 import org.vadere.manager.TraCIException;
+import org.vadere.manager.traci.commandHandler.variables.ControlVar;
+import org.vadere.manager.traci.commandHandler.variables.PersonVar;
+import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
+import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
+import org.vadere.manager.traci.commandHandler.variables.VadereVar;
 
 /**
  * List of all TraCI Commands and there Types.
  */
 public enum TraCICmd {
 	// TraCI/Control-related commands
-	GET_VERSION(0x00, CmdType.CTRL),
-	SIM_STEP(0x02, CmdType.CTRL),
-	CLOSE(0x7F, CmdType.CTRL),
-	LOAD(0x01, CmdType.CTRL),
-	SET_ORDER(0x03, CmdType.CTRL),
-	SEND_FILE(0x75, CmdType.CTRL),
+	GET_VERSION(0x00, CmdType.CTRL, ControlVar::asString),
+	SIM_STEP(0x02, CmdType.CTRL, ControlVar::asString),
+	CLOSE(0x7F, CmdType.CTRL, ControlVar::asString),
+	LOAD(0x01, CmdType.CTRL, ControlVar::asString),
+	SET_ORDER(0x03, CmdType.CTRL, ControlVar::asString),
+	SEND_FILE(0x75, CmdType.CTRL, ControlVar::asString),
 	// Value Retrieval
 	GET_INDUCTION_LOOP(0xa0, CmdType.VALUE_GET),
 	RESPONSE_GET_INDUCTION_LOOP(0xb0, CmdType.RESPONSE),
@@ -30,22 +35,23 @@ public enum TraCICmd {
 	RESPONSE_GET_ROUTE_VALUE(0xb6, CmdType.RESPONSE),
 	GET_POI_VALUE(0xa7, CmdType.VALUE_GET),
 	RESPONSE_GET_POI_VALUE(0xb7, CmdType.RESPONSE),
-	GET_POLYGON(0xa8, CmdType.VALUE_GET),
-	RESPONSE_GET_POLYGON(0xb8, CmdType.RESPONSE),
+
+	GET_POLYGON(0xa8, CmdType.VALUE_GET, PolygonVar::asString),
+	RESPONSE_GET_POLYGON(0xb8, CmdType.RESPONSE, PolygonVar::asString),
 	GET_JUNCTION_VALUE(0xa9, CmdType.VALUE_GET),
 	RESPONSE_GET_JUNCTION_VALUE(0xb9, CmdType.RESPONSE),
 	GET_EDGE_VALUE(0xaa, CmdType.VALUE_GET),
 	RESPONSE_GET_EDGE_VALUE(0xba, CmdType.RESPONSE),
-	GET_SIMULATION_VALUE(0xab, CmdType.VALUE_GET),
-	RESPONSE_GET_SIMULATION_VALUE(0xbb, CmdType.RESPONSE),
+	GET_SIMULATION_VALUE(0xab, CmdType.VALUE_GET, SimulationVar::asString),
+	RESPONSE_GET_SIMULATION_VALUE(0xbb, CmdType.RESPONSE, SimulationVar::asString),
 	GET_GUI_VALUE(0xac, CmdType.VALUE_GET),
 	RESPONSE_GET_GUI_VALUE(0xbc, CmdType.RESPONSE),
 	GET_LANEAREA_DETECTOR(0xad, CmdType.VALUE_GET),
 	RESPONSE_GET_LANEAREA_DETECTOR(0xbd, CmdType.RESPONSE),
-	GET_PERSON_VALUE(0xae, CmdType.VALUE_GET),
-	RESPONSE_GET_PERSON_VALUE(0xbe, CmdType.RESPONSE),
-	GET_VADERE_VALUE(0xaf, CmdType.VALUE_GET),
-	RESPONSE_GET_VADERE_VALUE(0xbf, CmdType.RESPONSE),
+	GET_PERSON_VALUE(0xae, CmdType.VALUE_GET, PersonVar::asString),
+	RESPONSE_GET_PERSON_VALUE(0xbe, CmdType.RESPONSE, PersonVar::asString),
+	GET_VADERE_VALUE(0xaf, CmdType.VALUE_GET, VadereVar::asString),
+	RESPONSE_GET_VADERE_VALUE(0xbf, CmdType.RESPONSE, VadereVar::asString),
 	// State Changing
 	SET_TRAFFIC_LIGHT_STATE(0xc2, CmdType.VALUE_SET),
 	SET_LANE_STATE(0xc3, CmdType.VALUE_SET),
@@ -93,12 +99,20 @@ public enum TraCICmd {
 
 	public int id;
 	public CmdType type;
+	public  VarString varString;
 
 	TraCICmd(int id, CmdType type) {
 		this.id = id;
 		this.type = type;
-
+		this.varString = id1 -> "varID: " + id1;
 	}
+
+	TraCICmd(int id, CmdType type, VarString varString) {
+		this.id = id;
+		this.type = type;
+		this.varString = varString;
+	}
+
 
 	public static TraCICmd fromId(int id) {
 		for (TraCICmd traCICmd : values()) {
@@ -110,11 +124,14 @@ public enum TraCICmd {
 
 	@Override
 	public String toString() {
-
 		return String.format("TraCICmd{%s: id=0x%02X, type=%s}", name(), id, type);
 	}
 
 	public String logShort() {
-		return String.format("{%s: 0x%02X%s}", name(), id, type);
+		return String.format("{%s: 0x%02X %s}", name(), id, type);
+	}
+
+	public String logShort(int varId) {
+		return String.format("{%s: 0x%02X %s VAR: %s}", name(), id, type, varString.varAsString(varId));
 	}
 }
