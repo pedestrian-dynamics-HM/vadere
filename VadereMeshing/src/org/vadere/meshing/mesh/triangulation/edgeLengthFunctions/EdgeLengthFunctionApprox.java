@@ -40,7 +40,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
-		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
+		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, pslg, circumRadiusFunc, 10, false, false);
 		triangulation = ruppertsTriangulator.generate();
 		triangulation.enableCache();
 
@@ -56,7 +56,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
 						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
 					var u = triangulation.getMesh().getTwinVertex(e);
-					double len = v.distance(u) * (1.0 / (Math.sqrt(2)*4.0));
+					double len = v.distance(u) * (1.0 / (Math.sqrt(2) * 1.2/*4.0*/));
 					if(len < minEdgeLen) {
 						minEdgeLen = len;
 					}

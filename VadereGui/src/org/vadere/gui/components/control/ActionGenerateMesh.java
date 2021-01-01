@@ -54,21 +54,21 @@ public class ActionGenerateMesh extends AbstractAction {
 
 			MeshConstructor constructor = new MeshConstructor();
 
-			/*CompletableFuture.supplyAsync(
+			CompletableFuture.supplyAsync(
 					() -> constructor.pslgToAdaptivePMesh(pslg, hmin, hmax, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
 					.exceptionally( ex ->  {
 						ex.printStackTrace();
 						return null;
-					});*/
+					});
 
-			CompletableFuture.supplyAsync(
-					() -> constructor.pslgToAdaptivePMesh(pslg, hmin, hmax,true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
+			/*CompletableFuture.supplyAsync(
+					() -> constructor.pslgToUniformOptimalPMesh(pslg, hmin,true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,""))
 					.exceptionally( ex ->  {
 						ex.printStackTrace();
 						return null;
-					});
+					});*/
 			CompletableFuture.supplyAsync(
-					() -> constructor.pslgToCoarsePMesh(pslg, true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,IOUtils.BACKGROUND_MESH_ENDING))
+					() -> constructor.pslgToCoarsePMesh(pslg, p -> Double.POSITIVE_INFINITY,true)).thenAccept(mesh -> saveFloorFieldMesh(mesh,IOUtils.BACKGROUND_MESH_ENDING))
 					.exceptionally( ex ->  {
 						ex.printStackTrace();
 						return null;
@@ -77,7 +77,7 @@ public class ActionGenerateMesh extends AbstractAction {
 	}
 
 	private void saveFloorFieldMesh(@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh, final String ending) {
-		logger.info("generate mesh");
+		logger.info("generate mesh (" + mesh.getMinEdgeLen() + ", " + mesh.getMaxEdgeLen() + ")");
 
 		File meshDir = new File(model.getCurrentProjectPath().concat("/" + IOUtils.SCENARIO_DIR + "/" + IOUtils.MESH_DIR));
 		File outputFile = new File(meshDir.getAbsoluteFile() + "/" +  model.getCurrentScenario().getName() + ending + ".poly");

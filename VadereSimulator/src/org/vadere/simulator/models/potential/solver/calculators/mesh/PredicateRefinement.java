@@ -42,6 +42,6 @@ public class PredicateRefinement<V extends IVertex, E extends IHalfEdge, F exten
 		if(curvature <= GeometryUtils.DOUBLE_EPS) {
 			return false;
 		}
-		return len > minEdgeLen + minEdgeLen * 0.3 * (1/(curvature));
+		return len > minEdgeLen + minEdgeLen * delta * (1/(curvature));
 	}
 }

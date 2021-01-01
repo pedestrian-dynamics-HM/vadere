@@ -517,8 +517,8 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 		boolean isGreen1 = !isBoundary1 && isGreen(getMesh().getFace(edge));
 		boolean isGreen2 = !isBoundary2 && isGreen(getMesh().getTwinFace(edge));
 
-		boolean isRed1 = isRed(getMesh().getFace(edge));
-		boolean isRed2 = isRed(getMesh().getTwinFace(edge));
+//		boolean isRed1 = isRed(getMesh().getFace(edge));
+//		boolean isRed2 = isRed(getMesh().getTwinFace(edge));
 
 		int level = getLevel(edge);
 

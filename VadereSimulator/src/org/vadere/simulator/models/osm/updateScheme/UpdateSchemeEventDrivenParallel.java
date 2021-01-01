@@ -41,48 +41,52 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 	private boolean[][] locked;
 	private double pedestrianPotentialWidth;
 	private int iteration = 0;
-	private ArrayList<ArrayList<Integer>> histgram;
 	private BufferedWriter bufferedWriter;
+
+	private double sideLength = -1;
 
 	public UpdateSchemeEventDrivenParallel(@NotNull final Topography topography, @NotNull final double pedestrianPotentialWidth) {
 		super(topography);
 		this.topography = topography;
 		this.pedestrianPotentialWidth = pedestrianPotentialWidth;
 
-		/*this.histgram = new ArrayList<>();
 		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/parallelOSM/");
 		try {
 			bufferedWriter = IOUtils.getWriter("histogram.csv", dir);
 			bufferedWriter.write("iteration round\n");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-//		histgram.add(new ArrayList<>());
-//		ArrayList<Integer> histo = histgram.get(iteration);
+		ArrayList<Integer> histUpdateable = new ArrayList<>();
 		topography.getElements(PedestrianOSM.class).parallelStream().forEach(pedestrianOSM -> pedestrianOSM.clearStrides());
 
-		double maxStepSize = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredStepSize()).max().orElse(0);
-		double maxDesiredSpeed = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredSpeed()).max().orElse(0);
+		if(sideLength <= 0) {
+			double maxStepSize = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredStepSize()).max().orElse(0);
+			double maxDesiredSpeed = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredSpeed()).max().orElse(0);
 
-		double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
-		//double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
-		double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0 * 0.4;
-		//logger.debug("initial grid with a grid edge length equal to " + sideLength);
+			//double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
+			//double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
+			double stepSize = maxStepSize;
+			sideLength = (2.0*stepSize+pedestrianPotentialWidth);                                                                                                                                           ;
+			//logger.debug("initial grid with a grid edge length equal to " + sideLength);
+		}
 
 		for(PedestrianOSM ped : pedestrianEventsQueue) {
 			ped.updateCount = -1;
 		}
+
+		int nCells = 0;
 
 		int counter = 1;
 		// event driven update ignores time credits
 		do {
 			linkedCellsGrid = new LinkedCellsGrid<>(new VRectangle(topography.getBounds()), sideLength);
 			locked = new boolean[linkedCellsGrid.getGridWidth()][linkedCellsGrid.getGridHeight()];
-
+			nCells = linkedCellsGrid.getGridWidth() * linkedCellsGrid.getGridHeight();
 			List<PedestrianOSM> updateAbleAgents = new LinkedList<>();
 			List<PedestrianOSM> notUpdateAbleAgents = new LinkedList<>();
 
@@ -94,24 +98,24 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				if(!locked[gridPos[0]][gridPos[1]]) {
 					updateAbleAgents.add(ped);
 					ped.updateCount = counter;
-
-					// lock neighbours
-					for(int y = -1; y <= 1; y++) {
-						for(int x = -1; x <= 1; x++) {
-							int col = Math.min(locked.length-1, Math.max(0, gridPos[0]+x));
-							int row = Math.min(locked[0].length-1, Math.max(0, gridPos[1]+y));
-							locked[col][row] = true;
-						}
-					}
 				} else {
 					notUpdateAbleAgents.add(ped);
 					ped.updateCount = -1;
 				}
+
+				// lock neighbours
+				for(int y = -1; y <= 1; y++) {
+					for(int x = -1; x <= 1; x++) {
+						int col = Math.min(locked.length-1, Math.max(0, gridPos[0]+x));
+						int row = Math.min(locked[0].length-1, Math.max(0, gridPos[1]+y));
+						locked[col][row] = true;
+					}
+				}
 			}
 
-			/*logger.debug("update " + updateAbleAgents.size() + " in parallel in round " + counter + ".");
-			histo.add(updateAbleAgents.size());
-			logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");*/
+
+			histUpdateable.add(updateAbleAgents.size());
+			//logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");
 			updateAbleAgents.parallelStream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
 				//System.out.println(ped.getId());
@@ -123,11 +127,11 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			counter++;
 		} while (!pedestrianEventsQueue.isEmpty() && pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec);
 		iteration++;
-
-		/*try {
+		logger.debug("rounds: " + counter + ", #peds: " + topography.getPedestrianDynamicElements().getElements().size() + ", cells: " + nCells + ", sideLen:" + sideLength);
+		try {
 			StringBuilder builder = new StringBuilder();
-			for(int round = 1; round <= histo.size(); round++) {
-				for(int i = 0; i < histo.get(round-1); i++) {
+			for(int round = 1; round <= histUpdateable.size(); round++) {
+				for(int i = 0; i < histUpdateable.get(round-1); i++) {
 					builder.append(iteration);
 					builder.append(" ");
 					builder.append(round);
@@ -138,6 +142,6 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 			bufferedWriter.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 }

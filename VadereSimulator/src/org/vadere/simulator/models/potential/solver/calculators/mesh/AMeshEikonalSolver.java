@@ -22,6 +22,7 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMe
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
@@ -121,6 +122,24 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			setBurned(v);
 			setAsInitialVertex(v);
 		}
+	}
+
+	protected List<V> findInitialVertices(final Collection<VShape> targetShapes) {
+		//TODO a more clever init!
+		List<V> initialVertices = new ArrayList<>();
+		for(VShape shape : targetShapes) {
+			getMesh().streamVertices()
+					.filter(v -> shape.contains(getMesh().toPoint(v)))
+					.forEach(v -> {
+						for(V u : getMesh().getAdjacentVertexIt(v)) {
+							initialVertices.add(u);
+							setAsInitialVertex(u);
+						}
+						initialVertices.add(v);
+						setAsInitialVertex(v);
+					});
+		}
+		return initialVertices;
 	}
 
 	protected void unsolve() {

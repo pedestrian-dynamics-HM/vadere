@@ -18,6 +18,7 @@ import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -60,6 +61,18 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 
 	private ITimeCostFunction timeCostFunction;
 
+	private Collection<VShape> targetShapes = null;
+
+
+	public MeshEikonalSolverFMMIterative(@NotNull final String identifier,
+	                             @NotNull final Collection<VShape> targetShapes,
+	                             @NotNull final ITimeCostFunction timeCostFunction,
+	                             @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	) {
+		this(new MeshEikonalSolverFMM<>(identifier, targetShapes, timeCostFunction, triangulation));
+		this.targetShapes = targetShapes;
+		this.timeCostFunction = timeCostFunction;
+	}
 
 	public MeshEikonalSolverFMMIterative(@NotNull final ITimeCostFunction timeCostFunction,
 	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
@@ -130,7 +143,12 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 				solver.getTriangulation().removeTriEventListener(solver);
 				IIncrementalTriangulation<V, E, F> refinedTriangulation = refine(solver.getTriangulation());
 				//solver = new MeshEikonalSolverFMM<>(getTimeCostFunction(), refinedTriangulation, refinedTriangulation.getMesh().getBoundaryVertices());
-				solver = new MeshEikonalSolverFMM<>(getTimeCostFunction(), pointList, refinedTriangulation);
+				//
+				if(targetShapes == null) {
+					solver = new MeshEikonalSolverFMM<>(getTimeCostFunction(), pointList, refinedTriangulation);
+				} else {
+					solver = new MeshEikonalSolverFMM<>("", targetShapes, timeCostFunction, refinedTriangulation);
+				}
 				solver.solve();
 
 				System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));

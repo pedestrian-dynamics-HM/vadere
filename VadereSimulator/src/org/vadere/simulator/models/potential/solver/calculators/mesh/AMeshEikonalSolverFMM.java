@@ -105,7 +105,7 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 	 */
 	protected void updatePotentialOfNeighbours(@NotNull final V vertex) {
 		for(V neighbour : getMesh().getAdjacentVertexIt(vertex)) {
-			if(!isBurned(neighbour)) {
+			if(!isBurned(neighbour) && !isInitialVertex(neighbour)) {
 				updatePotential(neighbour);
 			}
 		}
