@@ -88,7 +88,7 @@ public class ThreatCognitionModelTest {
     }
 
     @Test
-    public void updateSetsInsideThreatAreaIfThreatStimulusAndPedIsNotBlockedByObstacles() {
+    public void updateSetsThreatenedIfThreatStimulusAndPedIsNotBlockedByObstacles() {
         initializeTopography();
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
@@ -100,7 +100,7 @@ public class ThreatCognitionModelTest {
 
         modelUnderTest.update(pedestrians);
 
-        assertEquals(SelfCategory.INSIDE_THREAT_AREA, pedestrian.getSelfCategory());
+        assertEquals(SelfCategory.THREATENED, pedestrian.getSelfCategory());
     }
 
     @Test
@@ -180,11 +180,11 @@ public class ThreatCognitionModelTest {
 
         modelUnderTest.update(pedestrians);
 
-        assertEquals(SelfCategory.OUTSIDE_THREAT_AREA, pedestrian.getSelfCategory());
+        assertEquals(SelfCategory.COMMON_FATE, pedestrian.getSelfCategory());
     }
 
     @Test
-    public void updateSetsInsideOrOutsideThreatAreaUponElapsedTimeStimulusIfPedestrianWasThreatenedBefore() {
+    public void updateSetsThreatenedOrCommonFateUponElapsedTimeStimulusIfPedestrianWasThreatenedBefore() {
         initializeTopography();
 
         AttributesTarget attributesTarget = new AttributesTarget();
@@ -215,7 +215,7 @@ public class ThreatCognitionModelTest {
 
             modelUnderTest.update(pedestrians);
 
-            SelfCategory expectedSelfCategory = (i <= threatRadius) ? SelfCategory.INSIDE_THREAT_AREA : SelfCategory.OUTSIDE_THREAT_AREA ;
+            SelfCategory expectedSelfCategory = (i <= threatRadius) ? SelfCategory.THREATENED : SelfCategory.COMMON_FATE;
             assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
         }
     }
@@ -259,7 +259,7 @@ public class ThreatCognitionModelTest {
         Pedestrian threatenedNeighbor = new Pedestrian(attributesAgent, new Random());
         threatenedNeighbor.setMostImportantStimulus(threatStimulus);
         threatenedNeighbor.getThreatMemory().add(threatStimulus);
-        threatenedNeighbor.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
+        threatenedNeighbor.setSelfCategory(SelfCategory.COMMON_FATE);
         threatenedNeighbor.setPosition(new VPoint(threatRadius, threatRadius));
         threatenedNeighbor.setGroupMembership(GroupMembership.IN_GROUP);
 
@@ -277,7 +277,7 @@ public class ThreatCognitionModelTest {
 
         modelUnderTest.update(pedestrians);
 
-        assertEquals(SelfCategory.INSIDE_THREAT_AREA, pedestrian.getSelfCategory());
+        assertEquals(SelfCategory.THREATENED, pedestrian.getSelfCategory());
     }
 
 }

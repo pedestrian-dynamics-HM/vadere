@@ -64,9 +64,9 @@ public class SimpleCognitionModelTest {
     }
 
     @Test
-    public void updatesSetsInsideThreatOnThreatStimulus() {
+    public void updatesSetsThreatenedOnThreatStimulus() {
         testCognitionLayer(SelfCategory.TARGET_ORIENTED,
-                SelfCategory.INSIDE_THREAT_AREA,
+                SelfCategory.THREATENED,
                 new Threat());
     }
 

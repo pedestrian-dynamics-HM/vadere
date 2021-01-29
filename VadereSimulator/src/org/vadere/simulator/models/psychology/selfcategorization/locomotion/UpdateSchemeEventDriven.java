@@ -67,12 +67,12 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			} else {
 				osmBehaviorController.makeStepToTarget(pedestrian, topography);
 			}
-		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.THREATENED) {
 			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.COMMON_FATE) {
 			// TODO: Check if "changeToTargetRepulsionStrategyAndIncreaseSpeed()" is really necessary here.
-			//   It is necessary here if pedestrian was "INSIDE_THREAT_AREA" before but locomotion layer
+			//   It is necessary here if pedestrian was "THREATENED" before but locomotion layer
 			//   had no time to call this method.
 			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);

@@ -29,7 +29,7 @@ import java.util.Collection;
  * methods in this class because, usually, first a stimulus is processed and
  * then pedestrians decide which behavior to follow. E.g., first a {@link Threat}
  * is recognized and then a pedestrian decides to follow a
- * {@link SelfCategory#INSIDE_THREAT_AREA} behavior.
+ * {@link SelfCategory#THREATENED} behavior.
  */
 public interface ICognitionModel {
 

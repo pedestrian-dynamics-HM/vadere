@@ -30,7 +30,7 @@ public class SimpleCognitionModel implements ICognitionModel {
             if (stimulus instanceof ChangeTarget) {
                 nextSelfCategory = SelfCategory.CHANGE_TARGET;
             } else if (stimulus instanceof Threat) {
-                nextSelfCategory = SelfCategory.INSIDE_THREAT_AREA;
+                nextSelfCategory = SelfCategory.THREATENED;
             } else if (stimulus instanceof Wait || stimulus instanceof WaitInArea) {
                 nextSelfCategory = SelfCategory.WAIT;
             } else if (stimulus instanceof ElapsedTime) {

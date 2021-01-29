@@ -55,12 +55,12 @@ public class ThreatCognitionModel implements ICognitionModel {
 
         // Current stimulus is a threat => store it and make clear that pedestrian is inside threat area.
         pedestrian.getThreatMemory().add((Threat) stimulus);
-        pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
+        pedestrian.setSelfCategory(SelfCategory.THREATENED);
 
-        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
+        // Gerta suggests to apply SelfCategory.COMMON_FATE
         // so that agents directly search a safe zone if they are blocked by a wall.
         if (TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography)) {
-            pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
+            pedestrian.setSelfCategory(SelfCategory.COMMON_FATE);
         }
     }
 
@@ -102,12 +102,12 @@ public class ThreatCognitionModel implements ICognitionModel {
         boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
         boolean pedestrianIsBlockedByObstacle = TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography);
 
-        // Gerta suggests to apply SelfCategory.OUTSIDE_THREAT_AREA
+        // Gerta suggests to apply SelfCategory.COMMON_FATE
         // so that agents directly search a safe zone if they are blocked by a wall.
         if (pedestrianIsInsideThreatArea && pedestrianIsBlockedByObstacle == false) {
-            pedestrian.setSelfCategory(SelfCategory.INSIDE_THREAT_AREA);
+            pedestrian.setSelfCategory(SelfCategory.THREATENED);
         } else {
-            pedestrian.setSelfCategory(SelfCategory.OUTSIDE_THREAT_AREA);
+            pedestrian.setSelfCategory(SelfCategory.COMMON_FATE);
         }
     }
 
@@ -125,7 +125,7 @@ public class ThreatCognitionModel implements ICognitionModel {
      * This behavior is triggered by method {@link #handleThreat(Pedestrian, Stimulus)}.
      */
     private void imitateThreatenedNeighborIfPresent(Pedestrian pedestrian) {
-        List<Pedestrian> threatenedNeighbors = TopographyHelper.getNeighborsWithSelfCategory(pedestrian, SelfCategory.OUTSIDE_THREAT_AREA, topography);
+        List<Pedestrian> threatenedNeighbors = TopographyHelper.getNeighborsWithSelfCategory(pedestrian, SelfCategory.COMMON_FATE, topography);
         List<Pedestrian> threatenedIngroupNeighbors = threatenedNeighbors.stream()
                 .filter(ped -> ped.getGroupMembership() == GroupMembership.IN_GROUP)
                 .collect(Collectors.toList());
