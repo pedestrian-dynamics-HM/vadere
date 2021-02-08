@@ -86,7 +86,8 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ ],
+        "behaviors" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -387,8 +388,20 @@
             "knowledge" : [ ]
           }
         },
+        "infectionStatus" : "SUSCEPTIBLE",
+        "protectiveMeasures" : {
+          "maskType" : null,
+          "pedestrianSpeakingVolume" : null
+        },
+        "infectionHistory" : {
+          "inInfectionZoneLastStep" : false,
+          "totalStepsInInfectionZone" : 0,
+          "totalStepsSinceInfected" : 0,
+          "totalStepsSinceRecovered" : 0
+        },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "isLeader" : false,
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -438,8 +451,20 @@
             "knowledge" : [ ]
           }
         },
+        "infectionStatus" : "SUSCEPTIBLE",
+        "protectiveMeasures" : {
+          "maskType" : null,
+          "pedestrianSpeakingVolume" : null
+        },
+        "infectionHistory" : {
+          "inInfectionZoneLastStep" : false,
+          "totalStepsInInfectionZone" : 0,
+          "totalStepsSinceInfected" : 0,
+          "totalStepsSinceRecovered" : 0
+        },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "isLeader" : false,
         "trajectory" : {
           "footSteps" : [ ]
         },

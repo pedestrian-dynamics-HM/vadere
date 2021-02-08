@@ -68,7 +68,8 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompact",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompact",
-        "submodels" : [ ]
+        "submodels" : [ ],
+        "behaviors" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompact" : {
         "pedPotentialWidth" : 0.5,
