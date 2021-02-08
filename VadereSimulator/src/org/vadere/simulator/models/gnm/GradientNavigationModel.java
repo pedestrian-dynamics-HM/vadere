@@ -2,6 +2,7 @@ package org.vadere.simulator.models.gnm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -36,6 +37,8 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<Model> models = new LinkedList<>();
+	private List<Behavior> behaviors = new LinkedList<>();
+
 
 	@Deprecated
 	public GradientNavigationModel(final Domain domain,
@@ -181,6 +184,11 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	@Override
 	public List<Model> getSubmodels() {
 		return models;
+	}
+
+	@Override
+	public List<Behavior> getBehaviors() {
+		return null;
 	}
 
 	@Override

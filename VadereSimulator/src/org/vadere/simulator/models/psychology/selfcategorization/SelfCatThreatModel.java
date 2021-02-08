@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -77,6 +78,7 @@ public class SelfCatThreatModel implements MainModel {
 
     // These models are updated in the actual simulation loop.
     private List<Model> models = new LinkedList<>();
+    private List<Behavior> behaviors = new LinkedList<>();
     private double lastSimTimeInSec;
 
     // Distribution to assign pedestrians as IN_GROUP or OUT_GROUP members.
@@ -86,7 +88,10 @@ public class SelfCatThreatModel implements MainModel {
     public List<Model> getSubmodels() {
         return models;
     }
-
+    @Override
+    public List<Behavior> getBehaviors() {
+        return behaviors;
+    }
     @Override
     public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
 

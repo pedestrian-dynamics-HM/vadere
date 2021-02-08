@@ -2,6 +2,7 @@ package org.vadere.simulator.models.bmm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 public class BiomechanicsModel implements MainModel {
 
 	private List<Model> models = new LinkedList<>();
-
+	private List<Behavior> behaviors = new LinkedList<>();
 	private AttributesBMM attributesBMM;
 	private AttributesBHM attributesBHM;
 	private AttributesAgent attributesPedestrian;
@@ -132,5 +133,8 @@ public class BiomechanicsModel implements MainModel {
 	public List<Model> getSubmodels() {
 		return models;
 	}
-
+	@Override
+	public List<Behavior> getBehaviors() {
+		return behaviors;
+	}
 }

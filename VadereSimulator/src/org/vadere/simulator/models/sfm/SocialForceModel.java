@@ -2,6 +2,7 @@ package org.vadere.simulator.models.sfm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -11,11 +12,8 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
-import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
-import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
-import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSFM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -40,6 +38,7 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> impl
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
 	private List<Model> models = new LinkedList<>();
+	private List<Behavior> behaviors = new LinkedList<>();
 
 
 	@Deprecated
@@ -192,7 +191,10 @@ public class SocialForceModel extends ODEModel<Pedestrian, AttributesAgent> impl
 	public List<Model> getSubmodels() {
 		return models;
 	}
-	
+	@Override
+	public List<Behavior> getBehaviors() {
+		return behaviors;
+	}
 	@Override
 	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;

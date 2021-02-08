@@ -1,3 +1,15 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
 package org.vadere.gui.onlinevisualization.model;
 
 import java.awt.*;
@@ -91,6 +103,24 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		Collection<Pedestrian> result = new LinkedList<>();
 		result.addAll(domain.getTopography().getElements(Pedestrian.class));
 		return result;
+	}
+
+	@Override
+	public Collection<Pedestrian> getInfectedPedestrians() {
+		if (domain == null) return new LinkedList<>();
+
+		return domain.getTopography().getElements(Pedestrian.class)
+				.stream().filter(p -> p.isInfected()).collect(Collectors.toList());
+	}
+
+	@Override
+	public double getInfectionRate() {
+		if (domain != null) {
+			if (domain.getTopography() == null)
+				return 0;
+			return domain.getTopography().getInfectionRate();
+		}
+		return 0;
 	}
 
 	@Override

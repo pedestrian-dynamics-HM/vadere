@@ -5,6 +5,7 @@ package org.vadere.simulator.models.ovm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
@@ -21,10 +22,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
 import org.w3c.dom.Attr;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
@@ -32,6 +30,7 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	private AttributesOVM attributesOVM;
 	private OVMEquations ovmEquations;
 	private List<Model> models;
+	private List<Behavior> behaviors = new LinkedList<>();
 
 	/**
 	 * Constructor for OptimalVelocityModel used in the ModelCreator
@@ -147,5 +146,8 @@ public class OptimalVelocityModel extends ODEModel<Car, AttributesCar> {
 	public List<Model> getSubmodels() {
 		return models;
 	}
-
+	@Override
+	public List<Behavior> getBehaviors() {
+		return behaviors;
+	}
 }

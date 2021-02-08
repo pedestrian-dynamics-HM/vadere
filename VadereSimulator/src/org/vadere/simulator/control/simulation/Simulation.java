@@ -1,9 +1,11 @@
 package org.vadere.simulator.control.simulation;
 
+import org.vadere.simulator.control.behavior.Behavior;
+import org.vadere.simulator.control.behavior.PedestrianBehavior;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -51,6 +53,7 @@ public class Simulation {
 	private final List<PassiveCallback> passiveCallbacks;
 	private final List<RemoteRunListener> remoteRunListeners;
 	private List<Model> models;
+	private List<Behavior> behaviors;
 
 	private boolean isRunSimulation = false;
 	private boolean isPaused = false;
@@ -119,6 +122,7 @@ public class Simulation {
 		this.scenarioCache = scenarioCache;
 
 		this.models = mainModel.getSubmodels();
+		this.behaviors = mainModel.getBehaviors();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
@@ -223,6 +227,7 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -383,6 +388,8 @@ public class Simulation {
 
 		updateLocomotionLayer(simTimeInSec);
 
+		updatePedestriansBehaviors();
+
 		if (topographyController.getTopography().hasTeleporter()) {
 			teleporterController.update(simTimeInSec);
 		}
@@ -446,6 +453,15 @@ public class Simulation {
 					// rebuild CellGrid if model does not manage the CellGrid state while updating
 					topographyController.update(simTimeInSec); //rebuild CellGrid
 				}
+			}
+		}
+	}
+
+	private void updatePedestriansBehaviors() {
+		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
+		for (var behavior : behaviors){
+			if(behavior instanceof PedestrianBehavior){
+				behavior.apply(pedestrians, topography);
 			}
 		}
 	}

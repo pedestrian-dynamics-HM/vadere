@@ -1,5 +1,20 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.simulator.models;
 
+
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -9,12 +24,12 @@ import java.util.List;
 
 /**
  * A main model of a simulation which can include submodels.
- * 
+ *
  */
 public interface MainModel extends Model, DynamicElementFactory {
 
 	List<Model> getSubmodels();
-
+	List<Behavior> getBehaviors();
 	default SourceControllerFactory getSourceControllerFactory() {
 		return new SingleSourceControllerFactory();
 	}

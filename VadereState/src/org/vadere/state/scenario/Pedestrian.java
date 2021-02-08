@@ -1,6 +1,9 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.infection.InfectionHistory;
+import org.vadere.state.infection.PedestrianInfectionType;
+import org.vadere.state.infection.PedestrianProtectiveMeasures;
 import org.vadere.state.psychology.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
@@ -33,9 +36,73 @@ public class Pedestrian extends Agent {
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
 	private PsychologyStatus psychologyStatus;
-
+	private PedestrianInfectionType infectionStatus;
+	private PedestrianProtectiveMeasures protectiveMeasures;
+	private InfectionHistory infectionHistory;
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
+
+	private boolean isLeader = false;
+
+	public PsychologyStatus getPsychologyStatus() {
+		return psychologyStatus;
+	}
+
+	public void setPsychologyStatus(PsychologyStatus psychologyStatus) {
+		this.psychologyStatus = psychologyStatus;
+	}
+
+	public PedestrianInfectionType getInfectionStatus() {
+		return infectionStatus;
+	}
+
+	public void setInfectionStatus(PedestrianInfectionType infectionStatus) {
+		this.infectionStatus = infectionStatus;
+	}
+
+	public PedestrianProtectiveMeasures getProtectiveMeasures() {
+		return protectiveMeasures;
+	}
+
+	public void setProtectiveMeasures(PedestrianProtectiveMeasures protectiveMeasures) {
+		this.protectiveMeasures = protectiveMeasures;
+	}
+
+	public InfectionHistory getInfectionHistory() {
+		return infectionHistory;
+	}
+
+	public void setInfectionHistory(InfectionHistory infectionHistory) {
+		this.infectionHistory = infectionHistory;
+	}
+
+	public boolean isLeader() {
+		return isLeader;
+	}
+
+	public void setLeader(boolean leader) {
+		isLeader = leader;
+	}
+
+	public void setTrajectory(VTrajectory trajectory) {
+		this.trajectory = trajectory;
+	}
+
+	public void setFootstepHistory(FootstepHistory footstepHistory) {
+		this.footstepHistory = footstepHistory;
+	}
+
+	public Map<Class<? extends ModelPedestrian>, ModelPedestrian> getModelPedestrianMap() {
+		return modelPedestrianMap;
+	}
+
+	public void setModelPedestrianMap(Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap) {
+		this.modelPedestrianMap = modelPedestrianMap;
+	}
+
+	public void setType(ScenarioElementType type) {
+		this.type = type;
+	}
 
 	/**
 	 * trajectory is a list of foot steps a pedestrian made during the duration of one time step.
@@ -68,6 +135,10 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
+
+		infectionStatus = PedestrianInfectionType.SUSCEPTIBLE;
+		protectiveMeasures = new PedestrianProtectiveMeasures();
+		infectionHistory = new InfectionHistory();
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -112,6 +183,8 @@ public class Pedestrian extends Agent {
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public KnowledgeBase getKnowledgeBase() {return psychologyStatus.getKnowledgeBase(); }
+	public boolean isInfected() { return infectionStatus != null && infectionStatus == PedestrianInfectionType.INFECTED;}
+	public boolean isSusceptible() { return infectionStatus != null && infectionStatus == PedestrianInfectionType.SUSCEPTIBLE;}
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;

@@ -1,7 +1,21 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.simulator.models.osm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
@@ -51,6 +65,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private double lastSimTimeInSec;
 	private ExecutorService executorService;
 	private List<Model> models = new LinkedList<>();
+	private List<Behavior> behaviors = new LinkedList<>();
 
 	public OptimalStepsModel() {
 		this.speedAdjusters = new LinkedList<>();
@@ -79,6 +94,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		logger.debug("build subModels");
 		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
 		subModelBuilder.addBuildedSubModelsToList(models);
+		behaviors = BehaviorBuilder.buildBehaviors(attributesOSM.getBehaviors(), modelAttributesList, domain.getTopography());
 
 		logger.debug("create Target potential field");
 		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
@@ -272,6 +288,11 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	@Override
 	public List<Model> getSubmodels() {
 		return models;
+	}
+
+	@Override
+	public List<Behavior> getBehaviors() {
+		return behaviors;
 	}
 
 	@Override

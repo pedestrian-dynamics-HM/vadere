@@ -2,6 +2,7 @@ package org.vadere.simulator.models.reynolds;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.reynolds.behaviour.CollisionAvoidance;
@@ -39,6 +40,9 @@ public class ReynoldsSteeringModel implements MainModel {
 	private WallAvoidance bWallAvoidance;
 	private Wander bWander;
 	private List<Model> submodels;
+	private List<Behavior> behaviors = new LinkedList<>();
+
+
 
 	public ReynoldsSteeringModel() {
 		this.bSeek = new Seek(this);
@@ -143,4 +147,8 @@ public class ReynoldsSteeringModel implements MainModel {
 		return submodels;
 	}
 
+	@Override
+	public List<Behavior> getBehaviors() {
+		return behaviors;
+	}
 }

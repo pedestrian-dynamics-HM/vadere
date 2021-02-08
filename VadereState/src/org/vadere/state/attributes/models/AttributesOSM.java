@@ -1,9 +1,23 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.state.attributes.models;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import lombok.Getter;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.MovementType;
@@ -170,7 +184,8 @@ public class AttributesOSM extends Attributes {
 	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
 	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
 	private List<String> submodels = new LinkedList<>();
-
+	@Getter
+	private List<String> behaviors = new LinkedList<>();
 	public AttributesOSM() {}
 
 	// Getters...

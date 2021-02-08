@@ -1,12 +1,6 @@
 package org.vadere.gui.components.model;
 
 
-import java.awt.*;
-import java.util.Collection;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -14,6 +8,12 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+
+import java.awt.*;
+import java.util.Collection;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public abstract class SimulationModel<T extends DefaultSimulationConfig> extends DefaultModel {
 
@@ -31,7 +31,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 	}
 
 	public abstract Collection<Agent> getAgents();
-
+	public abstract Collection<Pedestrian> getInfectedPedestrians();
 	public abstract Collection<Pedestrian> getPedestrians();
 
 	public abstract int getTopographyId();
@@ -127,4 +127,5 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 		super.notifyObservers();
 	}
 
+	public abstract double getInfectionRate();
 }

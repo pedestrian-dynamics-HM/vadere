@@ -1,3 +1,16 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.gui.renderer.agent;
 
 
@@ -35,10 +48,25 @@ public class AgentRender implements Renderer {
 
 	@Override
 	public void render(@NotNull final ScenarioElement element, @NotNull final Color color, @NotNull final Graphics2D g) {
+		Pedestrian ped = (Pedestrian) element;
 
+		switch (ped.getInfectionStatus()) {
+			case INFECTED: {
+				g.setColor(Color.red);
+				DefaultRenderer.fill(getShape(ped), g);
+				return;
+			}
+			case RECOVERED: {
+				g.setColor(Color.green);
+				DefaultRenderer.fill(getShape(ped), g);
+				return;
+			}
+
+			default: break;
+		}
+		
 		if (model.config.isShowGroups()) {
 			try {
-				Pedestrian ped = (Pedestrian) element;
 				renderGroup(ped, g, color);
 			} catch (ClassCastException cce) {
 				logger.error("Error casting to Pedestrian");
@@ -54,6 +82,9 @@ public class AgentRender implements Renderer {
 	private void renderGroup(Pedestrian ped, Graphics2D g, Color color) {
 		g.setColor(Color.DARK_GRAY);
 		g.fill(ped.getShape());
+		if (ped.isLeader()) {
+			color = Color.RED;
+		}
 		g.setColor(color);
 		DefaultRenderer.fill(getShape(ped), g);
 	}

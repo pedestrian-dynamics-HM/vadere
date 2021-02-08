@@ -1,3 +1,16 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.gui.postvisualization.model;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,11 +23,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.StimulusFactory;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.scenario.TopographyIterator;
+import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
@@ -22,20 +31,14 @@ import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class PostvisualizationModel extends SimulationModel<PostvisualizationConfig> {
 
@@ -198,6 +201,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			agentList.add(toAgent(agentRow));
 		}
 		return agentList;
+	}
+
+	@Override
+	public synchronized Collection<Pedestrian> getInfectedPedestrians() {
+		Table agents = getAgentTable();
+		List<Pedestrian> pedestrians = new ArrayList<>(agents.rowCount());
+		for(Row agentRow : agents) {
+			var agent = toAgent(agentRow);
+			if(agent instanceof Pedestrian && ((Pedestrian)agent).isInfected()){
+				pedestrians.add((Pedestrian)agent);
+			}
+		}
+		return pedestrians;
 	}
 
 	public synchronized TableTrajectoryFootStep getTrajectories() {
@@ -434,6 +450,11 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	@Override
 	public boolean isAlive(int pedId) {
 		return trajectories.getDeathTime(pedId) > getSimTimeInSec();
+	}
+
+	@Override
+	public double getInfectionRate() {
+		return getTopography().getInfectionRate();
 	}
 
 	public synchronized void setAgentColoring(@NotNull final AttributesAgent attributesAgent) {

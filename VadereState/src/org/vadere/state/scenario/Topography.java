@@ -1,15 +1,23 @@
+/**
+ * Edited to enable the infection transmission behavior
+ *  By: Mina Abadeer(1), Sameh Magharious(2)
+ *
+ * (1)Group Parallel and Distributed Systems
+ * Department of Computer Science
+ * University of Muenster, Germany
+ *
+ * (2)Dell Technologies, USA
+ *
+ * This software is licensed under the GNU Lesser General Public License (LGPL).
+ */
+
 package org.vadere.state.scenario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
-
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesCar;
-import org.vadere.state.attributes.scenario.AttributesDynamicElement;
-import org.vadere.state.attributes.scenario.AttributesObstacle;
-import org.vadere.state.attributes.scenario.AttributesTopography;
+import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -24,15 +32,7 @@ import org.vadere.util.random.SimpleReachablePointProvider;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -93,6 +93,17 @@ public class Topography implements DynamicElementMover{
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
 	private List<Obstacle> boundaryObstacles;
+
+	//TODO: Should be refactored to a separate infection status class
+	private double infectionRate;
+
+	public double getInfectionRate() {
+		return infectionRate;
+	}
+
+	public void setInfectionRate(double infectionRate) {
+		this.infectionRate = infectionRate;
+	}
 
 	private final List<Stairs> stairs;
 
@@ -430,6 +441,8 @@ public class Topography implements DynamicElementMover{
 		return targets;
 	}
 
+
+
 	public List<TargetChanger> getTargetChangers() {
 		return targetChangers;
 	}
@@ -596,7 +609,7 @@ public class Topography implements DynamicElementMover{
 
 	/**
 	 * Creates a deep copy of the scenario.
-	 * 
+	 *
 	 * @deprecated This manual implementation is error-prone. Remove this method
 	 *             and use the standard clone instead.
 	 */
@@ -660,6 +673,7 @@ public class Topography implements DynamicElementMover{
 		for (DynamicElementRemoveListener<Car> carRemoveListener : this.cars.getElementRemovedListener()) {
 			s.addElementRemovedListener(Car.class, carRemoveListener);
 		}
+		s.setInfectionRate(this.infectionRate);
 
 		return s;
 	}

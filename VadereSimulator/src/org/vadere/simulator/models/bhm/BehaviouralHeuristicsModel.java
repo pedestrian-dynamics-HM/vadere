@@ -2,6 +2,7 @@ package org.vadere.simulator.models.bhm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.behavior.Behavior;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
@@ -45,8 +46,9 @@ public class BehaviouralHeuristicsModel implements MainModel {
 			}
 		}
 	}
-	
+
 	private List<Model> models = new LinkedList<>();
+	private List<Behavior> behaviors = new LinkedList<>();
 
 	private AttributesBHM attributesBHM;
 	private AttributesAgent attributesPedestrian;
@@ -161,4 +163,8 @@ public class BehaviouralHeuristicsModel implements MainModel {
 		return models;
 	}
 
+	@Override
+	public List<Behavior> getBehaviors() {
+		return null;
+	}
 }
