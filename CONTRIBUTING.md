@@ -148,3 +148,6 @@ package as the class under test.
 People who have contributed code to the project at the Munich University of Applied Sciences (in alphabetical order):
 
 Florian Albrecht, Benjamin Degenhart, Felix Dietrich, Marion Gödel, Benedikt Kleinmeier, Daniel Lehmberg, Jakob Schöttl, Stefan Schuhbäck, Michael Seitz, Swen Stemmer, Isabella von Sivers, Mario Teixeira Parente, Peter Zarnitz, Benedikt Zönnchen
+
+External Contributors:  
+Mina Abadeer (Uni Münster, abadeer@uni-muenster.de)
