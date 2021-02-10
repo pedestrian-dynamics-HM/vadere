@@ -20,6 +20,7 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -29,7 +30,9 @@ import java.util.List;
 public interface MainModel extends Model, DynamicElementFactory {
 
 	List<Model> getSubmodels();
-	List<Behavior> getBehaviors();
+	default List<Behavior> getBehaviors() {
+		return new LinkedList<>();
+	}
 	default SourceControllerFactory getSourceControllerFactory() {
 		return new SingleSourceControllerFactory();
 	}

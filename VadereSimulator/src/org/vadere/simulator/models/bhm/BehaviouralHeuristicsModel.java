@@ -162,9 +162,4 @@ public class BehaviouralHeuristicsModel implements MainModel {
 	public List<Model> getSubmodels() {
 		return models;
 	}
-
-	@Override
-	public List<Behavior> getBehaviors() {
-		return null;
-	}
 }

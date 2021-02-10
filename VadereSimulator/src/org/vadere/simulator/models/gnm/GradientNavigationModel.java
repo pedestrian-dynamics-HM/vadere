@@ -187,11 +187,6 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	}
 
 	@Override
-	public List<Behavior> getBehaviors() {
-		return null;
-	}
-
-	@Override
 	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;
 	}
