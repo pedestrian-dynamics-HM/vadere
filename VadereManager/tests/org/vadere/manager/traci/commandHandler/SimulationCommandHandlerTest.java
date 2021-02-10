@@ -1,7 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.TestRemoteManager;
 import org.vadere.manager.traci.TraCICmd;
@@ -9,16 +8,12 @@ import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
-import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
-import org.vadere.simulator.entrypoints.ScenarioFactory;
-import org.vadere.simulator.projects.Scenario;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SimulationCommandHandlerTest extends CommandHandlerTest {
@@ -34,8 +29,8 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "-1";
-		String retValWin = "7cbf8c42d1b4cfa035f613c30236227d51062db8";
-		String retValLin = "24830db16e36cf11bc9bd0913be6f9ee42d8d0bb";
+		String retValWin = "e4744ecd416f5d6d6ba8fe27c33152b75c8ecf08";
+		String retValLin = "72ac91df689c27ab4c2dcbeab65e2814ddc5dae4";
 
 		// response ok //
 		String basePath = "testResources/testProject001/scenarios";
