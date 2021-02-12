@@ -131,8 +131,20 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	}
 
 	@Override
+	public boolean zoomIn(double zoomFactor) {
+		double scale = scaleFactor * zoomFactor;
+		return setScale(scale);
+	}
+
+	@Override
 	public boolean zoomOut() {
 		double scale = scaleFactor / 1.2;
+		return setScale(scale);
+	}
+
+	@Override
+	public boolean zoomOut(double zoomFactor) {
+		double scale = scaleFactor / zoomFactor;
 		return setScale(scale);
 	}
 

@@ -38,11 +38,13 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 * zoom by a fixed factor into the topography by changing the viewport.
 	 */
 	boolean zoomIn();
+	boolean zoomIn(double zoomFactor);
 
 	/**
 	 * zoom by a fixed factor out of the topography by changing the viewport.
 	 */
 	boolean zoomOut();
+	boolean zoomOut(double zoomFactor);
 
 	/**
 	 * Set the current mouse position. This helps to draw the cursor.
