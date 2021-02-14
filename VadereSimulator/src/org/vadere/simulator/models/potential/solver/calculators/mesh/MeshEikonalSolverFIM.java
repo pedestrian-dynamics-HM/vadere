@@ -83,12 +83,12 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		this.identifier = identifier;
 		this.activeList = new LinkedList<>();
 
-		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
+		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
 		try {
 			bufferedWriter = IOUtils.getWriter("updates_fim.csv", dir);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
@@ -113,7 +113,7 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		double ms = System.currentTimeMillis();
 		getTriangulation().enableCache();
 		nUpdates = 0;
-		narrowBandSizes.add(new ArrayList<>());
+		//narrowBandSizes.add(new ArrayList<>());
 
 		if(!solved || needsUpdate()) {
 			if(!solved) {
@@ -129,17 +129,17 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		}
 
 		solved = true;
-		updates.add(nUpdates);
+		//updates.add(nUpdates);
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
 		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
-		if(iteration % 100 == 0) {
+		/*if(iteration % 100 == 0) {
 			writeNarrowBandSize();
 		}
 		if(iteration == 3354) {
 			writeUpdates();
-		}
+		}*/
 		iteration++;
 		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
 	}
@@ -163,9 +163,9 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 
 	private void march() {
 		ArrayList<Integer> narrowBandSize=null;
-		if(iteration % 100 == 0) {
+		/*if(iteration % 100 == 0) {
 			narrowBandSize = narrowBandSizes.get(narrowBandSizes.size()-1);
-		}
+		}*/
 
 		while(!activeList.isEmpty()) {
 			//logger.debug("#activeList = " + activeList.size());

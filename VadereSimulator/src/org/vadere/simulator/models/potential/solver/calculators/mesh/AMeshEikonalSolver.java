@@ -23,16 +23,13 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,14 +37,17 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  *
+ * Abstract class that solves the eikonal equation on a Mesh i.e. 2-D triangular mesh.
+ * It is the basis for the implementation of the FMM, FIM, FSM and IFIM on triangular meshes.
+ *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
 public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> implements MeshEikonalSolver<V, E, F>, ITriEventListener<V, E, F> {
 
-	@Nullable private ITimeCostFunction timeCostFunction;
-	@Nullable private ITimeCostFunctionMesh<V> meshTimeCostFunction;
+	private ITimeCostFunctionMesh<V> meshTimeCostFunction;
+
 	@Nullable IDistanceFunction distanceFunction;
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private Collection<V> initialVertices;
@@ -79,6 +79,14 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	private MeshEikonalSolver.LocalSover localSover = MeshEikonalSolver.LocalSover.SETHIAN;
 
+	/**
+	 * Default constructor.
+	 *
+	 * @param identifier        the identifier is used for all container names. A container is basically a bijective function, that maps
+	 *                          a data point (Object or primitive data type) to a vertex, halfe-edge or face.
+	 * @param triangulation     the 2-D triangular mesh i.e. the discretization the solution is based on.
+	 * @param timeCostFunction  the timeCostFunction of the eikonal equation, i.e. 1/F(x).
+	 */
 	public AMeshEikonalSolver(@NotNull final String identifier,
 	                          @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                          @NotNull final ITimeCostFunction timeCostFunction) {
@@ -87,7 +95,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			// unsave cast
 			this.meshTimeCostFunction = (ITimeCostFunctionMesh<V>)timeCostFunction;
 		} else {
-			this.timeCostFunction = timeCostFunction;
+			this.meshTimeCostFunction = ITimeCostFunctionMesh.convert(timeCostFunction);
 		}
 
 		this.triangulation = triangulation;
@@ -124,6 +132,13 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		}
 	}
 
+	/**
+	 * Marks and returns the initial vertices, i.e. vertices at which the wavefront propagation starts.
+	 *
+	 * @param targetShapes  the agent destination/target of the eikonal equation
+	 *
+	 * @return
+	 */
 	protected List<V> findInitialVertices(final Collection<VShape> targetShapes) {
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
@@ -142,6 +157,10 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		return initialVertices;
 	}
 
+	/**
+	 * Resets all computed travel times but keeps the computed values which are mesh dependent
+	 * (and therefore, do not change if the mesh does not change), for example, the angles inside a triangle.
+	 */
 	protected void unsolve() {
 		triangulation.getMesh().streamVerticesParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
 			setUndefined(v);
@@ -152,6 +171,9 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		//solved = false;
 	}
 
+	/**
+	 * Computes all mesh dependent measures such as angles and virtual supports.
+	 */
 	protected void prepareMesh() {
 		triangulation.getMesh().streamEdgesParallel().forEach(e -> setVirtualSupport(e, Collections.EMPTY_LIST));
 		triangulation.getMesh().streamEdgesParallel().forEach(e -> setAccuteEdge(e));
@@ -173,7 +195,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {
-		return timeCostFunction != null ? timeCostFunction : meshTimeCostFunction;
+		return meshTimeCostFunction;
 	}
 
 	@Override
@@ -306,7 +328,8 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		V v2 = getMesh().getVertex(prev);
 
 		double potential = Double.MAX_VALUE;
-
+		//TODO: the code below should be used to enable virtual simplexes, however this might currently fail because their is no neighboring connectifity
+		// for those simplices defined by the mesh and the FIM might stall because it tests the wrong connectivities not part of the DAG!
 		/*if(isNonAcute(edge)) {
 			V v = getMesh().getVertex(edge);
 			List<Pair<V, V>> list = getVirtualSupport(edge);
@@ -441,6 +464,17 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		return getTimeCostFunction().needsUpdate();
 	}
 
+	/**
+	 * Returns barycentric interpolated value at (x,y) based on the {@link IVertexContainerDouble} containerDouble.
+	 *
+	 * @param triangulation     the triangular mesh (this is most of the time {@link this#triangulation})
+	 * @param containerDouble   some vertex container
+	 * @param x                 x-coordinate of the request point
+	 * @param y                 y-coordinate of the request point
+	 * @param caller            the caller object to optimize the triangle walk
+	 *
+	 * @return the barycentric interpolated value at (x,y)
+	 */
 	protected double getInterpolatedPotential(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final IVertexContainerDouble<V, E, F> containerDouble,
@@ -613,12 +647,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	}
 
 	protected void setTimeCost(@NotNull final V v) {
-		if(meshTimeCostFunction != null) {
-			setTimeCost(v, meshTimeCostFunction.costAt(v));
-		} else {
-			setTimeCost(v, timeCostFunction.costAt(getMesh().toPoint(v), v));
-		}
-
+		setTimeCost(v, meshTimeCostFunction.costAt(v));
 	}
 
 	protected void setTimeCost(@NotNull final V v, final double value) {

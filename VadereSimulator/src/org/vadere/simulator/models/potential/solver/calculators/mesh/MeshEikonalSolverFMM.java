@@ -57,12 +57,12 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		super(solver.identifier, triangulation, solver.getTimeCostFunction());
 		this.identifier = solver.identifier;
 		setInitialVertices(initialVertices, p -> 0.0);
-		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
+		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
 		try {
 			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	/**
@@ -80,12 +80,12 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 
-		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
+		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
 		try {
 			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 		HashSet<V> targetVertices = new HashSet<>();
 		IDistanceFunction distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);

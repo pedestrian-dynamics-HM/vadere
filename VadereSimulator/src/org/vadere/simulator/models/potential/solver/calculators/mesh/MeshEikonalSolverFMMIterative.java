@@ -29,6 +29,15 @@ import java.util.function.Predicate;
 
 
 // TODO this is experimental code!
+/**
+ * This code solves the eikonal equation by iteratively refine the mesh as described in the PhD thesis of B. Zoennchen.
+ * The implementation is experimental and not jet ready for general usage, i.e. the code is still not very well structured
+ * and rather hard to read.
+ *
+ * @param <V>   the type of the vertices of the triangulation
+ * @param <E>   the type of the half-edges of the triangulation
+ * @param <F>   the type of the faces of the triangulation
+ */
 public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdge, F extends IFace> implements EikonalSolver, ITriEventListener<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(MeshEikonalSolverFMMIterative.class);

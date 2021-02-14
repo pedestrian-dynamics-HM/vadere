@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 
 
 /**
- * This class computes the traveling time T using the fast iterative method for arbitrary triangulated meshes.
+ * This class computes the traveling time T using a lock free variant of the fast iterative method for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *

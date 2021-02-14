@@ -18,6 +18,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * This callback class updates the so called agent/pedestrian density every time an agent moves,
+ * i.e. whenever this listener is called. Therefore, the listener has to be added in the first place.
+ * {@link DensityUpdater#nameAgentDensity} is the name of the container of the mesh where the agent
+ * density (a {@link Double}) value is saved.
+ *
+ * @param <V>   the type of the vertices of the triangulation
+ * @param <E>   the type of the half-edges of the triangulation
+ * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
+ */
 public class DensityUpdater<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IMoveDynamicElementListener {
 
 	public static final String nameAgentDensity = "agent_density";

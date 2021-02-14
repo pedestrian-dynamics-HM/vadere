@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * This class computes the traveling time T using the fast iterative method for arbitrary triangulated meshes.
+ * This class computes the traveling time T using the informed fast iterative method (IFIM) for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
@@ -115,12 +115,12 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 
-		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
+		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
 		try {
 			bufferedWriter = IOUtils.getWriter("updates_ifim.csv", dir);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 
@@ -129,7 +129,7 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		double ms = System.currentTimeMillis();
 		getTriangulation().enableCache();
 		nUpdates = 0;
-		narrowBandSizes.add(new ArrayList<>());
+		//narrowBandSizes.add(new ArrayList<>());
 
 		if(!solved || needsUpdate()) {
 			if(!solved) {
@@ -145,17 +145,17 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		}
 
 		solved = true;
-		updates.add(nUpdates);
+		//updates.add(nUpdates);
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
 		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
-		if(iteration % 100 == 0) {
+		/*if(iteration % 100 == 0) {
 			writeNarrowBandSize();
 		}
 		if(iteration == 3354) {
 			writeUpdates();
-		}
+		}*/
 		iteration++;
 		//logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
 		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
@@ -227,10 +227,10 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	private void march() {
-		ArrayList<Integer> narrowBandSize=null;
+		/*ArrayList<Integer> narrowBandSize=null;
 		if(iteration % 100 == 0) {
 			narrowBandSize = narrowBandSizes.get(narrowBandSizes.size()-1);
-		}
+		}*/
 		while(!activeList.isEmpty()) {
 			ListIterator<V> listIterator = activeList.listIterator();
 			//logger.debug("#activeList = " + activeList.size());
@@ -271,9 +271,9 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 								this.definingSimplex.setValue(xn, Pair.of(triple2.getMiddle(), triple2.getRight()));
 								setPotential(xn, qq);
 								newActiveList.add(xn);
-								if(iteration % 100 == 0) {
+								/*if(iteration % 100 == 0) {
 									narrowBandSize.add(newActiveList.size()+activeList.size());
-								}
+								}*/
 
 								setBurning(xn);
 								setUnburned(xn);
@@ -281,9 +281,9 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 						}
 					}
 					listIterator.remove();
-					if(iteration % 100 == 0) {
+					/*if(iteration % 100 == 0) {
 						narrowBandSize.add(newActiveList.size()+activeList.size());
-					}
+					}*/
 					if(updated) {
 						nUpdates++;
 					}

@@ -27,7 +27,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * A TimeCostFunction which reduces the travelling speed decreases with the obstacle density.
+ * A TimeCostFunction which reduces the travelling speed decreases with the pedestrian density.
+ * At the moment the code to dynamically refine the mesh is disabled
+ * (compare the unused method {@link TimeCostGaussianPedestrianDensityMesh#refineMesh}).
+ *
+ * Enabling the dynamic refinement is experimental code! It is not clear how often one should refine
+ * and how large the refinement cutoff should be used.
  *
  * @param <V>
  * @param <E>
@@ -46,6 +51,8 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 	private GenRegularRefinement<V, E, F> refiner;
 
 	private final double R = 0.7;
+
+	// the radius in meter for which a pedestrian can contribute to the density, i.e. the cutoff radius.
 	private final int influenceRadius = 5;
 	private final double a;
 	private final double Sp;
@@ -115,7 +122,8 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 			VTriangle triangle = triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e));
 			if(/*!refiner.isGreen(e) || */triangulation.getMesh().toLine(e).length() > h_max) {
 				for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
-					if(pedestrian.getPosition().distanceSq(triangle.midPoint()) < influenceRadius * influenceRadius) {
+					// influenceRadius is cutoff radius for the mesh refinement is 4 times the density cutoff radius, i.e. we have to refine every time an agent travles more than the influenceRadius.
+					if(pedestrian.getPosition().distanceSq(triangle.midPoint()) < influenceRadius * influenceRadius * 4) {
 						return true;
 					}
 				}
@@ -159,6 +167,7 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 	@Override
 	public void update() {
 		timeCostFunction.update();
+		// if we assume simTimeStep = 0.4 => 0.4 * 10 < influenceRadius = 5
 		if(step % 10 == 0) {
 			//refineMesh();
 		}
