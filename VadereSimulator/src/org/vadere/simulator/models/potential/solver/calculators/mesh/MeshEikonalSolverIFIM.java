@@ -147,7 +147,7 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		solved = true;
 		//updates.add(nUpdates);
 		double runTime = (System.currentTimeMillis() - ms);
-		logger.debug("fim run time = " + runTime);
+		logger.debug("ifim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
 		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
 		/*if(iteration % 100 == 0) {

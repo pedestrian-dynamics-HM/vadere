@@ -159,18 +159,19 @@ public class EikonalSolverIFIM extends AGridEikonalSolver {
 		//if(i==0) {
 			prefDefiningVertices = definingVertices;
 
-			for(Point p : cellGrid.pointStream().collect(Collectors.toList())) {
+			//this code was just to test if everything worked.
+			/*for(Point p : cellGrid.pointStream().collect(Collectors.toList())) {
 				if(!isReady(p)) {
 					System.out.println("error");
 					isReady(p);
 				}
-			}
+			}*/
 
 			definingVertices = new Point[cellGrid.getNumPointsX()][cellGrid.getNumPointsY()][2];
 		//}
 
 
-		System.out.println(i+"#update / #vertices: " + nUpdates + " / " + cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Reached).count());
+		//System.out.println(i+"#update / #vertices: " + nUpdates + " / " + cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Reached).count());
 		nUpdates = 0;
 		i++;
 	}

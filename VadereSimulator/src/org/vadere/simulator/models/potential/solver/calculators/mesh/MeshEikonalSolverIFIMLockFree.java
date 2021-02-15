@@ -157,7 +157,7 @@ public class MeshEikonalSolverIFIMLockFree<V extends IVertex, E extends IHalfEdg
 
 			solved = true;
 			double runTime = (System.currentTimeMillis() - ms);
-			logger.debug("fim parallel run time with " + nThreds + " threads = " + runTime);
+			logger.debug("lock-free ifim parallel run time with " + nThreds + " threads = " + runTime);
 			logger.debug("#nUpdates = " + nUpdates);
 			logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
 			//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
