@@ -85,6 +85,10 @@ public class TraCIValueSubscriptionCommand extends TraCICommand {
 		this.variables = variables;
 	}
 
+	public int getVariableIdentifier() {
+		return -1;
+	}
+
 	public TraCISubscriptionResponse getResponse() {
 		return response;
 	}

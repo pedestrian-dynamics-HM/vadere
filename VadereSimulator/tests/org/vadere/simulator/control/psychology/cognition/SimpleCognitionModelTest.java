@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
+import org.vadere.simulator.control.psychology.cognition.models.SimpleCognitionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
@@ -63,9 +64,9 @@ public class SimpleCognitionModelTest {
     }
 
     @Test
-    public void updatesSetsInsideThreatOnThreatStimulus() {
+    public void updatesSetsThreatenedOnThreatStimulus() {
         testCognitionLayer(SelfCategory.TARGET_ORIENTED,
-                SelfCategory.INSIDE_THREAT_AREA,
+                SelfCategory.THREATENED,
                 new Threat());
     }
 

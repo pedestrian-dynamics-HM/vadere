@@ -62,10 +62,10 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			} else {
 				osmBehaviorController.makeStepToTarget(pedestrian, topography);
 			}
-		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.THREATENED) {
 			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.COMMON_FATE) {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.WAIT) {

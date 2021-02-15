@@ -1,7 +1,7 @@
 {
   "name" : "06-Test-TargetChanger-ChangesToDynamicTarget",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -197,7 +197,7 @@
           "type" : "RECTANGLE"
         },
         "reachDistance" : 0.0,
-        "nextTargetIsPedestrian" : true,
+        "changeAlgorithmType" : "FOLLOW_PERSON",
         "nextTarget" : [ 2 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       } ],

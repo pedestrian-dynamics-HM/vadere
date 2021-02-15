@@ -1,7 +1,7 @@
 {
   "name" : "18-ScriptAgents-ChangeTargetScriptedCognitionModel",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

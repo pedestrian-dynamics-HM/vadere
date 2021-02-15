@@ -84,7 +84,9 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		logger.debugf("%s: execute %d subscriptions",
 				TraCICmd.SIM_STEP.name(),
 				remoteManager.getSubscriptions().size());
-		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+		remoteManager.getSubscriptions().forEach(sub -> {
+			sub.executeSubscription(remoteManager);
+		});
 
 		// remove subscriptions no longer valid
 		remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);

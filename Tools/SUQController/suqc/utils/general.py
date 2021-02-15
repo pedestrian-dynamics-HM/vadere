@@ -14,6 +14,7 @@ import pandas as pd
 
 import suqc
 from suqc.configuration import SuqcConfig
+from fnmatch import fnmatch, filter
 
 
 def get_current_suqc_state():
@@ -23,12 +24,16 @@ def get_current_suqc_state():
         GIT_COMMIT_HASH = GIT_COMMIT_HASH.decode().strip()
 
         uncommited_changes = subprocess.check_output(["git", "status", "--porcelain"])
-        uncommited_changes = uncommited_changes.decode()  # is returned as a byte sequence -> decode to string
+        uncommited_changes = (
+            uncommited_changes.decode()
+        )  # is returned as a byte sequence -> decode to string
 
         if uncommited_changes:
             print("WARNING: THERE ARE UNCOMMITED CHANGED IN THE REPO")
-            print("In order to have a reproducible scenario run you should check if untracked changes in the following "
-                  "files should be commited before: \n")
+            print(
+                "In order to have a reproducible scenario run you should check if untracked changes in the following "
+                "files should be commited before: \n"
+            )
             print(uncommited_changes)
 
         return {"git_hash": GIT_COMMIT_HASH, "umcommited_changes": uncommited_changes}
@@ -60,16 +65,20 @@ def check_parent_exists_folder_remove(folder_path, ask_user_to_replace: bool):
     parent = os.path.dirname(folder_path)
 
     if not os.path.exists(parent) or not os.path.isdir(parent):
-        raise ValueError(f"Path {folder_path} is not valid, because path {parent} is not a directory or does "
-                         f"not exist.")
+        raise ValueError(
+            f"Path {folder_path} is not valid, because path {parent} is not a directory or does "
+            f"not exist."
+        )
 
     if os.path.exists(folder_path):
         if os.path.isfile(folder_path):
             raise ValueError(f"Path to {folder_path} is a file not a directory.")
 
         if ask_user_to_replace and not user_query_yes_no(
-                f"The directory {folder_path} does already exist. In the process it may get removed (which results in "
-                f"a loss of data). Do you want to proceed?", default="no"):
+            f"The directory {folder_path} does already exist. In the process it may get removed (which results in "
+            f"a loss of data). Do you want to proceed?",
+            default="no",
+        ):
             print("Terminating...")
             exit()
 
@@ -80,28 +89,36 @@ def njobs_check_and_set(njobs, ntasks):
     nkernels = multiprocessing.cpu_count()
 
     if not isinstance(njobs, int) or njobs == 0 or njobs < -1:
-        raise ValueError("njobs has to be an integer and cannot be zero or smaller than -1")
+        raise ValueError(
+            "njobs has to be an integer and cannot be zero or smaller than -1"
+        )
 
     if njobs > ntasks:
-        print(f"WARNING: More jobs are requested (={njobs}) than tasks to carry out (={ntasks}). "
-              f"Setting njobs={ntasks}.")
+        print(
+            f"WARNING: More jobs are requested (={njobs}) than tasks to carry out (={ntasks}). "
+            f"Setting njobs={ntasks}."
+        )
         return ntasks
 
     if njobs > nkernels:
-        print(f"WARNING: More jobs (={njobs}) requested than CPU kernels available (={nkernels}). ")
+        print(
+            f"WARNING: More jobs (={njobs}) requested than CPU kernels available (={nkernels}). "
+        )
         return njobs
 
     if njobs == -1:  # this is adapted to scikit-learn way
         njobs = min(nkernels, ntasks)
-        print(f"INFO: Available cpus: {nkernels}. Nr. of tasks {ntasks}. "
-              f"Setting to njobs={njobs}.")
+        print(
+            f"INFO: Available cpus: {nkernels}. Nr. of tasks {ntasks}. "
+            f"Setting to njobs={njobs}."
+        )
         return njobs
 
     return njobs
 
 
 def str_timestamp():
-    return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
 def parent_folder_clean(p):
@@ -135,8 +152,7 @@ def user_query_yes_no(question: str, default=None) -> bool:
 
     # source: https://stackoverflow.com/questions/3041986/apt-command-line-interface-like-yes-no-input
 
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
@@ -153,7 +169,7 @@ def user_query_yes_no(question: str, default=None) -> bool:
         sys.stdout.write("\n")
         sys.stdout.flush()
 
-        if default is not None and choice == '':
+        if default is not None and choice == "":
             return valid[default]
         elif choice in valid:
             return valid[choice]
@@ -163,7 +179,7 @@ def user_query_yes_no(question: str, default=None) -> bool:
 
 def user_query_numbered_list(elements: list):
 
-    max_choice = len(elements)-1
+    max_choice = len(elements) - 1
     print("Choose an option of the following list:")
 
     for i, txt in enumerate(elements):
@@ -178,3 +194,50 @@ def user_query_numbered_list(elements: list):
                 return elements[choice]
         except ValueError:
             print("The number has to be an integer.")
+
+
+def include_patterns(*patterns):
+
+    # https://stackoverflow.com/questions/42487578/python-shutil-copytree-use-ignore-function-to-keep-specific-files-types
+
+    """Factory function that can be used with copytree() ignore parameter.
+
+    Arguments define a sequence of glob-style patterns
+    that are used to specify what files to NOT ignore.
+    Creates and returns a function that determines this for each directory
+    in the file hierarchy rooted at the source directory when used with
+    shutil.copytree().
+    """
+
+    def _ignore_patterns(path, names):
+
+        keep = set(name for pattern in patterns for name in filter(names, pattern))
+        ignore = set(
+            name
+            for name in names
+            if name not in keep and not os.path.isdir(os.path.join(path, name))
+        )
+        return ignore
+
+    return _ignore_patterns
+
+
+def removeEmptyFolders(path):
+
+    # https://metinsaylan.com/7974/gist-python-script-to-delete-all-empty-folders/
+
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in dirs:
+            try:
+                if (
+                    len(os.listdir(os.path.join(root, name))) == 0
+                ):  # check whether the directory is empty
+                    try:
+                        os.rmdir(os.path.join(root, name))
+                    except:
+                        print("FAILED :", os.path.join(root, name))
+                        pass
+            except:
+                pass
+
+    return

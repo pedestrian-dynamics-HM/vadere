@@ -6,6 +6,16 @@
 
 ### Added
 
+- Added new output processor "PedestrianTargetReachTimeProcessor" to log the time when an agent reaches its target.
+
+### Changed
+
+- In `postLoop()` of `Simulation.java`, clear the topography as very last step so that models and output processors can use it before.
+
+## v1.15 (2020-11-12)
+
+### Added
+
 - The TikZ snapshot button allows to export either the whole topography or only the current (scaled) view. This is useful when visualizing parts of bigger topographies.
 - Added "--version" to "vadere-console.jar".
 - Added a Vadere logo (a simple "V") as window and task bar icon to get rid of the lame default Java icon.
@@ -44,6 +54,10 @@
 
 ### Changed
 
+- Refactored EikMesh code.
+- Refactored psychology-related code and added several test scenarios.
+- Refactored TikZ generator code.
+- The behavioral heuristics model (BHM) can now be used with a floor field. I.e., BHM agents are able to derive the geodetic distance to their targets instead of using the Euclidean distance.
 - The "Time" slider in the PostVis uses the resolution of the "Res." slider instead of using a fixed step size of 0.4 seconds.
 - The Model (of the GUI MVC) of the Postvisualization changed to a DataFrame based structure using [Tablesaw](https://github.com/jtablesaw/tablesaw) which is based on [FastUtils](http://fastutil.di.unimi.it/).
 - `FootStepProcessor` interpolates the pedestrian's foot step to obtain a more precise position.  

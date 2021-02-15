@@ -58,10 +58,10 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			} else {
 				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 			}
-		} else if (selfCategory == SelfCategory.INSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.THREATENED) {
 			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-		} else if (selfCategory == SelfCategory.OUTSIDE_THREAT_AREA) {
+		} else if (selfCategory == SelfCategory.COMMON_FATE) {
 			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.WAIT) {

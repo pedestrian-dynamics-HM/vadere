@@ -101,16 +101,17 @@ public class EikMeshPoly {
 			//Thread.sleep(500);
 			meshPanel.repaint();
 		}
-		//meshImprover.generate();
+		System.out.println(String.format("Mesh generation complete: %d vertices", meshImprover.getMesh().getNumberOfVertices()));
 
-
+		System.out.println("Writing TikZ file...");
 		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), fileName + ".tex");
-		//System.out.println(meshImprover.getMesh().getNumberOfVertices());
+		System.out.println("Writing TikZ file finished");
 
+		System.out.println("Writing Poly file...");
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String[] splitName = fileName.split("\\.");
 		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName + "_tri.poly");
-
+		System.out.println("Writing Poly file finished.");
 	}
 
 	public static void displayPolyFile(@NotNull final String fileName) throws IOException {

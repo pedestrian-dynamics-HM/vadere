@@ -93,7 +93,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 				when(simState.getSimTimeInSec()).thenReturn(retVal);
 			}
 		};
-		TraCICommand ret = simCmdHandler.process_getSimTime(cmd, rm, var);
+		TraCICommand ret = simCmdHandler.process_getSimTime(cmd, rm);
 		checkGET_OK(ret);
 		testGetValue(ret, varID, varType, elementID, retVal);
 		

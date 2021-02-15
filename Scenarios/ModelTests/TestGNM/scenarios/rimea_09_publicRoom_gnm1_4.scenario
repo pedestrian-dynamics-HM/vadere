@@ -1,7 +1,7 @@
 {
   "name" : "rimea_09_publicRoom_gnm1_4",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

@@ -1,7 +1,7 @@
 {
   "name" : "rimea_05_react_sfm1",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

@@ -158,6 +158,7 @@ public class Scenario {
 		this.scenarioStore.setAttributesPsychology(attributesPsychology);
 	}
 
+
 	public void setTopography(@NotNull final Topography topography) {
 		scenarioStore.setTopography(topography);
 	}

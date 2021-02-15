@@ -48,12 +48,16 @@ public enum ScenarioCheckerReason {
 	AREAS_DENSITY_VORONOI_PROCESSOR_MISMATCH("ScenarioChecker.processor.checkAreasInAreaDensityVoronoiProcessor.mismatch"),
 	MEASUREMENT_AREA_NOT_RECTANGULAR("ScenarioChecker.processor.measurementArea.hasToBeRectangular"),
 
+	// Missing dataprocessors which are necessary in the strategyModel
+	DATAPROCESSOR_MISSING("ScenarioChecker.processor.strategyModelDataProcessorCheck."),
+
+
 	// Group attributes
 	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored"),
 
-
 	// Model reasons
 	CA_SPAWNING("ScenarioChecker.models.ca.spawning.setup.err");
+
 
 	private String msgId;
 

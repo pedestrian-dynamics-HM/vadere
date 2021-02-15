@@ -1,8 +1,8 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
-import org.vadere.simulator.control.psychology.cognition.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.IPerceptionModel;
+import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -88,6 +88,7 @@ public class Simulation {
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
 
+
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
 					  ICognitionModel cognitionModel, double startTimeInSec,
 					  final String name, ScenarioStore scenarioStore,
@@ -101,6 +102,8 @@ public class Simulation {
 		this.mainModel = mainModel;
 		this.perceptionModel = perceptionModel;
 		this.cognitionModel = cognitionModel;
+
+
 		this.scenarioStore = scenarioStore;
 		this.attributesSimulation = scenarioStore.getAttributesSimulation();
 		this.attributesAgent = scenarioStore.getTopography().getAttributesPedestrian();
@@ -220,7 +223,6 @@ public class Simulation {
 
 	private void postLoop() {
 		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
-		topographyController.postLoop(this.simTimeInSec);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -234,7 +236,10 @@ public class Simulation {
 			processorManager.postLoop(this.simulationState);
 		}
 
-		// notify remoteManger that simulation ended. If a command waited for the next
+		// Models and processors require the latest topography for post processing.
+		// Therefore, reset topography afterwards (I guess resetting the topography was introduced by Stefan).
+		topographyController.postLoop(this.simTimeInSec);
+		// Notify remoteManger that simulation ended. If a command waited for the next
 		// simulation step notify it and execute command with current SimulationState.
 		setWaitForSimCommand(true); // its save to read the state now.
 		remoteRunListeners.forEach(RemoteRunListener::lastSimulationStepFinishedListener);
@@ -371,6 +376,7 @@ public class Simulation {
 	}
 
 	private void updateCallbacks(double simTimeInSec) {
+
 		updateScenarioElements(simTimeInSec);
 
 		updatePsychologyLayer(simTimeInSec);
@@ -411,6 +417,7 @@ public class Simulation {
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}
 
+
 	private void updatePsychologyLayer(double simTimeInSec) {
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
@@ -423,6 +430,8 @@ public class Simulation {
 			pedestrians.stream().forEach(pedestrian -> pedestrian.setMostImportantStimulus(elapsedTime));
 		}
 	}
+
+
 
 	private void updateLocomotionLayer(double simTimeInSec) {
 		for (Model m : models) {

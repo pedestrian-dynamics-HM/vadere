@@ -1,7 +1,7 @@
 {
   "name" : "rimea_12_evacuation_nelder_mead",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

@@ -1,7 +1,7 @@
 {
   "name" : "DenseCrowd_withoutGroups_moreTargets_6_waiting",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -405,7 +405,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -453,7 +456,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -501,7 +507,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -549,7 +558,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -597,7 +609,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
@@ -645,7 +660,10 @@
             "latestThreatUnhandled" : false
           },
           "selfCategory" : null,
-          "groupMembership" : "OUT_GROUP"
+          "groupMembership" : "OUT_GROUP",
+          "knowledgeBase" : {
+            "knowledge" : [ ]
+          }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],

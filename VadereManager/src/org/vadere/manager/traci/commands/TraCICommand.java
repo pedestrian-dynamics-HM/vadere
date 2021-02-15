@@ -102,4 +102,6 @@ public abstract class TraCICommand {
 	}
 
 	public abstract TraCIPacket buildResponsePacket();
+
+	public  int getVariableIdentifier(){return -1;}
 }

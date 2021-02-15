@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_osm1_125_up",
   "description" : "",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

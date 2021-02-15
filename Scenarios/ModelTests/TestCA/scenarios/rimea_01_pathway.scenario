@@ -1,7 +1,7 @@
 {
   "name" : "rimea_01_pathway",
   "description" : "numberOfCircles = 1, stepCircleResolution = 18, DISCRETE",
-  "release" : "1.12",
+  "release" : "1.15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",

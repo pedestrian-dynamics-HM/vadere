@@ -57,11 +57,17 @@ public enum PersonVar {
 		throw new TraCIException(String.format("No person var found with id: %02X", id));
 	}
 
+	public static String asString(int id){
+		try {
+			return fromId(id).toString();
+		} catch (TraCIException ignored) { }
+		return "No variable for id: " + id;
+	}
+
 	@Override
 	public String toString() {
-		return "PersonVar{" +
-				name() +
-				": id=" + id +
+		return name() + "{" +
+				"id=" + id +
 				", type=" + type +
 				'}';
 	}

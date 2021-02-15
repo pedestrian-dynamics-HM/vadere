@@ -81,14 +81,17 @@ public class DefaultModeAdapter implements IMode {
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (e.isControlDown()) {
+			/* Use a smaller scale factor if the ALT key is pressed simultaneously */
+			double zoomFactor = e.isAltDown() ? 1.05 : 1.2;
+
 			if (e.getWheelRotation() > 0) {
-				if (panelModel.zoomOut()) {
+				if (panelModel.zoomOut(zoomFactor)) {
 					panelModel.notifyScaleListeners();
 					panelModel.notifyObservers();
 				}
 				delay();
 			} else if (e.getWheelRotation() < 0) {
-				if (panelModel.zoomIn()) {
+				if (panelModel.zoomIn(zoomFactor)) {
 					panelModel.notifyScaleListeners();
 					panelModel.notifyObservers();
 				}
