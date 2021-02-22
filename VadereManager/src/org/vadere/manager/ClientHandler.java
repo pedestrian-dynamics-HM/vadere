@@ -22,6 +22,7 @@ public class ClientHandler implements Runnable {
 	private final TraCISocket traCISocket;
 	private CommandExecutor cmdExecutor;
 	private RemoteManager remoteManager;
+	private String scenarioString;
 
 
 	public ClientHandler(ServerSocket serverSocket, TraCISocket traCISocket, Path basedir, boolean guiSupport) {
@@ -29,12 +30,21 @@ public class ClientHandler implements Runnable {
 		this.traCISocket = traCISocket;
 		this.remoteManager = new RemoteManager(basedir, guiSupport);
 		this.cmdExecutor = new CommandExecutor(remoteManager);
+		this.scenarioString = ""; // traci will provide the scenario
 	}
 
+	public void setScenario(String scenarioString) {
+		this.scenarioString = scenarioString;
+	}
 
 	@Override
 	public void run() {
 		try {
+			if (!scenarioString.equals("")){
+				// scenario provided in command line. Load it and then wait for traci commands
+				remoteManager.loadScenario(this.scenarioString);
+				remoteManager.startSimulation();
+			}
 			handleClient();
 		} catch (EOFException eof) {
 			logger.infof("EOF. Client closed socket");

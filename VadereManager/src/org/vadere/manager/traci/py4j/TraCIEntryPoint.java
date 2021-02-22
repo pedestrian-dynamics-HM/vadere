@@ -14,7 +14,7 @@ import org.vadere.manager.TraCISocket;
 import org.vadere.manager.client.traci.PersonAPI;
 import org.vadere.manager.client.traci.PolygonAPI;
 import org.vadere.manager.client.traci.SimulationAPI;
-import org.vadere.manager.client.traci.VadereAPI;
+import org.vadere.manager.client.traci.MiscAPI;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class TraCIEntryPoint implements Runnable {
 	protected org.vadere.manager.client.traci.SimulationAPI simulationapi;
 	protected org.vadere.manager.client.traci.PolygonAPI polygonapi;
 	protected org.vadere.manager.client.traci.PersonAPI personapi;
-	protected org.vadere.manager.client.traci.VadereAPI vadereapi;
+	protected org.vadere.manager.client.traci.MiscAPI vadereapi;
 	protected TraCIControl traciControl;
 
 	private boolean running;
@@ -152,7 +152,7 @@ public class TraCIEntryPoint implements Runnable {
 		simulationapi = new org.vadere.manager.client.traci.SimulationAPI(traCISocket);
 		polygonapi = new org.vadere.manager.client.traci.PolygonAPI(traCISocket);
 		personapi = new org.vadere.manager.client.traci.PersonAPI(traCISocket);
-		vadereapi = new org.vadere.manager.client.traci.VadereAPI(traCISocket);
+		vadereapi = new org.vadere.manager.client.traci.MiscAPI(traCISocket);
 		traciControl = new TraCIControl(traCISocket, basePath, defaultScenario);
 	}
 
@@ -235,7 +235,7 @@ public class TraCIEntryPoint implements Runnable {
 		return personapi;
 	}
 
-	public VadereAPI getVadereapi() {
+	public MiscAPI getVadereapi() {
 		return vadereapi;
 	}
 

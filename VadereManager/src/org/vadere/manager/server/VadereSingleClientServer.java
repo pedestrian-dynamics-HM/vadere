@@ -2,6 +2,7 @@ package org.vadere.manager.server;
 
 import org.vadere.manager.ClientHandler;
 import org.vadere.manager.TraCISocket;
+import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,8 +16,11 @@ import java.nio.file.Path;
 public class VadereSingleClientServer extends AbstractVadereServer {
 
 
-	public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport, boolean trace) {
+	private String scenarioPath;
+
+	public VadereSingleClientServer(ServerSocket serverSocket, Path baseDir, boolean guiSupport, boolean trace, String scenarioPath) {
 		super(serverSocket, baseDir, guiSupport, trace);
+		this.scenarioPath = scenarioPath;
 	}
 
 	@Override
@@ -24,7 +28,14 @@ public class VadereSingleClientServer extends AbstractVadereServer {
 		try {
 			logger.infof("listening on port %d... (gui-mode: %s) Single Simulation", serverSocket.getLocalPort(), Boolean.toString(guiSupport));
 			Socket clientSocket = serverSocket.accept();
-			Thread t = new Thread(new ClientHandler(serverSocket, new TraCISocket(clientSocket, trace), baseDir, guiSupport));
+
+			ClientHandler handler = new ClientHandler(serverSocket, new TraCISocket(clientSocket, trace), baseDir, guiSupport);
+			if (!scenarioPath.equals("")){
+				handler.setScenario(IOUtils.readTextFile(scenarioPath));
+			}
+
+
+			Thread t = new Thread(handler);
 			t.start();
 			t.join();
 

@@ -33,7 +33,14 @@ import java.util.stream.Collectors;
 		singleAnnotation = PolygonHandler.class,
 		multipleAnnotation = PolygonHandlers.class,
 		cmdEnum = TraCICmd.class,
-		varEnum = PolygonVar.class
+		varEnum = PolygonVar.class,
+		var = "V_POLYGON",
+		cmdGet = 0xa8,
+		cmdSet = 0xc8,
+		cmdSub = 0xd8,
+		cmdResponseSub = 0xe8,
+		cmdCtx = 0x88,
+		cmdResponseCtx = 0x98
 )
 
 public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
@@ -196,13 +203,13 @@ public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
 		return cmd;
 	}
 
-	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.POS_2D, name = "getPosition2D")
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.POSITION, name = "getPosition2D")
 	public TraCICommand process_getPosition2D(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar) {
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
 
-	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.IMAGE_FILE, name = "getImageFile")
+	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.IMAGEFILE, name = "getImageFile")
 	public TraCICommand process_getImageFile(TraCIGetCommand cmd, RemoteManager remoteManager, PolygonVar traCIVar) {
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
@@ -251,11 +258,11 @@ public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
 				return process_getCentroid(getCmd, remoteManager, var);
 			case COLOR:
 				return process_getColor(getCmd, remoteManager, var);
-			case POS_2D:
+			case POSITION:
 				return process_getPosition2D(getCmd, remoteManager, var);
 			case DISTANCE:
 				return process_getDistance(getCmd, remoteManager);
-			case IMAGE_FILE:
+			case IMAGEFILE:
 			case WIDTH:
 			case HEIGHT:
 			case ANGLE:

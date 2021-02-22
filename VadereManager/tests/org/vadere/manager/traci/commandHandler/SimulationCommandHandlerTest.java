@@ -1,7 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.TestRemoteManager;
 import org.vadere.manager.traci.TraCICmd;
@@ -9,10 +8,7 @@ import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
-import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
-import org.vadere.simulator.entrypoints.ScenarioFactory;
-import org.vadere.simulator.projects.Scenario;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
@@ -80,7 +76,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getSimTime() {
-		SimulationVar var = SimulationVar.CURR_SIM_TIME;
+		SimulationVar var = SimulationVar.TIME;
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "-1";

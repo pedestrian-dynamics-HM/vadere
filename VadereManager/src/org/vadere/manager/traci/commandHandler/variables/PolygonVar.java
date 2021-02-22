@@ -12,8 +12,8 @@ public enum PolygonVar {
 	CENTROID(0x50, TraCIDataType.POS_2D), // get
 	DISTANCE(0x51, TraCIDataType.STRING_LIST), // get
 	COLOR(0x45, TraCIDataType.COLOR), // get, set
-	POS_2D(0x42, TraCIDataType.POS_2D), // get
-	IMAGE_FILE(0x93, TraCIDataType.STRING),
+	POSITION(0x42, TraCIDataType.POS_2D), // get
+	IMAGEFILE(0x93, TraCIDataType.STRING),
 	WIDTH(0x4d, TraCIDataType.DOUBLE), // get, set
 	HEIGHT(0xbc, TraCIDataType.DOUBLE), // get, set
 	ANGLE(0x43, TraCIDataType.DOUBLE);

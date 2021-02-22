@@ -34,12 +34,19 @@ import java.util.Random;
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Vadere API
  */
 @TraCIApi(
-		name = "VadereAPI",
+		name = "MiscAPI",
 		nameShort = "va",
 		singleAnnotation = VadereHandler.class,
 		multipleAnnotation = VadereHandlers.class,
 		cmdEnum = TraCICmd.class,
-		varEnum = VadereVar.class
+		varEnum = VadereVar.class,
+		var = "V_MISC",
+		cmdGet = 0xac,
+		cmdSet = 0xcc,
+		cmdSub = 0xdc,
+		cmdResponseSub = 0xec,
+		cmdCtx = 0x8c,
+		cmdResponseCtx = 0x9c
 )
 
 public class VadereCommandHandler extends CommandHandler<VadereVar> {

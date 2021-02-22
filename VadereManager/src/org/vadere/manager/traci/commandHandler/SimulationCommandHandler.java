@@ -49,7 +49,14 @@ import java.util.stream.Collectors;
 		singleAnnotation = SimulationHandler.class,
 		multipleAnnotation = SimulationHandlers.class,
 		cmdEnum = TraCICmd.class,
-		varEnum = SimulationVar.class
+		varEnum = SimulationVar.class,
+		var = "V_SIM",
+		cmdGet = 0xab,
+		cmdSet = 0xcb,
+		cmdSub = 0xdb,
+		cmdResponseSub = 0xeb,
+		cmdCtx = 0x8b,
+		cmdResponseCtx = 0x9b
 )
 public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
@@ -98,7 +105,7 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	}
 
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.NETWORK_BOUNDING_BOX_2D,
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.NET_BOUNDING_BOX,
 			name = "getNetworkBound", ignoreElementId = true)
 	public TraCICommand process_getNetworkBound(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
@@ -110,33 +117,33 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			ArrayList<VPoint> polyList = new ArrayList<>();
 			polyList.add(lowLeft);
 			polyList.add(highRight);
-			cmd.setResponse(responseOK(SimulationVar.NETWORK_BOUNDING_BOX_2D.type, polyList));
+			cmd.setResponse(responseOK(SimulationVar.NET_BOUNDING_BOX.type, polyList));
 		});
 
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CURR_SIM_TIME,
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.TIME,
 			name = "getTime", ignoreElementId = true)
 	public TraCICommand process_getSimTime(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
 		remoteManager.accessState((manager, state) -> {
 			// BigDecimal to ensure correct comparison in omentpp
 			BigDecimal time = BigDecimal.valueOf(state.getSimTimeInSec());
-			cmd.setResponse(responseOK(SimulationVar.CURR_SIM_TIME.type, time.setScale(1, RoundingMode.HALF_UP).doubleValue()));
+			cmd.setResponse(responseOK(SimulationVar.TIME.type, time.setScale(1, RoundingMode.HALF_UP).doubleValue()));
 		});
 
 		return cmd;
 	}
 
-	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.VAR_DELTA_T,
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.DELTA_T,
 			name = "getSimSte", ignoreElementId = true)
 	public TraCICommand process_getSimStep(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
 		remoteManager.accessState((manager, state) -> {
 			// BigDecimal to ensure correct comparison in omentpp
 			double time = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
-			cmd.setResponse(responseOK(SimulationVar.CURR_SIM_TIME.type, time));
+			cmd.setResponse(responseOK(SimulationVar.TIME.type, time));
 		});
 
 		return cmd;

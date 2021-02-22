@@ -1,6 +1,5 @@
 package org.vadere.manager;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -35,7 +34,7 @@ public class Manager {
 			logger.infof("Start Server(%s) with Loglevel: %s", VadereServer.currentVersion.getVersionString(), logger.getLevel().toString());
 			AbstractVadereServer server;
 			if (ns.getBoolean("singleClient")) {
-				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"));
+				server = new VadereSingleClientServer(serverSocket, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"), ns.getString("scenario"));
 			} else {
 				ExecutorService pool = Executors.newFixedThreadPool(ns.getInt("clientNum"));
 				server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"));
@@ -130,5 +129,11 @@ public class Manager {
 				.dest("output-dir") // set name in namespace
 				.type(String.class)
 				.help("Supply output directory as base directory for received scenarios.");
+
+		parser.addArgument("--scenario")
+				.required(false)
+				.dest("scenario") // set name in namespace
+				.type(String.class)
+				.help("Supply path to scenario. This will start this scenario and waits for first simstep command");
 	}
 }
