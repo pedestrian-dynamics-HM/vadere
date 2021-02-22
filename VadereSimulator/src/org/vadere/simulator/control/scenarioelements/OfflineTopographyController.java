@@ -1,16 +1,8 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.fields.PotentialFieldDistancesBruteForce;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.models.AttributesFloorField;
@@ -18,17 +10,15 @@ import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.IDistanceFunctionCached;
 import org.vadere.util.random.SimpleReachablePointProvider;
 
-import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class OfflineTopographyController {
+public class OfflineTopographyController extends ScenarioElementController  {
 
 	private final Domain domain;
 	protected final Random random;

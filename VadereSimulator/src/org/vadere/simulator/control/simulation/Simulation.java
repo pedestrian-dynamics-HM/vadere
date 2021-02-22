@@ -2,9 +2,14 @@ package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.control.scenarioelements.*;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
+import org.vadere.simulator.control.scenarioelements.AbsorbingAreaController;
+import org.vadere.simulator.control.scenarioelements.SourceController;
+import org.vadere.simulator.control.scenarioelements.TargetChangerController;
+import org.vadere.simulator.control.scenarioelements.TargetController;
+import org.vadere.simulator.control.scenarioelements.TeleporterController;
+import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -23,7 +28,12 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.AbsorbingArea;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Source;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.TargetChanger;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -33,7 +43,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Simulation {
+public class Simulation implements ControllerManager{
 
 	private static Logger logger = Logger.getLogger(Simulation.class);
 
@@ -137,6 +147,11 @@ public class Simulation {
 		// this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
 			initPotentialFieldsForVisualization(mainModel);
+		}
+
+		// allow models to register to Controllers
+		for(var model : this.models){
+			model.registerToScenarioElementControllerEvents(this);
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
@@ -550,4 +565,34 @@ public class Simulation {
 		return stimulusController;
 	}
 
+
+	@Override
+	public Collection<SourceController> getSourceControllers() {
+		return sourceControllers;
+	}
+
+	@Override
+	public Collection<TargetController> getTargetControllers() {
+		return targetControllers;
+	}
+
+	@Override
+	public Collection<TargetChangerController> getTargetChangerControllers() {
+		return targetChangerControllers;
+	}
+
+	@Override
+	public Collection<AbsorbingAreaController> getAbsorbingAreaControllers() {
+		return absorbingAreaControllers;
+	}
+
+	@Override
+	public TeleporterController getTeleporterController() {
+		return teleporterController;
+	}
+
+	@Override
+	public TopographyController getTopographyController() {
+		return topographyController;
+	}
 }

@@ -99,7 +99,7 @@ public class SingleSourceController extends SourceController {
 
 				for (VPoint spawnPoint : spawnPoints) {
 					if (!isMaximumNumberOfSpawnedElementsReached()) {
-						addNewAgentToScenario(spawnPoint);
+						addNewAgentToScenario(spawnPoint, simTimeInSec);
 						dynamicElementsCreatedTotal++;
 					}
 				}

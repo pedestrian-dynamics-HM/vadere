@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TargetController {
+public class TargetController extends ScenarioElementController  {
 
 	private static final Logger log = Logger.getLogger(TargetController.class);
 

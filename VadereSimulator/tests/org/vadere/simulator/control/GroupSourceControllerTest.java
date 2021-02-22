@@ -92,7 +92,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 		d.random = new Random(builder.getRandomSeed());
 
 		d.source = new Source(d.attributesSource);
-		d.pedestrianFactory = new DynamicElementFactory() {
+		d.pedestrianFactory = new TestDynamicElementFactory(d) {
 			private int pedestrianIdCounter = 0;
 
 			@Override
