@@ -1,9 +1,16 @@
-package org.vadere.meshing.mesh.triangulation;
+package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
+import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
@@ -11,6 +18,8 @@ import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.math.InterpolationUtil;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.function.Function;
 
 /**
@@ -58,6 +67,32 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 			}
 		};
 		return edgeLengthFunction;
+	}
+
+	default <V extends IVertex, E extends IHalfEdge, F extends IFace> void smooth(double g, IIncrementalTriangulation<V, E, F> triangulation) {
+		assert g > 0;
+		// smooth the function based such that it is g-Lipschitz
+		var mesh = triangulation.getMesh();
+		PriorityQueue<V> heap = new PriorityQueue<>(
+				Comparator.comparingDouble(v1 -> mesh.getDoubleData(v1, propName))
+		);
+		heap.addAll(mesh.getVertices());
+
+		while (!heap.isEmpty()) {
+			var v = heap.poll();
+			double hv = mesh.getDoubleData(v, propName);
+			for (var u : mesh.getAdjacentVertexIt(v)) {
+				double hu = mesh.getDoubleData(u, propName);
+				double min = Math.min(hu, hv + g * v.distance(u));
+
+				// update heap
+				if (min < hu) {
+					heap.remove(u);
+					mesh.setDoubleData(u, propName, min);
+					heap.add(u);
+				}
+			}
+		}
 	}
 
 	/*static IEdgeLengthFunction smooth(double g) {

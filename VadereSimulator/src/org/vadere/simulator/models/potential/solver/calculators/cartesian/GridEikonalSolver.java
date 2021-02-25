@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
@@ -83,6 +84,83 @@ public interface GridEikonalSolver extends EikonalSolver {
 
 	default double getPotential(final IPoint pos, final double unknownPenalty, final double weight) {
 		return getPotential(getCellGrid(), pos.getX(), pos.getY(), unknownPenalty, weight);
+	}
+
+	default Direction computeDirection(final Point point, final CellGrid cellGrid) {
+		boolean posX = false;
+		boolean posY = false;
+		if (isValidPoint(cellGrid, new Point(point.x + 1, point.y)) &&
+				(!isValidPoint(cellGrid, new Point(point.x - 1, point.y))
+						|| (cellGrid.getValue(new Point(point.x + 1, point.y)).potential < cellGrid
+						.getValue(new Point(point.x - 1, point.y)).potential))) {
+			posX = true;
+		}
+
+		if (isValidPoint(cellGrid, new Point(point.x, point.y + 1)) &&
+				(!isValidPoint(cellGrid, new Point(point.x, point.y - 1))
+						|| (cellGrid.getValue(new Point(point.x, point.y + 1)).potential < cellGrid
+						.getValue(new Point(point.x, point.y - 1)).potential))) {
+			posY = true;
+		}
+
+		if(posX && posY) {
+			return Direction.UP_RIGHT;
+		} else if(posX && !posY) {
+			return Direction.BOTTOM_RIGHT;
+		} else if(!posX && posY) {
+			return Direction.UP_LEFT;
+		} else {
+			return Direction.BOTTOM_LEFT;
+		}
+	}
+
+	default Point[] getPointByDirection(final Point point, final CellGrid cellGrid, final Direction direction) {
+		Point xPoint, yPoint;
+
+		switch (direction) {
+			case UP_LEFT:
+				xPoint = new Point(point.x - 1, point.y);
+				yPoint = new Point(point.x, point.y + 1);
+				break;
+			case UP_RIGHT:
+				xPoint = new Point(point.x + 1, point.y);
+				yPoint = new Point(point.x, point.y + 1);
+				break;
+			case BOTTOM_LEFT:
+				xPoint = new Point(point.x - 1, point.y);
+				yPoint = new Point(point.x, point.y - 1);
+				break;
+			default:
+				xPoint = new Point(point.x + 1, point.y);
+				yPoint = new Point(point.x, point.y - 1);
+				break;
+		}
+		Point[] result = new Point[2];
+
+		double xVal = Double.MAX_VALUE;
+		double yVal = Double.MAX_VALUE;
+		if(isValidPoint(cellGrid, xPoint)) {
+			result[0] = xPoint;
+			xVal = cellGrid.getValue(xPoint).potential;
+		}
+
+		if(isValidPoint(cellGrid, yPoint)) {
+			result[1] = yPoint;
+			yVal = cellGrid.getValue(yPoint).potential;
+		}
+
+		double cost = getTimeCostFunction().costAt(new VPoint(point.x, point.y));
+		double speed = (1.0 / cellGrid.getResolution()) / cost; // = F/cost
+		double distance = 1.0 / speed;
+		if(Math.abs(xVal - yVal) >= distance) {
+			if(xVal > yVal) {
+				result[0] = null;
+			} else {
+				result[1] = null;
+			}
+		}
+
+		return result;
 	}
 
 	default double computeGodunovDifference(final Point point, final CellGrid cellGrid, final Direction direction) {
@@ -206,6 +284,150 @@ public interface GridEikonalSolver extends EikonalSolver {
 		}
 
 		return result;
+	}
+
+	default Triple<Double, Point, Point> computeGodunovDifferenceAndDep(final Point point, final CellGrid cellGrid, final Direction direction) {
+
+		VPoint position = cellGrid.pointToCoord(point.x, point.y);
+		double cost = getTimeCostFunction().costAt(new VPoint(position.x, position.y));
+		double speed = (1.0 / cellGrid.getResolution()) / cost; // = F/cost
+
+		double a = 0;
+		double b = 0;
+		double distance = 1.0 / speed;
+		double c = -1.0 / (speed * speed);
+
+		double result = Double.MAX_VALUE;
+
+		Point xPoint;
+		Point yPoint;
+
+		Point xhPoint;
+		Point yhPoint;
+		switch (direction) {
+			case UP_LEFT:
+				xPoint = new Point(point.x - 1, point.y);
+				yPoint = new Point(point.x, point.y + 1);
+				xhPoint = new Point(point.x - 2, point.y);
+				yhPoint = new Point(point.x, point.y + 2);
+				break;
+			case UP_RIGHT:
+				xPoint = new Point(point.x + 1, point.y);
+				yPoint = new Point(point.x, point.y + 1);
+				xhPoint = new Point(point.x + 2, point.y);
+				yhPoint = new Point(point.x, point.y + 2);
+				break;
+			case BOTTOM_LEFT:
+				xPoint = new Point(point.x - 1, point.y);
+				yPoint = new Point(point.x, point.y - 1);
+				xhPoint = new Point(point.x - 2, point.y);
+				yhPoint = new Point(point.x, point.y - 2);
+				break;
+			case BOTTOM_RIGHT:
+				xPoint = new Point(point.x + 1, point.y);
+				yPoint = new Point(point.x, point.y - 1);
+				xhPoint = new Point(point.x + 2, point.y);
+				yhPoint = new Point(point.x, point.y - 2);
+				break;
+			default: {
+				if (isValidPoint(cellGrid, new Point(point.x + 1, point.y)) &&
+						(!isValidPoint(cellGrid, new Point(point.x - 1, point.y))
+								|| (cellGrid.getValue(new Point(point.x + 1, point.y)).potential < cellGrid
+								.getValue(new Point(point.x - 1, point.y)).potential))) {
+					xPoint = new Point(point.x + 1, point.y);
+					xhPoint = new Point(point.x + 2, point.y);
+				} else {
+					xPoint = new Point(point.x - 1, point.y);
+					xhPoint = new Point(point.x - 2, point.y);
+				}
+
+				if (isValidPoint(cellGrid, new Point(point.x, point.y + 1)) &&
+						(!isValidPoint(cellGrid, new Point(point.x, point.y - 1))
+								|| (cellGrid.getValue(new Point(point.x, point.y + 1)).potential < cellGrid
+								.getValue(new Point(point.x, point.y - 1)).potential))) {
+					yPoint = new Point(point.x, point.y + 1);
+					yhPoint = new Point(point.x, point.y + 2);
+				} else {
+					yPoint = new Point(point.x, point.y - 1);
+					yhPoint = new Point(point.x, point.y - 2);
+				}
+			}
+		}
+
+		double xVal = Double.MAX_VALUE;
+		if (isValidPoint(cellGrid, xPoint)) {
+			xVal = cellGrid.getValue(xPoint).potential;
+			if (xVal != Double.MAX_VALUE) {
+				a += 1.0;
+				b -= 2 * xVal;
+				c += Math.pow(xVal, 2);
+			} else {
+				xPoint = null;
+			}
+		} else {
+			xPoint = null;
+		}
+
+		double yVal = Double.MAX_VALUE;
+		if (isValidPoint(cellGrid, yPoint)) {
+			yVal = cellGrid.getValue(yPoint).potential;
+			if (yVal != Double.MAX_VALUE) {
+				a += 1.0;
+				b -= 2 * yVal;
+				c += Math.pow(yVal, 2);
+			} else {
+				yPoint = null;
+			}
+		} else {
+			yPoint = null;
+		}
+
+		if ((xVal != Double.MAX_VALUE ^ yVal != Double.MAX_VALUE) || Math.abs(xVal - yVal) >= distance) {
+			if(xVal < yVal) {
+				return Triple.of(xVal + distance, xPoint, null);
+			}
+			else {
+				return Triple.of(yVal + distance, null, yPoint);
+			}
+		} else if ((xVal == Double.MAX_VALUE && yVal == Double.MAX_VALUE)) {
+			// logger.warn("no solution possible");
+			return Triple.of(result, null, null);
+		} else {
+			if (isHighAccuracy()) {
+				if (isValidPoint(cellGrid, xhPoint) && cellGrid.getValue(xhPoint).potential < xVal) {
+					double tp = (1.0 / 3.0) * (4.0 * xVal - cellGrid.getValue(xhPoint).potential);
+					double factor = 9.0 / 4.0;
+					a += factor;
+					b -= 2.0 * 9.0 / 4.0 * tp;
+					c += factor * Math.pow(tp, 2);
+				}
+
+				if (isValidPoint(cellGrid, yhPoint) && cellGrid.getValue(yhPoint).potential < yVal) {
+					double tp = (1.0 / 3.0) * (4.0 * yVal - cellGrid.getValue(yhPoint).potential);
+					double factor = 9.0 / 4.0;
+					a += factor;
+					b -= 2.0 * factor * tp;
+					c += factor * Math.pow(tp, 2);
+				}
+			}
+			java.util.List<Double> solutions = MathUtil.solveQuadratic(a, b, c);
+			int numberOfSolutions = solutions.size();
+
+			if (numberOfSolutions == 2) {
+				result = Math.max(solutions.get(0), solutions.get(1));
+			} else if (numberOfSolutions == 1) {
+				result = solutions.get(0);
+			}
+
+			if(result <= xVal) {
+				xPoint = null;
+			}
+
+			if(result <= yVal) {
+				yPoint = null;
+			}
+			return Triple.of(result, xPoint, yPoint);
+		}
 	}
 
 	default double computeGodunovDifference(final Point point, final Direction direction) {

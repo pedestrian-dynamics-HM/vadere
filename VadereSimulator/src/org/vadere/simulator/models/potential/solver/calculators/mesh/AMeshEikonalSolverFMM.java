@@ -12,7 +12,7 @@ import java.util.PriorityQueue;
 
 public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
-	private PriorityQueue<V> narrowBand;
+	protected PriorityQueue<V> narrowBand;
 
 	public AMeshEikonalSolverFMM(
 			@NotNull final String identifier,
@@ -22,10 +22,9 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 
 		Comparator<V> pointComparator = (v1, v2) -> {
 			double alpha = 0.3;
-			double beta = 1;
 
-			double key1 = alpha * getPotential(v1)/* + (1-alpha)*beta*distToDest.apply(getMesh().toPoint(v1))*/;
-			double key2 = alpha * getPotential(v2)/* +  (1-alpha)*beta*distToDest.apply(getMesh().toPoint(v2))*/;
+			double key1 = alpha * getPotential(v1);
+			double key2 = alpha * getPotential(v2);
 
 			if (key1 < key2) {
 				return -1;
@@ -51,11 +50,12 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 
 	protected void initializeNarrowBand() {
 		for(V vertex : getInitialVertices()) {
-			for(V v : getMesh().getAdjacentVertexIt(vertex)) {
+			narrowBand.add(vertex);
+			/*for(V v : getMesh().getAdjacentVertexIt(vertex)) {
 				if(isUndefined(v)) {
 					updatePotential(v);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -104,7 +104,7 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 	 */
 	protected void updatePotentialOfNeighbours(@NotNull final V vertex) {
 		for(V neighbour : getMesh().getAdjacentVertexIt(vertex)) {
-			if(!isBurned(neighbour)) {
+			if(!isBurned(neighbour) && !isInitialVertex(neighbour)) {
 				updatePotential(neighbour);
 			}
 		}

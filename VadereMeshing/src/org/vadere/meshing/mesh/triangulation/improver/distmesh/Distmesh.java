@@ -7,7 +7,7 @@ import com.vividsolutions.jts.triangulate.DelaunayTriangulationBuilder;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.meshing.ConstantLineIterator;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;

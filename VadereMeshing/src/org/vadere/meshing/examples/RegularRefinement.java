@@ -68,19 +68,22 @@ public class RegularRefinement {
 
 		GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(
 				triangulation,
-				e -> triangulation.getMesh().toLine(e).length() > 0.5 && triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) <= radius,
-				1);
+				//e -> triangulation.getMesh().toLine(e).length() > 0.5 && triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) <= radius,
+				3);
 
 		Predicate<PHalfEdge> edgeSplitPredicate = e ->
 				!triangulation.getMesh().isBoundary(e) &&
 						triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) < 3.0 &&
 						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
 
-		refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
-		refinement.refine();
+		//refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
+		synchronized (triangulation.getMesh()) {
+			refinement.refine();
+		}
+
 		meshPanel.repaint();
 
-		Thread.sleep(2000);
+		/*Thread.sleep(2000);
 		VPoint q = new VPoint(3,3);
 		Predicate<PVertex> coarsePredicate = v -> q.distance(v) > 3.0;
 		refinement.setCoarsePredicate(coarsePredicate);
@@ -94,7 +97,7 @@ public class RegularRefinement {
 						triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(q) < 3.0 &&
 						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
 		refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
-		refinement.refine();
+		refinement.refine();*/
 	}
 
 }

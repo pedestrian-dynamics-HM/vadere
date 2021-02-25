@@ -200,7 +200,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 			}
 		}
 
-		List<E> edgest = mesh.streamEdges().filter(e -> !mesh.isBoundary(e)).filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
+		/*List<E> edgest = mesh.streamEdges().filter(e -> !mesh.isBoundary(e)).filter(e -> isNonAcute(e, mesh)).collect(Collectors.toList());
 		Random random = new Random(0);
 		for (E edge : edgest) {
 			V v = mesh.getVertex(edge);
@@ -217,9 +217,9 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 					graphics.setColor(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
 					graphics.fill(tri);
 				}*/
-			}
+		/*	}
 
-		}
+		}*/
 
 		for(E edge : edges) {
 			Color ec = Color.DARK_GRAY;

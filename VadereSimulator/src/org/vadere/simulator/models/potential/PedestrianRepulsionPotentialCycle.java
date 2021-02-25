@@ -114,6 +114,11 @@ public class PedestrianRepulsionPotentialCycle implements
 	}
 
 	@Override
+	public double getMaximalInfluenceRadius() {
+		return potentialFieldPedestrian.getMaximalInfluenceRadius();
+	}
+
+	@Override
 	public Collection<? extends Agent> getRelevantAgents(VCircle relevantArea,
 			Agent pedestrian, Topography scenario) {
 		return potentialFieldPedestrian.getRelevantAgents(relevantArea,

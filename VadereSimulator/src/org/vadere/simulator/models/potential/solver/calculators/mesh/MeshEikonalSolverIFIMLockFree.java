@@ -1,16 +1,21 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
+import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.io.CollectionUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.math.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +30,7 @@ import java.util.stream.IntStream;
 
 
 /**
- * This class computes the traveling time T using the fast iterative method for arbitrary triangulated meshes.
+ * This class computes the traveling time T using the lock free variant of the fast iterative method for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
@@ -33,13 +38,27 @@ import java.util.stream.IntStream;
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
-public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
+public class MeshEikonalSolverIFIMLockFree<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
-	private static Logger logger = Logger.getLogger(MeshEikonalSolverFIMParallel.class);
+	private static Logger logger = Logger.getLogger(MeshEikonalSolverIFIMLockFree.class);
 	public final String nameAtomicBoolean = "nameAtomic";
-	private int nThreds = 1;
+	private int nThreds = 5;
 	private Random random = new Random(1);
 	final String identifier;
+
+	public static final String nameOldDefiningSimplex = "oldDefiningSimplex";
+	public static final String nameDefiningSimplex = "definingSimplex";
+
+	public static final String nameSpeedChanged = "speedChanged";
+	public static final String nameOldSpeed = "oldTimeCosts";
+	public static final String nameOldPotential = "oldPotential";
+
+	private IVertexContainerObject<V, E, F, Pair> oldDefiningSimplex;
+	private IVertexContainerObject<V, E, F, Pair> definingSimplex;
+
+	private IVertexContainerDouble<V, E, F> oldPotential;
+	private IVertexContainerDouble<V, E, F> oldTimeCosts;
+	private IVertexContainerBoolean<V, E, F> speedChange;
 
 	static {
 		logger.setDebug();
@@ -60,7 +79,7 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 	private int iteration = 0;
 	private int nUpdates = 0;
 	private ForkJoinPool forkJoinPool;
-
+	private final double epsilon = 0;
 
 	// Note: The updateOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
 
@@ -72,20 +91,26 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 	 * @param timeCostFunction  the time cost function t(x). Note F(x) = 1 / t(x).
 	 * @param triangulation     the triangulation the propagating wave moves on.
 	 */
-	public MeshEikonalSolverFIMParallel(@NotNull final String identifier,
-	                                    @NotNull final Collection<VShape> targetShapes,
-	                                    @NotNull final ITimeCostFunction timeCostFunction,
-	                                    @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                                    @NotNull final Collection<VShape> destinations
+	public MeshEikonalSolverIFIMLockFree(@NotNull final String identifier,
+	                                     @NotNull final Collection<VShape> targetShapes,
+	                                     @NotNull final ITimeCostFunction timeCostFunction,
+	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		this.forkJoinPool = ForkJoinPool.commonPool();
-		//this.nThreds = forkJoinPool.getParallelism();
+		this.nThreds = forkJoinPool.getParallelism();
 		logger.debug("parallel fim using " + nThreds + " threads.");
 		this.activeLists = new ArrayList<>(nThreds);
 		this.forkJoinPool = new ForkJoinPool(nThreds);
 		this.atomicBooleans = getMesh().getObjectVertexContainer(identifier + "_" + nameAtomicBoolean, AtomicBoolean.class);
+
+		this.oldDefiningSimplex = getMesh().getObjectVertexContainer(identifier + "_" + nameOldDefiningSimplex, Pair.class);
+		this.definingSimplex = getMesh().getObjectVertexContainer(identifier + "_" + nameDefiningSimplex, Pair.class);
+
+		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
+		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
+		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 
 		for(int i = 0; i < nThreds; i++) {
 			activeLists.add(new LinkedList<>());
@@ -132,7 +157,7 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 
 			solved = true;
 			double runTime = (System.currentTimeMillis() - ms);
-			logger.debug("fim parallel run time with " + nThreds + " threads = " + runTime);
+			logger.debug("lock-free ifim parallel run time with " + nThreds + " threads = " + runTime);
 			logger.debug("#nUpdates = " + nUpdates);
 			logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
 			//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
@@ -152,30 +177,37 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 		getMesh().streamVerticesParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
 			setUndefined(v);
 			setPotential(v, Double.MAX_VALUE);
-			setUnburning(v);
+			setTimeCost(v);
 		});
-		solved = false;
+		//solved = false;
 	}
 
 	// sequential task
 	private void initialActiveList() throws ExecutionException, InterruptedException {
 		// run the task for exactly nThread thread
 		List<List<V>> partition = CollectionUtils.split(getInitialVertices(), nThreds);
-		forkJoinPool.submit(() -> IntStream.range(0, activeLists.size()).parallel().forEach(i -> {
-					partition.get(i).stream().flatMap(v -> getMesh().streamVertices(v)).forEach(v -> {
-					if(isUndefined(v)) {
-						updatePotential(v, i);
-					}
-				});
-
-		})).get();
+		forkJoinPool.submit(() -> IntStream.range(0, activeLists.size()).parallel().forEach(i -> activeLists.get(i).addAll(partition.get(i)))).get();
 	}
+
+	/*private void initialActiveList() {
+		for(V vertex : getInitialVertices()) {
+			activeList.addLast(vertex);
+			//setPotential(vertex, 0);
+		}
+	}*/
 
 	private void march() throws ExecutionException, InterruptedException {
 		while (!allEmpty()) {
 			loadBalance();
 			marchStep();
 		}
+		// copy the values
+		getMesh().streamVerticesParallel().forEach(v -> oldDefiningSimplex.setValue(v, definingSimplex.getValue(v)));
+		// clear might not be necessary
+		getMesh().streamVerticesParallel().forEach(v -> definingSimplex.setValue(v, null));
+
+		getMesh().streamVerticesParallel().forEach(v -> setOldPotential(v, getPotential(v)));
+		getMesh().streamVerticesParallel().forEach(v -> setOldTimeCost(v, getTimeCost(v)));
 	}
 
 	private boolean allEmpty() throws ExecutionException, InterruptedException {
@@ -214,41 +246,99 @@ public class MeshEikonalSolverFIMParallel<V extends IVertex, E extends IHalfEdge
 				while(listIterator.hasNext()) {
 					V x = listIterator.next();
 					double p = getPotential(x);
-					double q =  Math.min(p, recomputePotential(x));
+					double q = p;
 
-					// not converged
-					if(!isBurned(x) && p > q) {
-						setPotential(x, q);
+					if(!isInitialVertex(x)) {
+						if(requiresUpdate(x)) {
+							nUpdates++;
+						}
+						Triple<Double, V, V> triple = recomputePotentialAndDefiningSimplex(x);
+
+						if(triple.getLeft() < p) {
+							q =  triple.getLeft();
+							this.definingSimplex.setValue(x, Pair.of(triple.getMiddle(), triple.getRight()));
+							setPotential(x, q);
+						}
 					}
+
 					// converged
-					else {
+					if (Math.abs(p - q) <= epsilon) {
+						setBurned(x);
+						setUnburning(x);
 						// check adjacent neighbors
 						for(V xn : getMesh().getAdjacentVertexIt(x)) {
-							if(getPotential(xn) > getPotential(x) && !isBurining(xn)) {
-								p = getPotential(xn);
-								q = recomputePotential(xn);
-								if(p > q) {
-									setPotential(xn, q);
+							if(getPotential(xn) > getPotential(x) && !isBurining(xn) && !isInitialVertex(xn) && isReady(xn)) {
 
+								double pp = getPotential(xn);
+								Triple<Double, V, V> triple2 = recomputePotentialAndDefiningSimplex(xn);
+								double qq = triple2.getLeft();
+
+								if(pp > qq) {
+									setPotential(xn, qq);
 									// atomic compare and set!
 									//logger.debug(Thread.currentThread().getName());
 									AtomicBoolean atomicBoolean = atomicBooleans.getValue(xn);
 									if(!atomicBoolean.compareAndExchange(false, true)) {
+										definingSimplex.setValue(xn, Pair.of(triple2.getMiddle(), triple2.getRight()));
+										setBurning(xn);
+										setUnburned(xn);
 										newActiveList.add(xn);
-										//setBurning(xn);
 									}
 								}
 							}
 						}
 						listIterator.remove();
-						nUpdates++;
-						setBurned(x);
-						setUnburning(x);
 					}
 				}
 				activeList.addAll(newActiveList);
 			});
 		}).get();
+	}
+
+	double getOldPotential(@NotNull final V vertex) {
+		return oldPotential.getValue(vertex);
+	}
+
+	void setOldPotential(@NotNull final V vertex, final double value) {
+		oldPotential.setValue(vertex, value);
+	}
+
+	void setOldTimeCost(@NotNull final V vertex, final double value) {
+		oldTimeCosts.setValue(vertex, value);
+	}
+
+	private boolean isReady(V p) {
+		Pair<V, V> preDefiningSimplex = this.oldDefiningSimplex.getValue(p);
+
+		if(preDefiningSimplex == null) {
+			return true;
+		}
+		return isValid(preDefiningSimplex.getLeft()) && isValid(preDefiningSimplex.getRight());
+	}
+
+	private boolean isValid(V p) {
+		return p == null || isBurned(p) || isInitialVertex(p);
+	}
+
+	private boolean requiresUpdate(@NotNull final V v) {
+		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
+			if(hasChanged(getOldPotential(v), neighbour)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasChanged(@NotNull final double oldPotential, @NotNull final V neighbor) {
+		if(!solved) {
+			return true;
+		}
+
+		if(isUndefined(neighbor) && oldPotential < getOldPotential(neighbor)) {
+			return false;
+		}
+
+		return Math.abs(getOldPotential(neighbor) - getPotential(neighbor)) > MathUtil.EPSILON;
 	}
 
 	@Override

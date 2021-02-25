@@ -1,7 +1,7 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Distmesh;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 import org.vadere.util.geometry.shapes.VPolygon;

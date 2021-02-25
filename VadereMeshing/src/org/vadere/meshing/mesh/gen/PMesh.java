@@ -511,6 +511,9 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 				faceMap.put(f, cF);
 				cF.setEdge(edgeMap.get(f.getEdge()));
 				clone.faces.add(cF);
+				if(isHole(f)) {
+					clone.holes.add(cF);
+				}
 			}
 
 			for(PVertex cV : clone.vertices) {

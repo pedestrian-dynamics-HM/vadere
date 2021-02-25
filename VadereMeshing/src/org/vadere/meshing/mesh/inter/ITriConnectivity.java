@@ -15,6 +15,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
+import org.vadere.util.math.InterpolationUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;

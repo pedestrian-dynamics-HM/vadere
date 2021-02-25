@@ -29,6 +29,15 @@ public class PRuppertsTriangulator extends GenRuppertsTriangulator<PVertex, PHal
 	}
 
 	public PRuppertsTriangulator(
+			@NotNull final PSLG pslgBound,
+			@NotNull final PSLG pslg,
+			@NotNull final Function<IPoint, Double> circumRadiusFunc,
+			final double minAngle,
+			final boolean createHoles) {
+		this(pslgBound, pslg, circumRadiusFunc, minAngle, createHoles, true);
+	}
+
+	public PRuppertsTriangulator(
 			@NotNull final PSLG pslg,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc,
 			final double minAngle,
@@ -36,6 +45,17 @@ public class PRuppertsTriangulator extends GenRuppertsTriangulator<PVertex, PHal
 			final boolean allowSegmentFaces) {
 		super(() -> new PMesh(), pslg, minAngle, circumRadiusFunc, createHoles, allowSegmentFaces);
 	}
+
+	public PRuppertsTriangulator(
+			@NotNull final PSLG pslgBound,
+			@NotNull final PSLG pslg,
+			@NotNull final Function<IPoint, Double> circumRadiusFunc,
+			final double minAngle,
+			final boolean createHoles,
+			final boolean allowSegmentFaces) {
+		super(() -> new PMesh(), pslgBound, pslg, minAngle, circumRadiusFunc, createHoles, allowSegmentFaces);
+	}
+
 
 
 	public PRuppertsTriangulator(

@@ -30,7 +30,8 @@ public class PredicateEdgeRefinement<V extends IVertex, E extends IHalfEdge, F e
 		VLine line = solver.getMesh().toLine(e);
 		double len = line.length();
 		double maxCurvature = 0.0;
-		if(solver.isBurned(solver.getMesh().getVertex(e)) && solver.isBurned(solver.getMesh().getTwinVertex(e))) {
+
+		if(solver.isBurned(vertex) && solver.isBurned(vertexTwin)) {
 			for (E edge : solver.getMesh().getEdgeIt(vertex)) {
 				double[] curvatures = GeometryUtilsMesh.curvature(solver.getMesh(), v -> solver.getPotential(v), v -> solver.isBurned(v), edge);
 				maxCurvature = Math.max(maxCurvature, curvatures[1]);

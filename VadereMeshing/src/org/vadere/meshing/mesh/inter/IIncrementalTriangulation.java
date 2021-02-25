@@ -23,6 +23,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformTriangulator;
+import org.vadere.util.math.InterpolationUtil;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -109,6 +110,17 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 		return getMesh()
 				.streamEdges()
 				.filter(getMesh()::isAlive).map(getMesh()::toLine).collect(Collectors.toSet());
+	}
+
+	default double getInterpolatedValue(final double px, final double py, final String valueName) {
+		double x[] = new double[3];
+		double y[] = new double[3];
+		double z[] = new double[3];
+		var face = locateFace(px, py).get();
+		getTriPoints(face, x, y, z, valueName);
+		double totalArea = GeometryUtils.areaOfPolygon(x, y);
+		double value = InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, px, py);
+		return value;
 	}
 
 

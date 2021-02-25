@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation;
+package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -22,9 +22,6 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 
-
-	private static final String propName = "edgeLength";
-
 	public EdgeLengthFunctionApprox(
 			@NotNull final PSLG pslg,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc) {
@@ -43,7 +40,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
-		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, circumRadiusFunc, 10, false);
+		var ruppertsTriangulator = new PRuppertsTriangulator(boundedPSLG, pslg, circumRadiusFunc, 10, false, false);
 		triangulation = ruppertsTriangulator.generate();
 		triangulation.enableCache();
 
@@ -59,7 +56,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
 						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
 					var u = triangulation.getMesh().getTwinVertex(e);
-					double len = v.distance(u) * (1.0 / Math.sqrt(2));
+					double len = v.distance(u) * (1.0 / (Math.sqrt(2) * 1.2/*4.0*/));
 					if(len < minEdgeLen) {
 						minEdgeLen = len;
 					}
@@ -81,28 +78,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 	public void smooth(double g) {
 		assert g > 0;
-		// smooth the function based such that it is g-Lipschitz
-		var mesh = triangulation.getMesh();
-		PriorityQueue<PVertex> heap = new PriorityQueue<>(
-				Comparator.comparingDouble(v1 -> mesh.getDoubleData(v1, propName))
-		);
-		heap.addAll(mesh.getVertices());
-
-		while (!heap.isEmpty()) {
-			var v = heap.poll();
-			double hv = mesh.getDoubleData(v, propName);
-			for (var u : mesh.getAdjacentVertexIt(v)) {
-				double hu = mesh.getDoubleData(u, propName);
-				double min = Math.min(hu, hv + g * v.distance(u));
-
-				// update heap
-				if (min < hu) {
-					heap.remove(u);
-					mesh.setDoubleData(u, propName, min);
-					heap.add(u);
-				}
-			}
-		}
+		smooth(g, triangulation);
 	}
 
 	@Override

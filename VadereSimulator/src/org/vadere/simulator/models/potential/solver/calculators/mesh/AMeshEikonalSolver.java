@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IEdgeContainerBoolean;
@@ -21,16 +22,14 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMe
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,14 +37,17 @@ import java.util.stream.Collectors;
 /**
  * @author Benedikt Zoennchen
  *
+ * Abstract class that solves the eikonal equation on a Mesh i.e. 2-D triangular mesh.
+ * It is the basis for the implementation of the FMM, FIM, FSM and IFIM on triangular meshes.
+ *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
  */
 public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> implements MeshEikonalSolver<V, E, F>, ITriEventListener<V, E, F> {
 
-	@Nullable private ITimeCostFunction timeCostFunction;
-	@Nullable private ITimeCostFunctionMesh<V> meshTimeCostFunction;
+	private ITimeCostFunctionMesh<V> meshTimeCostFunction;
+
 	@Nullable IDistanceFunction distanceFunction;
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private Collection<V> initialVertices;
@@ -77,6 +79,14 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	private MeshEikonalSolver.LocalSover localSover = MeshEikonalSolver.LocalSover.SETHIAN;
 
+	/**
+	 * Default constructor.
+	 *
+	 * @param identifier        the identifier is used for all container names. A container is basically a bijective function, that maps
+	 *                          a data point (Object or primitive data type) to a vertex, halfe-edge or face.
+	 * @param triangulation     the 2-D triangular mesh i.e. the discretization the solution is based on.
+	 * @param timeCostFunction  the timeCostFunction of the eikonal equation, i.e. 1/F(x).
+	 */
 	public AMeshEikonalSolver(@NotNull final String identifier,
 	                          @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                          @NotNull final ITimeCostFunction timeCostFunction) {
@@ -85,7 +95,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			// unsave cast
 			this.meshTimeCostFunction = (ITimeCostFunctionMesh<V>)timeCostFunction;
 		} else {
-			this.timeCostFunction = timeCostFunction;
+			this.meshTimeCostFunction = ITimeCostFunctionMesh.convert(timeCostFunction);
 		}
 
 		this.triangulation = triangulation;
@@ -116,24 +126,54 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		this.distanceFunction = distanceFunction;
 		for(V v : initialVertices) {
 			double dist = distanceFunction.apply(new VPoint(getMesh().toPoint(v)));
-			setPotential(v, dist);
+			setPotential(v, Math.max(0, dist));
 			setBurned(v);
 			setAsInitialVertex(v);
 		}
 	}
 
+	/**
+	 * Marks and returns the initial vertices, i.e. vertices at which the wavefront propagation starts.
+	 *
+	 * @param targetShapes  the agent destination/target of the eikonal equation
+	 *
+	 * @return
+	 */
+	protected List<V> findInitialVertices(final Collection<VShape> targetShapes) {
+		//TODO a more clever init!
+		List<V> initialVertices = new ArrayList<>();
+		for(VShape shape : targetShapes) {
+			getMesh().streamVertices()
+					.filter(v -> shape.contains(getMesh().toPoint(v)))
+					.forEach(v -> {
+						for(V u : getMesh().getAdjacentVertexIt(v)) {
+							initialVertices.add(u);
+							setAsInitialVertex(u);
+						}
+						initialVertices.add(v);
+						setAsInitialVertex(v);
+					});
+		}
+		return initialVertices;
+	}
+
+	/**
+	 * Resets all computed travel times but keeps the computed values which are mesh dependent
+	 * (and therefore, do not change if the mesh does not change), for example, the angles inside a triangle.
+	 */
 	protected void unsolve() {
 		triangulation.getMesh().streamVerticesParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
-			if(!isInitialVertex(v)) {
-				setUndefined(v);
-				setPotential(v, Double.MAX_VALUE);
-			}
+			setUndefined(v);
+			setPotential(v, Double.MAX_VALUE);
 			setTimeCost(v);
 		});
 		initialVertices = initialVertices.stream().filter(v -> !getMesh().isDestroyed(v)).collect(Collectors.toList());
-		solved = false;
+		//solved = false;
 	}
 
+	/**
+	 * Computes all mesh dependent measures such as angles and virtual supports.
+	 */
 	protected void prepareMesh() {
 		triangulation.getMesh().streamEdgesParallel().forEach(e -> setVirtualSupport(e, Collections.EMPTY_LIST));
 		triangulation.getMesh().streamEdgesParallel().forEach(e -> setAccuteEdge(e));
@@ -155,7 +195,13 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 
 	@Override
 	public ITimeCostFunction getTimeCostFunction() {
-		return timeCostFunction != null ? timeCostFunction : meshTimeCostFunction;
+		return meshTimeCostFunction;
+	}
+
+	@Override
+	public void update() {
+		getTimeCostFunction().update();
+		solve();
 	}
 
 	protected boolean isLazy() {
@@ -210,6 +256,34 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		return potential;
 	}
 
+	protected Triple<Double, V, V> recomputePotentialAndDefiningSimplex(@NotNull final V vertex) {
+		// loop over all, check whether the point is contained and update its
+		// value accordingly
+		double potential = Double.MAX_VALUE;
+		V v1 = null;
+		V v2 = null;
+
+		for(E edge : getMesh().getEdgeIt(vertex)) {
+			if(!getMesh().isBoundary(edge)) {
+				Triple<Double, V, V> triple = computePotentialAndDefinigSimplex(edge);
+
+				if(triple.getLeft() < potential) {
+					potential = triple.getLeft();
+					v1 = triple.getMiddle();
+					v2 = triple.getRight();
+				}
+			}
+		}
+		if(potential <= getPotential(v1)) {
+			v1 = null;
+		}
+		if(potential <= getPotential(v2)) {
+			v2 = null;
+		}
+
+		return Triple.of(potential, v1, v2);
+	}
+
 	/**
 	 * Updates a point (the point where the edge ends) given a triangle (which is the face of the edge).
 	 * The point can only be updated if the triangle triangleContains it and the other two points are in the frozen band.
@@ -229,7 +303,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 			if(list.isEmpty()) {
 				//logger.warn("could not find virtual support for non-acute triangle.");
 				//potential = computePotential(edge, next, prev, -1.0);
-				//potential = computePotential(edge, next, prev, getCosPhi(edge));
+				potential = computePotential(edge, next, prev, getCosPhi(edge));
 			} else {
 				DoubleArrayList cosPhis = getVirtualSupportCosPhi(edge);
 
@@ -245,6 +319,43 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		}
 
 		return potential;
+	}
+
+	private Triple<Double, V, V> computePotentialAndDefinigSimplex(@NotNull final E edge) {
+		E next = getMesh().getNext(edge);
+		E prev = getMesh().getPrev(edge);
+		V v1 = getMesh().getVertex(next);
+		V v2 = getMesh().getVertex(prev);
+
+		double potential = Double.MAX_VALUE;
+		//TODO: the code below should be used to enable virtual simplexes, however this might currently fail because their is no neighboring connectifity
+		// for those simplices defined by the mesh and the FIM might stall because it tests the wrong connectivities not part of the DAG!
+		/*if(isNonAcute(edge)) {
+			V v = getMesh().getVertex(edge);
+			List<Pair<V, V>> list = getVirtualSupport(edge);
+			// this might happen for vertices which are close at the initialVertex!
+			if(list.isEmpty()) {
+				//logger.warn("could not find virtual support for non-acute triangle.");
+				//potential = computePotential(edge, next, prev, -1.0);
+				potential = computePotential(edge, next, prev, getCosPhi(edge));
+			} else {
+				DoubleArrayList cosPhis = getVirtualSupportCosPhi(edge);
+
+				for(int i = 0; i < list.size(); i++) {
+					Pair<V, V> pair = list.get(i);
+					double cosPhi = cosPhis.getDouble(i);
+					double q = computePotential(v, pair.getLeft(), pair.getRight(), cosPhi, localSover);
+					if(q < potential) {
+						potential = q;
+						v1 = pair.getLeft();
+						v2 = pair.getRight();
+					}
+				}
+			}
+		} else {*/
+			potential = computePotential(edge, next, prev, getCosPhi(edge));
+		//}
+		return Triple.of(potential, v1, v2);
 	}
 
 	protected List<Pair<V, V>> computeVirtualSupport(@NotNull final E edge) {
@@ -353,6 +464,17 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		return getTimeCostFunction().needsUpdate();
 	}
 
+	/**
+	 * Returns barycentric interpolated value at (x,y) based on the {@link IVertexContainerDouble} containerDouble.
+	 *
+	 * @param triangulation     the triangular mesh (this is most of the time {@link this#triangulation})
+	 * @param containerDouble   some vertex container
+	 * @param x                 x-coordinate of the request point
+	 * @param y                 y-coordinate of the request point
+	 * @param caller            the caller object to optimize the triangle walk
+	 *
+	 * @return the barycentric interpolated value at (x,y)
+	 */
 	protected double getInterpolatedPotential(
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			@NotNull final IVertexContainerDouble<V, E, F> containerDouble,
@@ -525,12 +647,7 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	}
 
 	protected void setTimeCost(@NotNull final V v) {
-		if(meshTimeCostFunction != null) {
-			setTimeCost(v, meshTimeCostFunction.costAt(v));
-		} else {
-			setTimeCost(v, timeCostFunction.costAt(getMesh().toPoint(v), v));
-		}
-
+		setTimeCost(v, meshTimeCostFunction.costAt(v));
 	}
 
 	protected void setTimeCost(@NotNull final V v, final double value) {

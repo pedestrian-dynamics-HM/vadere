@@ -10,7 +10,7 @@ import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IMeshDistanceFunction;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.ADelaunayTriangulator;
@@ -645,7 +645,7 @@ public class MeshExamples {
 		panel.repaint();*/
 		//System.out.println(TexGraphGenerator.toTikz(meshImprover.getMesh()));
 
-		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 
@@ -784,7 +784,7 @@ public class MeshExamples {
 
 		logger.info(TexGraphGenerator.toTikz(meshImprover.getMesh()));*/
 
-		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, panel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 	}

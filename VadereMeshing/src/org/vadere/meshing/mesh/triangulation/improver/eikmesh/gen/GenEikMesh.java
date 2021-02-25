@@ -32,7 +32,7 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.DistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -121,7 +121,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private static final Logger log = Logger.getLogger(GenEikMesh.class);
 
 	static {
-		//log.setDebug();
+		log.setDebug();
 	}
 
 

@@ -12,6 +12,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 public interface MeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> extends EikonalSolver {
 
+	/**
+	 * Types of gradient approximations.
+	 */
 	enum LocalSover {
 		SETHIAN, MATRIX;
 	}
