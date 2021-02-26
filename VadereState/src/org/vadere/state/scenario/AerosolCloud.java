@@ -22,7 +22,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public AerosolCloud(@NotNull AttributesAerosolCloud attributes) { this.attributes = attributes; }
 
-//    public AttributesAerosolCloud(AerosolCloud aerosolCloud) {
+//    public AerosolCloud(AerosolCloud aerosolCloud) {
 //        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getAerosolPersistenceTime(), aerosolCloud.getAerosolPersistenceStart(), aerosolCloud.getAerosolCloudDiameter()));
 //    }
 
@@ -50,6 +50,7 @@ public class AerosolCloud extends ScenarioElement {
     public double getAerosolCloudRadius() { return attributes.getAerosolCloudRadius(); }
     public double getAerosolPersistenceTime() { return attributes.getAerosolPersistenceTime(); }
     public double getAerosolPersistenceStart() { return attributes.getAerosolPersistenceStart(); }
+    public double getAerosolCloudPathogenLoad() { return attributes.getAerosolCloudPathogenLoad(); }
 
     // Setter
     @Override
@@ -65,6 +66,12 @@ public class AerosolCloud extends ScenarioElement {
     public void setId(int id){
         ((AttributesAerosolCloud)getAttributes()).setId(id);
     }
+
+    public void setAerosolPersistenceTime(double aerosolPersistenceTime) { attributes.setAerosolPersistenceTime(aerosolPersistenceTime); }
+    public void setAerosolPersistenceStart(double aerosolPersistenceStart) { attributes.setAerosolPersistenceStart(aerosolPersistenceStart); }
+    public void setAerosolCloudRadius(double aerosolCloudRadius) { attributes.setAerosolCloudRadius(aerosolCloudRadius); }
+    public void setAerosolCloudPathogenLoad(double aerosolCloudPathogenLoad) { attributes.setAerosolCloudPathogenLoad(aerosolCloudPathogenLoad); }
+
 
     // Other methods
     @Override
@@ -85,6 +92,7 @@ public class AerosolCloud extends ScenarioElement {
     public Collection<AerosolCloudListener> getAerosolCloudListeners() {
         return Collections.unmodifiableCollection(aerosolCloudListeners);
     }
+
 
     // TODO: check BK /SS ?
 //    @Override

@@ -163,9 +163,12 @@ public class Pedestrian extends Agent {
 	public double getPathogenAbsorptionRate() { return medicineStatus.getPathogenAbsorptionRate(); }
 	public double getAbsorbedAmountOfPathogen() {return medicineStatus.getAbsorbedAmountOfPathogen(); }
 	public double getSusceptibility() { return medicineStatus.getSusceptibility(); }
-	public double getLatentPeriod() { return medicineStatus.getLatentPeriod(); }
+	public double getExposedPeriod() { return medicineStatus.getExposedPeriod(); }
 	public double getInfectiousPeriod() {return medicineStatus.getInfectiousPeriod(); }
 	public double getRecoveredPeriod() {return medicineStatus.getRecoveredPeriod(); }
+	public double getExposedStartTime() { return medicineStatus.getExposedStartTime(); }
+	public double getInfectiousStartTime() { return medicineStatus.getInfectiousStartTime(); }
+	public double getRecoveredStartTime() { return medicineStatus.getRecoveredStartTime(); }
 
 	// Setter
 	public void setIdAsTarget(int id) { this.idAsTarget = id; }
@@ -195,9 +198,12 @@ public class Pedestrian extends Agent {
 	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { medicineStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }
 	public void setAbsorbedAmountOfPathogen(double absorbedAmountOfPathogen) { medicineStatus.setAbsorbedAmountOfPathogen(absorbedAmountOfPathogen); }
 	public void setSusceptibility(double susceptibility) { medicineStatus.setSusceptibility(susceptibility); }
-	public void setLatentPeriod(double latentPeriod) { medicineStatus.setLatentPeriod(latentPeriod); }
+	public void setExposedPeriod(double latentPeriod) { medicineStatus.setExposedPeriod(latentPeriod); }
 	public void setInfectiousPeriod(double infectiousPeriod) { medicineStatus.setInfectiousPeriod(infectiousPeriod); }
 	public void setRecoveredPeriod(double recoveredPeriod) { medicineStatus.setRecoveredPeriod(recoveredPeriod); }
+	public void setExposedStartTime(double exposedStartTime) { medicineStatus.setExposedStartTime(exposedStartTime); }
+	public void setInfectiousStartTime(double infectiousStartTime) { medicineStatus.setInfectiousStartTime(infectiousStartTime); }
+	public void setRecoveredStartTime(double recoveredStartTime) { medicineStatus.setRecoveredStartTime(recoveredStartTime); }
 
 	// Methods
 	public boolean isTarget() {

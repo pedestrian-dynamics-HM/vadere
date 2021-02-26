@@ -11,7 +11,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private double aerosolPersistenceTime;
     private double aerosolPersistenceStart;
     private double aerosolCloudRadius;
-    // private double pathogenLoad;
+    private double aerosolCloudPathogenLoad;
 
     // Constructors
     public AttributesAerosolCloud(){};
@@ -41,6 +41,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     public double getAerosolPersistenceTime() { return aerosolPersistenceTime; }
     public double getAerosolPersistenceStart() { return aerosolPersistenceStart; }
     public double getAerosolCloudRadius() { return aerosolCloudRadius; }
+    public double getAerosolCloudPathogenLoad() { return aerosolCloudPathogenLoad; }
 
     // Setter
     @Override
@@ -52,7 +53,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     public void setAerosolPersistenceTime(double aerosolPersistenceTime) { this.aerosolPersistenceTime = aerosolPersistenceTime; }
     public void setAerosolPersistenceStart(double aerosolPersistenceStart) { this.aerosolPersistenceStart = aerosolPersistenceStart; }
     public void setAerosolCloudRadius(double aerosolCloudRadius) { this.aerosolCloudRadius = aerosolCloudRadius; }
-
+    public void setAerosolCloudPathogenLoad(double aerosolCloudPathogenLoad) { this.aerosolCloudPathogenLoad = aerosolCloudPathogenLoad; }
 
 
 }
