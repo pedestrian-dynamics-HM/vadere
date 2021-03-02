@@ -1,8 +1,10 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.health.HealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
@@ -33,6 +35,8 @@ public class Pedestrian extends Agent {
 	private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
 	private PsychologyStatus psychologyStatus;
+
+	private HealthStatus healthStatus;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
@@ -68,6 +72,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
+		// healthStatus = new HealthStatus(); // ToDo check if necessary (-> BK)
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -83,6 +88,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = other.isLikelyInjured;
 
 		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
+		// healthStatus = new HealthStatus(other.healthStatus);  // ToDo check if necessary (-> BK)
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -112,6 +118,16 @@ public class Pedestrian extends Agent {
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public KnowledgeBase getKnowledgeBase() {return psychologyStatus.getKnowledgeBase(); }
+	public InfectionStatus getInfectionStatus() { return healthStatus.getInfectionStatus(); }
+	public double lastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
+	public double pathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
+	public double pathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
+	public boolean isHighlyInfectious() { return healthStatus.getIsHighlyInfectious(); }
+	public double pathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
+	public double susceptibility() { return healthStatus.getSusceptibility(); }
+	public double exposedPeriod() { return healthStatus.getExposedPeriod(); }
+	public double infectiousPeriod() { return healthStatus.getInfectiousPeriod(); }
+	public double recoveredPeriod() { return healthStatus.getRecoveredPeriod(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -162,6 +178,9 @@ public class Pedestrian extends Agent {
 	public void setThreatMemory(ThreatMemory threatMemory) { psychologyStatus.setThreatMemory(threatMemory); }
 	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setGroupMembership(GroupMembership groupMembership) { psychologyStatus.setGroupMembership(groupMembership); }
+	public void setInfectionStatus(InfectionStatus infectionStatus) { healthStatus.setInfectionStatus(infectionStatus); }
+	public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { healthStatus.setLastInfectionStatusUpdateTime(lastInfectionStatusUpdateTime); }
+	public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { healthStatus.setPathogenAbsorbedLoad(pathogenAbsorbedLoad); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
