@@ -2,22 +2,17 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionTri;
-import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -30,13 +25,17 @@ import java.util.function.Predicate;
 
 // TODO this is experimental code!
 /**
- * This code solves the eikonal equation by iteratively refine the mesh as described in the PhD thesis of B. Zoennchen.
+ * This code solves the eikonal equation by iteratively refine the mesh as described in the PhD thesis of B. Zoennchen (Section 9.4.3).
  * The implementation is experimental and not jet ready for general usage, i.e. the code is still not very well structured
  * and rather hard to read.
+ *
+ * @author Benedikt Zoennchen
  *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdge, F extends IFace> implements EikonalSolver, ITriEventListener<V, E, F> {
 

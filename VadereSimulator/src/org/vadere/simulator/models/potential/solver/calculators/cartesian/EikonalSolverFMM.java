@@ -81,7 +81,6 @@ public class EikonalSolverFMM extends AGridEikonalSolver {
 		}
 		long runTime = System.currentTimeMillis() - ms;
 		logger.debug("fmm on the gird run time = " + runTime + ", #updates = " + updates);
-		System.out.println("fmm on the gird run time = " + runTime + ", #updates = " + updates);
 	}
 
 	/**

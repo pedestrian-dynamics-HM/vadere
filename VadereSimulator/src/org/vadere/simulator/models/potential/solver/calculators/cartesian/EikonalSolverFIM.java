@@ -130,7 +130,7 @@ public class EikonalSolverFIM extends AGridEikonalSolver {
 			activeList.addAll(newActiveList);
 		}
 
-		System.out.println("#update / #vertices: " + nUpdates + " / " + cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Reached).count());
+		logger.debug("#update / #vertices: " + nUpdates + " / " + cellGrid.pointStream().filter(p -> cellGrid.getValue(p).tag == PathFindingTag.Reached).count());
 		nUpdates = 0;
 	}
 

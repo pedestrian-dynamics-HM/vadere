@@ -10,6 +10,10 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 
+/**
+ * @author Benedikt Zoennchen
+ *
+ */
 public interface MeshEikonalSolver<V extends IVertex, E extends IHalfEdge, F extends IFace> extends EikonalSolver {
 
 	/**

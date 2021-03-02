@@ -25,13 +25,15 @@ import java.util.stream.IntStream;
 
 
 /**
- * This class computes the traveling time T using a lock free variant of the fast iterative method for arbitrary triangulated meshes.
+ * This class computes the traveling time T using a (multi threaded) lock free variant of the fast iterative method for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 

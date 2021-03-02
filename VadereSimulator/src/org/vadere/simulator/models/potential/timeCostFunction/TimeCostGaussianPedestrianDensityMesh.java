@@ -37,6 +37,8 @@ import java.util.function.Predicate;
  * @param <V>
  * @param <E>
  * @param <F>
+ *
+ * @author Benedikt Zoennchen
  */
 public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> implements ITimeCostFunctionMesh<V> {
 

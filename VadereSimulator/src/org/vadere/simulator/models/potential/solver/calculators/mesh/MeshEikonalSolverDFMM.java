@@ -30,6 +30,8 @@ import java.util.List;
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolverFMM<V, E, F> {
 
@@ -40,10 +42,6 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	public static final String nameOldPotential = "oldPotential";
 
 	final String identifier;
-
-	static {
-		logger.setDebug();
-	}
 
 	/**
 	 * The time cost function defined on the geometry.

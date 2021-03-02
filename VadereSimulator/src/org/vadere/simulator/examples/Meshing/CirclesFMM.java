@@ -1,4 +1,4 @@
-package org.vadere.simulator.examples;
+package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Code to generate the circle eikonal example of the PhD thesis of B. Zoennchen (p. 184, Fig 9.6).
+ *
+ * @author Benedikt Zoennchen
+ */
 public class CirclesFMM {
 
 	public static void main(String ... args) throws IOException, InterruptedException {
@@ -71,10 +76,4 @@ public class CirclesFMM {
 		System.out.println(improver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 
 	}
-/*
-@NotNull final String identifier,
-	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final Collection<IPoint> targetPoints,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
- */
 }

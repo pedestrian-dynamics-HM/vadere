@@ -121,7 +121,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	private static final Logger log = Logger.getLogger(GenEikMesh.class);
 
 	static {
-		log.setDebug();
+		//log.setDebug();
 	}
 
 

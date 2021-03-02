@@ -1,4 +1,4 @@
-package org.vadere.simulator.examples;
+package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -36,6 +36,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * Code to test the iterative eikonal solver discussed in the PhD thesis of B. Zoennchen (p. 187, Alg. 20).
+ *
+ * @author Benedikt Zoennchen
+ */
 public class Curvature {
 
 	public static void main(String ... args) throws IOException, InterruptedException {

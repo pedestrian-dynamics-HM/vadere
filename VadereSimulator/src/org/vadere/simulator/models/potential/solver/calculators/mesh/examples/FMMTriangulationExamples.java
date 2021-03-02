@@ -37,6 +37,8 @@ import java.util.function.Function;
  * (2) generate a mesh using EikMesh (if {@link FMMTriangulationExamples#visualize} is true this is displayed)
  * (3) define a target area (polygon)
  * (4) apply the FMM on a triangular mesh
+ *
+ * @author Benedikt Zoennchen
  */
 public class FMMTriangulationExamples {
 

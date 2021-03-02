@@ -35,8 +35,6 @@ public abstract class Agent extends DynamicElement {
 	private Vector2D velocity;
 	private double freeFlowSpeed;
 
-	public int updateCount = -1;
-
 	private LinkedList<Agent> followers;
 
 	// TODO: Maybe, add also a List<Agent> of followers for an agent.
