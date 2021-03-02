@@ -1,17 +1,18 @@
 package org.vadere.state.attributes.scenario;
 
 import org.vadere.state.attributes.AttributesEmbedShape;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VShape;
 
 
 public class AttributesAerosolCloud extends AttributesEmbedShape {
 
-    private VShape shape;
-    private int id;
-    private double aerosolPersistenceTime;
-    private double aerosolPersistenceStart;
-    private double aerosolCloudRadius;
-    private double aerosolCloudPathogenLoad;
+    private VShape shape; // VCircle centroid
+    private int id = AttributesEmbedShape.ID_NOT_SET;
+    private double aerosolPersistenceTime = 60 * 15;
+    private double aerosolPersistenceStart = -1;
+    // private double aerosolCloudRadius = ;
+    private double aerosolCloudPathogenLoad = -1;
 
     // Constructors
     public AttributesAerosolCloud(){};
@@ -40,7 +41,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     }
     public double getAerosolPersistenceTime() { return aerosolPersistenceTime; }
     public double getAerosolPersistenceStart() { return aerosolPersistenceStart; }
-    public double getAerosolCloudRadius() { return aerosolCloudRadius; }
+    public double getAerosolCloudRadius() { return ((VCircle)shape).getRadius(); } //
     public double getAerosolCloudPathogenLoad() { return aerosolCloudPathogenLoad; }
 
     // Setter

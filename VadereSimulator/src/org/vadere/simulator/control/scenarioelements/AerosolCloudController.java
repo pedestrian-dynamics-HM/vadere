@@ -32,21 +32,28 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     // Other methods
+
     public void update(double simTimeInSec) {
-        for (DynamicElement element : getDynamicElementsNearAerosolCloud()) {
+        // max age, age reduzieren, controller entfernen
+        // postition verändern
+        // cloud vergrößern
+        // viruslast anpassen
 
-            final Pedestrian pedestrian;
-            if (element instanceof Pedestrian) {
-                pedestrian = (Pedestrian) element;
-            } else {
-                log.error("The given object is not a subtype of Pedestrian");
-                continue;
-            }
-
-            if (hasPedestianReachedAerosolCloud(pedestrian)) {
-                notifyListenersAerosolCloudReached(pedestrian);
-                // do something with pedestrian (accumulate "viral load")
-            }
+        // Code raus -> sir model
+//        for (DynamicElement element : getDynamicElementsNearAerosolCloud()) {
+//
+//            final Pedestrian pedestrian;
+//            if (element instanceof Pedestrian) {
+//                pedestrian = (Pedestrian) element;
+//            } else {
+//                log.error("The given object is not a subtype of Pedestrian");
+//                continue;
+//            }
+//
+//            if (hasPedestianReachedAerosolCloud(pedestrian)) {
+//                notifyListenersAerosolCloudReached(pedestrian);
+//                // do something with pedestrian (accumulate "viral load")
+//            }
         }
     }
 

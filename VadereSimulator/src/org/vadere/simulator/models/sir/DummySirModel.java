@@ -1,9 +1,7 @@
 package org.vadere.simulator.models.sir;
 
-import org.lwjgl.system.CallbackI;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.scenarioelements.SourceController;
-import org.vadere.simulator.control.scenarioelements.AerosolCloudController;
 import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
@@ -12,7 +10,6 @@ import org.vadere.state.attributes.models.AttributeSIR;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.medicine.InfectionStatus;
 import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -89,7 +86,7 @@ public class DummySirModel extends AbstractSirModel {
 			// how to use simulator.scenarioelements.AerosolCloudController? -> get all pedestrians inside a cloud; is this another option?
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
-				absorbPathogen(pedestrian, aerosolCloud.getAerosolCloudPathogenLoad());
+				absorbPathogenFromAerosolCloud(pedestrian, aerosolCloud.getAerosolCloudPathogenLoad());
 			}
 		}
 
@@ -189,7 +186,7 @@ public class DummySirModel extends AbstractSirModel {
 		return pedestriansInsideAerosolCloud;
 	}
 
-	public void absorbPathogen(Pedestrian pedestrian, double pathogenLoad) {
+	public void absorbPathogenFromAerosolCloud(Pedestrian pedestrian, double pathogenLoad) {
 		InfectionStatus infectionStatus = pedestrian.getInfectionStatus();
 		double absorbedPathogen = pedestrian.getPathogenAbsorptionRate() * pathogenLoad;
 		double accumulatedAbsorbedAbsorbedPathogen = pedestrian.getAbsorbedAmountOfPathogen() + absorbedPathogen;

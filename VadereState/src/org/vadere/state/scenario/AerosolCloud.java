@@ -17,14 +17,13 @@ public class AerosolCloud extends ScenarioElement {
     private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
 
     // Constructors
-    // TODO: Check constructors -> BK / SS ?
     public AerosolCloud() { this(new AttributesAerosolCloud()); }
 
     public AerosolCloud(@NotNull AttributesAerosolCloud attributes) { this.attributes = attributes; }
 
-//    public AerosolCloud(AerosolCloud aerosolCloud) {
-//        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getAerosolPersistenceTime(), aerosolCloud.getAerosolPersistenceStart(), aerosolCloud.getAerosolCloudDiameter()));
-//    }
+    public AerosolCloud(AerosolCloud aerosolCloud) {
+        this(aerosolCloud.attributes);
+    }
 
     // Getter
     @Override
