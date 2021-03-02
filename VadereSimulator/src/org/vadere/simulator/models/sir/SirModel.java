@@ -26,7 +26,7 @@ public interface SirModel extends Model {
                 if (simTimeInSec >= pedestrian.getLastInfectionStatusUpdateTime() + pedestrian.getInfectiousPeriod()) {
                     pedestrian.setInfectionStatus(InfectionStatus.RECOVERED);
                     pedestrian.setLastInfectionStatusUpdateTime(simTimeInSec);
-                    pedestrian.setPathogenAbsorbedLoad(0.0);
+                    pedestrian.setPathogenAbsorbedLoad(0.0); // reset pathogen load to 0 ToDo: define value (0.0) somewhere else?
                 }
                 break;
             case RECOVERED:
