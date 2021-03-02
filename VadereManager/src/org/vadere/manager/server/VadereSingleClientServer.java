@@ -30,10 +30,11 @@ public class VadereSingleClientServer extends AbstractVadereServer {
 			Socket clientSocket = serverSocket.accept();
 
 			ClientHandler handler = new ClientHandler(serverSocket, new TraCISocket(clientSocket, trace), baseDir, guiSupport);
-			if (!scenarioPath.equals("")){
-				handler.setScenario(IOUtils.readTextFile(scenarioPath));
+			if (scenarioPath != null){
+				if (!scenarioPath.equals("")){
+					handler.setScenario(IOUtils.readTextFile(scenarioPath));
+				}
 			}
-
 
 			Thread t = new Thread(handler);
 			t.start();
