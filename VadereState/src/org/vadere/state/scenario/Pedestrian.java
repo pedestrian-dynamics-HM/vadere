@@ -119,15 +119,15 @@ public class Pedestrian extends Agent {
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public KnowledgeBase getKnowledgeBase() {return psychologyStatus.getKnowledgeBase(); }
 	public InfectionStatus getInfectionStatus() { return healthStatus.getInfectionStatus(); }
-	public double lastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
-	public double pathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
-	public double pathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
-	public boolean isHighlyInfectious() { return healthStatus.getIsHighlyInfectious(); }
-	public double pathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
-	public double susceptibility() { return healthStatus.getSusceptibility(); }
-	public double exposedPeriod() { return healthStatus.getExposedPeriod(); }
-	public double infectiousPeriod() { return healthStatus.getInfectiousPeriod(); }
-	public double recoveredPeriod() { return healthStatus.getRecoveredPeriod(); }
+	public double getLastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
+	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
+	public double getPathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
+	public boolean getIsHighlyInfectious() { return healthStatus.getIsHighlyInfectious(); }
+	public double getPathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
+	public double getSusceptibility() { return healthStatus.getSusceptibility(); }
+	public double getExposedPeriod() { return healthStatus.getExposedPeriod(); }
+	public double getInfectiousPeriod() { return healthStatus.getInfectiousPeriod(); }
+	public double getRecoveredPeriod() { return healthStatus.getRecoveredPeriod(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
