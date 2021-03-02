@@ -49,38 +49,22 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		super(topography);
 		this.topography = topography;
 		this.pedestrianPotentialWidth = pedestrianPotentialWidth;
-
-		File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/parallelOSM/");
-		try {
-			bufferedWriter = IOUtils.getWriter("histogram.csv", dir);
-			bufferedWriter.write("iteration round\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
-		ArrayList<Integer> histUpdateable = new ArrayList<>();
 		topography.getElements(PedestrianOSM.class).parallelStream().forEach(pedestrianOSM -> pedestrianOSM.clearStrides());
 
-		if(sideLength <= 0) {
-			double maxStepSize = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredStepSize()).max().orElse(0);
-			double maxDesiredSpeed = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredSpeed()).max().orElse(0);
+		double maxStepSize = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredStepSize()).max().orElse(0);
+		double maxDesiredSpeed = topography.getElements(PedestrianOSM.class).parallelStream().mapToDouble(ped -> ped.getDesiredSpeed()).max().orElse(0);
 
-			//double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
-			//double sideLength = (stepSize+pedestrianPotentialWidth) * 2.0;
-			double stepSize = maxStepSize;
-			sideLength = (2.0*stepSize+pedestrianPotentialWidth);                                                                                                                                           ;
-			//logger.debug("initial grid with a grid edge length equal to " + sideLength);
-		}
-
-		for(PedestrianOSM ped : pedestrianEventsQueue) {
-			ped.updateCount = -1;
-		}
+		double stepSize = Math.max(maxStepSize, maxDesiredSpeed * timeStepInSec);
+		// this formula is slightly different than the formula in the PhD of B. Zoennchen (p. 63, eq. 5.3)
+		// bit it is a good approximation
+		double sideLength = (2.0 * stepSize + pedestrianPotentialWidth);
+		//logger.debug("initial grid with a grid edge length equal to " + sideLength);
 
 		int nCells = 0;
-
 		int counter = 1;
 		// event driven update ignores time credits
 		do {
@@ -97,10 +81,10 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				// lock cell of the agent
 				if(!locked[gridPos[0]][gridPos[1]]) {
 					updateAbleAgents.add(ped);
-					ped.updateCount = counter;
+					//ped.updateCount = counter;
 				} else {
 					notUpdateAbleAgents.add(ped);
-					ped.updateCount = -1;
+					//ped.updateCount = -1;
 				}
 
 				// lock neighbours
@@ -113,8 +97,6 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 				}
 			}
 
-
-			histUpdateable.add(updateAbleAgents.size());
 			//logger.debug("not updated " + notUpdateAbleAgents.size() + " " + counter + ".");
 			updateAbleAgents.parallelStream().forEach(ped -> {
 				//logger.info(ped.getTimeOfNextStep());
@@ -128,20 +110,5 @@ public class UpdateSchemeEventDrivenParallel extends UpdateSchemeEventDriven {
 		} while (!pedestrianEventsQueue.isEmpty() && pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec);
 		iteration++;
 		logger.debug("rounds: " + counter + ", #peds: " + topography.getPedestrianDynamicElements().getElements().size() + ", cells: " + nCells + ", sideLen:" + sideLength);
-		try {
-			StringBuilder builder = new StringBuilder();
-			for(int round = 1; round <= histUpdateable.size(); round++) {
-				for(int i = 0; i < histUpdateable.get(round-1); i++) {
-					builder.append(iteration);
-					builder.append(" ");
-					builder.append(round);
-					builder.append("\n");
-				}
-			}
-			bufferedWriter.write(builder.toString());
-			bufferedWriter.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

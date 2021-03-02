@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
  * Abstract class that solves the eikonal equation on a Mesh i.e. 2-D triangular mesh.
  * It is the basis for the implementation of the FMM, FIM, FSM and IFIM on triangular meshes.
  *
+ * @author Benedikt Zoennchen
+ *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation

@@ -10,36 +10,33 @@ import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
-import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.data.cellgrid.PathFindingTag;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.math.MathUtil;
 
-import java.awt.*;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
- * This class computes the traveling time T using the informed fast iterative method (IFIM) for arbitrary triangulated meshes.
+ * This class computes the traveling time T using the Informed Fast Iterative Method (IFIM) for arbitrary triangulated meshes.
+ * Compare PhD thesis B. Zoennchen Section 9.5.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 

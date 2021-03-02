@@ -10,6 +10,10 @@ import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+/**
+ * @author Benedikt Zoennchen
+ *
+ */
 public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
 	protected PriorityQueue<V> narrowBand;

@@ -1,11 +1,9 @@
 package org.vadere.gui.onlinevisualization.view;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +14,6 @@ import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.visualization.ColorHelper;
 
 public class OnlinevisualizationRenderer extends SimulationRenderer {
 
@@ -25,7 +22,6 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	private final Map<Integer, VPoint> lastPedestrianPositions;
 	private final Map<Integer, VPoint> pedestrianDirections;
 	private final Map<Integer, LinkedList<VPoint>> pedestrianPositions;
-	private final ArrayList<Color> randomColors = new ArrayList<>();
 
 	public OnlinevisualizationRenderer(final OnlineVisualizationModel model) {
 		super(model);
@@ -58,35 +54,10 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 		}
 	}
 
-	private Color getNextRandomColor() {
-		Random random = new Random(1);
-		Color color = new Color(random.nextInt(150), random.nextInt(150), random.nextInt(150));
-		while (randomColors.contains(color)) {
-			color = new Color(random.nextInt(150), random.nextInt(150), random.nextInt(150));
-		}
-		randomColors.add(color);
-
-		return color;
-	}
-
-	private Color getRandomColor(final int index) {
-		if(randomColors.size() <=  index) {
-			while (randomColors.size() <= index) {
-				randomColors.add(getNextRandomColor());
-			}
-		}
-		return randomColors.get(index);
-	}
-
 	private void renderPedestrians(final Graphics2D g) {
 		AgentRender agentRender = getAgentRender();
 		for (Pedestrian ped : model.getPedestrians()) {
 			Color agentColor = getPedestrianColor(ped);
-
-			if(ped.updateCount != -1) {
-				agentColor = getRandomColor(ped.updateCount);
-			}
-
 			g.setColor(agentColor);
 			VPoint position = ped.getPosition();
 			agentRender.render(ped, agentColor, g);

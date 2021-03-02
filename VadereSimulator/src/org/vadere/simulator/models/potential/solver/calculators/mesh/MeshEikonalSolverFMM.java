@@ -5,24 +5,16 @@ import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -34,14 +26,12 @@ import java.util.stream.Collectors;
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolverFMM<V, E, F> {
 
 	private static Logger logger = Logger.getLogger(MeshEikonalSolverFMM.class);
-
-	static {
-		logger.setDebug();
-	}
 
 	final String identifier;
 	private int nUpdates = 0;
@@ -57,12 +47,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		super(solver.identifier, triangulation, solver.getTimeCostFunction());
 		this.identifier = solver.identifier;
 		setInitialVertices(initialVertices, p -> 0.0);
-		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
-		try {
-			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	/**
@@ -79,13 +63,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
-
-		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
-		try {
-			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 
 		HashSet<V> targetVertices = new HashSet<>();
 		IDistanceFunction distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
@@ -135,22 +112,7 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		setInitialVertices(initialVertices, p -> 0.0);
-
-		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
-		try {
-			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
-
-	/*public EikonalSolverFMMTriangulation(@NotNull final String identifier,
-			                             @NotNull final ITimeCostFunction timeCostFunction,
-	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                                     @NotNull final Collection<V> targetVertices
-	) {
-		this(identifier, timeCostFunction, triangulation, targetVertices);
-	}*/
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
 	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
@@ -174,56 +136,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
-
-		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
-		try {
-			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-
-		//TODO a more clever init!
-		/*List<V> initialVertices = new ArrayList<>();
-		for(VShape shape : targetShapes) {
-			List<V> partilyInitialVertices = new ArrayList<>();
-			getMesh().streamVertices()
-					.filter(v -> shape.contains(getMesh().toPoint(v)))
-					.forEach(v -> {
-						for(V u : getMesh().getAdjacentVertexIt(v)) {
-							partilyInitialVertices.add(u);
-							setAsInitialVertex(u);
-						}
-						partilyInitialVertices.add(v);
-						setAsInitialVertex(v);
-					});
-
-			// this might happen if the target is very small or the mesh is to coarse!
-			if(partilyInitialVertices.isEmpty()) {
-				VPoint centroid = shape.getCentroid();
-				if(shape.contains(centroid)) {
-					Optional<F> optFace = triangulation.locate(centroid);
-					if(optFace.isPresent()) {
-						F face = optFace.get();
-						getMesh().streamVertices(face).forEach(v -> {
-							for(V u : getMesh().getAdjacentVertexIt(v)) {
-								partilyInitialVertices.add(u);
-								setAsInitialVertex(u);
-							}
-							partilyInitialVertices.add(v);
-							setAsInitialVertex(v);
-						});
-					} else {
-						throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
-					}
-				}
-				else {
-					throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
-				}
-			}
-
-			initialVertices.addAll(partilyInitialVertices);
-		}*/
-
 		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 	}
 
@@ -252,13 +164,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		setInitialVertices(initialVertices, distFunc);
-
-		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");
-		try {
-			bufferedWriter = IOUtils.getWriter("floorfields.csv", dir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
@@ -268,8 +173,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	) {
 		this("", timeCostFunction, triangulation, targetVertices, distFunc);
 	}
-
-	private BufferedWriter bufferedWriter;
 
 	/**
 	 * Calculate the fast marching solution. This is called only once,
@@ -296,21 +199,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 
 		solved = true;
 		double runTime = (System.currentTimeMillis() - ms);
-		//logger.debug("fmm run time = " + runTime);
-		//logger.debug("#nUpdates = " + (getMesh().getNumberOfVertices() - getInitialVertices().size()));
-		//logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
-
-		/*try {
-			StringBuilder builder = new StringBuilder();
-
-			bufferedWriter.write(getMesh().toPythonTriangulation(v -> getPotential(v)));
-			bufferedWriter.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		System.out.println(getMesh().toPythonTriangulation(v -> getPotential(v)));
-		System.out.println();*/
-		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
+		logger.debug("fmm run time = " + runTime);
 	}
 }

@@ -16,7 +16,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
-
+/**
+ * The Informed Fast Iterative Method on a Cartesian Grid, compare PhD thesis B. Zoennchen Section 9.5
+ *
+ * @author Benedikt Zoennchen
+ */
 public class EikonalSolverIFIM extends AGridEikonalSolver {
 
 	private final IDistanceFunction distFunc;

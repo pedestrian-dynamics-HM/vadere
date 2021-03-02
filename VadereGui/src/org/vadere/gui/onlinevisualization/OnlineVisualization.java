@@ -143,13 +143,11 @@ public class OnlineVisualization implements PassiveCallback {
 				selectedAgent = (Agent)model.getSelectedElement();
 			}
 
-			/*if(model.config.isShowPotentialField() && selectedAgent != null && potentialField != null) {
+			if(model.config.isShowPotentialField() && selectedAgent != null && potentialField != null) {
 				pedPotentialField = IPotentialField.copyAgentField(potentialField, selectedAgent, new VRectangle(model.getTopographyBound()), 0.1);
-			}*/
+			}
 
-			//ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, domain.clone(), pft, pedPotentialField, selectedAgent, discretizations);
-			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, domain, pft, pedPotentialField, selectedAgent, discretizations);
-
+			ObservationAreaSnapshotData data = new ObservationAreaSnapshotData(simTimeInSec, domain.clone(), pft, pedPotentialField, selectedAgent, discretizations);
 			model.pushObservationAreaSnapshot(data);
 		}
 	}
