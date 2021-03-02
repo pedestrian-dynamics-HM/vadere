@@ -17,7 +17,7 @@
       "processors" : [ 4 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "pedsNearby.txt",
+      "filename" : "contacts.txt",
       "processors" : [ 5 ]
     } ],
     "processors" : [ {
@@ -38,7 +38,14 @@
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
-      "id" : 5
+      "id" : 5,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.5,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -69,13 +76,13 @@
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
-        "pedPotentialPersonalSpaceWidth" : 1.2,
-        "pedPotentialHeight" : 50.0,
+        "pedPotentialPersonalSpaceWidth" : 1.5,
+        "pedPotentialHeight" : 130.0,
         "obstPotentialWidth" : 0.8,
-        "obstPotentialHeight" : 4.0,
+        "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
-        "personalSpacePower" : 1,
-        "intimateSpacePower" : 1
+        "personalSpacePower" : 2,
+        "intimateSpacePower" : 0
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -152,16 +159,16 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 52.5,
-            "y" : 32.5
+            "x" : 52.0,
+            "y" : 32.0
           }, {
             "x" : 38.0,
-            "y" : 32.5
+            "y" : 32.0
           }, {
             "x" : 38.0,
             "y" : 27.0
           }, {
-            "x" : 52.5,
+            "x" : 52.0,
             "y" : 27.0
           } ]
         },
@@ -555,12 +562,12 @@
             "y" : 5.0
           }, {
             "x" : 23.0,
-            "y" : 0.0
+            "y" : 0.5
           }, {
-            "x" : 52.5,
-            "y" : 0.0
+            "x" : 52.0,
+            "y" : 0.5
           }, {
-            "x" : 52.5,
+            "x" : 52.0,
             "y" : 17.0
           }, {
             "x" : 49.0,
@@ -594,16 +601,16 @@
             "y" : 3.7
           }, {
             "x" : 17.5,
-            "y" : 0.0
+            "y" : 0.5
           }, {
-            "x" : 0.0,
-            "y" : 0.0
+            "x" : 0.5,
+            "y" : 0.5
           }, {
-            "x" : 0.0,
-            "y" : 32.5
+            "x" : 0.5,
+            "y" : 32.0
           }, {
             "x" : 26.4,
-            "y" : 32.5
+            "y" : 32.0
           }, {
             "x" : 26.4,
             "y" : 27.0
@@ -722,7 +729,7 @@
         "shape" : {
           "x" : 51.0,
           "y" : 16.0,
-          "width" : 1.5,
+          "width" : 1.0,
           "height" : 12.5,
           "type" : "RECTANGLE"
         },
@@ -732,7 +739,7 @@
           "x" : 26.2,
           "y" : 31.5,
           "width" : 12.0,
-          "height" : 1.0,
+          "height" : 0.5,
           "type" : "RECTANGLE"
         },
         "id" : 25
@@ -787,7 +794,7 @@
         "id" : 100,
         "absorbing" : false,
         "shape" : {
-          "x" : 26.5,
+          "x" : 26.6,
           "y" : 9.0,
           "width" : 1.0359735731416286,
           "height" : 1.489826513082832,
@@ -822,7 +829,7 @@
         "absorbing" : false,
         "shape" : {
           "x" : 30.5,
-          "y" : 8.9,
+          "y" : 9.0,
           "width" : 1.0,
           "height" : 1.5,
           "type" : "RECTANGLE"
@@ -855,10 +862,10 @@
         "id" : 103,
         "absorbing" : false,
         "shape" : {
-          "x" : 27.971641791044775,
-          "y" : 7.53358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
+          "x" : 27.342698357755474,
+          "y" : 6.981712962962962,
+          "width" : 1.960255042986791,
+          "height" : 1.3482243618874437,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4.0,
@@ -906,10 +913,10 @@
         "id" : 107,
         "absorbing" : false,
         "shape" : {
-          "x" : 34.39477611940298,
-          "y" : 7.33358208955224,
-          "width" : 1.169478216732756,
-          "height" : 1.3672689453061455,
+          "x" : 33.96804449828853,
+          "y" : 6.945093457943923,
+          "width" : 1.9962098378472106,
+          "height" : 1.455757576914463,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 5.0,
@@ -957,10 +964,10 @@
         "id" : 111,
         "absorbing" : false,
         "shape" : {
-          "x" : 41.2044776119403,
-          "y" : 7.526865671641792,
-          "width" : 1.1368759156670762,
-          "height" : 1.2473905238919745,
+          "x" : 40.645972751048035,
+          "y" : 7.102839794623282,
+          "width" : 2.095380776559338,
+          "height" : 1.2714164009104838,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 5.0,
@@ -1032,6 +1039,23 @@
           "type" : "RECTANGLE"
         },
         "waitingTime" : 2.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 200,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 46.0,
+          "y" : 12.82834890965732,
+          "width" : 3.0,
+          "height" : 0.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -1226,11 +1250,28 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
+        "id" : 999,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 7.2,
+          "y" : 3.7,
+          "width" : 5.7,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 40.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
         "id" : 202,
         "absorbing" : false,
         "shape" : {
-          "x" : 47.7,
-          "y" : 21.8,
+          "x" : 46.6,
+          "y" : 19.7,
           "width" : 1.24862729638604,
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
@@ -1246,8 +1287,8 @@
         "id" : 201,
         "absorbing" : false,
         "shape" : {
-          "x" : 40.1,
-          "y" : 15.71667661776413,
+          "x" : 41.0,
+          "y" : 16.51667661776413,
           "width" : 1.4805655066530221,
           "height" : 1.7833233822358707,
           "type" : "RECTANGLE"
@@ -1365,8 +1406,8 @@
         "id" : 412,
         "absorbing" : false,
         "shape" : {
-          "x" : 25.8,
-          "y" : 22.338777525022586,
+          "x" : 26.3,
+          "y" : 22.438777525022584,
           "width" : 1.272995057045641,
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
@@ -1451,7 +1492,7 @@
         "absorbing" : false,
         "shape" : {
           "x" : 26.4,
-          "y" : 29.638777525022586,
+          "y" : 28.538777525022585,
           "width" : 1.0,
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
@@ -1467,8 +1508,8 @@
         "id" : 415,
         "absorbing" : false,
         "shape" : {
-          "x" : 23.0,
-          "y" : 16.33877752502259,
+          "x" : 23.5,
+          "y" : 16.53877752502259,
           "width" : 1.272995057045641,
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
@@ -1484,8 +1525,8 @@
         "id" : 413,
         "absorbing" : false,
         "shape" : {
-          "x" : 25.7,
-          "y" : 16.23877752502259,
+          "x" : 26.3,
+          "y" : 16.53877752502259,
           "width" : 1.272995057045641,
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
@@ -1552,8 +1593,8 @@
         "id" : 405,
         "absorbing" : false,
         "shape" : {
-          "x" : 37.3,
-          "y" : 16.33877752502259,
+          "x" : 37.6,
+          "y" : 16.63877752502259,
           "width" : 1.272995057045641,
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
@@ -2042,2416 +2083,218 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 9999,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 23.5,
-          "y" : 25.5,
-          "width" : 1.5,
-          "height" : 0.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 101,
+        "id" : 899,
         "absorbing" : false,
         "shape" : {
-          "x" : 29.05379979928805,
-          "y" : 5.0,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 2.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 101,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 34.95379979928805,
-          "y" : 5.0,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 2.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 101,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 41.25379979928805,
-          "y" : 5.0,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 2.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 104,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 30.5,
-          "y" : 7.4,
-          "width" : 1.0,
+          "x" : 11.0,
+          "y" : 11.5,
+          "width" : 9.0,
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
+        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 104,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 26.6,
-          "y" : 7.4,
-          "width" : 1.0,
-          "height" : 1.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 5.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 104,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 24.5,
-          "y" : 7.4,
-          "width" : 1.0,
-          "height" : 1.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 5.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 104,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 24.5,
-          "y" : 8.9,
-          "width" : 1.0,
-          "height" : 1.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 5.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.971641791044775,
-          "y" : 8.93358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 35.87164179104477,
-          "y" : 7.43358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.27164179104477,
-          "y" : 7.43358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.37164179104477,
-          "y" : 8.93358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 34.37164179104477,
-          "y" : 9.03358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 36.17164179104478,
-          "y" : 9.03358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 39.37164179104477,
-          "y" : 9.03358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 39.471641791044775,
-          "y" : 7.43358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 41.17164179104478,
-          "y" : 9.13358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.77164179104477,
-          "y" : 9.13358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.77164179104477,
-          "y" : 7.73358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.37164179104478,
-          "y" : 7.53358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 44.571641791044776,
-          "y" : 8.03358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 103,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 45.971641791044775,
-          "y" : 8.03358208955224,
-          "width" : 1.131311609697491,
-          "height" : 1.296355235298165,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 25.41669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.01669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 29.91669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 31.41669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 33.21669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.81669388585928,
-          "y" : 11.3,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 36.31669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 39.31669388585928,
-          "y" : 11.3,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.11669388585928,
-          "y" : 11.2,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 44.61669388585928,
-          "y" : 11.3,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 102,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 20.21669388585928,
-          "y" : 5.7,
-          "width" : 1.5,
-          "height" : 0.8,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 115,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 48.2,
-          "y" : 5.4,
-          "width" : 0.8,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 3.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 115,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 48.2,
-          "y" : 10.4,
-          "width" : 0.8,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 3.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 115,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 48.2,
-          "y" : 13.0,
-          "width" : 0.8,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 3.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 115,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 48.3,
-          "y" : 14.5,
-          "width" : 0.8,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 3.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 45.5,
-          "y" : 16.0,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 45.4,
-          "y" : 17.3,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 46.7,
-          "y" : 17.3,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 46.8,
-          "y" : 16.1,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 45.7,
-          "y" : 21.7,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.3,
-          "y" : 22.9,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.4,
-          "y" : 21.2,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.6,
-          "y" : 19.0,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.4,
-          "y" : 17.0,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 43.1,
-          "y" : 15.4,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.1,
-          "y" : 22.9,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.0,
-          "y" : 20.9,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.3,
-          "y" : 19.0,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.1,
-          "y" : 17.4,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 42.2,
-          "y" : 15.5,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 40.4,
-          "y" : 20.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 40.3,
-          "y" : 18.8,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 38.6,
-          "y" : 20.7,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 38.7,
-          "y" : 19.0,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 38.9,
-          "y" : 16.8,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.2,
-          "y" : 23.2,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.2,
-          "y" : 20.1,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.2,
-          "y" : 18.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 36.0,
-          "y" : 23.1,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 35.9,
-          "y" : 21.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 35.9,
-          "y" : 18.8,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 36.0,
-          "y" : 16.1,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 35.9,
-          "y" : 20.2,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 46.3,
-          "y" : 19.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 46.2,
-          "y" : 19.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 202,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 46.2,
-          "y" : 19.6,
-          "width" : 1.24862729638604,
-          "height" : 1.1000000000000014,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 34.4,
-          "y" : 18.638777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 34.4,
-          "y" : 20.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.4,
-          "y" : 18.438777525022587,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.4,
-          "y" : 20.638777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 31.0,
-          "y" : 16.438777525022587,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 31.0,
-          "y" : 18.638777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 31.0,
-          "y" : 20.838777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 31.1,
-          "y" : 22.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 29.4,
-          "y" : 20.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 29.4,
-          "y" : 18.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 28.3,
-          "y" : 16.138777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 28.5,
-          "y" : 18.338777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 25.7,
-          "y" : 18.238777525022584,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 28.3,
-          "y" : 20.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 28.3,
-          "y" : 22.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.2,
-          "y" : 16.138777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.3,
-          "y" : 18.338777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.3,
-          "y" : 20.638777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 27.3,
-          "y" : 22.538777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 25.9,
-          "y" : 20.338777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 24.7,
-          "y" : 16.238777525022584,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 24.6,
-          "y" : 18.138777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 24.4,
-          "y" : 19.938777525022587,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 23.0,
-          "y" : 18.338777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 22.8,
-          "y" : 20.338777525022586,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 23.2,
-          "y" : 22.53877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 407,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 22.0,
-          "y" : 16.038777525022585,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 21.9,
-          "y" : 22.33877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 20.2,
-          "y" : 21.13877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 20.3,
-          "y" : 16.93877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 19.4,
-          "y" : 15.93877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 18.5,
-          "y" : 17.03877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 18.4,
-          "y" : 21.03877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 22.0,
-          "y" : 17.93877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 413,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 21.9,
-          "y" : 20.03877752502259,
-          "width" : 1.272995057045641,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 13.085432050690358,
-          "y" : 16.6,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 12.985432050690358,
-          "y" : 19.3,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 12.985432050690358,
-          "y" : 21.9,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 14.485432050690358,
-          "y" : 21.8,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 15.785432050690357,
-          "y" : 16.7,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 15.685432050690357,
-          "y" : 19.2,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 16.88543205069036,
-          "y" : 16.5,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 16.88543205069036,
-          "y" : 19.4,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 16.88543205069036,
-          "y" : 22.0,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 6.285432050690357,
-          "y" : 21.3,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 3.185432050690357,
-          "y" : 13.5,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 3.185432050690357,
-          "y" : 18.0,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 5.085432050690358,
-          "y" : 13.3,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 5.285432050690358,
-          "y" : 16.1,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 6.285432050690358,
-          "y" : 17.5,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 9.28543205069036,
-          "y" : 15.1,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 11.18543205069036,
-          "y" : 15.0,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 11.385432050690357,
-          "y" : 21.9,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 9.285432050690359,
-          "y" : 18.6,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 8.08543205069036,
-          "y" : 17.3,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 8.085432050690358,
-          "y" : 21.4,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 5.285432050690357,
-          "y" : 21.7,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 901,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 3.185432050690359,
-          "y" : 21.8,
-          "width" : 1.0,
-          "height" : 2.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 10.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 26.3,
-          "y" : 27.038777525022585,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 30.9,
-          "y" : 30.738777525022584,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.9,
-          "y" : 30.638777525022586,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.2,
-          "y" : 27.238777525022584,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 37.1,
-          "y" : 28.938777525022584,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 28.9,
-          "y" : 27.138777525022586,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 35.0,
-          "y" : 27.938777525022587,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 30.9,
-          "y" : 27.53877752502259,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 604,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 32.9,
-          "y" : 27.538777525022585,
-          "width" : 1.0,
-          "height" : 1.961222474977415,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 4.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 304,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 15.9,
-          "y" : 26.0,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 304,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 19.7,
-          "y" : 26.1,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 304,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 23.1,
-          "y" : 26.1,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 304,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 2.6,
-          "y" : 26.0,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 304,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 9.0,
-          "y" : 26.1,
-          "width" : 2.5,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 999,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 7.2,
-          "y" : 3.7,
-          "width" : 5.7,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 40.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
+        "parallelWaiters" : 2,
         "individualWaiting" : true,
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       } ],
-      "targetChangers" : [ ],
+      "targetChangers" : [ {
+        "id" : 6,
+        "shape" : {
+          "x" : 20.2,
+          "y" : 9.0,
+          "width" : 1.8,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 300, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
+        "probabilityToChangeTarget" : [ 0.2, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.4, 0.3, 1.0 ]
+      }, {
+        "id" : 1,
+        "shape" : {
+          "x" : 22.00361731235326,
+          "y" : 6.537570927693197,
+          "width" : 1.5,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 300, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 200 ],
+        "probabilityToChangeTarget" : [ 0.2, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.7, 0.4, 0.6, 0.4, 0.3, 1.0 ]
+      }, {
+        "id" : 2,
+        "shape" : {
+          "x" : 46.0,
+          "y" : 11.301557632398755,
+          "width" : 3.0,
+          "height" : 1.2,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 101, 102, 103, 104, 105, 106, 107, 200, 201 ],
+        "probabilityToChangeTarget" : [ 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 0.025, 1.0, 1.0 ]
+      }, {
+        "id" : 3,
+        "shape" : {
+          "x" : 22.0,
+          "y" : 12.0,
+          "width" : 1.5,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 201, 301, 302, 303, 304, 305, 800, 803 ],
+        "probabilityToChangeTarget" : [ 0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 1.0, 1.0 ]
+      }, {
+        "id" : 11,
+        "shape" : {
+          "x" : 11.0,
+          "y" : 11.5,
+          "width" : 9.0,
+          "height" : 0.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 801, 802, 803, 804, 805 ],
+        "probabilityToChangeTarget" : [ 0.2, 0.2, 0.2, 0.2, 0.2 ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 11.0,
+          "y" : 10.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 801, 811, 999, 1000 ],
+        "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 13.0,
+          "y" : 10.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 802, 812, 999, 1000 ],
+        "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 15.0,
+          "y" : 10.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 803, 813, 999, 1000 ],
+        "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 19.0,
+          "y" : 10.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 805, 815, 999, 1000 ],
+        "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 17.0,
+          "y" : 10.5,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 804, 814, 999, 1000 ],
+        "probabilityToChangeTarget" : [ 1.0, 1.0, 0.2, 1.0 ]
+      }, {
+        "id" : 7,
+        "shape" : {
+          "x" : 46.0,
+          "y" : 12.5,
+          "width" : 3.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 202 ],
+        "probabilityToChangeTarget" : [ 0.5 ]
+      }, {
+        "id" : 12,
+        "shape" : {
+          "x" : 40.7,
+          "y" : 15.899733183339103,
+          "width" : 2.0886938242759925,
+          "height" : 2.700266816660898,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 301, 400, 402, 404, 405, 505, 406, 601, 602, 603, 604, 407, 408, 409, 509, 410, 411, 412, 413, 513, 414, 415, 900, 800, 899, 804 ],
+        "probabilityToChangeTarget" : [ 0.1, 0.4, 0.4, 0.4, 0.8, 0.4, 0.8, 0.1, 0.1, 0.1, 0.1, 0.8, 0.4, 0.8, 0.8, 0.4, 0.6, 0.4, 0.6, 0.4, 0.4, 0.4, 0.3, 1.0, 1.0, 1.0 ]
+      }, {
+        "id" : 13,
+        "shape" : {
+          "x" : 46.0,
+          "y" : 19.506433129418113,
+          "width" : 2.5,
+          "height" : 1.5,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 301, 1100, 1101, 400, 402, 404, 405, 505, 406, 601, 602, 603, 604, 407, 408, 409, 509, 410, 411, 412, 413, 513, 414, 415, 900, 800, 899, 803 ],
+        "probabilityToChangeTarget" : [ 1.0, 0.5, 0.5, 0.8, 0.8, 0.8, 0.4, 0.8, 0.4, 0.9, 0.4, 0.4, 0.5, 0.4, 0.8, 0.4, 0.2, 0.8, 0.4, 0.8, 0.4, 0.2, 0.8, 0.4, 0.3, 1.0, 1.0, 1.0 ]
+      }, {
+        "id" : 29,
+        "shape" : {
+          "x" : 19.0,
+          "y" : 19.2,
+          "width" : 2.0,
+          "height" : 1.55,
+          "type" : "RECTANGLE"
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SORTED_SUB_LIST",
+        "nextTarget" : [ 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 899, 801 ],
+        "probabilityToChangeTarget" : [ 0.7, 0.7, 0.7, 0.3, 0.3, 0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 1.0, 1.0 ]
+      } ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 77,
+        "id" : 76,
         "shape" : {
-          "x" : 14.0,
-          "y" : 4.5,
+          "x" : 21.5,
+          "y" : 0.5,
           "width" : 1.5,
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.NegativeExponentialDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 16.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -4459,16 +2302,16 @@
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 99 ],
+        "targetIds" : [ 98 ],
         "groupSizeDistribution" : [ 2.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 78,
+        "id" : 77,
         "shape" : {
           "x" : 20.0,
           "y" : 0.5,
-          "width" : 1.0E-4,
+          "width" : 1.5,
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
