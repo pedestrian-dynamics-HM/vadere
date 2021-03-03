@@ -72,7 +72,7 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
-		// healthStatus = new HealthStatus(); // ToDo check if necessary (-> BK)
+		healthStatus = new HealthStatus();
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -88,7 +88,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = other.isLikelyInjured;
 
 		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
-		// healthStatus = new HealthStatus(other.healthStatus);  // ToDo check if necessary (-> BK)
+		healthStatus = new HealthStatus(other.healthStatus);
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);

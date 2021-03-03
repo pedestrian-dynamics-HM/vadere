@@ -3,9 +3,9 @@ package org.vadere.state.health;
 public class HealthStatus {
 
     // Member variables
-    private InfectionStatus infectionStatus = InfectionStatus.SUSCEPTIBLE;
-    private double lastInfectionStatusUpdateTime = -1;
-    private double pathogenAbsorbedLoad = -1;
+    private InfectionStatus infectionStatus;
+    private double lastInfectionStatusUpdateTime;
+    private double pathogenAbsorbedLoad;
 
     // define infectious agent
     final private double pathogenEmissionCapacity; // potentially emitted pathogen load per update interval by infectious agent
@@ -14,35 +14,51 @@ public class HealthStatus {
     final private double pathogenAbsorptionRate; // percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
     final private double susceptibility; // min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent depending on its immune system)
 
-    final private double exposedPeriod;     // defined individually; draw from distribution that is typical for disease
-    final private double infectiousPeriod;  // defined individually; draw from distribution that is typical for disease
-    final private double recoveredPeriod;   // defined individually; draw from distribution that is typical for disease
+    final private double exposedPeriod;
+    final private double infectiousPeriod;
+    final private double recoveredPeriod;
 
     // Constructors
-    // ToDo: check if other constructors are necessary
     public HealthStatus() {
-
         // ToDo: define realistic default values
-        pathogenEmissionCapacity = 5.0;
-        isHighlyInfectious = false;
-        pathogenAbsorptionRate = 0.1;
-        susceptibility = 10;
-        exposedPeriod = -1;
-        infectiousPeriod = -1;
-        recoveredPeriod = -1;
+        this.infectionStatus = InfectionStatus.SUSCEPTIBLE;
+        this.lastInfectionStatusUpdateTime = -1;
+        this.pathogenAbsorbedLoad = 0.0;
+        this.pathogenEmissionCapacity = 5.0;
+        this.isHighlyInfectious = false;
+        this.pathogenAbsorptionRate = 0.1;
+        this.susceptibility = 10;
+        this.exposedPeriod = 2*24*60*60;    // ToDo should be drawn from distribution
+        this.infectiousPeriod = 14*24*60*60;    // ToDo should be drawn from distribution
+        this.recoveredPeriod = 150*24*60*60;    // ToDo should be drawn from distribution
     }
-    public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime,
-                        double pathogenAbsorbedLoad) {
+
+    public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
+                        double pathogenEmissionCapacity, boolean isHighlyInfectious, double pathogenAbsorptionRate,
+                        double susceptibility, double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
         this.infectionStatus = infectionStatus;
         this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime;
         this.pathogenAbsorbedLoad = pathogenAbsorbedLoad;
-        pathogenEmissionCapacity = 5.0;
-        isHighlyInfectious = false;
-        pathogenAbsorptionRate = 0.1;
-        susceptibility = 10;
-        exposedPeriod = -1;
-        infectiousPeriod = -1;
-        recoveredPeriod = -1;
+        this.pathogenEmissionCapacity = pathogenEmissionCapacity;
+        this.isHighlyInfectious = isHighlyInfectious;
+        this.pathogenAbsorptionRate = pathogenAbsorptionRate;
+        this.susceptibility = susceptibility;
+        this.exposedPeriod = exposedPeriod;
+        this.infectiousPeriod = infectiousPeriod;
+        this.recoveredPeriod = recoveredPeriod;
+    }
+
+    public HealthStatus(HealthStatus other) {
+        this.infectionStatus = other.getInfectionStatus();
+        this.lastInfectionStatusUpdateTime = other.getLastInfectionStatusUpdateTime();
+        this.pathogenAbsorbedLoad = other.getPathogenAbsorbedLoad();
+        this.pathogenEmissionCapacity = other.getPathogenEmissionCapacity();
+        this.isHighlyInfectious = other.getIsHighlyInfectious();
+        this.pathogenAbsorptionRate = other.getPathogenAbsorptionRate();
+        this.susceptibility = other.getSusceptibility();
+        this.exposedPeriod = other.getExposedPeriod();
+        this.infectiousPeriod = other.getInfectiousPeriod();
+        this.recoveredPeriod = other.getRecoveredPeriod();
     }
 
 
