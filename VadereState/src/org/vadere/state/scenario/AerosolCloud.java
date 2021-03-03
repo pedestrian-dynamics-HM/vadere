@@ -19,18 +19,21 @@ public class AerosolCloud extends ScenarioElement {
     // private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
 
     // Constructors
-    // ToDo: check if other constructors are necessary (-> BK)
-//    public AerosolCloud() { this(new AttributesAerosolCloud()); }
-//    public AerosolCloud(AerosolCloud aerosolCloud) {
-//        this(aerosolCloud.attributes);
-//    }
-//    public AerosolCloud(@NotNull AttributesAerosolCloud attributes) { this.attributes = attributes; }
+    public AerosolCloud() { this(new AttributesAerosolCloud()); }
 
+    public AerosolCloud(@NotNull AttributesAerosolCloud attributes) {
+        this.attributes = attributes;
+    }
+
+    public AerosolCloud(AerosolCloud aerosolCloud){
+        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getCreationTime(),
+                aerosolCloud.getPathogenLoad(), aerosolCloud.getLifeTime()));
+    }
 
 
     // Getter
     @Override
-    public VCircle getShape() {     // ToDo check of one must use VShape instead -> attributesAerosolCloud
+    public VShape getShape() {     // ToDo check of one must use VShape instead -> attributesAerosolCloud
         return attributes.getShape();
     }
 
@@ -49,17 +52,15 @@ public class AerosolCloud extends ScenarioElement {
         return attributes;
     }
 
-    public double getRadius() { return attributes.getRadius(); }
     public double getLifeTime() { return attributes.getLifeTime(); }
     public double getCreationTime() { return attributes.getCreationTime(); }
     public double getPathogenLoad() { return attributes.getPathogenLoad(); }
 
     // Setter
-    // ToDo: implement setRadius (or setShape) -> AttributesAerosolCloud.java
-//    @Override
-//    public void setShape(VShape newShape) {
-//        attributes.setShape(newShape);
-//    }
+    @Override
+    public void setShape(VShape newShape) {
+        attributes.setShape(newShape);
+    }
 
     @Override
     public void setAttributes(Attributes attributes) {
@@ -73,13 +74,18 @@ public class AerosolCloud extends ScenarioElement {
     public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
     public void setPathogenLoad(double pathogenLoad) { attributes.setPathogenLoad(pathogenLoad); }
 
-    // Other methods
 
-    // ToDo: check if necessary
-//    @Override
-//    public ScenarioElement clone() {
-//        return new AerosolCloud(((AttributesAerosolCloud) attributes.clone()));
-//    }
+    // Other methods
+    public void changeExtent(int dimension, double scalingFactor1D) {
+        double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
+        // setShape(new VShape(getShape().getCentroid(), getShape()."extentInDimension" * scalingFactorInDimension); // increase extent
+        setPathogenLoad(getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
+    }
+
+    @Override
+    public ScenarioElement clone() {
+        return new AerosolCloud(((AttributesAerosolCloud) attributes.clone()));
+    }
 
     // ToDo: implement AerosolCloudListener (or remove commented code)
 //    /** Models can register a target listener. */
@@ -97,36 +103,35 @@ public class AerosolCloud extends ScenarioElement {
 //    }
 
 
-    // TODO: check BK /SS ?
-//    @Override
-//    public int hashCode() {
-//        final int prime = 31;
-//        int result = 1;
-//        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
-//        return result;
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) {
-//            return true;
-//        }
-//        if (obj == null) {
-//            return false;
-//        }
-//        if (!(obj instanceof AerosolCloud)) {
-//            return false;
-//        }
-//        AerosolCloud other = (AerosolCloud) obj;
-//        if (attributes == null) {
-//            if (other.attributes != null) {
-//                return false;
-//            }
-//        } else if (!attributes.equals(other.attributes)) {
-//            return false;
-//        }
-//        return true;
-//    }
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof AerosolCloud)) {
+            return false;
+        }
+        AerosolCloud other = (AerosolCloud) obj;
+        if (attributes == null) {
+            if (other.attributes != null) {
+                return false;
+            }
+        } else if (!attributes.equals(other.attributes)) {
+            return false;
+        }
+        return true;
+    }
 
 
 }
