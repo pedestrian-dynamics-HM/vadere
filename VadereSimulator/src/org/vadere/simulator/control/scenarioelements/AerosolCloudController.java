@@ -2,7 +2,10 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.scenario.*;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
+
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 
 
 /**
@@ -27,17 +30,37 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     // Other methods
-    public void update(double simTimeInSec) {
-        // controller hinzufügen, entfernen
-        // postition verändern
-        // cloud vergrößern
-        // viruslast anpassen
+    public void create(double simTimeInSec, Pedestrian pedestrian) {
+        VPoint position = pedestrian.getPosition();
+        double pathogenLoad = pedestrian.getPathogenEmissionCapacity();
+
+        // ToDo create aerosolCloud at position with pathogenLoad, at simTimeInSec
     }
 
-    public void changeExtent(AerosolCloud aerosolCloud, int dimension, double scalingFactor1D) {
-        double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
+    public void update(double simTimeInSec) {
+        changeAerosolCloudExtent(aerosolCloud);
+        reduceAerosolCloudPathogenLoad(aerosolCloud);
+        if (hasAerosolCloudReachedLifeEnd(aerosolCloud, simTimeInSec)) {
+            // ToDo delete cloud
+        }
+    }
+
+    public void changeAerosolCloudExtent(AerosolCloud aerosolCloud) {
+        // ToDo change extent
+        // int dimension = 2;
+        // double scalingFactor1D = 1;
+        // double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
         // setShape(new VShape(getShape().getCentroid(), getShape()."extentInDimension" * scalingFactorInDimension); // increase extent
-        aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
+        // aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
+    }
+
+    public void reduceAerosolCloudPathogenLoad(AerosolCloud aerosolCloud) {
+        // ToDo
+    }
+
+    public boolean hasAerosolCloudReachedLifeEnd(AerosolCloud aerosolCloud, double simTimeInSec) {
+        double minimumRelevantPathogenLoad = 0.0;
+        return (aerosolCloud.getPathogenLoad() <= minimumRelevantPathogenLoad) || (simTimeInSec > aerosolCloud.getCreationTime() + aerosolCloud.getLifeTime());
     }
 
 //    private void notifyListenersAerosolCloudReached(final Pedestrian pedestrian) {

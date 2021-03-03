@@ -4,12 +4,7 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
-import org.vadere.simulator.control.scenarioelements.AbsorbingAreaController;
-import org.vadere.simulator.control.scenarioelements.SourceController;
-import org.vadere.simulator.control.scenarioelements.TargetChangerController;
-import org.vadere.simulator.control.scenarioelements.TargetController;
-import org.vadere.simulator.control.scenarioelements.TeleporterController;
-import org.vadere.simulator.control.scenarioelements.TopographyController;
+import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -28,12 +23,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.scenario.AbsorbingArea;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.TargetChanger;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -54,6 +44,7 @@ public class Simulation implements ControllerManager{
 	private final Collection<TargetController> targetControllers;
 	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
+	private Collection<AerosolCloudController> aerosolCloudControllers; // ToDo: Check if final or not (ask SS)
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -178,6 +169,10 @@ public class Simulation implements ControllerManager{
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
 			absorbingAreaControllers.add(new AbsorbingAreaController(topography, absorbingArea));
+		}
+
+		for (AerosolCloud aerosolCloud : topography.getAerosolClouds()) {
+			aerosolCloudControllers.add(new AerosolCloudController(topography, aerosolCloud));
 		}
 
 		if (topography.hasTeleporter()) {
@@ -429,6 +424,10 @@ public class Simulation implements ControllerManager{
 			absorbingAreaController.update(simTimeInSec);
 		}
 
+		for (AerosolCloudController aerosolCloudController : this.aerosolCloudControllers) {
+			aerosolCloudController.update(simTimeInSec);
+		}
+
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}
 
@@ -594,5 +593,10 @@ public class Simulation implements ControllerManager{
 	@Override
 	public TopographyController getTopographyController() {
 		return topographyController;
+	}
+
+	@Override
+	public Collection<AerosolCloudController> getAerosolCloudControllers() {
+		return aerosolCloudControllers;
 	}
 }
