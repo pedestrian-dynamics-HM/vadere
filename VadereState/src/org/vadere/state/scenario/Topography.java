@@ -475,6 +475,10 @@ public class Topography implements DynamicElementMover{
 		return cars;
 	}
 
+	public Collection<AerosolCloud> getAerosolClouds() {
+		return aerosolClouds;
+	}
+
 	public void addSource(Source source) {
 		this.sources.add(source);
 	}
@@ -500,6 +504,8 @@ public class Topography implements DynamicElementMover{
 	public void addStairs(Stairs stairs) {
 		this.stairs.add(stairs);
 	}
+
+	public void addAerosolCloud(AerosolCloud aerosolCloud) { this.aerosolClouds.add(aerosolCloud); }
 
 	public void setTeleporter(Teleporter teleporter) {
 		allScenarioElements.remove(this.teleporter); // remove old teleporter
@@ -727,6 +733,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(getInitialElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toSet()));
+		usedIds.addAll(aerosolClouds.stream().map(AerosolCloud::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -760,6 +767,10 @@ public class Topography implements DynamicElementMover{
 		getInitialElements(Pedestrian.class).stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		aerosolClouds.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 	}
 
 	private int nextIdNotInSet(Set<Integer> usedIDs){
@@ -779,7 +790,7 @@ public class Topography implements DynamicElementMover{
 				+ targetChangers.size()
 				+ sources.size()
 				+ boundaryObstacles.size()
-				+ absorbingAreas.size()));
+				+ absorbingAreas.size())); // ToDo: ask BK/SS: add aerosolClouds? what about measurementAreas?
 
 		all.addAll(obstacles);
 		all.addAll(stairs);
@@ -789,6 +800,7 @@ public class Topography implements DynamicElementMover{
 		all.addAll(boundaryObstacles);
 		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
+		all.addAll(aerosolClouds);
 		return  all;
 
 	}
@@ -816,9 +828,5 @@ public class Topography implements DynamicElementMover{
 	public void setContextId(String contextId) {
 		this.contextId = contextId;
 	}
-
-    public Collection<AerosolCloud> getAerosolClouds() {
-        return aerosolClouds;
-    }
 
 }
