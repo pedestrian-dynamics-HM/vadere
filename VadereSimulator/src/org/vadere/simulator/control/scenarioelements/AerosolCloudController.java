@@ -9,7 +9,7 @@ import org.vadere.util.logging.Logger;
  * Manipulate pedestrians which enter the given {@link AerosolCloud}.
  * <p>
  * Take following attributes into account when manipulating pedestrians:
- * - {@link AttributesAerosolCloud#getRadius()} ()}
+ * - {@link AttributesAerosolCloud#getShape()}
  * <p>
  */
 
