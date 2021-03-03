@@ -76,12 +76,6 @@ public class AerosolCloud extends ScenarioElement {
 
 
     // Other methods
-    public void changeExtent(int dimension, double scalingFactor1D) {
-        double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
-        // setShape(new VShape(getShape().getCentroid(), getShape()."extentInDimension" * scalingFactorInDimension); // increase extent
-        setPathogenLoad(getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
-    }
-
     @Override
     public ScenarioElement clone() {
         return new AerosolCloud(((AttributesAerosolCloud) attributes.clone()));

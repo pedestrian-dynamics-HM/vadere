@@ -34,6 +34,11 @@ public class AerosolCloudController extends ScenarioElementController {
         // viruslast anpassen
     }
 
+    public void changeExtent(AerosolCloud aerosolCloud, int dimension, double scalingFactor1D) {
+        double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
+        // setShape(new VShape(getShape().getCentroid(), getShape()."extentInDimension" * scalingFactorInDimension); // increase extent
+        aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
+    }
 
 //    private void notifyListenersAerosolCloudReached(final Pedestrian pedestrian) {
 //        for (AerosolCloudListener listener : aerosolCloud.getAerosolCloudListeners()) {
