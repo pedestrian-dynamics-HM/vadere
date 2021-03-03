@@ -14,6 +14,7 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
@@ -131,8 +132,7 @@ public class InfectionModel extends AbstractSirModel {
 		final Rectangle2D aerosolCloudBounds = aerosolCloud.getShape().getBounds2D();
 		final VPoint centerOfAerosolCloud = new VPoint(aerosolCloudBounds.getCenterX(), aerosolCloudBounds.getCenterY());
 
-		final double aerosolCloudRadius = aerosolCloud.getRadius();
-		final double aerosolCloudProximity = Math.max(aerosolCloudBounds.getHeight(), aerosolCloudBounds.getWidth()) + aerosolCloudRadius;
+		final double aerosolCloudProximity = Math.max(aerosolCloudBounds.getHeight(), aerosolCloudBounds.getWidth());
 
 		List<Pedestrian> pedestriansNearAerosolCloud = this.domain.getTopography().getSpatialMap(Pedestrian.class).getObjects(centerOfAerosolCloud, aerosolCloudProximity);
 
@@ -140,11 +140,9 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	public boolean isPedestrianInAerosolCloud(AerosolCloud aerosolCloud, Pedestrian pedestrian) {
-		final double aerosolCloudRadius = aerosolCloud.getRadius();
-		final VPoint pedestrianPosition = pedestrian.getPosition();
-		final VCircle aerosolCloudShape = aerosolCloud.getShape();
-
-		return aerosolCloudShape.contains(pedestrianPosition) || aerosolCloudShape.distance(pedestrianPosition) < aerosolCloudRadius;
+		VShape aerosolCloudShape = aerosolCloud.getShape();
+		VPoint pedestrianPosition = pedestrian.getPosition();
+		return aerosolCloudShape.contains(pedestrianPosition);
 	}
 
 	public Collection<Pedestrian> getPedestriansInsideAerosolCloud(AerosolCloud aerosolCloud) {
