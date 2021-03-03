@@ -1,9 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
-import com.sun.jdi.InvocationException;
-
 import org.vadere.manager.RemoteManager;
-import org.vadere.manager.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
@@ -11,7 +8,6 @@ import org.vadere.manager.traci.writer.TraCIPacket;
 import org.vadere.util.logging.Logger;
 
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Dispatcher for {@link TraCICommand}s.
@@ -29,6 +25,7 @@ public class CommandExecutor {
 		cmdMap.put(TraCICmd.GET_VERSION.id, ControlCommandHandler.instance::process_getVersion);
 		cmdMap.put(TraCICmd.LOAD.id, ControlCommandHandler.instance::process_load);
 		cmdMap.put(TraCICmd.SIM_STEP.id, ControlCommandHandler.instance::process_simStep);
+		cmdMap.put(TraCICmd.GET_STATE.id, ControlCommandHandler.instance::process_getState);
 		cmdMap.put(TraCICmd.CLOSE.id, ControlCommandHandler.instance::process_close);
 		cmdMap.put(TraCICmd.SEND_FILE.id, ControlCommandHandler.instance::process_load_file);
 		cmdMap.put(TraCICmd.GET_PERSON_VALUE.id, PersonCommandHandler.instance::processGet);

@@ -265,12 +265,18 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			ReferenceCoordinateSystem coord =
 					state.getScenarioStore().getTopography()
 							.getAttributes().getReferenceCoordinateSystem();
-			coord.initialize();
-			CompoundObject o = CoordRef.asCompoundObject(
-					coord.getEpsgCode(),
-					coord.getTranslation()
-			);
-			cmd.setResponse(responseOK(SimulationVar.COORD_REF.type, o));
+			if (coord != null){
+				coord.initialize();
+				CompoundObject o = CoordRef.asCompoundObject(
+						coord.getEpsgCode(),
+						coord.getTranslation()
+				);
+				cmd.setResponse(responseOK(SimulationVar.COORD_REF.type, o));
+			} else {
+				cmd.setResponse(responseERR("Conversion not supported. Is ReferenceCoordinateSystem correctly set in Vadere?",
+						TraCICmd.GET_SIMULATION_VALUE, TraCICmd.RESPONSE_GET_SIMULATION_VALUE));
+			}
+
 		});
 		return cmd;
 	}

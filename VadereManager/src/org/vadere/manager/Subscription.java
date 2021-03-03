@@ -13,6 +13,12 @@ import org.vadere.util.logging.Logger;
 
 import java.util.Arrays;
 
+
+/**
+ * Wrapper around a given TraCIValueSubscriptionCommand to execute the
+ * subscription
+ * todo: merge multiple subscription so no unnecessary duplicates are send  send
+ */
 public class Subscription {
 
 	private static Logger logger = Logger.getLogger(Subscription.class);
@@ -30,6 +36,13 @@ public class Subscription {
 	}
 
 	public void executeSubscription(RemoteManager remoteManager) {
+
+		// todo check if subscription is still valid.
+//		markForRemoval();
+//		if (markedForRemoval){
+//			return;
+//		}
+
 		TraCISubscriptionResponse subResponse = new TraCISubscriptionResponse(
 				new StatusResponse(valueSubscriptionCommand.getTraCICmd(), TraCIStatusResponse.OK, ""),
 				responseIdentifier, valueSubscriptionCommand.getElementIdentifier(), valueSubscriptionCommand.getNumberOfVariables());
@@ -59,6 +72,12 @@ public class Subscription {
 					TraCISubscriptionResponse.removeResponse(valueSubscriptionCommand, responseIdentifier));
 		} else {
 			valueSubscriptionCommand.setResponse(subResponse);
+		}
+	}
+
+	public void markIfOld(double simTime){
+		if (this.valueSubscriptionCommand.getEndTime() >= simTime){
+			markForRemoval();
 		}
 	}
 

@@ -7,12 +7,7 @@ import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;
-import org.vadere.manager.traci.response.StatusResponse;
-import org.vadere.manager.traci.response.TraCIGetResponse;
-import org.vadere.manager.traci.response.TraCIGetVersionResponse;
-import org.vadere.manager.traci.response.TraCISimTimeResponse;
-import org.vadere.manager.traci.response.TraCIStatusResponse;
-import org.vadere.manager.traci.response.TraCISubscriptionResponse;
+import org.vadere.manager.traci.response.*;
 import org.vadere.util.logging.Logger;
 
 import java.nio.ByteBuffer;
@@ -194,6 +189,23 @@ public class TraCIPacket extends ByteArrayOutputStreamTraCIWriter {
 				.writeString(res.getVersionString());
 
 		addCommandWithoutLen(cmdBuilder.asByteArray());
+
+		return this;
+	}
+
+	public TraCIPacket wrapGetStateCommand(TraCIGetStateResponse res) {
+		addStatusResponse(res.getStatusResponse());
+
+		if (!res.getStatusResponse().getResponse().equals(TraCIStatusResponse.OK))
+			return this; // ERR or NOT_IMPLEMENTED --> only StatusResponse
+
+
+		// not length field! Directly add number of subscription responses.
+		writeInt(res.getNumberOfSubscriptions());
+
+		// add each SubscriptionsResponse as its own command (with length and responseID)
+		res.getSubscriptionResponses().forEach(this::wrapSubscription);
+
 
 		return this;
 	}

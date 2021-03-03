@@ -6,12 +6,7 @@ import org.vadere.manager.server.VadereServer;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIVersion;
-import org.vadere.manager.traci.commands.control.TraCICloseCommand;
-import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.traci.commands.control.TraCILoadCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommandV20_0_1;
-import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
+import org.vadere.manager.traci.commands.control.*;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 import org.vadere.manager.traci.writer.TraCIPacket;
 
@@ -72,6 +67,8 @@ public abstract class TraCICommand {
 				return new TraCIGetVersionCommand();
 			case SIM_STEP:
 				return new TraCISimStepCommand(cmdBuffer);
+			case GET_STATE:
+				return  new TraCIGetStateCommand(cmdBuffer);
 			case CLOSE:
 				return new TraCICloseCommand();
 			case SEND_FILE:

@@ -10,15 +10,8 @@ import org.vadere.manager.traci.commandHandler.annotation.ControlHandler;
 import org.vadere.manager.traci.commandHandler.annotation.ControlHandlers;
 import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commands.TraCICommand;
-import org.vadere.manager.traci.commands.control.TraCICloseCommand;
-import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommand;
-import org.vadere.manager.traci.commands.control.TraCISendFileCommandV20_0_1;
-import org.vadere.manager.traci.commands.control.TraCISimStepCommand;
-import org.vadere.manager.traci.response.StatusResponse;
-import org.vadere.manager.traci.response.TraCIGetVersionResponse;
-import org.vadere.manager.traci.response.TraCISimTimeResponse;
-import org.vadere.manager.traci.response.TraCIStatusResponse;
+import org.vadere.manager.traci.commands.control.*;
+import org.vadere.manager.traci.response.*;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -71,6 +64,23 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		return cmd;
 	}
 
+	public TraCICommand process_getState(TraCICommand rawCmd, RemoteManager remoteManager){
+		TraCIGetStateCommand cmd = (TraCIGetStateCommand) rawCmd;
+
+		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+
+		// get responses
+		TraCIGetStateResponse response = new TraCIGetStateResponse(
+				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
+
+		remoteManager.getSubscriptions().forEach(sub -> {
+			response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
+		});
+		cmd.setResponse(response);
+
+		return cmd;
+	}
+
 	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
 		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
@@ -84,9 +94,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		logger.debugf("%s: execute %d subscriptions",
 				TraCICmd.SIM_STEP.name(),
 				remoteManager.getSubscriptions().size());
-		remoteManager.getSubscriptions().forEach(sub -> {
-			sub.executeSubscription(remoteManager);
-		});
+		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
 		// remove subscriptions no longer valid
 		remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);

@@ -6,7 +6,6 @@ import org.vadere.manager.Subscription;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
-import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCIValueSubscriptionCommand;
 import org.vadere.manager.traci.response.StatusResponse;
 import org.vadere.manager.traci.response.TraCIGetResponse;
@@ -17,9 +16,7 @@ import org.vadere.util.logging.Logger;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -123,13 +120,8 @@ public abstract class CommandHandler<VAR extends Enum> {
 										TraCICmd apiCmdResponse) {
 		TraCIValueSubscriptionCommand cmd = (TraCIValueSubscriptionCommand) rawCmd;
 
-		List<TraCIGetCommand> getCommands = new ArrayList<>();
+		cmd.buildGetCommands(getCommand);
 
-		cmd.getVariables().forEach(var -> {
-			getCommands.add(new TraCIGetCommand(getCommand, var, cmd.getElementIdentifier()));
-		});
-
-		cmd.setGetCommands(getCommands);
 		// add correct Get-Handler and the subscription command to the remoteManager
 		// after each SIM_STEP command the remoteMangers knows how to gather
 		// the subscribed variables. It is the responsibility of the
