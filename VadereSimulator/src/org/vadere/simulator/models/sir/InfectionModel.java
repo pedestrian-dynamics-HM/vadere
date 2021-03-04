@@ -13,6 +13,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.DynamicElementContainer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -61,9 +62,7 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	@Override
-	public void preLoop(double simTimeInSec) {
-		logger.infof(">>>>>>>>>>>DummySirModel preLoop %f", simTimeInSec);
-	}
+	public void preLoop(double simTimeInSec) { logger.infof(">>>>>>>>>>>DummySirModel preLoop %f", simTimeInSec); }
 
 	@Override
 	public void postLoop(double simTimeInSec) {
@@ -91,6 +90,13 @@ public class InfectionModel extends AbstractSirModel {
 			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
 		}
 
+		// just for testing
+		if (counter < 1) {
+			VPoint position = new VPoint(28, 6);
+			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(position, 0.75), simTimeInSec, 1000000, 60 * 15, false));
+			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+			counter += 1;
+		}
 
 		// delete old aerosolClouds
 		Collection<AerosolCloud> aerosolClouds = this.domain.getTopography().getAerosolClouds().stream().filter(a -> a.getHasReachedLifeEnd()).collect(Collectors.toSet());
@@ -160,4 +166,5 @@ public class InfectionModel extends AbstractSirModel {
 		}
 		return pedestriansInsideAerosolCloud;
 	}
+
 }
