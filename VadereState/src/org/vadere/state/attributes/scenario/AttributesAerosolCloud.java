@@ -12,6 +12,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private double creationTime;
     private double pathogenLoad;
     final private double lifeTime;
+    private boolean hasReachedLifeEnd;
 
     // Constructors
     public AttributesAerosolCloud() {
@@ -20,6 +21,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = -1;
         this.pathogenLoad = -1;
         this.lifeTime = 60 * 15;
+        this.hasReachedLifeEnd = false;
     }
 
     public AttributesAerosolCloud(VShape shape, double creationTime){
@@ -28,12 +30,13 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double creationTime, double pathogenLoad, double lifeTime) {
+    public AttributesAerosolCloud(int id, VShape shape, double creationTime, double pathogenLoad, double lifeTime, boolean hasReachedLifeEnd) {
         this.id = id;
         this.shape = shape;
         this.creationTime = creationTime;
         this.pathogenLoad = pathogenLoad;
         this.lifeTime = lifeTime;
+        this.hasReachedLifeEnd = hasReachedLifeEnd;
     }
 
     // Getter
@@ -50,6 +53,8 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public double getPathogenLoad() { return pathogenLoad; }
 
+    public boolean getHasReachedLifeEnd() { return hasReachedLifeEnd; }
+
     // Setter
     public void setId(int id) {
         checkSealed();
@@ -64,4 +69,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     public void setCreationTime(double creationTime) { this.creationTime = creationTime; }
 
     public void setPathogenLoad(double pathogenLoad) { this.pathogenLoad = pathogenLoad; }
+
+    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { this.hasReachedLifeEnd = hasReachedLifeEnd; }
 }

@@ -38,11 +38,12 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     public void update(double simTimeInSec) {
-        changeAerosolCloudExtent(aerosolCloud);
-        reduceAerosolCloudPathogenLoad(aerosolCloud);
-        if (hasAerosolCloudReachedLifeEnd(aerosolCloud, simTimeInSec)) {
-            // ToDo delete cloud
-        }
+            System.out.println("in AerosolCloudController");
+            changeAerosolCloudExtent(aerosolCloud);
+            reduceAerosolCloudPathogenLoad(aerosolCloud);
+            if (hasAerosolCloudReachedLifeEnd(aerosolCloud, simTimeInSec)) {
+                aerosolCloud.setHasReachedLifeEnd(true);
+            }
     }
 
     public void changeAerosolCloudExtent(AerosolCloud aerosolCloud) {
@@ -55,7 +56,7 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     public void reduceAerosolCloudPathogenLoad(AerosolCloud aerosolCloud) {
-        // ToDo
+        aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad() - 0.01));
     }
 
     public boolean hasAerosolCloudReachedLifeEnd(AerosolCloud aerosolCloud, double simTimeInSec) {

@@ -27,7 +27,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public AerosolCloud(AerosolCloud aerosolCloud){
         this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getCreationTime(),
-                aerosolCloud.getPathogenLoad(), aerosolCloud.getLifeTime()));
+                aerosolCloud.getPathogenLoad(), aerosolCloud.getLifeTime(), aerosolCloud.getHasReachedLifeEnd()));
     }
 
 
@@ -55,6 +55,7 @@ public class AerosolCloud extends ScenarioElement {
     public double getLifeTime() { return attributes.getLifeTime(); }
     public double getCreationTime() { return attributes.getCreationTime(); }
     public double getPathogenLoad() { return attributes.getPathogenLoad(); }
+    public boolean getHasReachedLifeEnd() { return attributes.getHasReachedLifeEnd(); }
 
     // Setter
     @Override
@@ -73,6 +74,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
     public void setPathogenLoad(double pathogenLoad) { attributes.setPathogenLoad(pathogenLoad); }
+    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
 
 
     // Other methods

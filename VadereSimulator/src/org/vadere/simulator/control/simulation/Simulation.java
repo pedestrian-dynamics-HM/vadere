@@ -424,8 +424,18 @@ public class Simulation implements ControllerManager{
 			absorbingAreaController.update(simTimeInSec);
 		}
 
-		for (AerosolCloudController aerosolCloudController : this.aerosolCloudControllers) {
-			aerosolCloudController.update(simTimeInSec);
+		// quick workaround: simulation.java creates aerosolCloudController for each aerosolCloud in topography similarly to targetControllers
+		if (aerosolCloudControllers != null) {
+			this.aerosolCloudControllers.clear();
+		}
+
+		for (AerosolCloud aerosolCloud : this.topographyController.getTopography().getAerosolClouds()) {
+			aerosolCloudControllers.add(new AerosolCloudController(this.topographyController.getTopography(), aerosolCloud));
+		}
+		if (aerosolCloudControllers != null) {
+			for (AerosolCloudController aerosolCloudController : this.aerosolCloudControllers) {
+				aerosolCloudController.update(simTimeInSec);
+			}
 		}
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid

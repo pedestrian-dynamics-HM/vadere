@@ -1,12 +1,14 @@
 package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.scenarioelements.AerosolCloudController;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributeSIR;
+import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
@@ -23,9 +25,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
+
 @ModelClass
 public class InfectionModel extends AbstractSirModel {
-
 
 
 	// keep attributes here and not in AbstractSirModel becase the may change based on
@@ -34,13 +37,18 @@ public class InfectionModel extends AbstractSirModel {
 
 	private double someModelState;
 
+	private int counter;
+
+	private int skipUpdateLoops;
+
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
 			this.domain = domain;
 			this.random = random;
 			this.attributesAgent = attributesPedestrian;
 			this.attributeSIR = Model.findAttributes(attributesList, AttributeSIR.class);
-
+			this.counter = 0;
+			this.skipUpdateLoops = 10;
 			// initialize modelState
 			someModelState = 1 * attributeSIR.getInitialR();
 	}
@@ -68,10 +76,27 @@ public class InfectionModel extends AbstractSirModel {
 		// do your model code here....
 		this.someModelState = simTimeInSec * this.attributeSIR.getInitialR();
 
-		// event queue: every x-th loop:
-		// 		update aerosol clouds -> AerosolCloudController
-		// 		add new clouds -> AerosolCloudController
+		// add new cloud for each infectious pedestrian at current position and simTime
+		// if (counter % skipUpdateLoops == 0) {
+		// 		...
+		// }
+		// counter += 1;
+		Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
+				.getElements()
+				.stream()
+				.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
+				.collect(Collectors.toSet());
+		for (Pedestrian pedestrian : infectedPedestrians) {
+			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
+			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+		}
 
+
+		// delete old aerosolClouds
+		Collection<AerosolCloud> aerosolClouds = this.domain.getTopography().getAerosolClouds().stream().filter(a -> a.getHasReachedLifeEnd()).collect(Collectors.toSet());
+		for (AerosolCloud aerosolCloud : aerosolClouds) {
+			this.domain.getTopography().getAerosolClouds().remove(aerosolCloud);
+		}
 
 		// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
 		Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds(); // ToDo check Topography: more changes required?
@@ -79,7 +104,6 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
 				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
-
 
 			}
 		}
@@ -90,16 +114,6 @@ public class InfectionModel extends AbstractSirModel {
 			updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
 		}
 
-		// call AerosolCloudController ? -> update aerosol clouds (add new ones, modify, delete old clouds)
-
-		// access topography
-//		 Topography topography = this.domain.getTopography();
-
-		// access measurement areas (static none moving areas for infection?)
-//		 MeasurementArea area = this.domain.getTopography().getMeasurementArea(attributeSIR.getInfectionZoneIds().get(0));
-
-		// access all Pedestrians
-//		this.domain.getTopography().getPedestrianDynamicElements().getElements().stream()....
 	}
 
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
@@ -116,16 +130,6 @@ public class InfectionModel extends AbstractSirModel {
 
 	public double getSomeModelState() {
 		return someModelState;
-	}
-
-
-	// ToDo: move method to SirModel.java (how to use "domain" in SirModel.java?)
-	public Collection<Pedestrian> getInfectedPedestrians(){
-		if (domain == null) return new LinkedList<>();
-		return this.domain.getTopography().getPedestrianDynamicElements().getElements()
-				.stream()
-				.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
-				.collect(Collectors.toList());
 	}
 
 	public Collection<Pedestrian> getDynamicElementsNearAerosolCloud(AerosolCloud aerosolCloud) {
