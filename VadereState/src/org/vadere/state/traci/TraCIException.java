@@ -1,7 +1,4 @@
-package org.vadere.manager;
-
-import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.commands.TraCIGetCommand;
+package org.vadere.state.traci;
 
 public class TraCIException extends RuntimeException {
 
@@ -21,21 +18,21 @@ public class TraCIException extends RuntimeException {
 		super(message, cause);
 	}
 
-	public static TraCIException cmdErr(TraCICmd cmd, Throwable cause) {
+	public static TraCIException cmdErr(String cmd, Throwable cause) {
 		return new TraCIException("Error creating command: " + cmd.toString(), cause);
 	}
 
-	public static TraCIException cmdErrDatatype(TraCICmd cmd, Throwable cause) {
+	public static TraCIException cmdErrDatatype(String cmd, Throwable cause) {
 		return new TraCIException("Error creating Datatype: " + cmd.toString(), cause);
 	}
 
-	public static TraCIException cmdErrVariableType(TraCICmd cmd, Throwable cause) {
+	public static TraCIException cmdErrVariableType(String cmd, Throwable cause) {
 		return new TraCIException("Error creating PersonVar: " + cmd.toString(), cause);
 	}
 
-	public static TraCIException getNotImplemented(TraCIGetCommand cmd) {
-		return new TraCIException("GetCommand for variableIdentifier " + cmd.getVariableIdentifier()
-				+ "not supported in API: " + cmd.getTraCICmd().toString());
+	public static TraCIException getNotImplemented(String varId, String cmdId) {
+		return new TraCIException("GetCommand for variableIdentifier " + varId
+				+ "not supported in API: " + cmdId);
 	}
 
 	public String getMessageForClient() {

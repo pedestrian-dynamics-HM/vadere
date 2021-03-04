@@ -3,10 +3,11 @@ package org.vadere.manager.traci.commandHandler;
 import org.apache.commons.math3.util.Pair;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
-import org.vadere.manager.TraCICommandCreationException;
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.CompoundObjectProvider;
+import org.vadere.state.traci.TraCICommandCreationException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
@@ -15,7 +16,7 @@ import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCompoundPayload;
-import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.state.traci.CompoundObject;
 import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
@@ -104,6 +105,23 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return responseERR("[" + var.toString() + "] " + err, TraCICmd.GET_SIMULATION_VALUE, TraCICmd.RESPONSE_GET_SIMULATION_VALUE);
 	}
 
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.DATA_PROCESSOR,
+			name = "getDataProcessorValue", ignoreElementId = false)
+	public TraCICommand process_getDataProcessorValue(TraCIGetCommand cmd, RemoteManager remoteManager){
+		remoteManager.accessState((manager, state) -> {
+			int processorId = Integer.parseInt(cmd.getElementIdentifier());
+			var processor = state.getControllerProvider().getProcessorManager().getProcessor(processorId);
+			if (processor instanceof CompoundObjectProvider){
+				var provider = (CompoundObjectProvider)processor;
+				cmd.setResponse(responseOK(SimulationVar.DATA_PROCESSOR.type, provider.provide()));
+			} else {
+				cmd.setResponse(responseERR(SimulationVar.DATA_PROCESSOR,
+						String.format("No processor found with id %d or processor does not provide CompoundObject", processorId)));
+			}
+		});
+		return cmd;
+	}
 
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.NET_BOUNDING_BOX,
 			name = "getNetworkBound", ignoreElementId = true)

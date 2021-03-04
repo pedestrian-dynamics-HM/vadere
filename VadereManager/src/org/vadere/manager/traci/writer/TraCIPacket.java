@@ -1,9 +1,9 @@
 package org.vadere.manager.traci.writer;
 
 import org.apache.commons.codec.binary.Hex;
-import org.vadere.manager.TraCIExceptionInternal;
+import org.vadere.state.traci.TraCIExceptionInternal;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.TraCIGetVersionCommand;
 import org.vadere.manager.traci.reader.TraCIPacketBuffer;

@@ -1,4 +1,6 @@
-package org.vadere.manager;
+package org.vadere.state.traci;
+
+import org.vadere.state.traci.TraCIException;
 
 public class TraCICommandCreationException extends TraCIException {
 	public TraCICommandCreationException(String message) {

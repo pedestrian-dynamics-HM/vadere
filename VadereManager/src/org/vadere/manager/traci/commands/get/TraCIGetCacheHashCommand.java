@@ -1,9 +1,9 @@
 package org.vadere.manager.traci.commands.get;
 
-import org.vadere.manager.TraCICommandCreationException;
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCICommandCreationException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 

@@ -1,7 +1,8 @@
 package org.vadere.manager.traci.commandHandler.variables;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.manager.traci.commands.TraCICommand;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
 
 public enum SimulationVar {
 
@@ -25,6 +26,7 @@ public enum SimulationVar {
 	NET_BOUNDING_BOX(0x7c, TraCIDataType.POLYGON),
 	CACHE_HASH(0x7d, TraCIDataType.STRING),
 	SIM_CONFIG(0x7e, TraCIDataType.COMPOUND_OBJECT),
+	DATA_PROCESSOR(0x7f, TraCIDataType.COMPOUND_OBJECT),
 	;
 
 	public int id;

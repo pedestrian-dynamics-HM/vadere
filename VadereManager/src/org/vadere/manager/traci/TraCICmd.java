@@ -1,6 +1,6 @@
 package org.vadere.manager.traci;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commandHandler.variables.PolygonVar;

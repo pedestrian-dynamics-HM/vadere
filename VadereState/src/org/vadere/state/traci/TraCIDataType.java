@@ -1,6 +1,4 @@
-package org.vadere.manager.traci;
-
-import org.vadere.manager.TraCIException;
+package org.vadere.state.traci;
 
 /**
  * Possible data types used in TraCI

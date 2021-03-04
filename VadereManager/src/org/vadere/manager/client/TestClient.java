@@ -625,6 +625,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getDataProcessorValue(String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_getNetworkBound(String[] args) throws IOException {
 
 	}

@@ -1,6 +1,6 @@
 package org.vadere.manager.traci.response;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 
 /**
  * Status Codes for each Response send from a TraCI-Server. These codes are wrapped within a {@link

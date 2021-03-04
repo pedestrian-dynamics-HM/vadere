@@ -1,6 +1,6 @@
 package org.vadere.manager.traci.response;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 

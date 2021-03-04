@@ -8,6 +8,8 @@ import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIExceptionInternal;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 

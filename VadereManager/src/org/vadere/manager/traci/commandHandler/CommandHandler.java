@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIValueSubscriptionCommand;
 import org.vadere.manager.traci.response.StatusResponse;

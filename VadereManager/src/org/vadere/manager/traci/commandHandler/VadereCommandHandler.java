@@ -6,7 +6,7 @@ import org.apache.commons.collections.ListUtils;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandler;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandlers;
 import org.vadere.manager.traci.commandHandler.variables.VadereVar;

@@ -1,6 +1,6 @@
 package org.vadere.manager.traci.sumo;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 
 public enum LightPhase {
 

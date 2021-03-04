@@ -1,8 +1,8 @@
 package org.vadere.manager.traci.writer;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
-import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
+import org.vadere.state.traci.CompoundObject;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.util.geometry.Vector3D;

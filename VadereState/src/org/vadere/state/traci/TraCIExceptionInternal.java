@@ -1,4 +1,6 @@
-package org.vadere.manager;
+package org.vadere.state.traci;
+
+import org.vadere.state.traci.TraCIException;
 
 /**
  * Use this Exception if the message produces has no mean for a TraCI client. The stacktrace is
