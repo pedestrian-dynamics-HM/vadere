@@ -11,8 +11,8 @@ public class AttributeSIR extends Attributes {
 	// initial r-Value of SIR model
 	private double initialR = 0.8;
 	private ArrayList<Integer> infectionZoneIds = new ArrayList<>();
-
-
+	private ArrayList<Integer> infectedPedestriansSourceId = new ArrayList<>();
+	private double infectedPedestriansEmissionCapacity = 5.0;
 
 
 	public double getInitialR() {
@@ -33,4 +33,10 @@ public class AttributeSIR extends Attributes {
 	public ArrayList<Integer> getInfectionZoneIds() {
 		return infectionZoneIds;
 	}
+
+	public ArrayList<Integer> getInfectedPedestriansSourceId() {
+		return infectedPedestriansSourceId;
+	}
+
+	public double getInfectedPedestriansEmissionCapacity() { return infectedPedestriansEmissionCapacity; }
 }

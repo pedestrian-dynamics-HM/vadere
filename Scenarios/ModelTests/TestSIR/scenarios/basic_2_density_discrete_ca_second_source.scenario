@@ -2,7 +2,7 @@
   "name" : "basic_2_density_discrete_ca_second_source",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "ac0170fed653fc88de63855539909e2a5ab60598",
+  "commithash" : "5421b5a8fea892c8ba79003bf14fdb2fe4744ae6",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -113,7 +113,9 @@
       },
       "org.vadere.state.attributes.models.AttributeSIR" : {
         "initialR" : 0.8,
-        "infectionZoneIds" : [ 1, 2 ]
+        "infectionZoneIds" : [ 1, 2 ],
+        "infectedPedestriansSourceId" : [ 5 ],
+        "infectedPedestriansEmissionCapacity" : 5.0
       }
     },
     "attributesSimulation" : {
@@ -246,7 +248,7 @@
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
