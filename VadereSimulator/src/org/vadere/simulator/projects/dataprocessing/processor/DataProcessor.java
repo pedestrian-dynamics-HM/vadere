@@ -44,6 +44,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 	private Map<K, V> data;
 
 	private int lastStep;
+	private K lastKey;
 
 	private boolean stopSimBeforeSimFinish;
 
@@ -109,7 +110,12 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return this.lastStep;
 	}
 
+	public K getLastKey() {
+		return lastKey;
+	}
+
 	protected void putValue(final K key, final V value) {
+		this.lastKey = key;
 		this.data.put(key, value);
 	}
 

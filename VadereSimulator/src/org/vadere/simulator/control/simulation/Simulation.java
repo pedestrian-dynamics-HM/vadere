@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Simulation {
+public class Simulation implements ControllerProvider{
 
 	private static Logger logger = Logger.getLogger(Simulation.class);
 
@@ -222,7 +222,7 @@ public class Simulation {
 	}
 
 	private void postLoop() {
-		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+		simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, this);
 
 		for (Model m : models) {
 			m.postLoop(simTimeInSec);
@@ -283,7 +283,7 @@ public class Simulation {
 				updateCallbacks(simTimeInSec);
 
 				step++;
-				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel);
+				this.simulationState = new SimulationState(name, topography, scenarioStore, simTimeInSec, step, mainModel, this);
 
 				if (attributesSimulation.isWriteSimulationData()) {
 					processorManager.update(this.simulationState);
@@ -370,7 +370,7 @@ public class Simulation {
 	}
 
 	private SimulationState initialSimulationState() {
-		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel);
+		SimulationState state = new SimulationState(name, topography.clone(), scenarioStore, simTimeInSec, step, mainModel, this);
 
 		return state;
 	}
@@ -550,4 +550,38 @@ public class Simulation {
 		return stimulusController;
 	}
 
+	@Override
+	public Collection<SourceController> getSourceControllers() {
+		return sourceControllers;
+	}
+
+	@Override
+	public Collection<TargetController> getTargetControllers() {
+		return targetControllers;
+	}
+
+	@Override
+	public Collection<TargetChangerController> getTargetChangerControllers() {
+		return targetChangerControllers;
+	}
+
+	@Override
+	public Collection<AbsorbingAreaController> getAbsorbingAreaControllers() {
+		return absorbingAreaControllers;
+	}
+
+	@Override
+	public TeleporterController getTeleporterController() {
+		return teleporterController;
+	}
+
+	@Override
+	public TopographyController getTopographyController() {
+		return topographyController;
+	}
+
+	@Override
+	public ProcessorManager getProcessorManager() {
+		return processorManager;
+	}
 }
