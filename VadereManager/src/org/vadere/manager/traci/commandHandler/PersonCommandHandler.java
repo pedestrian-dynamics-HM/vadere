@@ -6,14 +6,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.PersonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.PersonHandlers;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
-import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.state.traci.CompoundObject;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.state.psychology.perception.types.KnowledgeItem;
@@ -42,8 +42,14 @@ import java.util.stream.Collectors;
 		singleAnnotation = PersonHandler.class,
 		multipleAnnotation = PersonHandlers.class,
 		cmdEnum = TraCICmd.class,
-		varEnum = PersonVar.class
-)
+		varEnum = PersonVar.class,
+		var = "V_PERSON",
+		cmdGet = 0xae,
+		cmdSet = 0xce,
+		cmdSub = 0xde,
+		cmdResponseSub = 0xee,
+		cmdCtx = 0x8e,
+		cmdResponseCtx = 0x9e)
 public class PersonCommandHandler extends CommandHandler<PersonVar> {
 
 	public static PersonCommandHandler instance;
@@ -166,7 +172,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ID_LIST, name = "getIDList", ignoreElementId = true)
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.ID_LIST, name = "getIdList", ignoreElementId = true)
 	public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		remoteManager.accessState((manager, state) -> {
 			List<String> data = state.getTopography().getPedestrianDynamicElements()
@@ -195,7 +201,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIDCount", ignoreElementId = true)
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COUNT, name = "getIdCount", ignoreElementId = true)
 	public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		remoteManager.accessState((manager, state) -> {
 			int numPeds = state.getTopography().getPedestrianDynamicElements().getElements().size();
@@ -233,7 +239,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D, name = "getPosition2D")
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POSITION, name = "getPosition2D")
 	public TraCICommand process_getPosition(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
 		remoteManager.accessState((manager, state) -> {
@@ -241,10 +247,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
 
 			if (checkIfPedestrianExists(ped, cmd)) {
-				cmd.setResponse(responseOK(PersonVar.POS_2D.type, ped.getPosition()));
+				cmd.setResponse(responseOK(PersonVar.POSITION.type, ped.getPosition()));
 				logger.tracef("%s.%s: t=%f pedId=%s pos2d=%s",
 						TraCICmd.GET_PERSON_VALUE.logShort(),
-						PersonVar.POS_2D.logShort(),
+						PersonVar.POSITION.logShort(),
 						state.getSimTimeInSec(),
 						cmd.getElementIdentifier(),
 						ped.getPosition().toString());
@@ -253,7 +259,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.POS_2D, name = "setPosition2D", dataTypeStr = "VPoint")
+	@PersonHandler(cmd = TraCICmd.SET_PERSON_STATE, var = PersonVar.POSITION, name = "setPosition2D", dataTypeStr = "VPoint")
 	public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager) {
 		VPoint data = (VPoint) cmd.getVariableValue();
 		remoteManager.accessState((manager, state) -> {
@@ -267,7 +273,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_3D, name = "getPosition3D")
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POSITION3D, name = "getPosition3D")
 	public TraCICommand process_getPosition3D(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
 		remoteManager.accessState((manager, state) -> {
@@ -276,7 +282,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 
 			if (checkIfPedestrianExists(ped, cmd)) {
 				VPoint pos2d = ped.getPosition();
-				cmd.setResponse(responseOK(PersonVar.POS_3D.type, new Vector3D(pos2d.x, pos2d.y, 0.0)));
+				cmd.setResponse(responseOK(PersonVar.POSITION3D.type, new Vector3D(pos2d.x, pos2d.y, 0.0)));
 				logger.debugf("time: %f Pedestrian: %s Position: %s",
 						state.getSimTimeInSec(),
 						cmd.getElementIdentifier(),
@@ -299,19 +305,19 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.MAX_SPEED, name = "getMaximumSpeed")
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.MAXSPEED, name = "getMaximumSpeed")
 	public TraCICommand process_getMaximumSpeed(TraCIGetCommand cmd, RemoteManager rmeoteManager) {
 		rmeoteManager.accessState((manager, state) -> {
 			Pedestrian ped = state.getTopography().getPedestrianDynamicElements()
 					.getElement(Integer.parseInt(cmd.getElementIdentifier()));
 			if (checkIfPedestrianExists(ped, cmd)) {
-				cmd.setResponse(responseOK(PersonVar.MAX_SPEED.type, ped.getAttributes().getMaximumSpeed()));
+				cmd.setResponse(responseOK(PersonVar.MAXSPEED.type, ped.getAttributes().getMaximumSpeed()));
 			}
 		});
 		return cmd;
 	}
 
-	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POS_2D_LIST, name = "getPosition2DList", ignoreElementId = true)
+	@PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.POSITION_LIST, name = "getPosition2DList", ignoreElementId = true)
 	public TraCICommand process_getPosition2DList(TraCIGetCommand cmd, RemoteManager remoteManager) {
 		remoteManager.accessState((manager, state) -> {
 			Map<String, VPoint> data = state.getTopography().getPedestrianDynamicElements()
@@ -323,7 +329,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 						return new HashMap.SimpleEntry<>(id, position);
 					})
 					.collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
-			TraCIGetResponse res = responseOK(PersonVar.POS_2D_LIST.type, data);
+			TraCIGetResponse res = responseOK(PersonVar.POSITION_LIST.type, data);
 			cmd.setResponse(res);
 			logger.debugf("time: %f (ID,POSITION)s: %s", state.getSimTimeInSec(), data.toString());
 		});

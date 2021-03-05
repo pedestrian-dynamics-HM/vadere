@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.response;
 
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 
 import java.util.Objects;

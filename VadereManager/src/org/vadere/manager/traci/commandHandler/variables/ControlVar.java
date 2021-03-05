@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.commandHandler.variables;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
 
 public enum ControlVar {
 	NONE(-1, TraCIDataType.INTEGER);

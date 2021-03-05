@@ -43,30 +43,6 @@ public class OfflineSimulation {
 
 		this.trajectories = null;
 		this.simulationStates = null;
-		/*this.trajectories = pedestriansByStep
-				.entrySet()
-				.stream()
-				.flatMap(entry -> entry.getValue().stream())
-				.map(ped -> ped.getId())
-				.distinct()
-				.map(id -> new Trajectory(pedestriansByStep, id, vadere.getAttributesSimulation().getSimTimeStepLength()))
-				.collect(Collectors.toMap(t -> t.getPedestrianId(), t -> t));
-
-		topographyController.prepareTopography();
-		simulationStates = pedestriansByStep.keySet().stream().sorted().map(step -> generateSimulationState(step))
-				.collect(Collectors.toList());*/
-	}
-
-	private SimulationState generateSimulationState(final Step step) {
-		Topography topography = topographyController.getTopography().clone();
-		topography.reset();
-		// add pedestrians to the topography
-		trajectories.values().stream()
-				.filter(t -> t.isAlive(step.getStepNumber()))
-				.map(t -> t.getAgent(step.getStepNumber()))
-				.filter(opt -> opt.isPresent()).forEach(opt -> topography.addElement(opt.get()));
-		return new SimulationState(vadere.getName(), topography, vadere.getScenarioStore(),
-				(step.getStepNumber()-1) * vadere.getAttributesSimulation().getSimTimeStepLength(), step.getStepNumber(),  null);
 	}
 
 	private void prepareOutput() {

@@ -6,6 +6,7 @@ import org.vadere.simulator.control.simulation.ScenarioRun;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.traci.TraCIException;
 
 import java.nio.file.Path;
 import java.util.List;

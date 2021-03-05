@@ -1,6 +1,6 @@
 package org.vadere.manager.traci.reader;
 
-import org.vadere.manager.TraCIExceptionInternal;
+import org.vadere.state.traci.TraCIExceptionInternal;
 
 import java.nio.ByteBuffer;
 

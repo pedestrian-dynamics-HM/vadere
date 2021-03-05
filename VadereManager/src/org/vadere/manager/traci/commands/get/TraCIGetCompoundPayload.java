@@ -1,10 +1,10 @@
 package org.vadere.manager.traci.commands.get;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
-import org.vadere.manager.traci.compound.CompoundObject;
+import org.vadere.state.traci.CompoundObject;
 
 public class TraCIGetCompoundPayload extends TraCIGetCommand {
 

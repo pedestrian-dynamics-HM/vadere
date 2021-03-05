@@ -1,8 +1,6 @@
-package org.vadere.manager.traci.compound;
+package org.vadere.state.traci;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
 
 import java.util.Arrays;
 import java.util.Iterator;

@@ -1,6 +1,6 @@
 package org.vadere.manager.traci;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
@@ -17,6 +17,7 @@ public enum TraCICmd {
 	CLOSE(0x7F, CmdType.CTRL, ControlVar::asString),
 	LOAD(0x01, CmdType.CTRL, ControlVar::asString),
 	SET_ORDER(0x03, CmdType.CTRL, ControlVar::asString),
+	GET_STATE(0x04, CmdType.CTRL, ControlVar::asString),
 	SEND_FILE(0x75, CmdType.CTRL, ControlVar::asString),
 	// Value Retrieval
 	GET_INDUCTION_LOOP(0xa0, CmdType.VALUE_GET),

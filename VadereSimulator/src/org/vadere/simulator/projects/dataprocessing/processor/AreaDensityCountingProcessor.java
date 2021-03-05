@@ -8,6 +8,10 @@ import org.vadere.state.scenario.Pedestrian;
 import java.util.Collection;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.CompoundObjectBuilder;
+import org.vadere.state.traci.CompoundObjectProvider;
+import org.vadere.state.traci.TraCIDataType;
 
 /**
  * @author Daniel Lehmberg
@@ -20,7 +24,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
  */
 
 @DataProcessorClass(label = "AreaDensityCountingProcessor")
-public class AreaDensityCountingProcessor extends AreaDataProcessor<Integer>  {
+public class AreaDensityCountingProcessor extends AreaDataProcessor<Integer> implements CompoundObjectProvider {
 
     public AreaDensityCountingProcessor() {
         super("areaDensityCounting");
@@ -54,5 +58,18 @@ public class AreaDensityCountingProcessor extends AreaDataProcessor<Integer>  {
             setAttributes(new AttributesAreaDensityCountingProcessor());
         }
         return super.getAttributes();
+    }
+
+    @Override
+    public CompoundObject provide(CompoundObjectBuilder builder) {
+        int lastValue = getValue(getLastKey());
+        int measurementAreaId = this.getMeasurementArea().getId();
+        return builder.rest()
+                .add(TraCIDataType.INTEGER) // measurementAreaId
+                .add(TraCIDataType.INTEGER) //  timestep of count
+                .add(TraCIDataType.INTEGER) // countInId
+                .build(measurementAreaId,
+                        getLastKey().getTimestep(),
+                        lastValue);
     }
 }

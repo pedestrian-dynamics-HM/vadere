@@ -1,7 +1,4 @@
-package org.vadere.manager.traci.compound;
-
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
+package org.vadere.state.traci;
 
 import java.util.LinkedList;
 
