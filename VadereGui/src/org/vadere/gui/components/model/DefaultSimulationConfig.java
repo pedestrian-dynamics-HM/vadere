@@ -28,6 +28,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
+	private boolean showAerosolClouds = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
 	private boolean showMeasurementArea = true;
@@ -152,6 +153,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showAbsorbingAreas;
 	}
 
+	public boolean isShowAerosolClouds() {
+		return showAerosolClouds;
+	}
+
 	public boolean isShowMeasurementAreas() {
 		return showMeasurementArea;
 	}
@@ -186,6 +191,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowAbsorbingAreas(boolean showAbsorbingAreas) {
 		this.showAbsorbingAreas = showAbsorbingAreas;
+		setChanged();
+	}
+
+	public void setShowAerosolClouds(boolean showAerosolClouds) {
+		this.showAerosolClouds = showAerosolClouds;
 		setChanged();
 	}
 

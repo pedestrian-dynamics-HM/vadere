@@ -19,11 +19,15 @@ import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.*;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -32,6 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 
 public class Simulation implements ControllerManager{
 

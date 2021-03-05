@@ -1,6 +1,7 @@
 package org.vadere.gui.onlinevisualization.view;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
+import org.vadere.gui.topographycreator.view.ScenarioElementRenderer;
+import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -52,6 +55,24 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 			renderPedestrians(g);
 			// DefaultRenderer.paintPedestrianIds(g, model.getPedestrians());
 		}
+
+		if (model.config.isShowAerosolClouds()) {
+			renderAerosolClouds(g);
+		}
+	}
+
+	private void renderAerosolClouds(final Graphics2D g) {
+		// ToDo correct rendering or delete comment
+//		Collection<AerosolCloud> aerosolClouds = model.getTopography().getAerosolClouds();
+//		for (AerosolCloud aerosolCloud : aerosolClouds) {
+//			Color aerosolCloudColor = model.config.getAerosolCloudColor();
+//			g.setColor(aerosolCloudColor);
+//			VPoint position = aerosolCloud.getShape().getCentroid();
+//			double opacity = aerosolCloud.getPathogenLoad();
+//			renderScenarioElement(aerosolCloud, g, aerosolCloudColor);
+//		}
+		// ToDo Why is model.getTopography().getAerosolClouds() : size = 0
+		renderScenarioElement(model.getTopography().getAerosolClouds(), g, model.config.getAerosolCloudColor());
 	}
 
 	private void renderPedestrians(final Graphics2D g) {

@@ -105,6 +105,7 @@ public abstract class StateJsonConverter {
 		Collection<AttributesTarget> targets = new LinkedList<>();
 		Collection<AttributesTargetChanger> targetChangers = new LinkedList<>();
 		Collection<AttributesAbsorbingArea> absorbingAreas = new LinkedList<>();
+		Collection<AttributesAerosolCloud> aerosolClouds = new LinkedList<>();
 		Collection<AttributesSource> sources = new LinkedList<>();
 		Collection<AttributesMeasurementArea> measurementAreas = new LinkedList<>();
 		Collection<? extends DynamicElement> dynamicElements = new LinkedList<>();
@@ -156,6 +157,7 @@ public abstract class StateJsonConverter {
 		store.absorbingAreas.forEach(absorbingArea -> topography.addAbsorbingArea(new AbsorbingArea(absorbingArea)));
 		store.sources.forEach(source -> topography.addSource(new Source(source)));
 		store.measurementAreas.forEach(area -> topography.addMeasurementArea(new MeasurementArea(area)));
+		store.aerosolClouds.forEach(aerosolCloud -> topography.addAerosolCloud(new AerosolCloud(aerosolCloud)));
 
 		store.dynamicElements.forEach(topography::addInitialElement);
 
@@ -228,6 +230,8 @@ public abstract class StateJsonConverter {
 				return mapper.readValue(json, AttributesStairs.class);
 			case MEASUREMENT_AREA:
 				return mapper.readValue(json, AttributesMeasurementArea.class);
+			case AEROSOL_CLOUD:
+				return mapper.readValue(json, AttributesAerosolCloud.class);
 			case TELEPORTER:
 				return mapper.readValue(json, AttributesTeleporter.class);
 			case CAR:
@@ -312,6 +316,11 @@ public abstract class StateJsonConverter {
 		topography.getAbsorbingAreas()
 				.forEach(absorbingArea -> absorbingAreaNodes.add(mapper.convertValue(absorbingArea.getAttributes(), JsonNode.class)));
 		topographyNode.set("absorbingAreas", absorbingAreaNodes);
+
+		ArrayNode aerosolCloudNodes = mapper.createArrayNode();
+		topography.getAerosolClouds()
+				.forEach(aerosolCloud -> aerosolCloudNodes.add(mapper.convertValue(aerosolCloud.getAttributes(), JsonNode.class)));
+		topographyNode.set("aerosolClouds", aerosolCloudNodes);
 
 		ArrayNode sourceNodes = mapper.createArrayNode();
 		topography.getSources()

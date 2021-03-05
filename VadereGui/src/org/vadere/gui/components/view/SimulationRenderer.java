@@ -103,6 +103,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
         }
 
+        // ToDo account for aerosolCloudPathogenLoad (use opacity -> see renderMeasurementArea)
+        if (model.config.isShowAerosolClouds()) {
+            renderScenarioElement(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
+        }
+
         if (model.config.isShowSources()) {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
         }
