@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.control.scenarioelements.AerosolCloudController;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
@@ -13,7 +12,6 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.DynamicElementContainer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -40,8 +38,6 @@ public class InfectionModel extends AbstractSirModel {
 
 	private int counter;
 
-	private int skipUpdateLoops;
-
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
 			this.domain = domain;
@@ -49,7 +45,7 @@ public class InfectionModel extends AbstractSirModel {
 			this.attributesAgent = attributesPedestrian;
 			this.attributeSIR = Model.findAttributes(attributesList, AttributeSIR.class);
 			this.counter = 0;
-			this.skipUpdateLoops = 10;
+
 			// initialize modelState
 			someModelState = 1 * attributeSIR.getInitialR();
 	}
@@ -75,21 +71,6 @@ public class InfectionModel extends AbstractSirModel {
 		// do your model code here....
 		this.someModelState = simTimeInSec * this.attributeSIR.getInitialR();
 
-		// add new cloud for each infectious pedestrian at current position and simTime
-		// if (counter % skipUpdateLoops == 0) {
-		// 		...
-		// }
-		// counter += 1;
-		Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
-				.getElements()
-				.stream()
-				.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
-				.collect(Collectors.toSet());
-		for (Pedestrian pedestrian : infectedPedestrians) {
-			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
-			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
-		}
-
 		// just for testing
 		if (counter < 1) {
 			VPoint position = new VPoint(28, 6);
@@ -98,28 +79,42 @@ public class InfectionModel extends AbstractSirModel {
 			counter += 1;
 		}
 
-		// delete old aerosolClouds
-		Collection<AerosolCloud> aerosolClouds = this.domain.getTopography().getAerosolClouds().stream().filter(a -> a.getHasReachedLifeEnd()).collect(Collectors.toSet());
-		for (AerosolCloud aerosolCloud : aerosolClouds) {
-			this.domain.getTopography().getAerosolClouds().remove(aerosolCloud);
-		}
+		if (this.attributeSIR.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributeSIR.getInfectionModelLastUpdateTime() + this.attributeSIR.getInfectionModelUpdateStepLength()) {
+			this.attributeSIR.setInfectionModelLastUpdateTime(simTimeInSec);
 
-		// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
-		Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds(); // ToDo check Topography: more changes required?
-		for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
-			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
-			for (Pedestrian pedestrian : pedestriansInsideCloud) {
-				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
+			// add new cloud for each infectious pedestrian at current position and simTime
+			Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
+					.getElements()
+					.stream()
+					.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
+					.collect(Collectors.toSet());
+			for (Pedestrian pedestrian : infectedPedestrians) {
+				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
+				this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+			}
 
+			// delete old aerosolClouds
+			Collection<AerosolCloud> aerosolClouds = this.domain.getTopography().getAerosolClouds().stream().filter(a -> a.getHasReachedLifeEnd()).collect(Collectors.toSet());
+			for (AerosolCloud aerosolCloud : aerosolClouds) {
+				this.domain.getTopography().getAerosolClouds().remove(aerosolCloud);
+			}
+
+			// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
+			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds(); // ToDo check Topography: more changes required?
+			for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
+				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
+				for (Pedestrian pedestrian : pedestriansInsideCloud) {
+					updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
+
+				}
+			}
+
+			// update pedestrian infection statuses
+			Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
+			for (Pedestrian pedestrian : allPedestrians) {
+				updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
 			}
 		}
-
-		// update pedestrian infection statuses
-		Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
-		for (Pedestrian pedestrian : allPedestrians) {
-			updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
-		}
-
 	}
 
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
