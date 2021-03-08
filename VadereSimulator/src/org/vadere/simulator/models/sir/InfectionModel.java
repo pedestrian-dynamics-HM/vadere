@@ -6,7 +6,8 @@ import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributeSIR;
+import org.vadere.state.attributes.models.AttributesInfectionModel;
+import org.vadere.state.attributes.models.InfectionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.InfectionStatus;
@@ -31,46 +32,43 @@ public class InfectionModel extends AbstractSirModel {
 
 
 	// keep attributes here and not in AbstractSirModel becase the may change based on
-	// implementation (AttributeSIR is the base class for all SIR models used here for simplicity)
-	private AttributeSIR attributeSIR;
+	// implementation (AttributesInfectionModel is the base class for all SIR models used here for simplicity)
+	private AttributesInfectionModel attributesInfectionModel;
 
 	private double someModelState;
 
 	private int counter;
+
+	private ControllerManager controllerManager;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
 			this.domain = domain;
 			this.random = random;
 			this.attributesAgent = attributesPedestrian;
-			this.attributeSIR = Model.findAttributes(attributesList, AttributeSIR.class);
+			this.attributesInfectionModel = Model.findAttributes(attributesList, AttributesInfectionModel.class);
 			this.counter = 0;
-
-			// initialize modelState
-			someModelState = 1 * attributeSIR.getInitialR();
 	}
 
 	@Override
 	public void registerToScenarioElementControllerEvents(ControllerManager controllerManager) {
+		this.controllerManager = controllerManager; // ToDo: controllerManager should be handled by initialize method (this requires changes in all models)
 		for (var controller : controllerManager.getSourceControllers()){
 			controller.register(this::sourceControllerEvent);
 		}
 	}
 
 	@Override
-	public void preLoop(double simTimeInSec) { logger.infof(">>>>>>>>>>>DummySirModel preLoop %f", simTimeInSec); }
+	public void preLoop(double simTimeInSec) { logger.infof(">>>>>>>>>>>InfectionModelModel preLoop %f", simTimeInSec); }
 
 	@Override
 	public void postLoop(double simTimeInSec) {
-		logger.infof(">>>>>>>>>>>DummySirModel postLoop %f", simTimeInSec);
+		logger.infof(">>>>>>>>>>>InfectionModelModel postLoop %f", simTimeInSec);
 	}
 
 	@Override
 	public void update(double simTimeInSec) {
-		logger.infof(">>>>>>>>>>>DummySirModel update  %f", simTimeInSec);
-		// do your model code here....
-		this.someModelState = simTimeInSec * this.attributeSIR.getInitialR();
-
+		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 		// just for testing
 		if (counter < 1) {
 			VPoint position = new VPoint(28, 6);
@@ -79,8 +77,8 @@ public class InfectionModel extends AbstractSirModel {
 			counter += 1;
 		}
 
-		if (this.attributeSIR.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributeSIR.getInfectionModelLastUpdateTime() + this.attributeSIR.getInfectionModelUpdateStepLength()) {
-			this.attributeSIR.setInfectionModelLastUpdateTime(simTimeInSec);
+		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()) {
+			this.attributesInfectionModel.setInfectionModelLastUpdateTime(simTimeInSec);
 
 			// add new cloud for each infectious pedestrian at current position and simTime
 			Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
@@ -90,13 +88,8 @@ public class InfectionModel extends AbstractSirModel {
 					.collect(Collectors.toSet());
 			for (Pedestrian pedestrian : infectedPedestrians) {
 				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
-				this.domain.getTopography().addAerosolCloud(newAerosolCloud);
-			}
-
-			// delete old aerosolClouds
-			Collection<AerosolCloud> aerosolClouds = this.domain.getTopography().getAerosolClouds().stream().filter(a -> a.getHasReachedLifeEnd()).collect(Collectors.toSet());
-			for (AerosolCloud aerosolCloud : aerosolClouds) {
-				this.domain.getTopography().getAerosolClouds().remove(aerosolCloud);
+				// this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+				this.controllerManager.registerAerosolCloud(newAerosolCloud);
 			}
 
 			// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
@@ -120,12 +113,24 @@ public class InfectionModel extends AbstractSirModel {
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
 		// SourceControllerListener. This will be called  *after* a pedestrians is inserted into the
 		// topography by the given SourceController. Change model state on Agent here
+		int sourceId = controller.getSourceId();
+		InfectionModelSourceParameters sourceParameters = getAttributesInfectionModel().getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst().get(); // ToDo ignores duplicates, ids that refer to -1 (default)
+
+		Pedestrian ped = (Pedestrian) scenarioElement;
+		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
+		ped.setPathogenEmissionCapacity(sourceParameters.getPedestrianPathogenEmissionCapacity());
+		ped.setPathogenAbsorptionRate(sourceParameters.getPedestrianPathogenAbsorptionRate());
+		ped.setSusceptibility(sourceParameters.getPedestrianSusceptibility());
+		ped.setExposedPeriod(sourceParameters.getExposedPeriod());
+		ped.setInfectiousPeriod(sourceParameters.getInfectiousPeriod());
+		ped.setRecoveredPeriod(sourceParameters.getRecoveredPeriod());
+
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
-		return scenarioElement;
+		return ped;
 	}
 
-	public AttributeSIR getAttributeSIR() {
-		return attributeSIR;
+	public AttributesInfectionModel getAttributesInfectionModel() {
+		return attributesInfectionModel;
 	}
 
 

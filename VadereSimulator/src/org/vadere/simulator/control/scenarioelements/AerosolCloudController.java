@@ -5,8 +5,6 @@ import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
-import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
-
 
 /**
  * Manipulate pedestrians which enter the given {@link AerosolCloud}.
@@ -23,30 +21,37 @@ public class AerosolCloudController extends ScenarioElementController {
     public final AerosolCloud aerosolCloud;
     private Topography topography;
 
+    private boolean done = false; // flag (true) marks aerosolCloudController that control already removed aerosolClouds and thus can be removed as well
+
     // Constructors
     public AerosolCloudController(Topography topography, AerosolCloud aerosolCloud) {
         this.aerosolCloud = aerosolCloud;
         this.topography = topography;
     }
 
+    public boolean isDone() {
+        return done;
+    }
+
     // Other methods
     public void create(double simTimeInSec, Pedestrian pedestrian) {
         VPoint position = pedestrian.getPosition();
         double pathogenLoad = pedestrian.getPathogenEmissionCapacity();
-
+        topography.addAerosolCloud(new AerosolCloud(new AttributesAerosolCloud()));
         // ToDo create aerosolCloud at position with pathogenLoad, at simTimeInSec
     }
 
     public void update(double simTimeInSec) {
             System.out.println("in AerosolCloudController");
-            changeAerosolCloudExtent(aerosolCloud);
-            reduceAerosolCloudPathogenLoad(aerosolCloud);
-            if (hasAerosolCloudReachedLifeEnd(aerosolCloud, simTimeInSec)) {
+            changeAerosolCloudExtent();
+            reduceAerosolCloudPathogenLoad();
+            if (hasAerosolCloudReachedLifeEnd(simTimeInSec)) {
                 aerosolCloud.setHasReachedLifeEnd(true);
             }
+            deleteAerosolCloudFlagController();
     }
 
-    public void changeAerosolCloudExtent(AerosolCloud aerosolCloud) {
+    public void changeAerosolCloudExtent() {
         // ToDo change extent
         // int dimension = 2;
         // double scalingFactor1D = 1;
@@ -55,13 +60,22 @@ public class AerosolCloudController extends ScenarioElementController {
         // aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
     }
 
-    public void reduceAerosolCloudPathogenLoad(AerosolCloud aerosolCloud) {
+    public void reduceAerosolCloudPathogenLoad() {
         aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad() - 0.01));
     }
 
-    public boolean hasAerosolCloudReachedLifeEnd(AerosolCloud aerosolCloud, double simTimeInSec) {
+    public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {
         double minimumRelevantPathogenLoad = 0.0;
         return (aerosolCloud.getPathogenLoad() <= minimumRelevantPathogenLoad) || (simTimeInSec > aerosolCloud.getCreationTime() + aerosolCloud.getLifeTime());
+    }
+
+    public void deleteAerosolCloudFlagController() {
+        if (aerosolCloud.getHasReachedLifeEnd()) {
+            topography.getAerosolClouds().remove(aerosolCloud);
+        }
+
+        // flag aerosolCloudController so that it can be removed by Simulation
+        this.done = true;
     }
 
 //    private void notifyListenersAerosolCloudReached(final Pedestrian pedestrian) {

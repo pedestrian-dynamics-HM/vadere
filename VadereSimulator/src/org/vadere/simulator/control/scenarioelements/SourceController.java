@@ -212,4 +212,6 @@ public abstract class SourceController extends ScenarioElementController impleme
 			listener.notify(this, simTimeInSec, pedestrian);
 		}
 	}
+
+	public int getSourceId() { return source.getId(); }
 }

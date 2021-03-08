@@ -122,7 +122,7 @@ public class Pedestrian extends Agent {
 	public double getLastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
 	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
 	public double getPathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
-	public boolean getIsHighlyInfectious() { return healthStatus.getIsHighlyInfectious(); }
+	public boolean isHighlyInfectious() { return healthStatus.isHighlyInfectious(); }
 	public double getPathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
 	public double getSusceptibility() { return healthStatus.getSusceptibility(); }
 	public double getExposedPeriod() { return healthStatus.getExposedPeriod(); }
@@ -181,6 +181,13 @@ public class Pedestrian extends Agent {
 	public void setInfectionStatus(InfectionStatus infectionStatus) { healthStatus.setInfectionStatus(infectionStatus); }
 	public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { healthStatus.setLastInfectionStatusUpdateTime(lastInfectionStatusUpdateTime); }
 	public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { healthStatus.setPathogenAbsorbedLoad(pathogenAbsorbedLoad); }
+	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity); }
+	public void setHighlyInfectious(boolean highlyInfectious) { healthStatus.setHighlyInfectious(highlyInfectious); }
+	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }
+	public void setSusceptibility(double susceptibility) { healthStatus.setSusceptibility(susceptibility); }
+	public void setExposedPeriod(double exposedPeriod) { healthStatus.setExposedPeriod(exposedPeriod); }
+	public void setInfectiousPeriod(double infectiousPeriod) { healthStatus.setInfectiousPeriod(infectiousPeriod); }
+	public void setRecoveredPeriod(double recoveredPeriod) { healthStatus.setRecoveredPeriod(recoveredPeriod); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
