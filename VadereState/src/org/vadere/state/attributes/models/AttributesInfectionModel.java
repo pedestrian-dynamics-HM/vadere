@@ -8,10 +8,9 @@ import java.util.ArrayList;
 @ModelAttributeClass
 public class AttributesInfectionModel extends Attributes {
 
-	private ArrayList<Integer> infectedPedestriansSourceId = new ArrayList<>();
 	private double infectionModelLastUpdateTime = -1;
-	private double infectionModelUpdateStepLength = 15; // equals 1/(pedestrians' average breathing rate)
-	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters;
+	private double infectionModelUpdateStepLength = 4; // equals 1/(pedestrians' average breathing rate) in seconds
+	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = new ArrayList<>();
 
 
 	public double getInfectionModelLastUpdateTime() { return infectionModelLastUpdateTime; }
@@ -19,8 +18,6 @@ public class AttributesInfectionModel extends Attributes {
 	public double getInfectionModelUpdateStepLength() { return infectionModelUpdateStepLength; }
 
 	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() { return infectionModelSourceParameters; }
-
-	public ArrayList<Integer> getInfectedPedestriansSourceId() { return infectedPedestriansSourceId; }
 
 	public void setInfectionModelLastUpdateTime(double infectionModelLastUpdateTime) { this.infectionModelLastUpdateTime = infectionModelLastUpdateTime; }
 }

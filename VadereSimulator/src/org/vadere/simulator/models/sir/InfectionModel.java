@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.scenarioelements.AerosolCloudController;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
@@ -19,10 +20,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
@@ -70,12 +68,12 @@ public class InfectionModel extends AbstractSirModel {
 	public void update(double simTimeInSec) {
 		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 		// just for testing
-		if (counter < 1) {
-			VPoint position = new VPoint(28, 6);
-			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(position, 0.75), simTimeInSec, 1000000, 60 * 15, false));
-			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
-			counter += 1;
-		}
+//		if (counter < 1) {
+//			VPoint position = new VPoint(28, 6);
+//			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(position, 0.75), simTimeInSec, 1000000, 60 * 15, false));
+//			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+//			counter += 1;
+//		}
 
 		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()) {
 			this.attributesInfectionModel.setInfectionModelLastUpdateTime(simTimeInSec);
@@ -113,8 +111,7 @@ public class InfectionModel extends AbstractSirModel {
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
 		// SourceControllerListener. This will be called  *after* a pedestrians is inserted into the
 		// topography by the given SourceController. Change model state on Agent here
-		int sourceId = controller.getSourceId();
-		InfectionModelSourceParameters sourceParameters = getAttributesInfectionModel().getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst().get(); // ToDo ignores duplicates, ids that refer to -1 (default)
+		InfectionModelSourceParameters sourceParameters = defineSourceParameters(controller);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
@@ -127,6 +124,29 @@ public class InfectionModel extends AbstractSirModel {
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
+	}
+
+	private InfectionModelSourceParameters defineSourceParameters(SourceController controller) {
+		int sourceId = controller.getSourceId();
+		int defaultSourceId = -1;
+		// ToDo:
+		// 	use switch -> case sourceId defined explicitly, sourceId defined by default (-> info), sourceId defined
+		// 	several times (-> error/warning), sourceId defined neither by default nor explicitly
+		Optional<InfectionModelSourceParameters> sourceParameters = getAttributesInfectionModel()
+				.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
+
+		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
+		if (!sourceParameters.isPresent()) {
+			sourceParameters = getAttributesInfectionModel().getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
+
+			// if not user defined default values: use attributesInfectionModel default values
+			if (!sourceParameters.isPresent()) {
+				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in infectionModelSourceParameters", sourceId);
+			} else {
+				logger.infof(">>>>>>>>>>>defineSourceParameters: sourceId %d not set explicitly in infectionModelSourceParameters. Source uses default infectionModelSourceParameters defined for sourceId: %d", sourceId, defaultSourceId);
+			}
+		}
+			return sourceParameters.get();
 	}
 
 	public AttributesInfectionModel getAttributesInfectionModel() {
