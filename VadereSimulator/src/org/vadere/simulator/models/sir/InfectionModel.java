@@ -112,7 +112,7 @@ public class InfectionModel extends AbstractSirModel {
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
-		ped.setPathogenEmissionCapacity(sourceParameters.getPedestrianPathogenEmissionCapacity());
+		ped.setPathogenEmissionCapacity(attributesInfectionModel.getPedestrianPathogenEmissionCapacity());
 		ped.setPathogenAbsorptionRate(attributesInfectionModel.getPedestrianPathogenAbsorptionRate());
 		ped.setSusceptibility(attributesInfectionModel.getPedestrianSusceptibility());
 		ped.setExposedPeriod(attributesInfectionModel.getExposedPeriod());

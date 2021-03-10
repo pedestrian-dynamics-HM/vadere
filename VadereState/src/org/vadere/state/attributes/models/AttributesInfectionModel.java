@@ -13,9 +13,10 @@ public class AttributesInfectionModel extends Attributes {
 
 	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = new ArrayList<>();
 
+	private double pedestrianPathogenEmissionCapacity = 1; // potentially emitted pathogen load per update interval by infectious agent
+
 	// Idea: use distributions and draw from org.vadere.state.scenario.ConstantDistribution
 	// with defined distribution parameters similarly to "interSpawnTimeDistribution"
-
 	/**
 	 * percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
 	 */
@@ -37,6 +38,10 @@ public class AttributesInfectionModel extends Attributes {
 	public double getInfectionModelUpdateStepLength() { return infectionModelUpdateStepLength; }
 
 	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() { return infectionModelSourceParameters; }
+
+	public double getPedestrianPathogenEmissionCapacity() {
+		return pedestrianPathogenEmissionCapacity;
+	}
 
 	public double getPedestrianPathogenAbsorptionRate() {
 		return pedestrianPathogenAbsorptionRate;
