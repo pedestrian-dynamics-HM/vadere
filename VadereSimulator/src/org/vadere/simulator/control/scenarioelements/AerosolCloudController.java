@@ -21,7 +21,8 @@ public class AerosolCloudController extends ScenarioElementController {
     public final AerosolCloud aerosolCloud;
     private Topography topography;
 
-    private boolean done = false; // flag (true) marks aerosolCloudController that control already removed aerosolClouds and thus can be removed as well
+    private boolean activeController = true; // flag (false) marks aerosolCloudController that has already removed its
+    // aerosolCloud and thus can be removed as well
 
     // Constructors
     public AerosolCloudController(Topography topography, AerosolCloud aerosolCloud) {
@@ -29,8 +30,8 @@ public class AerosolCloudController extends ScenarioElementController {
         this.topography = topography;
     }
 
-    public boolean isDone() {
-        return done;
+    public boolean isActiveController() {
+        return activeController;
     }
 
     // Other methods
@@ -72,10 +73,8 @@ public class AerosolCloudController extends ScenarioElementController {
     public void deleteAerosolCloudFlagController() {
         if (aerosolCloud.getHasReachedLifeEnd()) {
             topography.getAerosolClouds().remove(aerosolCloud);
+            this.activeController = false; // flag aerosolCloudController so that it can be removed by Simulation
         }
-
-        // flag aerosolCloudController so that it can be removed by Simulation
-        this.done = true;
     }
 
 //    private void notifyListenersAerosolCloudReached(final Pedestrian pedestrian) {

@@ -50,7 +50,7 @@ public class Simulation implements ControllerManager{
 	private final Collection<TargetController> targetControllers;
 	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
-	private Collection<AerosolCloudController> aerosolCloudControllers; // ToDo: Check if final or not (ask SS)
+	private Collection<AerosolCloudController> aerosolCloudControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -435,8 +435,8 @@ public class Simulation implements ControllerManager{
 			aerosolCloudController.update(simTimeInSec);
 		}
 
-		// keep only aerosolCloudControllers that are still required (not "done" yet)
-		this.aerosolCloudControllers = this.aerosolCloudControllers.stream().filter(c -> !c.isDone()).collect(Collectors.toList());
+		// keep only active aerosolCloudControllers
+		this.aerosolCloudControllers = this.aerosolCloudControllers.stream().filter(AerosolCloudController::isActiveController).collect(Collectors.toList());
 
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}

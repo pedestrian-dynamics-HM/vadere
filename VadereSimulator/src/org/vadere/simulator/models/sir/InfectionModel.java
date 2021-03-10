@@ -86,7 +86,7 @@ public class InfectionModel extends AbstractSirModel {
 					.collect(Collectors.toSet());
 			for (Pedestrian pedestrian : infectedPedestrians) {
 				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
-				// this.domain.getTopography().addAerosolCloud(newAerosolCloud);
+				// add newAerosolCloud and aerosolCloudController for that cloud to topography
 				this.controllerManager.registerAerosolCloud(newAerosolCloud);
 			}
 
