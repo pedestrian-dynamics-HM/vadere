@@ -1,7 +1,6 @@
 package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.control.scenarioelements.AerosolCloudController;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerManager;
 import org.vadere.simulator.models.Model;
@@ -67,13 +66,6 @@ public class InfectionModel extends AbstractSirModel {
 	@Override
 	public void update(double simTimeInSec) {
 		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
-		// just for testing
-//		if (counter < 1) {
-//			VPoint position = new VPoint(28, 6);
-//			AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(position, 0.75), simTimeInSec, 1000000, 60 * 15, false));
-//			this.domain.getTopography().addAerosolCloud(newAerosolCloud);
-//			counter += 1;
-//		}
 
 		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()) {
 			this.attributesInfectionModel.setInfectionModelLastUpdateTime(simTimeInSec);
@@ -85,8 +77,13 @@ public class InfectionModel extends AbstractSirModel {
 					.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
 					.collect(Collectors.toSet());
 			for (Pedestrian pedestrian : infectedPedestrians) {
-				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET, (VShape) new VCircle(pedestrian.getPosition(), 0.75), simTimeInSec, pedestrian.getPathogenEmissionCapacity(), 60 * 15, false));
-				// add newAerosolCloud and aerosolCloudController for that cloud to topography
+				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
+						new VCircle(pedestrian.getPosition(), attributesInfectionModel.getAerosolCloudInitialRadius()),
+						simTimeInSec,
+						pedestrian.getPathogenEmissionCapacity(),
+						attributesInfectionModel.getAerosolCloudLifeTime(),
+						false));
+				// add newAerosolCloud and aerosolCloudController for that cloud to topography:
 				this.controllerManager.registerAerosolCloud(newAerosolCloud);
 			}
 
@@ -116,11 +113,11 @@ public class InfectionModel extends AbstractSirModel {
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
 		ped.setPathogenEmissionCapacity(sourceParameters.getPedestrianPathogenEmissionCapacity());
-		ped.setPathogenAbsorptionRate(sourceParameters.getPedestrianPathogenAbsorptionRate());
-		ped.setSusceptibility(sourceParameters.getPedestrianSusceptibility());
-		ped.setExposedPeriod(sourceParameters.getExposedPeriod());
-		ped.setInfectiousPeriod(sourceParameters.getInfectiousPeriod());
-		ped.setRecoveredPeriod(sourceParameters.getRecoveredPeriod());
+		ped.setPathogenAbsorptionRate(attributesInfectionModel.getPedestrianPathogenAbsorptionRate());
+		ped.setSusceptibility(attributesInfectionModel.getPedestrianSusceptibility());
+		ped.setExposedPeriod(attributesInfectionModel.getExposedPeriod());
+		ped.setInfectiousPeriod(attributesInfectionModel.getInfectiousPeriod());
+		ped.setRecoveredPeriod(attributesInfectionModel.getRecoveredPeriod());
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
@@ -129,21 +126,18 @@ public class InfectionModel extends AbstractSirModel {
 	private InfectionModelSourceParameters defineSourceParameters(SourceController controller) {
 		int sourceId = controller.getSourceId();
 		int defaultSourceId = -1;
-		// ToDo:
-		// 	use switch -> case sourceId defined explicitly, sourceId defined by default (-> info), sourceId defined
-		// 	several times (-> error/warning), sourceId defined neither by default nor explicitly
 		Optional<InfectionModelSourceParameters> sourceParameters = getAttributesInfectionModel()
 				.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
 
 		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
-		if (!sourceParameters.isPresent()) {
+		if (sourceParameters.isEmpty()) {
 			sourceParameters = getAttributesInfectionModel().getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
 
-			// if not user defined default values: use attributesInfectionModel default values
-			if (!sourceParameters.isPresent()) {
-				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in infectionModelSourceParameters", sourceId);
-			} else {
+			// if no user defined default values: use attributesInfectionModel default values
+			if (sourceParameters.isPresent()) {
 				logger.infof(">>>>>>>>>>>defineSourceParameters: sourceId %d not set explicitly in infectionModelSourceParameters. Source uses default infectionModelSourceParameters defined for sourceId: %d", sourceId, defaultSourceId);
+			} else {
+				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in infectionModelSourceParameters", sourceId);
 			}
 		}
 			return sourceParameters.get();
@@ -153,20 +147,13 @@ public class InfectionModel extends AbstractSirModel {
 		return attributesInfectionModel;
 	}
 
-
-	public double getSomeModelState() {
-		return someModelState;
-	}
-
 	public Collection<Pedestrian> getDynamicElementsNearAerosolCloud(AerosolCloud aerosolCloud) {
 		final Rectangle2D aerosolCloudBounds = aerosolCloud.getShape().getBounds2D();
 		final VPoint centerOfAerosolCloud = new VPoint(aerosolCloudBounds.getCenterX(), aerosolCloudBounds.getCenterY());
 
 		final double aerosolCloudProximity = Math.max(aerosolCloudBounds.getHeight(), aerosolCloudBounds.getWidth());
 
-		List<Pedestrian> pedestriansNearAerosolCloud = this.domain.getTopography().getSpatialMap(Pedestrian.class).getObjects(centerOfAerosolCloud, aerosolCloudProximity);
-
-		return pedestriansNearAerosolCloud;
+		return this.domain.getTopography().getSpatialMap(Pedestrian.class).getObjects(centerOfAerosolCloud, aerosolCloudProximity);
 	}
 
 	public boolean isPedestrianInAerosolCloud(AerosolCloud aerosolCloud, Pedestrian pedestrian) {

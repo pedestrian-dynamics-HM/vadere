@@ -2,7 +2,6 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 
@@ -35,13 +34,6 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     // Other methods
-    public void create(double simTimeInSec, Pedestrian pedestrian) {
-        VPoint position = pedestrian.getPosition();
-        double pathogenLoad = pedestrian.getPathogenEmissionCapacity();
-        topography.addAerosolCloud(new AerosolCloud(new AttributesAerosolCloud()));
-        // ToDo create aerosolCloud at position with pathogenLoad, at simTimeInSec
-    }
-
     public void update(double simTimeInSec) {
             System.out.println("in AerosolCloudController");
             changeAerosolCloudExtent();
@@ -53,7 +45,7 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     public void changeAerosolCloudExtent() {
-        // ToDo change extent
+        // Idea: change extent -> for now: constant
         // int dimension = 2;
         // double scalingFactor1D = 1;
         // double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
@@ -62,7 +54,8 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     public void reduceAerosolCloudPathogenLoad() {
-        aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad()-0.1));
+        // Idea: reduce pathogenLoad with respect to time -> for now: constant
+        // aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad()));
     }
 
     public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {
@@ -76,10 +69,4 @@ public class AerosolCloudController extends ScenarioElementController {
             this.activeController = false; // flag aerosolCloudController so that it can be removed by Simulation
         }
     }
-
-//    private void notifyListenersAerosolCloudReached(final Pedestrian pedestrian) {
-//        for (AerosolCloudListener listener : aerosolCloud.getAerosolCloudListeners()) {
-//            listener.reachedAerosolCloud(aerosolCloud, pedestrian);
-//        }
-//    }
 }
