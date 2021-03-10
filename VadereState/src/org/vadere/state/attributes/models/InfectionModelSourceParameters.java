@@ -7,9 +7,9 @@ public class InfectionModelSourceParameters extends Attributes {
 
     private int sourceId = -1;
     private InfectionStatus infectionStatus = InfectionStatus.SUSCEPTIBLE;
-    private double pedestrianPathogenEmissionCapacity = 5; // potentially emitted pathogen load per update interval by infectious agent
+    private double pedestrianPathogenEmissionCapacity = 1; // potentially emitted pathogen load per update interval by infectious agent
     private double pedestrianPathogenAbsorptionRate = 0.1; // percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
-    private double pedestrianSusceptibility = 10; // min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent depending on its immune system)
+    private double pedestrianSusceptibility = 1; // min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent depending on its immune system)
     private double exposedPeriod = 2*24*60*60;
     private double infectiousPeriod = 14*24*60*60;
     private double recoveredPeriod = 150*24*60*60;

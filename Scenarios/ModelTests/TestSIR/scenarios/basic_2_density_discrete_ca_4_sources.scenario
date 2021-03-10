@@ -2,7 +2,7 @@
   "name" : "basic_2_density_discrete_ca_4_sources",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "eeeb90e7599e3a22a24ee5421b32798111ec4b90",
+  "commithash" : "46011b06dc6cababbffde5091ad667660b47a1ea",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -113,7 +113,7 @@
       },
       "org.vadere.state.attributes.models.AttributesInfectionModel" : {
         "infectionModelLastUpdateTime" : -1.0,
-        "infectionModelUpdateStepLength" : 15.0,
+        "infectionModelUpdateStepLength" : 4.0,
         "infectionModelSourceParameters" : [ {
           "sourceId" : -1,
           "infectionStatus" : "SUSCEPTIBLE",

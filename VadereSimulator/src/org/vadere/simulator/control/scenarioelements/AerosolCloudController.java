@@ -62,7 +62,7 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     public void reduceAerosolCloudPathogenLoad() {
-        aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad() - 0.01));
+        aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad()-0.1));
     }
 
     public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {

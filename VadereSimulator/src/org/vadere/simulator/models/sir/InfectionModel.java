@@ -91,7 +91,7 @@ public class InfectionModel extends AbstractSirModel {
 			}
 
 			// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
-			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds(); // ToDo check Topography: more changes required?
+			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
 			for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
 				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
 				for (Pedestrian pedestrian : pedestriansInsideCloud) {

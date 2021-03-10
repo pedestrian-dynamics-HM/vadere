@@ -5,6 +5,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -18,7 +19,10 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.bazaarvoice.jolt.modifier.function.Function.isPresent;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
@@ -103,9 +107,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
         }
 
-        // ToDo account for aerosolCloudPathogenLoad (use opacity -> see renderMeasurementArea)
         if (model.config.isShowAerosolClouds()) {
-            renderScenarioElement(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
+            double maxEmittedPathogenLoad = 1; //.attributesInfectionModel.InfectionModelSourceParameters.pedestrianPathogenEmissionCapacity;
+            renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor(), maxEmittedPathogenLoad);
         }
 
         if (model.config.isShowSources()) {

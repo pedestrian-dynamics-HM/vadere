@@ -79,7 +79,7 @@ public class AerosolCloud extends ScenarioElement {
 
     // Other methods
     @Override
-    public ScenarioElement clone() {
+    public AerosolCloud clone() {
         return new AerosolCloud(((AttributesAerosolCloud) attributes.clone()));
     }
 

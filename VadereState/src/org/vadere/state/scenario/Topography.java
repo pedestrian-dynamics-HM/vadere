@@ -640,6 +640,9 @@ public class Topography implements DynamicElementMover{
 		for (AbsorbingArea absorbingArea: getAbsorbingAreas()) {
 			s.addAbsorbingArea(absorbingArea.clone());
 		}
+		for (AerosolCloud aerosolCloud: getAerosolClouds()) {
+			s.addAerosolCloud(aerosolCloud.clone());
+		}
 		for (Source source : getSources()) {
 			s.addSource(source.clone());
 		}

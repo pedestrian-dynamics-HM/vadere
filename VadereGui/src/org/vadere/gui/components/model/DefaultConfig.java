@@ -19,7 +19,7 @@ public class DefaultConfig {
 	private Color measurementAreaColor = Color.RED;
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(0.60f, 0.52f, 0.00f);
-	private int aerosolCloudAlpha = 140;
+	private int aerosolCloudAlphaMax = 140;
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private boolean changed = false;
 
@@ -40,7 +40,7 @@ public class DefaultConfig {
 		this.measurementAreaColor = config.measurementAreaColor;
 		this.measurementAreaAlpha = config.measurementAreaAlpha;
 		this.aerosolCloudColor = config.aerosolCloudColor;
-		this.aerosolCloudAlpha = config.aerosolCloudAlpha;
+		this.aerosolCloudAlphaMax = config.aerosolCloudAlphaMax;
 		initGroupMembershipColor();
 
 		this.changed = config.changed;
@@ -96,7 +96,7 @@ public class DefaultConfig {
 		return groupMembershipColors.get(groupMembership);
 	}
 	public Color getAerosolCloudColor() {return aerosolCloudColor;}
-	public int getAerosolCloudAlpha() { return aerosolCloudAlpha; }
+	public int getAerosolCloudAlphaMax() { return aerosolCloudAlphaMax; }
 
 	// Setter
 	protected synchronized void setChanged() {
@@ -157,8 +157,8 @@ public class DefaultConfig {
 		this.absorbingAreaColor = aerosolCloudColor;
 	}
 
-	public void setAerosolCloudAlpha(int aerosolCloudAlpha) {
-		this.aerosolCloudAlpha = aerosolCloudAlpha;
+	public void setAerosolCloudAlphaMax(int aerosolCloudAlphaMax) {
+		this.aerosolCloudAlphaMax = aerosolCloudAlphaMax;
 	}
 
 }
