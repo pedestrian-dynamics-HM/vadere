@@ -97,6 +97,9 @@ public class InfectionModel extends AbstractSirModel {
 				}
 			}
 
+			// add model for droplet infection
+			// ...
+
 			// update pedestrian infection statuses
 			Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
 			for (Pedestrian pedestrian : allPedestrians) {
