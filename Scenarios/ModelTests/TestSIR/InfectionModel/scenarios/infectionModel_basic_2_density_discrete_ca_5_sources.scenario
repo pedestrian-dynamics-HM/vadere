@@ -1,7 +1,8 @@
 {
-  "name" : "basic_2_density_discrete_ca",
+  "name" : "infectionModel_basic_2_density_discrete_ca_5_sources",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "821495bb1957568690767df20b86eb071c0b2950",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -110,9 +111,24 @@
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
       },
-      "org.vadere.state.attributes.models.AttributeSIR" : {
-        "initialR" : 0.8,
-        "infectionZoneIds" : [ 1, 2 ]
+      "org.vadere.state.attributes.models.AttributesInfectionModel" : {
+        "infectionModelLastUpdateTime" : -1.0,
+        "infectionModelUpdateStepLength" : 4.0,
+        "infectionModelSourceParameters" : [ {
+          "sourceId" : -1,
+          "infectionStatus" : "SUSCEPTIBLE"
+        }, {
+          "sourceId" : 7,
+          "infectionStatus" : "INFECTIOUS"
+        } ],
+        "pedestrianPathogenEmissionCapacity" : 1.0,
+        "pedestrianPathogenAbsorptionRate" : 0.1,
+        "pedestrianSusceptibility" : 1.0,
+        "exposedPeriod" : 10000.0,
+        "infectiousPeriod" : 10000.0,
+        "recoveredPeriod" : 10000.0,
+        "aerosolCloudLifeTime" : 10000.0,
+        "aerosolCloudInitialRadius" : 0.75
       }
     },
     "attributesSimulation" : {
@@ -205,22 +221,111 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
       "sources" : [ {
-        "id" : 2,
+        "id" : 5,
         "shape" : {
           "x" : 1.0,
-          "y" : 1.0,
+          "y" : 1.1,
           "width" : 5.0,
-          "height" : 10.0,
+          "height" : 1.8,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 200,
+        "spawnNumber" : 50,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 6,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 3.1,
+          "width" : 5.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 50,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 7,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 5.1,
+          "width" : 5.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 8,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 7.1,
+          "width" : 5.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 50,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 1 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 9,
+        "shape" : {
+          "x" : 1.0,
+          "y" : 9.1,
+          "width" : 5.0,
+          "height" : 1.8,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 50,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 1 ],
