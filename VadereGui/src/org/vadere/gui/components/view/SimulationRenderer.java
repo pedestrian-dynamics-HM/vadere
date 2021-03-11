@@ -325,6 +325,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 				    return model.getGroupColor((Pedestrian)agent);
 			    }
 		    }
+            case INFECTION_STATUS: {
+                if (agent instanceof Pedestrian) {
+                    Pedestrian pedestrian = (Pedestrian) agent;
+                    return model.config.getInfectionStatusColor(pedestrian.getInfectionStatus());
+                }
+            }
 		    default: return model.config.getPedestrianColor();
 
 	    }
