@@ -80,7 +80,7 @@ public class InfectionModel extends AbstractSirModel {
 				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						new VCircle(pedestrian.getPosition(), attributesInfectionModel.getAerosolCloudInitialRadius()),
 						simTimeInSec,
-						pedestrian.getPathogenEmissionCapacity(),
+						pedestrian.emitPathogen(),
 						attributesInfectionModel.getAerosolCloudLifeTime(),
 						false));
 				// add newAerosolCloud and aerosolCloudController for that cloud to topography:

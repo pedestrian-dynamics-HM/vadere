@@ -55,6 +55,8 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public boolean getHasReachedLifeEnd() { return hasReachedLifeEnd; }
 
+    // public boolean getPathogenDensity() { return pathogenLoad / shape.getSize()}
+
     // Setter
     public void setId(int id) {
         checkSealed();

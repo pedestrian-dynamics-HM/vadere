@@ -13,19 +13,24 @@ public class AttributesInfectionModel extends Attributes {
 
 	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = new ArrayList<>();
 
-	private double pedestrianPathogenEmissionCapacity = 1; // potentially emitted pathogen load per update interval by infectious agent
+	private double pedestrianPathogenEmissionCapacity = 1; // emitted pathogen (in particles) = 10^pedestrianPathogenEmissionCapacity
 
 	// Idea: use distributions and draw from org.vadere.state.scenario.ConstantDistribution
 	// with defined distribution parameters similarly to "interSpawnTimeDistribution"
 	/**
 	 * percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
+	 * 1 breath : 0.5 * 10^-3 m^3, aerosolCloud volume: 4/3 * pi * r^3 m^3 (for r=0.75m -> V=1.8 m^3)
+	 * 1 breath makes about 0.03%
+	 * measures such as face covering may reduce this ratio
 	 */
-	private double pedestrianPathogenAbsorptionRate = 0.1;
+	private double pedestrianPathogenAbsorptionRate = 0.0003;
 	/**
-	 * min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent
-	 * depending on its immune system)
+	 * min absorbed pathogen load that leads to change in infectionStatus: susceptible -> exposed
+	 * (could be defined individually for each agent depending on its immune system)
+	 *
+	 *
 	 */
-	private double pedestrianSusceptibility = 1;
+	private double pedestrianSusceptibility = 500; // particles required for being infected
 	private double exposedPeriod = 2*24*60*60;
 	private double infectiousPeriod = 14*24*60*60;
 	private double recoveredPeriod = 150*24*60*60;

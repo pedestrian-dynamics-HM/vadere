@@ -218,6 +218,8 @@ public class Pedestrian extends Agent {
 		}
 	}
 
+	public double emitPathogen() { return healthStatus.emitPathogen(); }
+
 	// Overridden Methods
 
 	@Override

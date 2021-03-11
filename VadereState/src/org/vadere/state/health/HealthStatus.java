@@ -8,7 +8,7 @@ public class HealthStatus {
     private double pathogenAbsorbedLoad = 0.0;
 
     // define infectious agent
-    private double pathogenEmissionCapacity; // potentially emitted pathogen load per update interval by infectious agent
+    private double pathogenEmissionCapacity; // potentially emitted pathogen load in decimal log scale per update interval by infectious agent
     private boolean HighlyInfectious;
     // define susceptible agents
     private double pathogenAbsorptionRate; // percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
@@ -85,4 +85,7 @@ public class HealthStatus {
     public void setExposedPeriod(double exposedPeriod) { this.exposedPeriod = exposedPeriod; }
     public void setInfectiousPeriod(double infectiousPeriod) { this.infectiousPeriod = infectiousPeriod; }
     public void setRecoveredPeriod(double recoveredPeriod) { this.recoveredPeriod = recoveredPeriod; }
+
+    // other methods
+    public double emitPathogen() { return Math.pow(10, this.getPathogenEmissionCapacity()); }
 }
