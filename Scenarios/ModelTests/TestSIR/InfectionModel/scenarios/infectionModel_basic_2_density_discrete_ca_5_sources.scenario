@@ -2,7 +2,7 @@
   "name" : "infectionModel_basic_2_density_discrete_ca_5_sources",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "624e5b3cbf51666f3ade0deb7bd96f6627baad96",
+  "commithash" : "0239c24840943eb4271e9a1b4c5e50742f5be3bb",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -13,13 +13,13 @@
       "filename" : "out.txt",
       "processors" : [ 3 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "out1.txt",
-      "processors" : [ 4 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 6, 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "seir.txt",
+      "processors" : [ 8 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -52,6 +52,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatus",
+      "id" : 8
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

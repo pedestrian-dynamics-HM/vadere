@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -328,11 +329,50 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case INFECTION_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return model.config.getInfectionStatusColor(pedestrian.getInfectionStatus());
+                    return adaptInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad());
                 }
             }
 		    default: return model.config.getPedestrianColor();
 
 	    }
     }
+
+    public Color adaptInfectionStatusColor(InfectionStatus infectionStatus, double absorbedPathogenLoad) {
+        Color color = model.config.getInfectionStatusColor(infectionStatus);
+		boolean interpolateColors = true; // ToDo define as checkbox in settings dialog
+
+		double minAbsorbedPathogenLoad = 0;
+		double maxAbsorbedPathogenLoad = Math.pow(10, 3);
+		float t = (float) ((absorbedPathogenLoad - minAbsorbedPathogenLoad) / maxAbsorbedPathogenLoad);
+
+		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values
+        for (InfectionStatus status : InfectionStatus.values()) {
+            if (model.config.getInfectionStatusColor(status).equals(model.config.getDefaultInfectionStatusColor(InfectionStatus.SUSCEPTIBLE))) {
+                model.config.setInfectionStatusColor(status, model.config.getDefaultInfectionStatusColor(status));
+            }
+        }
+
+        Color susceptibleColor = model.config.getInfectionStatusColor(InfectionStatus.SUSCEPTIBLE);
+        Color exposedColor = model.config.getInfectionStatusColor(InfectionStatus.EXPOSED);
+
+        if (interpolateColors) {
+            switch (infectionStatus) {
+                case SUSCEPTIBLE:
+                case EXPOSED:
+                    if (absorbedPathogenLoad <= minAbsorbedPathogenLoad) { // if (t < 0)
+                        color = susceptibleColor;
+                    } else if (absorbedPathogenLoad >= maxAbsorbedPathogenLoad) { // if (t > 1)
+                        color = exposedColor;
+                    } else {
+                        // color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
+                        color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
+                    }
+                    break;
+                case INFECTIOUS:
+                case RECOVERED:
+            }
+        }
+		return color;
+    }
+
 }

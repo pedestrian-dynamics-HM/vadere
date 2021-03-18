@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -347,7 +348,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 		return color;
 	}
-
 	public Color getInfectionStatusColor(InfectionStatus infectionStatus) {
 		Color color = getPedestrianDefaultColor();
 
