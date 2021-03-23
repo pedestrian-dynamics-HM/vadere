@@ -64,7 +64,7 @@ public class DefaultConfig {
 
 	private void initInfectionStatusColor() {
 		infectionStatusColors.put(InfectionStatus.SUSCEPTIBLE, pedestrianColor);
-		infectionStatusColors.put(InfectionStatus.EXPOSED, new Color(76, 202, 96)); // use this in combination with org.vadere.util.visualization.ColorHelper.improvedColorInterpolation()
+		infectionStatusColors.put(InfectionStatus.EXPOSED, new Color(202, 76, 187)); // use this in combination with org.vadere.util.visualization.ColorHelper.improvedColorInterpolation()
 		infectionStatusColors.put(InfectionStatus.INFECTIOUS, new Color(202, 76, 76));
 		infectionStatusColors.put(InfectionStatus.RECOVERED, new Color(153, 153, 153));
 	}
