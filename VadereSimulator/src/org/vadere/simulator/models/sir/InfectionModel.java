@@ -14,13 +14,11 @@ import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.*;
 
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
@@ -68,43 +66,58 @@ public class InfectionModel extends AbstractSirModel {
 	public void update(double simTimeInSec) {
 		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 
-		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()) {
+		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()/2.0) {
 			this.attributesInfectionModel.setInfectionModelLastUpdateTime(simTimeInSec);
 
-			// add new cloud for each infectious pedestrian at current position and simTime
 			Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
 					.getElements()
 					.stream()
 					.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
 					.collect(Collectors.toSet());
-			for (Pedestrian pedestrian : infectedPedestrians) {
-				AerosolCloud newAerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
-						new VCircle(pedestrian.getPosition(), attributesInfectionModel.getAerosolCloudInitialRadius()),
-						simTimeInSec,
-						pedestrian.emitPathogen(),
-						attributesInfectionModel.getAerosolCloudLifeTime(),
-						false));
-				// add newAerosolCloud and aerosolCloudController for that cloud to topography:
-				this.controllerManager.registerAerosolCloud(newAerosolCloud);
-			}
 
-			// update absorbed pathogen load for each pedestrian and each cloud (every x-th loop):
-			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
-			for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
-				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
-				for (Pedestrian pedestrian : pedestriansInsideCloud) {
-					updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
+			for (Pedestrian ped : infectedPedestrians) {
+				if (ped.getStartBreatheOutPosition() == null) {
+					// step 1: store position when pedestrian starts breathing out -> v1
+					ped.setStartBreatheOutPosition(ped.getPosition());
+				} else {
+					// step 2: get position when pedestrian stops breathing out -> v2
+					// create ellipse with vertices v1 and v2
+					VPoint v1 = ped.getStartBreatheOutPosition();
+					ped.setStartBreatheOutPosition(null); // reset startBreatheOutPosition
+					VPoint v2 = ped.getPosition();
 
+					AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
+							createTransformedShape(v1, v2, Math.pow(attributesInfectionModel.getAerosolCloudInitialRadius(), 2) * Math.PI),
+							simTimeInSec,
+							ped.emitPathogen(),
+							attributesInfectionModel.getAerosolCloudLifeTime(),
+							false));
+					this.controllerManager.registerAerosolCloud(aerosolCloud);
 				}
 			}
 
-			// add model for droplet infection
-			// ...
+			// ToDo remove hacky code (counter)
+			counter += 1;
 
-			// update pedestrian infection statuses
-			Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
-			for (Pedestrian pedestrian : allPedestrians) {
-				updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
+			if (counter == 2) {
+				counter = 0;
+				Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
+				for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
+					Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
+					for (Pedestrian pedestrian : pedestriansInsideCloud) {
+						updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
+
+					}
+				}
+
+				// add model for droplet infection
+				// ...
+
+				// update pedestrian infection statuses
+				Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
+				for (Pedestrian pedestrian : allPedestrians) {
+					updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
+				}
 			}
 		}
 	}
@@ -178,4 +191,39 @@ public class InfectionModel extends AbstractSirModel {
 		return pedestriansInsideAerosolCloud;
 	}
 
+	public VShape createTransformedShape(VPoint vertex1, VPoint vertex2, double area) {
+		VPoint centerVertex = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
+		double majorAxis = vertex1.distance(vertex2);
+		double minorAxis = 4 * area / (majorAxis * Math.PI);
+
+		// ellipse parameters
+		double a = majorAxis / 2.0;
+		double b = minorAxis / 2.0;
+		double c = Math.sqrt(a * a - b * b);
+		double e = c / a; // eccentricity
+		VShape shape;
+
+		if (majorAxis < minorAxis) {
+ 			// return ellipse with (a'=b') -> circle
+ 			shape = new VCircle(new VPoint(centerVertex.getX(), centerVertex.getY()), Math.sqrt(area / Math.PI));
+ 		} else {
+			// return polygon (approximated ellipse with edges)
+			Path2D path = new Path2D.Double();
+			path.moveTo(a, 0); // define stating point
+			for (double angle = 0; angle < 2 * Math.PI; angle += Math.PI / 50.0) {
+				double radius = b / Math.sqrt(1 - Math.pow(e * Math.cos(angle), 2)); // radius(angle) from ellipse center to its bound
+				path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius); // convert polar to cartesian coordinates
+			}
+			path.closePath();
+			VShape polygon = new VPolygon(path);
+			double theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // get orientation of shape
+			AffineTransform transform = new AffineTransform();
+			transform.translate(centerVertex.getX(), centerVertex.getY());
+			transform.rotate(theta);
+
+			// shape = new VPolygon(transform.createTransformedShape(shape1));
+			shape = new VPolygon(transform.createTransformedShape(polygon));
+		}
+		return shape;
+	}
 }

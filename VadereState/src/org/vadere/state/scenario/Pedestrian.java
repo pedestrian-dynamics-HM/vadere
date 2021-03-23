@@ -121,6 +121,7 @@ public class Pedestrian extends Agent {
 	public InfectionStatus getInfectionStatus() { return healthStatus.getInfectionStatus(); }
 	public double getLastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
 	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
+	public VPoint getStartBreatheOutPosition() { return healthStatus.getStartBreatheOutPosition(); }
 	public double getPathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
 	public boolean isHighlyInfectious() { return healthStatus.isHighlyInfectious(); }
 	public double getPathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
@@ -181,6 +182,7 @@ public class Pedestrian extends Agent {
 	public void setInfectionStatus(InfectionStatus infectionStatus) { healthStatus.setInfectionStatus(infectionStatus); }
 	public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { healthStatus.setLastInfectionStatusUpdateTime(lastInfectionStatusUpdateTime); }
 	public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { healthStatus.setPathogenAbsorbedLoad(pathogenAbsorbedLoad); }
+	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) { healthStatus.setStartBreatheOutPosition(startBreatheOutPosition); }
 	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity); }
 	public void setHighlyInfectious(boolean highlyInfectious) { healthStatus.setHighlyInfectious(highlyInfectious); }
 	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }

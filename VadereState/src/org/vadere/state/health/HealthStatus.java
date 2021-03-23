@@ -1,11 +1,14 @@
 package org.vadere.state.health;
 
+import org.vadere.util.geometry.shapes.VPoint;
+
 public class HealthStatus {
 
     // Member variables
     private InfectionStatus infectionStatus;
     private double lastInfectionStatusUpdateTime = -1;
     private double pathogenAbsorbedLoad = 0.0;
+    private VPoint startBreatheOutPosition = null;
 
     // define infectious agent
     private double pathogenEmissionCapacity; // potentially emitted pathogen load in decimal log scale per update interval by infectious agent
@@ -24,6 +27,7 @@ public class HealthStatus {
 //        this.infectionStatus = InfectionStatus.SUSCEPTIBLE;
 //        this.lastInfectionStatusUpdateTime = -1;
 //        this.pathogenAbsorbedLoad = 0.0;
+//        this.startBreatheOutPosition = null;
 //        this.pathogenEmissionCapacity = 5.0;
 //        this.HighlyInfectious = false;
 //        this.pathogenAbsorptionRate = 0.1;
@@ -34,11 +38,13 @@ public class HealthStatus {
     }
 
     public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
+                        VPoint startBreatheOutPosition,
                         double pathogenEmissionCapacity, boolean highlyInfectious, double pathogenAbsorptionRate,
                         double susceptibility, double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
         this.infectionStatus = infectionStatus;
         this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime;
         this.pathogenAbsorbedLoad = pathogenAbsorbedLoad;
+        this.startBreatheOutPosition = startBreatheOutPosition;
         this.pathogenEmissionCapacity = pathogenEmissionCapacity;
         this.HighlyInfectious = highlyInfectious;
         this.pathogenAbsorptionRate = pathogenAbsorptionRate;
@@ -52,6 +58,7 @@ public class HealthStatus {
         this.infectionStatus = other.getInfectionStatus();
         this.lastInfectionStatusUpdateTime = other.getLastInfectionStatusUpdateTime();
         this.pathogenAbsorbedLoad = other.getPathogenAbsorbedLoad();
+        this.startBreatheOutPosition = other.getStartBreatheOutPosition();
         this.pathogenEmissionCapacity = other.getPathogenEmissionCapacity();
         this.HighlyInfectious = other.isHighlyInfectious();
         this.pathogenAbsorptionRate = other.getPathogenAbsorptionRate();
@@ -66,6 +73,7 @@ public class HealthStatus {
     public InfectionStatus getInfectionStatus() { return infectionStatus; }
     public double getLastInfectionStatusUpdateTime() { return lastInfectionStatusUpdateTime; }
     public double getPathogenAbsorbedLoad() { return pathogenAbsorbedLoad; }
+    public VPoint getStartBreatheOutPosition() { return startBreatheOutPosition; }
     public double getPathogenEmissionCapacity() {return pathogenEmissionCapacity; }
     public boolean isHighlyInfectious() { return HighlyInfectious; }
     public double getPathogenAbsorptionRate() { return pathogenAbsorptionRate ; }
@@ -78,6 +86,7 @@ public class HealthStatus {
     public void setInfectionStatus(InfectionStatus infectionStatus) { this.infectionStatus = infectionStatus; }
     public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime; }
     public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { this.pathogenAbsorbedLoad = pathogenAbsorbedLoad; }
+    public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) { this.startBreatheOutPosition = startBreatheOutPosition; }
     public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { this.pathogenEmissionCapacity = pathogenEmissionCapacity; }
     public void setHighlyInfectious(boolean highlyInfectious) { HighlyInfectious = highlyInfectious; }
     public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { this.pathogenAbsorptionRate = pathogenAbsorptionRate; }
