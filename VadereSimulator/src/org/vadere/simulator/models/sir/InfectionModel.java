@@ -31,9 +31,12 @@ public class InfectionModel extends AbstractSirModel {
 	// implementation (AttributesInfectionModel is the base class for all SIR models used here for simplicity)
 	private AttributesInfectionModel attributesInfectionModel;
 
-	private double someModelState;
-
 	private int counter;
+
+	private double nextAerosolCloudUpdateTime;
+	private double startBreatheInUpdateTime;
+	private double endBreatheInUpdateTime;
+	private double lastSimTimeInSec;
 
 	private ControllerManager controllerManager;
 
@@ -44,6 +47,10 @@ public class InfectionModel extends AbstractSirModel {
 			this.attributesAgent = attributesPedestrian;
 			this.attributesInfectionModel = Model.findAttributes(attributesList, AttributesInfectionModel.class);
 			this.counter = 0;
+			this.nextAerosolCloudUpdateTime = 0;
+			this.startBreatheInUpdateTime = 0;
+			this.endBreatheInUpdateTime = this.startBreatheInUpdateTime + this.attributesInfectionModel.getInfectionModelUpdateStepLength() / 2.0;
+			this.lastSimTimeInSec = 0;
 	}
 
 	@Override
@@ -66,8 +73,8 @@ public class InfectionModel extends AbstractSirModel {
 	public void update(double simTimeInSec) {
 		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 
-		if (this.attributesInfectionModel.getInfectionModelLastUpdateTime() < 0 || simTimeInSec >= this.attributesInfectionModel.getInfectionModelLastUpdateTime() + this.attributesInfectionModel.getInfectionModelUpdateStepLength()/2.0) {
-			this.attributesInfectionModel.setInfectionModelLastUpdateTime(simTimeInSec);
+		if (simTimeInSec >= nextAerosolCloudUpdateTime) {
+			nextAerosolCloudUpdateTime = nextAerosolCloudUpdateTime + this.attributesInfectionModel.getInfectionModelUpdateStepLength() / 2.0;
 
 			Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
 					.getElements()
@@ -113,30 +120,32 @@ public class InfectionModel extends AbstractSirModel {
 					this.controllerManager.registerAerosolCloud(aerosolCloud);
 				}
 			}
+		}
 
-			// ToDo remove hacky code (counter)
-			counter += 1;
 
-			if (counter == 2) {
-				counter = 0;
-				Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
-				for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
-					Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
-					for (Pedestrian pedestrian : pedestriansInsideCloud) {
-						updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity());
+		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
+		// Agents breathe in for time interval [startBreatheInUpdateTime, endBreatheInUpdateTime]
+		double deltaTime = (simTimeInSec - lastSimTimeInSec) / (this.attributesInfectionModel.getInfectionModelUpdateStepLength() / 2.0);
+		lastSimTimeInSec = simTimeInSec;
 
-					}
-				}
-
-				// add model for droplet infection
-				// ...
-
-				// update pedestrian infection statuses
-				Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
-				for (Pedestrian pedestrian : allPedestrians) {
-					updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
+		if (simTimeInSec > endBreatheInUpdateTime) {
+			startBreatheInUpdateTime = startBreatheInUpdateTime + this.attributesInfectionModel.getInfectionModelUpdateStepLength();
+			endBreatheInUpdateTime = startBreatheInUpdateTime + this.attributesInfectionModel.getInfectionModelUpdateStepLength() / 2.0;
+		}
+		if ((simTimeInSec >= startBreatheInUpdateTime) & (simTimeInSec <= endBreatheInUpdateTime) & (deltaTime > 0)) {
+			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
+			for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
+				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
+				for (Pedestrian pedestrian : pedestriansInsideCloud) {
+					updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * deltaTime);
 				}
 			}
+		}
+
+		// update pedestrian infection statuses
+		Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
+		for (Pedestrian pedestrian : allPedestrians) {
+			updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
 		}
 	}
 
