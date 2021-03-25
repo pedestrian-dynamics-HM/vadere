@@ -37,15 +37,13 @@ public interface SirModel extends Model {
         }
     }
 
-    default void updatePedestrianPathogenAbsorbedLoad(Pedestrian pedestrian, double pathogenLoad) {
+    default void updatePedestrianPathogenAbsorbedLoad(Pedestrian pedestrian, double pathogenDensity2D) {
         InfectionStatus infectionStatus = pedestrian.getInfectionStatus();
-        double absorbedPathogen = pedestrian.getPathogenAbsorptionRate() * pathogenLoad;
+        double absorbedPathogen = pedestrian.getPathogenAbsorptionRate() * pathogenDensity2D;
         double accumulatedAbsorbedPathogenLoad = pedestrian.getPathogenAbsorbedLoad() + absorbedPathogen;
 
         switch (infectionStatus) {
             case SUSCEPTIBLE:
-                pedestrian.setPathogenAbsorbedLoad(accumulatedAbsorbedPathogenLoad);
-                break;
             case EXPOSED:
                 pedestrian.setPathogenAbsorbedLoad(accumulatedAbsorbedPathogenLoad);
                 break;

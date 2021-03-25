@@ -86,10 +86,28 @@ public class InfectionModel extends AbstractSirModel {
 					ped.setStartBreatheOutPosition(null); // reset startBreatheOutPosition
 					VPoint v2 = ped.getPosition();
 
+					double area = Math.pow(attributesInfectionModel.getAerosolCloudInitialRadius(), 2) * Math.PI;
+					VShape shape = createTransformedShape(v1, v2, area);
+
+					// assumption: aerosolCloud has a constant vertical extent (in m). The height corresponds to a
+					// cylinder whose volume equals the
+					// - sphere with radius = initialAerosolCloudRadius
+					// - ellipsoid with principal diameters a, b, c where cross-sectional
+					// area (in the x-y-plane) = a * b * PI and c = initialAerosolCloudRadius
+					double height = 4 / 3 * attributesInfectionModel.getAerosolCloudInitialRadius();
+					double volume = area * height;
+
+					// assumption: only a part of the emitted pathogen remains in the x-y-plane
+					// (at z ~ height of the pedestrians' faces) due to effects such as
+					// declining "pathogen activity", evaporation, gravitation/sedimentation.
+					// These effects actually play a role over time -> remainingPathogenFraction or pathogenDensity2D
+					// should be updated over time (see AerosolCloudController)
+					double remainingPathogenFraction = 1;
+
 					AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
-							createTransformedShape(v1, v2, Math.pow(attributesInfectionModel.getAerosolCloudInitialRadius(), 2) * Math.PI),
+							shape,
 							simTimeInSec,
-							ped.emitPathogen(),
+							ped.emitPathogen() / volume * remainingPathogenFraction,
 							attributesInfectionModel.getAerosolCloudLifeTime(),
 							false));
 					this.controllerManager.registerAerosolCloud(aerosolCloud);
@@ -105,7 +123,7 @@ public class InfectionModel extends AbstractSirModel {
 				for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
 					Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
 					for (Pedestrian pedestrian : pedestriansInsideCloud) {
-						updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenLoad());
+						updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity());
 
 					}
 				}

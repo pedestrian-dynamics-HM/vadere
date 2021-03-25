@@ -11,10 +11,9 @@ public class HealthStatus {
     private VPoint startBreatheOutPosition = null;
 
     // define infectious agent
-    private double pathogenEmissionCapacity; // potentially emitted pathogen load in decimal log scale per update interval by infectious agent
-    private boolean HighlyInfectious;
+    private double pathogenEmissionCapacity; // potentially emitted pathogen load (pathogen particles per breath) in decimal log scale per update interval by infectious agent
     // define susceptible agents
-    private double pathogenAbsorptionRate; // percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
+    private double pathogenAbsorptionRate = 0.005; // tidal volume in m^3; one could account for protective measures such as masks by multiplying the tidal volume by a "mask efficiency factor [0, 1]"
     private double susceptibility; // min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent depending on its immune system)
 
     private double exposedPeriod;
@@ -23,30 +22,17 @@ public class HealthStatus {
 
     // Constructors
     public HealthStatus() {
-//        // ToDo: define realistic default values
-//        this.infectionStatus = InfectionStatus.SUSCEPTIBLE;
-//        this.lastInfectionStatusUpdateTime = -1;
-//        this.pathogenAbsorbedLoad = 0.0;
-//        this.startBreatheOutPosition = null;
-//        this.pathogenEmissionCapacity = 5.0;
-//        this.HighlyInfectious = false;
-//        this.pathogenAbsorptionRate = 0.1;
-//        this.susceptibility = 10;
-//        this.exposedPeriod = 2*24*60*60;    // ToDo should be drawn from distribution
-//        this.infectiousPeriod = 14*24*60*60;    // ToDo should be drawn from distribution
-//        this.recoveredPeriod = 150*24*60*60;    // ToDo should be drawn from distribution
     }
 
     public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
                         VPoint startBreatheOutPosition,
-                        double pathogenEmissionCapacity, boolean highlyInfectious, double pathogenAbsorptionRate,
+                        double pathogenEmissionCapacity, double pathogenAbsorptionRate,
                         double susceptibility, double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
         this.infectionStatus = infectionStatus;
         this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime;
         this.pathogenAbsorbedLoad = pathogenAbsorbedLoad;
         this.startBreatheOutPosition = startBreatheOutPosition;
         this.pathogenEmissionCapacity = pathogenEmissionCapacity;
-        this.HighlyInfectious = highlyInfectious;
         this.pathogenAbsorptionRate = pathogenAbsorptionRate;
         this.susceptibility = susceptibility;
         this.exposedPeriod = exposedPeriod;
@@ -60,7 +46,6 @@ public class HealthStatus {
         this.pathogenAbsorbedLoad = other.getPathogenAbsorbedLoad();
         this.startBreatheOutPosition = other.getStartBreatheOutPosition();
         this.pathogenEmissionCapacity = other.getPathogenEmissionCapacity();
-        this.HighlyInfectious = other.isHighlyInfectious();
         this.pathogenAbsorptionRate = other.getPathogenAbsorptionRate();
         this.susceptibility = other.getSusceptibility();
         this.exposedPeriod = other.getExposedPeriod();
@@ -75,7 +60,6 @@ public class HealthStatus {
     public double getPathogenAbsorbedLoad() { return pathogenAbsorbedLoad; }
     public VPoint getStartBreatheOutPosition() { return startBreatheOutPosition; }
     public double getPathogenEmissionCapacity() {return pathogenEmissionCapacity; }
-    public boolean isHighlyInfectious() { return HighlyInfectious; }
     public double getPathogenAbsorptionRate() { return pathogenAbsorptionRate ; }
     public double getSusceptibility() { return susceptibility; }
     public double getExposedPeriod() { return exposedPeriod; }
@@ -88,7 +72,6 @@ public class HealthStatus {
     public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { this.pathogenAbsorbedLoad = pathogenAbsorbedLoad; }
     public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) { this.startBreatheOutPosition = startBreatheOutPosition; }
     public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { this.pathogenEmissionCapacity = pathogenEmissionCapacity; }
-    public void setHighlyInfectious(boolean highlyInfectious) { HighlyInfectious = highlyInfectious; }
     public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { this.pathogenAbsorptionRate = pathogenAbsorptionRate; }
     public void setSusceptibility(double susceptibility) { this.susceptibility = susceptibility; }
     public void setExposedPeriod(double exposedPeriod) { this.exposedPeriod = exposedPeriod; }

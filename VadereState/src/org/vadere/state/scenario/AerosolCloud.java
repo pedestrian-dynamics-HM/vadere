@@ -4,12 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VShape;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 
 public class AerosolCloud extends ScenarioElement {
 
@@ -27,7 +22,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public AerosolCloud(AerosolCloud aerosolCloud){
         this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getCreationTime(),
-                aerosolCloud.getPathogenLoad(), aerosolCloud.getLifeTime(), aerosolCloud.getHasReachedLifeEnd()));
+                aerosolCloud.getPathogenDensity(), aerosolCloud.getLifeTime(), aerosolCloud.getHasReachedLifeEnd()));
     }
 
 
@@ -54,7 +49,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public double getLifeTime() { return attributes.getLifeTime(); }
     public double getCreationTime() { return attributes.getCreationTime(); }
-    public double getPathogenLoad() { return attributes.getPathogenLoad(); }
+    public double getPathogenDensity() { return attributes.getPathogenDensity(); }
     public boolean getHasReachedLifeEnd() { return attributes.getHasReachedLifeEnd(); }
 
     // Setter
@@ -73,7 +68,7 @@ public class AerosolCloud extends ScenarioElement {
     }
 
     public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
-    public void setPathogenLoad(double pathogenLoad) { attributes.setPathogenLoad(pathogenLoad); }
+    public void setPathogenDensity(double pathogenDensity) { attributes.setPathogenDensity(pathogenDensity); }
     public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
 
 

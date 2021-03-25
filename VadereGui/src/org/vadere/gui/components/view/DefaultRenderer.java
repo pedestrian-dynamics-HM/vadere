@@ -295,7 +295,7 @@ public abstract class DefaultRenderer {
 		final Color tmpColor = graphics.getColor();
 		AerosolCloud cloud = (AerosolCloud) element;
 		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
-		float currentAlpha = (float) ((cloud.getPathogenLoad() / maxEmittedPathogenLoad) * maxAlpha);
+		float currentAlpha = (float) ((cloud.getPathogenDensity() / maxEmittedPathogenLoad) * maxAlpha);
 
 		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), defaultModel.getConfig().getAerosolCloudAlphaMax()));
 		if (cloud.getShape() instanceof VPolygon){

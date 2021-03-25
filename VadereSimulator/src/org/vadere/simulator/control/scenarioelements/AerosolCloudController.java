@@ -53,14 +53,18 @@ public class AerosolCloudController extends ScenarioElementController {
         // aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
     }
 
+    /**
+     * Reduce pathogenDensity2D at the height of the pedestrians' faces (x-y-plane)
+     * Considered effects: declining activity of pathogen, evaporation, gravitation
+     */
     public void reduceAerosolCloudPathogenLoad() {
-        // Idea: reduce pathogenLoad with respect to time -> for now: constant
-        // aerosolCloud.setPathogenLoad(Math.max(0.0, aerosolCloud.getPathogenLoad()));
+        // ...
+        aerosolCloud.setPathogenDensity(Math.max(0.0, aerosolCloud.getPathogenDensity()));
     }
 
     public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {
-        double minimumRelevantPathogenLoad = 0.0;
-        return (aerosolCloud.getPathogenLoad() <= minimumRelevantPathogenLoad) || (simTimeInSec > aerosolCloud.getCreationTime() + aerosolCloud.getLifeTime());
+        double minimumRelevantPathogenDensity = 0.0;
+        return (aerosolCloud.getPathogenDensity() <= minimumRelevantPathogenDensity) || (simTimeInSec > aerosolCloud.getCreationTime() + aerosolCloud.getLifeTime());
     }
 
     public void deleteAerosolCloudFlagController() {
