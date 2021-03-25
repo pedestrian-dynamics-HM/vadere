@@ -2,7 +2,7 @@
   "name" : "infectionModel_queue2",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "155c584e193d76eaa1e69033cbb6737e6a3fd641",
+  "commithash" : "5782820de5109d66e8f9aa31a0146b0943a99549",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,8 +102,8 @@
           "sourceId" : 1,
           "infectionStatus" : "INFECTIOUS"
         } ],
-        "pedestrianPathogenEmissionCapacity" : 7.0,
-        "pedestrianPathogenAbsorptionRate" : 1.0E-6,
+        "pedestrianPathogenEmissionCapacity" : 4.0,
+        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
