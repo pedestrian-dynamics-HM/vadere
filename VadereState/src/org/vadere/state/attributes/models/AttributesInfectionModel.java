@@ -13,29 +13,25 @@ public class AttributesInfectionModel extends Attributes {
 
 	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = new ArrayList<>();
 
-	private double pedestrianPathogenEmissionCapacity = 1; // emitted pathogen (in particles) = 10^pedestrianPathogenEmissionCapacity
+	private double pedestrianPathogenEmissionCapacity = 4; // 10^pedestrianPathogenEmissionCapacity = emitted pathogen (in particles)
 
 	// Idea: use distributions and draw from org.vadere.state.scenario.ConstantDistribution
 	// with defined distribution parameters similarly to "interSpawnTimeDistribution"
 	/**
-	 * percentage of pathogen load that is absorbed by an agent that inhales aerosol cloud with certain pathogen load
-	 * 1 breath : 0.5 * 10^-3 m^3, aerosolCloud volume: 4/3 * pi * r^3 m^3 (for r=0.75m -> V=1.8 m^3)
-	 * 1 breath makes about 0.03%
-	 * measures such as face covering may reduce this ratio
+	 * pedestrianPathogenAbsorptionRate: tidal volume in m^3; one could account for protective measures such as masks
+	 * by multiplying the tidal volume by a "mask efficiency factor [0, 1]"
 	 */
-	private double pedestrianPathogenAbsorptionRate = 0.0003;
+	private double pedestrianPathogenAbsorptionRate = 0.0005;
 	/**
 	 * min absorbed pathogen load that leads to change in infectionStatus: susceptible -> exposed
 	 * (could be defined individually for each agent depending on its immune system)
-	 *
-	 *
 	 */
-	private double pedestrianSusceptibility = 500; // particles required for being infected
+	private double pedestrianSusceptibility = 1000; // absorbed particles required for being exposed
 	private double exposedPeriod = 2*24*60*60;
 	private double infectiousPeriod = 14*24*60*60;
-	private double recoveredPeriod = 150*24*60*60;
+	private double recoveredPeriod = 365*24*60*60;
 
-	private double aerosolCloudLifeTime = 2*60*60;
+	private double aerosolCloudLifeTime = 1*60*60;
 	private double aerosolCloudInitialRadius = 0.75;
 
 	public double getInfectionModelLastUpdateTime() { return infectionModelLastUpdateTime; }

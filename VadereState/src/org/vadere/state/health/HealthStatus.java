@@ -13,7 +13,7 @@ public class HealthStatus {
     // define infectious agent
     private double pathogenEmissionCapacity; // potentially emitted pathogen load (pathogen particles per breath) in decimal log scale per update interval by infectious agent
     // define susceptible agents
-    private double pathogenAbsorptionRate = 0.005; // tidal volume in m^3; one could account for protective measures such as masks by multiplying the tidal volume by a "mask efficiency factor [0, 1]"
+    private double pathogenAbsorptionRate;
     private double susceptibility; // min absorbed pathogen load that leads to susceptible -> exposed (could be defined individually for each agent depending on its immune system)
 
     private double exposedPeriod;
