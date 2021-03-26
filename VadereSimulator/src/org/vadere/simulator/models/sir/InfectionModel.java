@@ -14,6 +14,7 @@ import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.*;
 
 import java.awt.geom.*;
@@ -76,11 +77,7 @@ public class InfectionModel extends AbstractSirModel {
 		if (simTimeInSec >= nextAerosolCloudUpdateTime) {
 			nextAerosolCloudUpdateTime = nextAerosolCloudUpdateTime + this.attributesInfectionModel.getInfectionModelUpdateStepLength() / 2.0;
 
-			Collection<Pedestrian> infectedPedestrians = this.domain.getTopography().getPedestrianDynamicElements()
-					.getElements()
-					.stream()
-					.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
-					.collect(Collectors.toSet());
+			Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(this.domain.getTopography());
 
 			for (Pedestrian ped : infectedPedestrians) {
 				if (ped.getStartBreatheOutPosition() == null) {
@@ -135,7 +132,7 @@ public class InfectionModel extends AbstractSirModel {
 		if ((simTimeInSec >= startBreatheInUpdateTime) & (simTimeInSec <= endBreatheInUpdateTime) & (deltaTime > 0)) {
 			Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
 			for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
-				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
+				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(this.domain.getTopography(), aerosolCloud);
 				for (Pedestrian pedestrian : pedestriansInsideCloud) {
 					updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * deltaTime);
 				}
@@ -147,6 +144,14 @@ public class InfectionModel extends AbstractSirModel {
 		for (Pedestrian pedestrian : allPedestrians) {
 			updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
 		}
+	}
+
+	public static Collection<Pedestrian> getInfectedPedestrians(Topography topography) {
+		return topography.getPedestrianDynamicElements()
+				.getElements()
+				.stream()
+				.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
+				.collect(Collectors.toSet());
 	}
 
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
@@ -191,25 +196,25 @@ public class InfectionModel extends AbstractSirModel {
 		return attributesInfectionModel;
 	}
 
-	public Collection<Pedestrian> getDynamicElementsNearAerosolCloud(AerosolCloud aerosolCloud) {
+	public static Collection<Pedestrian> getDynamicElementsNearAerosolCloud(Topography topography, AerosolCloud aerosolCloud) {
 		final Rectangle2D aerosolCloudBounds = aerosolCloud.getShape().getBounds2D();
 		final VPoint centerOfAerosolCloud = new VPoint(aerosolCloudBounds.getCenterX(), aerosolCloudBounds.getCenterY());
 
 		final double aerosolCloudProximity = Math.max(aerosolCloudBounds.getHeight(), aerosolCloudBounds.getWidth());
 
-		return this.domain.getTopography().getSpatialMap(Pedestrian.class).getObjects(centerOfAerosolCloud, aerosolCloudProximity);
+		return topography.getSpatialMap(Pedestrian.class).getObjects(centerOfAerosolCloud, aerosolCloudProximity);
 	}
 
-	public boolean isPedestrianInAerosolCloud(AerosolCloud aerosolCloud, Pedestrian pedestrian) {
+	public static boolean isPedestrianInAerosolCloud(AerosolCloud aerosolCloud, Pedestrian pedestrian) {
 		VShape aerosolCloudShape = aerosolCloud.getShape();
 		VPoint pedestrianPosition = pedestrian.getPosition();
 		return aerosolCloudShape.contains(pedestrianPosition);
 	}
 
-	public Collection<Pedestrian> getPedestriansInsideAerosolCloud(AerosolCloud aerosolCloud) {
+	public static Collection<Pedestrian> getPedestriansInsideAerosolCloud(Topography topography, AerosolCloud aerosolCloud) {
 		Collection<Pedestrian> pedestriansInsideAerosolCloud = new LinkedList<>();
 
-		Collection<Pedestrian> pedestriansNearAerosolCloud = getDynamicElementsNearAerosolCloud(aerosolCloud);
+		Collection<Pedestrian> pedestriansNearAerosolCloud = getDynamicElementsNearAerosolCloud(topography, aerosolCloud);
 		for (Pedestrian pedestrian : pedestriansNearAerosolCloud) {
 			if (isPedestrianInAerosolCloud(aerosolCloud, pedestrian)){
 				pedestriansInsideAerosolCloud.add(pedestrian);
@@ -218,7 +223,7 @@ public class InfectionModel extends AbstractSirModel {
 		return pedestriansInsideAerosolCloud;
 	}
 
-	public VShape createTransformedShape(VPoint vertex1, VPoint vertex2, double area) {
+	public static VShape createTransformedShape(VPoint vertex1, VPoint vertex2, double area) {
 		VPoint centerVertex = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
 		double majorAxis = vertex1.distance(vertex2);
 		double minorAxis = 4 * area / (majorAxis * Math.PI);

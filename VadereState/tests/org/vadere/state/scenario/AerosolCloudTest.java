@@ -93,7 +93,7 @@ public class AerosolCloudTest extends TestCase {
         assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());
         assertEquals(aerosolCloudOriginal.getShape(), aerosolCloudClone.getShape());
         assertEquals(aerosolCloudOriginal.getCreationTime(), aerosolCloudClone.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(aerosolCloudOriginal.getPathogenLoad(), aerosolCloudClone.getPathogenLoad(), ALLOWED_DOUBLE_TOLERANCE);
+        assertEquals(aerosolCloudOriginal.getPathogenDensity(), aerosolCloudClone.getPathogenDensity(), ALLOWED_DOUBLE_TOLERANCE);
         assertEquals(aerosolCloudOriginal.getHasReachedLifeEnd(), aerosolCloudClone.getHasReachedLifeEnd());
         assertEquals(aerosolCloudOriginal.getLifeTime(), aerosolCloudClone.getLifeTime(),ALLOWED_DOUBLE_TOLERANCE);
 
@@ -101,13 +101,13 @@ public class AerosolCloudTest extends TestCase {
         aerosolCloudClone.setId(2);
         aerosolCloudClone.setShape(newShape);
         aerosolCloudClone.setCreationTime(0);
-        aerosolCloudClone.setPathogenLoad(10e10);
+        aerosolCloudClone.setPathogenDensity(10e10);
         aerosolCloudClone.setHasReachedLifeEnd(true);
 
         assertEquals(id, aerosolCloudOriginal.getId());
         assertEquals(shape, aerosolCloudOriginal.getShape());
         assertEquals(creationTime, aerosolCloudOriginal.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(pathogenLoad, aerosolCloudOriginal.getPathogenLoad(), ALLOWED_DOUBLE_TOLERANCE);
+        assertEquals(pathogenLoad, aerosolCloudOriginal.getPathogenDensity(), ALLOWED_DOUBLE_TOLERANCE);
         assertEquals(hasReachedLifeEnd, aerosolCloudOriginal.getHasReachedLifeEnd());
     }
 
