@@ -122,12 +122,14 @@ public class Pedestrian extends Agent {
 	public double getLastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
 	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
 	public VPoint getStartBreatheOutPosition() { return healthStatus.getStartBreatheOutPosition(); }
+	public double getRespiratoryTimeOffset() { return healthStatus.getRespiratoryTimeOffset(); }
 	public double getPathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
 	public double getPathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
 	public double getSusceptibility() { return healthStatus.getSusceptibility(); }
 	public double getExposedPeriod() { return healthStatus.getExposedPeriod(); }
 	public double getInfectiousPeriod() { return healthStatus.getInfectiousPeriod(); }
 	public double getRecoveredPeriod() { return healthStatus.getRecoveredPeriod(); }
+	public boolean isBreathingIn() { return healthStatus.isBreathingIn(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -182,12 +184,14 @@ public class Pedestrian extends Agent {
 	public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { healthStatus.setLastInfectionStatusUpdateTime(lastInfectionStatusUpdateTime); }
 	public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { healthStatus.setPathogenAbsorbedLoad(pathogenAbsorbedLoad); }
 	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) { healthStatus.setStartBreatheOutPosition(startBreatheOutPosition); }
+	public void setRespiratoryTimeOffset(double respiratoryTimeOffset) { healthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset); }
 	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity); }
 	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }
 	public void setSusceptibility(double susceptibility) { healthStatus.setSusceptibility(susceptibility); }
 	public void setExposedPeriod(double exposedPeriod) { healthStatus.setExposedPeriod(exposedPeriod); }
 	public void setInfectiousPeriod(double infectiousPeriod) { healthStatus.setInfectiousPeriod(infectiousPeriod); }
 	public void setRecoveredPeriod(double recoveredPeriod) { healthStatus.setRecoveredPeriod(recoveredPeriod); }
+	public void setBreathingIn(boolean breathingIn) { healthStatus.setBreathingIn(breathingIn); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
