@@ -22,7 +22,7 @@ public class AerosolCloud extends ScenarioElement {
 
     public AerosolCloud(AerosolCloud aerosolCloud){
         this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getCreationTime(),
-                aerosolCloud.getPathogenDensity(), aerosolCloud.getLifeTime(), aerosolCloud.getHasReachedLifeEnd()));
+                aerosolCloud.getHalfLife(), aerosolCloud.getInitialPathogenLoad(), aerosolCloud.getHasReachedLifeEnd()));
     }
 
 
@@ -47,9 +47,10 @@ public class AerosolCloud extends ScenarioElement {
         return attributes;
     }
 
-    public double getLifeTime() { return attributes.getLifeTime(); }
+    public double getHalfLife() { return attributes.getHalfLife(); }
     public double getCreationTime() { return attributes.getCreationTime(); }
     public double getPathogenDensity() { return attributes.getPathogenDensity(); }
+    public double getInitialPathogenLoad() { return attributes.getInitialPathogenLoad(); }
     public boolean getHasReachedLifeEnd() { return attributes.getHasReachedLifeEnd(); }
 
     // Setter
@@ -68,7 +69,9 @@ public class AerosolCloud extends ScenarioElement {
     }
 
     public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
+    public void setHalfLife(double halfLife) { attributes.setHalfLife(halfLife); }
     public void setPathogenDensity(double pathogenDensity) { attributes.setPathogenDensity(pathogenDensity); }
+    public void setInitialPathogenLoad(double initialPathogenLoad) { attributes.setInitialPathogenLoad(initialPathogenLoad); }
     public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
 
 

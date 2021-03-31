@@ -31,7 +31,7 @@ public class AttributesInfectionModel extends Attributes {
 	private double infectiousPeriod = 14*24*60*60;
 	private double recoveredPeriod = 365*24*60*60;
 
-	private double aerosolCloudLifeTime = 1*60*60;
+	private double aerosolCloudHalfLife = 60;
 	private double aerosolCloudInitialRadius = 0.75;
 
 	public double getInfectionModelLastUpdateTime() { return infectionModelLastUpdateTime; }
@@ -64,8 +64,8 @@ public class AttributesInfectionModel extends Attributes {
 		return recoveredPeriod;
 	}
 
-	public double getAerosolCloudLifeTime() {
-		return aerosolCloudLifeTime;
+	public double getAerosolCloudHalfLife() {
+		return aerosolCloudHalfLife;
 	}
 
 	public double getAerosolCloudInitialRadius() {

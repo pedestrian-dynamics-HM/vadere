@@ -285,19 +285,20 @@ public abstract class DefaultRenderer {
 	}
 
 	protected void renderAerosolClouds(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
-										  final Color color, double maxEmittedPathogenLoad){
+										  final Color color){
 		for (ScenarioElement e : elements){
-			renderAerosolCloud(e, g, color, maxEmittedPathogenLoad);
+			renderAerosolCloud(e, g, color);
 		}
 	}
 
-	protected void renderAerosolCloud(ScenarioElement element, final Graphics2D graphics, Color color, double maxEmittedPathogenLoad){
+	protected void renderAerosolCloud(ScenarioElement element, final Graphics2D graphics, Color color){
 		final Color tmpColor = graphics.getColor();
 		AerosolCloud cloud = (AerosolCloud) element;
 		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
-		float currentAlpha = (float) ((cloud.getPathogenDensity() / maxEmittedPathogenLoad) * maxAlpha);
+		float minAlpha = 0; //defaultModel.getConfig().getAerosolCloudAlphaMin()
+		int currentAlpha = (int) ((cloud.getPathogenDensity() / cloud.getInitialPathogenLoad()) * (maxAlpha - minAlpha) + minAlpha);
 
-		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), defaultModel.getConfig().getAerosolCloudAlphaMax()));
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
 		if (cloud.getShape() instanceof VPolygon){
 			VPolygon p = (VPolygon) cloud.getShape();
 			if (p.getPoints().size() == 2){

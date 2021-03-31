@@ -95,7 +95,7 @@ public class AerosolCloudTest extends TestCase {
         assertEquals(aerosolCloudOriginal.getCreationTime(), aerosolCloudClone.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
         assertEquals(aerosolCloudOriginal.getPathogenDensity(), aerosolCloudClone.getPathogenDensity(), ALLOWED_DOUBLE_TOLERANCE);
         assertEquals(aerosolCloudOriginal.getHasReachedLifeEnd(), aerosolCloudClone.getHasReachedLifeEnd());
-        assertEquals(aerosolCloudOriginal.getLifeTime(), aerosolCloudClone.getLifeTime(),ALLOWED_DOUBLE_TOLERANCE);
+        assertEquals(aerosolCloudOriginal.getHalfLife(), aerosolCloudClone.getHalfLife(),ALLOWED_DOUBLE_TOLERANCE);
 
         // check that original is not affected by setters/changes to the clone
         aerosolCloudClone.setId(2);

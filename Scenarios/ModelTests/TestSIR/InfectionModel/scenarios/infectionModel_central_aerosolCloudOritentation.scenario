@@ -2,7 +2,6 @@
   "name" : "infectionModel_central_aerosolCloudOritentation",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "155c584e193d76eaa1e69033cbb6737e6a3fd641",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -105,7 +104,7 @@
         "exposedPeriod" : 172800.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
-        "aerosolCloudLifeTime" : 7200.0,
+        "aerosolCloudHalfLife" : 60.0,
         "aerosolCloudInitialRadius" : 0.75
       }
     },

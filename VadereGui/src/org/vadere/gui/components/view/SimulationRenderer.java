@@ -109,8 +109,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         }
 
         if (model.config.isShowAerosolClouds()) {
-            double maxEmittedPathogenLoad = 1; //.attributesInfectionModel.InfectionModelSourceParameters.pedestrianPathogenEmissionCapacity;
-            renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor(), maxEmittedPathogenLoad);
+            renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
         }
 
         if (model.config.isShowSources()) {

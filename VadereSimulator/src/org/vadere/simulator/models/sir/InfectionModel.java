@@ -86,7 +86,6 @@ public class InfectionModel extends AbstractSirModel {
 				// - ellipsoid with principal diameters a, b, c where cross-sectional
 				// area (in the x-y-plane) = a * b * PI and c = initialAerosolCloudRadius
 				double height = 4.0 / 3.0 * attributesInfectionModel.getAerosolCloudInitialRadius();
-				double volume = area * height;
 
 				// assumption: only a part of the emitted pathogen remains in the x-y-plane
 				// (at z ~ height of the pedestrians' faces) due to effects such as
@@ -94,12 +93,13 @@ public class InfectionModel extends AbstractSirModel {
 				// These effects actually play a role over time -> remainingPathogenFraction or pathogenDensity2D
 				// should be updated over time (see AerosolCloudController)
 				double remainingPathogenFraction = 1.0;
+				double pathogenLoad3DTo2D = (1.0 / height) * remainingPathogenFraction;
 
 				AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						shape,
 						simTimeInSec,
-						pedestrian.emitPathogen() / volume * remainingPathogenFraction,
-						attributesInfectionModel.getAerosolCloudLifeTime(),
+						attributesInfectionModel.getAerosolCloudHalfLife(),
+						pedestrian.emitPathogen() / area * pathogenLoad3DTo2D,
 						false));
 				this.controllerManager.registerAerosolCloud(aerosolCloud);
 			}
