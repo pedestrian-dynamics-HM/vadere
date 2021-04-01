@@ -79,6 +79,11 @@ public class InfectionModel extends AbstractSirModel {
 
 				double area = Math.pow(attributesInfectionModel.getAerosolCloudInitialRadius(), 2) * Math.PI;
 				VShape shape = createTransformedShape(v1, v2, area);
+				// ToDo find better solution to store shapeParameters
+				ArrayList<VPoint> shapeParameters = new ArrayList<>();
+				shapeParameters.add(0, new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0));
+				shapeParameters.add(1, v1);
+				shapeParameters.add(2, v2);
 
 				// assumption: aerosolCloud has a constant vertical extent (in m). The height corresponds to a
 				// cylinder whose volume equals the
@@ -95,8 +100,14 @@ public class InfectionModel extends AbstractSirModel {
 				double remainingPathogenFraction = 1.0;
 				double pathogenLoad3DTo2D = (1.0 / height) * remainingPathogenFraction;
 
+				// assumption: pathogen load within bounds of aerosolCloud represents 99.7% of total pathogen load;
+				// remainder is neglected;
+				// The load inside the aerosolCloud is distributed according to a 2dimensional gaussian distribution
+				// center corresponds to the mean value
+				// distance between center and aerosolCloud bound represents 3 * standard deviation
 				AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						shape,
+						shapeParameters,
 						simTimeInSec,
 						attributesInfectionModel.getAerosolCloudHalfLife(),
 						pedestrian.emitPathogen() / area * pathogenLoad3DTo2D,
@@ -113,8 +124,16 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(this.domain.getTopography(), aerosolCloud);
 			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(p -> p.isBreathingIn()).collect(Collectors.toSet());
 			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
-				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * timeNormalizationConst);
+				double pathogenLevelInsideCloud = aerosolCloud.calculatePathogenLevel(pedestrian.getPosition());
+				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * pathogenLevelInsideCloud * timeNormalizationConst);
 			}
+			// ToDo implement "turbulence" function: each agent that steps into an aerosolCloud causes swirls that should be accounted for
+			// influencing factors:
+			// - velocity of agent: average step length?
+			// - hitting aerosolCloud right through its center or closer to the bounds? maybe use trajectory as secant -> smaller section / greater section = impact factor
+			// effects:
+			// - greater aerosolcloud radius
+			// - (more homogeneous distribution inside aerosolCloud?)
 		}
 
 		// update pedestrians
@@ -215,8 +234,9 @@ public class InfectionModel extends AbstractSirModel {
 		return pedestriansInsideAerosolCloud;
 	}
 
+	// ToDo rename method (currently it has the same name method from AffineTransform)
 	public static VShape createTransformedShape(VPoint vertex1, VPoint vertex2, double area) {
-		VPoint centerVertex = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
+		VPoint center = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
 		double majorAxis = vertex1.distance(vertex2);
 		double minorAxis = 4 * area / (majorAxis * Math.PI);
 
@@ -229,7 +249,7 @@ public class InfectionModel extends AbstractSirModel {
 
 		if (majorAxis < minorAxis) {
  			// return ellipse with (a'=b') -> circle
- 			shape = new VCircle(new VPoint(centerVertex.getX(), centerVertex.getY()), Math.sqrt(area / Math.PI));
+ 			shape = new VCircle(new VPoint(center.getX(), center.getY()), Math.sqrt(area / Math.PI));
  		} else {
 			// return polygon (approximated ellipse with edges)
 			Path2D path = new Path2D.Double();
@@ -242,10 +262,9 @@ public class InfectionModel extends AbstractSirModel {
 			VShape polygon = new VPolygon(path);
 			double theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // get orientation of shape
 			AffineTransform transform = new AffineTransform();
-			transform.translate(centerVertex.getX(), centerVertex.getY());
+			transform.translate(center.getX(), center.getY());
 			transform.rotate(theta);
 
-			// shape = new VPolygon(transform.createTransformedShape(shape1));
 			shape = new VPolygon(transform.createTransformedShape(polygon));
 		}
 		return shape;

@@ -1,14 +1,20 @@
 package org.vadere.state.attributes.scenario;
 
+import org.lwjgl.system.CallbackI;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 
 public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     private int id;
     private VShape shape;
+    private ArrayList<VPoint> shapeParameters; // center, vertex1, vertex2 // ToDo: dirty parameter (may differ from actual shape)
     private double creationTime;
     private double pathogenDensity; // assumption: same density along z-axis
     private double halfLife;
@@ -17,8 +23,13 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     // Constructors
     public AttributesAerosolCloud() {
+        VPoint center = new VPoint(0, 0);
         this.id = AttributesEmbedShape.ID_NOT_SET;
-        this.shape = new VCircle(0.75);
+        this.shape = new VCircle(center, 0.75);
+        this.shapeParameters = new ArrayList<VPoint>();
+        this.shapeParameters.add(0, center);
+        this.shapeParameters.add(1, new VPoint(0, 0));
+        this.shapeParameters.add(2, new VPoint(0, 0));
         this.creationTime = -1;
         this.pathogenDensity = -1;
         this.halfLife = -1;
@@ -32,9 +43,10 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double creationTime, double halfLife, double initialPathogenLoad, boolean hasReachedLifeEnd) {
+    public AttributesAerosolCloud(int id, VShape shape, ArrayList<VPoint> shapeParameters, double creationTime, double halfLife, double initialPathogenLoad, boolean hasReachedLifeEnd) {
         this.id = id;
         this.shape = shape;
+        this.shapeParameters = shapeParameters;
         this.creationTime = creationTime;
         this.halfLife = halfLife;
         this.pathogenDensity = initialPathogenLoad;
@@ -48,6 +60,10 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     @Override
     public VShape getShape() { // ToDo: check if this works instead of public VShape getShape() {return shape;}
         return shape;
+    }
+
+    public ArrayList<VPoint> getShapeParameters() { // ToDo: check if this works instead of public VShape getShape() {return shape;}
+        return shapeParameters;
     }
 
     public double getCreationTime() { return creationTime; }
@@ -69,6 +85,10 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     @Override
     public void setShape(VShape shape) {
         this.shape = shape;
+    }
+
+    public void setShapeParameters(ArrayList<VPoint> shapeParameters) {
+        this.shapeParameters = shapeParameters;
     }
 
     public void setCreationTime(double creationTime) { this.creationTime = creationTime; }
