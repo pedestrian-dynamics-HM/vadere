@@ -7,6 +7,8 @@ import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.ArrayList;
+
 
 public class AerosolCloudTest extends TestCase {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
@@ -80,14 +82,20 @@ public class AerosolCloudTest extends TestCase {
     @Test
     public void testTestClone() {
         int id = 1;
-        VCircle shape = new VCircle(new VPoint(2, 2), 3);
+        double radius = 3.0;
+        VPoint center = new VPoint(2, 2);
+        VCircle shape = new VCircle(center, radius);
+        double area = radius * radius * Math.PI;
+        ArrayList<VPoint> shapeParameters = new ArrayList<VPoint>();
+        shapeParameters.add(0, center);
+
         VCircle newShape = new VCircle(new VPoint(3, 3), 4);
         double creationTime = 999.9;
         double pathogenLoad = 10e9;
         double lifeTime = 60*60*3;
         boolean hasReachedLifeEnd = false;
 
-        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, creationTime, pathogenLoad, lifeTime, hasReachedLifeEnd));
+        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, area, shapeParameters, creationTime, pathogenLoad, lifeTime, hasReachedLifeEnd));
         AerosolCloud aerosolCloudClone = aerosolCloudOriginal.clone();
 
         assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());

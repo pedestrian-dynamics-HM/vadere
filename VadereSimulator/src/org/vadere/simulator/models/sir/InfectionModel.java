@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.sir;
 
+import org.lwjgl.system.CallbackI;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerManager;
@@ -107,6 +108,7 @@ public class InfectionModel extends AbstractSirModel {
 				// distance between center and aerosolCloud bound represents 3 * standard deviation
 				AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						shape,
+						area,
 						shapeParameters,
 						simTimeInSec,
 						attributesInfectionModel.getAerosolCloudHalfLife(),
@@ -127,13 +129,45 @@ public class InfectionModel extends AbstractSirModel {
 				double pathogenLevelInsideCloud = aerosolCloud.calculatePathogenLevel(pedestrian.getPosition());
 				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * pathogenLevelInsideCloud * timeNormalizationConst);
 			}
-			// ToDo implement "turbulence" function: each agent that steps into an aerosolCloud causes swirls that should be accounted for
-			// influencing factors:
-			// - velocity of agent: average step length?
-			// - hitting aerosolCloud right through its center or closer to the bounds? maybe use trajectory as secant -> smaller section / greater section = impact factor
-			// effects:
-			// - greater aerosolcloud radius
-			// - (more homogeneous distribution inside aerosolCloud?)
+
+			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
+			double maxArea = 10;
+			if (aerosolCloud.getArea() < maxArea) {
+				double deltaRadius = 0.0;
+				double weight = 0.005; // each pedestrian with velocity v causes an increase of the cloud's radius by
+				// factor weight * v
+				for (Pedestrian pedestrian : pedestriansInsideCloud) {
+					deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
+				}
+				if (deltaRadius > 0.0) {
+					VShape shape = aerosolCloud.getShape();
+					VPoint center = aerosolCloud.getShapeParameters().get(0);
+					VPoint vertex1 = aerosolCloud.getShapeParameters().get(1);
+					VPoint vertex2 = aerosolCloud.getShapeParameters().get(2);
+
+					if (shape instanceof VPolygon) {
+						double oldAxis1 = Math.sqrt(Math.pow((vertex1.x - center.x), 2) + Math.pow((vertex1.y - center.y), 2));
+						double oldAxis2 = aerosolCloud.getArea() / Math.PI / oldAxis1;
+						VPoint newVertex1 = new VPoint(vertex1.x + deltaRadius * (vertex1.x - center.x) / oldAxis1, vertex1.y + deltaRadius * (vertex1.y - center.y) / oldAxis1);
+						VPoint newVertex2 = new VPoint(vertex2.x - deltaRadius * (vertex2.x - center.x) / oldAxis1, vertex2.y - deltaRadius * (vertex2.y - center.y) / oldAxis1);
+						double newArea = (oldAxis1 + deltaRadius) * (oldAxis2 + deltaRadius) * Math.PI;
+						VShape newShape = createTransformedShape(newVertex1, newVertex2, newArea);
+
+						aerosolCloud.setShape(newShape);
+						aerosolCloud.setArea(newArea);
+						ArrayList<VPoint> newShapeParameters = new ArrayList<>();
+						newShapeParameters.add(0, center);
+						newShapeParameters.add(1, newVertex1);
+						newShapeParameters.add(2, newVertex2);
+						aerosolCloud.setShapeParameters(newShapeParameters);
+					} else if (shape instanceof VCircle) {
+						double newArea = Math.pow((((VCircle) shape).getRadius() + deltaRadius), 2) * Math.PI;
+						VShape newShape = createTransformedShape(vertex1, vertex2, newArea);
+						aerosolCloud.setShape(newShape);
+						aerosolCloud.setArea(newArea);
+					}
+				}
+			}
 		}
 
 		// update pedestrians

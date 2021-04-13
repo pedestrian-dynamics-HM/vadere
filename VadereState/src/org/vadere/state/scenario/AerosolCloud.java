@@ -28,7 +28,7 @@ public class AerosolCloud extends ScenarioElement {
     }
 
     public AerosolCloud(AerosolCloud aerosolCloud){
-        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.attributes.getShapeParameters(), aerosolCloud.getCreationTime(),
+        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getArea(), aerosolCloud.attributes.getShapeParameters(), aerosolCloud.getCreationTime(),
                 aerosolCloud.getHalfLife(), aerosolCloud.getInitialPathogenLoad(), aerosolCloud.getHasReachedLifeEnd()));
     }
 
@@ -38,6 +38,8 @@ public class AerosolCloud extends ScenarioElement {
     public VShape getShape() {     // ToDo check of one must use VShape instead -> attributesAerosolCloud
         return attributes.getShape();
     }
+
+    public double getArea() { return attributes.getArea(); }
 
     public ArrayList<VPoint> getShapeParameters() {     // ToDo check of one must use VShape instead -> attributesAerosolCloud
         return attributes.getShapeParameters();
@@ -69,6 +71,9 @@ public class AerosolCloud extends ScenarioElement {
     public void setShape(VShape newShape) {
         attributes.setShape(newShape);
     }
+
+    public void setArea(double area) { attributes.setArea(area); }
+    public void setShapeParameters(ArrayList<VPoint> shapeParameters) { attributes.setShapeParameters(shapeParameters); }
 
     @Override
     public void setAttributes(Attributes attributes) {
