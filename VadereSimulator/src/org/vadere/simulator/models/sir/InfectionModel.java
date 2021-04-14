@@ -96,10 +96,9 @@ public class InfectionModel extends AbstractSirModel {
 				// assumption: only a part of the emitted pathogen remains in the x-y-plane
 				// (at z ~ height of the pedestrians' faces) due to effects such as
 				// declining "pathogen activity", evaporation, gravitation/sedimentation.
-				// These effects actually play a role over time -> remainingPathogenFraction or pathogenDensity2D
-				// should be updated over time (see AerosolCloudController)
 				double remainingPathogenFraction = 1.0;
 				double pathogenLoad3DTo2D = (1.0 / height) * remainingPathogenFraction;
+				double pathogenLoad = pedestrian.emitPathogen() / area * pathogenLoad3DTo2D;
 
 				// assumption: pathogen load within bounds of aerosolCloud represents 99.7% of total pathogen load;
 				// remainder is neglected;
@@ -112,7 +111,8 @@ public class InfectionModel extends AbstractSirModel {
 						shapeParameters,
 						simTimeInSec,
 						attributesInfectionModel.getAerosolCloudHalfLife(),
-						pedestrian.emitPathogen() / area * pathogenLoad3DTo2D,
+						pathogenLoad,
+						pathogenLoad,
 						false));
 				this.controllerManager.registerAerosolCloud(aerosolCloud);
 			}
@@ -127,10 +127,11 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(p -> p.isBreathingIn()).collect(Collectors.toSet());
 			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
 				double pathogenLevelInsideCloud = aerosolCloud.calculatePathogenLevel(pedestrian.getPosition());
-				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getPathogenDensity() * pathogenLevelInsideCloud * timeNormalizationConst);
+				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea() * pathogenLevelInsideCloud * timeNormalizationConst);
 			}
 
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
+			// assumption: aerosolClouds do not become greater than maxArea
 			double maxArea = 10;
 			if (aerosolCloud.getArea() < maxArea) {
 				double deltaRadius = 0.0;
@@ -146,8 +147,10 @@ public class InfectionModel extends AbstractSirModel {
 					VPoint vertex2 = aerosolCloud.getShapeParameters().get(2);
 
 					if (shape instanceof VPolygon) {
+						// get length of oldAxis1 (semi-axis between vertex1 and vertex2) and oldAxis2 (corresponding perpendicular semi-axis)
 						double oldAxis1 = Math.sqrt(Math.pow((vertex1.x - center.x), 2) + Math.pow((vertex1.y - center.y), 2));
 						double oldAxis2 = aerosolCloud.getArea() / Math.PI / oldAxis1;
+						// define new vertices and area
 						VPoint newVertex1 = new VPoint(vertex1.x + deltaRadius * (vertex1.x - center.x) / oldAxis1, vertex1.y + deltaRadius * (vertex1.y - center.y) / oldAxis1);
 						VPoint newVertex2 = new VPoint(vertex2.x - deltaRadius * (vertex2.x - center.x) / oldAxis1, vertex2.y - deltaRadius * (vertex2.y - center.y) / oldAxis1);
 						double newArea = (oldAxis1 + deltaRadius) * (oldAxis2 + deltaRadius) * Math.PI;

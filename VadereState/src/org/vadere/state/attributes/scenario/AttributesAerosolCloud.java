@@ -17,9 +17,9 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private double area;
     private ArrayList<VPoint> shapeParameters; // center, vertex1, vertex2 // ToDo: dirty parameter (may differ from actual shape)
     private double creationTime;
-    private double pathogenDensity; // assumption: same density along z-axis
     private double halfLife;
     private double initialPathogenLoad;
+    private double currentPathogenLoad;
     private boolean hasReachedLifeEnd;
 
     // Constructors
@@ -34,9 +34,9 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.shapeParameters.add(1, new VPoint(0, 0));
         this.shapeParameters.add(2, new VPoint(0, 0));
         this.creationTime = -1;
-        this.pathogenDensity = -1;
         this.halfLife = -1;
         this.initialPathogenLoad = -1;
+        this.currentPathogenLoad = -1;
         this.hasReachedLifeEnd = false;
     }
 
@@ -46,15 +46,15 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double area, ArrayList<VPoint> shapeParameters, double creationTime, double halfLife, double initialPathogenLoad, boolean hasReachedLifeEnd) {
+    public AttributesAerosolCloud(int id, VShape shape, double area, ArrayList<VPoint> shapeParameters, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
         this.id = id;
         this.shape = shape;
         this.area = area;
         this.shapeParameters = shapeParameters;
         this.creationTime = creationTime;
         this.halfLife = halfLife;
-        this.pathogenDensity = initialPathogenLoad;
         this.initialPathogenLoad = initialPathogenLoad;
+        this.currentPathogenLoad = currentPathogenLoad;
         this.hasReachedLifeEnd = hasReachedLifeEnd;
     }
 
@@ -74,11 +74,11 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public double getCreationTime() { return creationTime; }
 
-    public double getPathogenDensity() { return pathogenDensity; }
-
     public double getHalfLife() { return halfLife; }
 
     public double getInitialPathogenLoad() { return initialPathogenLoad; }
+
+    public double getCurrentPathogenLoad() { return currentPathogenLoad; }
 
     public boolean getHasReachedLifeEnd() { return hasReachedLifeEnd; }
 
@@ -101,11 +101,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public void setCreationTime(double creationTime) { this.creationTime = creationTime; }
 
-    public void setPathogenDensity(double pathogenDensity) { this.pathogenDensity = pathogenDensity; }
-
     public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { this.hasReachedLifeEnd = hasReachedLifeEnd; }
 
-    public void setHalfLife(double halfLife) { this.halfLife = halfLife; }
-
-    public void setInitialPathogenLoad(double initialPathogenLoad) { this.initialPathogenLoad = initialPathogenLoad; }
+    public void setCurrentPathogenLoad(double currentPathogenLoad) { this.currentPathogenLoad = currentPathogenLoad; }
 }

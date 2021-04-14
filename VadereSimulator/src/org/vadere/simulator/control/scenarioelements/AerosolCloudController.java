@@ -60,13 +60,14 @@ public class AerosolCloudController extends ScenarioElementController {
     public void reduceAerosolCloudPathogenLoad(double simTimeInSec) {
         double t = simTimeInSec - aerosolCloud.getCreationTime();
         double lambda = - Math.log(0.5) / aerosolCloud.getHalfLife();
-        aerosolCloud.setPathogenDensity(aerosolCloud.getInitialPathogenLoad() * Math.exp(-lambda * t));
+        aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getInitialPathogenLoad() * Math.exp(-lambda * t));
     }
 
     public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {
         // assumption: aerosolCloud is not relevant anymore if it has reached less than 1% of its initialPathogenLoad
-        double minimumRelevantPathogenDensity = 0.001 * aerosolCloud.getInitialPathogenLoad();
-        return (aerosolCloud.getPathogenDensity() < minimumRelevantPathogenDensity);
+        // As a consequence, the life time is about ln(1%) / -lambda * halfLife = 6.6 times halfLife.
+        double minimumRelevantPathogenLoad = 0.01 * aerosolCloud.getInitialPathogenLoad();
+        return (aerosolCloud.getCurrentPathogenLoad() < minimumRelevantPathogenLoad);
     }
 
     public void deleteAerosolCloudFlagController() {
