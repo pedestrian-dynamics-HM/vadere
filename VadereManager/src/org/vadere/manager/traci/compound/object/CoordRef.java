@@ -1,10 +1,9 @@
 package org.vadere.manager.traci.compound.object;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
-import org.vadere.manager.traci.compound.CompoundObject;
-import org.vadere.manager.traci.compound.CompoundObjectBuilder;
-import org.vadere.util.geometry.Vector3D;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.CompoundObjectBuilder;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class CoordRef {

@@ -222,8 +222,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	// personapi
 
 	@Override
-	public void personapi_getIDList(String[] args) throws IOException {
-		TraCIResponse res = personapi.getIDList();
+	public void personapi_getIdList(String[] args) throws IOException {
+		TraCIResponse res = personapi.getIdList();
 		printGet(res);
 	}
 
@@ -258,8 +258,8 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
-	public void personapi_getIDCount(String[] args) throws IOException {
-		TraCIResponse res = personapi.getIDCount();
+	public void personapi_getIdCount(String[] args) throws IOException {
+		TraCIResponse res = personapi.getIdCount();
 		printGet(res);
 	}
 
@@ -625,6 +625,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getDataProcessorValue(String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_getNetworkBound(String[] args) throws IOException {
 
 	}
@@ -632,7 +637,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	// vadere api
 
 	@Override
-	public void vadereapi_addStimulusInfos(String[] args) throws IOException {
+	public void miscapi_addStimulusInfos(String[] args) throws IOException {
 		if (args.length < 2) {
 			System.out.println("command needs argument json file");
 		}
@@ -644,18 +649,18 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		TraCIResponse res = vadereapi.addStimulusInfos(data);
+		TraCIResponse res = miscapi.addStimulusInfos(data);
 		System.out.println(res.toString());
 	}
 
 	@Override
-	public void vadereapi_getAllStimulusInfos(String[] args) throws IOException {
-		TraCIResponse res = vadereapi.getAllStimulusInfos();
+	public void miscapi_getAllStimulusInfos(String[] args) throws IOException {
+		TraCIResponse res = miscapi.getAllStimulusInfos();
 		System.out.println(res.toString());
 	}
 
 	@Override
-	public void vadereapi_createTargetChanger(String[] args) throws IOException {
+	public void miscapi_createTargetChanger(String[] args) throws IOException {
 		if (args.length < 2) {
 			System.out.println("command needs argument json file");
 			return;
@@ -668,12 +673,12 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		TraCIResponse res = vadereapi.createTargetChanger(data);
+		TraCIResponse res = miscapi.createTargetChanger(data);
 		System.out.println(res.toString());
 	}
 
 	@Override
-	public void vadereapi_removeTargetChanger(String[] args) throws IOException {
+	public void miscapi_removeTargetChanger(String[] args) throws IOException {
 		if (args.length < 2) {
 			System.out.println("command needs argument element id");
 			return;
@@ -681,7 +686,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 
 		String elementIdentifier = args[1];
 		// todo the second parameter is a dummy
-		TraCIResponse res = vadereapi.removeTargetChanger(elementIdentifier);
+		TraCIResponse res = miscapi.removeTargetChanger(elementIdentifier);
 		System.out.println(res.toString());
 	}
 

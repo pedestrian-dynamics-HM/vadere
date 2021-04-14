@@ -1,9 +1,9 @@
 package org.vadere.manager.traci.compound.object;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
-import org.vadere.manager.traci.compound.CompoundObject;
-import org.vadere.manager.traci.compound.CompoundObjectBuilder;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.CompoundObjectBuilder;
 
 import java.util.Objects;
 

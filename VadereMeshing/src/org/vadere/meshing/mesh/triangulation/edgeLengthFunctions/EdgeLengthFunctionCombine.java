@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.triangulation;
+package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.IPoint;

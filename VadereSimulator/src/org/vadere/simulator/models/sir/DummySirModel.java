@@ -2,7 +2,7 @@ package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.scenarioelements.SourceController;
-import org.vadere.simulator.control.simulation.ControllerManager;
+import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -44,8 +44,8 @@ public class DummySirModel extends AbstractSirModel {
 	}
 
 	@Override
-	public void registerToScenarioElementControllerEvents(ControllerManager controllerManager) {
-		for (var controller : controllerManager.getSourceControllers()){
+	public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
+		for (var controller : controllerProvider.getSourceControllers()){
 			controller.register(this::sourceControllerEvent);
 		}
 	}

@@ -2045,6 +2045,14 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 		return result;
 	}
 
+	default double getMinEdgeLen() {
+		return streamEdges().map(e -> toLine(e)).mapToDouble(l -> l.length()).min().orElse(0.0);
+	}
+
+	default double getMaxEdgeLen() {
+		return streamEdges().map(e -> toLine(e)).mapToDouble(l -> l.length()).max().orElse(0.0);
+	}
+
 	/**
 	 * Returns the half-edge which ends in v1 and starts in v2 if there is any, otherwise empty.
 	 *

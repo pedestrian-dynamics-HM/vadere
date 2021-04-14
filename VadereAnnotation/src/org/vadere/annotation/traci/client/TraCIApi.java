@@ -30,4 +30,11 @@ public @interface TraCIApi {
 	Class multipleAnnotation();
 	Class cmdEnum();
 	Class varEnum();
+	String var();
+	int cmdGet();
+	int cmdSet();
+	int cmdSub();
+	int cmdResponseSub();
+	int cmdCtx();
+	int cmdResponseCtx();
 }

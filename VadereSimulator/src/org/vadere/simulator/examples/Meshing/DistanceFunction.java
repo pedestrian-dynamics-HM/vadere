@@ -1,4 +1,4 @@
-package org.vadere.simulator.examples;
+package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.examples.ElementSizeFunction;
 import org.vadere.meshing.mesh.gen.PMesh;

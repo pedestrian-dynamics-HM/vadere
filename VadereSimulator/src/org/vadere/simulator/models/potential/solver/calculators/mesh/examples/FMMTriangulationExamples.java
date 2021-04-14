@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.potential.solver.calculators.mesh;
+package org.vadere.simulator.models.potential.solver.calculators.mesh.examples;
 
 import org.vadere.meshing.examples.MeshExamples;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -12,6 +12,8 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -27,22 +29,40 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
+/**
+ * Just an example of how to use the FMM on a triangular mesh using EikMesh.
+ *
+ * The following tasks are executed:
+ * (1) load the planar straight-line graph from a file (the definition of the spatial domain)
+ * (2) generate a mesh using EikMesh (if {@link FMMTriangulationExamples#visualize} is true this is displayed)
+ * (3) define a target area (polygon)
+ * (4) apply the FMM on a triangular mesh
+ *
+ * @author Benedikt Zoennchen
+ */
 public class FMMTriangulationExamples {
 
 	private static Logger log = Logger.getLogger(FMMTriangulationExamples.class);
+	private static boolean visualize = true;
+	private static boolean systemprint = true;
 
 	public static void main(String... args) throws IOException, InterruptedException {
+		// (1) + (2)
 		var triangulation = bridge();
 		VPolygon targetShape = GeometryUtils.toPolygon(new VPoint(33.90000000002328, 0.20000000018626451),
 				new VPoint(29.900000000023283, 0.5),
 				new VPoint(32.300000000046566, 6.0),
 				new VPoint(36.40000000002328, 4.900000000372529));
 
-		EikonalSolver solver = new MeshEikonalSolverFMM(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation);
+		MeshEikonalSolverFMM solver = new MeshEikonalSolverFMM(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation);
 		log.info("start FFM");
 		solver.solve();
 		log.info("FFM finished");
-		System.out.println(triangulation.getMesh().toPythonTriangulation(p -> triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential)));
+
+		if(systemprint) {
+			System.out.println(triangulation.getMesh().toPythonTriangulation(vertex -> solver.getPotential(vertex)));
+		}
+
 	}
 
 	public static IIncrementalTriangulation<
@@ -69,6 +89,8 @@ public class FMMTriangulationExamples {
 		);
 
 		var mesh = meshImprover.getMesh();
+
+
 		Color green = new Color(85, 168, 104);
 		Color red = new Color(196,78,82);
 		Color blue = new Color(76,114,202);
@@ -84,18 +106,26 @@ public class FMMTriangulationExamples {
 			}
 		};
 
-		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 800, colorFunction);
-		meshPanel.display("Combined distance functions " + h0);
+		var meshPanel = visualize ? new PMeshPanel(meshImprover.getMesh(), 1000, 800, colorFunction) : null;
+
+		if(visualize) {
+			meshPanel.display("Combined distance functions " + h0);
+		}
+
 		while (!meshImprover.isFinished()) {
 			meshImprover.improve();
 			Thread.sleep(20);
-			meshPanel.repaint();
+			if(visualize) {
+				meshPanel.repaint();
+			}
 		}
 		//meshImprover.generate();
 		// display the mesh
 
-		meshPanel.display("Combined distance functions " + h0);
-		System.out.println(TexGraphGenerator.toTikz(mesh, colorFunction, null, 1.0f, true));
+		if(systemprint) {
+			System.out.println(TexGraphGenerator.toTikz(mesh, colorFunction, null, 1.0f, true));
+		}
+
 		return meshImprover.getTriangulation();
 	}
 }

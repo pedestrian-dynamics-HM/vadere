@@ -1,27 +1,21 @@
 package org.vadere.manager.traci.commandHandler;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.TestRemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
-import org.vadere.manager.traci.commands.get.TraCIGetDistanceCommand;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

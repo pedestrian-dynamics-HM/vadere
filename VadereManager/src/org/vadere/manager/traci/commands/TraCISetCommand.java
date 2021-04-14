@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.commands;
 
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 import org.vadere.manager.traci.response.StatusResponse;

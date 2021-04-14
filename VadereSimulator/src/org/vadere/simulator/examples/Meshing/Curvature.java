@@ -1,18 +1,23 @@
-package org.vadere.simulator.examples;
+package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.PFace;
 import org.vadere.meshing.mesh.gen.PHalfEdge;
+import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMMIterative;
+import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
+import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -23,16 +28,23 @@ import org.vadere.util.math.InterpolationUtil;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * Code to test the iterative eikonal solver discussed in the PhD thesis of B. Zoennchen (p. 187, Alg. 20).
+ *
+ * @author Benedikt Zoennchen
+ */
 public class Curvature {
 
 	public static void main(String ... args) throws IOException, InterruptedException {
-		interativeEikonalSolver();
+		adaptoveEikonalSolverSine();
 	}
 
 	public static void interativeEikonalSolver() throws InterruptedException, IOException {
@@ -209,13 +221,93 @@ public class Curvature {
 			//panel.repaint();
 		}
 
+		var boundaryEdges = improver.getTriangulation().getMesh().getBoundaryEdges();
+		for(var e : boundaryEdges) {
+			var edge = improver.getTriangulation().getMesh().getTwin(e);
+			VPoint p1 = improver.getTriangulation().getMesh().toPoint(edge);
+			VPoint p2 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getNext(edge));
+			VPoint p3 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getPrev(edge));
+
+			double angle1 = GeometryUtils.angle(p1, p2, p3);
+
+			// non-acute triangle
+			double rightAngle = Math.PI/2;
+			if(angle1 > rightAngle + GeometryUtils.DOUBLE_EPS) {
+				improver.getTriangulation().splitEdge(edge, false);
+			}
+		}
+
+		ArrayList<IPoint> points = new ArrayList<>();
+		points.add(new VPoint(5, 5));
+		points.add(new VPoint(25, 25));
 
 		var solver = new MeshEikonalSolverFMMIterative<>(
-				p -> 1,
-				//Arrays.asList(new VPoint(5, 5)),
+				new UnitTimeCostFunction(),
 				improver.getTriangulation(),
+				//points,
 				improver.getTriangulation().getMesh().getBoundaryVertices(),
-				p -> Math.abs(distanceFunction.apply(p)));
+				p -> 0.0);
+		solver.solve();
+		meshWriter.write(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+		meshWriter.close();
+		System.out.println("finished");
+	}
+
+	public static void adaptoveEikonalSolverSine() throws InterruptedException, IOException {
+		BufferedWriter meshWriter = IOUtils.getWriter("floorField_ad.txt", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/"));
+
+		VPolygon bound = new VRectangle(-1, -1, 2, 2).toPolygon();
+		VPoint q = new VPoint(0,0);
+		IDistanceFunction distTarget = p -> -q.distanceToOrigin();
+		ITimeCostFunction timeCostFunction = p -> {
+			return 1.0 / (0.8 * Math.sin(2 * Math.PI * p.getX()) * Math.sin(2 * Math.PI * p.getY()) + 1.0);
+		};
+
+		IDistanceFunction distanceFunction = IDistanceFunction.create(bound);
+
+		//1.0 + Math.abs(distanceFunction.apply(p)) * 0.2
+		// (1) generate basic mesh
+		var improver = new GenEikMesh<PVertex, PHalfEdge, PFace>(
+				distanceFunction,
+				p -> 0.1,
+				Arrays.asList(q),
+				0.1,
+				GeometryUtils.boundRelative(bound.getPoints()),
+				Arrays.asList(bound),
+				() -> new PMesh());
+
+		improver.initialize();
+		for(int i = 0; i < 100; i++) {
+			//Thread.sleep(50);
+			improver.improve();
+			//panel.repaint();
+		}
+
+		/*var boundaryEdges = improver.getTriangulation().getMesh().getBoundaryEdges();
+		for(var e : boundaryEdges) {
+			var edge = improver.getTriangulation().getMesh().getTwin(e);
+			VPoint p1 = improver.getTriangulation().getMesh().toPoint(edge);
+			VPoint p2 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getNext(edge));
+			VPoint p3 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getPrev(edge));
+
+			double angle1 = GeometryUtils.angle(p1, p2, p3);
+
+			// non-acute triangle
+			double rightAngle = Math.PI/2;
+			if(angle1 > rightAngle + GeometryUtils.DOUBLE_EPS) {
+				improver.getTriangulation().splitEdge(edge, false);
+			}
+		}*/
+
+		ArrayList<IPoint> points = new ArrayList<>();
+		points.add(q);
+
+		var solver = new MeshEikonalSolverFMMIterative<>(
+				timeCostFunction,
+				points,
+				improver.getTriangulation(),
+				//improver.getTriangulation().getMesh().getBoundaryVertices(),
+				p -> 0.0);
 		solver.solve();
 		meshWriter.write(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
 		meshWriter.close();

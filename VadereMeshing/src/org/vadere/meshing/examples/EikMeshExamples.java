@@ -3,7 +3,7 @@ package org.vadere.meshing.examples;
 import org.vadere.meshing.mesh.gen.PMeshSuppliert;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
@@ -416,7 +416,7 @@ public class EikMeshExamples {
 		// display the mesh
 		//meshPanel.display("Geometry defined by a distance function (ring)");
 
-		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 
@@ -488,7 +488,7 @@ public class EikMeshExamples {
 		// display the mesh
 		meshPanel.display("Edge length function");*/
 
-		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800, meshImprover.getMesh().getBound());
+		var recorder = new MovRecorder<>(meshImprover, meshPanel.getMeshRenderer(), 1024, 800);
 		recorder.record();
 		recorder.finish();
 	}

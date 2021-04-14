@@ -1,6 +1,6 @@
 package org.vadere.manager.traci;
 
-import org.vadere.manager.TraCIException;
+import org.vadere.state.traci.TraCIException;
 
 public enum TraCIVersion {
 	V20_0_1(20, 0, 1),

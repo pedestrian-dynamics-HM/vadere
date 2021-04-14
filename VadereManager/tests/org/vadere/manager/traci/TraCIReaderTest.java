@@ -8,6 +8,7 @@ import org.vadere.manager.traci.sumo.LightPhase;
 import org.vadere.manager.traci.sumo.RoadMapPosition;
 import org.vadere.manager.traci.sumo.TrafficLightPhase;
 import org.vadere.manager.traci.writer.ByteArrayOutputStreamTraCIWriter;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;

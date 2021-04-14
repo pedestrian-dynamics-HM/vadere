@@ -1,7 +1,7 @@
 package org.vadere.manager.traci.commandHandler.variables;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
 
 
 /**
@@ -15,11 +15,11 @@ public enum PersonVar {
 	HAS_NEXT_TARGET(0x03, TraCIDataType.INTEGER), // get
 	NEXT_TARGET_LIST_INDEX(0x04, TraCIDataType.INTEGER), // get, set
 	SPEED(0x40, TraCIDataType.DOUBLE), // get, set
-	MAX_SPEED(0x45, TraCIDataType.DOUBLE), // get
+	MAXSPEED(0x45, TraCIDataType.DOUBLE), // get
 	VELOCITY(0x41, TraCIDataType.POS_2D), // get
-	POS_2D(0x42, TraCIDataType.POS_2D), // get, set
-	POS_2D_LIST(0xff, TraCIDataType.POS_2D_LIST), // get
-	POS_3D(0x42, TraCIDataType.POS_3D), // get
+	POSITION(0x42, TraCIDataType.POS_2D), // get, set
+	POSITION_LIST(0xff, TraCIDataType.POS_2D_LIST), // get
+	POSITION3D(0x42, TraCIDataType.POS_3D), // get
 	ANGLE(0x43, TraCIDataType.DOUBLE), // get
 	SLOPE(0x36, TraCIDataType.DOUBLE), // get
 	ROAD_ID(0x50, TraCIDataType.STRING), // get

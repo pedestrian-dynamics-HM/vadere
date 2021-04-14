@@ -6,13 +6,13 @@ import org.vadere.manager.RemoteManager;
 import org.vadere.manager.TestRemoteManager;
 import org.vadere.manager.traci.CmdType;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
-import org.vadere.manager.traci.compound.CompoundObject;
-import org.vadere.manager.traci.compound.CompoundObjectBuilder;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.CompoundObjectBuilder;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -264,7 +264,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getPosition3D() {
-		PersonVar var = PersonVar.POS_3D;
+		PersonVar var = PersonVar.POSITION3D;
 		int varID = var.id;
 		TraCIDataType varType = var.type;;
 		String elementID = "1";
@@ -289,7 +289,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getPosition2D() {
-		PersonVar var = PersonVar.POS_2D;
+		PersonVar var = PersonVar.POSITION;
 		int varID = var.id;
 		TraCIDataType varType = var.type;;
 		String elementID = "1";
@@ -311,7 +311,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getPosition2D2() {
-		PersonVar var = PersonVar.POS_2D;
+		PersonVar var = PersonVar.POSITION;
 		int varID = var.id;
 		String elementID = "10";
 		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
@@ -331,7 +331,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getPositionList() {
-		PersonVar var = PersonVar.POS_2D_LIST;
+		PersonVar var = PersonVar.POSITION_LIST;
 		int varID = var.id;
 		TraCIDataType varType = var.type;;
 		String elementID = "-1";
@@ -408,7 +408,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getMaximumSpeed() {
-		PersonVar var = PersonVar.MAX_SPEED;
+		PersonVar var = PersonVar.MAXSPEED;
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "1";
@@ -430,7 +430,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_getMaximumSpeed2() {
-		PersonVar var = PersonVar.MAX_SPEED;
+		PersonVar var = PersonVar.MAXSPEED;
 		int varID = var.id;
 		String elementID = "10";
 		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
@@ -765,7 +765,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_setPosition2D() {
-		PersonVar var = PersonVar.POS_2D;
+		PersonVar var = PersonVar.POSITION;
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "1";
@@ -786,7 +786,7 @@ public class PersonCommandHandlerTest extends CommandHandlerTest {
 
 	@Test
 	public void process_setPosition2D2() {
-		PersonVar var = PersonVar.POS_2D;
+		PersonVar var = PersonVar.POSITION;
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "10";

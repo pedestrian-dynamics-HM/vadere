@@ -1,13 +1,13 @@
 package org.vadere.manager.traci.commandHandler.variables;
 
-import org.vadere.manager.TraCIException;
-import org.vadere.manager.traci.TraCIDataType;
 import org.vadere.manager.traci.commands.TraCICommand;
+import org.vadere.state.traci.TraCIException;
+import org.vadere.state.traci.TraCIDataType;
 
 public enum SimulationVar {
 
-	CURR_SIM_TIME(0x66, TraCIDataType.DOUBLE),
-	VAR_DELTA_T(0x7b, TraCIDataType.DOUBLE), //step length
+	TIME(0x66, TraCIDataType.DOUBLE),
+	DELTA_T(0x7b, TraCIDataType.DOUBLE), //step length
 	NUM_LOADED_VEHICLES(0x71, TraCIDataType.INTEGER),
 	LOADED_VEHICLES_IDS(0x72, TraCIDataType.STRING_LIST),
 	NUM_DEPARTED_PEDESTRIAN(0x73, TraCIDataType.INTEGER), // alias NUM_DEPARTED_VEHICLES
@@ -23,9 +23,10 @@ public enum SimulationVar {
 	VEHICLES_STOP_PARKING_IDS(0x6f, TraCIDataType.STRING_LIST),
 	COORD_REF(0x90, TraCIDataType.COMPOUND_OBJECT),
 	//
-	NETWORK_BOUNDING_BOX_2D(0x7c, TraCIDataType.POLYGON),
+	NET_BOUNDING_BOX(0x7c, TraCIDataType.POLYGON),
 	CACHE_HASH(0x7d, TraCIDataType.STRING),
 	SIM_CONFIG(0x7e, TraCIDataType.COMPOUND_OBJECT),
+	DATA_PROCESSOR(0x7f, TraCIDataType.COMPOUND_OBJECT),
 	;
 
 	public int id;

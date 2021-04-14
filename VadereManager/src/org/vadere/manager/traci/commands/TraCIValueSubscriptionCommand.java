@@ -8,6 +8,11 @@ import org.vadere.manager.traci.writer.TraCIPacket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Subscription for {@link #variables} of the  domain {@link #traCICmd} and {@link #elementIdentifier}
+ * {@link #elementIdentifier} '-1' is used for domain global values (i.e. idList) otherwise
+ * the {@link #elementIdentifier} is the  id of the element (i.e. pedestrian)
+ */
 public class TraCIValueSubscriptionCommand extends TraCICommand {
 
 	private double beginTime;
@@ -40,6 +45,12 @@ public class TraCIValueSubscriptionCommand extends TraCICommand {
 		getCommands = new ArrayList<>();
 	}
 
+	public void buildGetCommands(TraCICmd getCmdId){
+		for(int varId: variables){
+			getCommands.add(new TraCIGetCommand(getCmdId, varId, elementIdentifier));
+		}
+	}
+
 	@Override
 	public TraCIPacket buildResponsePacket() {
 		return TraCIPacket.create().wrapValueSubscriptionCommand(response);
@@ -49,32 +60,16 @@ public class TraCIValueSubscriptionCommand extends TraCICommand {
 		return beginTime;
 	}
 
-	public void setBeginTime(double beginTime) {
-		this.beginTime = beginTime;
-	}
-
 	public double getEndTime() {
 		return endTime;
-	}
-
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
 	}
 
 	public String getElementIdentifier() {
 		return elementIdentifier;
 	}
 
-	public void setElementIdentifier(String elementIdentifier) {
-		this.elementIdentifier = elementIdentifier;
-	}
-
 	public int getNumberOfVariables() {
 		return numberOfVariables;
-	}
-
-	public void setNumberOfVariables(int numberOfVariables) {
-		this.numberOfVariables = numberOfVariables;
 	}
 
 	public List<Integer> getVariables() {
@@ -99,9 +94,5 @@ public class TraCIValueSubscriptionCommand extends TraCICommand {
 
 	public List<TraCIGetCommand> getGetCommands() {
 		return getCommands;
-	}
-
-	public void setGetCommands(List<TraCIGetCommand> getCommands) {
-		this.getCommands = getCommands;
 	}
 }

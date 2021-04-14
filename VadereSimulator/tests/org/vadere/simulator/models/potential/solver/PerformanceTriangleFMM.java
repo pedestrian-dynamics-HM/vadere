@@ -10,7 +10,7 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonal
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.triangulation.IEdgeLengthFunction;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 
 import java.util.List;
 import java.util.stream.Collectors;

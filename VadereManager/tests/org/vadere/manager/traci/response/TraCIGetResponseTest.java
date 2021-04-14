@@ -3,7 +3,7 @@ package org.vadere.manager.traci.response;
 import org.junit.Test;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.TraCIDataType;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.reader.TraCICommandBuffer;
 
 import static org.hamcrest.core.IsEqual.equalTo;

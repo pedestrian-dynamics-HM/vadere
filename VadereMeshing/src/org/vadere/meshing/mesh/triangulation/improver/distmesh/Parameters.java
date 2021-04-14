@@ -25,6 +25,6 @@ public class Parameters {
     public final static int SAMPLEDIVISION = 10;
     public final static int SEGMENTDIVISION = 0;
     //TODO increase this
-    public final static int MAX_NUMBER_OF_STEPS = 300;
+    public final static int MAX_NUMBER_OF_STEPS = 200;
 	public final static int HIGHEST_LEGAL_TEST = Integer.MAX_VALUE;
 }

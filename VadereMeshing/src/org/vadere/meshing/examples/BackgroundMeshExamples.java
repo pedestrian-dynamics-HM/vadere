@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
-import org.vadere.meshing.mesh.triangulation.EdgeLengthFunctionApprox;
+import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.math.IDistanceFunction;

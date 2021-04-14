@@ -4,9 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.Map;
 import java.util.Optional;
 
 public class SimulationState {
@@ -16,6 +14,7 @@ public class SimulationState {
 	private final int step;
 	private final String name;
 	private final MainModel mainModel;
+	private final ControllerProvider controllerProvider;
 	private boolean simStop = false;
 
 	protected SimulationState(final String name,
@@ -23,24 +22,15 @@ public class SimulationState {
 							  final ScenarioStore scenarioStore,
 							  final double simTimeInSec,
 							  final int step,
-							  @Nullable final MainModel mainModel) {
+							  @Nullable final MainModel mainModel,
+							  final ControllerProvider controllerProvider) {
 		this.name = name;
 		this.topography = topography;
 		this.simTimeInSec = simTimeInSec;
 		this.step = step;
 		this.scenarioStore = scenarioStore;
 		this.mainModel = mainModel;
-	}
-
-	@Deprecated
-	public SimulationState(final Map<Integer, VPoint> pedestrianPositionMap, final Topography topography,
-						   final double simTimeInSec, final int step) {
-		this.name = "";
-		this.topography = topography;
-		this.simTimeInSec = simTimeInSec;
-		this.step = step;
-		this.scenarioStore = null;
-		this.mainModel = null;
+		this.controllerProvider = controllerProvider;
 	}
 
 	// public access to getters
@@ -57,6 +47,9 @@ public class SimulationState {
 		return step;
 	}
 
+	public ControllerProvider getControllerProvider() {
+		return controllerProvider;
+	}
 
 	public ScenarioStore getScenarioStore() {
 		return scenarioStore;

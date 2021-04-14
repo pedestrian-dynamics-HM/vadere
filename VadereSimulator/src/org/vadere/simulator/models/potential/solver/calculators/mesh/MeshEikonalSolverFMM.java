@@ -6,19 +6,15 @@ import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.util.ArrayList;
+import java.io.BufferedWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -30,6 +26,8 @@ import java.util.stream.Collectors;
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolverFMM<V, E, F> {
 
@@ -60,11 +58,12 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	public MeshEikonalSolverFMM(@NotNull final String identifier,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final Collection<IPoint> targetPoints,
+	                            @NotNull final Collection<? extends IPoint> targetPoints,
 	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
+
 		HashSet<V> targetVertices = new HashSet<>();
 		IDistanceFunction distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
 
@@ -91,7 +90,7 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final Collection<IPoint> targetPoints,
+	                            @NotNull final Collection<? extends IPoint> targetPoints,
 	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
 	) {
 		this("", timeCostFunction, targetPoints, triangulation);
@@ -115,14 +114,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		setInitialVertices(initialVertices, p -> 0.0);
 	}
 
-	/*public EikonalSolverFMMTriangulation(@NotNull final String identifier,
-			                             @NotNull final ITimeCostFunction timeCostFunction,
-	                                     @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                                     @NotNull final Collection<V> targetVertices
-	) {
-		this(identifier, timeCostFunction, triangulation, targetVertices);
-	}*/
-
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
 	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 	                            @NotNull final Collection<V> targetVertices
@@ -145,50 +136,7 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
-
-		//TODO a more clever init!
-		List<V> initialVertices = new ArrayList<>();
-		for(VShape shape : targetShapes) {
-			List<V> partilyInitialVertices = new ArrayList<>();
-			getMesh().streamVertices()
-					.filter(v -> shape.contains(getMesh().toPoint(v)))
-					.forEach(v -> {
-						for(V u : getMesh().getAdjacentVertexIt(v)) {
-							partilyInitialVertices.add(u);
-							setAsInitialVertex(u);
-						}
-						partilyInitialVertices.add(v);
-						setAsInitialVertex(v);
-					});
-
-			// this might happen if the target is very small or the mesh is to coarse!
-			if(partilyInitialVertices.isEmpty()) {
-				VPoint centroid = shape.getCentroid();
-				if(shape.contains(centroid)) {
-					Optional<F> optFace = triangulation.locate(centroid);
-					if(optFace.isPresent()) {
-						F face = optFace.get();
-						getMesh().streamVertices(face).forEach(v -> {
-							for(V u : getMesh().getAdjacentVertexIt(v)) {
-								partilyInitialVertices.add(u);
-								setAsInitialVertex(u);
-							}
-							partilyInitialVertices.add(v);
-							setAsInitialVertex(v);
-						});
-					} else {
-						throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
-					}
-				}
-				else {
-					throw new IllegalArgumentException("the shape " + shape + " is not a legal target shape given the current mesh.");
-				}
-			}
-
-			initialVertices.addAll(partilyInitialVertices);
-		}
-
-		setInitialVertices(initialVertices, IDistanceFunction.createToTargets(targetShapes));
+		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final Collection<VShape> targetShapes,
@@ -252,8 +200,5 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 		solved = true;
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fmm run time = " + runTime);
-		logger.debug("#nUpdates = " + (getMesh().getNumberOfVertices() - getInitialVertices().size()));
-		logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
-		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
 	}
 }

@@ -1,6 +1,6 @@
 package org.vadere.simulator.models;
 
-import org.vadere.simulator.control.simulation.ControllerManager;
+import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
@@ -28,7 +28,7 @@ public interface Model {
 	                AttributesAgent attributesPedestrian, Random random);
 
 
-	default void registerToScenarioElementControllerEvents(ControllerManager controllerManager){
+	default void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider){
 		//do nothing on default
 	}
 

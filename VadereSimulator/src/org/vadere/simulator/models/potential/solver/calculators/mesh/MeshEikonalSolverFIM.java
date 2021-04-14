@@ -15,17 +15,18 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.ForkJoinPool;
 
 
 /**
- * This class computes the traveling time T using the fast iterative method for arbitrary triangulated meshes.
+ * This class computes the traveling time T using the (single threaded) Fast Iterative Method for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.
  *
  * @param <V>   the type of the vertices of the triangulation
  * @param <E>   the type of the half-edges of the triangulation
  * @param <F>   the type of the faces of the triangulation
+ *
+ * @author Benedikt Zoennchen
  */
 public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F extends IFace> extends AMeshEikonalSolver<V, E, F> {
 
@@ -51,7 +52,7 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 
 	private int iteration = 0;
 	private int nUpdates = 0;
-
+	private final double epsilon = 0;
 
 	// Note: The updateOrder of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
 
@@ -66,8 +67,8 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 	public MeshEikonalSolverFIM(@NotNull final String identifier,
 	                            @NotNull final Collection<VShape> targetShapes,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                            @NotNull final Collection<VShape> destinations
+	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            //@NotNull final Collection<VShape> destinations
 	) {
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
@@ -114,17 +115,14 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
-		logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
-		//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
+		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
+		iteration++;
 	}
 
 	private void initialActiveList() {
 		for(V vertex : getInitialVertices()) {
-			for(V v : getMesh().getAdjacentVertexIt(vertex)) {
-				if(isUndefined(v)) {
-					updatePotential(v);
-				}
-			}
+			activeList.addLast(vertex);
+			//setPotential(vertex, 0);
 		}
 	}
 
@@ -135,17 +133,19 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 			while(listIterator.hasNext()) {
 				V x = listIterator.next();
 				double p = getPotential(x);
-				double q =  Math.min(p, recomputePotential(x));
+				double q = p;
 
-				// not converged
-				if(!isBurned(x) && p > q) {
+				if(!isInitialVertex(x)) {
+					q =  Math.min(p, recomputePotential(x));
 					setPotential(x, q);
 				}
-				// converged
-				else {
+
+				if (Math.abs(p - q) <= epsilon) {
+					setBurned(x);
+					setUnburning(x);
 					// check adjacent neighbors
 					for(V xn : getMesh().getAdjacentVertexIt(x)) {
-						if(getPotential(xn) > getPotential(x) && !isBurining(xn)) {
+						if(getPotential(xn) > getPotential(x) && !isInitialVertex(xn) && !isBurining(xn)) {
 							p = getPotential(xn);
 							q = recomputePotential(xn);
 							if(p > q) {
@@ -156,9 +156,11 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 						}
 					}
 					listIterator.remove();
-					nUpdates++;
 					setBurned(x);
 					setUnburning(x);
+					if(!isInitialVertex(x)) {
+						nUpdates++;
+					}
 				}
 			}
 			activeList.addAll(newActiveList);
