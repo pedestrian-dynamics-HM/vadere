@@ -77,7 +77,7 @@ public class DummySirModel extends AbstractSirModel {
 		// add new clouds every update loop (aim is a defined frequency, set-off should be individual for each pedestrian)
 		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians();
 		for (Pedestrian pedestrian : infectedPedestrians) {
-			createAerosolCloud(pedestrian.getPosition(), simTimeInSec);
+			createAerosolCloud(pedestrian, simTimeInSec);
 		}
 
 		// update absorbed pathogen load for each pedestrian and each cloud (aim is a defined frequency, set-off should be individual for each pedestrian)
@@ -86,7 +86,7 @@ public class DummySirModel extends AbstractSirModel {
 			// how to use simulator.scenarioelements.AerosolCloudController? -> get all pedestrians inside a cloud; is this another option?
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(aerosolCloud);
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
-				absorbPathogenFromAerosolCloud(pedestrian, aerosolCloud.getAerosolCloudPathogenLoad());
+				absorbPathogenFromAerosolCloud(pedestrian, aerosolCloud.getCurrentPathogenLoad());
 			}
 		}
 
@@ -113,8 +113,8 @@ public class DummySirModel extends AbstractSirModel {
 		double pathogenLoad = pedestrian.getPathogenEmissionCapacity();
 		AerosolCloud aerosolCloud = new AerosolCloud();
 
-		aerosolCloud.setAerosolPersistenceStart(simTimeInSec);
-		aerosolCloud.setAerosolCloudPathogenLoad(pathogenLoad);
+		aerosolCloud.setCreationTime(simTimeInSec);
+		aerosolCloud.setCurrentPathogenLoad(pathogenLoad); // TODO: Check
 		// set shape (circle), center, radius
 
 		this.domain.getTopography().addAerosolCloud(aerosolCloud);

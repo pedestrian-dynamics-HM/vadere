@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.system.CallbackI;
 import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
@@ -11,6 +12,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
@@ -154,6 +156,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAerosolCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 
 		createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
 	}
@@ -219,6 +222,14 @@ public class SettingsDialog extends JDialog {
 		bTargetChangerColor.addActionListener(new ActionSetTargetChangerColor("Set Target Changer Color", model, pTargetChangerColor));
 		colorSettingsPane.add(pTargetChangerColor, cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(bTargetChangerColor, cc.xy(column3, row));
+
+		final JButton bAerosolCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pAerosolCloudColor = new JPanel();
+		pAerosolCloudColor.setBackground(model.config.getAerosolCloudColor());
+		pAerosolCloudColor.setPreferredSize(new Dimension(130, 20));
+		bAerosolCloudColor.addActionListener(new ActionSetAerosolCloudColor("Set Aerosol Cloud Color", model, pAerosolCloudColor));
+		colorSettingsPane.add(pAerosolCloudColor, cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(bAerosolCloudColor, cc.xy(column3, row));
 	}
 
 	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
@@ -232,6 +243,7 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
 		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
+		JRadioButton rbInfectionStatusColoring = createRadioButtonWithListener(AgentColoring.INFECTION_STATUS, Messages.getString("SettingsDialog.lblInfectionStatusColoring.text")+ ":");
 
 		rbTargetColoring.setSelected(true);
 		model.setAgentColoring(AgentColoring.TARGET);
@@ -241,6 +253,7 @@ public class SettingsDialog extends JDialog {
 		group.add(rbRandomColoring);
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
+		group.add(rbInfectionStatusColoring);
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
@@ -255,6 +268,12 @@ public class SettingsDialog extends JDialog {
 		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
+
+		JComboBox<InfectionStatus> cbInfectionStatuses = createInfectionStatusesComboBox();
+		final JPanel pInfectionStatus = new JPanel();
+		final JButton bChangeInfectionStatusColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringByInfectionStatus(cbInfectionStatuses, pInfectionStatus, bChangeInfectionStatusColor);
 
 		int row = 0;
 		int column1 = 2;
@@ -280,6 +299,11 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbSelfCategories, cc.xy(column2, row));
 		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column3, row));
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column4, row));
+
+		colorSettingsPane.add(rbInfectionStatusColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbInfectionStatuses, cc.xy(column2, row));
+		colorSettingsPane.add(pInfectionStatus, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeInfectionStatusColor, cc.xy(column4, row));
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
@@ -309,6 +333,12 @@ public class SettingsDialog extends JDialog {
 
 	private JComboBox<SelfCategory> createSelfCategoriesComboBox() {
 		JComboBox<SelfCategory> comboBox = new JComboBox<>(SelfCategory.values());
+
+		return comboBox;
+	}
+
+	private JComboBox<InfectionStatus> createInfectionStatusesComboBox() {
+		JComboBox<InfectionStatus> comboBox = new JComboBox<>(InfectionStatus.values());
 
 		return comboBox;
 	}
@@ -367,6 +397,26 @@ public class SettingsDialog extends JDialog {
 		});
 	}
 
+	private void initColoringByInfectionStatus(JComboBox<InfectionStatus> cbInfectionStatuses, JPanel pInfectionStatusColor, JButton bChangeInfectionStatusColor) {
+		cbInfectionStatuses.setSelectedIndex(0);
+
+		InfectionStatus selectedInfectionStatus = cbInfectionStatuses.getItemAt(cbInfectionStatuses.getSelectedIndex());
+		Color infectionStatusColor = model.config.getInfectionStatusColor(selectedInfectionStatus);
+
+		pInfectionStatusColor.setBackground(infectionStatusColor);
+		pInfectionStatusColor.setPreferredSize(new Dimension(130, 20));
+
+		// When user changes a color, save it in the model.
+		bChangeInfectionStatusColor.addActionListener(new ActionSetInfectionStatusColor("Set Infection Status Color", model, pInfectionStatusColor,
+				cbInfectionStatuses));
+
+		// Retrieve configured color from "model".
+		cbInfectionStatuses.addActionListener(e -> {
+			InfectionStatus selectedInfectionStatusInner = cbInfectionStatuses.getItemAt(cbInfectionStatuses.getSelectedIndex());
+			pInfectionStatusColor.setBackground(model.config.getInfectionStatusColor(selectedInfectionStatusInner));
+		});
+	}
+
 	private void initOtherSettingsPane(JLayeredPane otherSettingsPane) {
 		otherSettingsPane.setBorder(
 				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
@@ -381,6 +431,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowTargets = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargets.text")));
 		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
+		JCheckBox chShowAerosolClouds = new JCheckBox((Messages.getString("SettingsDialog.chbShowAerosolClouds.text")));
 		JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
@@ -429,6 +480,13 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
+		chShowAerosolClouds.setSelected(model.config.isShowAerosolClouds());
+		chShowAerosolClouds.addItemListener(e -> {
+			model.config.setShowAerosolClouds(!model.config.isShowAerosolClouds());
+			model.notifyObservers();
+		});
+
+
 		chShowMeasurementAreas.setSelected(model.config.isShowMeasurementArea());
 		chShowMeasurementAreas.addItemListener(e -> {
 			model.config.setShowMeasurementArea(!model.config.isShowMeasurementArea());
@@ -475,6 +533,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowTargetChangers, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowPedestrianInOutGroup, cc.xyw(column, row += NEXT_CELL, colSpan));
+		otherSettingsPane.add(chShowAerosolClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
 		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
 		chChowLogo.setSelected(model.config.isShowLogo());

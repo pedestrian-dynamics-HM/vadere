@@ -38,6 +38,10 @@ public class TopographyIterator implements Iterator<ScenarioElement> {
 			elements.add(topography.getAbsorbingAreas());
 		}
 
+		if (!topography.getAerosolClouds().isEmpty()) {
+			elements.add(topography.getAerosolClouds());
+		}
+
 		if (!topography.getTargetChangers().isEmpty()) {
 			elements.add(topography.getTargetChangers());
 		}

@@ -1,5 +1,6 @@
 package org.vadere.gui.components.model;
 
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 
 import java.awt.*;
@@ -18,12 +19,16 @@ public class DefaultConfig {
 	private Color pedestrianColor = new Color(0.2980392156862745f, 0.4470588235294118f, 0.7901960784313725f);
 	private Color measurementAreaColor = Color.RED;
 	private int measurementAreaAlpha = 140;
+	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
+	private int aerosolCloudAlphaMax = 128;
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
+	private HashMap<InfectionStatus, Color> infectionStatusColors = new HashMap<>();
 	private boolean changed = false;
 
 	// Constructors
 	public DefaultConfig() {
 		initGroupMembershipColor();
+		initInfectionStatusColor();
 	}
 
 	public DefaultConfig(final DefaultConfig config) {
@@ -37,7 +42,10 @@ public class DefaultConfig {
 		this.pedestrianColor = config.pedestrianColor;
 		this.measurementAreaColor = config.measurementAreaColor;
 		this.measurementAreaAlpha = config.measurementAreaAlpha;
+		this.aerosolCloudColor = config.aerosolCloudColor;
+		this.aerosolCloudAlphaMax = config.aerosolCloudAlphaMax;
 		initGroupMembershipColor();
+		initInfectionStatusColor();
 
 		this.changed = config.changed;
 	}
@@ -52,6 +60,13 @@ public class DefaultConfig {
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_FRIENDLY, new Color(0,135,98));
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_NEUTRAL, new Color(153,153,153));
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_HOSTILE, new Color(229,229,0));
+	}
+
+	private void initInfectionStatusColor() {
+		infectionStatusColors.put(InfectionStatus.SUSCEPTIBLE, pedestrianColor);
+		infectionStatusColors.put(InfectionStatus.EXPOSED, new Color(202, 76, 187)); // use this in combination with org.vadere.util.visualization.ColorHelper.improvedColorInterpolation()
+		infectionStatusColors.put(InfectionStatus.INFECTIOUS, new Color(202, 76, 76));
+		infectionStatusColors.put(InfectionStatus.RECOVERED, new Color(153, 153, 153));
 	}
 
 	// Getter
@@ -90,6 +105,11 @@ public class DefaultConfig {
 	}
 	public Color getGroupMembershipColor(GroupMembership groupMembership) {
 		return groupMembershipColors.get(groupMembership);
+	}
+	public Color getAerosolCloudColor() {return aerosolCloudColor;}
+	public int getAerosolCloudAlphaMax() { return aerosolCloudAlphaMax; }
+	public Color getDefaultInfectionStatusColor(InfectionStatus infectionStatus) {
+		return infectionStatusColors.get(infectionStatus);
 	}
 
 	// Setter
@@ -145,6 +165,14 @@ public class DefaultConfig {
 
 	public void setMeasurementAreaAlpha(int measurementAreaAlpha) {
 		this.measurementAreaAlpha = measurementAreaAlpha;
+	}
+
+	public void setAerosolCloudColor(Color aerosolCloudColor) {
+		this.absorbingAreaColor = aerosolCloudColor;
+	}
+
+	public void setAerosolCloudAlphaMax(int aerosolCloudAlphaMax) {
+		this.aerosolCloudAlphaMax = aerosolCloudAlphaMax;
 	}
 
 }

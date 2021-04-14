@@ -2,8 +2,8 @@ package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -13,16 +13,23 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
+import org.vadere.simulator.models.sir.InfectionModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.models.InfectionModelSourceParameters;
+import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.scenario.*;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
@@ -32,6 +39,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 
 public class Simulation implements ControllerProvider{
 
@@ -44,6 +53,7 @@ public class Simulation implements ControllerProvider{
 	private final Collection<TargetController> targetControllers;
 	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
+	private Collection<AerosolCloudController> aerosolCloudControllers;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -111,6 +121,7 @@ public class Simulation implements ControllerProvider{
 		this.targetControllers = new LinkedList<>();
 		this.targetChangerControllers = new LinkedList<>();
 		this.absorbingAreaControllers = new LinkedList<>();
+		this.aerosolCloudControllers = new LinkedList<>();
 		this.topography = scenarioStore.getTopography();
 		this.runTimeInSec = attributesSimulation.getFinishTime();
 		this.startTimeInSec = startTimeInSec;
@@ -141,7 +152,7 @@ public class Simulation implements ControllerProvider{
 
 		// allow models to register to Controllers
 		for(var model : this.models){
-			model.registerToScenarioElementControllerEvents(this); //TODO
+			model.registerToScenarioElementControllerEvents(this);
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
@@ -168,6 +179,10 @@ public class Simulation implements ControllerProvider{
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
 			absorbingAreaControllers.add(new AbsorbingAreaController(topography, absorbingArea));
+		}
+
+		for (AerosolCloud aerosolCloud : topography.getAerosolClouds()) {
+			aerosolCloudControllers.add(new AerosolCloudController(topography, aerosolCloud));
 		}
 
 		if (topography.hasTeleporter()) {
@@ -419,6 +434,13 @@ public class Simulation implements ControllerProvider{
 			absorbingAreaController.update(simTimeInSec);
 		}
 
+		for (AerosolCloudController aerosolCloudController : this.aerosolCloudControllers) {
+			aerosolCloudController.update(simTimeInSec);
+		}
+
+		// keep only active aerosolCloudControllers
+		this.aerosolCloudControllers = this.aerosolCloudControllers.stream().filter(AerosolCloudController::isActiveController).collect(Collectors.toList());
+
 		topographyController.update(simTimeInSec); //rebuild CellGrid
 	}
 
@@ -583,6 +605,17 @@ public class Simulation implements ControllerProvider{
 	@Override
 	public TopographyController getTopographyController() {
 		return topographyController;
+	}
+
+	@Override
+	public void registerAerosolCloud(AerosolCloud aerosolCloud) {
+		topography.addAerosolCloud(aerosolCloud);
+		aerosolCloudControllers.add(new AerosolCloudController(topography, aerosolCloud));
+	}
+
+	@Override
+	public Collection<AerosolCloudController> getAerosolCloudControllers() {
+		return aerosolCloudControllers;
 	}
 
 	@Override

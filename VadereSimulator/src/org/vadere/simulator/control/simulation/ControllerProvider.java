@@ -1,12 +1,8 @@
 package org.vadere.simulator.control.simulation;
 
-import org.vadere.simulator.control.scenarioelements.AbsorbingAreaController;
-import org.vadere.simulator.control.scenarioelements.SourceController;
-import org.vadere.simulator.control.scenarioelements.TargetChangerController;
-import org.vadere.simulator.control.scenarioelements.TargetController;
-import org.vadere.simulator.control.scenarioelements.TeleporterController;
-import org.vadere.simulator.control.scenarioelements.TopographyController;
+import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
+import org.vadere.state.scenario.AerosolCloud;
 
 import java.util.Collection;
 
@@ -16,7 +12,9 @@ public interface ControllerProvider {
 	Collection<TargetController> getTargetControllers();
 	Collection<TargetChangerController> getTargetChangerControllers();
 	Collection<AbsorbingAreaController> getAbsorbingAreaControllers();
+	Collection<AerosolCloudController> getAerosolCloudControllers();
 	TeleporterController getTeleporterController();
 	TopographyController getTopographyController();
+	void registerAerosolCloud(AerosolCloud aerosolCloud);
 	ProcessorManager getProcessorManager();
 }

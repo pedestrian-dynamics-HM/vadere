@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.*;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
@@ -275,6 +274,36 @@ public abstract class DefaultRenderer {
 				defaultModel.getConfig().getMeasurementAreaAlpha()));
 		if (area.getShape() instanceof VPolygon){
 			VPolygon p = (VPolygon) area.getShape();
+			if (p.getPoints().size() == 2){
+				graphics.setStroke(new BasicStroke(3*getLineWidth()));
+				graphics.draw(p);
+			}
+		}
+		fill(element.getShape(), graphics);
+
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderAerosolClouds(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+										  final Color color){
+		for (ScenarioElement e : elements){
+			renderAerosolCloud(e, g, color);
+		}
+	}
+
+	protected void renderAerosolCloud(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		AerosolCloud cloud = (AerosolCloud) element;
+		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
+		float minAlpha = 10; //defaultModel.getConfig().getAerosolCloudAlphaMin()
+		double initialArea = 0.5 * 0.5 * Math.PI; // ToDo: retrieve initialArea from attributesInfectionModel
+		double maxPathogenDensity = cloud.getInitialPathogenLoad() / initialArea;
+		double currentPathogenDensity = cloud.getCurrentPathogenLoad() / cloud.getArea();
+		int currentAlpha = (int) ((currentPathogenDensity / maxPathogenDensity) * (maxAlpha - minAlpha) + minAlpha);
+
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
+		if (cloud.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) cloud.getShape();
 			if (p.getPoints().size() == 2){
 				graphics.setStroke(new BasicStroke(3*getLineWidth()));
 				graphics.draw(p);

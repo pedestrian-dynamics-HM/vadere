@@ -1,10 +1,10 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.medicine.InfectionStatus;
-import org.vadere.state.medicine.MedicineStatus;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.health.HealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
@@ -36,6 +36,8 @@ public class Pedestrian extends Agent {
 
 	private PsychologyStatus psychologyStatus;
 
+	private HealthStatus healthStatus;
+
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
 
@@ -52,8 +54,6 @@ public class Pedestrian extends Agent {
 
 	private Map<Class<? extends ModelPedestrian>, ModelPedestrian> modelPedestrianMap;
 	private ScenarioElementType type = ScenarioElementType.PEDESTRIAN; // TODO used at all? For JSON de-/serialization? Car does NOT have this field. remove if unused!
-
-	private MedicineStatus medicineStatus;
 
 	// Constructors
 	private Pedestrian() {
@@ -72,12 +72,12 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
+		healthStatus = new HealthStatus();
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
 		trajectory = new VTrajectory();
 		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
-		// medicineStatus = new MedicineStatus(InfectionStatus.SUSCEPTIBLE, ) // TODO: -> ask BK
 	}
 
 	protected Pedestrian(Pedestrian other) {
@@ -88,6 +88,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = other.isLikelyInjured;
 
 		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
+		healthStatus = new HealthStatus(other.healthStatus);
 
 		if (other.groupIds != null) {
 			groupIds = new LinkedList<>(other.groupIds);
@@ -100,8 +101,6 @@ public class Pedestrian extends Agent {
 		trajectory = new VTrajectory();
 		trajectory = other.trajectory;
 		footstepHistory = other.footstepHistory;
-
-		medicineStatus = new MedicineStatus(other.medicineStatus);
 	}
 
 	// Getter
@@ -119,6 +118,18 @@ public class Pedestrian extends Agent {
 	public SelfCategory getSelfCategory() { return psychologyStatus.getSelfCategory(); }
 	public GroupMembership getGroupMembership() { return psychologyStatus.getGroupMembership(); }
 	public KnowledgeBase getKnowledgeBase() {return psychologyStatus.getKnowledgeBase(); }
+	public InfectionStatus getInfectionStatus() { return healthStatus.getInfectionStatus(); }
+	public double getLastInfectionStatusUpdateTime() { return healthStatus.getLastInfectionStatusUpdateTime(); }
+	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
+	public VPoint getStartBreatheOutPosition() { return healthStatus.getStartBreatheOutPosition(); }
+	public double getRespiratoryTimeOffset() { return healthStatus.getRespiratoryTimeOffset(); }
+	public double getPathogenEmissionCapacity() {return healthStatus.getPathogenEmissionCapacity(); }
+	public double getPathogenAbsorptionRate() { return healthStatus.getPathogenAbsorptionRate(); }
+	public double getSusceptibility() { return healthStatus.getSusceptibility(); }
+	public double getExposedPeriod() { return healthStatus.getExposedPeriod(); }
+	public double getInfectiousPeriod() { return healthStatus.getInfectiousPeriod(); }
+	public double getRecoveredPeriod() { return healthStatus.getRecoveredPeriod(); }
+	public boolean isBreathingIn() { return healthStatus.isBreathingIn(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
@@ -157,19 +168,6 @@ public class Pedestrian extends Agent {
         }
     }
 
-    // TODO: Check if implementation necessary -> BK / SS:
-	public InfectionStatus getInfectionStatus() { return medicineStatus.getInfectionStatus(); }
-	public double getPathogenEmissionCapacity() { return medicineStatus.getPathogenEmissionCapacity(); }
-	public double getPathogenAbsorptionRate() { return medicineStatus.getPathogenAbsorptionRate(); }
-	public double getAbsorbedAmountOfPathogen() {return medicineStatus.getAbsorbedAmountOfPathogen(); }
-	public double getSusceptibility() { return medicineStatus.getSusceptibility(); }
-	public double getExposedPeriod() { return medicineStatus.getExposedPeriod(); }
-	public double getInfectiousPeriod() {return medicineStatus.getInfectiousPeriod(); }
-	public double getRecoveredPeriod() {return medicineStatus.getRecoveredPeriod(); }
-	public double getExposedStartTime() { return medicineStatus.getExposedStartTime(); }
-	public double getInfectiousStartTime() { return medicineStatus.getInfectiousStartTime(); }
-	public double getRecoveredStartTime() { return medicineStatus.getRecoveredStartTime(); }
-
 	// Setter
 	public void setIdAsTarget(int id) { this.idAsTarget = id; }
 	public void setChild(boolean child) {
@@ -182,6 +180,18 @@ public class Pedestrian extends Agent {
 	public void setThreatMemory(ThreatMemory threatMemory) { psychologyStatus.setThreatMemory(threatMemory); }
 	public void setSelfCategory(SelfCategory selfCategory) { psychologyStatus.setSelfCategory(selfCategory); }
 	public void setGroupMembership(GroupMembership groupMembership) { psychologyStatus.setGroupMembership(groupMembership); }
+	public void setInfectionStatus(InfectionStatus infectionStatus) { healthStatus.setInfectionStatus(infectionStatus); }
+	public void setLastInfectionStatusUpdateTime(double lastInfectionStatusUpdateTime) { healthStatus.setLastInfectionStatusUpdateTime(lastInfectionStatusUpdateTime); }
+	public void setPathogenAbsorbedLoad(double pathogenAbsorbedLoad) { healthStatus.setPathogenAbsorbedLoad(pathogenAbsorbedLoad); }
+	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) { healthStatus.setStartBreatheOutPosition(startBreatheOutPosition); }
+	public void setRespiratoryTimeOffset(double respiratoryTimeOffset) { healthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset); }
+	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity); }
+	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }
+	public void setSusceptibility(double susceptibility) { healthStatus.setSusceptibility(susceptibility); }
+	public void setExposedPeriod(double exposedPeriod) { healthStatus.setExposedPeriod(exposedPeriod); }
+	public void setInfectiousPeriod(double infectiousPeriod) { healthStatus.setInfectiousPeriod(infectiousPeriod); }
+	public void setRecoveredPeriod(double recoveredPeriod) { healthStatus.setRecoveredPeriod(recoveredPeriod); }
+	public void setBreathingIn(boolean breathingIn) { healthStatus.setBreathingIn(breathingIn); }
 	public void setGroupIds(LinkedList<Integer> groupIds) {
 		this.groupIds = groupIds;
 	}
@@ -191,19 +201,6 @@ public class Pedestrian extends Agent {
 	public <T extends ModelPedestrian> ModelPedestrian setModelPedestrian(T modelPedestrian) {
 		return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
 	}
-
-	// TODO: Check if implementation necessary -> BK / SS:
-	public void setInfectionStatus(InfectionStatus infectionStatus) { medicineStatus.setInfectionStatus(infectionStatus); }
-	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) { medicineStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity); }
-	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) { medicineStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate); }
-	public void setAbsorbedAmountOfPathogen(double absorbedAmountOfPathogen) { medicineStatus.setAbsorbedAmountOfPathogen(absorbedAmountOfPathogen); }
-	public void setSusceptibility(double susceptibility) { medicineStatus.setSusceptibility(susceptibility); }
-	public void setExposedPeriod(double latentPeriod) { medicineStatus.setExposedPeriod(latentPeriod); }
-	public void setInfectiousPeriod(double infectiousPeriod) { medicineStatus.setInfectiousPeriod(infectiousPeriod); }
-	public void setRecoveredPeriod(double recoveredPeriod) { medicineStatus.setRecoveredPeriod(recoveredPeriod); }
-	public void setExposedStartTime(double exposedStartTime) { medicineStatus.setExposedStartTime(exposedStartTime); }
-	public void setInfectiousStartTime(double infectiousStartTime) { medicineStatus.setInfectiousStartTime(infectiousStartTime); }
-	public void setRecoveredStartTime(double recoveredStartTime) { medicineStatus.setRecoveredStartTime(recoveredStartTime); }
 
 	// Methods
 	public boolean isTarget() {
@@ -224,6 +221,8 @@ public class Pedestrian extends Agent {
 			trajectory.clear();
 		}
 	}
+
+	public double emitPathogen() { return healthStatus.emitPathogen(); }
 
 	// Overridden Methods
 
