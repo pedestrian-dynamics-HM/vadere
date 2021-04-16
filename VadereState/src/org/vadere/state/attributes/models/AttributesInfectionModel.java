@@ -8,11 +8,9 @@ import java.util.ArrayList;
 @ModelAttributeClass
 public class AttributesInfectionModel extends Attributes {
 
-	private double infectionModelLastUpdateTime = -1;
-	private double infectionModelUpdateStepLength = 4; // equals 1/(pedestrians' average breathing rate) in seconds
-
 	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = new ArrayList<>();
 
+	private double pedestrianRespiratoryCyclePeriod = 4; // equals 1/(pedestrians' average breathing rate) in seconds
 	private double pedestrianPathogenEmissionCapacity = 4; // 10^pedestrianPathogenEmissionCapacity = emitted pathogen (in particles)
 
 	// Idea: use distributions and draw from org.vadere.state.scenario.ConstantDistribution
@@ -34,9 +32,7 @@ public class AttributesInfectionModel extends Attributes {
 	private double aerosolCloudHalfLife = 60;
 	private double aerosolCloudInitialRadius = 0.75;
 
-	public double getInfectionModelLastUpdateTime() { return infectionModelLastUpdateTime; }
-
-	public double getInfectionModelUpdateStepLength() { return infectionModelUpdateStepLength; }
+	public double getPedestrianRespiratoryCyclePeriod() { return pedestrianRespiratoryCyclePeriod; }
 
 	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() { return infectionModelSourceParameters; }
 
@@ -71,6 +67,4 @@ public class AttributesInfectionModel extends Attributes {
 	public double getAerosolCloudInitialRadius() {
 		return aerosolCloudInitialRadius;
 	}
-
-	public void setInfectionModelLastUpdateTime(double infectionModelLastUpdateTime) { this.infectionModelLastUpdateTime = infectionModelLastUpdateTime; }
 }

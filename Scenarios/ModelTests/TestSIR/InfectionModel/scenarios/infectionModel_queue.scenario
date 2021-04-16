@@ -2,6 +2,7 @@
   "name" : "infectionModel_queue",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "661b70916fe31e9e06b0b1a9d6c4ab7e708ff758",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -74,7 +75,7 @@
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 1.0,
+        "targetAttractionStrength" : 0.5,
         "cacheType" : "NO_CACHE",
         "cacheDir" : "",
         "timeCostAttributes" : {
@@ -92,8 +93,6 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesInfectionModel" : {
-        "infectionModelLastUpdateTime" : -1.0,
-        "infectionModelUpdateStepLength" : 4.0,
         "infectionModelSourceParameters" : [ {
           "sourceId" : 6,
           "infectionStatus" : "SUSCEPTIBLE"
@@ -101,6 +100,7 @@
           "sourceId" : 1,
           "infectionStatus" : "INFECTIOUS"
         } ],
+		"pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
@@ -108,7 +108,7 @@
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 60.0,
-        "aerosolCloudInitialRadius" : 0.75
+        "aerosolCloudInitialRadius" : 0.5
       }
     },
     "attributesSimulation" : {
@@ -121,7 +121,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 1436250873317888407,
-      "simulationSeed" : 0
+      "simulationSeed" : 1436250873317888407
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
@@ -135,8 +135,8 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 10.0,
-          "height" : 10.0
+          "width" : 11.0,
+          "height" : 11.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -144,94 +144,184 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "x" : 1.0,
-          "y" : 8.0,
-          "width" : 8.0,
-          "height" : 1.0,
+          "x" : 0.5,
+          "y" : 10.0,
+          "width" : 10.0,
+          "height" : 0.5,
           "type" : "RECTANGLE"
         },
         "id" : 2
       }, {
         "shape" : {
-          "x" : 7.8,
-          "y" : 2.0,
-          "width" : 1.2,
-          "height" : 6.0,
+          "x" : 10.0,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 9.0,
           "type" : "RECTANGLE"
         },
         "id" : 3
       }, {
         "shape" : {
-          "x" : 1.0,
-          "y" : 1.0,
-          "width" : 8.0,
-          "height" : 1.0,
+          "x" : 0.5,
+          "y" : 0.5,
+          "width" : 10.0,
+          "height" : 0.5,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
           "x" : 1.0,
-          "y" : 3.008423586040914,
-          "width" : 1.2000000000000002,
-          "height" : 4.991576413959086,
+          "y" : 1.5,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 5
       }, {
         "shape" : {
-          "x" : 5.8,
-          "y" : 3.128760529482551,
-          "width" : 0.40000000000000036,
-          "height" : 4.871239470517449,
+          "x" : 7.0,
+          "y" : 1.5,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 10
       }, {
         "shape" : {
-          "x" : 6.8,
-          "y" : 2.0,
-          "width" : 0.4,
-          "height" : 5.2,
+          "x" : 8.0,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 11
       }, {
         "shape" : {
-          "x" : 2.8,
-          "y" : 2.0,
-          "width" : 0.4,
-          "height" : 5.2,
+          "x" : 4.0,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 12
       }, {
         "shape" : {
-          "x" : 3.8,
-          "y" : 2.8,
-          "width" : 0.4,
-          "height" : 5.2,
+          "x" : 5.0,
+          "y" : 1.5,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 13
       }, {
         "shape" : {
-          "x" : 4.8,
-          "y" : 2.0,
-          "width" : 0.4,
-          "height" : 5.2,
+          "x" : 6.0,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 14
       }, {
         "shape" : {
-          "x" : 1.0,
-          "y" : 1.9975932611311666,
-          "width" : 0.6606498194945849,
-          "height" : 0.9987966305655842,
+          "x" : 9.0,
+          "y" : 1.5,
+          "width" : 0.5,
+          "height" : 8.5,
           "type" : "RECTANGLE"
         },
         "id" : 7
+      }, {
+        "shape" : {
+          "x" : 3.0,
+          "y" : 1.5,
+          "width" : 0.5,
+          "height" : 8.5,
+          "type" : "RECTANGLE"
+        },
+        "id" : 8
+      }, {
+        "shape" : {
+          "x" : 2.0,
+          "y" : 1.0,
+          "width" : 0.5,
+          "height" : 8.5,
+          "type" : "RECTANGLE"
+        },
+        "id" : 15
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 11.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 11.0001,
+            "y" : 0.5001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 0.5001
+          } ]
+        },
+        "id" : 16
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 11.0001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 11.0001,
+            "y" : 11.0001
+          }, {
+            "x" : 10.4999,
+            "y" : 11.0001
+          }, {
+            "x" : 10.4999,
+            "y" : -1.0E-4
+          } ]
+        },
+        "id" : 17
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 11.0001,
+            "y" : 11.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 11.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : 10.4999
+          }, {
+            "x" : 11.0001,
+            "y" : 10.4999
+          } ]
+        },
+        "id" : 18
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : -1.0E-4,
+            "y" : 11.0001
+          }, {
+            "x" : -1.0E-4,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : -1.0E-4
+          }, {
+            "x" : 0.5001,
+            "y" : 11.0001
+          } ]
+        },
+        "id" : 19
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -239,13 +329,13 @@
         "id" : 9,
         "absorbing" : true,
         "shape" : {
-          "x" : 7.25,
-          "y" : 2.05,
+          "x" : 9.5,
+          "y" : 9.0,
           "width" : 0.5,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
+        "waitingTime" : 15.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -259,8 +349,8 @@
       "sources" : [ {
         "id" : 6,
         "shape" : {
-          "x" : 1.7,
-          "y" : 2.1,
+          "x" : 0.5,
+          "y" : 9.5,
           "width" : 0.5,
           "height" : 0.5,
           "type" : "RECTANGLE"
@@ -281,8 +371,8 @@
       }, {
         "id" : 1,
         "shape" : {
-          "x" : 2.3,
-          "y" : 2.6,
+          "x" : 0.5,
+          "y" : 8.5,
           "width" : 0.5,
           "height" : 0.5,
           "type" : "RECTANGLE"

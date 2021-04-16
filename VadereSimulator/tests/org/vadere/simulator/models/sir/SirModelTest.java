@@ -17,22 +17,6 @@ import static org.junit.Assert.assertEquals;
 public abstract class SirModelTest {
     public abstract SirModel sirModel();
 
-    @Test
-    public void throwIfPedestrianInfectionStatusDoesNotReachExposed() {
-        Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(1, 1), 1, 2, InfectionStatus.SUSCEPTIBLE);
-
-        Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElement(1);
-        pedestrian.setPathogenAbsorbedLoad(pedestrian.getSusceptibility());
-        sirModel().updatePedestrianInfectionStatus(pedestrian, 10.0);
-        assertEquals(pedestrian.getInfectionStatus(), InfectionStatus.EXPOSED);
-        // ToDo: This test does not work; (how) do I test Interfaces?
-    }
-
-    @Test
-    public void testUpdatePedestrianPathogenAbsorbedLoad() {
-    }
-
     private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, InfectionStatus infectionStatus) {
         Pedestrian pedestrian = new Pedestrian(new AttributesAgent(), new Random(1));
         pedestrian.setPosition(pedPosition);

@@ -435,7 +435,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (AerosolCloudController aerosolCloudController : this.aerosolCloudControllers) {
-			aerosolCloudController.update(simTimeInSec);
+			aerosolCloudController.update(simTimeInSec, attributesSimulation.getSimTimeStepLength());
 		}
 
 		// keep only active aerosolCloudControllers

@@ -34,36 +34,22 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     // Other methods
-    public void update(double simTimeInSec) {
+    public void update(double simTimeInSec, double simTimeStepLength) {
             System.out.println("in AerosolCloudController");
-            changeAerosolCloudExtent();
-            reduceAerosolCloudPathogenLoad(simTimeInSec);
-            if (hasAerosolCloudReachedLifeEnd(simTimeInSec)) {
+
+            // Effect of diffusion is negligible if the simulation time is short
+            // double rateOfSpread = 0.001;
+            // aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
+
+            aerosolCloud.updateCurrentAerosolCloudPathogenLoad(simTimeInSec);
+
+            if (hasAerosolCloudReachedLifeEnd()) {
                 aerosolCloud.setHasReachedLifeEnd(true);
             }
             deleteAerosolCloudFlagController();
     }
 
-    public void changeAerosolCloudExtent() {
-        // Idea: change extent -> for now: constant
-        // int dimension = 2;
-        // double scalingFactor1D = 1;
-        // double scalingFactorInDimension = Math.pow(scalingFactor1D, dimension);
-        // setShape(new VShape(getShape().getCentroid(), getShape()."extentInDimension" * scalingFactorInDimension); // increase extent
-        // aerosolCloud.setPathogenLoad(aerosolCloud.getPathogenLoad() / scalingFactorInDimension); // reduce pathogenLoad (density)
-    }
-
-    /**
-     * Reduce pathogenDensity2D at the height of the pedestrians' faces (x-y-plane)
-     * Considered effects: declining activity of pathogen, evaporation, gravitation
-     */
-    public void reduceAerosolCloudPathogenLoad(double simTimeInSec) {
-        double t = simTimeInSec - aerosolCloud.getCreationTime();
-        double lambda = - Math.log(0.5) / aerosolCloud.getHalfLife();
-        aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getInitialPathogenLoad() * Math.exp(-lambda * t));
-    }
-
-    public boolean hasAerosolCloudReachedLifeEnd(double simTimeInSec) {
+    public boolean hasAerosolCloudReachedLifeEnd() {
         // assumption: aerosolCloud is not relevant anymore if it has reached less than 1% of its initialPathogenLoad
         // As a consequence, the life time is about ln(1%) / -lambda * halfLife = 6.6 times halfLife.
         double minimumRelevantPathogenLoad = 0.01 * aerosolCloud.getInitialPathogenLoad();

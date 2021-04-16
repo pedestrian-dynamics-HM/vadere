@@ -92,8 +92,6 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesInfectionModel" : {
-        "infectionModelLastUpdateTime" : -1.0,
-        "infectionModelUpdateStepLength" : 4.0,
         "infectionModelSourceParameters" : [ {
           "sourceId" : 3,
           "infectionStatus" : "SUSCEPTIBLE"
@@ -101,6 +99,7 @@
           "sourceId" : 5,
           "infectionStatus" : "INFECTIOUS"
         } ],
+		"pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.vadere.simulator.models.sir.InfectionModel.*;
+import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 
 public class InfectionModelTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
@@ -49,9 +50,9 @@ public class InfectionModelTest {
         attributeList = getAttributeList();
         infectionModel = new InfectionModel();
 
-        polygon = createTransformedShape(vertex1, vertex2, area);
-        circle1 = createTransformedShape(vertex1, vertex3, area);
-        circle2 = createTransformedShape(vertex1, vertex1, area);
+        polygon = createTransformedAerosolCloudShape(vertex1, vertex2, area);
+        circle1 = createTransformedAerosolCloudShape(vertex1, vertex3, area);
+        circle2 = createTransformedAerosolCloudShape(vertex1, vertex1, area);
     }
 
     // cleanup test environment
@@ -80,6 +81,7 @@ public class InfectionModelTest {
         return attrList;
     }
 
+    // ToDo: createTransformedShape should be tested in AerosolCloudTest
     @Test
     public void throwIfTransformedAerosolCloudShapeWithFarDistancedVerticesNotTypeVPolygon() {
         // create any polygon
@@ -186,7 +188,7 @@ public class InfectionModelTest {
             simTimeInSec =+ simTimeStepLength;
         }
 
-        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / infectionModel.getAttributesInfectionModel().getInfectionModelUpdateStepLength());
+        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / infectionModel.getAttributesInfectionModel().getPedestrianRespiratoryCyclePeriod());
         int actualNumberOfAerosolClouds = topography.getAerosolClouds().size();
 
         assertEquals(actualNumberOfAerosolClouds, expectedNumberOfAerosolClouds);

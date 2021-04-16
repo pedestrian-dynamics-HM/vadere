@@ -224,6 +224,18 @@ public class Pedestrian extends Agent {
 
 	public double emitPathogen() { return healthStatus.emitPathogen(); }
 
+	public void absorbPathogen(double pathogenConcentration) {
+		healthStatus.absorbPathogen(pathogenConcentration);
+	}
+
+	public void updateInfectionStatus(double simTimeInSec)	{
+		healthStatus.updateInfectionStatus(simTimeInSec);
+	}
+
+	public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
+		healthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
+	}
+
 	// Overridden Methods
 
 	@Override

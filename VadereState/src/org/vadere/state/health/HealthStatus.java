@@ -1,5 +1,6 @@
 package org.vadere.state.health;
 
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public class HealthStatus {
@@ -90,4 +91,60 @@ public class HealthStatus {
 
     // other methods
     public double emitPathogen() { return Math.pow(10, this.getPathogenEmissionCapacity()); }
+
+    public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
+        // Assumption: phases when breathing in and out are equally long
+        // Breathing in phase condition: sin(time) > 0 or cos(time) == 1
+        double b = 2.0 * Math.PI / periodLength;
+        if ((Math.sin(b * (respiratoryTimeOffset + simTimeInSec)) > 0) || (Math.cos(b * (respiratoryTimeOffset + simTimeInSec)) == 1)) {
+            setBreathingIn(true);
+        } else {
+            setBreathingIn(false);
+        }
+    }
+
+    public void absorbPathogen(double pathogenConcentration) {
+        double accumulatedAbsorbedPathogenLoad = pathogenAbsorbedLoad + pathogenAbsorptionRate * pathogenConcentration;
+
+        switch (infectionStatus) {
+            case SUSCEPTIBLE:
+            case EXPOSED:
+                setPathogenAbsorbedLoad(accumulatedAbsorbedPathogenLoad);
+                break;
+            case INFECTIOUS:
+            case RECOVERED:
+                break; // do not absorb
+            default:
+                throw new IllegalStateException("Unexpected value: " + infectionStatus);
+        }
+    }
+
+    public void updateInfectionStatus(double simTimeInSec) {
+        switch (infectionStatus) {
+            case SUSCEPTIBLE:
+                if (pathogenAbsorbedLoad >= susceptibility) {
+                    setInfectionStatus(InfectionStatus.EXPOSED);
+                    setLastInfectionStatusUpdateTime(simTimeInSec);
+                }
+                break;
+            case EXPOSED:
+                if (simTimeInSec >= lastInfectionStatusUpdateTime + exposedPeriod) {
+                    setInfectionStatus(InfectionStatus.INFECTIOUS);
+                    setLastInfectionStatusUpdateTime(simTimeInSec);
+                }
+                break;
+            case INFECTIOUS:
+                if (simTimeInSec >= lastInfectionStatusUpdateTime + infectiousPeriod) {
+                    setInfectionStatus(InfectionStatus.RECOVERED);
+                    setLastInfectionStatusUpdateTime(simTimeInSec);
+                    setPathogenAbsorbedLoad(0.0); // reset pathogen load to 0
+                }
+                break;
+            case RECOVERED:
+                if (simTimeInSec >= lastInfectionStatusUpdateTime + recoveredPeriod) {
+                    setInfectionStatus(InfectionStatus.SUSCEPTIBLE);
+                }
+                break;
+        }
+    }
 }

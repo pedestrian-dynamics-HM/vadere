@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
+import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 
 @ModelClass
 public class InfectionModel extends AbstractSirModel {
@@ -78,7 +79,7 @@ public class InfectionModel extends AbstractSirModel {
 				VPoint v2 = pedestrian.getPosition();
 
 				double area = Math.pow(attributesInfectionModel.getAerosolCloudInitialRadius(), 2) * Math.PI;
-				VShape shape = createTransformedShape(v1, v2, area);
+				VShape shape = createTransformedAerosolCloudShape(v1, v2, area);
 				// ToDo find better solution to store shapeParameters
 				ArrayList<VPoint> shapeParameters = new ArrayList<>();
 				shapeParameters.add(0, new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0));
@@ -118,15 +119,16 @@ public class InfectionModel extends AbstractSirModel {
 		}
 
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
-		double timeNormalizationConst = simTimeStepLength / (this.getAttributesInfectionModel().getInfectionModelUpdateStepLength() / 2);
+		double timeNormalizationConst = simTimeStepLength / (attributesInfectionModel.getPedestrianRespiratoryCyclePeriod() / 2);
 
 		Collection<AerosolCloud> updatedAerosolClouds = this.domain.getTopography().getAerosolClouds();
 		for (AerosolCloud aerosolCloud : updatedAerosolClouds) {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(this.domain.getTopography(), aerosolCloud);
 			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(p -> p.isBreathingIn()).collect(Collectors.toSet());
 			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
-				double pathogenLevelInsideCloud = aerosolCloud.calculatePathogenLevel(pedestrian.getPosition());
-				updatePedestrianPathogenAbsorbedLoad(pedestrian, aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea() * pathogenLevelInsideCloud * timeNormalizationConst);
+				double currentMeanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea();
+				double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
+				pedestrian.absorbPathogen(currentMeanPathogenConcentration * pathogenLevelAtPosition * timeNormalizationConst);
 			}
 
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
@@ -139,56 +141,15 @@ public class InfectionModel extends AbstractSirModel {
 				for (Pedestrian pedestrian : pedestriansInsideCloud) {
 					deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
 				}
-				if (deltaRadius > 0.0) {
-					VShape shape = aerosolCloud.getShape();
-					VPoint center = aerosolCloud.getShapeParameters().get(0);
-					VPoint vertex1 = aerosolCloud.getShapeParameters().get(1);
-					VPoint vertex2 = aerosolCloud.getShapeParameters().get(2);
-
-					if (shape instanceof VPolygon) {
-						// get length of oldAxis1 (semi-axis between vertex1 and vertex2) and oldAxis2 (corresponding perpendicular semi-axis)
-						double oldAxis1 = Math.sqrt(Math.pow((vertex1.x - center.x), 2) + Math.pow((vertex1.y - center.y), 2));
-						double oldAxis2 = aerosolCloud.getArea() / Math.PI / oldAxis1;
-						// define new vertices and area
-						VPoint newVertex1 = new VPoint(vertex1.x + deltaRadius * (vertex1.x - center.x) / oldAxis1, vertex1.y + deltaRadius * (vertex1.y - center.y) / oldAxis1);
-						VPoint newVertex2 = new VPoint(vertex2.x - deltaRadius * (vertex2.x - center.x) / oldAxis1, vertex2.y - deltaRadius * (vertex2.y - center.y) / oldAxis1);
-						double newArea = (oldAxis1 + deltaRadius) * (oldAxis2 + deltaRadius) * Math.PI;
-						VShape newShape = createTransformedShape(newVertex1, newVertex2, newArea);
-
-						aerosolCloud.setShape(newShape);
-						aerosolCloud.setArea(newArea);
-						ArrayList<VPoint> newShapeParameters = new ArrayList<>();
-						newShapeParameters.add(0, center);
-						newShapeParameters.add(1, newVertex1);
-						newShapeParameters.add(2, newVertex2);
-						aerosolCloud.setShapeParameters(newShapeParameters);
-					} else if (shape instanceof VCircle) {
-						double newArea = Math.pow((((VCircle) shape).getRadius() + deltaRadius), 2) * Math.PI;
-						VShape newShape = createTransformedShape(vertex1, vertex2, newArea);
-						aerosolCloud.setShape(newShape);
-						aerosolCloud.setArea(newArea);
-					}
-				}
+				aerosolCloud.increaseShape(deltaRadius);
 			}
 		}
 
 		// update pedestrians
 		Collection<Pedestrian> allPedestrians = this.domain.getTopography().getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
-			updatePedestrianInfectionStatus(pedestrian, simTimeInSec);
-
-			updateRespiratoryCycle(pedestrian, simTimeInSec, this.getAttributesInfectionModel().getInfectionModelUpdateStepLength());
-		}
-	}
-
-	public static void updateRespiratoryCycle(Pedestrian pedestrian, double simTimeInSec, double periodLength) {
-		// Assumption: phases when breathing in and out are equally long
-		// Breathing in phase condition: sin(time) > 0 or cos(time) == 1
-		double b = 2.0 * Math.PI / periodLength;
-		if ((Math.sin(b * (pedestrian.getRespiratoryTimeOffset() + simTimeInSec)) > 0) || (Math.cos(b * (pedestrian.getRespiratoryTimeOffset() + simTimeInSec)) == 1)) {
-			pedestrian.setBreathingIn(true);
-		} else {
-			pedestrian.setBreathingIn(false);
+			pedestrian.updateInfectionStatus(simTimeInSec);
+			pedestrian.updateRespiratoryCycle(simTimeInSec, attributesInfectionModel.getPedestrianRespiratoryCyclePeriod());
 		}
 	}
 
@@ -209,7 +170,7 @@ public class InfectionModel extends AbstractSirModel {
 		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
 		ped.setPathogenEmissionCapacity(attributesInfectionModel.getPedestrianPathogenEmissionCapacity());
 		ped.setPathogenAbsorptionRate(attributesInfectionModel.getPedestrianPathogenAbsorptionRate());
-		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesInfectionModel.getInfectionModelUpdateStepLength());
+		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesInfectionModel.getPedestrianRespiratoryCyclePeriod());
 		ped.setSusceptibility(attributesInfectionModel.getPedestrianSusceptibility());
 		ped.setExposedPeriod(attributesInfectionModel.getExposedPeriod());
 		ped.setInfectiousPeriod(attributesInfectionModel.getInfectiousPeriod());
@@ -222,12 +183,12 @@ public class InfectionModel extends AbstractSirModel {
 	private InfectionModelSourceParameters defineSourceParameters(SourceController controller) {
 		int sourceId = controller.getSourceId();
 		int defaultSourceId = -1;
-		Optional<InfectionModelSourceParameters> sourceParameters = getAttributesInfectionModel()
+		Optional<InfectionModelSourceParameters> sourceParameters = attributesInfectionModel
 				.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
 
 		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
 		if (sourceParameters.isEmpty()) {
-			sourceParameters = getAttributesInfectionModel().getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
+			sourceParameters = attributesInfectionModel.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
 
 			// if no user defined default values: use attributesInfectionModel default values
 			if (sourceParameters.isPresent()) {
@@ -268,41 +229,5 @@ public class InfectionModel extends AbstractSirModel {
 			}
 		}
 		return pedestriansInsideAerosolCloud;
-	}
-
-	// ToDo rename method (currently it has the same name method from AffineTransform)
-	public static VShape createTransformedShape(VPoint vertex1, VPoint vertex2, double area) {
-		VPoint center = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
-		double majorAxis = vertex1.distance(vertex2);
-		double minorAxis = 4 * area / (majorAxis * Math.PI);
-
-		// ellipse parameters
-		double a = majorAxis / 2.0;
-		double b = minorAxis / 2.0;
-		double c = Math.sqrt(a * a - b * b);
-		double e = c / a; // eccentricity
-		VShape shape;
-
-		if (majorAxis < minorAxis) {
- 			// return ellipse with (a'=b') -> circle
- 			shape = new VCircle(new VPoint(center.getX(), center.getY()), Math.sqrt(area / Math.PI));
- 		} else {
-			// return polygon (approximated ellipse with edges)
-			Path2D path = new Path2D.Double();
-			path.moveTo(a, 0); // define stating point
-			for (double angle = 0; angle < 2 * Math.PI; angle += Math.PI / 50.0) {
-				double radius = b / Math.sqrt(1 - Math.pow(e * Math.cos(angle), 2)); // radius(angle) from ellipse center to its bound
-				path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius); // convert polar to cartesian coordinates
-			}
-			path.closePath();
-			VShape polygon = new VPolygon(path);
-			double theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // get orientation of shape
-			AffineTransform transform = new AffineTransform();
-			transform.translate(center.getX(), center.getY());
-			transform.rotate(theta);
-
-			shape = new VPolygon(transform.createTransformedShape(polygon));
-		}
-		return shape;
 	}
 }
