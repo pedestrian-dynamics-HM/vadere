@@ -184,13 +184,17 @@ public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasR
 
             // assumption: the pathogen concentration is normally distributed along x and y (gaussian ellipsoid)
             double n = 3.0; // the distance between boundary and center of the shape represents n times standard deviation of the
-            pathogenLevel = twoDimensionalNormalDistZeroMeanZeroCorrelation(xStd / n, yStd / n, translatedPosition.x, translatedPosition.y);
+            pathogenLevel = normalPathogenDistribution(xStd / n, yStd / n, translatedPosition.x, translatedPosition.y);
         }
         return pathogenLevel;
     }
 
-    private double twoDimensionalNormalDistZeroMeanZeroCorrelation(double xStd, double yStd, double x, double y) {
+    private double normalPathogenDistribution(double xStd, double yStd, double x, double y) {
         return 1.0 / (2.0 * Math.PI * xStd * yStd) * (Math.exp(-1.0 / 2.0 * ((x * x) / (xStd * xStd) + (y * y) / (yStd * yStd))));
+    }
+
+    private double uniformPathogenDistribution() {
+        return 1/attributes.getArea();
     }
 
     public void increaseShape(double deltaRadius) {
