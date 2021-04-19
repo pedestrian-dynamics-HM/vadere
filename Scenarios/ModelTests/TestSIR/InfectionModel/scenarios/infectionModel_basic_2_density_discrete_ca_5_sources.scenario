@@ -129,7 +129,7 @@
         "infectiousPeriod" : 20.0,
         "recoveredPeriod" : 20.0,
         "aerosolCloudHalfLife" : 60.0,
-        "aerosolCloudInitialRadius" : 0.75
+        "aerosolCloudInitialArea" : 1.7
       }
     },
     "attributesSimulation" : {

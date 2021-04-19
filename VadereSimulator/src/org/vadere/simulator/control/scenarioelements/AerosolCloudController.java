@@ -34,14 +34,8 @@ public class AerosolCloudController extends ScenarioElementController {
     }
 
     // Other methods
-    public void update(double simTimeInSec, double simTimeStepLength) {
+    public void update(double simTimeInSec) {
             System.out.println("in AerosolCloudController");
-
-            // Effect of diffusion is negligible if the simulation time is short
-            // double rateOfSpread = 0.001;
-            // aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
-
-            aerosolCloud.updateCurrentAerosolCloudPathogenLoad(simTimeInSec);
 
             if (hasAerosolCloudReachedLifeEnd()) {
                 aerosolCloud.setHasReachedLifeEnd(true);

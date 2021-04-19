@@ -30,7 +30,7 @@ public class AttributesInfectionModel extends Attributes {
 	private double recoveredPeriod = 365*24*60*60;
 
 	private double aerosolCloudHalfLife = 60;
-	private double aerosolCloudInitialRadius = 0.75;
+	private double aerosolCloudInitialArea = 1.7;
 
 	public double getPedestrianRespiratoryCyclePeriod() { return pedestrianRespiratoryCyclePeriod; }
 
@@ -64,7 +64,7 @@ public class AttributesInfectionModel extends Attributes {
 		return aerosolCloudHalfLife;
 	}
 
-	public double getAerosolCloudInitialRadius() {
-		return aerosolCloudInitialRadius;
+	public double getAerosolCloudInitialArea() {
+		return aerosolCloudInitialArea;
 	}
 }
