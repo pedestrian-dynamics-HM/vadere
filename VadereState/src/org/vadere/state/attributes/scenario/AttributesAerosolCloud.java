@@ -7,6 +7,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 
@@ -15,7 +16,8 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private int id;
     private VShape shape;
     private double area;
-    private ArrayList<VPoint> shapeParameters; // center, vertex1, vertex2 // ToDo: dirty parameter (may differ from actual shape)
+    private VPoint center;
+    private ArrayList<VPoint> vertices;
     private double creationTime;
     private double halfLife;
     private double initialPathogenLoad;
@@ -29,10 +31,8 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.id = AttributesEmbedShape.ID_NOT_SET;
         this.shape = new VCircle(center, radius);
         this.area = radius * radius * Math.PI;
-        this.shapeParameters = new ArrayList<VPoint>();
-        this.shapeParameters.add(0, center);
-        this.shapeParameters.add(1, new VPoint(0, 0));
-        this.shapeParameters.add(2, new VPoint(0, 0));
+        this.center = center;
+        this.vertices = new ArrayList<>(Arrays.asList(new VPoint(0, 0), new VPoint(0, 0)));
         this.creationTime = -1;
         this.halfLife = -1;
         this.initialPathogenLoad = -1;
@@ -46,11 +46,12 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double area, ArrayList<VPoint> shapeParameters, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
+    public AttributesAerosolCloud(int id, VShape shape, double area, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
         this.id = id;
         this.shape = shape;
         this.area = area;
-        this.shapeParameters = shapeParameters;
+        this.center = center;
+        this.vertices = vertices;
         this.creationTime = creationTime;
         this.halfLife = halfLife;
         this.initialPathogenLoad = initialPathogenLoad;
@@ -68,19 +69,33 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public double getArea() { return  area; }
 
-    public ArrayList<VPoint> getShapeParameters() { // ToDo: check if this works instead of public VShape getShape() {return shape;}
-        return shapeParameters;
+    public VPoint getCenter() {
+        return center;
     }
 
-    public double getCreationTime() { return creationTime; }
+    public ArrayList<VPoint> getVertices() {
+        return vertices;
+    }
 
-    public double getHalfLife() { return halfLife; }
+    public double getCreationTime() {
+        return creationTime;
+    }
 
-    public double getInitialPathogenLoad() { return initialPathogenLoad; }
+    public double getHalfLife() {
+        return halfLife;
+    }
 
-    public double getCurrentPathogenLoad() { return currentPathogenLoad; }
+    public double getInitialPathogenLoad() {
+        return initialPathogenLoad;
+    }
 
-    public boolean getHasReachedLifeEnd() { return hasReachedLifeEnd; }
+    public double getCurrentPathogenLoad() {
+        return currentPathogenLoad;
+    }
+
+    public boolean getHasReachedLifeEnd() {
+        return hasReachedLifeEnd;
+    }
 
     // Setter
     public void setId(int id) {
@@ -95,13 +110,22 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public void setArea(double area) { this.area = area; }
 
-    public void setShapeParameters(ArrayList<VPoint> shapeParameters) {
-        this.shapeParameters = shapeParameters;
+    public void setCenter(VPoint center) {
+        this.center = center;
+    }
+    public void setVertices(ArrayList<VPoint> vertices) {
+        this.vertices = vertices;
     }
 
-    public void setCreationTime(double creationTime) { this.creationTime = creationTime; }
+    public void setCreationTime(double creationTime) {
+        this.creationTime = creationTime;
+    }
 
-    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { this.hasReachedLifeEnd = hasReachedLifeEnd; }
+    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) {
+        this.hasReachedLifeEnd = hasReachedLifeEnd;
+    }
 
-    public void setCurrentPathogenLoad(double currentPathogenLoad) { this.currentPathogenLoad = currentPathogenLoad; }
+    public void setCurrentPathogenLoad(double currentPathogenLoad) {
+        this.currentPathogenLoad = currentPathogenLoad;
+    }
 }

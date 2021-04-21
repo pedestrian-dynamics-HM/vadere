@@ -12,6 +12,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.vadere.util.opencl.CLDemo.logger;
 
@@ -26,26 +27,23 @@ public class AerosolCloud extends ScenarioElement {
 
 
     // Constructors
-    public AerosolCloud() { this(new AttributesAerosolCloud()); }
-
+    public AerosolCloud() {
+        this(new AttributesAerosolCloud());
+    }
 
     public AerosolCloud(@NotNull AttributesAerosolCloud attributes) {
         this.attributes = attributes;
     }
 
-    public AerosolCloud(AerosolCloud aerosolCloud){
-        this(new AttributesAerosolCloud(aerosolCloud.getId(), aerosolCloud.getShape(), aerosolCloud.getArea(), aerosolCloud.attributes.getShapeParameters(), aerosolCloud.getCreationTime(),
-                aerosolCloud.getHalfLife(), aerosolCloud.getInitialPathogenLoad(), aerosolCloud.getCurrentPathogenLoad(), aerosolCloud.getHasReachedLifeEnd()));
-    }
-
-
     // Getter
     @Override
-    public VShape getShape() {     // ToDo check of one must use VShape instead -> attributesAerosolCloud
+    public VShape getShape() {
         return attributes.getShape();
     }
 
-    public double getArea() { return attributes.getArea(); }
+    public double getArea() {
+        return attributes.getArea();
+    }
 
     @Override
     public int getId() {
@@ -62,11 +60,25 @@ public class AerosolCloud extends ScenarioElement {
         return attributes;
     }
 
-    public double getHalfLife() { return attributes.getHalfLife(); }
-    public double getCreationTime() { return attributes.getCreationTime(); }
-    public double getInitialPathogenLoad() { return attributes.getInitialPathogenLoad(); }
-    public double getCurrentPathogenLoad() {return attributes.getCurrentPathogenLoad(); }
-    public boolean getHasReachedLifeEnd() { return attributes.getHasReachedLifeEnd(); }
+    public double getHalfLife() {
+        return attributes.getHalfLife();
+    }
+
+    public double getCreationTime() {
+        return attributes.getCreationTime();
+    }
+
+    public double getInitialPathogenLoad() {
+        return attributes.getInitialPathogenLoad();
+    }
+
+    public double getCurrentPathogenLoad() {
+        return attributes.getCurrentPathogenLoad();
+    }
+
+    public boolean getHasReachedLifeEnd() {
+        return attributes.getHasReachedLifeEnd();
+    }
 
 
     // Setter
@@ -75,20 +87,29 @@ public class AerosolCloud extends ScenarioElement {
         attributes.setShape(newShape);
     }
 
-    public void setArea(double area) { attributes.setArea(area); }
+    public void setArea(double area) {
+        attributes.setArea(area);
+    }
 
     @Override
     public void setAttributes(Attributes attributes) {
         this.attributes = (AttributesAerosolCloud) attributes;
     }
 
-    public void setId(int id){
-        ((AttributesAerosolCloud)getAttributes()).setId(id);
+    public void setId(int id) {
+        ((AttributesAerosolCloud) getAttributes()).setId(id);
     }
 
-    public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
-    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
-    public void setCurrentPathogenLoad(double currentPathogenLoad) { attributes.setCurrentPathogenLoad(currentPathogenLoad);
+    public void setCreationTime(double creationTime) {
+        attributes.setCreationTime(creationTime);
+    }
+
+    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) {
+        attributes.setHasReachedLifeEnd(hasReachedLifeEnd);
+    }
+
+    public void setCurrentPathogenLoad(double currentPathogenLoad) {
+        attributes.setCurrentPathogenLoad(currentPathogenLoad);
     }
 
     // Other methods
@@ -134,31 +155,26 @@ public class AerosolCloud extends ScenarioElement {
         }
         AerosolCloud other = (AerosolCloud) obj;
         if (attributes == null) {
-            if (other.attributes != null) {
-                return false;
-            }
-        } else if (!attributes.equals(other.attributes)) {
-            return false;
-        }
-        return true;
+            return other.attributes == null;
+        } else return attributes.equals(other.attributes);
     }
 
-    public double calculatePathogenLevelAtPosition(VPoint position){
+    public double calculatePathogenLevelAtPosition(VPoint position) {
         double pathogenLevel;
         double theta = 0;
-        if(!attributes.getShape().contains(position)){
+        if (!attributes.getShape().contains(position)) {
             // pathogenLevel outside shape is 0
             pathogenLevel = 0.0;
         } else {
             double xStd = -1;
             double yStd = -1;
             VShape shape = attributes.getShape();
-            VPoint center = attributes.getShapeParameters().get(0);
+            VPoint center = attributes.getCenter();
             AffineTransform transform = new AffineTransform();
 
             if (shape instanceof VPolygon) {
-                VPoint vertex1 = attributes.getShapeParameters().get(1);
-                VPoint vertex2 = attributes.getShapeParameters().get(2);
+                VPoint vertex1 = attributes.getVertices().get(0);
+                VPoint vertex2 = attributes.getVertices().get(1);
                 theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // orientation of connecting line between vertex1 and vertex2
                 transform.rotate(-theta);
                 transform.translate(-center.x, -center.y);
@@ -196,16 +212,16 @@ public class AerosolCloud extends ScenarioElement {
     }
 
     private double uniformPathogenDistribution() {
-        return 1/attributes.getArea();
+        return 1 / attributes.getArea();
     }
 
     public void increaseShape(double deltaRadius) {
         if (deltaRadius > 0.0) {
 
             VShape shape = attributes.getShape();
-            VPoint center = attributes.getShapeParameters().get(0);
-            VPoint vertex1 = attributes.getShapeParameters().get(1);
-            VPoint vertex2 = attributes.getShapeParameters().get(2);
+            VPoint center = attributes.getCenter();
+            VPoint vertex1 = attributes.getVertices().get(0);
+            VPoint vertex2 = attributes.getVertices().get(1);
 
             if (shape instanceof VPolygon) {
                 // get length of oldAxis1 (semi-axis between vertex1 and vertex2) and oldAxis2 (corresponding perpendicular semi-axis)
@@ -219,11 +235,8 @@ public class AerosolCloud extends ScenarioElement {
 
                 attributes.setShape(newShape);
                 attributes.setArea(newArea);
-                ArrayList<VPoint> newShapeParameters = new ArrayList<>();
-                newShapeParameters.add(0, center);
-                newShapeParameters.add(1, newVertex1);
-                newShapeParameters.add(2, newVertex2);
-                attributes.setShapeParameters(newShapeParameters);
+                attributes.setCenter(center);
+                attributes.setVertices(new ArrayList<>(Arrays.asList(newVertex1, newVertex2)));
             } else if (shape instanceof VCircle) {
                 double newArea = Math.pow((((VCircle) shape).getRadius() + deltaRadius), 2) * Math.PI;
                 VShape newShape = createTransformedAerosolCloudShape(vertex1, vertex2, newArea);

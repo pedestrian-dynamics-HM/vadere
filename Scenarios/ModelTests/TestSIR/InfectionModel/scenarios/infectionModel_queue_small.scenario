@@ -2,7 +2,7 @@
   "name" : "infectionModel_queue_small",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "661b70916fe31e9e06b0b1a9d6c4ab7e708ff758",
+  "commithash" : "c0f180ad6add35b0d695432a05924bccf9c66266",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -114,7 +114,7 @@
     "attributesSimulation" : {
       "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.5,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,

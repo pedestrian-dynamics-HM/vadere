@@ -82,7 +82,7 @@ public class InfectionModel extends AbstractSirModel {
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
-			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(p -> p.isBreathingIn()).collect(Collectors.toSet());
+			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(Pedestrian::isBreathingIn).collect(Collectors.toSet());
 			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
 				double currentMeanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea();
 				double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
@@ -113,11 +113,9 @@ public class InfectionModel extends AbstractSirModel {
 
 				double area = attributesInfectionModel.getAerosolCloudInitialArea();
 				VShape shape = createTransformedAerosolCloudShape(v1, v2, area);
-				// ToDo find better solution to store shapeParameters
-				ArrayList<VPoint> shapeParameters = new ArrayList<>();
-				shapeParameters.add(0, new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0));
-				shapeParameters.add(1, v1);
-				shapeParameters.add(2, v2);
+				ArrayList<VPoint> vertices = new ArrayList<>(Arrays.asList(v1, v2));
+				VPoint center = new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0);
+
 
 				// assumption: aerosolCloud has a constant vertical extent (in m). The height corresponds to a
 				// cylinder whose volume equals the
@@ -126,15 +124,13 @@ public class InfectionModel extends AbstractSirModel {
 				// area (in the x-y-plane) = a * b * PI and c = initialAerosolCloudRadius
 				double radius = Math.sqrt(area / Math.PI);
 				double height = 4.0 / 3.0 * radius;
-				// assumption: the relevant layer (about height of the agents' heads) contains only part of the total
-				// pathogenLoad and has a defined thickness
-				double thicknessOfRelevantLayer = 0.3;
-				double pathogenLoad = pedestrian.emitPathogen() * (thicknessOfRelevantLayer / height);
+				double pathogenLoad = pedestrian.emitPathogen() / height;
 
 				AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						shape,
 						area,
-						shapeParameters,
+						center,
+						vertices,
 						simTimeInSec,
 						attributesInfectionModel.getAerosolCloudHalfLife(),
 						pathogenLoad,
@@ -147,11 +143,9 @@ public class InfectionModel extends AbstractSirModel {
 
 	/**
 	 * Deletes aerosolClouds that have reached less than a minimumPercentage of their initial pathogen concentration
-	 * @param topography
 	 */
 	public static void deleteExpiredAerosolClouds(Topography topography, AttributesInfectionModel attributesInfectionModel) {
 		double minimumPercentage = 0.01;
-		// ToDo check if area is actual area
 		Collection<AerosolCloud> aerosolCloudsToBeDeleted = topography.getAerosolClouds().stream().filter(a -> a.getCurrentPathogenLoad() / a.getArea() < minimumPercentage * a.getInitialPathogenLoad() / attributesInfectionModel.getAerosolCloudInitialArea()).collect(Collectors.toSet());
 		for (AerosolCloud aerosolCloud : aerosolCloudsToBeDeleted) {
 			topography.getAerosolClouds().remove(aerosolCloud);
