@@ -12,9 +12,7 @@ public interface ControllerProvider {
 	Collection<TargetController> getTargetControllers();
 	Collection<TargetChangerController> getTargetChangerControllers();
 	Collection<AbsorbingAreaController> getAbsorbingAreaControllers();
-	Collection<AerosolCloudController> getAerosolCloudControllers();
 	TeleporterController getTeleporterController();
 	TopographyController getTopographyController();
-	void registerAerosolCloud(AerosolCloud aerosolCloud);
 	ProcessorManager getProcessorManager();
 }
