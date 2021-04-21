@@ -36,24 +36,5 @@ public class AerosolCloudController extends ScenarioElementController {
     // Other methods
     public void update(double simTimeInSec) {
             System.out.println("in AerosolCloudController");
-
-            if (hasAerosolCloudReachedLifeEnd()) {
-                aerosolCloud.setHasReachedLifeEnd(true);
-            }
-            deleteAerosolCloudFlagController();
-    }
-
-    public boolean hasAerosolCloudReachedLifeEnd() {
-        // assumption: aerosolCloud is not relevant anymore if it has reached less than 1% of its initialPathogenLoad
-        // As a consequence, the life time is about ln(1%) / -lambda * halfLife = 6.6 times halfLife.
-        double minimumRelevantPathogenLoad = 0.01 * aerosolCloud.getInitialPathogenLoad();
-        return (aerosolCloud.getCurrentPathogenLoad() < minimumRelevantPathogenLoad);
-    }
-
-    public void deleteAerosolCloudFlagController() {
-        if (aerosolCloud.getHasReachedLifeEnd()) {
-            topography.getAerosolClouds().remove(aerosolCloud);
-            this.activeController = false; // flag aerosolCloudController so that it can be removed by Simulation
-        }
     }
 }

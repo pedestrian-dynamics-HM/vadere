@@ -87,7 +87,9 @@ public class AerosolCloud extends ScenarioElement {
     }
 
     public void setCreationTime(double creationTime) { attributes.setCreationTime(creationTime); }
-public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
+    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasReachedLifeEnd(hasReachedLifeEnd); }
+    public void setCurrentPathogenLoad(double currentPathogenLoad) { attributes.setCurrentPathogenLoad(currentPathogenLoad);
+    }
 
     // Other methods
     @Override
@@ -265,11 +267,5 @@ public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) { attributes.setHasR
             shape = new VPolygon(transform.createTransformedShape(polygon));
         }
         return shape;
-    }
-
-    public void updateCurrentAerosolCloudPathogenLoad(double simTimeInSec) {
-        double t = simTimeInSec - attributes.getCreationTime();
-        double lambda = - Math.log(0.5) / attributes.getHalfLife();
-        attributes.setCurrentPathogenLoad(attributes.getInitialPathogenLoad() * Math.exp(-lambda * t));
     }
 }
