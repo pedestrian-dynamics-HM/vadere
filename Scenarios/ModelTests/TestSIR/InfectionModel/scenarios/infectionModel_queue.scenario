@@ -2,7 +2,7 @@
   "name" : "infectionModel_queue",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "661b70916fe31e9e06b0b1a9d6c4ab7e708ff758",
+  "commithash" : "81ee927e0fdb8640a4ecaa6707b8eb773f300bd7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -100,15 +100,15 @@
           "sourceId" : 1,
           "infectionStatus" : "INFECTIOUS"
         } ],
-		"pedestrianRespiratoryCyclePeriod" : 4.0,
+        "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
-        "aerosolCloudHalfLife" : 60.0,
-        "aerosolCloudInitialArea" : 1.7
+        "aerosolCloudHalfLife" : 180.0,
+        "aerosolCloudInitialArea" : 0.75
       }
     },
     "attributesSimulation" : {

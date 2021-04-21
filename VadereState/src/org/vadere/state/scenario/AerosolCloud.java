@@ -45,6 +45,10 @@ public class AerosolCloud extends ScenarioElement {
         return attributes.getArea();
     }
 
+    public double getHeigth() {
+        return attributes.getHeight();
+    }
+
     @Override
     public int getId() {
         return attributes.getId();
@@ -159,6 +163,10 @@ public class AerosolCloud extends ScenarioElement {
         } else return attributes.equals(other.attributes);
     }
 
+    /**
+     * Calculates the pathogenLevel inside an aerosolCloud assuming a Gaussian distribution in x and y direction; the
+     * aerosolCloud's radial component equals n times the standard deviation
+     */
     public double calculatePathogenLevelAtPosition(VPoint position) {
         double pathogenLevel;
         double theta = 0;
@@ -209,10 +217,6 @@ public class AerosolCloud extends ScenarioElement {
 
     private double normalPathogenDistribution(double xStd, double yStd, double x, double y) {
         return 1.0 / (2.0 * Math.PI * xStd * yStd) * (Math.exp(-1.0 / 2.0 * ((x * x) / (xStd * xStd) + (y * y) / (yStd * yStd))));
-    }
-
-    private double uniformPathogenDistribution() {
-        return 1 / attributes.getArea();
     }
 
     public void increaseShape(double deltaRadius) {

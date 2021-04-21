@@ -87,6 +87,7 @@ public class AerosolCloudTest extends TestCase {
         VPoint center = new VPoint(2, 2);
         VCircle shape = new VCircle(center, radius);
         double area = radius * radius * Math.PI;
+        double height = 1.0;
         ArrayList<VPoint> vertices = new ArrayList<>(Arrays.asList(new VPoint(0, 0), new VPoint(0, 0)));
 
         VCircle newShape = new VCircle(new VPoint(3, 3), 4);
@@ -95,7 +96,7 @@ public class AerosolCloudTest extends TestCase {
         double lifeTime = 60*60*3;
         boolean hasReachedLifeEnd = false;
 
-        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, area, center, vertices, creationTime, pathogenLoad, pathogenLoad, lifeTime, hasReachedLifeEnd));
+        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, area, height, center, vertices, creationTime, pathogenLoad, pathogenLoad, lifeTime, hasReachedLifeEnd));
         AerosolCloud aerosolCloudClone = aerosolCloudOriginal.clone();
 
         assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());

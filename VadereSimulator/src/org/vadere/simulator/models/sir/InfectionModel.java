@@ -84,9 +84,14 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(Pedestrian::isBreathingIn).collect(Collectors.toSet());
 			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
-				double currentMeanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea();
-				double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
-				pedestrian.absorbPathogen(currentMeanPathogenConcentration * pathogenLevelAtPosition * timeNormalizationConst);
+				double volume = aerosolCloud.getHeigth() * aerosolCloud.getArea();
+				double currentMeanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / volume;
+				// assumption: the pathogen is distributed uniformly within the aerosolCloud
+				// alternatively, calculate the level according to a gaussian distribution with	and multiply with the
+				// meanPathogenConcentration
+				// double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
+
+				pedestrian.absorbPathogen(currentMeanPathogenConcentration * timeNormalizationConst);
 			}
 		}
 
@@ -111,30 +116,30 @@ public class InfectionModel extends AbstractSirModel {
 				pedestrian.setStartBreatheOutPosition(null); // reset startBreatheOutPosition
 				VPoint v2 = pedestrian.getPosition();
 
-				double area = attributesInfectionModel.getAerosolCloudInitialArea();
-				VShape shape = createTransformedAerosolCloudShape(v1, v2, area);
+				double initialArea = attributesInfectionModel.getAerosolCloudInitialArea();
+				VShape shape = createTransformedAerosolCloudShape(v1, v2, initialArea);
 				ArrayList<VPoint> vertices = new ArrayList<>(Arrays.asList(v1, v2));
 				VPoint center = new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0);
 
 
 				// assumption: aerosolCloud has a constant vertical extent (in m). The height corresponds to a
 				// cylinder whose volume equals the
-				// - sphere with radius = initialAerosolCloudRadius
+				// - sphere with radius = sqrt(initialArea / PI)
 				// - ellipsoid with principal diameters a, b, c where cross-sectional
-				// area (in the x-y-plane) = a * b * PI and c = initialAerosolCloudRadius
-				double radius = Math.sqrt(area / Math.PI);
+				// area (in the x-y-plane) = a * b * PI and c = radius
+				double radius = Math.sqrt(initialArea / Math.PI);
 				double height = 4.0 / 3.0 * radius;
-				double pathogenLoad = pedestrian.emitPathogen() / height;
 
 				AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
 						shape,
-						area,
+						initialArea,
+						height,
 						center,
 						vertices,
 						simTimeInSec,
 						attributesInfectionModel.getAerosolCloudHalfLife(),
-						pathogenLoad,
-						pathogenLoad,
+						pedestrian.emitPathogen(),
+						pedestrian.emitPathogen(),
 						false));
 				topography.addAerosolCloud(aerosolCloud);
 			}
@@ -171,21 +176,16 @@ public class InfectionModel extends AbstractSirModel {
 
 			// Increasing extent due to moving air caused by agents
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
-			// assumption: aerosolClouds do not become greater than maxArea
-			double maxArea = 10;
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
-			if (aerosolCloud.getArea() < maxArea) {
-				double deltaRadius = 0.0;
-				double weight = 0.005; // each pedestrian with velocity v causes an increase of the cloud's radius by
-				// factor weight * v
-				for (Pedestrian pedestrian : pedestriansInsideCloud) {
-					deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
-				}
-				aerosolCloud.increaseShape(deltaRadius);
+			double deltaRadius = 0.0;
+			double weight = 0.005; // each pedestrian with velocity v causes an increase of the cloud's radius by
+			// factor weight * v
+			for (Pedestrian pedestrian : pedestriansInsideCloud) {
+				deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
 			}
+			aerosolCloud.increaseShape(deltaRadius);
 		}
 	}
-
 
 	public static Collection<Pedestrian> getInfectedPedestrians(Topography topography) {
 		return topography.getPedestrianDynamicElements()

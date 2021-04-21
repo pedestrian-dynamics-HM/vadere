@@ -16,6 +16,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private int id;
     private VShape shape;
     private double area;
+    private double height;
     private VPoint center;
     private ArrayList<VPoint> vertices;
     private double creationTime;
@@ -30,6 +31,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         double radius = 0.75;
         this.id = AttributesEmbedShape.ID_NOT_SET;
         this.shape = new VCircle(center, radius);
+        this.height = 1.0;
         this.area = radius * radius * Math.PI;
         this.center = center;
         this.vertices = new ArrayList<>(Arrays.asList(new VPoint(0, 0), new VPoint(0, 0)));
@@ -46,10 +48,11 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double area, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
+    public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
         this.id = id;
         this.shape = shape;
         this.area = area;
+        this.height = height;
         this.center = center;
         this.vertices = vertices;
         this.creationTime = creationTime;
@@ -67,7 +70,13 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         return shape;
     }
 
-    public double getArea() { return  area; }
+    public double getArea() {
+        return  area;
+    }
+
+    public double getHeight() {
+        return height;
+    }
 
     public VPoint getCenter() {
         return center;
