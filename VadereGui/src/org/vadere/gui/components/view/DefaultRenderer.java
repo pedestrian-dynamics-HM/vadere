@@ -296,7 +296,7 @@ public abstract class DefaultRenderer {
 		AerosolCloud cloud = (AerosolCloud) element;
 		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
 		float minAlpha = 10; //defaultModel.getConfig().getAerosolCloudAlphaMin()
-		double initialVolume = 4.0 / 3.0 * Math.pow(0.5, 3) * Math.PI; // ToDo: retrieve initialArea from attributesInfectionModel
+		double initialVolume = 4.0 / 3.0 * Math.pow(0.5, 3) * Math.PI;
 		double maxPathogenConcentration = cloud.getInitialPathogenLoad() / initialVolume;
 		double currentPathogenConcentration = cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeigth());
 		int currentAlpha = (int) ((currentPathogenConcentration / maxPathogenConcentration) * (maxAlpha - minAlpha) + minAlpha);

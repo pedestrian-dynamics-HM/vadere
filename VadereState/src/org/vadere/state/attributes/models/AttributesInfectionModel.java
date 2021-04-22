@@ -25,16 +25,20 @@ public class AttributesInfectionModel extends Attributes {
 	 * (could be defined individually for each agent depending on its immune system)
 	 */
 	private double pedestrianSusceptibility = 1000; // absorbed particles required for being exposed
-	private double exposedPeriod = 2*24*60*60;
-	private double infectiousPeriod = 14*24*60*60;
-	private double recoveredPeriod = 365*24*60*60;
+	private double exposedPeriod = 2 * 24 * 60 * 60;
+	private double infectiousPeriod = 14 * 24 * 60 * 60;
+	private double recoveredPeriod = 365 * 24 * 60 * 60;
 
 	private double aerosolCloudHalfLife = 60;
 	private double aerosolCloudInitialArea = 1.7;
 
-	public double getPedestrianRespiratoryCyclePeriod() { return pedestrianRespiratoryCyclePeriod; }
+	public double getPedestrianRespiratoryCyclePeriod() {
+		return pedestrianRespiratoryCyclePeriod;
+	}
 
-	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() { return infectionModelSourceParameters; }
+	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() {
+		return infectionModelSourceParameters;
+	}
 
 	public double getPedestrianPathogenEmissionCapacity() {
 		return pedestrianPathogenEmissionCapacity;

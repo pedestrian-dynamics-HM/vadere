@@ -171,7 +171,8 @@ public class InfectionModel extends AbstractSirModel {
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 
 			// Increasing extent due to diffusion
-			double rateOfSpread = 0.001;
+			double rateOfSpread = 0.001; // describes how fast the aerosolCloud spreads due to diffusion; unit: m/s; and
+			// could be implemented as user-defined parameter in AttributesInfectionModel
 			aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
 
 			// Increasing extent due to moving air caused by agents
@@ -179,7 +180,7 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			double deltaRadius = 0.0;
 			double weight = 0.005; // each pedestrian with velocity v causes an increase of the cloud's radius by
-			// factor weight * v
+			// factor weight * v; could be implemented as user-defined parameter in AttributesInfectionModel
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
 				deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
 			}
@@ -196,7 +197,7 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
-		// SourceControllerListener. This will be called  *after* a pedestrians is inserted into the
+		// SourceControllerListener. This will be called  *after* a pedestrian is inserted into the
 		// topography by the given SourceController. Change model state on Agent here
 		InfectionModelSourceParameters sourceParameters = defineSourceParameters(controller);
 

@@ -256,15 +256,15 @@ public class AerosolCloud extends ScenarioElement {
         double minorAxis = 4.0 * area / (majorAxis * Math.PI);
 
         // ellipse parameters
-        double a = majorAxis / 2.0;
-        double b = minorAxis / 2.0;
+        double a = majorAxis / 2.0; // semi-major axis
+        double b = minorAxis / 2.0; // semi-minor axis
         double c = Math.sqrt(a * a - b * b);
         double e = c / a; // eccentricity
         VShape shape;
         int numberOfNodesAlongBound = 50;
 
-        if (majorAxis < minorAxis) {
-            // return ellipse with (a'=b') -> circle
+        if (majorAxis <= minorAxis) {
+            // return circle, i.e. ellipse with (a'=b')
             shape = new VCircle(new VPoint(center.getX(), center.getY()), Math.sqrt(area / Math.PI));
         } else {
             // return polygon (approximated ellipse with edges)

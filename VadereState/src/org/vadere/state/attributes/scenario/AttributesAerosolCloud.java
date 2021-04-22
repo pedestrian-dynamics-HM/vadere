@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.lwjgl.system.CallbackI;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -8,7 +7,6 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 
 public class AttributesAerosolCloud extends AttributesEmbedShape {
@@ -66,7 +64,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     public int getId() { return id; }
 
     @Override
-    public VShape getShape() { // ToDo: check if this works instead of public VShape getShape() {return shape;}
+    public VShape getShape() {
         return shape;
     }
 
@@ -117,11 +115,14 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.shape = shape;
     }
 
-    public void setArea(double area) { this.area = area; }
+    public void setArea(double area) {
+        this.area = area;
+    }
 
     public void setCenter(VPoint center) {
         this.center = center;
     }
+
     public void setVertices(ArrayList<VPoint> vertices) {
         this.vertices = vertices;
     }
