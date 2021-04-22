@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesInfectionModel;
 import org.vadere.state.attributes.models.InfectionModelSourceParameters;
@@ -64,7 +65,7 @@ public class InfectionModelTest {
     @Test
     public void testInitializeOk() {
         // initialize must find the AttributesInfectionModel from the  attributeList
-        infectionModel.initialize(attributeList,null,null,null);
+        infectionModel.initialize(attributeList, new Domain(new Topography()),null,null);
 
         AttributesInfectionModel attributesInfectionModel = infectionModel.getAttributesInfectionModel();
         ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = attributesInfectionModel.getInfectionModelSourceParameters();
@@ -75,13 +76,12 @@ public class InfectionModelTest {
     public List<Attributes> getAttributeList() {
         ArrayList<Attributes> attrList = new ArrayList<>();
         var att = new AttributesInfectionModel();
-        // att.setInfectionModelLastUpdateTime(expectedLastUpdateTime);
+
         attrList.add(att);
 
         return attrList;
     }
 
-    // ToDo: createTransformedShape should be tested in AerosolCloudTest
     @Test
     public void throwIfTransformedAerosolCloudShapeWithFarDistancedVerticesNotTypeVPolygon() {
         // create any polygon
@@ -174,9 +174,10 @@ public class InfectionModelTest {
 
     @Test
     public void testUpdateNumberOfGeneratedAerosolClouds() {
-        InfectionModel infectionModel = new InfectionModel();
-        infectionModel.initialize(attributeList,null,null,null);
         Topography topography = new Topography();
+
+        infectionModel.initialize(attributeList, new Domain(topography),null,null);
+
         createPedestrian(topography, new VPoint(10, 10), 1, -1, InfectionStatus.INFECTIOUS);
 
         double simTimeInSec = 0.0;
@@ -185,7 +186,7 @@ public class InfectionModelTest {
 
         while(simTimeInSec <= simEndTime) {
             infectionModel.update(simTimeInSec);
-            simTimeInSec =+ simTimeStepLength;
+            simTimeInSec += simTimeStepLength;
         }
 
         int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / infectionModel.getAttributesInfectionModel().getPedestrianRespiratoryCyclePeriod());
@@ -229,7 +230,7 @@ public class InfectionModelTest {
         createPedestrian(topography, new VPoint(10, 10), 4, -1, InfectionStatus.SUSCEPTIBLE);
         createPedestrian(topography, new VPoint(10.5, 10.5), 5, -1, InfectionStatus.SUSCEPTIBLE);
 
-        Collection<Pedestrian> expectedPedestriansInAerosolCloud = new LinkedList<Pedestrian>();
+        Collection<Pedestrian> expectedPedestriansInAerosolCloud = new LinkedList<>();
         expectedPedestriansInAerosolCloud.add(topography.getPedestrianDynamicElements().getElement(4));
         expectedPedestriansInAerosolCloud.add(topography.getPedestrianDynamicElements().getElement(5));
 

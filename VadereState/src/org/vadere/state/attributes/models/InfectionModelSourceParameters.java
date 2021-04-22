@@ -11,7 +11,7 @@ public class InfectionModelSourceParameters extends Attributes {
     public InfectionModelSourceParameters() {
     }
 
-    public InfectionModelSourceParameters(int sourceId, InfectionStatus infectionStatus, double pedestrianPathogenEmissionCapacity, double pedestrianPathogenAbsorptionRate, double pedestrianSusceptibility, double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
+    public InfectionModelSourceParameters(int sourceId, InfectionStatus infectionStatus) {
         this.sourceId = sourceId;
         this.infectionStatus = infectionStatus;
     }
