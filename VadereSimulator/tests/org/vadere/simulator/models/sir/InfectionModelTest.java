@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesInfectionModel;
@@ -28,9 +29,12 @@ import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolClo
 
 public class InfectionModelTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
+    static final double simTimeStepLength = 0.4;
 
     List<Attributes> attributeList;
     InfectionModel infectionModel;
+    Topography topography;
+    VadereContext ctx;
 
     // member variables defining aerosol cloud shapes
     double area = 1;
@@ -50,6 +54,12 @@ public class InfectionModelTest {
     public void setUp() {
         attributeList = getAttributeList();
         infectionModel = new InfectionModel();
+        topography = new Topography();
+        topography.setContextId("testId");
+
+        ctx = new VadereContext();
+        ctx.put(InfectionModel.simStepLength, simTimeStepLength);
+        VadereContext.add(topography.getContextId(), ctx);
 
         polygon = createTransformedAerosolCloudShape(vertex1, vertex2, area);
         circle1 = createTransformedAerosolCloudShape(vertex1, vertex3, area);
@@ -65,10 +75,9 @@ public class InfectionModelTest {
     @Test
     public void testInitializeOk() {
         // initialize must find the AttributesInfectionModel from the  attributeList
-        infectionModel.initialize(attributeList, new Domain(new Topography()),null,null);
+        infectionModel.initialize(attributeList, new Domain(topography),null,null);
 
         AttributesInfectionModel attributesInfectionModel = infectionModel.getAttributesInfectionModel();
-        ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters = attributesInfectionModel.getInfectionModelSourceParameters();
 
         Assert.assertEquals(attributeList.get(0), attributesInfectionModel);
     }
@@ -162,7 +171,6 @@ public class InfectionModelTest {
 
     @Test
     public void testUpdateNumberOfGeneratedAerosolClouds() {
-        Topography topography = new Topography();
 
         infectionModel.initialize(attributeList, new Domain(topography),null,null);
 
