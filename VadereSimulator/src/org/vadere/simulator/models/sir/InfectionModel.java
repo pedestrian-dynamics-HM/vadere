@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.sir;
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
@@ -29,9 +30,12 @@ import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolClo
 public class InfectionModel extends AbstractSirModel {
 
 	private AttributesInfectionModel attributesInfectionModel;
-	private ControllerProvider controllerProvider;
 	double simTimeStepLength;
 	Topography topography;
+
+	public static final String simStepLength = "simTimeStepLength";
+
+	static final double exponentialDecayFactor = Math.log(2.0);
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -40,12 +44,12 @@ public class InfectionModel extends AbstractSirModel {
 			this.attributesAgent = attributesPedestrian;
 			this.attributesInfectionModel = Model.findAttributes(attributesList, AttributesInfectionModel.class);
 			this.topography = domain.getTopography();
-			this.simTimeStepLength = 0.4; // ToDo how to get simTimeStepLength from simulation
+			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
 	}
 
 	@Override
 	public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
-		this.controllerProvider = controllerProvider; // ToDo: controllerProvider should be handled by initialize method (this requires changes in all models)
+		// ToDo: controllerProvider should be handled by initialize method (this requires changes in all models)
 		for (var controller : controllerProvider.getSourceControllers()){
 			controller.register(this::sourceControllerEvent);
 		}
