@@ -139,18 +139,6 @@ public class InfectionModelTest {
         assertEquals(actualArea, area, ALLOWED_DOUBLE_TOLERANCE);
     }
 
-    @Test
-    public void testGetInfectedPedestrians() {
-        Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(1, 1), 2, 1, InfectionStatus.SUSCEPTIBLE);
-        createPedestrian(topography, new VPoint(2, 1), 3, 1, InfectionStatus.INFECTIOUS);
-        createPedestrian(topography, new VPoint(3, 1), 4, 1, InfectionStatus.INFECTIOUS);
-        Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
-        Collection<Pedestrian> expectedInfectedPedestrians = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> p.getId() > 2).collect(Collectors.toSet());
-
-        assertEquals(infectedPedestrians, expectedInfectedPedestrians);
-    }
-
     private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, InfectionStatus infectionStatus) {
         Pedestrian pedestrian = new Pedestrian(new AttributesAgent(), new Random(1));
         pedestrian.setPosition(pedPosition);

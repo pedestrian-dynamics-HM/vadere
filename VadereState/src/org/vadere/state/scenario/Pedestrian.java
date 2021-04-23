@@ -224,6 +224,14 @@ public class Pedestrian extends Agent {
 	public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
 		healthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
 	}
+	public boolean isStartingBreatheOut() {
+		return healthStatus.isStartingBreatheOut();
+	}
+
+	public boolean isStartingBreatheIn() {
+		return healthStatus.isStartingBreatheIn();
+	}
+
 
 	// Overridden Methods
 

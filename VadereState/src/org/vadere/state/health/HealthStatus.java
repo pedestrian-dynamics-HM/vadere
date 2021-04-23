@@ -168,6 +168,14 @@ public class HealthStatus {
         setBreathingIn((Math.sin(b * (respiratoryTimeOffset + simTimeInSec)) > 0) || (Math.cos(b * (respiratoryTimeOffset + simTimeInSec)) == 1));
     }
 
+    public boolean isStartingBreatheOut() {
+        return (!breathingIn && startBreatheOutPosition == null);
+    }
+
+    public boolean isStartingBreatheIn() {
+        return (breathingIn && !(startBreatheOutPosition == null));
+    }
+
     public void absorbPathogen(double pathogenConcentration) {
         double accumulatedAbsorbedPathogenLoad = pathogenAbsorbedLoad + pathogenAbsorptionRate * pathogenConcentration;
 
