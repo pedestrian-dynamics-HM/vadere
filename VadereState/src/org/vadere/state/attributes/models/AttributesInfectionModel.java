@@ -8,30 +8,35 @@ import org.vadere.state.health.InfectionStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.vadere.state.scenario.AerosolCloud;
+import org.vadere.state.health.HealthStatus;
+import org.vadere.state.scenario.Pedestrian;
+
+/**
+ * This class defines the attributes of the corresponding InfectionModel. All attributes are defined by the user and
+ * relate to
+ * <ul>
+ *     <li>the InfectionModel: {@link #infectionModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
+ *     <li>the {@link HealthStatus} of the {@link Pedestrian}s</li>
+ *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the InfectionModel</li>
+ * </ul>
+ */
 @ModelAttributeClass
 public class AttributesInfectionModel extends Attributes {
 
+	// Attributes that are required by the InfectionModel
 	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters;
-
 	private double pedestrianRespiratoryCyclePeriod; // equals 1/(pedestrians' average breathing rate) in seconds
-	private double pedestrianPathogenEmissionCapacity; // 10^pedestrianPathogenEmissionCapacity = emitted pathogen (in particles)
 
-	// Idea: use distributions and draw from org.vadere.state.scenario.ConstantDistribution
-	// with defined distribution parameters similarly to "interSpawnTimeDistribution"
-	/**
-	 * pedestrianPathogenAbsorptionRate: tidal volume in m^3; one could account for protective measures such as masks
-	 * by multiplying the tidal volume by a "mask efficiency factor [0, 1]"
-	 */
+	// Pedestrians' healthStatus related attributes
+	private double pedestrianPathogenEmissionCapacity;
 	private double pedestrianPathogenAbsorptionRate;
-	/**
-	 * min absorbed pathogen load that leads to change in infectionStatus: susceptible -> exposed
-	 * (could be defined individually for each agent depending on its immune system)
-	 */
-	private double pedestrianSusceptibility; // absorbed particles required for being exposed
+	private double pedestrianSusceptibility;
 	private double exposedPeriod;
 	private double infectiousPeriod;
 	private double recoveredPeriod;
 
+	// AerosolCloud related attributes
 	private double aerosolCloudHalfLife;
 	private double aerosolCloudInitialArea;
 

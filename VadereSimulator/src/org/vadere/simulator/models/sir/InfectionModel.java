@@ -25,7 +25,18 @@ import java.util.stream.Collectors;
 
 import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
+import org.vadere.state.health.*;
 
+/**
+ * This class models the spread of infectious pathogen among pedestrians.
+ * For this purpose, the InfectionModel controls the airborne transmission of pathogen from infectious pedestrians to
+ * other pedestrians, i.e. it
+ * <ul>
+ *     <li>initializes each pedestrian's {@link HealthStatus} after a pedestrian is inserted into the topography,</li>
+ *     <li>updates the pedestrian's {@link HealthStatus}</li>
+ *     <li>creates, updates and deletes each {@link AerosolCloud}</li>
+ * </ul>
+ */
 @ModelClass
 public class InfectionModel extends AbstractSirModel {
 
@@ -81,23 +92,7 @@ public class InfectionModel extends AbstractSirModel {
 
 	public static void updatePedestrians(Topography topography, AttributesInfectionModel attributesInfectionModel, double simTimeInSec, double simTimeStepLength) {
 
-		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
-		double timeNormalizationConst = simTimeStepLength / (attributesInfectionModel.getPedestrianRespiratoryCyclePeriod() / 2);
-		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
-		for (AerosolCloud aerosolCloud : allAerosolClouds) {
-			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
-			Collection<Pedestrian> breathingInPedestriansInsideCloud = pedestriansInsideCloud.stream().filter(Pedestrian::isBreathingIn).collect(Collectors.toSet());
-			for (Pedestrian pedestrian : breathingInPedestriansInsideCloud) {
-				double volume = aerosolCloud.getHeigth() * aerosolCloud.getArea();
-				double currentMeanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / volume;
-				// assumption: the pathogen is distributed uniformly within the aerosolCloud
-				// alternatively, calculate the level according to a gaussian distribution with	and multiply with the
-				// meanPathogenConcentration
-				// double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
-
-				pedestrian.absorbPathogen(currentMeanPathogenConcentration * timeNormalizationConst);
-			}
-		}
+		updatePathogenLoad(topography, attributesInfectionModel, simTimeStepLength);
 
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {

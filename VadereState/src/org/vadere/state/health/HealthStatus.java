@@ -1,7 +1,26 @@
 package org.vadere.state.health;
 
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.state.scenario.Pedestrian;
 
+/**
+ * This class contains all attributes and methods that a {@link Pedestrian} needs to emit and absorb pathogen. The
+ * {@link HealthStatus} is initialized und updated by the InfectionModel.
+ *
+ * <ul>
+ *     <li>{@link #pathogenEmissionCapacity}: potentially emitted pathogen load (pathogen particles per breath) in
+ *     decimal log scale per update interval by infectious agent define susceptible agents</li>
+ *     <li>{@link #pathogenAbsorptionRate}: tidal volume in m^3; one could account for protective measures such as
+ *     masks by multiplying the tidal volume by a "mask efficiency factor [0, 1]"</li>
+ *     <li>{@link #pathogenAbsorbedLoad}: current pathogen load that a pedestrian has accumulated</li>
+ *     <li>{@link #susceptibility}: min absorbed pathogen load that leads to change from infectionStatus susceptible
+ *     to exposed.</li>
+ *     <li>{@link #exposedPeriod}, {@link #infectiousPeriod}, {@link #recoveredPeriod}: time that must pass until the
+ *     infectionStatus changes to the next status.</li>
+ * </ul>
+ *
+ *
+ */
 public class HealthStatus {
 
     // Member variables
@@ -12,11 +31,9 @@ public class HealthStatus {
     private double respiratoryTimeOffset;
     private boolean breathingIn;
 
-    private double pathogenEmissionCapacity; // potentially emitted pathogen load (pathogen particles per breath)
-    // in decimal log scale per update interval by infectious agent define susceptible agents
+    private double pathogenEmissionCapacity;
     private double pathogenAbsorptionRate;
-    private double susceptibility; // min absorbed pathogen load that leads to susceptible -> exposed
-    // (could be defined individually for each agent depending on its immune system)
+    private double susceptibility;
     private double exposedPeriod;
     private double infectiousPeriod;
     private double recoveredPeriod;

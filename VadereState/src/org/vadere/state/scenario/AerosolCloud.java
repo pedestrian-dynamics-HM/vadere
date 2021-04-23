@@ -16,7 +16,19 @@ import java.util.Arrays;
 
 import static org.vadere.util.opencl.CLDemo.logger;
 
-
+/**
+ * This class models aerosolClouds. AerosolClouds represent one mode of transmission how pathogen can spread among
+ * pedestrians. They are created, updated and deleted in the InfectionModel:
+ *
+ * <ul>
+ *     <li>Creation: infectious pedestrians emit pathogen, i.e. an aerosolCloud is created. Its shape and position
+ *     depend on the pedestrian's trajectory and respiratory cycle. The shape can either be circular or elliptical.</li>
+ *     <li>Update: An aerosolCloud can change its extent (shape) and pathogenLoad. The corresponding methods are defined
+ *     in this class. The pathogen concentration equals pathogenLoad / volume. </li>
+ *     <li>Deletion: The InfectionModel deletes an aerosolCloud once it has reached a minimum pathogen
+ *     concentration</li>
+ * </ul>
+ */
 public class AerosolCloud extends ScenarioElement {
 
     private AttributesAerosolCloud attributes;
@@ -163,9 +175,11 @@ public class AerosolCloud extends ScenarioElement {
         } else return attributes.equals(other.attributes);
     }
 
-    /**
+    /*
      * Calculates the pathogenLevel inside an aerosolCloud assuming a Gaussian distribution in x and y direction; the
      * aerosolCloud's radial component equals n times the standard deviation
+     *
+     * Currently, the method is not used but may be helpful in future work.
      */
     public double calculatePathogenLevelAtPosition(VPoint position) {
         double pathogenLevel;
