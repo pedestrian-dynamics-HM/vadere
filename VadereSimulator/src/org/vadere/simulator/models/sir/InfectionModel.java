@@ -67,12 +67,10 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	@Override
-	public void preLoop(double simTimeInSec) { logger.infof(">>>>>>>>>>>InfectionModelModel preLoop %f", simTimeInSec); }
+	public void preLoop(double simTimeInSec) {}
 
 	@Override
-	public void postLoop(double simTimeInSec) {
-		logger.infof(">>>>>>>>>>>InfectionModelModel postLoop %f", simTimeInSec);
-	}
+	public void postLoop(double simTimeInSec) {}
 
 	@Override
 	public void update(double simTimeInSec) {

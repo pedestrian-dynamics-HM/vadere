@@ -30,6 +30,7 @@ public class AerosolCloud extends ScenarioElement {
 
     private AttributesAerosolCloud attributes;
 
+    final static int numberOfNodesAlongEllipseBound = 50;
 
     // ToDo: implement AerosolCloudListener (or remove commented code)
     // private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
@@ -238,44 +239,61 @@ public class AerosolCloud extends ScenarioElement {
         return 1.0 / (2.0 * Math.PI * xStd * yStd) * (Math.exp(-1.0 / 2.0 * ((x * x) / (xStd * xStd) + (y * y) / (yStd * yStd))));
     }
 
+    /*
+     * This method increases the shape of a circular aerosolCloud about deltaRadius; In case of an elliptical
+     * aerosolCloud, the area is increased about the same cross-sectional area as if its shape were circular and changed
+     * by deltaRadius.
+     */
     public void increaseShape(double deltaRadius) {
         if (deltaRadius > 0.0) {
 
             VShape shape = attributes.getShape();
             VPoint center = attributes.getCenter();
             VPoint vertex1 = attributes.getVertices().get(0);
-            VPoint vertex2 = attributes.getVertices().get(1);
+            double radius = Math.sqrt(attributes.getArea() / Math.PI);
 
+            // define new cross-sectional area
+            double newArea = Math.pow((radius + deltaRadius), 2) * Math.PI;
+            attributes.setArea(newArea);
+
+            // define new shape and vertices
             if (shape instanceof VPolygon) {
-                Vector2D semiAxis1 = new Vector2D(center.x - vertex1.x, center.y - vertex1.y);
-                double lengthSemiAxis1 = semiAxis1.getLength();
-                double lengthSemiAxis2 = attributes.getArea() / Math.PI / lengthSemiAxis1;
-                Vector2D unitAxis1 = semiAxis1.normalize(1);
-                double radius = Math.sqrt(attributes.getArea() / Math.PI);
-                double newArea = (radius + deltaRadius) * (radius + deltaRadius) * Math.PI;
-                double deltaSemiAxis;
-
-                // deltaSemiAxis = increaseEllipseAxisProportionally(deltaRadius, lengthSemiAxis1, lengthSemiAxis2);
-                deltaSemiAxis = increaseEllipseAxisEqually(deltaRadius, lengthSemiAxis1, lengthSemiAxis2, radius);
-
-                // define new vertices
-                Vector2D newSemiAxis1 = unitAxis1.multiply(lengthSemiAxis1 + deltaSemiAxis);
-                VPoint newVertex1 =  newSemiAxis1.add(center);
-                VPoint newVertex2 =  newSemiAxis1.multiply(-1.0).add(center);
-
-                VShape newShape = createTransformedAerosolCloudShape(newVertex1, newVertex2, newArea);
-
-                attributes.setShape(newShape);
-                attributes.setArea(newArea);
-                attributes.setCenter(new VPoint((newVertex1.x + newVertex2.x)/2, (newVertex1.y + newVertex2.y)/2));
-                attributes.setVertices(new ArrayList<>(Arrays.asList(newVertex1, newVertex2)));
+                increaseEllipticalShape(radius, deltaRadius, newArea, center, vertex1);
             } else if (shape instanceof VCircle) {
-                double newArea = Math.pow((((VCircle) shape).getRadius() + deltaRadius), 2) * Math.PI;
-                VShape newShape = createTransformedAerosolCloudShape(vertex1, vertex2, newArea);
-                attributes.setShape(newShape);
-                attributes.setArea(newArea);
+                increaseCircularShape(newArea, center);
             }
+
+            // define new center
+            VPoint newCenter = new VPoint((attributes.getVertices().get(0).x + attributes.getVertices().get(1).x) / 2, (attributes.getVertices().get(0).y + attributes.getVertices().get(1).y) / 2);
+            attributes.setCenter(newCenter);
         }
+    }
+
+    private void increaseCircularShape(double newArea, VPoint center) {
+        VShape newShape = createTransformedAerosolCloudShape(center, center, newArea);
+        attributes.setShape(newShape);
+        attributes.setVertices(new ArrayList<>(Arrays.asList(center, center)));
+    }
+
+    private void increaseEllipticalShape(double radius, double deltaRadius, double newArea, VPoint center, VPoint vertex1) {
+        Vector2D semiAxis1 = new Vector2D(center.x - vertex1.x, center.y - vertex1.y);
+        double lengthSemiAxis1 = semiAxis1.getLength();
+        double lengthSemiAxis2 = attributes.getArea() / Math.PI / lengthSemiAxis1;
+        Vector2D unitAxis1 = semiAxis1.normalize(1);
+        double deltaSemiAxis;
+
+        // deltaSemiAxis = increaseEllipseAxisProportionally(deltaRadius, lengthSemiAxis1, lengthSemiAxis2);
+        deltaSemiAxis = increaseEllipseAxisEqually(deltaRadius, lengthSemiAxis1, lengthSemiAxis2, radius);
+
+        // define new vertices
+        Vector2D newSemiAxis1 = unitAxis1.multiply(lengthSemiAxis1 + deltaSemiAxis);
+        VPoint newVertex1 =  newSemiAxis1.add(center);
+        VPoint newVertex2 =  newSemiAxis1.multiply(-1.0).add(center);
+
+        VShape newShape = createTransformedAerosolCloudShape(newVertex1, newVertex2, newArea);
+
+        attributes.setShape(newShape);
+        attributes.setVertices(new ArrayList<>(Arrays.asList(newVertex1, newVertex2)));
     }
 
     private double increaseEllipseAxisEqually(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2, double radius) {
@@ -286,15 +304,16 @@ public class AerosolCloud extends ScenarioElement {
         return deltaAxes;
     }
 
-    private double increaseEllipseAxisProportionally(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2) {
-        // increase proportionally to all sides
-        // deltas for semiAxes, where (I) and (II) hold true
-        // (I) lengthSemiAxis1 / lengthSemiAxis2 = newAxis1 / newAxis2 (relation between semiAxis1 and semiAxis2 stays the same)
-        // (II) (radius + deltaRadius)^2 * PI = (lengthSemiAxis1 + deltaSemiAxis1) * (lengthSemiAxis2 + deltaAxis2) * PI (new area of an elliptical aerosolCloud equals the new area of a circular aerosolCloud)
-        double w = Math.sqrt(1.0 + 2 * deltaRadius / Math.sqrt(lengthSemiAxis1 * lengthSemiAxis2) + (deltaRadius * deltaRadius) / (lengthSemiAxis1 * lengthSemiAxis2));
-        double deltaSemiAxis1 = lengthSemiAxis1 * w - lengthSemiAxis1;
-        return  deltaSemiAxis1;
-    }
+// Method currently not used but maybe helpful for future work
+//    private double increaseEllipseAxisProportionally(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2) {
+//        // increase proportionally to all sides
+//        // deltas for semiAxes, where (I) and (II) hold true
+//        // (I) lengthSemiAxis1 / lengthSemiAxis2 = newAxis1 / newAxis2 (relation between semiAxis1 and semiAxis2 stays the same)
+//        // (II) (radius + deltaRadius)^2 * PI = (lengthSemiAxis1 + deltaSemiAxis1) * (lengthSemiAxis2 + deltaAxis2) * PI (new area of an elliptical aerosolCloud equals the new area of a circular aerosolCloud)
+//        double w = Math.sqrt(1.0 + 2 * deltaRadius / Math.sqrt(lengthSemiAxis1 * lengthSemiAxis2) + (deltaRadius * deltaRadius) / (lengthSemiAxis1 * lengthSemiAxis2));
+//        double deltaSemiAxis1 = lengthSemiAxis1 * w - lengthSemiAxis1;
+//        return  deltaSemiAxis1;
+//    }
 
     public static VShape createTransformedAerosolCloudShape(VPoint vertex1, VPoint vertex2, double area) {
         VPoint center = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
@@ -302,22 +321,20 @@ public class AerosolCloud extends ScenarioElement {
         double minorAxis = 4.0 * area / (majorAxis * Math.PI);
 
         // ellipse parameters
-        double a = majorAxis / 2.0; // semi-major axis
-        double b = minorAxis / 2.0; // semi-minor axis
-        double c = Math.sqrt(a * a - b * b);
-        double e = c / a; // eccentricity
+        double semiMajorAxis = majorAxis / 2.0;
+        double semiMinorAxis = minorAxis / 2.0;
+        double eccentricity = Math.sqrt(semiMajorAxis * semiMajorAxis - semiMinorAxis * semiMinorAxis) / semiMajorAxis;
         VShape shape;
-        int numberOfNodesAlongBound = 50;
 
         if (majorAxis <= minorAxis) {
-            // return circle, i.e. ellipse with (a'=b')
+            // return circle, i.e. ellipse with (semiMajorAxis' = semiMinorAxis' = radius)
             shape = new VCircle(new VPoint(center.getX(), center.getY()), Math.sqrt(area / Math.PI));
         } else {
             // return polygon (approximated ellipse with edges)
             Path2D path = new Path2D.Double();
-            path.moveTo(a, 0); // define stating point
-            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongBound) {
-                double radius = b / Math.sqrt(1 - Math.pow(e * Math.cos(angle), 2)); // radius(angle) from ellipse center to its bound
+            path.moveTo(semiMajorAxis, 0); // define stating point
+            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongEllipseBound) {
+                double radius = semiMinorAxis / Math.sqrt(1 - Math.pow(eccentricity * Math.cos(angle), 2)); // radius(angle) from ellipse center to its bound
                 path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius); // convert polar to cartesian coordinates
             }
             path.closePath();
