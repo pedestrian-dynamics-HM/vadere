@@ -18,8 +18,8 @@ public class AerosolCloudTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
 
     protected AerosolCloud aerosolCloud = new AerosolCloud();
-    AerosolCloud aerosolCloudCirc;
-    AerosolCloud aerosolCloudEllip;
+    private AerosolCloud aerosolCloudCirc;
+    private AerosolCloud aerosolCloudEllip;
 
 
     @Before

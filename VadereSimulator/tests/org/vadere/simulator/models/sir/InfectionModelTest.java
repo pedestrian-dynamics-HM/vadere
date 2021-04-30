@@ -8,7 +8,6 @@ import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesInfectionModel;
-import org.vadere.state.attributes.models.InfectionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -21,7 +20,6 @@ import org.vadere.util.geometry.shapes.*;
 
 import java.awt.geom.Path2D;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.vadere.simulator.models.sir.InfectionModel.*;

@@ -25,9 +25,9 @@ public class HealthStatus {
 
     // Member variables
     private InfectionStatus infectionStatus;
-    private double lastInfectionStatusUpdateTime = -1;
-    private double pathogenAbsorbedLoad = 0.0;
-    private VPoint startBreatheOutPosition = null;
+    private double lastInfectionStatusUpdateTime;
+    private double pathogenAbsorbedLoad;
+    private VPoint startBreatheOutPosition;
     private double respiratoryTimeOffset;
     private boolean breathingIn;
 
@@ -38,8 +38,32 @@ public class HealthStatus {
     private double infectiousPeriod;
     private double recoveredPeriod;
 
+    private final static double defaultPathogenLoad = 0.0;
+    private final static double defaultUpdateTime = -1;
+
     // Constructors
+    public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
+                        VPoint startBreatheOutPosition, double respiratoryTimeOffset, boolean breathingIn,
+                        double pathogenEmissionCapacity, double pathogenAbsorptionRate, double susceptibility,
+                        double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
+        this.infectionStatus = infectionStatus;
+        this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime;
+        this.pathogenAbsorbedLoad = pathogenAbsorbedLoad;
+        this.startBreatheOutPosition = startBreatheOutPosition;
+        this.respiratoryTimeOffset = respiratoryTimeOffset;
+        this.breathingIn = breathingIn;
+        this.pathogenEmissionCapacity = pathogenEmissionCapacity;
+        this.pathogenAbsorptionRate = pathogenAbsorptionRate;
+        this.susceptibility = susceptibility;
+        this.exposedPeriod = exposedPeriod;
+        this.infectiousPeriod = infectiousPeriod;
+        this.recoveredPeriod = recoveredPeriod;
+    }
+
     public HealthStatus() {
+        this(InfectionStatus.SUSCEPTIBLE, defaultUpdateTime, defaultPathogenLoad, null,
+                -1, false, -1, -1, -1,
+                -1, -1, -1);
     }
 
     public HealthStatus(HealthStatus other) {
@@ -210,12 +234,13 @@ public class HealthStatus {
                 if (simTimeInSec >= lastInfectionStatusUpdateTime + infectiousPeriod) {
                     setInfectionStatus(InfectionStatus.RECOVERED);
                     setLastInfectionStatusUpdateTime(simTimeInSec);
-                    setPathogenAbsorbedLoad(0.0); // reset pathogen load to 0
+                    setPathogenAbsorbedLoad(defaultPathogenLoad); // reset pathogen load to 0
                 }
                 break;
             case RECOVERED:
                 if (simTimeInSec >= lastInfectionStatusUpdateTime + recoveredPeriod) {
                     setInfectionStatus(InfectionStatus.SUSCEPTIBLE);
+                    setLastInfectionStatusUpdateTime(defaultUpdateTime); // reset lastInfectionStatusUpdateTime
                 }
                 break;
         }
