@@ -121,7 +121,7 @@
           "sourceId" : 7,
           "infectionStatus" : "INFECTIOUS"
         } ],
-		"pedestrianRespiratoryCyclePeriod" : 4.0,
+        "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 1.0,
         "pedestrianPathogenAbsorptionRate" : 0.4,
         "pedestrianSusceptibility" : 1.0,

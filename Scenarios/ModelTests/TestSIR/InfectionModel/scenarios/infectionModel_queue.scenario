@@ -2,7 +2,6 @@
   "name" : "infectionModel_queue",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "81ee927e0fdb8640a4ecaa6707b8eb773f300bd7",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

@@ -2,7 +2,7 @@
   "name" : "infectionModel_bottleneck",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "81ee927e0fdb8640a4ecaa6707b8eb773f300bd7",
+  "commithash" : "3141002e5c3429329907e2adf4b0373c72da3fd3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,7 +102,7 @@
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
+        "pedestrianPathogenAbsorptionRate" : 1.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
