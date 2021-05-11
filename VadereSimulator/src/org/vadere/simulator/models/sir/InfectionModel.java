@@ -129,8 +129,7 @@ public class InfectionModel extends AbstractSirModel {
 				simTimeInSec,
 				attributesInfectionModel.getAerosolCloudHalfLife(),
 				pedestrian.emitPathogen(),
-				pedestrian.emitPathogen(),
-				false));
+				pedestrian.emitPathogen()));
 
 		return aerosolCloud;
 	}

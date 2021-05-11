@@ -32,14 +32,13 @@ public class AerosolCloudTest {
         double creationTime = 0;
         double halfLife = 60;
         double initialPathogenLoad = 10e4;
-        boolean hasReachedLifeEnd = false;
 
         // attributes for circular aerosolCloud
         VPoint vertexCirc1 = new VPoint(center.x, center.y);
         VPoint vertexCirc2 = new VPoint(center.x, center.y);
         ArrayList<VPoint> verticesCirc = new ArrayList<>(Arrays.asList(vertexCirc1, vertexCirc2));
         VShape shapeCirc = AerosolCloud.createTransformedAerosolCloudShape(vertexCirc1, vertexCirc2, area);
-        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, shapeCirc, area, height, center, verticesCirc, creationTime, halfLife, initialPathogenLoad, initialPathogenLoad, hasReachedLifeEnd);
+        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, shapeCirc, area, height, center, verticesCirc, creationTime, halfLife, initialPathogenLoad, initialPathogenLoad);
         aerosolCloudCirc = new AerosolCloud(attributesCirc);
 
         // attributes for elliptical aerosolCloud
@@ -48,7 +47,7 @@ public class AerosolCloudTest {
         VPoint vertexEllip2 = new VPoint(center.x, center.y + minSemiAxis);
         ArrayList<VPoint> verticesEllip = new ArrayList<>(Arrays.asList(vertexEllip1, vertexEllip2));
         VShape shapeEllip = AerosolCloud.createTransformedAerosolCloudShape(vertexEllip1, vertexEllip2, area);
-        AttributesAerosolCloud attributesEllip = new AttributesAerosolCloud(id, shapeEllip, area, height, center, verticesEllip, creationTime, halfLife, initialPathogenLoad, initialPathogenLoad, hasReachedLifeEnd);
+        AttributesAerosolCloud attributesEllip = new AttributesAerosolCloud(id, shapeEllip, area, height, center, verticesEllip, creationTime, halfLife, initialPathogenLoad, initialPathogenLoad);
         aerosolCloudEllip = new AerosolCloud(attributesEllip);
     }
 
@@ -88,27 +87,23 @@ public class AerosolCloudTest {
         double creationTime = 999.9;
         double pathogenLoad = 10e9;
         double lifeTime = 60*60*3;
-        boolean hasReachedLifeEnd = false;
 
-        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, area, height, center, vertices, creationTime, pathogenLoad, pathogenLoad, lifeTime, hasReachedLifeEnd));
+        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, shape, area, height, center, vertices, creationTime, pathogenLoad, pathogenLoad, lifeTime));
         AerosolCloud aerosolCloudClone = aerosolCloudOriginal.clone();
 
         Assert.assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());
         Assert.assertEquals(aerosolCloudOriginal.getShape(), aerosolCloudClone.getShape());
         Assert.assertEquals(aerosolCloudOriginal.getCreationTime(), aerosolCloudClone.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
-        Assert.assertEquals(aerosolCloudOriginal.getHasReachedLifeEnd(), aerosolCloudClone.getHasReachedLifeEnd());
         Assert.assertEquals(aerosolCloudOriginal.getHalfLife(), aerosolCloudClone.getHalfLife(),ALLOWED_DOUBLE_TOLERANCE);
 
         // check that original is not affected by setters/changes to the clone
         aerosolCloudClone.setId(2);
         aerosolCloudClone.setShape(newShape);
         aerosolCloudClone.setCreationTime(0);
-        aerosolCloudClone.setHasReachedLifeEnd(true);
 
         Assert.assertEquals(id, aerosolCloudOriginal.getId());
         Assert.assertEquals(shape, aerosolCloudOriginal.getShape());
         Assert.assertEquals(creationTime, aerosolCloudOriginal.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
-        Assert.assertEquals(hasReachedLifeEnd, aerosolCloudOriginal.getHasReachedLifeEnd());
     }
 
     @Test

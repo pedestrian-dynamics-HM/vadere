@@ -24,7 +24,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
     private double halfLife;
     private double initialPathogenLoad;
     private double currentPathogenLoad;
-    private boolean hasReachedLifeEnd;
 
     // Constructors
     public AttributesAerosolCloud() {
@@ -40,7 +39,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.halfLife = -1;
         this.initialPathogenLoad = -1;
         this.currentPathogenLoad = -1;
-        this.hasReachedLifeEnd = false;
     }
 
     public AttributesAerosolCloud(VShape shape, double creationTime){
@@ -49,7 +47,7 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.creationTime = creationTime;
     }
 
-    public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad, boolean hasReachedLifeEnd) {
+    public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad) {
         this.id = id;
         this.shape = shape;
         this.area = area;
@@ -60,7 +58,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         this.halfLife = halfLife;
         this.initialPathogenLoad = initialPathogenLoad;
         this.currentPathogenLoad = currentPathogenLoad;
-        this.hasReachedLifeEnd = hasReachedLifeEnd;
     }
 
     // Getter
@@ -103,10 +100,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         return currentPathogenLoad;
     }
 
-    public boolean getHasReachedLifeEnd() {
-        return hasReachedLifeEnd;
-    }
-
     // Setter
     public void setId(int id) {
         checkSealed();
@@ -132,10 +125,6 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public void setCreationTime(double creationTime) {
         this.creationTime = creationTime;
-    }
-
-    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) {
-        this.hasReachedLifeEnd = hasReachedLifeEnd;
     }
 
     public void setCurrentPathogenLoad(double currentPathogenLoad) {

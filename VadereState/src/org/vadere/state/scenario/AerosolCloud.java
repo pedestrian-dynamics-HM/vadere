@@ -98,11 +98,6 @@ public class AerosolCloud extends ScenarioElement {
         return attributes.getCurrentPathogenLoad();
     }
 
-    public boolean getHasReachedLifeEnd() {
-        return attributes.getHasReachedLifeEnd();
-    }
-
-
     // Setter
     @Override
     public void setShape(VShape newShape) {
@@ -124,10 +119,6 @@ public class AerosolCloud extends ScenarioElement {
 
     public void setCreationTime(double creationTime) {
         attributes.setCreationTime(creationTime);
-    }
-
-    public void setHasReachedLifeEnd(boolean hasReachedLifeEnd) {
-        attributes.setHasReachedLifeEnd(hasReachedLifeEnd);
     }
 
     public void setCurrentPathogenLoad(double currentPathogenLoad) {
