@@ -1,8 +1,8 @@
 {
-  "name" : "infectionModel_passageway",
+  "name" : "infectionModel_passageway_ex3",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "3141002e5c3429329907e2adf4b0373c72da3fd3",
+  "commithash" : "255d9084a926dfa26d050ace9515f01e012c2682",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -102,19 +102,19 @@
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 1.0E-4,
+        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 172800.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 3.1536E7,
-        "aerosolCloudHalfLife" : 180.0,
+        "aerosolCloudHalfLife" : 120.0,
         "aerosolCloudInitialArea" : 0.75
       }
     },
     "attributesSimulation" : {
       "finishTime" : 500.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.05,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,

@@ -2,7 +2,6 @@
   "name" : "infectionModel_bottleneck",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "3141002e5c3429329907e2adf4b0373c72da3fd3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

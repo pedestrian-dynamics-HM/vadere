@@ -1,7 +1,8 @@
 {
-  "name" : "infectionModel_queue_small",
+  "name" : "infectionModel_queue_small_ex2",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "255d9084a926dfa26d050ace9515f01e012c2682",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -101,19 +102,19 @@
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 1.0E-4,
+        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
-        "aerosolCloudHalfLife" : 180.0,
+        "aerosolCloudHalfLife" : 120.0,
         "aerosolCloudInitialArea" : 0.75
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 700.0,
+      "finishTime" : 900.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.05,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -211,13 +212,13 @@
         "id" : 9,
         "absorbing" : true,
         "shape" : {
-          "x" : 4.0,
-          "y" : 9.0,
-          "width" : 0.8,
-          "height" : 1.0,
+          "x" : 4.15,
+          "y" : 8.9,
+          "width" : 0.5,
+          "height" : 1.05,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 45.0,
+        "waitingTime" : 90.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -231,16 +232,16 @@
       "sources" : [ {
         "id" : 6,
         "shape" : {
-          "x" : 1.0,
-          "y" : 9.5,
-          "width" : 0.8,
+          "x" : 1.15,
+          "y" : 9.45,
+          "width" : 0.5,
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "distributionParameters" : [ 2.0 ],
         "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 15,
+        "maxSpawnNumberTotal" : 10,
         "startTime" : 0.0,
         "endTime" : 50.0,
         "spawnAtRandomPositions" : false,
@@ -253,9 +254,9 @@
       }, {
         "id" : 1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 9.0,
-          "width" : 0.8,
+          "x" : 1.15,
+          "y" : 8.9,
+          "width" : 0.5,
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
