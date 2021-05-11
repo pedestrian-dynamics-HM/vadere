@@ -287,6 +287,11 @@ public class AerosolCloud extends ScenarioElement {
         attributes.setVertices(new ArrayList<>(Arrays.asList(newVertex1, newVertex2)));
     }
 
+    /*
+     * Returns deltaAxis in m by which an elliptical aerosolCloud will be increased equally in the direction of its
+     * semi-major and semi-minor axes. The resulting cross sectional area equals the area of a circle whose radius is
+     * increased by deltaRadius.
+     */
     private double increaseEllipseAxisEqually(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2, double radius) {
         // increase equally to all sides
         double axisSum = lengthSemiAxis1 + lengthSemiAxis2;
@@ -296,6 +301,11 @@ public class AerosolCloud extends ScenarioElement {
     }
 
 // Method currently not used but maybe helpful for future work
+//    /*
+//     * Returns deltaAxis in m by which an elliptical aerosolCloud will be increased in the direction of its
+//     * major axis. The corresponding minor axis is increased proportionally, i.e. the resulting cross sectional area
+//     * of the aerosolCloud equals the area of a circle whose radius is increased by deltaRadius.
+//     */
 //    private double increaseEllipseAxisProportionally(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2) {
 //        // increase proportionally to all sides
 //        // deltas for semiAxes, where (I) and (II) hold true

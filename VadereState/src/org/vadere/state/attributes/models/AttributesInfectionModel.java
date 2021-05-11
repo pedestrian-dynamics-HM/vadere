@@ -42,14 +42,14 @@ public class AttributesInfectionModel extends Attributes {
 
 	public AttributesInfectionModel() {
 		this.infectionModelSourceParameters = new ArrayList<>(Arrays.asList(new InfectionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, InfectionStatus.SUSCEPTIBLE)));
-		this.pedestrianRespiratoryCyclePeriod = 4;
+		this.pedestrianRespiratoryCyclePeriod = 4; // respiratory cycle in seconds
 		this.pedestrianPathogenEmissionCapacity = 4;
-		this.pedestrianPathogenAbsorptionRate = 0.0005;
-		this.pedestrianSusceptibility = 1000;
-		this.exposedPeriod = 2 * 24 * 60 * 60;
-		this.infectiousPeriod = 14 * 24 * 60 * 60;
-		this.recoveredPeriod = 365 * 24 * 60 * 60;
-		this.aerosolCloudHalfLife = 60;
+		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume (per breath) 0.5 l in m^3
+		this.pedestrianSusceptibility = 1000; // pathogen load required for changing infectionStatus to exposed
+		this.exposedPeriod = 2 * 24 * 60 * 60; // 2 days in seconds
+		this.infectiousPeriod = 14 * 24 * 60 * 60; // 14 days in seconds
+		this.recoveredPeriod = 365 * 24 * 60 * 60; // 1 year in seconds
+		this.aerosolCloudHalfLife = 120;
 		this.aerosolCloudInitialArea = 0.75;
 	}
 
