@@ -172,63 +172,63 @@ public class AerosolCloud extends ScenarioElement {
         } else return attributes.equals(other.attributes);
     }
 
-    /*
-     * Calculates the pathogenLevel inside an aerosolCloud assuming a Gaussian distribution in x and y direction; the
-     * aerosolCloud's radial component equals n times the standard deviation
-     *
-     * Currently, the method is not used but may be helpful in future work.
-     */
-    public double calculatePathogenLevelAtPosition(VPoint position) {
-        double pathogenLevel;
-        double theta = 0;
-        if (!attributes.getShape().contains(position)) {
-            // pathogenLevel outside shape is 0
-            pathogenLevel = 0.0;
-        } else {
-            double xStd = -1;
-            double yStd = -1;
-            VShape shape = attributes.getShape();
-            VPoint center = attributes.getCenter();
-            AffineTransform transform = new AffineTransform();
-
-            if (shape instanceof VPolygon) {
-                VPoint vertex1 = attributes.getVertices().get(0);
-                VPoint vertex2 = attributes.getVertices().get(1);
-                theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // orientation of connecting line between vertex1 and vertex2
-                transform.rotate(-theta);
-                transform.translate(-center.x, -center.y);
-
-                // transform aerosolCloud (translate center to origin, change orientation (if not type VCircle)
-                VShape transformedShape = new VPolygon(transform.createTransformedShape(shape));
-                xStd = transformedShape.getBounds2D().getMaxX(); // xStd equals length of semi-Axis along x
-                yStd = transformedShape.getBounds2D().getMaxY(); // yStd equals length of semi-Axis along y
-
-            } else if (shape instanceof VCircle) {
-                // transform aerosolCloud (translate center to origin, change orientation (if not type VCircle)
-                transform.translate(-center.x, -center.y);
-                VCircle circle = (VCircle) shape;
-                double radius = circle.getRadius();
-                xStd = radius;
-                yStd = radius;
-                theta = 0.0;
-            } else {
-                logger.errorf(">>>>>>>>>>>calculatePathogenLevel: shape of aerosolCloud with Id %i is neither VPolygon nor VCircle.", this.getId());
-            }
-
-            // transform position
-            VPoint translatedPosition = new VPoint(position.x - center.x, position.y - center.y);
-            translatedPosition.rotate(-theta);
-
-            // assumption: the pathogen concentration is normally distributed along x and y (gaussian ellipsoid)
-            double n = 3.0; // the distance between boundary and center of the shape represents n times standard deviation of the
-            pathogenLevel = normalPathogenDistribution(xStd / n, yStd / n, translatedPosition.x, translatedPosition.y);
-        }
-        return pathogenLevel;
-    }
-
-    private double normalPathogenDistribution(double xStd, double yStd, double x, double y) {
-        return 1.0 / (2.0 * Math.PI * xStd * yStd) * (Math.exp(-1.0 / 2.0 * ((x * x) / (xStd * xStd) + (y * y) / (yStd * yStd))));
-    }
+//    /*
+//     * Calculates the pathogenLevel inside an aerosolCloud assuming a Gaussian distribution in x and y direction; the
+//     * aerosolCloud's radial component equals n times the standard deviation
+//     *
+//     * Currently, the method is not used but may be helpful in future work.
+//     */
+//    public double calculatePathogenLevelAtPosition(VPoint position) {
+//        double pathogenLevel;
+//        double theta = 0;
+//        if (!attributes.getShape().contains(position)) {
+//            // pathogenLevel outside shape is 0
+//            pathogenLevel = 0.0;
+//        } else {
+//            double xStd = -1;
+//            double yStd = -1;
+//            VShape shape = attributes.getShape();
+//            VPoint center = attributes.getCenter();
+//            AffineTransform transform = new AffineTransform();
+//
+//            if (shape instanceof VPolygon) {
+//                VPoint vertex1 = attributes.getVertices().get(0);
+//                VPoint vertex2 = attributes.getVertices().get(1);
+//                theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // orientation of connecting line between vertex1 and vertex2
+//                transform.rotate(-theta);
+//                transform.translate(-center.x, -center.y);
+//
+//                // transform aerosolCloud (translate center to origin, change orientation (if not type VCircle)
+//                VShape transformedShape = new VPolygon(transform.createTransformedShape(shape));
+//                xStd = transformedShape.getBounds2D().getMaxX(); // xStd equals length of semi-Axis along x
+//                yStd = transformedShape.getBounds2D().getMaxY(); // yStd equals length of semi-Axis along y
+//
+//            } else if (shape instanceof VCircle) {
+//                // transform aerosolCloud (translate center to origin, change orientation (if not type VCircle)
+//                transform.translate(-center.x, -center.y);
+//                VCircle circle = (VCircle) shape;
+//                double radius = circle.getRadius();
+//                xStd = radius;
+//                yStd = radius;
+//                theta = 0.0;
+//            } else {
+//                logger.errorf(">>>>>>>>>>>calculatePathogenLevel: shape of aerosolCloud with Id %i is neither VPolygon nor VCircle.", this.getId());
+//            }
+//
+//            // transform position
+//            VPoint translatedPosition = new VPoint(position.x - center.x, position.y - center.y);
+//            translatedPosition.rotate(-theta);
+//
+//            // assumption: the pathogen concentration is normally distributed along x and y (gaussian ellipsoid)
+//            double n = 3.0; // the distance between boundary and center of the shape represents n times standard deviation of the
+//            pathogenLevel = normalPathogenDistribution(xStd / n, yStd / n, translatedPosition.x, translatedPosition.y);
+//        }
+//        return pathogenLevel;
+//    }
+//
+//    private double normalPathogenDistribution(double xStd, double yStd, double x, double y) {
+//        return 1.0 / (2.0 * Math.PI * xStd * yStd) * (Math.exp(-1.0 / 2.0 * ((x * x) / (xStd * xStd) + (y * y) / (yStd * yStd))));
+//    }
 
     /*
      * This method increases the shape of a circular aerosolCloud about deltaRadius; In case of an elliptical
@@ -295,6 +295,19 @@ public class AerosolCloud extends ScenarioElement {
     private double increaseEllipseAxisEqually(double deltaRadius, double lengthSemiAxis1, double lengthSemiAxis2, double radius) {
         // increase equally to all sides
         double axisSum = lengthSemiAxis1 + lengthSemiAxis2;
+        /* Let 2 * a and 2 * b be the principal diameters of an ellipse; circle with radius so that
+         * ellipseArea = circleArea
+         * ellipseArea = a * b * PI
+         * circeArea = radius^2 * PI
+         *
+         * Now increase circle by deltaRadius: increasedCircleArea = (radius + deltaRadius)^2 * PI
+         * and increase the ellipse equally in direction of a and b by deltaAxes:
+         * increasedEllipseArea = (a + deltaAxes) * (b + deltaAxes) * PI
+         *
+         * Under the condition (increasedEllipseArea = increasedCircleArea), we have:
+         * (a + deltaAxes) * (b + deltaAxes) * PI = (radius + deltaRadius)^2 * PI
+         * solve for deltaAxes and obtain ...
+         */
         double deltaAxes =  ((-axisSum) + Math.sqrt(Math.pow(axisSum, 2) + 4.0 * (2.0 * deltaRadius * radius + deltaRadius * deltaRadius))) / 2;
 
         return deltaAxes;

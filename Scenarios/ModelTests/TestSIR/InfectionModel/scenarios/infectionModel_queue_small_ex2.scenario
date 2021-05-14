@@ -2,7 +2,7 @@
   "name" : "infectionModel_queue_small_ex2",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "255d9084a926dfa26d050ace9515f01e012c2682",
+  "commithash" : "76c167299adb73d75dba1b2765cb8fdd995788fe",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -94,10 +94,10 @@
       },
       "org.vadere.state.attributes.models.AttributesInfectionModel" : {
         "infectionModelSourceParameters" : [ {
-          "sourceId" : 6,
+          "sourceId" : 1,
           "infectionStatus" : "SUSCEPTIBLE"
         }, {
-          "sourceId" : 1,
+          "sourceId" : 2,
           "infectionStatus" : "INFECTIOUS"
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
@@ -209,7 +209,7 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 9,
+        "id" : 3,
         "absorbing" : true,
         "shape" : {
           "x" : 4.15,
@@ -230,7 +230,7 @@
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
       "sources" : [ {
-        "id" : 6,
+        "id" : 1,
         "shape" : {
           "x" : 1.15,
           "y" : 9.45,
@@ -247,12 +247,12 @@
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 9 ],
+        "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       }, {
-        "id" : 1,
+        "id" : 2,
         "shape" : {
           "x" : 1.15,
           "y" : 8.9,
@@ -269,7 +269,7 @@
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 9 ],
+        "targetIds" : [ 3 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null

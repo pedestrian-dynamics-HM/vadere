@@ -132,11 +132,14 @@ public class InfectionModel extends AbstractSirModel {
 		ArrayList<VPoint> vertices = new ArrayList<>(Arrays.asList(v1, v2));
 		VPoint center = new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0);
 
-		// assumption: aerosolCloud has a constant vertical extent (in m). The height corresponds to a
-		// cylinder whose volume equals the
-		// - sphere with radius = sqrt(initialArea / PI)
-		// - ellipsoid with principal diameters a, b, c where cross-sectional
-		// area (in the x-y-plane) = a * b * PI and c = radius
+		/* Assumption: The aerosolCloud has a constant vertical extent (in m). The height corresponds to a
+		 * cylinder whose volume cylinderVolume equals the volume of a sphere with radius = sqrt(initialArea / PI)
+		 * => volumeSphere = 4 / 3 * PI * radius^3 and baseArea = radius^2 * PI
+		 *
+		 * cylinderBaseArea = baseArea
+		 * height = cylinderHeight = cylinderVolume / cylinderBaseArea =
+		 * = sphereVolume / baseArea = (4 / 3 * PI * radius^3) / (radius^2 * PI) = 4 / 3 * radius
+		 */
 		double radius = Math.sqrt(initialArea / Math.PI);
 		double height = 4.0 / 3.0 * radius;
 
