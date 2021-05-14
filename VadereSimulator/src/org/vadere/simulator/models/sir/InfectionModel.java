@@ -46,7 +46,27 @@ public class InfectionModel extends AbstractSirModel {
 
 	public static final String simStepLength = "simTimeStepLength";
 
-	static final double exponentialDecayFactor = Math.log(2.0);
+	/*
+	 * constant that results from exponential decay of pathogen concentration: C(t) = C_init * exp(-lambda * t),
+	 * lambda = exponentialDecayFactor / halfLife
+	 */
+	private static final double exponentialDecayFactor = Math.log(2.0);
+
+	/* minimumPercentage defines a percentage of the initial pathogen concentration
+	 * (pathogenLoad / aerosolCloud.volume); As soon as an aerosolCloud has reached the minimum concentration, the
+	 * aerosolCloud is considered negligible and therefore deleted
+	 */
+	private static final double minimumPercentage = 0.01;
+
+	/* rateOfSpread describes how fast the aerosolCloud spreads due to diffusion; unit: m/s; and
+	 * could be implemented as user-defined parameter in AttributesInfectionModel
+	 */
+	private static final double rateOfSpread = 0.001;
+
+	/* each pedestrian with velocity v causes an increase of the cloud's radius by factor
+	 * weight * v * simTimeStepLength; could be implemented as user-defined parameter in AttributesInfectionModel
+	 */
+	private static final double weight = 0.005;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -148,16 +168,12 @@ public class InfectionModel extends AbstractSirModel {
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 
 			// Increasing extent due to diffusion
-			double rateOfSpread = 0.001; // describes how fast the aerosolCloud spreads due to diffusion; unit: m/s; and
-			// could be implemented as user-defined parameter in AttributesInfectionModel
 			aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
 
 			// Increasing extent due to moving air caused by agents
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			double deltaRadius = 0.0;
-			double weight = 0.005; // each pedestrian with velocity v causes an increase of the cloud's radius by
-			// factor weight * v; could be implemented as user-defined parameter in AttributesInfectionModel
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
 				deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
 			}
@@ -166,7 +182,6 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	public void deleteExpiredAerosolClouds() {
-		double minimumPercentage = 0.01;
 		Collection<AerosolCloud> aerosolCloudsToBeDeleted = topography.getAerosolClouds()
 				.stream()
 				.filter(a -> a.getCurrentPathogenLoad() / a.getArea() < minimumPercentage * a.getInitialPathogenLoad() / attributesInfectionModel.getAerosolCloudInitialArea())
