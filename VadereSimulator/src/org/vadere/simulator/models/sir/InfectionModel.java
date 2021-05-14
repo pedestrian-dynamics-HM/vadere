@@ -66,7 +66,7 @@ public class InfectionModel extends AbstractSirModel {
 	/* each pedestrian with velocity v causes an increase of the cloud's radius by factor
 	 * weight * v * simTimeStepLength; could be implemented as user-defined parameter in AttributesInfectionModel
 	 */
-	private static final double weight = 0.005;
+	private static final double weight = 0.0125;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -175,7 +175,7 @@ public class InfectionModel extends AbstractSirModel {
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			double deltaRadius = 0.0;
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
-				deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight;
+				deltaRadius = deltaRadius + pedestrian.getVelocity().getLength() * weight * simTimeStepLength;
 			}
 			aerosolCloud.increaseShape(deltaRadius);
 		}
