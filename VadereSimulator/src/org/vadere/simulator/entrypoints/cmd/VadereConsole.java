@@ -31,13 +31,14 @@ public class VadereConsole {
 		VadereArgumentParser vadereArgumentParser = new VadereArgumentParser();
 		ArgumentParser argumentParser = vadereArgumentParser.getArgumentParser();
 
-		addSubCommandsToParser(argumentParser);
+
 
 		try {
+			addSubCommandsToParser(argumentParser);
 			Namespace ns = vadereArgumentParser.parseArgsAndProcessInitialOptions(args);
 			SubCommandRunner sRunner = ns.get("func");
 			StdOutErrLog.addStdOutErrToLog();
-			sRunner.run(ns, argumentParser);
+			sRunner.run(ns, argumentParser, null);
 
 		} catch (UnsatisfiedLinkError linkError) {
 			System.err.println("[LWJGL]: " + linkError.getMessage());
@@ -53,7 +54,7 @@ public class VadereConsole {
 	}
 
 	// TODO: Move this method to "VadereArgumentParser".
-	private static void addSubCommandsToParser(ArgumentParser parser) {
+	private static void addSubCommandsToParser(ArgumentParser parser) throws Exception {
 		Subparsers subparsers = parser.addSubparsers()
 										.title("subcommands")
 										.description("valid subcommands")
@@ -210,6 +211,13 @@ public class VadereConsole {
 				.dest("output")
 				.help("A output file or directory depending on called method.");
 
+		misc.addArgument("--args")
+				.required(false)
+				.type(String.class)
+				.setDefault("")
+				.dest("args")
+				.help("list of key=value pairs separated by semicolon ';'. No space allowed. Args ar passed to the " +
+						"selected methode in '-m' ");
 
 		String[] utilMethods = utilsSubCommand.methodsString();
 		misc.addArgument("-m")

@@ -15,6 +15,7 @@ import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class ScenarioRunSubCommand implements SubCommandRunner {
@@ -23,6 +24,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 	private boolean checkScenario(final Scenario scenario, String scenarioCheckerSwitch){
 
 		if(scenarioCheckerSwitch.equals(ScenarioChecker.CHECKER_OFF)){
+			logger.debugf("ScenarioChecker: OFF (no checks performed");
 			return true;
 		}
 
@@ -40,7 +42,7 @@ public class ScenarioRunSubCommand implements SubCommandRunner {
 	}
 
 	@Override
-	public void run(Namespace ns, ArgumentParser parser) {
+	public void run(Namespace ns, ArgumentParser parser, HashMap<String, Object> args) {
 		Path outputDir = Paths.get(ns.getString("output-dir"));
 		boolean overrideTimeStepSetting = ns.getBoolean("override-timestep-setting");
 		String scenarioCheckerSwitch = ns.getString("scenario-checker");

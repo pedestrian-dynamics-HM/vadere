@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -129,6 +130,11 @@ public class GeometryCleaner {
 	 */
 	private Pair<VPolygon, List<VPolygon>> mergePolygons(@NotNull final Collection<VLine> lines, @NotNull final List<VPolygon> polygons) {
 
+		boolean dbg = logger.getLevel() == Level.DEBUG;
+		long logInterval = 10000; // every 10 seconds
+		long lastTime = System.currentTimeMillis() - logInterval;
+		long loopCount = 0;
+
 		// 1. compute the contrained Delaunay triangulation (all non-intersecting lines are constrained)
 		IncrementalTriangulation<PVertex, PHalfEdge, PFace> dt = new IncrementalTriangulation<>(new PMesh(), boundingBox);
 		GenConstrainedDelaunayTriangulator<PVertex, PHalfEdge, PFace> cdt = new GenConstrainedDelaunayTriangulator<>(dt, lines, false);
@@ -148,6 +154,12 @@ public class GeometryCleaner {
 		for(PFace face : faces) {
 			if(!triangulation.getMesh().isBorder(face) && !triangulation.getMesh().isDestroyed(face) && !triangulation.getMesh().isHole(face)) {
 				triangulation.createHole(face, f -> distanceFunction.apply(triangulation.getMesh().toMidpoint(f)) > 0, true);
+			}
+			loopCount++;
+			if(dbg && System.currentTimeMillis() - lastTime > logInterval){
+				PMesh p = (PMesh) triangulation.getMesh();
+				lastTime = System.currentTimeMillis();
+				logger.debugf("compute holes: Faces: %d/%d pMesh: %s", loopCount, faces.size(), p.toString());
 			}
 		}
 

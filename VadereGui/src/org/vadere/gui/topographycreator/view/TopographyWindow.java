@@ -18,38 +18,7 @@ import org.vadere.gui.components.view.ScenarioToolBar;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
-import org.vadere.gui.topographycreator.control.ActionBasic;
-import org.vadere.gui.topographycreator.control.ActionCopyElement;
-import org.vadere.gui.topographycreator.control.ActionDeleteElement;
-import org.vadere.gui.topographycreator.control.ActionInsertCopiedElement;
-import org.vadere.gui.topographycreator.control.ActionMaximizeSize;
-import org.vadere.gui.topographycreator.control.ActionMergeObstacles;
-import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
-import org.vadere.gui.topographycreator.control.ActionPlaceRandomPedestrians;
-import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
-import org.vadere.gui.topographycreator.control.ActionRedo;
-import org.vadere.gui.topographycreator.control.ActionResetTopography;
-import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
-import org.vadere.gui.topographycreator.control.ActionSelectCut;
-import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
-import org.vadere.gui.topographycreator.control.ActionSimplifyObstacles;
-import org.vadere.gui.topographycreator.control.ActionSubtractMeasurementArea;
-import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
-import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
-import org.vadere.gui.topographycreator.control.ActionTranslateElements;
-import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
-import org.vadere.gui.topographycreator.control.ActionUndo;
-import org.vadere.gui.topographycreator.control.ActionZoomIn;
-import org.vadere.gui.topographycreator.control.ActionZoomOut;
-import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
-import org.vadere.gui.topographycreator.control.DrawDotMode;
-import org.vadere.gui.topographycreator.control.DrawRectangleMode;
-import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
-import org.vadere.gui.topographycreator.control.EraserMode;
-import org.vadere.gui.topographycreator.control.SelectElementMode;
-import org.vadere.gui.topographycreator.control.TopographyAction;
-import org.vadere.gui.topographycreator.control.UndoAdaptor;
+import org.vadere.gui.topographycreator.control.*;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
@@ -308,8 +277,11 @@ public class TopographyWindow extends JPanel {
 				.getResource("/icons/paint_method_dot_icon.png")), panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
+		Action manhattanGrid = new ActionManhattanGrid("TopographyCreator.btnManhattanGrid.label",
+				img("/icons/obstacle_icon.png"), panelModel, undoSupport);
 
-		List<Action> obstacleAndTargetDrawModes = new ArrayList<>();
+		List<Action> obstacleDrawModes = new ArrayList<>();
+		List<Action> targetDrawModes = new ArrayList<>();
 		List<Action> sourceDrawModes = new ArrayList<>();
 		List<Action> absorbingAreaDrawModes = new ArrayList<>();
 		List<Action> measurementAreaDrawModes = new ArrayList<>();
@@ -317,9 +289,14 @@ public class TopographyWindow extends JPanel {
 		List<Action> pedestrianDrawModes = new ArrayList<>();
 		List<Action> pedestrianMiscActions = new ArrayList<>();
 
-		obstacleAndTargetDrawModes.add(rectangle);
-		obstacleAndTargetDrawModes.add(pen);
-		obstacleAndTargetDrawModes.add(pen2);
+		obstacleDrawModes.add(rectangle);
+		obstacleDrawModes.add(pen);
+		obstacleDrawModes.add(pen2);
+		obstacleDrawModes.add(manhattanGrid);
+
+		targetDrawModes.add(rectangle);
+		targetDrawModes.add(pen);
+		targetDrawModes.add(pen2);
 
 		sourceDrawModes.add(rectangle);
 		sourceDrawModes.add(pen);
@@ -343,18 +320,17 @@ public class TopographyWindow extends JPanel {
 		TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu(
 				"Obstacle", new ImageIcon(
 				Resources.class.getResource("/icons/obstacle_icon.png")), panelModel, switchToObstacleAction,
-				obsButton, obstacleAndTargetDrawModes);
+				obsButton, obstacleDrawModes);
 
 		/* open target paint method dialog action */
 		JButton targetButton = new JButton();
-		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target", new ImageIcon(Resources.class
-				.getResource("/icons/target_icon.png")), panelModel, switchToTargetAction, targetButton,
-				obstacleAndTargetDrawModes);
+		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu("Target",
+				img("/icons/target_icon.png"), panelModel, switchToTargetAction, targetButton, targetDrawModes);
 
 		JButton targetChangerButton = new JButton();
-		TopographyAction openTargetChangerDialog = new ActionOpenDrawOptionMenu("TargetChanger", new ImageIcon(Resources.class
-				.getResource("/icons/target_changer_icon.png")), panelModel, switchToTargetChangerAction, targetChangerButton,
-				obstacleAndTargetDrawModes);
+		TopographyAction openTargetChangerDialog = new ActionOpenDrawOptionMenu("TargetChanger",
+				img("/icons/target_changer_icon.png"), panelModel, switchToTargetChangerAction, targetChangerButton,
+				targetDrawModes);
 
 		/* open absorbing area paint method dialog action */
 		JButton absorbingAreaButton = new JButton();
@@ -364,9 +340,8 @@ public class TopographyWindow extends JPanel {
 
 		/* open stairs paint method dialog action */
 		JButton stairsButton = new JButton();
-		TopographyAction openStairsDialog = new ActionOpenDrawOptionMenu("Stairs", new ImageIcon(Resources.class
-				.getResource("/icons/stairs_icon.png")), panelModel, switchToStairsAction, stairsButton,
-				obstacleAndTargetDrawModes);
+		TopographyAction openStairsDialog = new ActionOpenDrawOptionMenu("Stairs", img("/icons/stairs_icon.png"),
+				panelModel, switchToStairsAction, stairsButton, targetDrawModes);
 
 		/* open measurement area paint method dialog action*/
 		JButton measurementAreaButton = new JButton();
@@ -523,6 +498,10 @@ public class TopographyWindow extends JPanel {
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "deselect");
 		getActionMap().put("deselect", new ActionDeselect(panelModel, thisPanel, selectShape));
 
+	}
+
+	private ImageIcon img(String name){
+		return  new ImageIcon(Resources.class.getResource(name));
 	}
 
 	public IDrawPanelModel getPanelModel() {

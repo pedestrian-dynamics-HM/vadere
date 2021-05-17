@@ -12,12 +12,13 @@ import org.vadere.util.logging.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class SuqSubCommand implements SubCommandRunner {
 	private final static Logger logger = Logger.getLogger(SuqSubCommand.class);
 
 	@Override
-	public void run(Namespace ns, ArgumentParser parser) {
+	public void run(Namespace ns, ArgumentParser parser, HashMap<String, Object> args) {
 		Path outputDir = Paths.get(ns.getString("output-dir"));
 		if (!outputDir.toFile().exists()){
 			if ( ! outputDir.toFile().mkdirs() ) {

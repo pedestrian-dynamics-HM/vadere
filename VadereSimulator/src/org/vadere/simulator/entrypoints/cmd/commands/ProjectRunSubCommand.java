@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class ProjectRunSubCommand implements SubCommandRunner {
 
 
 	@Override
-	public void run(Namespace ns, ArgumentParser parser) throws Exception {
+	public void run(Namespace ns, ArgumentParser parser, HashMap<String, Object> args) throws Exception {
 		Locale.setDefault(Locale.ENGLISH);
 		String projectPath = ns.getString("project-dir");
 

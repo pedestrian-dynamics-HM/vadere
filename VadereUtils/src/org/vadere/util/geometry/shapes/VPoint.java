@@ -2,6 +2,7 @@ package org.vadere.util.geometry.shapes;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.vadere.util.geometry.GeometryUtils;

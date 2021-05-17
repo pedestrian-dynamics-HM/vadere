@@ -471,6 +471,16 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	}
 
 	@Override
+	public String toString() {
+		return "PMesh{" +
+				"numberOfEdges=" + numberOfEdges +
+				", numberOfFaces=" + numberOfFaces +
+				", numberOfHoles=" + numberOfHoles +
+				", numberOfVertices=" + numberOfVertices +
+				'}';
+	}
+
+	@Override
 	public synchronized PMesh clone() {
 		try {
 			PMesh clone = (PMesh)super.clone();

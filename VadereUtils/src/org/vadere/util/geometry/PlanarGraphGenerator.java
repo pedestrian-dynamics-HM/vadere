@@ -4,9 +4,11 @@ import com.github.davidmoten.rtree.RTree;
 import com.github.davidmoten.rtree.geometry.Rectangle;
 import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
 
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +26,8 @@ import java.util.List;
  * @author Benedikt Zoennchen
  */
 public class PlanarGraphGenerator {
+
+	private final static Logger logger = Logger.getLogger(PlanarGraphGenerator.class);
 
 	private RTree<String, VLine> lineRTree;
 	private RTree<String, VLine> unresolvedLines;
@@ -64,13 +68,22 @@ public class PlanarGraphGenerator {
 	public Collection<VLine> generate() {
 		reset();
 		boolean hasChanged;
+		long logInterval = 10000; // every 10 seconds
+		long lastTime = System.currentTimeMillis() - logInterval;
+		boolean do_log = logger.getLevel() == Level.DEBUG;
+		long loopCount = 0;
 
 		do {
 			hasChanged = false;
+			loopCount++;
 			ArrayList<VLine> allLines = new ArrayList<>();
 			unresolvedLines.entries().map(e -> e.geometry()).forEach(line -> allLines.add(line));
 			//int size = unresolvedLines.size();
 			//System.out.println(size);
+			if (do_log && System.currentTimeMillis() - lastTime > logInterval){
+				lastTime = System.currentTimeMillis();
+				logger.debugf("unresolvedLines: %d  allLines: %d  loopCount: %d", unresolvedLines.size(), allLines.size(), loopCount);
+			}
 			for(VLine line1 : allLines) {
 				Rectangle mbr = line1.mbr();
 				RectangleDouble bufferedMbr = RectangleDouble.create(mbr.x1() - tol, mbr.y1() - tol, mbr.x2() + tol, mbr.y2() + tol);

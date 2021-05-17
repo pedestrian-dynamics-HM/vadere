@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.vadere.util.io.IOUtils.VADERE_PROJECT_FILENAME;
@@ -38,7 +39,7 @@ public class MigrationSubCommand implements SubCommandRunner {
 	ArrayList<Path> err = new ArrayList<>();
 
 	@Override
-	public void run(Namespace ns, ArgumentParser parser) throws Exception {
+	public void run(Namespace ns, ArgumentParser parser, HashMap<String, Object> args) throws Exception {
 
 		outputPathString = ns.getString("output-file");
 		targetVersion = Version.fromString(ns.getString("target-version"));
