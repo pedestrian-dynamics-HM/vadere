@@ -8,12 +8,20 @@ helper and osm structures in osm_helper.py
 """
 import argparse
 import logging
+import math
 import os
 from random import sample
 from typing import List
+import matplotlib.pyplot as plt
+from shapely.geometry import asPolygon, asPoint, asLineString
+import igraph as ig
+import json
+import numpy as np
+from multiprocessing import set_start_method, get_context, cpu_count
+
 
 from osm_converter import OsmConverter
-from osm_helper import OsmArg, OsmConfig, OsmData, PolyObjectWidthId
+from osm_helper import OsmArg, OsmConfig, OsmData, PolyObjectWidthId, Node, Way, Nd
 
 
 class HullAction(argparse.Action):
@@ -26,7 +34,7 @@ class HullAction(argparse.Action):
 
 
 def random_source_target_match(
-    sources: List[PolyObjectWidthId], targets: List[PolyObjectWidthId]
+        sources: List[PolyObjectWidthId], targets: List[PolyObjectWidthId]
 ):
     target_ids = [t.template_data.get("id") for t in targets]
 
@@ -54,7 +62,7 @@ def parse_command_line_arguments(manual_args=None):
     main = argparse.ArgumentParser(
         prog="OpenStreetMap (OSM) Util for (Vadere, OMNeT++)",
         description="Collection of small commands to manipulate an OSM xml file to "
-        "preparer it for conversion to Vadere or OMNeT++ structures",
+                    "preparer it for conversion to Vadere or OMNeT++ structures",
     )
 
     parent_parser = argparse.ArgumentParser(add_help=False)
@@ -100,7 +108,15 @@ def parse_command_line_arguments(manual_args=None):
         nargs="?",
         default=False,
         help="Set to reduce export to elements within an area of interest. "
-        "(way taged with vadere:area-of-intrest) ",
+             "(way taged with vadere:area-of-intrest) ",
+    )
+
+    convert_parser.add_argument(
+        "--template",
+        dest="template",
+        default=None,
+        required=False,
+        help="path to scenario file to use as template."
     )
 
     convert_parser.set_defaults(main_func=main_convert)
@@ -151,8 +167,8 @@ def parse_command_line_arguments(manual_args=None):
         default=0.25,
         nargs="?",
         help="The perpendicular distance between the line defined by the way element and the "
-        "parallel line used to build the polygon. The width of the polygon will thus be "
-        "2*dist",
+             "parallel line used to build the polygon. The width of the polygon will thus be "
+             "2*dist",
     )
 
     #
@@ -162,7 +178,7 @@ def parse_command_line_arguments(manual_args=None):
         "lint",
         parents=[parent_parser],
         description="Check for unique ids, add id-tag if missing, check for non  "
-        "normalized obstacles",
+                    "normalized obstacles",
     )
     lint_parser.set_defaults(main_func=main_lint)
 
@@ -218,7 +234,7 @@ def parse_command_line_arguments(manual_args=None):
         default="osm.config",
         nargs="?",
         help="create a default config file including all possible commands. If -c is used this"
-        "option is ignored",
+             "option is ignored",
     )
 
     config_parser.set_defaults(main_func=main_apply_config)
@@ -321,8 +337,27 @@ def main_convert(cmd_args):
         targets=targets_joined,
         measurement_areas=measurement_joined,
     )
-    OsmConverter.print_output(cmd_args.output, vadere_topography_output)
-    # converter.osm.save()
+
+
+    if cmd_args.template is not None:
+        # read template scenario and repalce topogrpahy
+        if not os.path.exists(cmd_args.template):
+            raise ValueError(f"template does not exist {cmd_args.template}")
+        with open(cmd_args.template, 'r', encoding='utf-8') as fd:
+            tmpl = json.load(fd)
+
+        name = os.path.basename(os.path.split(cmd_args.output)[1])
+        topography = json.loads(vadere_topography_output)
+        tmpl["scenario"]["topography"] = topography
+        tmpl["name"] = name
+
+        print(f"write output {cmd_args.output}")
+        with open(cmd_args.output, "w", encoding="utf-8") as fd:
+            json.dump(tmpl, fd, indent=2)
+
+    else:
+      OsmConverter.print_output(cmd_args.output, vadere_topography_output)
+
 
 
 def main_walls(args):
@@ -355,18 +390,16 @@ def main_lint(args):
 def main_apply_config(args):
     cfg = OsmConfig(args.config)
 
-    default_args = {"input": cfg["Config"]["input"], "output": cfg["Config"]["output"]}
-    for cmd in cfg["Config"]["command-order"]:
-        if f"{cmd}:options" not in cfg:
+    default_args = cfg.default_args()
+    for cmd in cfg["command-order"]:
+        if cmd not in cfg:
             logging.warning(
                 f"no option specified for command '{cmd}' will use default if possible"
             )
 
         cmd_args = {}
         cmd_args.update(default_args)
-        cmd_args.update(cfg[f"{cmd}:options"])
-        if f"{cmd}:way-list" in cfg:
-            cmd_args.update({"way-list": cfg.get_way_list(cmd)})
+        cmd_args.update(cfg.cmd_args(cmd))
         cmd_args = OsmArg(cmd_args)
         main_func = cmd_entry[cmd]
         print(
@@ -397,7 +430,346 @@ cmd_entry = {
     "convert": main_convert,
 }
 
+
+
+class Block:
+
+    def __init__(self, ways):
+        self.ways = ways
+        self.block_to_node = {}
+        self.block_to_way = {}
+        self.next_block_id = 0
+
+    def merge(self, block_ids):
+        nodes = set()
+        ways = set()
+        for b in block_ids:
+            nodes.update(self.block_to_node.pop(b))
+            ways.update(self.block_to_way.pop(b))
+
+        b_id = self.next_block()
+        self.block_to_node[b_id] = nodes
+        self.block_to_way[b_id] = ways
+        return b_id
+
+    def next_block(self):
+        r = self.next_block_id
+        self.next_block_id += 1
+        self.block_to_way.setdefault(r, set())
+        self.block_to_node.setdefault(r, set())
+        return r
+
+    def create(self):
+        for w in self.ways:
+            b_id = []
+            for block, nodes in self.block_to_node.items():
+                if not nodes.isdisjoint(set(w.nds)):
+                    b_id.append(block)
+
+            if len(b_id) == 0:
+                # new block
+                b_id = self.next_block()
+            elif len(b_id) == 1:
+                b_id = b_id[0]
+            else:
+                # merge existing blocks because current way is part of two blocks
+                b_id = self.merge(b_id)
+
+            self.block_to_node[b_id].update(set(w.nds))
+            self.block_to_way[b_id].add(w)
+
+        return self.block_to_way, self.block_to_node
+
+
+class ConvaceHull:
+    lon = 0
+    lat = 1
+    earth_radius = 6371000  # meter
+
+    def __init__(self, points, prime_ix=0):
+        """
+        points np.array of the form (N,2) with (longitute, latitude) values
+        """
+
+        self.data_set = points
+        # no duplicates
+        self.data_set = np.unique(self.data_set, axis=0)
+
+        # select all at the beginning
+        self.indices = np.ones(self.data_set.shape[0], dtype=bool)
+
+        self.prime_k = np.array([3, 5, 7, 11, 13, 17, 21, 23, 29, 31, 37, 41, 43,
+                                 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97])
+        self.prime_ix = prime_ix
+
+    def min_lat_index(self, points):
+        indices = np.argsort(points[:, self.lat])
+        return indices[0]
+
+    def next_k(self):
+        if self.prime_ix < len(self.prime_k):
+            return self.prime_k[self.prime_ix]
+        else:
+            return -1
+
+    def haversine_dist(self, loc_ini, loc_end):
+        """
+        loc_ini: point,
+        loc_end: list of points?
+        https://en.wikipedia.org/wiki/Haversine_formula
+        """
+        lon1, lat1, lon2, lat2 = map(np.radians,
+                                     [
+                                         loc_ini[self.lon], loc_ini[self.lat],
+                                         loc_end[:, self.lon], loc_end[:, self.lat]
+                                     ])
+        delta_lon = lon2 - lon1
+        delta_lat = lat2 - lat1
+        a = np.square(np.sin(delta_lat / 2.0)) + \
+            np.cos(lat1) * np.cos(lat2) * np.square(np.sin(delta_lon / 2.0))
+
+        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a))
+        return  c * self.earth_radius
+
+    def k_nearest(self, ix, k):
+        """
+        ix: index into data_set
+        k:  number of neighbors
+        """
+        # index based on data_set
+        ixs = self.indices
+
+
+        # remove visited/removed points
+        base_indices = np.arange(len(ixs))[ixs]  # ixs is a boolean mask!
+        distances = self.haversine_dist(self.data_set[ix, :], self.data_set[ixs, :])
+
+        # arg sorted (smallest dist index at front of list)
+        sorted_indices = np.argsort(distances)
+        kk = min(k, len(sorted_indices))
+
+        k_nearest = sorted_indices[range(kk)]
+
+        # get index of point based on base set
+        return base_indices[k_nearest]
+
+    def headings(self, ix, ixs, ref_heading=0.0):
+        if ref_heading < 0 or ref_heading >= 360.0:
+            raise ValueError("Heading must be in the range of [0, 360)")
+
+        # reference point
+        r_ix = np.radians(self.data_set[ix, :])
+        # point to which the heading is calculated
+        r_ixs = np.radians(self.data_set[ixs, :])
+
+        delta_lons = r_ixs[:, self.lon] - r_ix[self.lon]
+        y = np.multiply(np.sin(delta_lons), np.cos(r_ixs[:, self.lat]))
+        x = math.cos(r_ix[self.lat]) * np.sin(r_ixs[:, self.lat]) - \
+            math.sin(r_ix[self.lat]) * np.multiply(np.cos(r_ixs[:, self.lat]), np.cos(delta_lons))
+        bearings = (np.degrees(np.arctan2(y,x)) + 360.0) % 360.0 - ref_heading
+        bearings[bearings < 0.0] += 360.0
+        return bearings
+
+    def calc_recursive(self):
+        recurse = ConvaceHull(self.data_set, self.prime_ix + 1)
+        next_k = recurse.next_k()
+        if next_k == -1:
+            return None
+        return recurse.calc(next_k)
+
+    def calc(self, k=3):
+
+        if self.data_set.shape[0] < 3:
+            return None
+
+        if self.data_set.shape[0] == 3:
+            return self.data_set
+
+        kk = min(k, self.data_set.shape[0])
+
+        first_point = self.min_lat_index(self.data_set)
+        current_point = first_point
+
+        hull = np.reshape(np.array(self.data_set[first_point, :]), (1,2))
+        test_hull = hull
+
+        # remove the first point
+        self.indices[first_point] = False
+
+        prev_angle = 270 # Initial reference id due west. North is zero, measured clockwise.
+        step = 2
+        stop = 2 + kk
+
+        while((current_point != first_point) or (step == 2)) and len(self.indices[self.indices]) > 0:
+            if step == stop:
+                self.indices[first_point] = True
+
+            knn = self.k_nearest(current_point, kk)
+
+            # Calc headings between first_point and the knn points
+            # Returns angles in the same indexing sequence as in knn
+            angles = self.headings(current_point, knn, prev_angle)
+
+            # Calculate the candidate indexes (largest angles first)
+            candidates = np.argsort(-angles)
+
+            i = 0
+            invalid_hull = True
+            while invalid_hull and i < len(candidates):
+                candidate = candidates[i]
+
+                # Create a test hull to check if there are any self-intersections
+                next_point = np.reshape(self.data_set[knn[candidate]], (1,2))
+                test_hull = np.append(hull, next_point, axis=0)
+
+                line = asLineString(test_hull)
+                invalid_hull = not line.is_simple
+                i += 1
+
+            if invalid_hull:
+                return self.calc_recursive()
+
+            prev_angle = self.headings(knn[candidate], np.array([current_point]))
+            current_point = knn[candidate]
+            hull = test_hull
+
+            self.indices[current_point] = False
+            step += 1
+
+        poly = asPolygon(hull)
+
+        count = 0
+        total = self.data_set.shape[0]
+        for ix in range(total):
+            pt = asPoint(self.data_set[ix, :])
+            if poly.intersects(pt) or pt.within(poly):
+                count += 1
+            else:
+                d = poly.distance(pt)
+                if d < 1e-5:
+                    count += 1
+
+        if count == total:
+            return hull
+        else:
+            return self.calc_recursive()
+
+class ConvexBlock:
+
+    def __init__(self, osm: OsmData, ways: List[Way]):
+        self.osm = osm
+        self.ways = ways
+        # build convex hull
+        n, hull = osm.convex_hull([w.id for w in ways])
+        self.nodes = n
+        self.convex_hull_idx = hull
+
+        _hull = np.append(n[hull], n[hull[0]])
+        hull_edges = []
+        for i in range(0, len(_hull)-1):
+            hull_edges.append(list(_hull[i:i+2]))
+
+        self.hull_edges = hull_edges
+
+        self.graph = ig.Graph()
+        self.nd_to_edge = {}
+        self.nd_to_vertex = {}
+
+        # create directed graph
+        for w in self.ways:
+            for e in w.edges():
+                nd_e = self.nd_edge(e)
+                if nd_e[0] not in self.nd_to_vertex:
+                    v = self.graph.add_vertex(nd_e[0])
+                    self.nd_to_vertex[nd_e[0]] = v
+                if nd_e[1] not in self.nd_to_vertex:
+                    v = self.graph.add_vertex(nd_e[1])
+                    self.nd_to_vertex[nd_e[1]] = v
+
+                e = self.graph.add_edge(*self.g_edge(nd_e))
+                self.nd_to_edge[nd_e] = e
+
+    def g_edge(self, nd_edge):
+        start = self.nd_to_vertex[nd_edge[0]]
+        end = self.nd_to_vertex[nd_edge[1]]
+        return start, end
+
+    def nd_edge(self, nd_array):
+        e = (nd_array[0].id, nd_array[1].id)
+        return e
+
+    def valid_edge(self, edge):
+        """
+        check if given edge is present in graph
+        """
+        _edge_key = (edge[0], edge[1])
+        ret = self.nd_to_edge.get(_edge_key, None)
+        if ret is not None:
+            return True
+        _edge_key = (edge[1], edge[0])
+        ret = self.nd_to_edge.get(_edge_key, None)
+        if ret is not None:
+            return True
+        return False
+
+    def plot(self):
+        layout = self.graph.layout("kk")
+        ig.plot(self.graph, layout=layout)
+
+    def plot_block(self):
+        points = [self.osm.utm_lookup(n) for n in self.nodes[self.convex_hull_idx]]
+        points = np.array(points)
+        points = np.append(points, points[0, :]).reshape((-1, 2))
+        plt.plot(points[:, 0], points[:, 1])
+        plt.show()
+
+    def calc(self):
+        # loop over convex hull edges
+        hull_nodes = self.nodes[self.convex_hull_idx]
+
+        block_hull = []
+        for edge in self.hull_edges:
+            is_valid = self.valid_edge(edge)
+            if is_valid:
+                block_hull.append(edge)
+                print(f"add edge {edge}")
+            else:
+                print(f"edge invalid find valid path from {edge[0]} --- {edge[1]} ")
+                vert_1 = self.nd_to_vertex[edge[0]]
+                vert_2 = self.nd_to_vertex[edge[1]]
+                path  = self.graph.get_all_simple_paths(v=vert_1, to=vert_2)
+                print(f"found {len(path)} paths")
+                print("hi")
+
 if __name__ == "__main__":
-    path = "/home/sts/repos/vadere/Scenarios/Demos/roVer/scenarios/test.config"
-    args = parse_command_line_arguments(["use-config", "-c", path])
+    set_start_method("spawn")
+    # path = f"{os.environ['HOME']}/repos/crownet/vadere/Scenarios/Demos/roVer/scenarios/mf_base.config"
+    # args = parse_command_line_arguments(["use-config", "-c", path])
+    args = parse_command_line_arguments()
+    # p = "/home/vm-sts/repos/crownet/vadere/Scenarios/Demos/roVer/scenarios/layer1.osm"
+    # p_out = "/home/vm-sts/repos/crownet/vadere/Scenarios/Demos/roVer/scenarios/layer1_out.osm"
+    # osm = OsmData(p, p_out)
+    # n = [Node.from_xml(e) for e in osm.nodes]
+    # ways = [Way.from_xml(e) for e in osm.ways]
+    # b = Block(ways)
+    # block_way, block_nodes = b.create()
+    # block = block_way[10]
+    # g = ConvexBlock(osm, block_way[10])
+    # g.calc()
+    # g.plot_block()
+    # print("hi")
+
+    #
+    # p = np.array([osm.lonlat_lookup(n.id) for n in ret[1][10]])
+    # h = ConvaceHull(p)
+    # hull_array = h.calc(k=21)
+    #
+    #
+    # ax = plt.scatter(p[:,0], p[:,1])
+    # x, y = asPolygon(hull_array).exterior.xy
+    # plt.plot(x,y)
+    # # ax.plot(x,y)
+    # plt.show()
+    #
+    # print("hi")
     args.main_func(args)

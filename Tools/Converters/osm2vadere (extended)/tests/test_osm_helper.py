@@ -154,7 +154,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16255438099, 11.58692204178).to_xml(),
         ]
         lookup = OsmLookup()
-        lookup.load(nodes)
+        lookup.load_cleanup(nodes)
 
         self.assertDictEqual(lookup.latlon_to_node_errors, {})
         self.assertEqual(len(lookup.zone_map), 1)
@@ -171,7 +171,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16255438099, 11.58692204178).to_xml(),
         ]
         lookup = OsmLookup()
-        lookup.load(nodes)
+        lookup.load_cleanup(nodes)
         self.assertEqual(len(lookup.latlon_to_node), 3)
         self.assertEqual(len(lookup.node_to_utm), 3)
         self.assertEqual(len(lookup.node_to_latlon), 3)
@@ -179,7 +179,7 @@ class TestOsmLookup(unittest.TestCase):
         self.assertDictEqual(lookup.latlon_to_node_errors, {})
 
         # should be cleaned
-        lookup.load(nodes)
+        lookup.load_cleanup(nodes)
         self.assertEqual(len(lookup.latlon_to_node), 3)
         self.assertEqual(len(lookup.node_to_utm), 3)
         self.assertEqual(len(lookup.node_to_latlon), 3)
@@ -213,7 +213,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16255438099, 11.58692204178).to_xml(),
         ]
         lookup = OsmLookup()
-        lookup.load(nodes)
+        lookup.load_cleanup(nodes)
 
         self.assertEqual(len(lookup.latlon_to_node), 3)
         self.assertEqual(len(lookup.node_to_utm), 3)
@@ -231,7 +231,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16255438099, 33.58692204178).to_xml(),
         ]  # wrong zone
         lookup = OsmLookup()
-        self.assertRaises(RuntimeError, lookup.load, nodes)
+        self.assertRaises(RuntimeError, lookup.load_cleanup, nodes)
 
     def test_duplicated_ids_negative(self):
         nodes = [
@@ -240,7 +240,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16255438099, 11.58692204178).to_xml(),
         ]
         lookup = OsmLookup(strict=True)
-        self.assertRaises(OsmLookupError, lookup.load, nodes)
+        self.assertRaises(OsmLookupError, lookup.load_cleanup, nodes)
         self.assertEqual(len(lookup.latlon_to_node_errors), 0)
 
     def test_duplicated_ids_positive(self):
@@ -250,7 +250,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(3, 48.16255438099, 11.58692204178).to_xml(),
         ]
         lookup = OsmLookup(strict=True)
-        lookup.load(nodes)
+        lookup.load_cleanup(nodes)
         self.assertEqual(len(lookup.latlon_to_node_errors), 0)
 
     def test_duplicated_latlon(self):
@@ -260,7 +260,7 @@ class TestOsmLookup(unittest.TestCase):
             Node.create_node(-3, 48.16254537153, 11.58697933476).to_xml(),
         ]
         lookup = OsmLookup(strict=True)
-        self.assertRaises(OsmLookupError, lookup.load, nodes)
+        self.assertRaises(OsmLookupError, lookup.load_cleanup, nodes)
         self.assertEqual(len(lookup.latlon_to_node_errors), 1)
 
 

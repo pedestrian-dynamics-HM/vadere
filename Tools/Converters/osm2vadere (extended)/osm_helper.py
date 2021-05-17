@@ -1,13 +1,20 @@
 import itertools
 import logging
+import sys
+from multiprocessing import get_context, cpu_count
+
+import os
 import random
-from typing import Any, List, Set, Tuple
+from typing import Any, List, Set, Tuple, Union
 
 import numpy as np
 import utm as utm_latlog_converter
 from lxml import etree
 from lxml.etree import Element, ElementTree
 from scipy.spatial import ConvexHull
+import yaml
+import numpy as np
+from configparser import ConfigParser, NoOptionError
 
 
 """
@@ -27,7 +34,6 @@ tag(building, *) -> this are polygons ==> obstacles
 
 """
 
-
 class Node:
     def __init__(self):
         self.id = -1
@@ -35,6 +41,7 @@ class Node:
         self.visible = "true"
         self.lat = 0.0
         self.lon = 0.0
+        self.utm = []
         self.tags: List[Tag] = []
 
     @classmethod
@@ -44,6 +51,17 @@ class Node:
         n.add_tag("rover:id", np.abs(n.id))
         n.lat = lat
         n.lon = lon
+        return n
+
+    @classmethod
+    def from_xml(cls, e):
+        n = cls()
+        try:
+            n.id = int(e.get("id"))
+            n.lat = float(e.get("lat"))
+            n.lon = float(e.get("lon"))
+        except Exception:
+            return None
         return n
 
     def add_tag(self, key, value):
@@ -76,19 +94,36 @@ class Nd:
     def __init__(self, ref_id):
         self.id = ref_id
 
+    @classmethod
+    def from_xml(cls, e):
+        return cls(int(e.get("ref")))
+
     def to_xml(self):
         element = Element("nd")
         element.set("ref", str(self.id))
         return element
 
     def __eq__(self, other):
-        return self.id == other.id
+        if type(other) == int:
+            return  self.id == other
+        else:
+            return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __repr__(self):
+        return f"Nd: {self.id}"
 
 
 class Tag:
     def __init__(self, k, v):
         self.k = k
         self.v = v
+
+    @classmethod
+    def from_xml(cls, e):
+        return cls(e.get("k"), e.get("v"))
 
     def to_xml(self):
         element = Element("tag")
@@ -108,6 +143,37 @@ class Way:
         self.attr = {}
         self.nds = []
         self.tags = []
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __repr__(self):
+        return f"Way: {self.id} with {len(self.nds)} nodes"
+
+    def edges(self):
+        ret = []
+        if self.nds[0] == self.nds[-1]:
+            for i in range(0, len(self.nds)-1):
+                ret.append(self.nds[i:i+2])
+        else:
+            d = [*self.nds, self.nds[0]]
+            for i in range(0, len(d)-1,):
+                ret.append(d[i:i+2])
+        return ret
+
+    @classmethod
+    def from_xml(cls, e):
+        w = cls()
+        try:
+            w.id = int(e.get('id'))
+            w.nds = [Nd.from_xml(e) for e in e.xpath("nd")]
+            w.tags = [Tag.from_xml(e) for e in e.xpath("tag")]
+        except Exception:
+            return Node
+        return w
 
     @classmethod
     def create_with_refs(
@@ -141,6 +207,9 @@ class Way:
 
     def add_tag(self, key, value):
         self.tags.append(Tag(key, value))
+
+    def get_tag_dict(self):
+        return {t.k: t.v for t in self.tags}
 
     def to_xml(self) -> Element:
         element = Element("way")
@@ -309,24 +378,69 @@ class PolyObjectWidthId:
 
 
 class OsmLookup:
+    lat = 0
+    lon = 1
+    earth_radius = 6371000  # meter
+
+
     def __init__(self, strict=True):
         self.strict = strict
         self.node_to_latlon = {}
         self.node_to_utm = {}
+        self.way_to_nodes = {}
+        self.way_to_tags = {}
         self.latlon_to_node = {}
         self.zone_map = {}
         self.latlon_to_node_errors = {}
+        self.bound_lat_lon = np.array([[0, 0], [0, 0]])
 
-    def load(self, nodes: Element):
+    def build_PolyObjectWidthIds(self, ways: List[Way], tag_name_space):
+        print()
+        num_ways = len(ways)
+        poly_objs = []
+        for idx , way in enumerate(ways):
+            nodes = [n.id for n in way.nds]
+            utm = [self.node_to_utm[id] for id in nodes]
+            if utm[0] == utm[-1]:
+                utm = utm[0:-1]
+            poly = PolyObjectWidthId(way.id, utm)
+            poly.template_data.update(OsmData.update_tag_dict(way.get_tag_dict(), tag_name_space))
+            poly_objs.append(poly)
+            if idx % 100:
+                print(f"\rbuild_PolyObjectWidthIds: {idx}/{num_ways}", end='')
+        print()
+        return poly_objs
+
+    def handle_node(self, nodes: List[Node]):
+        ret = []
+        for node in nodes:
+            x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(node.lat, node.lon)
+            ret.append([node, x, y, zone_number, zone_letter])
+        return ret
+
+    def load_cleanup(self, nodes: Element):
         self.node_to_latlon = {}
         self.node_to_utm = {}
         self.latlon_to_node = {}
         self.zone_map = {}
         self.latlon_to_node_errors = {}
 
-        for node in nodes:
-            latlon_point = (float(node.get("lat")), float(node.get("lon")))
-            node_id = int(node.get("id"))
+        lat = []
+        lon = []
+        clean_nodes = []
+        num_nodes = len(nodes)
+        error_nodes = []
+        for idx, node in enumerate(nodes):
+            try:
+                latlon_point = (float(node.get("lat")), float(node.get("lon")))
+                lat.append(latlon_point[self.lat])
+                lon.append(latlon_point[self.lon])
+                node_id = int(node.get("id"))
+            except Exception as e:
+                error_nodes.append(f"cannot parse node <<{node.values()} >> reason: {e}")
+                continue
+
+            clean_nodes.append(node)
             x, y, zone_number, zone_letter = utm_latlog_converter.from_latlon(
                 float(latlon_point[0]), float(latlon_point[1])
             )
@@ -357,14 +471,19 @@ class OsmLookup:
                 )
                 if self.strict:
                     if node_id > 0:
-                        print(
+                        error_nodes.append(
                             f"found node ids [{error_set}] which point to the same lonlat coordinates. continue because these points belong to osm ... "
                         )
                     else:
                         raise OsmLookupError(msg)
-                else:
-                    print(f"{msg} continue ...")
+
             self.latlon_to_node.setdefault(latlon_point, node_id)
+            if idx % 100:
+                print(f"\rbuild_PolyObjectWidthIds: {idx}/{num_nodes} errors: {len(error_nodes)}", end='')
+        print()
+        lat = np.array(lat)
+        lon = np.array(lon)
+        self.bound_lat_lon  = np.array([[lat.min(), lon.min()], [lat.max(), lon.max()]])
 
     def convert_latlon_to_utm(self, latlon):
         latlon_point = (float(latlon[0]), float(latlon[1]))
@@ -395,6 +514,13 @@ class OsmLookup:
         if latlon is not None:
             self.latlon_to_node.pop(latlon)
 
+    def get_base_point(self, offset_in_meter=0):
+
+       lat_min, lon_min = self.bound_lat_lon[:, self.lat]
+       lat_min = lat_min + offset_in_meter/self.earth_radius * 180/np.pi
+       lon_min = lon_min + offset_in_meter/(self.earth_radius * np.cos(np.pi * lat_min/180)) * 180/np.pi
+       return [lat_min, lon_min]
+
 
 class OsmLookupError(LookupError):
     def __init__(self, msg):
@@ -409,9 +535,12 @@ class OsmData:
         self.xml: ElementTree = etree.parse(self.input_file, parser).getroot()
         self.osm_root: Element = self.xml.xpath("/osm")[0]
 
-        nodes = self.osm_root.xpath("/osm/node")
+        _nodes = [Node.from_xml(e) for e in self.osm_root.xpath("/osm/node")]
+        _nodes = list(filter(None.__ne__, _nodes))
+        _ways = [Way.from_xml(e) for e in self.ways]
+        _ways = list(filter(None.__ne__, _ways))
         self.lookup = OsmLookup(strict=strict)
-        self.lookup.load(nodes)
+        self.lookup.load_cleanup(self.nodes)
 
         self.obstacle_selectors = [
             lambda: self.filter_for_buildings(
@@ -600,7 +729,21 @@ class OsmData:
                     if key_value[0].startswith(namespace):
                         key = key_value[0][len(namespace) :]
                         tag_dic.setdefault(key, key_value[1])
+        return tag_dic
 
+    @staticmethod
+    def update_tag_dict(tags, namespace: str = Node):
+        tag_dic = {}
+        if (len(tags)) == 0 or namespace is None:
+            return tag_dic
+        else:
+            for key, value in tags.items():
+                if namespace == "*":
+                    tag_dic.setdefault(key, value)
+                else:
+                    if key.startswith(namespace):
+                        key = key[len(namespace) :]
+                        tag_dic.setdefault(key, value)
         return tag_dic
 
     def utm_lookup(self, node_id: int) -> ():
@@ -614,6 +757,10 @@ class OsmData:
             return self.lookup.node_to_latlon.get(node_id)
         else:
             raise OsmLookupError(f"no latlon coordinate found for node id: {node_id}")
+
+    def lonlat_lookup(self, node_id: int) -> ():
+        r = self.latlon_lookup(node_id)
+        return [r[1], r[0]]
 
     @staticmethod
     def tag_update_or_create(element: Element, key: str, value):
@@ -845,16 +992,20 @@ class OsmData:
             xpath = f"/osm/way[not({exc})]"
         return self.xml.xpath(xpath)
 
-    def create_convex_hull(self, way_ids: List[int]):
+    def convex_hull(self, way_ids: List[int]):
         node_ids = []
         for way_id in way_ids:
             node_ids.extend(self.way_node_refs(way_id))
+        node_ids = np.unique(np.array(node_ids))
 
         # find points on convex hull
         _utm_points = [self.utm_lookup(node_id) for node_id in node_ids]
-        id_array = np.array(node_ids)
         hull = ConvexHull(np.array(_utm_points))
-        hull_point_ids = list(id_array[hull.vertices])
+        return node_ids, hull.vertices
+
+    def create_convex_hull(self, way_ids: List[int]):
+        id_array, hull_idx = self.convex_hull(way_ids)
+        hull_point_ids = list(id_array[hull_idx])
         hull_point_ids.append(hull_point_ids[0])
 
         # create way with convex hull
@@ -1113,144 +1264,59 @@ class OsmCfgParser:
         return ";" in val
 
 
-class OsmConfigTextGroupParser(OsmCfgParser):
-    def __init__(self, data: dict):
-        super().__init__(data)
-        self._simple_group_id = 0
-        self._simple_group = []
 
-    def pre_group(self, group: str, curr_line: int):
-        """
-        Ensure clean startup state.
-        """
-        self._simple_group_id = 0
-        self._simple_group = []
-
-    def post_group(self, group: str, curr_line: int):
-        """
-        In the case  the last group of way id's did not end with a new line write the data in #_simple_group to data.
-        """
-        if len(self._simple_group) > 0:
-            self._add_to_group(group, {str(self._simple_group_id): self._simple_group})
-            self._simple_group_id += 1
-
-    def parse_line(self, active_group: str, striped_line: str, curr_line: int):
-        if striped_line == "":
-            # group ended (or first group)
-            self._write_simple_group_as_list(active_group)
-            self._simple_group = []
-            if self._key_used(active_group, str(self._simple_group_id)):
-                self._simple_group_id += 1
-        else:
-            if striped_line.startswith("way "):
-                self._simple_group.append(striped_line[4:].strip())
-            else:
-                self._simple_group.append(striped_line)
-
-    def _write_simple_group_as_list(self, group_name):
-        if (len(self._simple_group)) == 0:
-            return
-
-        self._add_to_group(group_name, {str(self._simple_group_id): self._simple_group})
-
-    def _key_used(self, group_key, key: str):
-        return key in self.data[group_key]
 
 
 class OsmConfig(dict):
     def __init__(self, cfg_path, **kwargs):
         super().__init__(**kwargs)
         self.cfg_path = cfg_path
-        # self.configGroups = dict()
-        self.parser_map = {
-            "convex-hull:way-list": OsmConfigTextGroupParser(self),
-            "wall:way-list": OsmConfigTextGroupParser(self),
-            "default": OsmCfgParser(self),
-        }
         self._current_line_num = 0
         self._previous_group = ""
         self._active_group = ""
+        with open(self.cfg_path, 'r', encoding='utf-8') as fd:
+            self._cfg = yaml.safe_load(fd)
 
-        self._parse_config()
+        self._arg_dispatch = {
+            'default': self._default_args,
+        }
 
-    def _parse_config(self):
 
-        with open(self.cfg_path, "r") as cfg_f:
-            for line in cfg_f:
-                self._current_line_num += 1
-                if line.strip().startswith("#"):
-                    line = ""
+    def __getitem__(self, item):
+        return self._cfg[item]
 
-                # check for new group. If yes handle post and pre calls to parser
-                # if not do nothing. As long as we dont have any group (start of parsing)
-                # continue reading lines until we have a group.
-                new_group = self._new_group(line)
-                if self._active_group == "":
-                    continue
+    def __contains__(self, item):
+        return item in self._cfg
 
-                # handle pre and post parse_line calls.
-                if new_group:
-                    if self._previous_group != "":
-                        old_parser = self._select_parser(self._previous_group)
-                        old_parser.post_group(
-                            self._previous_group, self._current_line_num
-                        )
-                    new_parser = self._select_parser(self._active_group)
-                    new_parser.pre_group(self._active_group, self._current_line_num)
-                    continue
-
-                # select parser based on active group.
-                parser = self._select_parser(self._active_group)
-
-                parser.parse_line(
-                    self._active_group, line.strip(), self._current_line_num
-                )
-
-        # EOF reached. Call post parse_line on last active parser
-        last_parser = self._select_parser(self._active_group)
-        last_parser.post_group(self._active_group, self._current_line_num)
-
-    def _select_parser(self, configGroup: str):
-        if configGroup in self.parser_map:
-            parser = self.parser_map[configGroup]
+    def default_args(self):
+        ret = {}
+        if os.path.relpath(self["input-file"]):
+            ret["input"] = os.path.join(os.path.split(self.cfg_path)[0], self["input-file"])
         else:
-            parser = self.parser_map["default"]
+            ret["input"] = self["input-file"]
 
-        return parser
-
-    def _new_group(self, val: str):
-        g = val.strip()
-        if g.startswith("[") and g.endswith("]") and len(g) > 2:
-            self._previous_group = self._active_group
-            self._active_group = g[1:-1]
-            self[self._active_group] = {}
-            return True
+        if self["output-file"] == "" or self["output-file"] is None:
+            ret["output"] = None
+        elif os.path.relpath(self["output-file"]):
+            ret["output"] = os.path.join(os.path.split(self.cfg_path)[0], self["output-file"])
         else:
-            return False
+            ret["output"] = self["output-file"]
+        return ret
+
+
+    def _default_args(self, cmd):
+        return self._cfg[cmd]["args"]
+
+
+    def cmd_args(self, cmd):
+        _f = self._arg_dispatch.get(cmd, self._default_args)
+        return _f(cmd)
 
     def print_config(self):
         for k, v in self.items():
             print(k)
             for kk, vv in v.items():
                 print(f"\t{kk}: {vv}")
-
-    def get_way_list(self, cmd):
-        if f"{cmd}:way-list" not in self:
-            return []
-        else:
-            return list(self[f"{cmd}:way-list"].values())
-
-    def get_convex_hull_list(self):
-        if "convex-hull:way-list" not in self:
-            return []
-        else:
-            return list(self["convex-hull:way-list"].values())
-
-    def get_wall_list(self):
-        if "wall:way-list" not in self:
-            return []
-        else:
-            return list(self["convex-hull:way-list"].values())
 
 
 def convert_walls(osm: OsmData):

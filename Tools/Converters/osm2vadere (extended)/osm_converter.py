@@ -52,6 +52,8 @@
 
 import math
 import os
+import multiprocessing
+from itertools import repeat
 from string import Template
 from typing import List
 
@@ -114,7 +116,7 @@ class OsmConverter:
         # self.simple_buildings = OsmConverter.filter_for_buildings(self.xml_tree)
         # self.complex_buildings = OsmConverter.filter_for_buildings_in_relations(self.xml_tree)
 
-        self.base_point_lon_lat = self.osm.base_point
+        self.base_point_lon_lat =  self.osm.lookup.get_base_point(offset_in_meter=-10.0)
         self.base_point_utm = [0.0, 0.0]
         self.zone_map = {}
         self.obstacles: List[Element] = []
@@ -456,13 +458,14 @@ class OsmConverter:
             with open(output_file, "w") as text_file:
                 print(output, file=text_file)
 
-    def convert_way_to_utm(self, way: Element):
-        way_id = way.get("id")
-        node_ids = self.osm.way_node_refs(way_id)
+    # def convert_way_to_utm(self, way: Element):
+    def convert_way_to_utm(self, way: osm_helper.Way):
+        # way_id = way.get("id")
+        node_ids = [e.id for e in way.nds]
         converted_way_points = self.osm.nodes_to_utm(node_ids)
 
         # if way is closed remove last element (it's the same as the first)
-        if self.osm.way_is_closed(way_id):
+        if self.osm.way_is_closed(way.id):
             converted_way_points = converted_way_points[:-1]
 
         return converted_way_points
@@ -475,6 +478,18 @@ class OsmConverter:
             f"  Base point: {self.base_point_lon_lat} (not to be confused with utm based point which!"
         )
 
+    def way_to_utm(self, way: osm_helper.Way, tag_name_space=None):
+        # Collect nodes that belong to the current building.
+        utm_points = self.convert_way_to_utm(way)
+
+        if self.use_osm_id:
+            element = PolyObjectWidthId(way.id, utm_points)
+            element.template_data.update(OsmData.update_tag_dict(way.get_tag_dict(), tag_name_space))
+        else:
+            element = PolyObjectWidthId(-1, utm_points)
+            element.template_data.update(OsmData.update_tag_dict(way.get_tag_dict(), tag_name_space))
+        return element
+
     def convert_to_utm_poly_object(
         self,
         data,
@@ -483,20 +498,8 @@ class OsmConverter:
         base_point=None,
         remove_duplicates=True,
     ):
-        polygons_in_utm = []
-        # ways which already are 'polygons'
-        for way in data:
-            # Collect nodes that belong to the current building.
-            utm_points = self.convert_way_to_utm(way)
-
-            if self.use_osm_id:
-                element = PolyObjectWidthId(way.get("id"), utm_points)
-                element.template_data.update(OsmData.tags_to_dict(way, tag_name_space))
-                polygons_in_utm.append(element)
-            else:
-                element = PolyObjectWidthId(-1, utm_points)
-                element.template_data.update(OsmData.tags_to_dict(way, tag_name_space))
-                polygons_in_utm.append(element)
+        ways = [osm_helper.Way.from_xml(e) for e in data]
+        polygons_in_utm = self.osm.lookup.build_PolyObjectWidthIds(ways, tag_name_space)
 
         utm_topography_elements = polygons_in_utm
         if base_point is None:
