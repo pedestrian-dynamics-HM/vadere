@@ -7639,7 +7639,7 @@
     <tag k="building" v="yes"/>
     <tag k="building:levels" v="4"/>
     <tag k="roof:colour" v="grey"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="33487023" timestamp="2019-01-24T22:27:38Z" uid="155331" user="benhurxt" visible="true" version="24" changeset="66613465">
@@ -7782,7 +7782,7 @@
     <nd ref="429636733"/>
     <tag k="building" v="residential"/>
     <tag k="protect_class" v="22"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="late 19C"/>
   </way>
@@ -7795,7 +7795,7 @@
     <nd ref="429636807"/>
     <tag k="building" v="residential"/>
     <tag k="roof:colour" v="#EEEEEE"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36948869" timestamp="2014-08-18T19:19:51Z" uid="91790" user="morray" visible="true" version="7" changeset="24841801">
@@ -7811,7 +7811,7 @@
     <tag k="architect" v="Josef Knerr"/>
     <tag k="building" v="residential"/>
     <tag k="protect_class" v="22"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="1904"/>
   </way>
@@ -7827,7 +7827,7 @@
     <nd ref="429636950"/>
     <nd ref="429636941"/>
     <tag k="building" v="residential"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="~1900"/>
   </way>
@@ -8022,7 +8022,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965589" timestamp="2013-12-19T23:38:37Z" uid="834127" user="kartler175" visible="true" version="4" changeset="19542502">
@@ -8039,7 +8039,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Occamstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965590" timestamp="2013-12-19T23:38:37Z" uid="834127" user="kartler175" visible="true" version="4" changeset="19542502">
@@ -8055,7 +8055,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965591" timestamp="2013-10-20T13:56:40Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -8072,7 +8072,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965592" timestamp="2014-11-02T20:05:02Z" uid="78613" user="heilbron" visible="true" version="5" changeset="26511966">
@@ -8089,7 +8089,7 @@
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965593" timestamp="2014-11-02T20:05:01Z" uid="78613" user="heilbron" visible="true" version="4" changeset="26511966">
@@ -8106,7 +8106,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965594" timestamp="2014-11-02T20:04:59Z" uid="78613" user="heilbron" visible="true" version="4" changeset="26511966">
@@ -8122,7 +8122,7 @@
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965595" timestamp="2013-10-20T13:56:45Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="18451928">
@@ -8133,7 +8133,7 @@
     <nd ref="429834419"/>
     <tag k="addr:postcode" v="80802"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="36965596" timestamp="2014-01-03T09:14:37Z" uid="13219" user="Pyrokrat" visible="true" version="4" changeset="19782512">
@@ -8151,7 +8151,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="37229096" timestamp="2014-08-24T14:11:29Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -8162,7 +8162,7 @@
     <nd ref="1214825499"/>
     <nd ref="433580559"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="37229097" timestamp="2014-08-24T14:11:29Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -8173,7 +8173,7 @@
     <nd ref="433580566"/>
     <nd ref="433580563"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="39057410" timestamp="2017-07-07T11:40:46Z" uid="367380" user="Mloni" visible="true" version="7" changeset="50106355">
@@ -8364,7 +8364,7 @@
     <nd ref="1030655677"/>
     <nd ref="1030655659"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815439" timestamp="2018-04-25T06:38:59Z" uid="7352749" user="Arikp" visible="true" version="6" changeset="58397913">
@@ -8382,7 +8382,7 @@
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
     <tag k="building:levels" v="6"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815442" timestamp="2015-08-14T21:27:53Z" uid="78613" user="heilbron" visible="true" version="5" changeset="33343235">
@@ -8398,7 +8398,7 @@
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815443" timestamp="2013-10-20T14:17:42Z" uid="13219" user="Pyrokrat" visible="true" version="4" changeset="18452307">
@@ -8414,7 +8414,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815444" timestamp="2013-10-20T14:17:41Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18452307">
@@ -8431,7 +8431,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815446" timestamp="2015-08-14T21:27:55Z" uid="78613" user="heilbron" visible="true" version="5" changeset="33343235">
@@ -8448,7 +8448,7 @@
     <tag k="building" v="yes"/>
     <tag k="roof:orientation" v="across"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815449" timestamp="2015-08-14T21:27:55Z" uid="78613" user="heilbron" visible="true" version="5" changeset="33343235">
@@ -8466,7 +8466,7 @@
     <tag k="building" v="yes"/>
     <tag k="roof:orientation" v="across"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="88815452" timestamp="2015-08-14T21:27:54Z" uid="78613" user="heilbron" visible="true" version="5" changeset="33343235">
@@ -8483,7 +8483,7 @@
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-4434885"/>
+    <tag k="rover:obstacle:hull" v="-502180094"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="89922513" timestamp="2013-08-28T12:21:06Z" uid="56526" user="JJ Rammerl" visible="true" version="2" changeset="17553630">
@@ -8500,7 +8500,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Münchner Freiheit"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-171551051"/>
+    <tag k="rover:obstacle:hull" v="-587626021"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8512,7 +8512,7 @@
     <nd ref="1042311788"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-171551051"/>
+    <tag k="rover:obstacle:hull" v="-587626021"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8530,7 +8530,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Münchner Freiheit"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-171551051"/>
+    <tag k="rover:obstacle:hull" v="-587626021"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8549,7 +8549,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-171551051"/>
+    <tag k="rover:obstacle:hull" v="-587626021"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8568,7 +8568,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8584,7 +8584,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8603,7 +8603,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8621,7 +8621,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8638,7 +8638,7 @@
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8657,7 +8657,7 @@
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
     <tag k="name" v="Baltenzentrum"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8668,7 +8668,7 @@
     <nd ref="1042333394"/>
     <nd ref="1042333340"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8686,7 +8686,7 @@
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8701,7 +8701,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8722,7 +8722,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8739,7 +8739,7 @@
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8756,7 +8756,7 @@
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8771,7 +8771,7 @@
     <tag k="addr:housenumber" v="4"/>
     <tag k="addr:street" v="Marschallstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8789,7 +8789,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="Bing"/>
   </way>
@@ -8820,7 +8820,7 @@
     <tag k="addr:street" v="Leopoldstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-750225121"/>
+    <tag k="rover:obstacle:hull" v="-933227210"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="93607081" timestamp="2015-09-21T14:50:12Z" uid="2290263" user="soemisch" visible="true" version="11" changeset="34163945">
@@ -8852,7 +8852,7 @@
     <tag k="addr:street" v="Occamstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822682" timestamp="2013-10-20T13:20:59Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="18451256">
@@ -8867,7 +8867,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822684" timestamp="2014-11-02T20:05:00Z" uid="78613" user="heilbron" visible="true" version="3" changeset="26511966">
@@ -8883,7 +8883,7 @@
     <tag k="addr:street" v="Occamstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822685" timestamp="2011-03-07T11:06:37Z" uid="301486" user="occam11" visible="true" version="2" changeset="7483012">
@@ -8900,7 +8900,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Occamstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822686" timestamp="2014-08-24T14:11:28Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -8911,7 +8911,7 @@
     <nd ref="1143085967"/>
     <nd ref="1143085881"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822687" timestamp="2011-02-08T23:34:09Z" uid="342705" user="KonB" visible="true" version="1" changeset="7232063">
@@ -8925,7 +8925,7 @@
     <nd ref="1143085819"/>
     <nd ref="1143086050"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822692" timestamp="2014-08-24T14:11:32Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -8938,7 +8938,7 @@
     <nd ref="1143085992"/>
     <nd ref="1143085846"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822693" timestamp="2014-01-02T23:29:40Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="19778078">
@@ -8956,7 +8956,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="survey 2 January 2014"/>
   </way>
@@ -8974,7 +8974,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822699" timestamp="2019-04-16T15:37:37Z" uid="14390" user="BeKri" visible="true" version="3" changeset="69276432">
@@ -8986,7 +8986,7 @@
     <nd ref="1143085843"/>
     <nd ref="1143085797"/>
     <tag k="building" v="garage"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822700" timestamp="2013-10-20T13:20:58Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="18451256">
@@ -9006,7 +9006,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822702" timestamp="2014-11-02T20:05:02Z" uid="78613" user="heilbron" visible="true" version="2" changeset="26511966">
@@ -9023,7 +9023,7 @@
     <tag k="addr:street" v="Occamstraße"/>
     <tag k="building" v="yes"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822703" timestamp="2014-01-02T23:29:41Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="19778078">
@@ -9042,7 +9042,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="survey 2 January 2014"/>
   </way>
@@ -9058,7 +9058,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822706" timestamp="2013-10-20T13:56:44Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -9076,7 +9076,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822713" timestamp="2014-08-24T14:11:35Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -9090,7 +9090,7 @@
     <nd ref="1214825364"/>
     <nd ref="1143085881"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822714" timestamp="2011-02-08T23:34:13Z" uid="342705" user="KonB" visible="true" version="1" changeset="7232063">
@@ -9102,7 +9102,7 @@
     <nd ref="1143085777"/>
     <nd ref="1143086051"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822716" timestamp="2014-06-07T21:18:04Z" uid="8703" user="rolandg" visible="true" version="3" changeset="22799928">
@@ -9115,7 +9115,7 @@
     <nd ref="1143086005"/>
     <nd ref="2904937021"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822718" timestamp="2013-10-20T13:20:57Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="18451256">
@@ -9134,7 +9134,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822719" timestamp="2014-08-24T14:11:36Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9149,7 +9149,7 @@
     <nd ref="1143085823"/>
     <nd ref="1143086056"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822720" timestamp="2013-08-28T12:21:06Z" uid="56526" user="JJ Rammerl" visible="true" version="3" changeset="17553630">
@@ -9166,7 +9166,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Münchner Freiheit"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822721" timestamp="2014-11-02T20:04:45Z" uid="78613" user="heilbron" visible="true" version="3" changeset="26511966">
@@ -9180,7 +9180,7 @@
     <nd ref="429834424"/>
     <tag k="building" v="yes"/>
     <tag k="roof:colour" v="#666666"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822722" action="modify" timestamp="2013-08-28T12:21:06Z" uid="56526" user="JJ Rammerl" visible="true" version="3" changeset="17553630">
@@ -9198,7 +9198,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Münchner Freiheit"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822724" action="modify" timestamp="2014-08-24T14:11:49Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9212,7 +9212,7 @@
     <tag k="addr:housenumber" v="4"/>
     <tag k="addr:street" v="Siegfriedstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="source" v="survey"/>
   </way>
@@ -9228,7 +9228,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Münchner Freiheit"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822728" timestamp="2011-02-08T23:34:16Z" uid="342705" user="KonB" visible="true" version="1" changeset="7232063">
@@ -9238,7 +9238,7 @@
     <nd ref="429834415"/>
     <nd ref="429834416"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822731" timestamp="2014-01-03T09:14:36Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="19782512">
@@ -9253,7 +9253,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822732" timestamp="2014-12-12T19:37:02Z" uid="78613" user="heilbron" visible="true" version="4" changeset="27428817">
@@ -9272,7 +9272,7 @@
     <tag k="building" v="yes"/>
     <tag k="building:levels" v="4"/>
     <tag k="roof:colour" v="grey"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822734" action="modify" timestamp="2014-10-18T12:31:50Z" uid="91790" user="morray" visible="true" version="5" changeset="26169302">
@@ -9290,7 +9290,7 @@
     <tag k="building" v="apartments"/>
     <tag k="roof:colour" v="ce8674"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822737" timestamp="2013-10-20T13:56:39Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -9307,7 +9307,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="98822738" timestamp="2013-10-20T13:20:56Z" uid="13219" user="Pyrokrat" visible="true" version="2" changeset="18451256">
@@ -9323,7 +9323,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="100024661" timestamp="2014-01-24T17:17:04Z" uid="360562" user="haytigran" visible="true" version="2" changeset="20180611">
@@ -9374,7 +9374,7 @@
     <nd ref="1213329171"/>
     <tag k="building" v="yes"/>
     <tag k="building:levels" v="4"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105283013" timestamp="2018-07-18T17:17:43Z" uid="8499206" user="SeisenB" visible="true" version="5" changeset="60843349">
@@ -9390,7 +9390,7 @@
     <tag k="building" v="apartments"/>
     <tag k="building:levels" v="4"/>
     <tag k="roof:levels" v="1"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105283014" timestamp="2014-08-24T14:11:49Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -9407,7 +9407,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105283015" timestamp="2014-08-24T14:11:51Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9430,7 +9430,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105283017" timestamp="2014-08-24T14:11:43Z" uid="91790" user="morray" visible="true" version="5" changeset="24979970">
@@ -9449,7 +9449,7 @@
     <tag k="architect" v="R. Böhm"/>
     <tag k="building" v="apartments"/>
     <tag k="protect_class" v="22"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="1903"/>
   </way>
@@ -9467,7 +9467,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Morawitzkystraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-515777654"/>
+    <tag k="rover:obstacle:hull" v="-1945875675"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105289322" timestamp="2014-01-24T17:17:03Z" uid="360562" user="haytigran" visible="true" version="3" changeset="20180611">
@@ -9546,7 +9546,7 @@
     <nd ref="1282567713"/>
     <nd ref="1213408584"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-17330038"/>
+    <tag k="rover:obstacle:hull" v="-381648319"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="105289331" timestamp="2017-02-21T09:25:33Z" uid="4642374" user="x_zhao_MENTZ" visible="true" version="8" changeset="46268490">
@@ -9601,7 +9601,7 @@
     <tag k="building" v="apartments"/>
     <tag k="roof:colour" v="7b5d4b"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568607" timestamp="2014-08-24T14:11:47Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9633,7 +9633,7 @@
     <nd ref="2509522510"/>
     <nd ref="1279152768"/>
     <tag k="building" v="residential"/>
-    <tag k="rover:obstacle:hull" v="-515579840"/>
+    <tag k="rover:obstacle:hull" v="-574419069"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568618" timestamp="2014-12-12T19:36:59Z" uid="78613" user="heilbron" visible="true" version="4" changeset="27428817">
@@ -9649,7 +9649,7 @@
     <tag k="building" v="yes"/>
     <tag k="roof:colour" v="#666666"/>
     <tag k="roof:shape" v="flat"/>
-    <tag k="rover:obstacle:hull" v="-750225121"/>
+    <tag k="rover:obstacle:hull" v="-933227210"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568626" action="modify" timestamp="2014-08-24T14:11:39Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -9665,7 +9665,7 @@
     <tag k="addr:housenumber" v="10"/>
     <tag k="addr:street" v="Siegfriedstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568627" timestamp="2016-09-30T12:56:51Z" uid="14390" user="BeKri" visible="true" version="5" changeset="42541803">
@@ -9677,7 +9677,7 @@
     <nd ref="1279152645"/>
     <nd ref="1279152841"/>
     <tag k="building" v="residential"/>
-    <tag k="rover:obstacle:hull" v="-515579840"/>
+    <tag k="rover:obstacle:hull" v="-574419069"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568630" timestamp="2016-09-30T12:56:49Z" uid="14390" user="BeKri" visible="true" version="4" changeset="42541803">
@@ -9688,7 +9688,7 @@
     <nd ref="1279152806"/>
     <nd ref="1279152795"/>
     <tag k="building" v="residential"/>
-    <tag k="rover:obstacle:hull" v="-515579840"/>
+    <tag k="rover:obstacle:hull" v="-574419069"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112568632" action="modify" timestamp="2014-08-24T14:11:52Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9700,7 +9700,7 @@
     <tag k="addr:housenumber" v="8a"/>
     <tag k="addr:street" v="Siegfriedstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112953982" timestamp="2014-08-24T14:11:50Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9735,7 +9735,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-17330038"/>
+    <tag k="rover:obstacle:hull" v="-381648319"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112954005" timestamp="2014-08-24T14:11:51Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -9768,7 +9768,7 @@
     <tag k="addr:housenumber" v="12"/>
     <tag k="addr:street" v="Siegfriedstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-538062546"/>
+    <tag k="rover:obstacle:hull" v="-948733422"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112954016" timestamp="2014-08-24T14:11:41Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -9863,7 +9863,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-17330038"/>
+    <tag k="rover:obstacle:hull" v="-381648319"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="112954056" timestamp="2014-08-24T14:11:39Z" uid="91790" user="morray" visible="true" version="4" changeset="24979970">
@@ -9970,7 +9970,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Herzogstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075078" timestamp="2011-06-10T13:33:47Z" uid="342705" user="KonB" visible="true" version="1" changeset="8397338">
@@ -9983,7 +9983,7 @@
     <nd ref="1318875094"/>
     <nd ref="1318876611"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075100" timestamp="2012-11-30T16:28:52Z" uid="338611" user="marek kleciak" visible="true" version="2" changeset="14100891">
@@ -9995,7 +9995,7 @@
     <nd ref="1318876284"/>
     <nd ref="1318875661"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075105" timestamp="2016-09-30T12:57:01Z" uid="14390" user="BeKri" visible="true" version="4" changeset="42541803">
@@ -10045,7 +10045,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Siegesstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075193" timestamp="2014-01-02T23:29:41Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="19778078">
@@ -10060,7 +10060,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Siegesstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075197" timestamp="2014-08-27T09:10:42Z" uid="2290918" user="ap-KF" visible="true" version="3" changeset="25046803">
@@ -10092,7 +10092,7 @@
     <nd ref="1318875447"/>
     <nd ref="429636745"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117075261" timestamp="2014-08-27T09:10:42Z" uid="2290918" user="ap-KF" visible="true" version="4" changeset="25046803">
@@ -10123,7 +10123,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Siegesstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-714113567"/>
+    <tag k="rover:obstacle:hull" v="-227526317"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589806" timestamp="2013-10-20T13:56:44Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10138,7 +10138,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589810" timestamp="2013-10-20T13:56:40Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10153,7 +10153,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589836" timestamp="2014-11-02T20:04:51Z" uid="78613" user="heilbron" visible="true" version="3" changeset="26511966">
@@ -10170,7 +10170,7 @@
     <tag k="building" v="yes"/>
     <tag k="roof:colour" v="grey"/>
     <tag k="roof:shape" v="flat"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589838" timestamp="2016-06-14T20:21:19Z" uid="4117905" user="Kinderstadtplan" visible="true" version="5" changeset="40025965">
@@ -10190,7 +10190,7 @@
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
     <tag k="operator" v="Nilpferde e.V."/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589841" timestamp="2011-06-13T23:04:06Z" uid="342705" user="KonB" visible="true" version="1" changeset="8432586">
@@ -10200,7 +10200,7 @@
     <nd ref="1324415540"/>
     <nd ref="1324415761"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-576119517"/>
+    <tag k="rover:obstacle:hull" v="-1302290651"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589878" timestamp="2013-10-20T13:56:43Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10217,7 +10217,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589888" timestamp="2011-06-13T23:04:11Z" uid="342705" user="KonB" visible="true" version="1" changeset="8432586">
@@ -10227,7 +10227,7 @@
     <nd ref="1324416050"/>
     <nd ref="1324415827"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-806531120"/>
+    <tag k="rover:obstacle:hull" v="-1605553400"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589909" timestamp="2013-10-20T13:20:56Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451256">
@@ -10245,7 +10245,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Haimhauserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589961" timestamp="2013-10-20T13:56:42Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10263,7 +10263,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117589970" timestamp="2013-10-20T13:56:44Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10278,7 +10278,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117590051" timestamp="2013-10-20T13:56:41Z" uid="13219" user="Pyrokrat" visible="true" version="4" changeset="18451928">
@@ -10295,7 +10295,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117590089" timestamp="2013-10-20T13:56:40Z" uid="13219" user="Pyrokrat" visible="true" version="3" changeset="18451928">
@@ -10310,7 +10310,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Hesseloherstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="117590119" timestamp="2019-04-10T21:31:03Z" uid="14390" user="BeKri" visible="true" version="5" changeset="69097808">
@@ -10341,7 +10341,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Marktstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-404960259"/>
+    <tag k="rover:obstacle:hull" v="-1273076164"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="127977585" timestamp="2017-11-07T15:11:04Z" uid="8748" user="ToniE" visible="true" version="8" changeset="53583763">
@@ -10423,7 +10423,7 @@
     <tag k="addr:postcode" v="80803"/>
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
-    <tag k="rover:obstacle:hull" v="-17330038"/>
+    <tag k="rover:obstacle:hull" v="-381648319"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="145673023" timestamp="2014-08-24T14:11:50Z" uid="91790" user="morray" visible="true" version="3" changeset="24979970">
@@ -10443,7 +10443,7 @@
     <tag k="addr:street" v="Clemensstraße"/>
     <tag k="building" v="apartments"/>
     <tag k="protect_class" v="22"/>
-    <tag k="rover:obstacle:hull" v="-17330038"/>
+    <tag k="rover:obstacle:hull" v="-381648319"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="1890"/>
   </way>
@@ -10806,7 +10806,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-806531120"/>
+    <tag k="rover:obstacle:hull" v="-1605553400"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="173168560" timestamp="2014-12-12T19:37:01Z" uid="78613" user="heilbron" visible="true" version="4" changeset="27428817">
@@ -10826,7 +10826,7 @@
     <tag k="roof:colour" v="#DDDDDD"/>
     <tag k="roof:levels" v="1"/>
     <tag k="roof:shape" v="gabled"/>
-    <tag k="rover:obstacle:hull" v="-750225121"/>
+    <tag k="rover:obstacle:hull" v="-933227210"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="173168628" timestamp="2014-06-30T12:12:19Z" uid="8703" user="rolandg" visible="true" version="4" changeset="23344904">
@@ -10860,7 +10860,7 @@
     <nd ref="349333340"/>
     <tag k="building" v="residential"/>
     <tag k="protect_class" v="22"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
     <tag k="start_date" v="~1900"/>
   </way>
@@ -11047,7 +11047,7 @@
     <tag k="addr:housenumber" v="14b"/>
     <tag k="addr:street" v="Kaiserstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-515579840"/>
+    <tag k="rover:obstacle:hull" v="-574419069"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="237111686" action="modify" timestamp="2014-10-10T16:46:02Z" uid="91790" user="morray" visible="true" version="2" changeset="25986687">
@@ -11083,7 +11083,7 @@
     <nd ref="2509348051"/>
     <tag k="building" v="yes"/>
     <tag k="roof:colour" v="grey"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="243544423" action="modify" timestamp="2014-08-30T16:31:45Z" uid="91790" user="morray" visible="true" version="2" changeset="25121610">
@@ -11260,7 +11260,7 @@
     <nd ref="1318875508"/>
     <nd ref="2578884669"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-517482034"/>
+    <tag k="rover:obstacle:hull" v="-1551715245"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="251709416" timestamp="2014-08-27T09:10:42Z" uid="2290918" user="ap-KF" visible="true" version="2" changeset="25046803">
@@ -11274,7 +11274,7 @@
     <tag k="addr:postcode" v="80802"/>
     <tag k="addr:street" v="Feilitzschstraße"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-806531120"/>
+    <tag k="rover:obstacle:hull" v="-1605553400"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="251805202" timestamp="2018-08-20T17:14:20Z" uid="8748" user="ToniE" visible="true" version="3" changeset="61830369">
@@ -12396,7 +12396,7 @@
     <nd ref="1143085968"/>
     <nd ref="2904937026"/>
     <tag k="building" v="residential"/>
-    <tag k="rover:obstacle:hull" v="-724056993"/>
+    <tag k="rover:obstacle:hull" v="-1195894129"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="286817442" timestamp="2016-09-30T12:57:06Z" uid="14390" user="BeKri" visible="true" version="2" changeset="42541803">
@@ -12454,7 +12454,7 @@
     <nd ref="3045309365"/>
     <nd ref="3045309360"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-806531120"/>
+    <tag k="rover:obstacle:hull" v="-1605553400"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="300442411" timestamp="2014-08-27T09:10:40Z" uid="2290918" user="ap-KF" visible="true" version="1" changeset="25046803">
@@ -12470,7 +12470,7 @@
     <nd ref="3045309373"/>
     <nd ref="3045309366"/>
     <tag k="building" v="yes"/>
-    <tag k="rover:obstacle:hull" v="-806531120"/>
+    <tag k="rover:obstacle:hull" v="-1605553400"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="300559220" timestamp="2015-07-31T11:56:57Z" uid="78234" user="The_Mappet_Show" visible="true" version="2" changeset="33004633">
@@ -12722,7 +12722,7 @@
     <nd ref="429834418"/>
     <nd ref="429834413"/>
     <tag k="building" v="garage"/>
-    <tag k="rover:obstacle:hull" v="-999046037"/>
+    <tag k="rover:obstacle:hull" v="-2109419498"/>
     <tag k="rover:obstacle:ignore" v="yes"/>
   </way>
   <way id="315892725" timestamp="2018-03-26T12:00:00Z" uid="1787357" user="letihu" visible="true" version="5" changeset="57532595">
@@ -21408,4 +21408,868 @@
     <tag k="type" v="route"/>
     <tag k="website" v="https://www.airportbus-muenchen.de/"/>
   </relation>
+  <way id="-900465461" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="900465461"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1389321049" action="modify" visible="true">
+    <nd ref="1042333350"/>
+    <nd ref="1042333491"/>
+    <nd ref="1042333198"/>
+    <nd ref="1042333501"/>
+    <nd ref="1042333466"/>
+    <nd ref="1042333344"/>
+    <nd ref="1042333392"/>
+    <nd ref="429834384"/>
+    <nd ref="429834385"/>
+    <nd ref="1042333205"/>
+    <nd ref="1042333359"/>
+    <nd ref="1042333251"/>
+    <nd ref="1042333399"/>
+    <nd ref="1042333350"/>
+    <tag k="rover:id" v="1389321049"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-357809277" action="modify" visible="true">
+    <nd ref="1324415590"/>
+    <nd ref="2502842327"/>
+    <nd ref="1324415290"/>
+    <nd ref="1324415753"/>
+    <nd ref="1324415038"/>
+    <nd ref="1324414707"/>
+    <nd ref="429834386"/>
+    <nd ref="429834391"/>
+    <nd ref="1324414637"/>
+    <nd ref="1324415345"/>
+    <nd ref="1324415590"/>
+    <tag k="rover:id" v="357809277"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2065785421" action="modify" visible="true">
+    <nd ref="2587365890"/>
+    <nd ref="1143085856"/>
+    <nd ref="1143085764"/>
+    <nd ref="1143085865"/>
+    <nd ref="1143086036"/>
+    <nd ref="429834404"/>
+    <nd ref="429834403"/>
+    <nd ref="429834409"/>
+    <nd ref="429834399"/>
+    <nd ref="2587365893"/>
+    <nd ref="2587365890"/>
+    <tag k="rover:id" v="2065785421"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1151133777" action="modify" visible="true">
+    <nd ref="1143085752"/>
+    <nd ref="1143085768"/>
+    <nd ref="1143085742"/>
+    <nd ref="1143085902"/>
+    <nd ref="1143085782"/>
+    <nd ref="1143086076"/>
+    <nd ref="1143085734"/>
+    <nd ref="1143085978"/>
+    <nd ref="1143085878"/>
+    <nd ref="1143085809"/>
+    <nd ref="1143085871"/>
+    <nd ref="1143085752"/>
+    <tag k="rover:id" v="1151133777"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1300516799" action="modify" visible="true">
+    <nd ref="1042311736"/>
+    <nd ref="1042311753"/>
+    <nd ref="1042311758"/>
+    <nd ref="1042311773"/>
+    <nd ref="1042311745"/>
+    <nd ref="1042311727"/>
+    <nd ref="1042311736"/>
+    <tag k="rover:id" v="1300516799"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2102736660" action="modify" visible="true">
+    <nd ref="1282567480"/>
+    <nd ref="1282567703"/>
+    <nd ref="1282567667"/>
+    <nd ref="1282567771"/>
+    <nd ref="1213408550"/>
+    <nd ref="1213408584"/>
+    <nd ref="1282567303"/>
+    <nd ref="1282567480"/>
+    <tag k="rover:id" v="2102736660"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-785289365" action="modify" visible="true">
+    <nd ref="1143085891"/>
+    <nd ref="1143085731"/>
+    <nd ref="1214825385"/>
+    <nd ref="1143085846"/>
+    <nd ref="1214825377"/>
+    <nd ref="1143085790"/>
+    <nd ref="1282567117"/>
+    <nd ref="1282567540"/>
+    <nd ref="1279152505"/>
+    <nd ref="1143085891"/>
+    <tag k="rover:id" v="785289365"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2114723699" action="modify" visible="true">
+    <nd ref="1213358965"/>
+    <nd ref="1213358894"/>
+    <nd ref="433580561"/>
+    <nd ref="1213329193"/>
+    <nd ref="1213329171"/>
+    <nd ref="1213329151"/>
+    <nd ref="1213329212"/>
+    <nd ref="1213358953"/>
+    <nd ref="1213358795"/>
+    <nd ref="1213358965"/>
+    <tag k="rover:id" v="2114723699"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1939418562" action="modify" visible="true">
+    <nd ref="349333339"/>
+    <nd ref="349333340"/>
+    <nd ref="1839956515"/>
+    <nd ref="349333446"/>
+    <nd ref="429636946"/>
+    <nd ref="429636944"/>
+    <nd ref="2450607692"/>
+    <nd ref="1318875181"/>
+    <nd ref="349333346"/>
+    <nd ref="349333339"/>
+    <tag k="rover:id" v="1939418562"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-283230169" action="modify" visible="true">
+    <nd ref="349333124"/>
+    <nd ref="349333123"/>
+    <nd ref="1081999539"/>
+    <nd ref="1279152765"/>
+    <nd ref="1279152831"/>
+    <nd ref="1081999541"/>
+    <nd ref="1081999573"/>
+    <nd ref="349333125"/>
+    <nd ref="349333124"/>
+    <tag k="rover:id" v="283230169"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2111366742" action="modify" visible="true">
+    <nd ref="1279152803"/>
+    <nd ref="1279152580"/>
+    <nd ref="2450607665"/>
+    <nd ref="2450607667"/>
+    <nd ref="2450607664"/>
+    <nd ref="1279152637"/>
+    <nd ref="1279152645"/>
+    <nd ref="1279152806"/>
+    <nd ref="1279152803"/>
+    <tag k="rover:id" v="2111366742"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-833820399" action="modify" visible="true">
+    <nd ref="1836950669"/>
+    <nd ref="1324415847"/>
+    <nd ref="3045309368"/>
+    <nd ref="3045309367"/>
+    <nd ref="3045309361"/>
+    <nd ref="1836950728"/>
+    <nd ref="1836950736"/>
+    <nd ref="1836950739"/>
+    <nd ref="1836950725"/>
+    <nd ref="1836950669"/>
+    <tag k="rover:id" v="833820399"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-993616278" action="modify" visible="true">
+    <nd ref="429834427"/>
+    <nd ref="1318875818"/>
+    <nd ref="1318876335"/>
+    <nd ref="1143086086"/>
+    <nd ref="1143085929"/>
+    <nd ref="429834427"/>
+    <tag k="rover:id" v="993616278"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1042154127" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="1042154127"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2032422819" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="2032422819"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-897182521" action="modify" visible="true">
+    <nd ref="1042333350"/>
+    <nd ref="1042333491"/>
+    <nd ref="1042333198"/>
+    <nd ref="1042333501"/>
+    <nd ref="1042333466"/>
+    <nd ref="1042333344"/>
+    <nd ref="1042333392"/>
+    <nd ref="429834384"/>
+    <nd ref="429834385"/>
+    <nd ref="1042333205"/>
+    <nd ref="1042333359"/>
+    <nd ref="1042333251"/>
+    <nd ref="1042333399"/>
+    <nd ref="1042333350"/>
+    <tag k="rover:id" v="897182521"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1575183809" action="modify" visible="true">
+    <nd ref="1324415590"/>
+    <nd ref="2502842327"/>
+    <nd ref="1324415290"/>
+    <nd ref="1324415753"/>
+    <nd ref="1324415038"/>
+    <nd ref="1324414707"/>
+    <nd ref="429834386"/>
+    <nd ref="429834391"/>
+    <nd ref="1324414637"/>
+    <nd ref="1324415345"/>
+    <nd ref="1324415590"/>
+    <tag k="rover:id" v="1575183809"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-682922125" action="modify" visible="true">
+    <nd ref="2587365890"/>
+    <nd ref="1143085856"/>
+    <nd ref="1143085764"/>
+    <nd ref="1143085865"/>
+    <nd ref="1143086036"/>
+    <nd ref="429834404"/>
+    <nd ref="429834403"/>
+    <nd ref="429834409"/>
+    <nd ref="429834399"/>
+    <nd ref="2587365893"/>
+    <nd ref="2587365890"/>
+    <tag k="rover:id" v="682922125"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1839583119" action="modify" visible="true">
+    <nd ref="1143085752"/>
+    <nd ref="1143085768"/>
+    <nd ref="1143085742"/>
+    <nd ref="1143085902"/>
+    <nd ref="1143085782"/>
+    <nd ref="1143086076"/>
+    <nd ref="1143085734"/>
+    <nd ref="1143085978"/>
+    <nd ref="1143085878"/>
+    <nd ref="1143085809"/>
+    <nd ref="1143085871"/>
+    <nd ref="1143085752"/>
+    <tag k="rover:id" v="1839583119"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-18928003" action="modify" visible="true">
+    <nd ref="1042311736"/>
+    <nd ref="1042311753"/>
+    <nd ref="1042311758"/>
+    <nd ref="1042311773"/>
+    <nd ref="1042311745"/>
+    <nd ref="1042311727"/>
+    <nd ref="1042311736"/>
+    <tag k="rover:id" v="18928003"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1466773343" action="modify" visible="true">
+    <nd ref="1282567480"/>
+    <nd ref="1282567703"/>
+    <nd ref="1282567667"/>
+    <nd ref="1282567771"/>
+    <nd ref="1213408550"/>
+    <nd ref="1213408584"/>
+    <nd ref="1282567303"/>
+    <nd ref="1282567480"/>
+    <tag k="rover:id" v="1466773343"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1667208148" action="modify" visible="true">
+    <nd ref="1143085891"/>
+    <nd ref="1143085731"/>
+    <nd ref="1214825385"/>
+    <nd ref="1143085846"/>
+    <nd ref="1214825377"/>
+    <nd ref="1143085790"/>
+    <nd ref="1282567117"/>
+    <nd ref="1282567540"/>
+    <nd ref="1279152505"/>
+    <nd ref="1143085891"/>
+    <tag k="rover:id" v="1667208148"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-190530117" action="modify" visible="true">
+    <nd ref="1213358965"/>
+    <nd ref="1213358894"/>
+    <nd ref="433580561"/>
+    <nd ref="1213329193"/>
+    <nd ref="1213329171"/>
+    <nd ref="1213329151"/>
+    <nd ref="1213329212"/>
+    <nd ref="1213358953"/>
+    <nd ref="1213358795"/>
+    <nd ref="1213358965"/>
+    <tag k="rover:id" v="190530117"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1650626049" action="modify" visible="true">
+    <nd ref="349333339"/>
+    <nd ref="349333340"/>
+    <nd ref="1839956515"/>
+    <nd ref="349333446"/>
+    <nd ref="429636946"/>
+    <nd ref="429636944"/>
+    <nd ref="2450607692"/>
+    <nd ref="1318875181"/>
+    <nd ref="349333346"/>
+    <nd ref="349333339"/>
+    <tag k="rover:id" v="1650626049"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-844342499" action="modify" visible="true">
+    <nd ref="349333124"/>
+    <nd ref="349333123"/>
+    <nd ref="1081999539"/>
+    <nd ref="1279152765"/>
+    <nd ref="1279152831"/>
+    <nd ref="1081999541"/>
+    <nd ref="1081999573"/>
+    <nd ref="349333125"/>
+    <nd ref="349333124"/>
+    <tag k="rover:id" v="844342499"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-834967098" action="modify" visible="true">
+    <nd ref="1279152803"/>
+    <nd ref="1279152580"/>
+    <nd ref="2450607665"/>
+    <nd ref="2450607667"/>
+    <nd ref="2450607664"/>
+    <nd ref="1279152637"/>
+    <nd ref="1279152645"/>
+    <nd ref="1279152806"/>
+    <nd ref="1279152803"/>
+    <tag k="rover:id" v="834967098"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1809378079" action="modify" visible="true">
+    <nd ref="1836950669"/>
+    <nd ref="1324415847"/>
+    <nd ref="3045309368"/>
+    <nd ref="3045309367"/>
+    <nd ref="3045309361"/>
+    <nd ref="1836950728"/>
+    <nd ref="1836950736"/>
+    <nd ref="1836950739"/>
+    <nd ref="1836950725"/>
+    <nd ref="1836950669"/>
+    <tag k="rover:id" v="1809378079"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1314157487" action="modify" visible="true">
+    <nd ref="429834427"/>
+    <nd ref="1318875818"/>
+    <nd ref="1318876335"/>
+    <nd ref="1143086086"/>
+    <nd ref="1143085929"/>
+    <nd ref="429834427"/>
+    <tag k="rover:id" v="1314157487"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1634170871" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="1634170871"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-927877274" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="927877274"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1314537690" action="modify" visible="true">
+    <nd ref="1042333350"/>
+    <nd ref="1042333491"/>
+    <nd ref="1042333198"/>
+    <nd ref="1042333501"/>
+    <nd ref="1042333466"/>
+    <nd ref="1042333344"/>
+    <nd ref="1042333392"/>
+    <nd ref="429834384"/>
+    <nd ref="429834385"/>
+    <nd ref="1042333205"/>
+    <nd ref="1042333359"/>
+    <nd ref="1042333251"/>
+    <nd ref="1042333399"/>
+    <nd ref="1042333350"/>
+    <tag k="rover:id" v="1314537690"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-389532391" action="modify" visible="true">
+    <nd ref="1324415590"/>
+    <nd ref="2502842327"/>
+    <nd ref="1324415290"/>
+    <nd ref="1324415753"/>
+    <nd ref="1324415038"/>
+    <nd ref="1324414707"/>
+    <nd ref="429834386"/>
+    <nd ref="429834391"/>
+    <nd ref="1324414637"/>
+    <nd ref="1324415345"/>
+    <nd ref="1324415590"/>
+    <tag k="rover:id" v="389532391"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-179119609" action="modify" visible="true">
+    <nd ref="2587365890"/>
+    <nd ref="1143085856"/>
+    <nd ref="1143085764"/>
+    <nd ref="1143085865"/>
+    <nd ref="1143086036"/>
+    <nd ref="429834404"/>
+    <nd ref="429834403"/>
+    <nd ref="429834409"/>
+    <nd ref="429834399"/>
+    <nd ref="2587365893"/>
+    <nd ref="2587365890"/>
+    <tag k="rover:id" v="179119609"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2049182110" action="modify" visible="true">
+    <nd ref="1143085752"/>
+    <nd ref="1143085768"/>
+    <nd ref="1143085742"/>
+    <nd ref="1143085902"/>
+    <nd ref="1143085782"/>
+    <nd ref="1143086076"/>
+    <nd ref="1143085734"/>
+    <nd ref="1143085978"/>
+    <nd ref="1143085878"/>
+    <nd ref="1143085809"/>
+    <nd ref="1143085871"/>
+    <nd ref="1143085752"/>
+    <tag k="rover:id" v="2049182110"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1240273939" action="modify" visible="true">
+    <nd ref="1042311736"/>
+    <nd ref="1042311753"/>
+    <nd ref="1042311758"/>
+    <nd ref="1042311773"/>
+    <nd ref="1042311745"/>
+    <nd ref="1042311727"/>
+    <nd ref="1042311736"/>
+    <tag k="rover:id" v="1240273939"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-288018347" action="modify" visible="true">
+    <nd ref="1282567480"/>
+    <nd ref="1282567703"/>
+    <nd ref="1282567667"/>
+    <nd ref="1282567771"/>
+    <nd ref="1213408550"/>
+    <nd ref="1213408584"/>
+    <nd ref="1282567303"/>
+    <nd ref="1282567480"/>
+    <tag k="rover:id" v="288018347"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-192054452" action="modify" visible="true">
+    <nd ref="1143085891"/>
+    <nd ref="1143085731"/>
+    <nd ref="1214825385"/>
+    <nd ref="1143085846"/>
+    <nd ref="1214825377"/>
+    <nd ref="1143085790"/>
+    <nd ref="1282567117"/>
+    <nd ref="1282567540"/>
+    <nd ref="1279152505"/>
+    <nd ref="1143085891"/>
+    <tag k="rover:id" v="192054452"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1290028739" action="modify" visible="true">
+    <nd ref="1213358965"/>
+    <nd ref="1213358894"/>
+    <nd ref="433580561"/>
+    <nd ref="1213329193"/>
+    <nd ref="1213329171"/>
+    <nd ref="1213329151"/>
+    <nd ref="1213329212"/>
+    <nd ref="1213358953"/>
+    <nd ref="1213358795"/>
+    <nd ref="1213358965"/>
+    <tag k="rover:id" v="1290028739"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1857850994" action="modify" visible="true">
+    <nd ref="349333339"/>
+    <nd ref="349333340"/>
+    <nd ref="1839956515"/>
+    <nd ref="349333446"/>
+    <nd ref="429636946"/>
+    <nd ref="429636944"/>
+    <nd ref="2450607692"/>
+    <nd ref="1318875181"/>
+    <nd ref="349333346"/>
+    <nd ref="349333339"/>
+    <tag k="rover:id" v="1857850994"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1128564046" action="modify" visible="true">
+    <nd ref="349333124"/>
+    <nd ref="349333123"/>
+    <nd ref="1081999539"/>
+    <nd ref="1279152765"/>
+    <nd ref="1279152831"/>
+    <nd ref="1081999541"/>
+    <nd ref="1081999573"/>
+    <nd ref="349333125"/>
+    <nd ref="349333124"/>
+    <tag k="rover:id" v="1128564046"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1305846575" action="modify" visible="true">
+    <nd ref="1279152803"/>
+    <nd ref="1279152580"/>
+    <nd ref="2450607665"/>
+    <nd ref="2450607667"/>
+    <nd ref="2450607664"/>
+    <nd ref="1279152637"/>
+    <nd ref="1279152645"/>
+    <nd ref="1279152806"/>
+    <nd ref="1279152803"/>
+    <tag k="rover:id" v="1305846575"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2060928133" action="modify" visible="true">
+    <nd ref="1836950669"/>
+    <nd ref="1324415847"/>
+    <nd ref="3045309368"/>
+    <nd ref="3045309367"/>
+    <nd ref="3045309361"/>
+    <nd ref="1836950728"/>
+    <nd ref="1836950736"/>
+    <nd ref="1836950739"/>
+    <nd ref="1836950725"/>
+    <nd ref="1836950669"/>
+    <tag k="rover:id" v="2060928133"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2015368703" action="modify" visible="true">
+    <nd ref="429834427"/>
+    <nd ref="1318875818"/>
+    <nd ref="1318876335"/>
+    <nd ref="1143086086"/>
+    <nd ref="1143085929"/>
+    <nd ref="429834427"/>
+    <tag k="rover:id" v="2015368703"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-343911062" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="343911062"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1525882480" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="1525882480"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1302290651" action="modify" visible="true">
+    <nd ref="1042333350"/>
+    <nd ref="1042333491"/>
+    <nd ref="1042333198"/>
+    <nd ref="1042333501"/>
+    <nd ref="1042333466"/>
+    <nd ref="1042333344"/>
+    <nd ref="1042333392"/>
+    <nd ref="429834384"/>
+    <nd ref="429834385"/>
+    <nd ref="1042333205"/>
+    <nd ref="1042333359"/>
+    <nd ref="1042333251"/>
+    <nd ref="1042333399"/>
+    <nd ref="1042333350"/>
+    <tag k="rover:id" v="1302290651"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1273076164" action="modify" visible="true">
+    <nd ref="1324415590"/>
+    <nd ref="2502842327"/>
+    <nd ref="1324415290"/>
+    <nd ref="1324415753"/>
+    <nd ref="1324415038"/>
+    <nd ref="1324414707"/>
+    <nd ref="429834386"/>
+    <nd ref="429834391"/>
+    <nd ref="1324414637"/>
+    <nd ref="1324415345"/>
+    <nd ref="1324415590"/>
+    <tag k="rover:id" v="1273076164"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-2109419498" action="modify" visible="true">
+    <nd ref="2587365890"/>
+    <nd ref="1143085856"/>
+    <nd ref="1143085764"/>
+    <nd ref="1143085865"/>
+    <nd ref="1143086036"/>
+    <nd ref="429834404"/>
+    <nd ref="429834403"/>
+    <nd ref="429834409"/>
+    <nd ref="429834399"/>
+    <nd ref="2587365893"/>
+    <nd ref="2587365890"/>
+    <tag k="rover:id" v="2109419498"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1195894129" action="modify" visible="true">
+    <nd ref="1143085752"/>
+    <nd ref="1143085768"/>
+    <nd ref="1143085742"/>
+    <nd ref="1143085902"/>
+    <nd ref="1143085782"/>
+    <nd ref="1143086076"/>
+    <nd ref="1143085734"/>
+    <nd ref="1143085978"/>
+    <nd ref="1143085878"/>
+    <nd ref="1143085809"/>
+    <nd ref="1143085871"/>
+    <nd ref="1143085752"/>
+    <tag k="rover:id" v="1195894129"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-587626021" action="modify" visible="true">
+    <nd ref="1042311736"/>
+    <nd ref="1042311753"/>
+    <nd ref="1042311758"/>
+    <nd ref="1042311773"/>
+    <nd ref="1042311745"/>
+    <nd ref="1042311727"/>
+    <nd ref="1042311736"/>
+    <tag k="rover:id" v="587626021"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-381648319" action="modify" visible="true">
+    <nd ref="1282567480"/>
+    <nd ref="1282567703"/>
+    <nd ref="1282567667"/>
+    <nd ref="1282567771"/>
+    <nd ref="1213408550"/>
+    <nd ref="1213408584"/>
+    <nd ref="1282567303"/>
+    <nd ref="1282567480"/>
+    <tag k="rover:id" v="381648319"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-948733422" action="modify" visible="true">
+    <nd ref="1143085891"/>
+    <nd ref="1143085731"/>
+    <nd ref="1214825385"/>
+    <nd ref="1143085846"/>
+    <nd ref="1214825377"/>
+    <nd ref="1143085790"/>
+    <nd ref="1282567117"/>
+    <nd ref="1282567540"/>
+    <nd ref="1279152505"/>
+    <nd ref="1143085891"/>
+    <tag k="rover:id" v="948733422"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1945875675" action="modify" visible="true">
+    <nd ref="1213358965"/>
+    <nd ref="1213358894"/>
+    <nd ref="433580561"/>
+    <nd ref="1213329193"/>
+    <nd ref="1213329171"/>
+    <nd ref="1213329151"/>
+    <nd ref="1213329212"/>
+    <nd ref="1213358953"/>
+    <nd ref="1213358795"/>
+    <nd ref="1213358965"/>
+    <tag k="rover:id" v="1945875675"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1551715245" action="modify" visible="true">
+    <nd ref="349333339"/>
+    <nd ref="349333340"/>
+    <nd ref="1839956515"/>
+    <nd ref="349333446"/>
+    <nd ref="429636946"/>
+    <nd ref="429636944"/>
+    <nd ref="2450607692"/>
+    <nd ref="1318875181"/>
+    <nd ref="349333346"/>
+    <nd ref="349333339"/>
+    <tag k="rover:id" v="1551715245"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-933227210" action="modify" visible="true">
+    <nd ref="349333124"/>
+    <nd ref="349333123"/>
+    <nd ref="1081999539"/>
+    <nd ref="1279152765"/>
+    <nd ref="1279152831"/>
+    <nd ref="1081999541"/>
+    <nd ref="1081999573"/>
+    <nd ref="349333125"/>
+    <nd ref="349333124"/>
+    <tag k="rover:id" v="933227210"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-574419069" action="modify" visible="true">
+    <nd ref="1279152803"/>
+    <nd ref="1279152580"/>
+    <nd ref="2450607665"/>
+    <nd ref="2450607667"/>
+    <nd ref="2450607664"/>
+    <nd ref="1279152637"/>
+    <nd ref="1279152645"/>
+    <nd ref="1279152806"/>
+    <nd ref="1279152803"/>
+    <tag k="rover:id" v="574419069"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-1605553400" action="modify" visible="true">
+    <nd ref="1836950669"/>
+    <nd ref="1324415847"/>
+    <nd ref="3045309368"/>
+    <nd ref="3045309367"/>
+    <nd ref="3045309361"/>
+    <nd ref="1836950728"/>
+    <nd ref="1836950736"/>
+    <nd ref="1836950739"/>
+    <nd ref="1836950725"/>
+    <nd ref="1836950669"/>
+    <tag k="rover:id" v="1605553400"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-227526317" action="modify" visible="true">
+    <nd ref="429834427"/>
+    <nd ref="1318875818"/>
+    <nd ref="1318876335"/>
+    <nd ref="1143086086"/>
+    <nd ref="1143085929"/>
+    <nd ref="429834427"/>
+    <tag k="rover:id" v="227526317"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
+  <way id="-502180094" action="modify" visible="true">
+    <nd ref="1030655617"/>
+    <nd ref="1030655609"/>
+    <nd ref="1030655658"/>
+    <nd ref="1030655622"/>
+    <nd ref="1030655572"/>
+    <nd ref="1030655593"/>
+    <nd ref="1030655617"/>
+    <tag k="rover:id" v="502180094"/>
+    <tag k="rover:obstacle:hull" v="-1"/>
+    <tag k="rover:obstacle" v="convex-hull"/>
+  </way>
 </osm>
