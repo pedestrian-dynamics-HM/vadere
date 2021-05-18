@@ -1,0 +1,25 @@
+{ "numberOfReactionProbabilities": 4,
+  "reactionProbabilities": [
+    { "check-value" : 1,
+      "isBernoulliParameterCertain" : true,
+      "BernoulliParameter" : 0.0
+    },
+    { "check-value" : 2
+    },
+    { "check-value" : 3,
+      "isBernoulliParameterCertain" : false,
+      "BernoulliParameter" : {
+        "DistributionType" : "Uniform",
+        "DistributionParameters" : [0.0, 1.0]
+      }
+    },
+    { "check-value" : 4,
+      "isBernoulliParameterCertain" : false,
+      "BernoulliParameter" : {
+      "DistributionType" : "Gaussian",
+      "DistributionParameters" : [0.8, 0.03]
+       }
+    }
+  ]
+
+}

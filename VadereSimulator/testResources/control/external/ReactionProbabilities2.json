@@ -1,0 +1,7 @@
+{
+    "isBernoulliParameterCertain" : false,
+    "BernoulliParameter" : {
+      "DistributionType" : "Uniform",
+      "DistributionParameters" : [0.5, 1.0]
+    }
+}
