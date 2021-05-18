@@ -35,7 +35,7 @@ public enum PersonVar {
 	VEHICLE(0xc3, TraCIDataType.STRING), // get
 	ADD(0x80, TraCIDataType.STRING),
 	REMOVE_STAGE(0xc5, TraCIDataType.INTEGER), // set
-	TARGET_LIST(0xfe, TraCIDataType.STRING_LIST), // get, set
+	TARGET_LIST(0xfe, TraCIDataType.STRING_LIST), // get, set            
 	INFORMATION_ITEM(0xfd, TraCIDataType.COMPOUND_OBJECT)
 	;
 

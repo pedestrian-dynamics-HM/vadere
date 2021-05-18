@@ -488,6 +488,16 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_init_control(final String[] args) throws IOException {
+
+	}
+
+	@Override
+	public void simulationapi_apply_control(final String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_setSimConfig(String[] args) throws IOException {
 		System.out.println("not implemented");
 	}

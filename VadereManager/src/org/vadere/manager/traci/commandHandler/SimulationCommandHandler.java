@@ -3,11 +3,7 @@ package org.vadere.manager.traci.commandHandler;
 import org.apache.commons.math3.util.Pair;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
-import org.vadere.state.traci.CompoundObjectProvider;
-import org.vadere.state.traci.TraCICommandCreationException;
-import org.vadere.state.traci.TraCIException;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
@@ -16,16 +12,20 @@ import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCacheHashCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCompoundPayload;
-import org.vadere.state.traci.CompoundObject;
 import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
+import org.vadere.simulator.control.external.models.ControlModel;
+import org.vadere.simulator.control.external.models.ControlModelBuilder;
+import org.vadere.simulator.control.external.models.IControlModel;
+import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
+import org.vadere.state.traci.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
@@ -34,10 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +63,7 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	private Pair<Double, Set<Integer>> allPrevious; // time at witch the given ids were send over traci
 	private Pair<Double, List<String>> departedCache; // time at witch the given ids were send over traci
 	private Pair<Double, List<String>> arrivedCache; // time at witch the given ids were send over traci
+	private HashMap<String, IControlModel> iControlModelHashMap;
 
 	static {
 		instance = new SimulationCommandHandler();
@@ -77,6 +75,7 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		allPrevious = Pair.create(-1.0, new HashSet<>()); // never called.
 		departedCache = Pair.create(-1.0, new ArrayList<>());
 		arrivedCache = Pair.create(-1.0, new ArrayList<>());
+		iControlModelHashMap = new HashMap<>();
 	}
 
 	@Override
@@ -165,7 +164,83 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		});
 
 		return cmd;
+
+
 	}
+
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.EXTERNAL_INPUT_INIT,
+			name = "init_control", ignoreElementId = true )
+	public TraCICommand process_init_control(TraCISetCommand cmd, RemoteManager remoteManager) {
+		String controlModelName, controlModelType;
+		String reactionModelParameter;
+
+		try {
+
+			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
+			controlModelName = (String) cfg.getData(0, TraCIDataType.STRING);
+			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
+			reactionModelParameter = (String) cfg.getData(2, TraCIDataType.STRING);
+
+			ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
+
+			if (!iControlModelHashMap.containsKey(controlModelName)) {
+				IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
+				controlModel.setReactionModel(reactionModel);
+				iControlModelHashMap.put(controlModelName, controlModel);
+			}
+
+			logger.infof("Received ControlInitCommand:");
+			logger.infof(cfg.toString());
+			cmd.setOK();
+
+		} catch (TraCIException e) {
+			logger.errorf("cannot parse ControlInitCommand object. Err: %s", e.getMessage());
+			cmd.setErr(String.format("cannot parse ControlInitCommand object. Err: %s", e.getMessage()));
+		}
+
+		return cmd;
+	}
+
+	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.EXTERNAL_INPUT,
+			name = "apply_control", ignoreElementId = true )
+	public TraCICommand process_apply_control(TraCISetCommand cmd, RemoteManager remoteManager) {
+		int packet_size, specify_id;
+		String msg_content, model_name;
+
+
+		try {
+			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
+			//remoteManager.setSimCfg(cfg);
+			packet_size = (int) cfg.getData(0,TraCIDataType.INTEGER);
+			specify_id = Integer.parseInt((String) cfg.getData(1,TraCIDataType.STRING));
+			model_name = (String)  cfg.getData(2,TraCIDataType.STRING);
+			msg_content = (String) cfg.getData(3,TraCIDataType.STRING);
+
+			if (!iControlModelHashMap.containsKey(model_name)) {
+				logger.infof("Model" + model_name + " not found. Try to initialize from model name.");
+				IControlModel controlModel = ControlModelBuilder.getModel(model_name);
+				iControlModelHashMap.put(model_name, controlModel);
+			}
+
+			IControlModel controlModel = iControlModelHashMap.get(model_name);
+
+			remoteManager.accessState((manager, state) -> {
+				int i;
+				controlModel.update(state.getScenarioStore().getTopography(), state.getSimTimeInSec(), msg_content, specify_id);
+			});
+
+			logger.infof("Received ControlCommand:");
+			logger.infof(cfg.toString());
+			cmd.setOK();
+
+		} catch (TraCIException ex) {
+			logger.errorf("cannot parse ControlCommand object. Err: %s", ex.getMessage());
+			cmd.setErr(String.format("cannot parse ControlCommand object. Err: %s", ex.getMessage()));
+		}
+
+		return cmd;
+	}
+
 
 
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.SIM_CONFIG,
