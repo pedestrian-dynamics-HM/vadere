@@ -2,7 +2,7 @@
   "name" : "infectionModel_queue_small_ex2",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "76c167299adb73d75dba1b2765cb8fdd995788fe",
+  "commithash" : "c37e87349ff9541f120733853f0fda38898b0e63",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -16,6 +16,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "pathogenLoad.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -33,6 +37,9 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
