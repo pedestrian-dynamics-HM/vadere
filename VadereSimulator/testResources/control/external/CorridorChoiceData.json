@@ -1,0 +1,12 @@
+{
+  "time" : 7.0,
+  "space" : {
+     "x" : 0.0,
+     "y" : 0.0,
+     "radius": 100
+  },
+  "command" : {
+    "targetIds" : [1,2,3,4] ,
+    "probability" : [0.25, 0, 0.25, 0.5]
+  }
+}

@@ -2,22 +2,21 @@ package org.vadere.manager.traci.commandHandler;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.PersonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.PersonHandlers;
 import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
-import org.vadere.state.traci.CompoundObject;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.Vector3D;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -25,11 +24,7 @@ import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 

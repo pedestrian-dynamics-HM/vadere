@@ -1,0 +1,6 @@
+{
+  "command" : {
+    "targetIds" : [1,2,3,4] ,
+    "probability" : [0.25, 0, 0.25, 0.5]
+  }
+}
