@@ -12,9 +12,9 @@ import java.util.Collection;
 import java.util.List;
 
 @DataProcessorClass()
-public class NumberOfPedPerInfectionStatus extends DataProcessor<TimestepKey, List<Long>> {
+public class NumberOfPedPerInfectionStatusProcessor extends DataProcessor<TimestepKey, List<Long>> {
 
-    public NumberOfPedPerInfectionStatus(){
+    public NumberOfPedPerInfectionStatusProcessor(){
         super("infection statuses placeholder");
         // super("S", "E", "I", "R"); // ToDo: iterate through enum InfectionStatus
     }

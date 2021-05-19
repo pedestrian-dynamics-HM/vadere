@@ -52,7 +52,7 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 7
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatus",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
       "id" : 8
     } ],
     "isTimestamped" : true,

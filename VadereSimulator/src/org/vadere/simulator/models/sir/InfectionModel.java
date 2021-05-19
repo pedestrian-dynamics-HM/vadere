@@ -175,6 +175,8 @@ public class InfectionModel extends AbstractSirModel {
 
 			// Increasing extent due to moving air caused by agents
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
+			// ToDo: to be discussed if it makes sense to use the agent's velocity at each simStep (shouldn't it be the
+			//  mean velocity within each simStep? or is that too detailed?)
 			Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			double deltaRadius = 0.0;
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
