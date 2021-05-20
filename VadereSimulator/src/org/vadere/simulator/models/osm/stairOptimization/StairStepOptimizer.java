@@ -6,17 +6,15 @@ package org.vadere.simulator.models.osm.stairOptimization;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Stairs.Tread;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.List;
 
 /**
  * 
@@ -43,8 +41,15 @@ public class StairStepOptimizer extends StepCircleOptimizer {
 					.error("Only pedestrians should get in here that are on actual Stairs -> Bug in code.");
 		}
 
-		VPoint currentPosition = pedestrian.getPosition();
 		LinkedList<VPoint> reachablePositions = getReachablePositions(pedestrian, reachableArea);
+		return getMinBruteForce(pedestrian, reachablePositions);
+
+	}
+
+	private VPoint getMinBruteForce(PedestrianOSM pedestrian, LinkedList<VPoint> reachablePositions){
+
+
+		VPoint currentPosition = pedestrian.getPosition();
 
 		// Logger.getLogger(this.getClass()).info(reachablePositions.size());
 
@@ -76,6 +81,42 @@ public class StairStepOptimizer extends StepCircleOptimizer {
 		// nextPosition.toString() + " with potential = " + bestPotential );
 		return nextPosition;
 	}
+
+
+
+	public VPoint getNextPositionNone(PedestrianOSM pedestrian, List<VPoint> positions, Shape reachableArea) {
+
+		LinkedList<VPoint> reachablePositions = new LinkedList<>();
+		LinkedList<VPoint> reachablePositionsOutsideStairs = new LinkedList<>();
+
+		for (VPoint p : positions){
+			reachablePositions.add(p);
+			if (!stairs.getShape().contains(p)){
+				reachablePositionsOutsideStairs.add(p);
+			}
+		}
+
+		if (reachablePositionsOutsideStairs.size() == 0){
+			return getNextPosition(pedestrian, reachableArea);
+		}
+
+		logger.info(reachablePositionsOutsideStairs);
+
+		VPoint nextPos = reachablePositionsOutsideStairs.get(0);
+		double bestPot = pedestrian.getPotential(nextPos);
+
+		for (VPoint pp: reachablePositionsOutsideStairs){
+			if (pedestrian.getPotential(pp) < bestPot){
+				bestPot = pedestrian.getPotential(pp);
+				nextPos = pp;
+			}
+		}
+
+		// getMinBruteForce(pedestrian, reachablePositionsOutsideStairs);
+
+		return nextPos;
+	}
+
 
 	private LinkedList<VPoint> getReachablePositions(PedestrianOSM pedestrian, Shape reachableArea) {
 

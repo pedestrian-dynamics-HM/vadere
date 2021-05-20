@@ -1,5 +1,5 @@
 {
-  "name" : "stairs_diagonal_1_+1",
+  "name" : "escalator_counterflow",
   "description" : "",
   "release" : "1.15",
   "processWriters" : {
@@ -75,10 +75,10 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 70.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
-      "writeSimulationData" : false,
+      "realTimeSimTimeRatio" : 0.9,
+      "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
@@ -99,7 +99,7 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 10.0,
-          "height" : 10.0
+          "height" : 20.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -107,74 +107,47 @@
       },
       "obstacles" : [ {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 2.2,
-            "y" : 0.3
-          }, {
-            "x" : 9.6,
-            "y" : 7.999999999999999
-          }, {
-            "x" : 9.7,
-            "y" : 7.5
-          }, {
-            "x" : 2.4,
-            "y" : 0.0
-          } ]
+          "x" : 8.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 3
+        "id" : 2
       }, {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 6.6000000000000005,
-            "y" : 9.700000000000001
-          }, {
-            "x" : -0.3999999999999999,
-            "y" : 2.3
-          }, {
-            "x" : -0.19999999999999996,
-            "y" : 2.0
-          }, {
-            "x" : 7.000000000000001,
-            "y" : 9.6
-          } ]
+          "x" : 1.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 4
+        "id" : 3
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ {
         "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 3.8000000000000003,
-            "y" : 2.0
-          }, {
-            "x" : 1.7000000000000002,
-            "y" : 4.0
-          }, {
-            "x" : 5.8999999999999995,
-            "y" : 8.399999999999999
-          }, {
-            "x" : 8.1,
-            "y" : 6.5
-          } ]
+          "x" : 2.0,
+          "y" : 5.2,
+          "width" : 4.126760563380282,
+          "height" : 10.0,
+          "type" : "RECTANGLE"
         },
-        "id" : 5,
-        "treadCount" : 20,
+        "id" : 4,
+        "treadCount" : 30,
         "upwardDirection" : {
-          "x" : 1.0,
-          "y" : 1.0
+          "x" : 0.0,
+          "y" : -1.0
         }
       } ],
       "targets" : [ {
-        "id" : 2,
+        "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 6.8,
-          "y" : 7.7,
-          "width" : 2.0,
-          "height" : 1.5,
+          "x" : 2.0,
+          "y" : 18.0,
+          "width" : 1.9611178614823817,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -188,24 +161,24 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 1,
+        "id" : 5,
         "shape" : {
-          "x" : 0.8,
-          "y" : 1.2,
-          "width" : 1.8,
-          "height" : 1.4,
+          "x" : 4.823943661971831,
+          "y" : 1.0,
+          "width" : 3.176056338028169,
+          "height" : 1.1,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 2,
+        "distributionParameters" : [ 15.0 ],
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 50.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2 ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null

@@ -113,7 +113,7 @@
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 2
       }, {
         "shape" : {
           "x" : 1.0,
@@ -122,7 +122,7 @@
           "height" : 20.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1
+        "id" : 3
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ {
@@ -133,7 +133,7 @@
           "height" : 10.0,
           "type" : "RECTANGLE"
         },
-        "id" : -1,
+        "id" : 4,
         "treadCount" : 30,
         "upwardDirection" : {
           "x" : 0.0,
@@ -161,7 +161,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : -1,
+        "id" : 5,
         "shape" : {
           "x" : 2.0,
           "y" : 1.0,

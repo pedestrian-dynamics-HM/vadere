@@ -48,7 +48,7 @@ public abstract class StepCircleOptimizer {
 	 * quality of a optimization algorithm.
 	 */
 
-	protected class SolutionPair {
+	public class SolutionPair {
 		/* Inner data class to store point and function value. */
 		public final VPoint point;
 		public final double funcValue;

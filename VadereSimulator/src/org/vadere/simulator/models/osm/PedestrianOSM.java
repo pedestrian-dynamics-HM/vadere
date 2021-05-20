@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
+import org.vadere.simulator.models.osm.optimization.StepCircleOptimizerDiscrete;
 import org.vadere.simulator.models.potential.combinedPotentials.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -156,6 +157,15 @@ public class PedestrianOSM extends Pedestrian {
 
 			// get stairs object an agent may be on - remains null if agent is on area
 			Stairs stairs = null;
+
+			for (Stairs singleStairs : topography.getStairs()) {
+				if (singleStairs.getShape().distance( getPosition()) <= 1.0) {
+					stairs = singleStairs;
+					break;
+				}
+			}
+
+
 			for (Stairs singleStairs : topography.getStairs()) {
 				if (singleStairs.getShape().contains(getPosition())) {
 					stairs = singleStairs;
@@ -177,12 +187,35 @@ public class PedestrianOSM extends Pedestrian {
 
 			} else {
 				stairStepOptimizer = new StairStepOptimizer(stairs);
+
 				reachableArea = new VCircle(getPosition(), stairs.getTreadDepth() * 1.99);
 
-				refreshRelevantPedestrians();
-				nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
-				// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
-				// stairs @position: " + nextPosition);
+				Vector2D gradient = this.getTargetGradient(this.getNextPosition()).normalize(1);
+				Vector2D stairsVec = stairs.getAttributes().getUpwardDirection().rotate(Math.PI).normalize(1); // .
+
+				if (stairsVec.equals(gradient,0.4)){
+
+					refreshRelevantPedestrians();
+					nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
+					// Logger.getLogger(this.getClass()).info("Pedestrian " + this.getId() + " is on
+					// stairs @position: " + nextPosition);
+
+					nextPosition = stairStepOptimizer.getNextPosition(this, reachableArea);
+				}
+				else{
+
+					new StepCircleOptimizerDiscrete(0.0, new Random());
+					List<VPoint> positions = StepCircleOptimizerDiscrete.getReachablePositions(this, reachableArea, new Random());
+
+					this.nextPosition = stairStepOptimizer.getNextPositionNone(this, positions, reachableArea);
+
+				}
+
+
+
+
+
+
 			}
 		}
 
@@ -410,6 +443,9 @@ public class PedestrianOSM extends Pedestrian {
 		this.stepCircleOptimizer.clearMetricValues();
 		return values;
 	}
+
+
+
 
 	@Override
 	public PedestrianOSM clone() {
