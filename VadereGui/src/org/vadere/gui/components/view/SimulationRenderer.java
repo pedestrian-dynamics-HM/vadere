@@ -328,7 +328,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case INFECTION_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return adaptInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad());
+                    return adaptInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad(), pedestrian.getSusceptibility());
                 }
             }
 		    default: return model.config.getPedestrianColor();
@@ -336,12 +336,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	    }
     }
 
-    public Color adaptInfectionStatusColor(InfectionStatus infectionStatus, double absorbedPathogenLoad) {
+    public Color adaptInfectionStatusColor(InfectionStatus infectionStatus, double absorbedPathogenLoad, double susceptibility) {
         Color color = model.config.getInfectionStatusColor(infectionStatus);
 		boolean interpolateColors = true; // ToDo define as checkbox in settings dialog
 
 		double minAbsorbedPathogenLoad = 0;
-		double maxAbsorbedPathogenLoad = Math.pow(10, 3);
+		double maxAbsorbedPathogenLoad = susceptibility;
 		float t = (float) ((absorbedPathogenLoad - minAbsorbedPathogenLoad) / maxAbsorbedPathogenLoad);
 
 		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values

@@ -122,6 +122,7 @@ public class Pedestrian extends Agent {
 	public double getPathogenAbsorbedLoad() { return healthStatus.getPathogenAbsorbedLoad(); }
 	public VPoint getStartBreatheOutPosition() { return healthStatus.getStartBreatheOutPosition(); }
 	public boolean isBreathingIn() { return healthStatus.isBreathingIn(); }
+	public double getSusceptibility() { return healthStatus.getSusceptibility(); }
 	public LinkedList<Integer> getGroupIds() { return groupIds; }
 	public LinkedList<Integer> getGroupSizes() {
 		return groupSizes;
