@@ -28,6 +28,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
       "filename" : "pathogenConcentration.txt",
       "processors" : [ 7 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "infectionStatusPerPedestrian.txt",
+      "processors" : [ 8 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -59,6 +63,9 @@
         "gridResolution" : 0.5,
         "timeResolution" : 4.0
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
+      "id" : 8
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
