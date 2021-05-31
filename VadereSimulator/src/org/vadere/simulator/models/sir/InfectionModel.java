@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 import org.vadere.state.health.*;
 
@@ -43,7 +42,11 @@ public class InfectionModel extends AbstractSirModel {
 	private AttributesInfectionModel attributesInfectionModel;
 	double simTimeStepLength;
 	Topography topography;
+	int aerosolCloudIdCounter;
 
+	/**
+	 * Key that is used for initializeVadereContext in ScenarioRun
+	 */
 	public static final String simStepLength = "simTimeStepLength";
 
 	/*
@@ -76,6 +79,7 @@ public class InfectionModel extends AbstractSirModel {
 			this.attributesInfectionModel = Model.findAttributes(attributesList, AttributesInfectionModel.class);
 			this.topography = domain.getTopography();
 			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
+			this.aerosolCloudIdCounter = 1;
 	}
 
 	@Override
@@ -143,7 +147,7 @@ public class InfectionModel extends AbstractSirModel {
 		double radius = Math.sqrt(initialArea / Math.PI);
 		double height = 4.0 / 3.0 * radius;
 
-		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(ID_NOT_SET,
+		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(aerosolCloudIdCounter,
 				shape,
 				initialArea,
 				height,
@@ -153,6 +157,8 @@ public class InfectionModel extends AbstractSirModel {
 				attributesInfectionModel.getAerosolCloudHalfLife(),
 				pedestrian.emitPathogen(),
 				pedestrian.emitPathogen()));
+
+		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
 
 		return aerosolCloud;
 	}
