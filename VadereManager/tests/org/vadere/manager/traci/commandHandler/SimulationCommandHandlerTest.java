@@ -123,11 +123,10 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 
 			// set up control command
 			CompoundObject data = CompoundObjectBuilder.builder()
-					.add(TraCIDataType.INTEGER) // packet size
 					.add(TraCIDataType.STRING) // sending node
 					.add(TraCIDataType.STRING) // model name
 					.add(TraCIDataType.STRING) // command
-					.build(-1, "10", "RouteChoice" , "{'time': 8.0}");
+					.build("10", "RouteChoice" , "{'time': 8.0}");
 
 			TraCISetCommand cmd = (TraCISetCommand) getFirstCommand(TraCISetCommand.build(
 					TraCICmd.SET_SIMULATION_STATE, elementID, varID, varType, data));

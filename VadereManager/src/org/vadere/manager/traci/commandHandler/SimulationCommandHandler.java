@@ -211,10 +211,9 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		try {
 			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
 			//remoteManager.setSimCfg(cfg);
-			packet_size = (int) cfg.getData(0,TraCIDataType.INTEGER);
-			specify_id = Integer.parseInt((String) cfg.getData(1,TraCIDataType.STRING));
-			model_name = (String)  cfg.getData(2,TraCIDataType.STRING);
-			msg_content = (String) cfg.getData(3,TraCIDataType.STRING);
+			specify_id = Integer.parseInt((String) cfg.getData(0,TraCIDataType.STRING));
+			model_name = (String)  cfg.getData(1,TraCIDataType.STRING);
+			msg_content = (String) cfg.getData(2,TraCIDataType.STRING);
 
 			if (!iControlModelHashMap.containsKey(model_name)) {
 				logger.infof("Model" + model_name + " not found. Try to initialize from model name.");
