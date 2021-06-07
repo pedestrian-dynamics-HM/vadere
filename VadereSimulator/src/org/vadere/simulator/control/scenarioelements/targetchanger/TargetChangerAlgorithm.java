@@ -8,6 +8,7 @@ import org.vadere.state.scenario.TargetChanger;
 import org.vadere.state.scenario.TargetChangerAlgorithmType;
 import org.vadere.state.scenario.Topography;
 
+import java.util.Collection;
 import java.util.Random;
 
 public interface TargetChangerAlgorithm {
@@ -57,4 +58,5 @@ public interface TargetChangerAlgorithm {
 	 * Return true if targets have been changed, otherwise false
 	 */
 	boolean setAgentTargetList(Agent agent);
+
 }

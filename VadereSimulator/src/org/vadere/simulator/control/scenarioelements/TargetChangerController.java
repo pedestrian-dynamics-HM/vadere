@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -79,11 +80,29 @@ public class TargetChangerController {
                 continue;
             }
 
+
+
             if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
+
+                Collection<Agent> groupMembers = (Collection<Agent>) ((PedestrianOSM) agent).getRelevantPedestrians();
+                groupMembers.removeIf(p -> p==agent);
+
+                agent.setFollowers((LinkedList<Agent>) groupMembers);
+
+                for (Agent g : groupMembers) {
+                   g.setSingleTarget(agent.getId(),true);
+                }
+
                 logEnteringTimeOfAgent(agent, simTimeInSec);
                 changerAlgorithm.setAgentTargetList(agent);
                 notifyListenersTargetChangerAreaReached(agent);
+
                 processedAgents.put(agent.getId(), agent);
+                for (Agent g : groupMembers) {
+                    processedAgents.put(g.getId(),g);
+                }
+                int i =0;
+
             }
         }
     }
