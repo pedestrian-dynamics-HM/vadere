@@ -136,6 +136,15 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
+	public boolean isSimThreadAlive() {
+		if (currentSimulationThread == null)
+			return false;
+
+		return currentSimulationThread.isAlive();
+	}
+
+
+
 	public RemoteScenarioRun getRemoteSimulationRun() {
 		return currentSimulationRun;
 	}
@@ -199,4 +208,6 @@ public class RemoteManager implements RunnableFinishedListener {
 	public void setSimCfg(SimulationCfg simCfg) {
 		this.simCfg = simCfg;
 	}
+
+
 }
