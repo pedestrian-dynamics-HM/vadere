@@ -10,10 +10,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public abstract class Agent extends DynamicElement {
 

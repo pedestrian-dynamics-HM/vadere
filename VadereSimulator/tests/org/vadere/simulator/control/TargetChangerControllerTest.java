@@ -100,6 +100,46 @@ public class TargetChangerControllerTest {
         return pedestrians;
     }
 
+    private List<Pedestrian> createGroupOfPedestriansTargetT1(int startId) {
+        int seed = 0;
+        Random random = new Random(seed);
+
+        LinkedList<Integer> target= new LinkedList<>();
+        target.add(1);
+
+        LinkedList<Integer> groupId= new LinkedList<>();
+        groupId.add(42);
+
+        Pedestrian pedestrian1 = new Pedestrian(new AttributesAgent(startId), random);
+        pedestrian1.setPosition(new VPoint(5, 1));
+        pedestrian1.setTargets(target);
+        pedestrian1.setGroupIds(groupId);
+
+        Pedestrian pedestrian2 = new Pedestrian(new AttributesAgent(startId +  1), random);
+        pedestrian2.setPosition(new VPoint(1, 1));
+        pedestrian2.setTargets(target);
+        pedestrian2.setGroupIds(groupId);
+
+        LinkedList<Pedestrian> list1 = new LinkedList<>();
+        list1.add(pedestrian1);
+
+        LinkedList<Pedestrian> list2 = new LinkedList<>();
+        list2.add(pedestrian2);
+
+        pedestrian1.setAgentsInGroup(list2);
+        pedestrian2.setAgentsInGroup(list1);
+
+        // Watch out: Use an "ArrayList" to keep order and
+        // index 0 refers to pedestrian p1!
+        List<Pedestrian> pedestrians = new ArrayList<>();
+        pedestrians.add(pedestrian1);
+        pedestrians.add(pedestrian2);
+
+        return pedestrians;
+    }
+
+
+
     private List<Target> createTwoTargets() {
         boolean absorbing = true;
         AttributesTarget attributesTarget1 = new AttributesTarget(new VRectangle(7, 1, 2, 2), 1, absorbing);
@@ -453,6 +493,10 @@ public class TargetChangerControllerTest {
         assertListContainsSingleTarget(pedestrians.get(1).getTargets(), expectedTargetIdForPed2);
     }
 
+
+
+
+
     @Test
     public void updateModifiesFollowersIfTargetIsDynamic() {
         LinkedList<Integer> nextTarget = createIntegerList(1);
@@ -618,6 +662,7 @@ public class TargetChangerControllerTest {
 
     }
 
+
     private void assertListContainsSingleTarget(LinkedList<Integer> targetList, Integer targetId) {
         assertEquals(1, targetList.size());
         assertEquals(targetList.getFirst(), targetId);
@@ -631,6 +676,42 @@ public class TargetChangerControllerTest {
     private void assertListEqual(LinkedList<Integer> targetList, LinkedList<Integer> targetId) {
         assertEquals(targetList, targetId);
     }
+
+    @Test
+    public void updateChangesTargetGroup() {
+
+        Topography topography = new Topography();
+        List<Pedestrian> peds = createGroupOfPedestriansTargetT1(1);
+        List<Target> targs = createTwoTargets();
+
+        for (Pedestrian pedestrian : peds) {
+            topography.addElement(pedestrian);
+        }
+        for (Target target : targs) {
+            topography.addTarget(target);
+        }
+
+        LinkedList<Double> probability = new LinkedList<Double>(Arrays.asList(1.0));
+
+        AttributesTargetChanger attributesTargetChanger = createAttributesWithFixedRectangle();
+        attributesTargetChanger.setChangeAlgorithmType(TargetChangerAlgorithmType.SELECT_LIST);
+        attributesTargetChanger.setNextTarget(createIntegerList(2));
+        attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
+
+        TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
+        TargetChangerController controllerUnderTest = new TargetChangerController(topography, targetChanger, new Random(0));
+
+        assertEquals(peds.get(0).getNextTargetId(), 1);
+        assertEquals(peds.get(1).getNextTargetId(), 1);
+
+        controllerUnderTest.update(simTimeInSec);
+
+        assertEquals(peds.get(0).getNextTargetId(), 2);
+        assertEquals(peds.get(1).getNextTargetId(), 2);
+
+    }
+
+
 
 
 }
