@@ -7,6 +7,7 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.traci.TraCIException;
 import org.vadere.state.traci.TraCIExceptionInternal;
@@ -15,11 +16,15 @@ import org.vadere.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class acts as interface between the TraCI handling and the actual simulation. All
@@ -136,11 +141,22 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
-	public boolean isSimThreadAlive() {
-		if (currentSimulationThread == null)
-			return false;
+	public boolean isOutputWriting() {
 
-		return currentSimulationThread.isAlive();
+		List<OutputFile<?>> files = currentSimulationRun.getScenario().getDataProcessingJsonManager().getOutputFiles();
+		List<String> filesRequired = files.stream().map(f -> f.getFileName()).collect(Collectors.toList());
+
+		try {
+			List<Path> paths = Files.list(getRemoteSimulationRun().getOutputPath()).collect(Collectors.toList());
+			List<String> actualFiles = paths.stream().map(ff -> ff.getFileName().toString()).collect(Collectors.toList());
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		//TODO compare files
+
+		return false;
 	}
 
 

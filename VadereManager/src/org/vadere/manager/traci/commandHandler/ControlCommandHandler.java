@@ -12,7 +12,6 @@ import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.*;
 import org.vadere.manager.traci.response.*;
-import org.vadere.simulator.projects.SimulationResult;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -116,13 +115,15 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
 			logger.infof("Try to stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
 
-			if (! remoteManager.isSimThreadAlive()) {
-				logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
-				cmd.setResponse(TraCISimTimeResponse.simEndReached());
+			boolean writing = true;
+			while (writing) {
+				logger.info("Check");
+				writing = remoteManager.isOutputWriting();
 			}
-			else{
-				logger.infof("Cannot stop simulation at %f, because file writind has not finished yet.", stoppedAtTime);
-			}
+
+			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
+			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+
 		}
 
 		logger.debug("process_simStep done.");
