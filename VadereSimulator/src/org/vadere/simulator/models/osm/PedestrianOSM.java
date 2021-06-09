@@ -22,6 +22,7 @@ import org.vadere.state.scenario.Topography;
 ;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PedestrianOSM extends Pedestrian {
 
@@ -419,5 +420,23 @@ public class PedestrianOSM extends Pedestrian {
 	@Override
 	public String toString() {
 		return "id = " + getId() + " memory " + super.toString();
+	}
+
+	public LinkedList<Pedestrian> getPedGroupMembers(){
+
+		LinkedList<Pedestrian> peds = new LinkedList<>();
+		
+		if (this.getGroupIds() != null) {
+			if (this.getGroupIds().size() == 1) {
+				for (int i : getGroupIds()) {
+					Collection<Pedestrian> pp = getTopography().getPedestrianDynamicElements().getElements().stream().filter(p -> p.getGroupIds().getFirst() == i && p.getId() != getId()).collect(Collectors.toList());
+
+					for (Pedestrian ped : pp) {
+						peds.add(ped);
+					}
+				}
+			}
+		}
+		return peds;
 	}
 }
