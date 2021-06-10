@@ -88,6 +88,8 @@ public class Simulation implements ControllerProvider{
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
 
+	private boolean isFileWritingFinished;
+
 
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
 					  ICognitionModel cognitionModel, double startTimeInSec,
@@ -142,6 +144,8 @@ public class Simulation implements ControllerProvider{
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setDomain(domain);
 		}
+		// necessary to manage threads
+		this.isFileWritingFinished = false;
 	}
 
 	private void createControllers(Domain domain, MainModel mainModel, Random random) {
@@ -250,6 +254,9 @@ public class Simulation implements ControllerProvider{
 	 */
 	public void run() {
 		try {
+
+
+
 			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.setMainModel(mainModel);
 				processorManager.initOutputFiles();
@@ -348,7 +355,7 @@ public class Simulation implements ControllerProvider{
 
 				if (Thread.interrupted()) {
 					isRunSimulation = false;
-					simulationResult.setState("Simulation interrupted");
+					simulationResult.setState("Simulation interrupted.");
 					logger.info("Simulation interrupted.");
 				}
 			}
@@ -360,6 +367,8 @@ public class Simulation implements ControllerProvider{
 				processorManager.writeOutput();
 			}
 			logger.info("Finished writing all output files");
+			this.isFileWritingFinished = true;
+
 		}
 	}
 
@@ -583,5 +592,9 @@ public class Simulation implements ControllerProvider{
 	@Override
 	public ProcessorManager getProcessorManager() {
 		return processorManager;
+	}
+
+	public boolean isFileWritingFinished() {
+		return isFileWritingFinished;
 	}
 }

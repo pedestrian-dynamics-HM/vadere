@@ -205,6 +205,7 @@ public class ScenarioRun implements Runnable {
 			logger.info("Finally reached.");
 			doAfterSimulation();
 			VadereContext.remove(scenarioStore.getTopography().getContextId());
+
 		}
 	}
 
@@ -265,6 +266,12 @@ public class ScenarioRun implements Runnable {
 	public boolean isRunning() {
 		return simulation != null && simulation.isRunning();
 	}
+
+
+	public boolean isFileWritingFinished() {
+		return simulation.isFileWritingFinished();
+	}
+
 
 	public boolean isScenarioInSingleStepMode(){
 		return simulation != null && simulation.isSingleStepMode();

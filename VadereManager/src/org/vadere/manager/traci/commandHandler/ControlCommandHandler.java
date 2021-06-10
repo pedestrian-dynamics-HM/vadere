@@ -115,7 +115,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		// inform the TraCI client about this instead of giving it the Subscription results.
 		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
 			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
-
+/*
 			logger.info("Check whether data processor writing has finished.");
 			boolean writing = true;
 			int waitTime = 0;
@@ -130,11 +130,10 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
+*/
+			remoteManager.isFileWritingFinished();
 			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
-			cmd.setResponse(TraCISimTimeResponse.simEndReached());
-
-		}
+			cmd.setResponse(TraCISimTimeResponse.simEndReached()); }
 
 		logger.debug("process_simStep done.");
 		return cmd;

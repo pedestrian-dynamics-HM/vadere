@@ -116,17 +116,29 @@ public class RemoteManager implements RunnableFinishedListener {
 		return scenarioCache;
 	}
 
-	public boolean stopSimulationIfRunning() {
+	public boolean stopSimulationIfRunning(){
 		if (currentSimulationThread != null && currentSimulationThread.isAlive()) {
 			// todo: wait for currentSimulationThread to finish writing
 			// check if currentSimulationRun (RemoteScenarioRun)
 			// is in writing stage (sim is Finished but still writing data) Check this with enum or
 			// bool state like isRuning isPaused.
+
+			isFileWritingFinished();
+
 			currentSimulationThread.interrupt();
 			return true;
 		}
 
 		return false;
+	}
+
+	public boolean isFileWritingFinished(){
+		boolean isFileWriting = true;
+		while (isFileWriting) {
+			isFileWriting = !(currentSimulationRun.isFileWritingFinished());
+			logger.info("File writing active: " + isFileWriting);
+		}
+		return true;
 	}
 
 	public void addValueSubscription(Subscription sub) {
@@ -145,44 +157,6 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		return true;
 	}
-
-	public boolean hasOutputWritingFinished(int waitTime) {
-
-		try {
-			if (waitTime > 0) {
-				logger.info("Wait " + waitTime + "ms");
-				sleep(waitTime);
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		List<String> actualFiles = new ArrayList<>();
-
-		List<OutputFile<?>> files = currentSimulationRun.getScenario().getDataProcessingJsonManager().getOutputFiles();
-		List<String> filesRequired = files.stream().map(f -> f.getFileName()).collect(Collectors.toList());
-
-		try {
-			List<Path> paths = Files.list(getRemoteSimulationRun().getOutputPath()).collect(Collectors.toList());
-			actualFiles = paths.stream().map(ff -> ff.getFileName().toString()).collect(Collectors.toList());
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		filesRequired.removeAll(actualFiles);
-
-		if (filesRequired.size()==0){
-			logger.info("Output files succesfully written to disk.");
-		}
-		else{
-			logger.info("Output files being processed: " + filesRequired.toString());
-		}
-
-		return filesRequired.size() == 0;
-	}
-
-
 
 	public RemoteScenarioRun getRemoteSimulationRun() {
 		return currentSimulationRun;
