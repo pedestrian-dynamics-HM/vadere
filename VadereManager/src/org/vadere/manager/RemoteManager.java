@@ -1,5 +1,6 @@
 package org.vadere.manager;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
@@ -20,11 +21,11 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.lang.Thread.sleep;
 
 /**
  * This class acts as interface between the TraCI handling and the actual simulation. All
@@ -141,22 +142,40 @@ public class RemoteManager implements RunnableFinishedListener {
 		return true;
 	}
 
-	public boolean isOutputWriting() {
+	public boolean hasOutputWritingFinished(int waitTime) {
+
+		try {
+			if (waitTime > 0) {
+				logger.info("Wait " + waitTime + "ms");
+				sleep(waitTime);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		List<String> actualFiles = new ArrayList<>();
 
 		List<OutputFile<?>> files = currentSimulationRun.getScenario().getDataProcessingJsonManager().getOutputFiles();
 		List<String> filesRequired = files.stream().map(f -> f.getFileName()).collect(Collectors.toList());
 
 		try {
 			List<Path> paths = Files.list(getRemoteSimulationRun().getOutputPath()).collect(Collectors.toList());
-			List<String> actualFiles = paths.stream().map(ff -> ff.getFileName().toString()).collect(Collectors.toList());
+			actualFiles = paths.stream().map(ff -> ff.getFileName().toString()).collect(Collectors.toList());
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		//TODO compare files
+		filesRequired.removeAll(actualFiles);
 
-		return false;
+		if (filesRequired.size()==0){
+			logger.info("Output files succesfully written to disk.");
+		}
+		else{
+			logger.info("Output files being processed: " + filesRequired.toString());
+		}
+
+		return filesRequired.size() == 0;
 	}
 
 

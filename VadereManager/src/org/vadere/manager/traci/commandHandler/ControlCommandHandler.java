@@ -113,12 +113,14 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		// inform the TraCI client about this instead of giving it the Subscription results.
 		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
 			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
-			logger.infof("Try to stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
 
+
+			logger.info("Check whether data processor writing has finished.");
 			boolean writing = true;
+			int waitTime = 0;
 			while (writing) {
-				logger.info("Check");
-				writing = remoteManager.isOutputWriting();
+				writing = !(remoteManager.hasOutputWritingFinished(waitTime));
+				waitTime = 1;
 			}
 
 			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
