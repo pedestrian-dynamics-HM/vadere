@@ -2,7 +2,6 @@
   "name" : "infectionModel_bottleneck_ex1b",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "255d9084a926dfa26d050ace9515f01e012c2682",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -305,6 +304,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
+      "dropletClouds" : [ ],
       "sources" : [ {
         "id" : 3,
         "shape" : {

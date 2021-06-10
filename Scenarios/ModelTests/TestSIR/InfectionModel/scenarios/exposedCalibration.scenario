@@ -2,7 +2,6 @@
   "name" : "exposedCalibration",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "bae14a356aa077e6602e9c7a3206fef95cc19289",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -190,6 +189,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
+      "dropletClouds" : [ ],
       "sources" : [ {
         "id" : 15,
         "shape" : {

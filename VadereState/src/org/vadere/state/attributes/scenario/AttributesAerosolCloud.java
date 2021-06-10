@@ -12,58 +12,44 @@ import java.util.Arrays;
 /**
  * This class defines the attributes of an {@link AerosolCloud}.
  */
-public class AttributesAerosolCloud extends AttributesEmbedShape {
+public class AttributesAerosolCloud extends AttributesAerosolParticles {
 
-    private int id;
     private VShape shape;
     private double area;
     private double height;
     private VPoint center;
     private ArrayList<VPoint> vertices;
-    private double creationTime;
     private double halfLife;
-    private double initialPathogenLoad;
-    private double currentPathogenLoad;
 
     // Constructors
     public AttributesAerosolCloud() {
+        super();
         VPoint center = new VPoint(0, 0);
         double radius = 0.75;
-        this.id = AttributesEmbedShape.ID_NOT_SET;
         this.shape = new VCircle(center, radius);
         this.height = 1.0;
         this.area = radius * radius * Math.PI;
         this.center = center;
         this.vertices = new ArrayList<>(Arrays.asList(new VPoint(0, 0), new VPoint(0, 0)));
-        this.creationTime = -1;
-        this.halfLife = -1;
-        this.initialPathogenLoad = -1;
-        this.currentPathogenLoad = -1;
+        this.halfLife = 100;
     }
 
     public AttributesAerosolCloud(VShape shape, double creationTime){
-        this();
+        super(creationTime);
         this.shape = shape;
-        this.creationTime = creationTime;
     }
 
     public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad) {
-        this.id = id;
+        super(id, creationTime, initialPathogenLoad, currentPathogenLoad);
         this.shape = shape;
         this.area = area;
         this.height = height;
         this.center = center;
         this.vertices = vertices;
-        this.creationTime = creationTime;
         this.halfLife = halfLife;
-        this.initialPathogenLoad = initialPathogenLoad;
-        this.currentPathogenLoad = currentPathogenLoad;
     }
 
     // Getter
-    public int getId() { return id; }
-
-    @Override
     public VShape getShape() {
         return shape;
     }
@@ -84,29 +70,9 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
         return vertices;
     }
 
-    public double getCreationTime() {
-        return creationTime;
-    }
-
-    public double getHalfLife() {
-        return halfLife;
-    }
-
-    public double getInitialPathogenLoad() {
-        return initialPathogenLoad;
-    }
-
-    public double getCurrentPathogenLoad() {
-        return currentPathogenLoad;
-    }
+    public double getHalfLife() { return halfLife; }
 
     // Setter
-    public void setId(int id) {
-        checkSealed();
-        this.id = id;
-    }
-
-    @Override
     public void setShape(VShape shape) {
         this.shape = shape;
     }
@@ -121,13 +87,5 @@ public class AttributesAerosolCloud extends AttributesEmbedShape {
 
     public void setVertices(ArrayList<VPoint> vertices) {
         this.vertices = vertices;
-    }
-
-    public void setCreationTime(double creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public void setCurrentPathogenLoad(double currentPathogenLoad) {
-        this.currentPathogenLoad = currentPathogenLoad;
     }
 }

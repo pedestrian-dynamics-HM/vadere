@@ -2,7 +2,6 @@
   "name" : "infectionModel_queue_small_ex2",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "fcce04694e1f2117bc0550cc61b385f2382a6ded",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -276,6 +275,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
+      "dropletClouds" : [ ],
       "sources" : [ {
         "id" : 1,
         "shape" : {

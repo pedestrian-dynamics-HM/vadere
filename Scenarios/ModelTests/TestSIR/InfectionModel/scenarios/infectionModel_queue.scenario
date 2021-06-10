@@ -345,6 +345,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
+      "dropletClouds" : [ ],
       "sources" : [ {
         "id" : 6,
         "shape" : {

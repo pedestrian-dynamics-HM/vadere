@@ -26,7 +26,7 @@ import static org.vadere.util.opencl.CLDemo.logger;
  *     concentration</li>
  * </ul>
  */
-public class AerosolCloud extends ScenarioElement {
+public class AerosolCloud extends AerosolParticles {
 
     private AttributesAerosolCloud attributes;
 
@@ -55,7 +55,7 @@ public class AerosolCloud extends ScenarioElement {
         return attributes.getArea();
     }
 
-    public double getHeigth() {
+    public double getHeight() {
         return attributes.getHeight();
     }
 

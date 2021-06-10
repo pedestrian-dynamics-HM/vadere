@@ -11,11 +11,9 @@ import org.vadere.state.attributes.models.AttributesInfectionModel;
 import org.vadere.state.attributes.models.InfectionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesDropletCloud;
 import org.vadere.state.health.InfectionStatus;
-import org.vadere.state.scenario.AerosolCloud;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.*;
 
 import java.awt.geom.*;
@@ -24,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
+import static org.vadere.state.scenario.DropletCloud.createTransformedDropletCloudShape;
+
 import org.vadere.state.health.*;
 
 /**
@@ -100,20 +100,34 @@ public class InfectionModel extends AbstractSirModel {
 	public void update(double simTimeInSec) {
 		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 
+		executePathogenEmissionEvents(simTimeInSec);
 		updateAerosolClouds(simTimeInSec);
+		updateDropletClouds(simTimeInSec);
 		updatePedestrians(simTimeInSec);
 	}
 
+	public void executePathogenEmissionEvents(double simTimeInSec) {
+		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
+		for (Pedestrian pedestrian : infectedPedestrians) {
+			// ... for each user-defined event
+			createAerosolClouds(simTimeInSec, pedestrian);
+			createDropletClouds(simTimeInSec, pedestrian);
+		}
+	}
+
 	public void updateAerosolClouds(double simTimeInSec) {
-		createAerosolClouds(simTimeInSec);
 		updateAerosolCloudsPathogenLoad(simTimeInSec);
 		updateAerosolCloudsExtent();
 		deleteExpiredAerosolClouds();
 	}
 
-	public void createAerosolClouds(double simTimeInSec) {
-		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
-		for (Pedestrian pedestrian : infectedPedestrians) {
+	public void updateDropletClouds(double simTimeInSec) {
+		// dropletCloudPathogenLoad remains unchanged until deletion
+		deleteExpiredDropletClouds(simTimeInSec);
+	}
+
+	public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
+
 			if (pedestrian.isStartingBreatheOut()) {
 				pedestrian.setStartBreatheOutPosition(pedestrian.getPosition());
 
@@ -127,7 +141,6 @@ public class InfectionModel extends AbstractSirModel {
 				// reset pedestrian's startBreatheOutPosition
 				pedestrian.setStartBreatheOutPosition(null);
 			}
-		}
 	}
 
 	private AerosolCloud generateAerosolCloud(double simTimeInSec, Pedestrian pedestrian, VPoint v1, VPoint v2) {
@@ -161,6 +174,30 @@ public class InfectionModel extends AbstractSirModel {
 		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
 
 		return aerosolCloud;
+	}
+
+	private void createDropletClouds(double simTimeInSec, Pedestrian pedestrian) {
+		/**
+		 * Parameters for JSON // ToDo integrate these parameters in attributesInfectionModel
+		 */
+		double dropletExhalationFrequency = 10.0; // droplets are exhaled every 10 sec
+		double radius = 1.5;
+		double openingAngleInRad = Math.toRadians(45.0);
+		double lifeTime = 2.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
+		double emittedPathogenLoad = pedestrian.getSusceptibility();
+
+		if (simTimeInSec % dropletExhalationFrequency <= simTimeStepLength) {
+
+			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), pedestrian.getVelocity(), radius, openingAngleInRad);
+
+			DropletCloud dropletCloud = new DropletCloud(new AttributesDropletCloud(1,
+					shape,
+					simTimeInSec,
+					lifeTime,
+					emittedPathogenLoad));
+
+			topography.addDropletCloud(dropletCloud);
+		}
 	}
 
 	public void updateAerosolCloudsPathogenLoad(double simTimeInSec) {
@@ -202,10 +239,22 @@ public class InfectionModel extends AbstractSirModel {
 		}
 	}
 
+	public void deleteExpiredDropletClouds(double simTimeInSec) {
+		Collection<DropletCloud> dropletCloudsToBeDeleted = topography.getDropletClouds()
+				.stream()
+				.filter(d -> d.getLifeTime() + d.getCreationTime() < simTimeInSec)
+				.collect(Collectors.toSet());
+		for (DropletCloud dropletCloud : dropletCloudsToBeDeleted) {
+			topography.getDropletClouds().remove(dropletCloud);
+		}
+	}
+
 	public void updatePedestrians(double simTimeInSec) {
+		updatePedsPathogenLoad();
+		updatePedsHealthStatus(simTimeInSec);
+	}
 
-		updatePedPathogenLoad();
-
+	private void updatePedsHealthStatus(double simTimeInSec) {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
 			pedestrian.updateInfectionStatus(simTimeInSec);
@@ -213,25 +262,49 @@ public class InfectionModel extends AbstractSirModel {
 		}
 	}
 
-	private void updatePedPathogenLoad() {
+	private void updatePedsPathogenLoad() {
+		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
+				.getElements()
+				.stream()
+				.filter(Pedestrian::isBreathingIn)
+				.collect(Collectors.toSet());
+
+		pathogenFromAerosolClouds(breathingInPeds);
+
+		pathogenFromDropletClouds(breathingInPeds);
+	}
+
+	private void pathogenFromAerosolClouds(Collection<Pedestrian> breathingInPeds) {
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
 		double timeNormalizationConst = simTimeStepLength / (attributesInfectionModel.getPedestrianRespiratoryCyclePeriod() / 2.0);
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
-			Collection<Pedestrian> breathingInPedsInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud)
+			Collection<Pedestrian> breathingInPedsInAerosolCloud = breathingInPeds
 					.stream()
-					.filter(Pedestrian::isBreathingIn)
+					.filter(p -> aerosolCloud.getShape().contains(p.getPosition()))
 					.collect(Collectors.toSet());
 
-			for (Pedestrian pedestrian : breathingInPedsInsideCloud) {
-				double volume = aerosolCloud.getHeigth() * aerosolCloud.getArea();
+			for (Pedestrian ped : breathingInPedsInAerosolCloud) {
+				double volume = aerosolCloud.getHeight() * aerosolCloud.getArea();
 				double meanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / volume;
 				// assumption: the pathogen is distributed uniformly within the aerosolCloud
 				// alternatively, calculate the level according to a gaussian distribution with	and multiply with the
 				// meanPathogenConcentration
 				// double pathogenLevelAtPosition = aerosolCloud.calculatePathogenLevelAtPosition(pedestrian.getPosition());
+				ped.absorbPathogen(meanPathogenConcentration * timeNormalizationConst);
+			}
+		}
+	}
 
-				pedestrian.absorbPathogen(meanPathogenConcentration * timeNormalizationConst);
+	private void pathogenFromDropletClouds(Collection<Pedestrian> breathingInPeds) {
+		Collection<DropletCloud> allDropletClouds = topography.getDropletClouds();
+		for (DropletCloud dropletCloud : allDropletClouds) {
+			Collection<Pedestrian> breathingInPedsInDropletCloud = breathingInPeds
+					.stream()
+					.filter(p -> dropletCloud.getShape().contains(p.getPosition()))
+					.collect(Collectors.toSet());
+			for (Pedestrian ped : breathingInPedsInDropletCloud) {
+				ped.absorbPathogen(dropletCloud.getCurrentPathogenLoad());
 			}
 		}
 	}
