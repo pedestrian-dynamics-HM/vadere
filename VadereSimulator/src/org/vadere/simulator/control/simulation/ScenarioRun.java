@@ -202,6 +202,7 @@ public class ScenarioRun implements Runnable {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			simulationResult.stopTime();
+			logger.info("Finally reached.");
 			doAfterSimulation();
 			VadereContext.remove(scenarioStore.getTopography().getContextId());
 		}
