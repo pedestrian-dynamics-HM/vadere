@@ -16,8 +16,6 @@ import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
 
-import static java.lang.Thread.sleep;
-
 /**
  * Handel {@link org.vadere.manager.traci.commands.TraCICommand}s for the Control API
  */
@@ -115,22 +113,6 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		// inform the TraCI client about this instead of giving it the Subscription results.
 		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
 			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
-/*
-			logger.info("Check whether data processor writing has finished.");
-			boolean writing = true;
-			int waitTime = 0;
-			while (writing) {
-				writing = !(remoteManager.hasOutputWritingFinished(waitTime));
-				waitTime = 1;
-			}
-
-			logger.info("Wait additional time: 1000ms");
-			try {
-				sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-*/
 			remoteManager.isFileWritingFinished();
 			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
 			cmd.setResponse(TraCISimTimeResponse.simEndReached()); }
