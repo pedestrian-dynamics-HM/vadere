@@ -141,7 +141,7 @@ public class SettingsDialog extends JDialog {
 				.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
 
 		FormLayout colorSettingsLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
-				createCellsWithSeparators(8)); // rows
+				createCellsWithSeparators(9)); // rows
 		colorSettingsPane.setLayout(colorSettingsLayout);
 
 		// For each scenario element, add a color preview canvas and a button to change the color.
@@ -157,6 +157,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAerosolCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDropletCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 
 		createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
 	}
@@ -230,6 +231,14 @@ public class SettingsDialog extends JDialog {
 		bAerosolCloudColor.addActionListener(new ActionSetAerosolCloudColor("Set Aerosol Cloud Color", model, pAerosolCloudColor));
 		colorSettingsPane.add(pAerosolCloudColor, cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(bAerosolCloudColor, cc.xy(column3, row));
+
+		final JButton bDropletCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pDropletCloudColor = new JPanel();
+		pDropletCloudColor.setBackground(model.config.getDropletCloudColor());
+		pDropletCloudColor.setPreferredSize(new Dimension(130, 20));
+		bDropletCloudColor.addActionListener(new ActionSetDropletCloudColor("Set Droplet Cloud Color", model, pDropletCloudColor));
+		colorSettingsPane.add(pDropletCloudColor, cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(bDropletCloudColor, cc.xy(column3, row));
 	}
 
 	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
@@ -432,6 +441,7 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
 		JCheckBox chShowAerosolClouds = new JCheckBox((Messages.getString("SettingsDialog.chbShowAerosolClouds.text")));
+		JCheckBox chShowDropletClouds = new JCheckBox((Messages.getString("SettingsDialog.chbShowDropletClouds.text")));
 		JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
@@ -486,6 +496,11 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
+		chShowDropletClouds.setSelected(model.config.isShowDropletClouds());
+		chShowDropletClouds.addItemListener(e -> {
+			model.config.setShowDropletClouds(!model.config.isShowDropletClouds());
+			model.notifyObservers();
+		});
 
 		chShowMeasurementAreas.setSelected(model.config.isShowMeasurementArea());
 		chShowMeasurementAreas.addItemListener(e -> {
@@ -534,6 +549,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowPedestrianInOutGroup, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowAerosolClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
+		otherSettingsPane.add(chShowDropletClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
 		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
 		chChowLogo.setSelected(model.config.isShowLogo());

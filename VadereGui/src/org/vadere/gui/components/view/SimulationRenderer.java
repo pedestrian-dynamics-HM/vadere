@@ -112,6 +112,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
         }
 
+        if (model.config.isShowDropletClouds()) {
+            // ToDo use renderScenarioElement() instead?
+            renderDropletClouds(model.getTopography().getDropletClouds(), graphics, model.config.getDropletCloudColor());
+        }
+
         if (model.config.isShowSources()) {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
         }
