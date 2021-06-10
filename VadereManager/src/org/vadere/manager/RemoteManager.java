@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
 
 /**
@@ -133,10 +134,19 @@ public class RemoteManager implements RunnableFinishedListener {
 	}
 
 	public boolean isFileWritingFinished(){
+
 		boolean isFileWriting = true;
+		long time = currentTimeMillis();
+
 		while (isFileWriting) {
 			isFileWriting = !(currentSimulationRun.isFileWritingFinished());
-			logger.info("File writing active: " + isFileWriting);
+
+			// inform user every 5 seconds
+			if ((currentTimeMillis() - time) > 5000) {
+				time = currentTimeMillis();
+
+				logger.info("Wait for the data processors in the >simulation thread< to finish writing.\n");
+			}
 		}
 		return true;
 	}
