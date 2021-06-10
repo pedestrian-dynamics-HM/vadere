@@ -118,6 +118,10 @@ public class RemoteManager implements RunnableFinishedListener {
 
 	public boolean stopSimulationIfRunning() {
 		if (currentSimulationThread != null && currentSimulationThread.isAlive()) {
+			// todo: wait for currentSimulationThread to finish writing
+			// check if currentSimulationRun (RemoteScenarioRun)
+			// is in writing stage (sim is Finished but still writing data) Check this with enum or
+			// bool state like isRuning isPaused.
 			currentSimulationThread.interrupt();
 			return true;
 		}
