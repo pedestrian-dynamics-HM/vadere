@@ -17,7 +17,8 @@ public enum ScenarioElementType {
 	TELEPORTER(Color.GRAY, AttributesTeleporter.class),
 	CAR(Color.black, AttributesCar.class),
 	MEASUREMENT_AREA(Color.red, AttributesMeasurementArea.class),
-	AEROSOL_CLOUD(Color.YELLOW, AttributesAerosolCloud.class);
+	AEROSOL_CLOUD(Color.YELLOW, AttributesAerosolCloud.class),
+	DROPLET_CLOUD(Color.YELLOW, AttributesDropletCloud.class);
 
 	private Color color;
 	private Class<? extends Attributes> clazz;

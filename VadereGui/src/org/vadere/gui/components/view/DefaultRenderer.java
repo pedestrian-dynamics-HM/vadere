@@ -298,8 +298,33 @@ public abstract class DefaultRenderer {
 		float minAlpha = 10; //defaultModel.getConfig().getAerosolCloudAlphaMin()
 		double initialVolume = 4.0 / 3.0 * Math.pow(0.5, 3) * Math.PI;
 		double maxPathogenConcentration = cloud.getInitialPathogenLoad() / initialVolume;
-		double currentPathogenConcentration = cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeigth());
+		double currentPathogenConcentration = cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeight());
 		int currentAlpha = (int) ((currentPathogenConcentration / maxPathogenConcentration) * (maxAlpha - minAlpha) + minAlpha);
+
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
+		if (cloud.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) cloud.getShape();
+			if (p.getPoints().size() == 2){
+				graphics.setStroke(new BasicStroke(3*getLineWidth()));
+				graphics.draw(p);
+			}
+		}
+		fill(element.getShape(), graphics);
+
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderDropletClouds(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+									   final Color color){
+		for (ScenarioElement e : elements){
+			renderDropletCloud(e, g, color);
+		}
+	}
+
+	protected void renderDropletCloud(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		DropletCloud cloud = (DropletCloud) element;
+		int currentAlpha = 100;
 
 		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
 		if (cloud.getShape() instanceof VPolygon){
