@@ -36,9 +36,9 @@ public class VadereSingleClientServer extends AbstractVadereServer {
 				}
 			}
 
-			Thread t = new Thread(handler);
-			t.start();
-			t.join();
+			Thread traciThread = new Thread(handler);
+			traciThread.start();
+			traciThread.join();
 
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
