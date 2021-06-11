@@ -119,36 +119,12 @@ public class RemoteManager implements RunnableFinishedListener {
 
 	public boolean stopSimulationIfRunning(){
 		if (currentSimulationThread != null && currentSimulationThread.isAlive()) {
-			// todo: wait for currentSimulationThread to finish writing
-			// check if currentSimulationRun (RemoteScenarioRun)
-			// is in writing stage (sim is Finished but still writing data) Check this with enum or
-			// bool state like isRuning isPaused.
-
-			isFileWritingFinished();
-
+			logger.errorf("kill simulation thread");
 			currentSimulationThread.interrupt();
 			return true;
 		}
 
 		return false;
-	}
-
-	public boolean isFileWritingFinished(){
-
-		boolean isFileWriting = true;
-		long time = currentTimeMillis();
-
-		while (isFileWriting) {
-			isFileWriting = !(currentSimulationRun.isFileWritingFinished());
-
-			// inform user every 5 seconds
-			if ((currentTimeMillis() - time) > 5000) {
-				time = currentTimeMillis();
-
-				logger.info("Wait for the data processors in the >simulation thread< to finish writing.\n");
-			}
-		}
-		return true;
 	}
 
 	public void addValueSubscription(Subscription sub) {
@@ -179,6 +155,10 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		currentSimulationRun.nextStep(simTime);
 		return true;
+	}
+
+	public void waitForSimulationEnd(){
+		currentSimulationRun.waitForSimulationEnd();
 	}
 
 	public double getSimulationStoppedEarlyAtTime(){

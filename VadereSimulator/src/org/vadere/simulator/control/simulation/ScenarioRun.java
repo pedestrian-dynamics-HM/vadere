@@ -202,7 +202,7 @@ public class ScenarioRun implements Runnable {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			simulationResult.stopTime();
-			logger.info("Finally reached.");
+			logger.info("Simulation run finished.");
 			doAfterSimulation();
 			VadereContext.remove(scenarioStore.getTopography().getContextId());
 
@@ -267,10 +267,6 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isRunning();
 	}
 
-
-	public boolean isFileWritingFinished() {
-		return simulation.isFileWritingFinished();
-	}
 
 
 	public boolean isScenarioInSingleStepMode(){

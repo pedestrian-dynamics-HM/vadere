@@ -3,6 +3,7 @@ package org.vadere.manager;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.simulator.control.simulation.RemoteRunListener;
 import org.vadere.simulator.control.simulation.ScenarioRun;
+import org.vadere.simulator.control.simulation.SimThreadState;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
@@ -14,10 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener {
 
-	private final Object waitForLoopEnd;
+	private final Object waitForSimStepLoopEnd;
 	private final ReentrantLock lock;
 	private List<Subscription> subscriptions;
-	private boolean lastSimulationStep;
 	private double simulationStoppedEarlyAtTime;
 
 
@@ -25,18 +25,20 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		// overwriteTimestampSetting. In RemoteScenarioRun the caller defines where the output should go.
 		super(scenario, outputDir.toString(), true,scenarioFinishedListener, scenarioPath, scenarioCache);
 		this.singleStepMode = true;
-		this.waitForLoopEnd = new Object();
+		this.waitForSimStepLoopEnd = new Object();
 		this.lock = new ReentrantLock();
-		this.lastSimulationStep = false;
 		this.simulationStoppedEarlyAtTime = Double.MAX_VALUE;
 		addRemoteManagerListener(this);
 	}
 
 	synchronized public boolean accessState(RemoteManager remoteManager, StateAccessHandler stateAccessHandler) {
 		try {
+			if (!simulation.getThreadState().equals(SimThreadState.MAIN_LOOP)){
+				throw new TraCIException("Invalid access to simulation state. Simulation thread in state %s", simulation.getThreadState().name());
+			}
 			if (!isWaitForSimCommand()) {
-				synchronized (waitForLoopEnd) {
-					waitForLoopEnd.wait();
+				synchronized (waitForSimStepLoopEnd) {
+					waitForSimStepLoopEnd.wait();
 				}
 			}
 			lock.lock();
@@ -51,6 +53,14 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		return true;
 	}
 
+	synchronized public void waitForSimulationEnd(){
+		try {
+			waitForSimStepLoopEnd.wait();
+		} catch (InterruptedException e) {
+			logger.errorf("Interrupted while waiting for simulation thread to finish post loop");
+		}
+	}
+
 	synchronized public void nextStep(double simTime) {
 		try {
 			lock.lock();
@@ -62,27 +72,22 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 	}
 
 	@Override
-	public void simulationStepFinishedListener() {
-		synchronized (waitForLoopEnd) {
-			waitForLoopEnd.notify();
+	public void notifySimStepListener() {
+		synchronized (waitForSimStepLoopEnd) {
+			waitForSimStepLoopEnd.notify();
 		}
 	}
 
 	@Override
-	public void lastSimulationStepFinishedListener() {
-		synchronized (waitForLoopEnd) {
-			lastSimulationStep = true;
-			waitForLoopEnd.notify();
+	public void notifySimulationEndListener() {
+		synchronized (waitForSimStepLoopEnd) {
+			waitForSimStepLoopEnd.notify();
 		}
 	}
 
 	@Override
 	public void simulationStoppedEarlyListener(double time) {
 		simulationStoppedEarlyAtTime = time;
-	}
-
-	public boolean isLastSimulationStep() {
-		return lastSimulationStep;
 	}
 
 	public double getSimulationStoppedEarlyAtTime() {
