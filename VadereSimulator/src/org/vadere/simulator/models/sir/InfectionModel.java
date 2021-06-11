@@ -44,6 +44,10 @@ public class InfectionModel extends AbstractSirModel {
 	Topography topography;
 	int aerosolCloudIdCounter;
 
+	private Map<Integer, VPoint> lastPedestrianPositions;
+	private Map<Integer, Vector2D> viewingDirections;
+	private static final double MIN_STEP_LENGTH = 0.1;
+
 	/**
 	 * Key that is used for initializeVadereContext in ScenarioRun
 	 */
@@ -80,6 +84,8 @@ public class InfectionModel extends AbstractSirModel {
 			this.topography = domain.getTopography();
 			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
 			this.aerosolCloudIdCounter = 1;
+			this.viewingDirections = new HashMap<>();
+			this.lastPedestrianPositions = new HashMap<>();
 	}
 
 	@Override
@@ -177,18 +183,37 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	private void createDropletClouds(double simTimeInSec, Pedestrian pedestrian) {
-		/**
+		/*
 		 * Parameters for JSON // ToDo integrate these parameters in attributesInfectionModel
 		 */
 		double dropletExhalationFrequency = 10.0; // droplets are exhaled every 10 sec
 		double radius = 1.5;
 		double openingAngleInRad = Math.toRadians(45.0);
-		double lifeTime = 2.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
-		double emittedPathogenLoad = pedestrian.getSusceptibility();
+		double lifeTime = 1.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
+		double emittedPathogenLoad = pedestrian.getSusceptibility() / attributesInfectionModel.getPedestrianPathogenAbsorptionRate();
+
+		// ToDo: remove this quick solution; it would be better to have the walking directions stored in pedestrian
+		int pedestrianId = pedestrian.getId();
+		Vector2D viewingDirection;
+		VPoint currentPosition = pedestrian.getPosition();
+		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
+		if (lastPedestrianPositions.get(pedestrianId) == null) {
+			viewingDirection = new Vector2D(Math.random(), Math.random());
+		} else {
+			if (lastPosition.distance(currentPosition) < MIN_STEP_LENGTH) {
+				viewingDirection = viewingDirections.get(pedestrianId);
+			} else {
+				viewingDirection = new Vector2D(currentPosition.getX() - lastPosition.getX(),
+						currentPosition.getY() - lastPosition.getY());
+			}
+		}
+		viewingDirection.normalize(1);
+		viewingDirections.put(pedestrianId, viewingDirection);
+		lastPedestrianPositions.put(pedestrianId, currentPosition);
 
 		if (simTimeInSec % dropletExhalationFrequency <= simTimeStepLength) {
 
-			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), pedestrian.getVelocity(), radius, openingAngleInRad);
+			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), viewingDirection, radius, openingAngleInRad);
 
 			DropletCloud dropletCloud = new DropletCloud(new AttributesDropletCloud(1,
 					shape,

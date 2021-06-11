@@ -111,7 +111,7 @@ public class DropletCloud extends AerosolParticles {
         }
         path.closePath();
         VShape polygon = new VPolygon(path);
-        double theta = direction.angleTo(origin); // get orientation of shape
+        double theta = direction.angleToZero(); // get orientation of shape
 
         AffineTransform transform = new AffineTransform();
         transform.translate(origin.x, origin.y);
