@@ -83,6 +83,15 @@ public class TargetChangerController  extends ScenarioElementController  {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
                 changerAlgorithm.setAgentTargetList(agent);
                 notifyListenersTargetChangerAreaReached(agent);
+
+                if (agent instanceof Pedestrian){
+                    Pedestrian p = (Pedestrian) agent;
+                    if (p.isAgentsInGroup()) {
+                        for (Pedestrian ped : p.getPedGroupMembers()) {
+                            processedAgents.put(ped.getId(), ped);
+                        }
+                    }
+                }
                 processedAgents.put(agent.getId(), agent);
             }
         }
