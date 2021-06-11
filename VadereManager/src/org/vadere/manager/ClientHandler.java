@@ -77,7 +77,8 @@ public class ClientHandler implements Runnable {
 				}
 
 			}
-		} finally {
+		}
+		finally {
 			traCISocket.close();
 			remoteManager.stopSimulationIfRunning();
 			cmdExecutor = null;
