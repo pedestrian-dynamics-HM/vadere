@@ -248,8 +248,14 @@ public class Simulation implements ControllerProvider{
 		logger.info("Finished writing all output files");
 
 		// Notify remoteManger that simulation ended.
-		setWaitForSimCommand(false); // its save to read the state now.
-		remoteRunListeners.forEach(RemoteRunListener::notifySimulationEndListener);
+		logger.info("Post-loop: before waitForTraci");
+
+		if (singleStepMode) {
+			synchronized (this){
+				waitForTraci();
+			}
+		}
+		logger.info("Post-loop: finished.");
 	}
 
 	/**
@@ -257,7 +263,6 @@ public class Simulation implements ControllerProvider{
 	 */
 	public void run() {
 		try {
-
 
 
 			if (attributesSimulation.isWriteSimulationData()) {
@@ -330,19 +335,7 @@ public class Simulation implements ControllerProvider{
 						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
 						if (timeReached || simulateUntilInSec == -1){
 							logger.debugf("Simulated until: %.4f", simTimeInSec);
-
-							setWaitForSimCommand(true);
-							remoteRunListeners.forEach(RemoteRunListener::notifySimStepListener);
-							while (isWaitForSimCommand()){
-								logger.debugf("wait for next SimCommand...");
-								try {
-									wait();
-								} catch (InterruptedException e) {
-									setWaitForSimCommand(false);
-									Thread.currentThread().interrupt();
-									logger.warn("interrupt while waitForSimCommand");
-								}
-							}
+							waitForTraci();
 						}
 					}
 				}
@@ -369,6 +362,35 @@ public class Simulation implements ControllerProvider{
 			threadState = SimThreadState.POST_LOOP;
 			postLoop();
 			threadState = SimThreadState.FINISHED;
+		}
+	}
+
+	private void waitForTraci()  {
+
+
+		setWaitForSimCommand(true);
+
+		if (threadState.equals(SimThreadState.MAIN_LOOP)){
+			remoteRunListeners.forEach(RemoteRunListener::notifySimStepListener);
+		}
+		else if (threadState.equals(SimThreadState.POST_LOOP))
+		{
+			remoteRunListeners.forEach(RemoteRunListener::notifySimulationEndListener);
+		}
+		else{
+			logger.errorf("Wrong thread state: %s ", threadState);
+			return;
+		}
+
+		while (isWaitForSimCommand()){
+			logger.debugf("wait for next SimCommand...");
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				setWaitForSimCommand(false);
+				Thread.currentThread().interrupt();
+				logger.warn("interrupt while waitForSimCommand");
+			}
 		}
 	}
 

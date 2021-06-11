@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
+import org.vadere.simulator.control.simulation.SimThreadState;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
@@ -94,6 +95,10 @@ public class RemoteManager implements RunnableFinishedListener {
 		currentSimulationRun = new RemoteScenarioRun(scenario, outputDir, this, scenarioPath, scenarioCache);
 	}
 
+	public SimThreadState getCurrentSimThreadState(){
+		return currentSimulationRun.getCurrentSimThreadState();
+	}
+
 	public void loadScenario(String scenarioString) {
 		loadScenario(scenarioString, null);
 	}
@@ -138,7 +143,6 @@ public class RemoteManager implements RunnableFinishedListener {
 	public boolean accessState(StateAccessHandler stateAccessHandler) {
 		if (currentSimulationRun == null)
 			return false;
-
 		currentSimulationRun.accessState(this, stateAccessHandler);
 
 		return true;
@@ -155,6 +159,10 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		currentSimulationRun.nextStep(simTime);
 		return true;
+	}
+
+	public void notifySimulationThread(){
+		currentSimulationRun.notifySimulationThread();
 	}
 
 	public void waitForSimulationEnd(){

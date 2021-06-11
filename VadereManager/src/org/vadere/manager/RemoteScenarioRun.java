@@ -33,15 +33,15 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 
 	synchronized public boolean accessState(RemoteManager remoteManager, StateAccessHandler stateAccessHandler) {
 		try {
-			if (!simulation.getThreadState().equals(SimThreadState.MAIN_LOOP)){
-				throw new TraCIException("Invalid access to simulation state. Simulation thread in state %s", simulation.getThreadState().name());
-			}
 			if (!isWaitForSimCommand()) {
 				synchronized (waitForSimStepLoopEnd) {
 					waitForSimStepLoopEnd.wait();
 				}
 			}
 			lock.lock();
+			if (!checkValidThreadState()){
+				throw new TraCIException("Invalid access to simulation state. Simulation thread in state %s", simulation.getThreadState().name());
+			}
 			stateAccessHandler.execute(remoteManager, getSimulationState());
 
 		} catch (InterruptedException e) {
@@ -53,9 +53,20 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		return true;
 	}
 
+	synchronized public SimThreadState  getCurrentSimThreadState(){
+		if (simulation == null){
+			return SimThreadState.INIT;
+		}
+		return simulation.getThreadState();
+	}
+
+
 	synchronized public void waitForSimulationEnd(){
 		try {
-			waitForSimStepLoopEnd.wait();
+			synchronized (waitForSimStepLoopEnd) {
+				waitForSimStepLoopEnd.wait();
+			}
+
 		} catch (InterruptedException e) {
 			logger.errorf("Interrupted while waiting for simulation thread to finish post loop");
 		}
@@ -70,6 +81,11 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 			lock.unlock();
 		}
 	}
+
+	synchronized public void notifySimulationThread(){
+		nextStep(-1);
+	}
+
 
 	@Override
 	public void notifySimStepListener() {

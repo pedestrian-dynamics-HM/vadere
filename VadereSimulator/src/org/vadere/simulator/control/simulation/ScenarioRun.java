@@ -282,6 +282,13 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isWaitForSimCommand();
 	}
 
+	public boolean checkValidThreadState(){
+		if (simulation == null){
+			return false;
+		}
+		return SimThreadState.MAIN_LOOP.equals(simulation.getThreadState()) || SimThreadState.POST_LOOP.equals(simulation.getThreadState());
+	}
+
 	public void nextSimCommand(double simulateUntilInSec){
 
 		if ( !simulation.isSingleStepMode())

@@ -12,6 +12,7 @@ import org.vadere.manager.traci.commandHandler.variables.ControlVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.control.*;
 import org.vadere.manager.traci.response.*;
+import org.vadere.simulator.control.simulation.SimThreadState;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -88,8 +89,11 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		if (!remoteManager.nextStep(cmd.getTargetTime())) {
 			// Simulation finished. Wait until simulation thread finishes with post loop before
 			// telling traci client
-			remoteManager.waitForSimulationEnd();
+			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
+				remoteManager.waitForSimulationEnd();
+			}
 			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+			remoteManager.notifySimulationThread();
 			return cmd;
 		}
 		// execute all
@@ -118,8 +122,12 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
 			// Simulation finished. Wait until simulation thread finishes with post loop before
 			// telling traci client
-			remoteManager.waitForSimulationEnd();
-			cmd.setResponse(TraCISimTimeResponse.simEndReached()); }
+			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
+				remoteManager.waitForSimulationEnd();
+			}
+			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+			remoteManager.notifySimulationThread();
+		}
 
 		logger.debug("process_simStep done.");
 		return cmd;
