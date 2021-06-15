@@ -2,7 +2,7 @@
   "name" : "modellvergleich_queue",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "fcce04694e1f2117bc0550cc61b385f2382a6ded",
+  "commithash" : "6b1a27425f333526008fdfb9e1c8cfa712f6ff80",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -40,6 +40,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "pedestrianHealthStatust.txt",
       "processors" : [ 10 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudArea.txt",
+      "processors" : [ 11 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudData.txt",
+      "processors" : [ 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -80,6 +88,12 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianHealthStatusProcessor",
       "id" : 10
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudAreaProcessor",
+      "id" : 11
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
+      "id" : 12
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -161,7 +175,7 @@
     "attributesSimulation" : {
       "finishTime" : 1200.0,
       "simTimeStepLength" : 0.5,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
