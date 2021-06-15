@@ -57,6 +57,18 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		TraCICloseCommand cmd = (TraCICloseCommand) rawCmd;
 
 		remoteManager.setClientCloseCommandReceived(true);
+		
+		if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)) {
+
+			logger.info("Current simulation run in main loop. Stop simulation.");
+			remoteManager.getRemoteSimulationRun().setIsRunSimulation(false); // is_running = false in Simulation!
+			logger.info("Wake up simulation thread.");
+			remoteManager.getRemoteSimulationRun().notifySimulationThread(); // wake up simulation thread
+			logger.info("Wait for simulation end.");
+			remoteManager.waitForSimulationEnd(); // wait for simulation thread
+			logger.info("Wait for simulation end finished.");
+		}
+
 
 		if (remoteManager.stopSimulationIfRunning())
 			cmd.getResponse().getStatusResponse().setDescription("Stop simulation waiting for client close EOF");
@@ -69,6 +81,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		TraCIGetStateCommand cmd = (TraCIGetStateCommand) rawCmd;
 
 		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+
 
 		// get responses
 		TraCIGetStateResponse response = new TraCIGetStateResponse(
@@ -89,6 +102,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		if (!remoteManager.nextStep(cmd.getTargetTime())) {
 			// Simulation finished. Wait until simulation thread finishes with post loop before
 			// telling traci client
+			// TODO: check if this is reachable
 			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
 				remoteManager.waitForSimulationEnd();
 			}
@@ -123,10 +137,14 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 			// Simulation finished. Wait until simulation thread finishes with post loop before
 			// telling traci client
 			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
-				remoteManager.waitForSimulationEnd();
+
+				logger.errorf("Main loop not finished.");
 			}
 			cmd.setResponse(TraCISimTimeResponse.simEndReached());
+			logger.info("Sent simEndReached command to client.");
+
 			remoteManager.notifySimulationThread();
+			logger.info("Notified simulation thread");
 		}
 
 		logger.debug("process_simStep done.");

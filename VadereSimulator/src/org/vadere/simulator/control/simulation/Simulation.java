@@ -333,8 +333,8 @@ public class Simulation implements ControllerProvider{
 						// check reached next simTime (-1 simulate one step)
 						// round to long to ensure correct trap.
 						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
-						if (timeReached || simulateUntilInSec == -1){
-							logger.debugf("Simulated until: %.4f", simTimeInSec);
+						if (timeReached && isRunSimulation){
+							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
 						}
 					}
@@ -618,6 +618,10 @@ public class Simulation implements ControllerProvider{
 	@Override
 	public ProcessorManager getProcessorManager() {
 		return processorManager;
+	}
+
+	public void setIsRunSimulation(boolean running){
+		isRunSimulation = running;
 	}
 
 }
