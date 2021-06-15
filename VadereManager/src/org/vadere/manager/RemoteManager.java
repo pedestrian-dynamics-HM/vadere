@@ -1,12 +1,15 @@
 package org.vadere.manager;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
+import org.vadere.simulator.control.simulation.SimThreadState;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.traci.TraCIException;
 import org.vadere.state.traci.TraCIExceptionInternal;
@@ -15,11 +18,16 @@ import org.vadere.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.sleep;
 
 /**
  * This class acts as interface between the TraCI handling and the actual simulation. All
@@ -87,6 +95,10 @@ public class RemoteManager implements RunnableFinishedListener {
 		currentSimulationRun = new RemoteScenarioRun(scenario, outputDir, this, scenarioPath, scenarioCache);
 	}
 
+	public SimThreadState getCurrentSimThreadState(){
+		return currentSimulationRun.getCurrentSimThreadState();
+	}
+
 	public void loadScenario(String scenarioString) {
 		loadScenario(scenarioString, null);
 	}
@@ -110,8 +122,9 @@ public class RemoteManager implements RunnableFinishedListener {
 		return scenarioCache;
 	}
 
-	public boolean stopSimulationIfRunning() {
+	public boolean stopSimulationIfRunning(){
 		if (currentSimulationThread != null && currentSimulationThread.isAlive()) {
+			logger.errorf("kill simulation thread");
 			currentSimulationThread.interrupt();
 			return true;
 		}
@@ -130,7 +143,6 @@ public class RemoteManager implements RunnableFinishedListener {
 	public boolean accessState(StateAccessHandler stateAccessHandler) {
 		if (currentSimulationRun == null)
 			return false;
-
 		currentSimulationRun.accessState(this, stateAccessHandler);
 
 		return true;
@@ -147,6 +159,14 @@ public class RemoteManager implements RunnableFinishedListener {
 
 		currentSimulationRun.nextStep(simTime);
 		return true;
+	}
+
+	public void notifySimulationThread(){
+		currentSimulationRun.notifySimulationThread();
+	}
+
+	public void waitForSimulationEnd(){
+		currentSimulationRun.waitForSimulationEnd();
 	}
 
 	public double getSimulationStoppedEarlyAtTime(){
@@ -199,4 +219,6 @@ public class RemoteManager implements RunnableFinishedListener {
 	public void setSimCfg(SimulationCfg simCfg) {
 		this.simCfg = simCfg;
 	}
+
+
 }

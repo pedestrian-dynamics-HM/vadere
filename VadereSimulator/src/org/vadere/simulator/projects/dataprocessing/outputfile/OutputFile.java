@@ -7,6 +7,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.DataKey;
 import org.vadere.simulator.projects.dataprocessing.processor.DataProcessor;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriter;
 import org.vadere.simulator.projects.dataprocessing.writer.VadereWriterFactory;
+import org.vadere.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 
 public abstract class OutputFile<K extends DataKey<K>> {
 
+	private static Logger logger = Logger.getLogger(OutputFile.class);
 
 	//Note: Only header information from data keys are written in this, therefore, these are the indices
 	// Each processor attached to this processor itself attaches also headers, but they are not listed in this
@@ -104,6 +106,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 	public void write() {
 		if (!isEmpty()) {
+			logger.info("Absolute file name" + absoluteFileName);
 			try (VadereWriter out = writerFactory.create(absoluteFileName)) {
 
 			    this.writer = out;
@@ -120,6 +123,7 @@ public abstract class OutputFile<K extends DataKey<K>> {
 
 				out.flush();
 			} catch (IOException e) {
+				logger.error(e.getMessage());
 				throw new UncheckedIOException(e);
 			}
 		}
