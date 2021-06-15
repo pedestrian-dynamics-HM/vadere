@@ -267,7 +267,12 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isRunning();
 	}
 
-
+	public void setIsRunSimulation(boolean running) {
+		if (simulation != null) {
+			simulation.setIsRunSimulation(running);
+		}
+	}
+	
 
 	public boolean isScenarioInSingleStepMode(){
 		return simulation != null && simulation.isSingleStepMode();
