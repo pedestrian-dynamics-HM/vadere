@@ -7,6 +7,7 @@ import org.vadere.state.traci.TraCIDataType;
 public enum SimulationVar {
 
 	TIME(0x66, TraCIDataType.DOUBLE),
+	TIME_MS(0x70, TraCIDataType.INTEGER),
 	DELTA_T(0x7b, TraCIDataType.DOUBLE), //step length
 	NUM_LOADED_VEHICLES(0x71, TraCIDataType.INTEGER),
 	LOADED_VEHICLES_IDS(0x72, TraCIDataType.STRING_LIST),
