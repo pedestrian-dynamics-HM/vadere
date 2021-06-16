@@ -153,6 +153,21 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.TIME_MS,
+			name = "getTimeMs", ignoreElementId = true)
+	public TraCICommand process_getSimTimeMs(TraCIGetCommand cmd, RemoteManager remoteManager) {
+
+		// default to 0 ms in case simulation is not started jet
+		cmd.setResponse(responseOK(SimulationVar.TIME_MS.type, 0));
+		boolean ret = remoteManager.accessState((manager, state) -> {
+			// BigDecimal to ensure correct comparison in omentpp
+			int timeInMilliSeconds = (int)state.getSimTimeInSec() * 1000;
+			cmd.setResponse(responseOK(SimulationVar.TIME_MS.type, timeInMilliSeconds));
+		});
+
+		return cmd;
+	}
+
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.DELTA_T,
 			name = "getSimSte", ignoreElementId = true)
 	public TraCICommand process_getSimStep(TraCIGetCommand cmd, RemoteManager remoteManager) {
