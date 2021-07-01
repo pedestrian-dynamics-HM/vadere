@@ -205,6 +205,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

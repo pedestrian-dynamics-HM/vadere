@@ -196,6 +196,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -247,6 +248,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -298,6 +300,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -349,6 +352,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

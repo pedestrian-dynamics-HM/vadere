@@ -6,7 +6,9 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.util.logging.Logger;
 
+import javax.management.RuntimeErrorException;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -14,6 +16,9 @@ import java.util.PriorityQueue;
  * @author Benedikt Zoennchen
  */
 public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
+
+	private static Logger logger = Logger.getLogger(UpdateSchemeEventDriven.class);
+
 
 	private final Topography topography;
 	protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
@@ -28,15 +33,28 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 	@Override
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
+		int id = 0, counter = -1;
 		clearStrides(topography);
 		if(!pedestrianEventsQueue.isEmpty()) {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				update(ped, timeStepInSec, currentTimeInSec);
-				//TODO remove the following print statement
-				System.out.println(ped.getId());
+
 				pedestrianEventsQueue.add(ped);
+
+				if (id == ped.getId()) counter+=1;
+				if (counter >=10000) {
+					logger.errorf("Infinite loop. Always draw pedestrian id = " + id + " from poll.");
+
+					try {
+						throw new Exception("Pedestrian event queue not updated.");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+				id = ped.getId();
 			}
 		}
 	}
@@ -78,6 +96,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.OBEYING){
 			osmBehaviorController.makeStepToTarget(pedestrian,topography);
 		}
+
 	}
 
 	@Override
