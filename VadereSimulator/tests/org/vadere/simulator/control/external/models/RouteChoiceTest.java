@@ -97,6 +97,33 @@ public class RouteChoiceTest {
         return msg;
     }
 
+    private String readInputFile3(){
+        String dataPath = "testResources/control/external/CorridorChoiceData3.json";
+        String msg = "";
+
+        try {
+            msg = IOUtils.readTextFile(dataPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return msg;
+    }
+
+
+
+
+    private String readInputFile2(){
+        String dataPath = "testResources/control/external/CorridorChoiceData2.json";
+        String msg = "";
+
+        try {
+            msg = IOUtils.readTextFile(dataPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return msg;
+    }
+
 
     @Test
     public void updateState() {
@@ -184,5 +211,68 @@ public class RouteChoiceTest {
         int target = ped.getNextTargetId();
         assertEquals(target, 4);
     }
+
+    @Test
+    public void pedInRectangle() {
+
+        // Create a single pedestrian with initial target nr. 5
+        Topography topo = createTopography(createPedestrians(1));
+        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
+        ped.setPosition(new VPoint(5.,5.));
+
+        String msg = readInputFile3();
+        RouteChoice routeChoice = new RouteChoice();
+        // keep old target nr.5 because timeout reached
+        routeChoice.update(topo, -1., msg);
+
+        int target = ped.getNextTargetId();
+        assertEquals(target, 2);
+    }
+
+
+
+
+    public void commandIdMissing() {
+        // the route choice app requires a unique command id.
+
+        Topography topo = createTopography(createPedestrians(1));
+        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
+        ped.setPosition(new VPoint(0.,0.));
+
+        String msg = readInputFile2();
+        RouteChoice routeChoice = new RouteChoice();
+        routeChoice.update(topo, -1., msg);
+    }
+
+    @Test
+    public void testCommandIdMissingWrapper() {
+        try {
+            commandIdMissing();
+        } catch (final IllegalArgumentException e) {
+            assertTrue(e.getMessage().equals("Please provide a unique commandId != 0 for each command. Otherwise, information might not be processed."));
+        }
+    }
+
+    @Test
+    public void testHandleRecurringInformation() {
+
+        // Create a single pedestrian with initial target nr. 5
+        Topography topo = createTopography(createPedestrians(1));
+        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
+        ped.setPosition(new VPoint(0.,0.));
+
+        RouteChoice routeChoice = new RouteChoice();
+        // keep old target nr.5 because timeout reached
+        routeChoice.update(topo, -1., readInputFile());
+        assertEquals(ped.getNextTargetId(), 4);
+
+        // readInputFile3() provides target 2. it is skipped because the command id is the same.
+        routeChoice.update(topo, -1., readInputFile3());
+        assertEquals(ped.getNextTargetId(), 4);
+
+    }
+
+
+
 
 }

@@ -11,6 +11,9 @@ import java.util.Random;
 
 public class ReactionModel implements IReactModel{
 
+    private boolean isReactingToRecurringInformation;
+    private boolean isReactingToFirstInformationOnly;
+
     private int numberOfReactionBehaviors;
     private HashMap<Integer, DistParameters> distParameters = new HashMap<>();
 
@@ -26,6 +29,8 @@ public class ReactionModel implements IReactModel{
         ReactionParameter reactionParameter = new ReactionParameter(commandStr);
         numberOfReactionBehaviors = reactionParameter.getNrOptions();
         distParameters = reactionParameter.getDist();
+        isReactingToRecurringInformation = reactionParameter.isReactingToRecurringInformation();
+        isReactingToFirstInformationOnly = reactionParameter.isReactingToFirstInformationOnly();
     }
 
     public ReactionModel() {
@@ -84,7 +89,11 @@ public class ReactionModel implements IReactModel{
     }
 
 
+    public boolean isReactingToFirstInformationOnly() {
+        return isReactingToFirstInformationOnly;
+    }
 
-
-
+    public boolean isReactingToRecurringInformation() {
+        return isReactingToRecurringInformation;
+    }
 }
