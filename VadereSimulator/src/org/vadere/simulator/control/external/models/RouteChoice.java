@@ -18,6 +18,7 @@ public class RouteChoice extends ControlModel {
     private LinkedList<Integer> newTargetList;
 
 
+
     public RouteChoice() {
         super();
         random = new Random(0);
@@ -25,7 +26,8 @@ public class RouteChoice extends ControlModel {
     }
 
 
-    public void applyPedControl(Pedestrian ped, JSONObject pedCommand) {
+
+    public void getControlAction(Pedestrian ped, JSONObject pedCommand) {
 
         command = pedCommand;
         // get information from controller
@@ -104,8 +106,36 @@ public class RouteChoice extends ControlModel {
         return probs;
     }
 
+    public boolean isInformationProcessed(Pedestrian ped, int commandId){
 
+        // 1. handle conflicting instructions over time
+        if (reactionModel.isReactingToFirstInformationOnly()){
+            return isFirstInformation(ped);
+        }
 
+        // 2. handle recurring information that is received multiple times.
+
+        // If a command is received, the naviation app checks
+        // whether the command has already been displayed in an agent's app.
+
+        // This is necessary when the information is disseminated through the mobile network
+        // and can be received multiple times with different delays.
+        // In this case, the information is not further processed.
+
+        // Note: In the {@link ControlModel}, the agent makes the decision how to handle recurring information based on the reaction model setup.
+        // Here, the navigation app decides on how to proceed recurring information (do not proceed it).
+
+        return !isIdInList(ped, commandId);
+    }
+
+    public int getCommandId(){
+        // The navigation app requires a unique command identifier.
+        int id = super.getCommandId();
+        if (id == 0){
+            throw new IllegalArgumentException("Please provide a unique commandId != 0 for each command. Otherwise, information might not be processed.");
+        }
+        return id;
+    }
 
 
 }
