@@ -35,7 +35,10 @@ public class SimpleCognitionModel implements ICognitionModel {
                 nextSelfCategory = SelfCategory.WAIT;
             } else if (stimulus instanceof ElapsedTime) {
                 nextSelfCategory = SelfCategory.TARGET_ORIENTED;
-            } else {
+            } else if(stimulus instanceof InformationStimulus){
+                nextSelfCategory = SelfCategory.INFORMED;
+            }
+            else {
                 throw new IllegalArgumentException(String.format("Stimulus \"%s\" not supported by \"%s\"",
                         stimulus.getClass().getSimpleName(),
                         this.getClass().getSimpleName()));

@@ -22,6 +22,8 @@ public class StimulusFactory {
             stimulusObject = new Wait();
         } else if (stimulusAsString.matches(WaitInArea.class.getSimpleName())) {
             stimulusObject = new WaitInArea();
+        } else if (stimulusAsString.matches(InformationStimulus.class.getSimpleName())){
+            stimulusObject = new InformationStimulus();
         }
 
         return stimulusObject;

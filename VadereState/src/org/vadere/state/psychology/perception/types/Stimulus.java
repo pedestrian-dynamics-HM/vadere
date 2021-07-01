@@ -36,7 +36,8 @@ import java.util.List;
         @Type(value = Wait.class, name = "Wait"),
         @Type(value = WaitInArea.class, name = "WaitInArea"),
         @Type(value = ChangeTarget.class, name = "ChangeTarget"),
-        @Type(value = ChangeTargetScripted.class, name = "ChangeTargetScripted")
+        @Type(value = ChangeTargetScripted.class, name = "ChangeTargetScripted"),
+        @Type(value = InformationStimulus.class, name = "InformationStimulus")
 })
 // "time" is set when the stimulus is injected into the simulation run and must not be de-/serialized.
 @JsonIgnoreProperties({ "time" })

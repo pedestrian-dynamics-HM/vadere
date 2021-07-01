@@ -34,7 +34,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				update(ped, timeStepInSec, currentTimeInSec);
-				//System.out.println(ped.getId());
+				//TODO remove the following print statement
+				System.out.println(ped.getId());
 				pedestrianEventsQueue.add(ped);
 			}
 		}
@@ -72,6 +73,10 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.INFORMED){
+			osmBehaviorController.makeStepToTarget(pedestrian,topography);
+		} else if (selfCategory == SelfCategory.OBEYING){
+			osmBehaviorController.makeStepToTarget(pedestrian,topography);
 		}
 	}
 

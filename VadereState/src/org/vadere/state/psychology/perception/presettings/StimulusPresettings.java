@@ -31,7 +31,8 @@ public class StimulusPresettings {
                 new Wait(),
                 new WaitInArea(0, new VRectangle(0, 0, 10, 10)),
                 new ChangeTarget(),
-                new ChangeTargetScripted()
+                new ChangeTargetScripted(),
+                new InformationStimulus(""),
         };
 
         for (Stimulus stimulus : stimuliToUse) {
