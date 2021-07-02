@@ -31,5 +31,5 @@ public enum SelfCategory {
     CHANGE_TARGET,
     EVADE,
     INFORMED,
-    OBEYING
+    UNINFORMED, REFUSING
 }

@@ -6,6 +6,7 @@ import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
+import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.FootstepHistory;
@@ -136,6 +137,11 @@ public class Pedestrian extends Agent {
     public KnowledgeBase getKnowledgeBase() {
         return psychologyStatus.getKnowledgeBase();
     }
+
+    public void setInformation(KnowledgeItem info){
+        psychologyStatus.getKnowledgeBase().addInformation(info);
+    }
+
 
     public LinkedList<Integer> getGroupIds() {
         return groupIds;

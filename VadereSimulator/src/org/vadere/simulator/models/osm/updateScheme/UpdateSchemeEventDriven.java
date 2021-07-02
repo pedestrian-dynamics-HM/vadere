@@ -8,7 +8,6 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
-import javax.management.RuntimeErrorException;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -94,7 +93,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.INFORMED){
 			osmBehaviorController.makeStepToTarget(pedestrian,topography);
-		} else if (selfCategory == SelfCategory.OBEYING){
+		} else if (selfCategory == SelfCategory.REFUSING){
 			osmBehaviorController.makeStepToTarget(pedestrian,topography);
 		}
 
