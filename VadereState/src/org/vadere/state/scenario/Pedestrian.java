@@ -12,10 +12,15 @@ import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+import rx.Subscription;
 
 import java.util.*;
 
 public class Pedestrian extends Agent {
+
+    public static Logger logger = Logger.getLogger(Subscription.class);
+
 
     // Constants
     public static double PEDESTRIAN_MAX_SPEED_METER_PER_SECOND = 12.0;

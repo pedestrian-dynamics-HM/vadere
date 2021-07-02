@@ -4,6 +4,7 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -84,8 +85,15 @@ public abstract class ControlModel implements IControlModel {
                     this.setAction(ped, stimulusControl);
                     this.setProcessedAgents(ped,getCommandId());
                 }
+                else{
+                    logger.debugf("Ped, id = " + ped.getId() + ". Info not in time or space.");
+                }
+            }
+            else{
+                logger.debugf("Ped, id = " + ped.getId() + ". Command id not processed.");
             }
         }
+        int i;
     }
 
     public void update(Topography topography, StimulusController stimulusController, Double time, String command, final int specify_id) {
@@ -125,9 +133,14 @@ public abstract class ControlModel implements IControlModel {
 
     public void setAction(Pedestrian ped, StimulusController stimulusController){
         if (isPedReact()){
+            logger.debugf("Set CHANGE_ROUTE stimulus for Ped, id = " + ped.getId());
             this.stimulusController = stimulusController;
             triggerRedRaction(ped);
         }
+        else{
+            logger.debugf("Ped, id = " + ped.getId() + " does not respond to route recommendation.");
+        }
+
     }
 
     public void setReactionModel(ReactionModel reactionModel){

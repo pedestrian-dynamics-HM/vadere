@@ -193,6 +193,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false

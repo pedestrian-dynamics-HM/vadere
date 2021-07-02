@@ -206,6 +206,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -218,6 +219,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -257,6 +259,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -269,6 +272,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -308,6 +312,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -320,6 +325,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -359,6 +365,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -371,6 +378,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -410,6 +418,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -422,6 +431,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -461,6 +471,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -473,6 +484,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -512,6 +524,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -524,6 +537,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -563,6 +577,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -575,6 +590,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -614,6 +630,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -626,6 +643,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -665,6 +683,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -677,6 +696,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -716,6 +736,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -728,6 +749,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -767,6 +789,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -779,6 +802,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -818,6 +842,7 @@
         "isLikelyInjured" : false,
         "psychologyStatus" : {
           "mostImportantStimulus" : null,
+          "dynamicStimulus" : null,
           "threatMemory" : {
             "allThreats" : [ ],
             "latestThreatUnhandled" : false
@@ -830,6 +855,7 @@
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
@@ -63,24 +64,7 @@ public class RouteChoice extends ControlModel {
         LinkedList<Integer> oldTarget = ped.getTargets();
 
         ChangeTarget changeTarget = new ChangeTarget(this.simTime, newTargetList);
-        List<Stimulus> stimuli = new ArrayList<>();
-
-        stimuli.add(new ElapsedTime());
-        stimuli.add(changeTarget);
-
-        //ScenarioStore scenarioStore = stimulusController.getScenarioStore();
-
-
-
-
-        //TODO move this
-        simplePerceptionModel.initialize(topography);
-        simplePerceptionModel.update(Collections.singletonList(ped), stimuli);
-
-
-
-
-        //ped.setTargets(newTargetList);
+        ped.setAdditionalStimulus(changeTarget);
         logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
 
     }

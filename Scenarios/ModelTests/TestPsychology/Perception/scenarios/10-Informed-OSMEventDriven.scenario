@@ -7,6 +7,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 1, 2, 3 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
+      "filename" : "state.txt",
+      "processors" : [ 4 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -17,6 +21,9 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
       "id" : 3
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepSelfCategoryProcessor",
+      "id" : 4
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false

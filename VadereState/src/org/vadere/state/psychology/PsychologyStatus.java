@@ -59,8 +59,7 @@ public class PsychologyStatus {
     }
 
     public boolean hasAdditionalStimulus() {
-        if (dynamicStimulus == null)
-            return false;
+        return dynamicStimulus != null;
     }
 
     public Stimulus getDynamicStimulus() {

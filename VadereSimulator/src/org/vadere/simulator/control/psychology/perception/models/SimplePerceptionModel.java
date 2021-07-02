@@ -4,7 +4,10 @@ import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.logging.Logger;
+import rx.Subscription;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
  */
 public class SimplePerceptionModel implements IPerceptionModel {
 
+    public static Logger logger = Logger.getLogger(Subscription.class);
+
     private Topography topography;
 
     @Override
@@ -26,12 +31,14 @@ public class SimplePerceptionModel implements IPerceptionModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
         for (Pedestrian pedestrian : pedestrians) {
-            if (pedestrian.hasAdditionalStimulus())
-            {
-                stimuli.add(pedestrian.getA)
+
+            List<Stimulus> pedSpecificStimuli = new ArrayList<>(stimuli);
+
+            if (pedestrian.hasAdditionalStimulus()){
+                pedSpecificStimuli.add(pedestrian.getAdditionalStimulus());
             }
 
-            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(stimuli, pedestrian);
+            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
