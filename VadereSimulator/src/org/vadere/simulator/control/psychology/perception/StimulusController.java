@@ -53,6 +53,7 @@ public class StimulusController {
     public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
     public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
 
+
     // Methods
     public List<Stimulus> getStimuliForTime(double simulationTime) {
         List<Stimulus> stimuli = new ArrayList<>();

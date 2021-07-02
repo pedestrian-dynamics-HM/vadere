@@ -9,6 +9,7 @@ public class PsychologyStatus {
 
     // Member Variables
     private Stimulus mostImportantStimulus;
+    private Stimulus dynamicStimulus;
     private ThreatMemory threatMemory;
     private SelfCategory selfCategory;
     private GroupMembership groupMembership;
@@ -57,4 +58,16 @@ public class PsychologyStatus {
         this.groupMembership = groupMembership;
     }
 
+    public boolean hasAdditionalStimulus() {
+        if (dynamicStimulus == null)
+            return false;
+    }
+
+    public Stimulus getDynamicStimulus() {
+        return dynamicStimulus;
+    }
+
+    public void setDynamicStimulus(Stimulus dynamicStimulus) {
+        this.dynamicStimulus = dynamicStimulus;
+    }
 }

@@ -240,7 +240,8 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 			remoteManager.accessState((manager, state) -> {
 				int i;
-				controlModel.update(state.getScenarioStore().getTopography(), state.getSimTimeInSec(), msg_content, specify_id);
+
+				controlModel.update(state.getScenarioStore().getTopography(), manager.getRemoteSimulationRun().getStimulusController() , state.getSimTimeInSec(), msg_content, specify_id);
 			});
 
 			logger.infof("Received ControlCommand:");

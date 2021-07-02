@@ -6,16 +6,23 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
+import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.psychology.perception.types.ChangeTarget;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
+
+import static org.junit.Assert.assertNull;
 
 public class RouteChoice extends ControlModel {
 
     private JSONObject command;
     private Random random;
     private LinkedList<Integer> newTargetList;
+    SimplePerceptionModel simplePerceptionModel;
 
 
 
@@ -23,6 +30,7 @@ public class RouteChoice extends ControlModel {
         super();
         random = new Random(0);
         reactionModel = new ReactionModel();
+        simplePerceptionModel = new SimplePerceptionModel();
     }
 
 
@@ -53,7 +61,26 @@ public class RouteChoice extends ControlModel {
     protected void triggerRedRaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
-        ped.setTargets(newTargetList);
+
+        ChangeTarget changeTarget = new ChangeTarget(this.simTime, newTargetList);
+        List<Stimulus> stimuli = new ArrayList<>();
+
+        stimuli.add(new ElapsedTime());
+        stimuli.add(changeTarget);
+
+        //ScenarioStore scenarioStore = stimulusController.getScenarioStore();
+
+
+
+
+        //TODO move this
+        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.update(Collections.singletonList(ped), stimuli);
+
+
+
+
+        //ped.setTargets(newTargetList);
         logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
 
     }

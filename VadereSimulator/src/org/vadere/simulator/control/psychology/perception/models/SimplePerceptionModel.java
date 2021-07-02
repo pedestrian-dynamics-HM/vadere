@@ -26,6 +26,11 @@ public class SimplePerceptionModel implements IPerceptionModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
         for (Pedestrian pedestrian : pedestrians) {
+            if (pedestrian.hasAdditionalStimulus())
+            {
+                stimuli.add(pedestrian.getA)
+            }
+
             Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(stimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }

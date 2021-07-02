@@ -3,6 +3,7 @@ package org.vadere.simulator.control.external.models;
 
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -21,6 +22,7 @@ public abstract class ControlModel implements IControlModel {
     private CtlCommand command;
     protected ReactionModel reactionModel;
     protected HashMap<Pedestrian,LinkedList<Integer>> processedAgents;
+    protected StimulusController stimulusController;
 
 
     public ControlModel(){
@@ -69,7 +71,7 @@ public abstract class ControlModel implements IControlModel {
 
     public abstract void getControlAction(Pedestrian ped, JSONObject command);
 
-    public void update(Topography topo, Double time, String commandStr, Integer pedId)  {
+    public void update(Topography topo, Double time, String commandStr, Integer pedId, StimulusController stimulusControl)  {
         topography = topo;
         simTime = time;
         command = new CtlCommand(commandStr);
@@ -79,15 +81,15 @@ public abstract class ControlModel implements IControlModel {
             if (this.isInformationProcessed(ped, getCommandId())){
                 if (isInfoInTime() && isPedInDefinedArea(ped)) {
                     this.getControlAction(ped, command.getPedCommand());
-                    this.setAction(ped);
+                    this.setAction(ped, stimulusControl);
                     this.setProcessedAgents(ped,getCommandId());
                 }
             }
         }
     }
 
-    public void update(Topography topography, Double time, String command) {
-        update(topography,time,command,-1);
+    public void update(Topography topography, StimulusController stimulusController, Double time, String command, final int specify_id) {
+        update(topography, time,command,-1, stimulusController );
 
     }
 
@@ -121,8 +123,9 @@ public abstract class ControlModel implements IControlModel {
     }
 
 
-    public void setAction(Pedestrian ped){
+    public void setAction(Pedestrian ped, StimulusController stimulusController){
         if (isPedReact()){
+            this.stimulusController = stimulusController;
             triggerRedRaction(ped);
         }
     }

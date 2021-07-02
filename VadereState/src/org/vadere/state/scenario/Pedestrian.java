@@ -194,6 +194,7 @@ public class Pedestrian extends Agent {
         psychologyStatus.setMostImportantStimulus(mostImportantStimulus);
     }
 
+
     public void setThreatMemory(ThreatMemory threatMemory) {
         psychologyStatus.setThreatMemory(threatMemory);
     }
@@ -201,6 +202,21 @@ public class Pedestrian extends Agent {
     public void setSelfCategory(SelfCategory selfCategory) {
         psychologyStatus.setSelfCategory(selfCategory);
     }
+
+
+    public boolean hasAdditionalStimulus(){
+        return psychologyStatus.hasAdditionalStimulus();
+    }
+
+    public void setAdditionalStimulus(Stimulus additionalStimulus){
+        psychologyStatus.setDynamicStimulus(additionalStimulus);
+    }
+
+    public Stimulus getAdditionalStimulus(){
+        return psychologyStatus.getDynamicStimulus();
+    }
+
+
 
     public void setGroupMembership(GroupMembership groupMembership) {
         psychologyStatus.setGroupMembership(groupMembership);
