@@ -19,10 +19,10 @@ public class ActionSetInformationStateColor extends ActionSetColor {
 
     @Override
     protected void saveColor(Color color) {
-        InformationState selfCategory = comboBox.getItemAt(comboBox.getSelectedIndex());
+        InformationState informationState = comboBox.getItemAt(comboBox.getSelectedIndex());
 
-        if (selfCategory != null) {
-            model.config.setInformationStateColor(selfCategory, color);
+        if (informationState != null) {
+            model.config.setInformationStateColor(informationState, color);
         }
     }
 }
