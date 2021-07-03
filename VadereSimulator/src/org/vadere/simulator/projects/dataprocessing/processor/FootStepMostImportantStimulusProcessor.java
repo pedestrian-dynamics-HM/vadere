@@ -47,7 +47,6 @@ public class FootStepMostImportantStimulusProcessor extends DataProcessor<Eventt
 			}
 
 
-
 			for(FootStep fs : traj.getFootSteps()){
 				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), mostImportantStimulus);
 			}

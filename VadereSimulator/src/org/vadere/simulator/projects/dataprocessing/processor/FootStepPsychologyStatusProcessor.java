@@ -18,7 +18,7 @@ import java.util.LinkedList;
 @DataProcessorClass()
 public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
 
-	public static String[] HEADERS = { "mostImportantStimulus", "selfCategory", "groupMembership" };
+	public static String[] HEADERS = { "mostImportantStimulus", "selfCategory", "groupMembership", "informationState" };
 
 	public FootStepPsychologyStatusProcessor() {
 		super(HEADERS);
@@ -30,7 +30,6 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 			LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
 
 			SelfCategory selfCat = pedestrian.getSelfCategory();
-
 			String psychologyStatus = psychologyStatusToString(pedestrian);
 
 
@@ -57,16 +56,12 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 	}
 
 	private String psychologyStatusToString(Pedestrian pedestrian) {
-		String statusAsString = String.format("%s %s %s",
+		String statusAsString = String.format("%s %s %s %s",
 				pedestrian.getMostImportantStimulus().toStringForOutputProcessor(),
 				pedestrian.getSelfCategory().toString(),
-				pedestrian.getGroupMembership().toString()
+				pedestrian.getGroupMembership().toString(),
+				pedestrian.getKnowledgeBase().getInformationState().toString()
 				);
-
-		SelfCategory selfCategory = pedestrian.getSelfCategory();
-		if (selfCategory == SelfCategory.WAIT) {
-			java.lang.System.out.println(selfCategory.toString());
-		}
 
 		return statusAsString;
 	}
