@@ -7,6 +7,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -32,6 +33,15 @@ public class FootStepSelfCategoryProcessor extends DataProcessor<EventtimePedest
 				this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), p.getId()), selfCategoryString);
 			}
 		}
+	}
+
+	@Override
+	public String[] toStrings(EventtimePedestrianIdKey key) {
+		String[] footStepLine = this.getValues().toArray(new String[0]);
+
+		// Note: remove the "startTime" from the footStepLine because it is already included in the "simTime" of the
+		// EventtimePedestrianIdKey
+		return Arrays.copyOfRange(footStepLine, 1, footStepLine.length);
 	}
 
 }
