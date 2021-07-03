@@ -393,10 +393,10 @@ public class SettingsDialog extends JDialog {
 
 		cbInformationStates.setSelectedIndex(0);
 
-		InformationState selectedSelfCategory = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
-		Color selfCategoryColor = model.config.getInformationStateColor(selectedSelfCategory);
+		InformationState selectedInformationState = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+		Color informationStateColor = model.config.getInformationStateColor(selectedInformationState);
 
-		pInformationStateColor.setBackground(selfCategoryColor);
+		pInformationStateColor.setBackground(informationStateColor);
 		pInformationStateColor.setPreferredSize(new Dimension(130, 20));
 
 		// When user changes a color, save it in the model.
@@ -405,9 +405,11 @@ public class SettingsDialog extends JDialog {
 
 		// Retrieve configured color from "model".
 		cbInformationStates.addActionListener(e -> {
-			InformationState selectedSelfCategoryInner = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
-			pInformationStateColor.setBackground(model.config.getInformationStateColor(selectedSelfCategoryInner));
+			InformationState selectedInformationStateInner = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+			pInformationStateColor.setBackground(model.config.getInformationStateColor(selectedInformationStateInner));
 		});
+
+		int i;
 	}
 
 

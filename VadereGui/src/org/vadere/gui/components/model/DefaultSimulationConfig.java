@@ -64,6 +64,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.randomColors = new HashMap<>();
 		this.pedestrianColors = new HashMap<>();
 		this.selfCategoryColors = new HashMap<>();
+		this.informationStateColors = new HashMap<>();
 
 		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
 			this.pedestrianColors.put(new Integer(entry.getKey()), new Color(entry.getValue().getRed(), entry
@@ -333,7 +334,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	}
 
 
-
 	public Color getSelfCategoryColor(SelfCategory selfCategory) {
 		Color color = getPedestrianDefaultColor();
 
@@ -347,8 +347,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public Color getInformationStateColor(InformationState informationState) {
 		Color color = getPedestrianDefaultColor();
 
-		if (selfCategoryColors.containsKey(informationState.ordinal())) {
-			color = selfCategoryColors.get(informationState.ordinal());
+		if (informationStateColors.containsKey(informationState.ordinal())) {
+			color = informationStateColors.get(informationState.ordinal());
 		}
 
 		return color;
