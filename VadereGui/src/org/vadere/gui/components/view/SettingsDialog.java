@@ -292,6 +292,11 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column3, row));
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column4, row));
 
+		colorSettingsPane.add(rbInformationColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbInformationStates, cc.xy(column2, row));
+		colorSettingsPane.add(pInformationStateColor, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column4, row));
+
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
 
