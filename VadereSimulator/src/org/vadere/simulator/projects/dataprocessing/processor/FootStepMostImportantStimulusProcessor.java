@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import com.google.common.collect.Lists;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
@@ -8,6 +9,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -41,7 +43,7 @@ public class FootStepMostImportantStimulusProcessor extends DataProcessor<Eventt
 						this.putValue(new EventtimePedestrianIdKey(state.getSimTimeInSec(), p.getId()), mostImportantStimulus);
 					}
 					else {
-						this.getData().replace(this.getLastKey(), mostImportantStimulus);
+						this.getData().replace(getKey(p.getId()), mostImportantStimulus);
 					}
 				}
 			}
@@ -52,5 +54,19 @@ public class FootStepMostImportantStimulusProcessor extends DataProcessor<Eventt
 			}
 		}
 	}
+
+	private EventtimePedestrianIdKey getKey(int pedId) {
+		EventtimePedestrianIdKey key = null;
+		for (EventtimePedestrianIdKey k : Lists.reverse(new ArrayList<>(this.getKeys()))) {
+			if (k.getPedestrianId() == pedId){
+				key = k;
+				break;
+			}
+		}
+		//TODO check whether we can use stream instead? currenlty not working, but seems to be more effective
+		//key = this.getKeys().stream().filter(k -> k.getPedestrianId() == pedId).max(Comparator.comparing(EventtimePedestrianIdKey::getSimtime)).orElseThrow(NoSuchElementException::new);
+		return key;
+	}
+
 
 }
