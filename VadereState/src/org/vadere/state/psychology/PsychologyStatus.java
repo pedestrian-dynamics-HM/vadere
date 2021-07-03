@@ -2,6 +2,7 @@ package org.vadere.state.psychology;
 
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.psychology.perception.types.Stimulus;
 
