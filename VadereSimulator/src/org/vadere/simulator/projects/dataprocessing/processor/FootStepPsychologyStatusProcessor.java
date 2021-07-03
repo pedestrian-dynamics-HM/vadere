@@ -29,7 +29,26 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
 			LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
 
+			SelfCategory selfCat = pedestrian.getSelfCategory();
+
 			String psychologyStatus = psychologyStatusToString(pedestrian);
+
+
+			/* The actions WAIT and CHANGE_TARGET occur in between two footsteps.
+			* With the following if-statement the action is moved to the latest footstep available.
+			* If not, these two self categories are not visualized in the post-visualization.
+			* */
+			if ( (selfCat == SelfCategory.WAIT) || (selfCat == SelfCategory.CHANGE_TARGET) ) {
+				if (footSteps.size() == 0) {
+					if (state.getStep() == 1){
+						this.putValue(new EventtimePedestrianIdKey(state.getSimTimeInSec(), pedestrian.getId()), psychologyStatus);
+					}
+					else {
+						this.getData().replace(this.getLastKey(), psychologyStatus);
+					}
+				}
+			}
+
 
 			for (FootStep footStep : footSteps) {
 				putValue(new EventtimePedestrianIdKey(footStep.getStartTime(), pedestrian.getId()), psychologyStatus);
