@@ -5,6 +5,7 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
 import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
@@ -42,6 +43,11 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 				pedestrian.getSelfCategory().toString(),
 				pedestrian.getGroupMembership().toString()
 				);
+
+		SelfCategory selfCategory = pedestrian.getSelfCategory();
+		if (selfCategory == SelfCategory.WAIT) {
+			java.lang.System.out.println(selfCategory.toString());
+		}
 
 		return statusAsString;
 	}
