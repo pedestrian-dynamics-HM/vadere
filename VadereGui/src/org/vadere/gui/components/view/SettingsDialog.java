@@ -12,6 +12,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
 
@@ -232,6 +233,8 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
 		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
+		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+
 
 		rbTargetColoring.setSelected(true);
 		model.setAgentColoring(AgentColoring.TARGET);
@@ -241,6 +244,7 @@ public class SettingsDialog extends JDialog {
 		group.add(rbRandomColoring);
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
+		group.add(rbInformationColoring);
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
@@ -255,6 +259,13 @@ public class SettingsDialog extends JDialog {
 		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
+
+		JComboBox<InformationState> cbInformationStates = createInformationStateComboBox();
+		final JPanel pInformationStateColor = new JPanel();
+		final JButton bChangeInformationStateColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringByInformationState(cbInformationStates, pInformationStateColor, bChangeInformationStateColor);
+
 
 		int row = 0;
 		int column1 = 2;
@@ -280,6 +291,11 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbSelfCategories, cc.xy(column2, row));
 		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column3, row));
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column4, row));
+
+		colorSettingsPane.add(rbInformationColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbInformationStates, cc.xy(column2, row));
+		colorSettingsPane.add(pInformationStateColor, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column4, row));
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
@@ -309,9 +325,15 @@ public class SettingsDialog extends JDialog {
 
 	private JComboBox<SelfCategory> createSelfCategoriesComboBox() {
 		JComboBox<SelfCategory> comboBox = new JComboBox<>(SelfCategory.values());
-
 		return comboBox;
 	}
+
+	private JComboBox<InformationState> createInformationStateComboBox() {
+		JComboBox<InformationState> comboBox = new JComboBox<>(InformationState.values());
+		return comboBox;
+	}
+
+
 
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
 		cbTargetIds.setSelectedIndex(0);
@@ -366,6 +388,30 @@ public class SettingsDialog extends JDialog {
 			pSelfCategoryColor.setBackground(model.config.getSelfCategoryColor(selectedSelfCategoryInner));
 		});
 	}
+
+	private void initColoringByInformationState(JComboBox<InformationState> cbInformationStates, JPanel pInformationStateColor, JButton bChangeInformationStateColor) {
+
+		cbInformationStates.setSelectedIndex(0);
+
+		InformationState selectedInformationState = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+		Color informationStateColor = model.config.getInformationStateColor(selectedInformationState);
+
+		pInformationStateColor.setBackground(informationStateColor);
+		pInformationStateColor.setPreferredSize(new Dimension(130, 20));
+
+		// When user changes a color, save it in the model.
+		bChangeInformationStateColor.addActionListener(new ActionSetInformationStateColor("Set Information State Color", model, pInformationStateColor,
+				cbInformationStates));
+
+		// Retrieve configured color from "model".
+		cbInformationStates.addActionListener(e -> {
+			InformationState selectedInformationStateInner = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+			pInformationStateColor.setBackground(model.config.getInformationStateColor(selectedInformationStateInner));
+		});
+
+		int i;
+	}
+
 
 	private void initOtherSettingsPane(JLayeredPane otherSettingsPane) {
 		otherSettingsPane.setBorder(

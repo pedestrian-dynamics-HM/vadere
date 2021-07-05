@@ -1,5 +1,6 @@
-package org.vadere.state.psychology;
+package org.vadere.state.psychology.information;
 
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.KnowledgeItem;
 
 import java.util.ArrayList;
@@ -11,9 +12,11 @@ import java.util.regex.Pattern;
 public class KnowledgeBase {
 
 	private ArrayList<KnowledgeItem> knowledge;
+	private InformationState informationState;
 
 	public KnowledgeBase() {
 		this.knowledge = new ArrayList<>();
+		this.informationState = InformationState.NO_INFORMATION;
 	}
 
 	/**
@@ -35,6 +38,7 @@ public class KnowledgeBase {
 
 	public void addInformation(KnowledgeItem info){
 		knowledge.add(info);
+		setInformationState(InformationState.INFORMATION_RECEIVED);
 	}
 
 	public void removeInformation(String informationId){
@@ -47,5 +51,14 @@ public class KnowledgeBase {
 
 	public ArrayList<KnowledgeItem> getKnowledge() {
 		return knowledge;
+	}
+
+
+	public InformationState getInformationState() {
+		return informationState;
+	}
+
+	public void setInformationState(InformationState informationState) {
+		this.informationState = informationState;
 	}
 }

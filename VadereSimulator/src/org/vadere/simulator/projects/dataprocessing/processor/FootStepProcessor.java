@@ -4,6 +4,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
+import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
@@ -29,32 +30,31 @@ import java.util.LinkedList;
 @DataProcessorClass()
 public class FootStepProcessor extends DataProcessor<EventtimePedestrianIdKey, FootStep> {
 
-	public FootStepProcessor() {
-		super("endTime", "startX", "startY", "endX", "endY");
-	}
+    public FootStepProcessor() {
+        super("endTime", "startX", "startY", "endX", "endY");
+    }
 
-	@Override
-	protected void doUpdate(final SimulationState state) {
-		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
+    @Override
+    protected void doUpdate(final SimulationState state) {
+        for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
+            LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
 
-			for (FootStep fs : footSteps) {
-				putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);
-			}
-		}
-	}
+            for (FootStep fs : footSteps) {
+                putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);
+            }
+        }
+    }
+    @Override
+    public void init(final ProcessorManager manager) {
+        super.init(manager);
+    }
 
-	@Override
-	public void init(final ProcessorManager manager) {
-		super.init(manager);
-	}
+    @Override
+    public String[] toStrings(EventtimePedestrianIdKey key) {
+        String[] footStepLine = this.getValue(key).getValueString();
 
-	@Override
-	public String[] toStrings(EventtimePedestrianIdKey key) {
-		String[] footStepLine = this.getValue(key).getValueString();
-
-		// Note: remove the "startTime" from the footStepLine because it is already included in the "simTime" of the
-		// EventtimePedestrianIdKey
-		return Arrays.copyOfRange(footStepLine, 1, footStepLine.length);
-	}
+        // Note: remove the "startTime" from the footStepLine because it is already included in the "simTime" of the
+        // EventtimePedestrianIdKey
+        return Arrays.copyOfRange(footStepLine, 1, footStepLine.length);
+    }
 }
