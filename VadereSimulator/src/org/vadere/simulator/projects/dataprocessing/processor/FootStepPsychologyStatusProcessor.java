@@ -10,6 +10,8 @@ import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 
+import java.util.LinkedList;
+
 /**
  * Log {@link Pedestrian}'s current {@link PsychologyStatus} except its {@link ThreatMemory}.
  */
@@ -34,7 +36,7 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 			}
 		}
 	}
-	
+
 	private String psychologyStatusToString(Pedestrian pedestrian) {
 		String statusAsString = String.format("%s %s %s %s",
 				pedestrian.getMostImportantStimulus().toStringForOutputProcessor(),

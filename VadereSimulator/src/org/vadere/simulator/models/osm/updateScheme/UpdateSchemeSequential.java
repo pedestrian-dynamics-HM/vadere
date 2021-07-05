@@ -6,6 +6,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -66,8 +67,10 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		}
 	}
 
@@ -78,6 +81,8 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(pedestrian.getTimeOfNextStep() + pedestrian.getDurationNextStep());
 		}
 	}
+
+
 
 	@Override
 	public void elementAdded(Pedestrian element) {}
