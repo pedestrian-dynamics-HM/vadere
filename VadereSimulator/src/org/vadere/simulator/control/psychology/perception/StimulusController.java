@@ -1,13 +1,15 @@
 package org.vadere.simulator.control.psychology.perception;
 
+import org.jcodec.codecs.mjpeg.JpegDecoder;
+import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.scenario.Pedestrian;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +29,8 @@ public class StimulusController {
     private List<StimulusInfo> oneTimeStimuli;
     private List<StimulusInfo> recurringStimuli;
 
+    private HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli;
+
     // Constructors
     public StimulusController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
@@ -37,6 +41,8 @@ public class StimulusController {
 
         oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
         recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
+
+        pedSpecificStimuli = new HashMap<>();
     }
 
     // Getters
@@ -72,6 +78,85 @@ public class StimulusController {
 
         return stimuli;
     }
+
+    public HashMap<Pedestrian,List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
+
+        HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
+
+        for (Pedestrian ped : peds) {
+            List<Stimulus> stimuli = new ArrayList<>();
+            // these stimuli are equal for any pedestrian
+            stimuli = getStimuliForTime(simulationTime);
+
+            // the following stimuli are pedestrian-specific
+            stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime));
+        }
+
+        return pedSpecificStimuliForTime;
+    }
+
+    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime){
+        List<Stimulus> activeStimuli = new ArrayList<>();
+        if (pedSpecificStimuli.containsKey(pedestrian)){
+            pedSpecificStimuli.get(pedestrian).stream()
+                    .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
+                    .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+
+        }
+        return activeStimuli;
+
+    }
+
+    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian){
+        List<Stimulus> activeStimuli = new ArrayList<>();
+        if (pedSpecificStimuli.containsKey(pedestrian)){
+            pedSpecificStimuli.get(pedestrian).forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+        }
+        return activeStimuli;
+
+    }
+
+
+    private void setDynamicStimulus(Collection<Pedestrian> peds, StimulusInfo stimulusInfo){
+        for (Pedestrian ped : peds){
+            setDynamicStimulus(ped, stimulusInfo);
+        }
+    }
+
+    public void setDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
+        //TODO: check whether if-else is necessary
+
+        if (pedSpecificStimuli.containsKey(ped)) {
+            pedSpecificStimuli.get(ped).add(stimulusInfo);
+        }
+        else{
+            List<StimulusInfo> stimulusInfos = new ArrayList<>();
+            stimulusInfos.add(stimulusInfo);
+            pedSpecificStimuli.put(ped, stimulusInfos);
+        }
+    }
+
+    public void setDynamicStimulus(Pedestrian ped, Stimulus stimulus, double simTimeNextTimeStep){
+        List<StimulusInfo> stimuliList = new ArrayList<>();
+        if (pedSpecificStimuli.containsKey(ped)){
+            stimuliList.addAll(pedSpecificStimuli.get(ped));
+        }
+
+        List<Stimulus> newStimulus = new ArrayList<>();
+        newStimulus.add(stimulus);
+        StimulusInfo stimulusInfo = new StimulusInfo();
+        stimulusInfo.setTimeframe(new Timeframe(0, simTimeNextTimeStep, false, 0));
+        stimulusInfo.setStimuli(newStimulus);
+
+        pedSpecificStimuli.put(ped, stimuliList);
+
+    }
+
+
+
+
+
+
 
     private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {
         List<Stimulus> activeStimuli = new ArrayList<>();
