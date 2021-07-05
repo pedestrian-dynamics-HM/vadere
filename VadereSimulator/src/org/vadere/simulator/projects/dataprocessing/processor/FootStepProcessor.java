@@ -42,43 +42,8 @@ public class FootStepProcessor extends DataProcessor<EventtimePedestrianIdKey, F
             for (FootStep fs : footSteps) {
                 putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);
             }
-
-            //TODO: refactor
-            if ((footSteps.size() == 0) && (state.getStep() == 1)
-                    && ((pedestrian.getSelfCategory() == SelfCategory.WAIT) || (pedestrian.getSelfCategory() == SelfCategory.CHANGE_TARGET))) {
-                // add dummy footstep for self category visualization
-                FootStep fs = new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), 0.0, -1); // -1 needs to be corrected in the postloop
-                putValue(new EventtimePedestrianIdKey(state.getSimTimeInSec(), pedestrian.getId()), fs);
-            }
-
-
         }
     }
-
-    public void postLoop(final SimulationState state) {
-
-        // add correct end time to dummy footstep
-        //TODO: refactor
-        for (EventtimePedestrianIdKey key : this.getData().keySet()){
-            FootStep firstFootstep = this.getValue(key);
-            if (firstFootstep.getEndTime() == -1) {
-                for (EventtimePedestrianIdKey nextFootstep : this.getData().keySet()) {
-                    if (nextFootstep.getPedestrianId().equals(key.getPedestrianId()) &&
-                            this.getValue(nextFootstep).getStartTime() > 0.0) {
-                        FootStep fs = new FootStep(firstFootstep.getStart(),
-                                firstFootstep.getEnd(),
-                                firstFootstep.getStartTime(),
-                                this.getValue(nextFootstep).getStartTime());
-                        this.getData().replace(key, fs);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-
-
     @Override
     public void init(final ProcessorManager manager) {
         super.init(manager);
@@ -86,7 +51,6 @@ public class FootStepProcessor extends DataProcessor<EventtimePedestrianIdKey, F
 
     @Override
     public String[] toStrings(EventtimePedestrianIdKey key) {
-
         String[] footStepLine = this.getValue(key).getValueString();
 
         // Note: remove the "startTime" from the footStepLine because it is already included in the "simTime" of the
