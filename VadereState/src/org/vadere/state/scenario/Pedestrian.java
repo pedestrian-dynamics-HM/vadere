@@ -1,7 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.psychology.KnowledgeBase;
+import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;

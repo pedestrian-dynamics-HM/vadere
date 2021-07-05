@@ -6,6 +6,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootStep;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -70,8 +71,10 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		}
 	}
 

@@ -9,6 +9,7 @@ import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.StimulusFactory;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -259,6 +260,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			String selfCategoryString = row.getString(trajectories.selfCategoryCol);
 			pedestrian.setSelfCategory(SelfCategory.valueOf(selfCategoryString));
 		}
+
+		if (trajectories.informationStateCol != -1){
+			String informationStateString = row.getString(trajectories.informationStateCol);
+			pedestrian.getKnowledgeBase().setInformationState(InformationState.valueOf(informationStateString));
+		}
+
+
 
 		if(trajectories.groupMembershipCol != -1) {
 			String groupMembershipString = row.getString(trajectories.groupMembershipCol);
