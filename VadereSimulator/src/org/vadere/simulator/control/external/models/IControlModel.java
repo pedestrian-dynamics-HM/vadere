@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.external.models;
 
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.state.scenario.Topography;
 
 /**
@@ -15,8 +16,7 @@ import org.vadere.state.scenario.Topography;
 public interface IControlModel {
 
 
-    void update(Topography topo, Double time, String commandStr, Integer pedId);
-    void update(Topography topography, Double time, String command);
+    void update(Topography topo, Double time, String commandStr, Integer pedId, StimulusController stimulusController);
 
     void setReactionModel(ReactionModel reactionModel);
 }

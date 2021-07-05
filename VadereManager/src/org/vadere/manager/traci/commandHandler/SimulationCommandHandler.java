@@ -16,10 +16,10 @@ import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
-import org.vadere.simulator.control.external.models.ControlModel;
 import org.vadere.simulator.control.external.models.ControlModelBuilder;
 import org.vadere.simulator.control.external.models.IControlModel;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
@@ -239,8 +239,8 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			IControlModel controlModel = iControlModelHashMap.get(model_name);
 
 			remoteManager.accessState((manager, state) -> {
-				int i;
-				controlModel.update(state.getScenarioStore().getTopography(), state.getSimTimeInSec(), msg_content, specify_id);
+				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
+				controlModel.update(state.getScenarioStore().getTopography(), state.getSimTimeInSec(), msg_content, specify_id, stimulusController );
 			});
 
 			logger.infof("Received ControlCommand:");

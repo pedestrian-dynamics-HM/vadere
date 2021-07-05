@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.LinkedList;
@@ -53,7 +54,9 @@ public class RouteChoice extends ControlModel {
     protected void triggerRedRaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
-        ped.setTargets(newTargetList);
+        double timeCommandExecuted = this.simTime + 0.4; //TODO remove this hard coding
+        //ped.setTargets(newTargetList);
+        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
         logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
 
     }
