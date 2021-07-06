@@ -15,8 +15,10 @@ import org.vadere.state.scenario.Topography;
 
 public interface IControlModel {
 
+    void init(final Topography topo, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel);
+    void init(final Topography topo, final StimulusController stimulusController, final boolean isUsePsychologyLayer);
+    void init(final Topography topo, final ReactionModel reactionModel);
 
-    void update(Topography topo, Double time, String commandStr, Integer pedId, StimulusController stimulusController);
 
-    void setReactionModel(ReactionModel reactionModel);
+    void update(String commandStr, Double time, Integer pedId);
 }

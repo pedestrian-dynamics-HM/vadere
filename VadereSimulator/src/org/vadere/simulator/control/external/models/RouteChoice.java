@@ -54,10 +54,16 @@ public class RouteChoice extends ControlModel {
     protected void triggerRedRaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
-        double timeCommandExecuted = this.simTime + 0.4; //TODO remove this hard coding
-        //ped.setTargets(newTargetList);
-        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
-        logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+
+        if (isUsePsychologyLayer()) {
+            double timeCommandExecuted = this.simTime + 0.4;
+            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
+            logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
+        }else{
+            ped.setTargets(newTargetList);
+            logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+        }
+
 
     }
 
