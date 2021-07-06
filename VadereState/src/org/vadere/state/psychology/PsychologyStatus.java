@@ -2,8 +2,10 @@ package org.vadere.state.psychology;
 
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.perception.ThreatMemory;
+import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 
 public class PsychologyStatus {
@@ -46,6 +48,9 @@ public class PsychologyStatus {
     // Setter
     public void setMostImportantStimulus(Stimulus mostImportantStimulus) {
         this.mostImportantStimulus = mostImportantStimulus;
+        if (!(mostImportantStimulus instanceof ElapsedTime)){
+            this.getKnowledgeBase().setInformationState(InformationState.INFORMATION_STIMULUS);
+        }
     }
 
     public void setThreatMemory(ThreatMemory threatMemory) { this.threatMemory = threatMemory; }

@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -61,6 +62,7 @@ public class RouteChoice extends ControlModel {
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
             ped.setTargets(newTargetList);
+            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
             logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
         }
 

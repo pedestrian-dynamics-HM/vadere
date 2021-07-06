@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -155,6 +156,9 @@ public abstract class ControlModel implements IControlModel {
     public void setAction(Pedestrian ped){
         if (isPedReact()){
             triggerRedRaction(ped);
+        }
+        else{
+            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
         }
     }
 
