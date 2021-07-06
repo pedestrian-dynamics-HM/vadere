@@ -84,15 +84,20 @@ public class StimulusController {
         HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
 
         for (Pedestrian ped : peds) {
-            List<Stimulus> stimuli = new ArrayList<>();
-            // these stimuli are equal for any pedestrian
-            stimuli = getStimuliForTime(simulationTime);
-
-            // the following stimuli are pedestrian-specific
-            stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime));
+            pedSpecificStimuliForTime.put(ped, getStimuliForTime(simulationTime, ped));
         }
 
         return pedSpecificStimuliForTime;
+    }
+
+    public List<Stimulus> getStimuliForTime(double simulationTime, Pedestrian ped) {
+
+        List<Stimulus> stimuli = new ArrayList<>();
+        stimuli = getStimuliForTime(simulationTime);
+        stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime));
+
+        return stimuli;
+
     }
 
     private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime){
@@ -114,6 +119,17 @@ public class StimulusController {
         }
         return activeStimuli;
 
+    }
+
+    public void setDynamicStimulus(StimulusInfo stimulusInfo){
+        List<StimulusInfo> stimuliList = new ArrayList<>();
+        stimuliList.add(stimulusInfo);
+
+        List<StimulusInfo> oneTimeDynamicStimuli = filterOneTimeStimuli(stimuliList);
+        List<StimulusInfo> recurringDynamicStimuli = filterRecurringStimuli(stimuliList);
+
+        oneTimeStimuli.addAll(oneTimeDynamicStimuli);
+        recurringStimuli.addAll(recurringDynamicStimuli);
     }
 
 
