@@ -239,9 +239,18 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 			if (!iControlModelHashMap.containsKey(model_name)) {
 				logger.infof("Model" + model_name + " not found. Try to initialize from model name.");
-				IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-				iControlModelHashMap.put(model_name, controlModel);
+				remoteManager.accessState((manager, state) -> {
+					StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
+					Topography topography = state.getTopography();
+					boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
+					ReactionModel reactionModel = new ReactionModel();
+
+					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
+					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					iControlModelHashMap.put(model_name, controlModel);
+				});
 			}
+
 
 			IControlModel controlModel = iControlModelHashMap.get(model_name);
 
