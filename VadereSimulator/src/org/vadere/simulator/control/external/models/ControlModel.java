@@ -3,6 +3,9 @@ package org.vadere.simulator.control.external.models;
 
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -21,6 +24,8 @@ public abstract class ControlModel implements IControlModel {
     private CtlCommand command;
     protected ReactionModel reactionModel;
     protected HashMap<Pedestrian,LinkedList<Integer>> processedAgents;
+    protected StimulusController stimulusController;
+    private boolean isUsePsychologyLayer = false;
 
 
     public ControlModel(){
@@ -29,11 +34,39 @@ public abstract class ControlModel implements IControlModel {
         processedAgents = new HashMap<>();
     }
 
-    public ControlModel(ReactionModel reactionModel){
-        simTime = 0.0;
-        this.reactionModel = reactionModel;
+
+    @Override
+    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel) {
         processedAgents = new HashMap<>();
+        simTime = 0.0;
+
+        this.topography = topography;
+        this.stimulusController = stimulusController;
+        this.isUsePsychologyLayer = isUsePsychologyLayer;
+        this.reactionModel = reactionModel;
     }
+
+    @Override
+    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer){
+        processedAgents = new HashMap<>();
+        simTime = 0.0;
+
+        this.topography = topography;
+        this.stimulusController = stimulusController;
+        this.isUsePsychologyLayer = isUsePsychologyLayer;
+        this.reactionModel = new ReactionModel();
+    }
+
+    @Override
+    public void init(final Topography topography, final ReactionModel reactionModel){
+        processedAgents = new HashMap<>();
+        simTime = 0.0;
+
+        this.topography = topography;
+        this.isUsePsychologyLayer = false;
+        this.reactionModel = reactionModel;
+    }
+
 
 
     public abstract boolean isPedReact();
@@ -69,8 +102,8 @@ public abstract class ControlModel implements IControlModel {
 
     public abstract void getControlAction(Pedestrian ped, JSONObject command);
 
-    public void update(Topography topo, Double time, String commandStr, Integer pedId)  {
-        topography = topo;
+    public void update(String commandStr, Double time, Integer pedId)  {
+
         simTime = time;
         command = new CtlCommand(commandStr);
 
@@ -86,9 +119,8 @@ public abstract class ControlModel implements IControlModel {
         }
     }
 
-    public void update(Topography topography, Double time, String command) {
-        update(topography,time,command,-1);
-
+    public void update(String command,  Double time) {
+        update(command, time,-1);
     }
 
     private LinkedList<Integer> get_pedIds(Integer pedId)
@@ -125,10 +157,9 @@ public abstract class ControlModel implements IControlModel {
         if (isPedReact()){
             triggerRedRaction(ped);
         }
-    }
-
-    public void setReactionModel(ReactionModel reactionModel){
-        this.reactionModel = reactionModel;
+        else{
+            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
+        }
     }
 
     public boolean isInformationProcessed(Pedestrian ped, int commandId){
@@ -154,5 +185,7 @@ public abstract class ControlModel implements IControlModel {
     }
 
 
-
+    public boolean isUsePsychologyLayer() {
+        return isUsePsychologyLayer;
+    }
 }
