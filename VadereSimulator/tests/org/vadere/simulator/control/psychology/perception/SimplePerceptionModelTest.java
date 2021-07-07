@@ -134,7 +134,7 @@ public class SimplePerceptionModelTest {
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(pedestrians,stimuli);
 
         // Use "==" to compare if it is the same reference!
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));

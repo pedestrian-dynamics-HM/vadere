@@ -16,15 +16,16 @@ import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
-import org.vadere.simulator.control.external.models.ControlModel;
 import org.vadere.simulator.control.external.models.ControlModelBuilder;
 import org.vadere.simulator.control.external.models.IControlModel;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
+import org.vadere.state.scenario.Topography;
 import org.vadere.state.traci.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -196,13 +197,19 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
 			reactionModelParameter = (String) cfg.getData(2, TraCIDataType.STRING);
 
-			ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
+			remoteManager.accessState((manager, state) -> {
+				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
+				Topography topography = state.getTopography();
+				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
+				ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
 
-			if (!iControlModelHashMap.containsKey(controlModelName)) {
-				IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
-				controlModel.setReactionModel(reactionModel);
-				iControlModelHashMap.put(controlModelName, controlModel);
-			}
+				if (!iControlModelHashMap.containsKey(controlModelName)) {
+					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
+					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					iControlModelHashMap.put(controlModelName, controlModel);
+				}
+
+			});
 
 			logger.infof("Received ControlInitCommand:");
 			logger.infof(cfg.toString());
@@ -232,15 +239,23 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 			if (!iControlModelHashMap.containsKey(model_name)) {
 				logger.infof("Model" + model_name + " not found. Try to initialize from model name.");
-				IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-				iControlModelHashMap.put(model_name, controlModel);
+				remoteManager.accessState((manager, state) -> {
+					StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
+					Topography topography = state.getTopography();
+					boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
+					ReactionModel reactionModel = new ReactionModel();
+
+					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
+					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					iControlModelHashMap.put(model_name, controlModel);
+				});
 			}
+
 
 			IControlModel controlModel = iControlModelHashMap.get(model_name);
 
 			remoteManager.accessState((manager, state) -> {
-				int i;
-				controlModel.update(state.getScenarioStore().getTopography(), state.getSimTimeInSec(), msg_content, specify_id);
+				controlModel.update(msg_content, state.getSimTimeInSec(), specify_id);
 			});
 
 			logger.infof("Received ControlCommand:");

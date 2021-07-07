@@ -27,10 +27,7 @@ import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulation implements ControllerProvider{
@@ -453,8 +450,8 @@ public class Simulation implements ControllerProvider{
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
-			List<Stimulus> stimuli = stimulusController.getStimuliForTime(simTimeInSec);
-			perceptionModel.update(pedestrians, stimuli);
+			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
+			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
 		} else {
 			ElapsedTime elapsedTime = new ElapsedTime(simTimeInSec);

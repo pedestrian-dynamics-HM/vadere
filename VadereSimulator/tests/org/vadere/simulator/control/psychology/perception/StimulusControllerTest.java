@@ -2,15 +2,15 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -414,6 +414,65 @@ public class StimulusControllerTest {
         assertTimeStamp(stimuli, 8.3);
 
     }
+
+    @Test
+    public void getStimuliForDynamicPedSpecificStimuli(){
+
+        Stimulus stimulus1 = new Wait(2.0);
+
+        Pedestrian ped = new Pedestrian(new AttributesAgent(), new Random());
+        LinkedList<Integer> expectedTargetIdList = new LinkedList<>();
+        expectedTargetIdList.add(1);
+        Stimulus changeTargetOriginal = new ChangeTarget(4.0, expectedTargetIdList);
+
+
+        StimulusInfo stimulusInfo1 = getStimulusInfo(new Timeframe(0, 7, false,0), stimulus1);
+
+        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
+        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
+
+        List<Stimulus> stimuli1, pedSpecificStimuli;
+
+        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 4.0, false,0), changeTargetOriginal);
+        stimulusController.setDynamicStimulus(ped, stimulusInfo2);
+
+        stimuli1 = stimulusController.getStimuliForTime(4.0);
+        assertEquals(2, stimuli1.size());
+
+        pedSpecificStimuli = stimulusController.getStimuliForTime(4.0, ped);
+        assertEquals(3, pedSpecificStimuli.size());
+
+    }
+
+    @Test
+    public void getDynamicStimuli(){
+
+        Stimulus stimulus1 = new Wait(2.0);
+
+        LinkedList<Integer> expectedTargetIdList = new LinkedList<>();
+        expectedTargetIdList.add(1);
+        Stimulus changeTargetOriginal = new ChangeTarget(4.0, expectedTargetIdList);
+
+
+        StimulusInfo stimulusInfo1 = getStimulusInfo(new Timeframe(0, 7, false,0), stimulus1);
+
+        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
+        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
+
+        List<Stimulus> stimuli1, pedSpecificStimuli;
+
+        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 4.0, false,0), changeTargetOriginal);
+        stimulusController.setDynamicStimulus(stimulusInfo2);
+
+        stimuli1 = stimulusController.getStimuliForTime(4.0);
+        assertEquals(3, stimuli1.size());
+
+    }
+
+
+
+
+
 
     private void assertTimeStamp(List<Stimulus> stimuli, double simTime){
         stimuli.forEach(e -> assertEquals(e.getTime(), simTime, 1e-3));

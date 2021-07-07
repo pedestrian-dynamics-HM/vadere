@@ -3,6 +3,7 @@ package org.vadere.simulator.control.external.models;
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
+import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -135,8 +136,9 @@ public class RouteChoiceTest {
 
         RouteChoice routeChoice = new RouteChoice();
         Topography topo = createTopography(createPedestrians(nr_peds));
+        routeChoice.init(topo, new ReactionModel());
 
-        routeChoice.update(topo, -1.0, msg);
+        routeChoice.update(msg, -1.0);
 
         double prob;
         for (int i = 0; i < targets.length; i++) {
@@ -155,7 +157,8 @@ public class RouteChoiceTest {
 
         String msg = readInputFile();
         RouteChoice routeChoice = new RouteChoice();
-        routeChoice.update(topo, 6.0, msg);
+        routeChoice.init(topo, new ReactionModel());
+        routeChoice.update(msg, 6.0);
 
         int target = topo.getPedestrianDynamicElements().getElement(0).getNextTargetId();
         assertEquals(target, 4);
@@ -170,8 +173,10 @@ public class RouteChoiceTest {
 
         String msg = readInputFile();
         RouteChoice routeChoice = new RouteChoice();
+        routeChoice.init(topo, new ReactionModel());
+
         // keep old target nr.5 because timeout reached
-        routeChoice.update(topo, 10.0, msg);
+        routeChoice.update(msg, 10.0);
 
         int target = topo.getPedestrianDynamicElements().getElement(0).getNextTargetId();
         assertEquals(target, 5);
@@ -188,8 +193,10 @@ public class RouteChoiceTest {
 
         String msg = readInputFile();
         RouteChoice routeChoice = new RouteChoice();
+        routeChoice.init(topo, new ReactionModel());
+
         // keep old target nr.5 because timeout reached
-        routeChoice.update(topo, -1., msg);
+        routeChoice.update(msg, -1.);
 
         int target = ped.getNextTargetId();
         assertEquals(target, 5);
@@ -205,8 +212,10 @@ public class RouteChoiceTest {
 
         String msg = readInputFile();
         RouteChoice routeChoice = new RouteChoice();
+        routeChoice.init(topo, new ReactionModel());
+
         // keep old target nr.5 because timeout reached
-        routeChoice.update(topo, -1., msg);
+        routeChoice.update(msg, -1.);
 
         int target = ped.getNextTargetId();
         assertEquals(target, 4);
@@ -222,8 +231,10 @@ public class RouteChoiceTest {
 
         String msg = readInputFile3();
         RouteChoice routeChoice = new RouteChoice();
+        routeChoice.init(topo, new ReactionModel());
+
         // keep old target nr.5 because timeout reached
-        routeChoice.update(topo, -1., msg);
+        routeChoice.update(msg, -1.);
 
         int target = ped.getNextTargetId();
         assertEquals(target, 2);
@@ -241,7 +252,9 @@ public class RouteChoiceTest {
 
         String msg = readInputFile2();
         RouteChoice routeChoice = new RouteChoice();
-        routeChoice.update(topo, -1., msg);
+        routeChoice.init(topo, new ReactionModel());
+
+        routeChoice.update(msg, -1.);
     }
 
     @Test
@@ -262,12 +275,13 @@ public class RouteChoiceTest {
         ped.setPosition(new VPoint(0.,0.));
 
         RouteChoice routeChoice = new RouteChoice();
+        routeChoice.init(topo,new ReactionModel());
         // keep old target nr.5 because timeout reached
-        routeChoice.update(topo, -1., readInputFile());
+        routeChoice.update(readInputFile(), -1.);
         assertEquals(ped.getNextTargetId(), 4);
 
         // readInputFile3() provides target 2. it is skipped because the command id is the same.
-        routeChoice.update(topo, -1., readInputFile3());
+        routeChoice.update(readInputFile3(), -1.);
         assertEquals(ped.getNextTargetId(), 4);
 
     }
