@@ -1,8 +1,8 @@
 {
-  "name" : "modellvergleich_queue",
-  "description" : "",
+  "name" : "queueScenario_modelComparison",
+  "description" : "This scenario is used for comparing the simulation output between the implementations of the infection model in crowd:it and vadere.",
   "release" : "1.15",
-  "commithash" : "6b1a27425f333526008fdfb9e1c8cfa712f6ff80",
+  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
