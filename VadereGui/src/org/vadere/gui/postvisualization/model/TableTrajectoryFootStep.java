@@ -58,6 +58,7 @@ public class TableTrajectoryFootStep {
 	public final int mostImportantStimulusCol;
 	public final int selfCategoryCol;
 	public final int groupMembershipCol;
+	public final int informationStateCol;
 
 	public static final int agentDFPedIdCol = 0;
 	public static final int birthTimeCol = 1;
@@ -89,6 +90,7 @@ public class TableTrajectoryFootStep {
 		mostImportantStimulusCol = columnNames.getMostImportantStimulusCol(dataFrame);
 		selfCategoryCol = columnNames.getSelfCategoryCol(dataFrame);
 		groupMembershipCol = columnNames.getGroupMembershipCol(dataFrame);
+		informationStateCol = columnNames.getInformationStateCol(dataFrame);
 
 
 		this.trajectoryDataFrame = dataFrame;

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 import static org.vadere.state.scenario.DropletCloud.createTransformedDropletCloudShape;
-
 import org.vadere.state.health.*;
 
 /**
@@ -134,19 +133,19 @@ public class InfectionModel extends AbstractSirModel {
 
 	public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
 
-			if (pedestrian.isStartingBreatheOut()) {
-				pedestrian.setStartBreatheOutPosition(pedestrian.getPosition());
+		if (pedestrian.isStartingBreatheOut()) {
+			pedestrian.setStartBreatheOutPosition(pedestrian.getPosition());
 
-			} else if (pedestrian.isStartingBreatheIn()) {
-				VPoint startBreatheOutPosition = pedestrian.getStartBreatheOutPosition();
-				VPoint stopBreatheOutPosition = pedestrian.getPosition();
+		} else if (pedestrian.isStartingBreatheIn()) {
+			VPoint startBreatheOutPosition = pedestrian.getStartBreatheOutPosition();
+			VPoint stopBreatheOutPosition = pedestrian.getPosition();
 
-				AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, pedestrian, startBreatheOutPosition, stopBreatheOutPosition);
-				topography.addAerosolCloud(aerosolCloud);
+			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, pedestrian, startBreatheOutPosition, stopBreatheOutPosition);
+			topography.addAerosolCloud(aerosolCloud);
 
-				// reset pedestrian's startBreatheOutPosition
-				pedestrian.setStartBreatheOutPosition(null);
-			}
+			// reset pedestrian's startBreatheOutPosition
+			pedestrian.setStartBreatheOutPosition(null);
+		}
 	}
 
 	private AerosolCloud generateAerosolCloud(double simTimeInSec, Pedestrian pedestrian, VPoint v1, VPoint v2) {

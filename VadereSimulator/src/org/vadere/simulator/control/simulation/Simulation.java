@@ -27,10 +27,7 @@ import org.vadere.state.scenario.*;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
@@ -340,8 +337,8 @@ public class Simulation implements ControllerProvider{
 						// check reached next simTime (-1 simulate one step)
 						// round to long to ensure correct trap.
 						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
-						if (timeReached || simulateUntilInSec == -1){
-							logger.debugf("Simulated until: %.4f", simTimeInSec);
+						if (timeReached && isRunSimulation){
+							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
 						}
 					}
@@ -460,8 +457,8 @@ public class Simulation implements ControllerProvider{
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
-			List<Stimulus> stimuli = stimulusController.getStimuliForTime(simTimeInSec);
-			perceptionModel.update(pedestrians, stimuli);
+			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
+			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
 		} else {
 			ElapsedTime elapsedTime = new ElapsedTime(simTimeInSec);
@@ -625,6 +622,10 @@ public class Simulation implements ControllerProvider{
 	@Override
 	public ProcessorManager getProcessorManager() {
 		return processorManager;
+	}
+
+	public void setIsRunSimulation(boolean running){
+		isRunSimulation = running;
 	}
 
 }

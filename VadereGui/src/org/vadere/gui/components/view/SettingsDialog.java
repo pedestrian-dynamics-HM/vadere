@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.system.CallbackI;
 import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
@@ -14,6 +13,7 @@ import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
 
@@ -253,6 +253,8 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
 		JRadioButton rbInfectionStatusColoring = createRadioButtonWithListener(AgentColoring.INFECTION_STATUS, Messages.getString("SettingsDialog.lblInfectionStatusColoring.text")+ ":");
+		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+
 
 		rbTargetColoring.setSelected(true);
 		model.setAgentColoring(AgentColoring.TARGET);
@@ -263,6 +265,7 @@ public class SettingsDialog extends JDialog {
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
 		group.add(rbInfectionStatusColoring);
+		group.add(rbInformationColoring);
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
@@ -283,6 +286,13 @@ public class SettingsDialog extends JDialog {
 		final JButton bChangeInfectionStatusColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringByInfectionStatus(cbInfectionStatuses, pInfectionStatus, bChangeInfectionStatusColor);
+
+		JComboBox<InformationState> cbInformationStates = createInformationStateComboBox();
+		final JPanel pInformationStateColor = new JPanel();
+		final JButton bChangeInformationStateColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringByInformationState(cbInformationStates, pInformationStateColor, bChangeInformationStateColor);
+
 
 		int row = 0;
 		int column1 = 2;
@@ -314,6 +324,11 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pInfectionStatus, cc.xy(column3, row));
 		colorSettingsPane.add(bChangeInfectionStatusColor, cc.xy(column4, row));
 
+		colorSettingsPane.add(rbInformationColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbInformationStates, cc.xy(column2, row));
+		colorSettingsPane.add(pInformationStateColor, cc.xy(column3, row));
+		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column4, row));
+
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
 
@@ -342,13 +357,16 @@ public class SettingsDialog extends JDialog {
 
 	private JComboBox<SelfCategory> createSelfCategoriesComboBox() {
 		JComboBox<SelfCategory> comboBox = new JComboBox<>(SelfCategory.values());
-
 		return comboBox;
 	}
 
 	private JComboBox<InfectionStatus> createInfectionStatusesComboBox() {
 		JComboBox<InfectionStatus> comboBox = new JComboBox<>(InfectionStatus.values());
+		return comboBox;
+	}
 
+	private JComboBox<InformationState> createInformationStateComboBox() {
+		JComboBox<InformationState> comboBox = new JComboBox<>(InformationState.values());
 		return comboBox;
 	}
 
@@ -425,6 +443,30 @@ public class SettingsDialog extends JDialog {
 			pInfectionStatusColor.setBackground(model.config.getInfectionStatusColor(selectedInfectionStatusInner));
 		});
 	}
+
+	private void initColoringByInformationState(JComboBox<InformationState> cbInformationStates, JPanel pInformationStateColor, JButton bChangeInformationStateColor) {
+
+		cbInformationStates.setSelectedIndex(0);
+
+		InformationState selectedInformationState = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+		Color informationStateColor = model.config.getInformationStateColor(selectedInformationState);
+
+		pInformationStateColor.setBackground(informationStateColor);
+		pInformationStateColor.setPreferredSize(new Dimension(130, 20));
+
+		// When user changes a color, save it in the model.
+		bChangeInformationStateColor.addActionListener(new ActionSetInformationStateColor("Set Information State Color", model, pInformationStateColor,
+				cbInformationStates));
+
+		// Retrieve configured color from "model".
+		cbInformationStates.addActionListener(e -> {
+			InformationState selectedInformationStateInner = cbInformationStates.getItemAt(cbInformationStates.getSelectedIndex());
+			pInformationStateColor.setBackground(model.config.getInformationStateColor(selectedInformationStateInner));
+		});
+
+		int i;
+	}
+
 
 	private void initOtherSettingsPane(JLayeredPane otherSettingsPane) {
 		otherSettingsPane.setBorder(

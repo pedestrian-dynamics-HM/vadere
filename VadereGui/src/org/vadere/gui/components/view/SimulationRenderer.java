@@ -317,6 +317,11 @@ public abstract class SimulationRenderer extends DefaultRenderer {
                     Pedestrian pedestrian = (Pedestrian) agent;
                     return model.config.getSelfCategoryColor(pedestrian.getSelfCategory());
                 }
+            case INFORMATION_STATE:
+                if (agent instanceof Pedestrian) {
+                    Pedestrian pedestrian = (Pedestrian) agent;
+                    return model.config.getInformationStateColor(pedestrian.getKnowledgeBase().getInformationState());
+                }
 		    case PREDICATE: {
 		    	if (model instanceof PostvisualizationModel) {
 				    return ((PostvisualizationModel) model)

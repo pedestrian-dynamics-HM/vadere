@@ -1,13 +1,14 @@
 {
   "time" : 7.0,
   "space" : {
-     "x" : 0.0,
-     "y" : 0.0,
-     "radius": 100
+    "x" : 0.0,
+    "y" : 0.0,
+    "height": 100,
+    "width": 100
   },
   "command" : {
     "targetIds" : [1,2,3,4] ,
-    "probability" : [0.25, 0, 0.25, 0.5]
+    "probability" : [0, 1, 0, 0]
   },
   "commandId" : 1
 }

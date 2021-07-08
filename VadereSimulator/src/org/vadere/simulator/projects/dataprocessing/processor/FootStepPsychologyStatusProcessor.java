@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -17,7 +18,7 @@ import java.util.LinkedList;
 @DataProcessorClass()
 public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
 
-	public static String[] HEADERS = { "mostImportantStimulus", "selfCategory", "groupMembership" };
+	public static String[] HEADERS = { "mostImportantStimulus", "selfCategory", "groupMembership", "informationState" };
 
 	public FootStepPsychologyStatusProcessor() {
 		super(HEADERS);
@@ -37,10 +38,11 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 	}
 
 	private String psychologyStatusToString(Pedestrian pedestrian) {
-		String statusAsString = String.format("%s %s %s",
+		String statusAsString = String.format("%s %s %s %s",
 				pedestrian.getMostImportantStimulus().toStringForOutputProcessor(),
 				pedestrian.getSelfCategory().toString(),
-				pedestrian.getGroupMembership().toString()
+				pedestrian.getGroupMembership().toString(),
+				pedestrian.getKnowledgeBase().getInformationState().toString()
 				);
 
 		return statusAsString;
