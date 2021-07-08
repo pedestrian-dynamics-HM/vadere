@@ -224,7 +224,7 @@ public class InfectionModel extends AbstractSirModel {
 					.collect(Collectors.toSet());
 
 			for (Pedestrian pedestrian : breathingInPedsInsideCloud) {
-				double volume = aerosolCloud.getHeigth() * aerosolCloud.getArea();
+				double volume = aerosolCloud.getHeight() * aerosolCloud.getArea();
 				double meanPathogenConcentration = aerosolCloud.getCurrentPathogenLoad() / volume;
 				// assumption: the pathogen is distributed uniformly within the aerosolCloud
 				// alternatively, calculate the level according to a gaussian distribution with	and multiply with the

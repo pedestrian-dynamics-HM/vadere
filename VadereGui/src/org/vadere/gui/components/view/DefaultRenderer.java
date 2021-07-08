@@ -298,7 +298,7 @@ public abstract class DefaultRenderer {
 		float minAlpha = 10; //defaultModel.getConfig().getAerosolCloudAlphaMin()
 		double initialVolume = 4.0 / 3.0 * Math.pow(0.5, 3) * Math.PI;
 		double maxPathogenConcentration = cloud.getInitialPathogenLoad() / initialVolume;
-		double currentPathogenConcentration = cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeigth());
+		double currentPathogenConcentration = cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeight());
 		int currentAlpha = (int) ((currentPathogenConcentration / maxPathogenConcentration) * (maxAlpha - minAlpha) + minAlpha);
 
 		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));

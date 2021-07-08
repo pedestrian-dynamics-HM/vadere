@@ -34,7 +34,7 @@ public class AerosolCloudDataProcessor extends DataProcessor<TimestepIdDataKey, 
 
             double area = cloud.getArea();
             double load = cloud.getCurrentPathogenLoad();
-            double concentration = load / (cloud.getHeigth() * area);
+            double concentration = load / (cloud.getHeight() * area);
             putValue(key, Triple.of(area, load, concentration));
         }
     }

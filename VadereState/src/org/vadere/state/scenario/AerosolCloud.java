@@ -55,7 +55,7 @@ public class AerosolCloud extends ScenarioElement {
         return attributes.getArea();
     }
 
-    public double getHeigth() {
+    public double getHeight() {
         return attributes.getHeight();
     }
 
