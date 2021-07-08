@@ -11,12 +11,13 @@ public class ReactionParameter {
     int options = -1;
     HashMap<Integer, DistParameters> dist = new HashMap<>();
     private JSONObject rawCommand;
+    private boolean isReactingToRecurringInformation = false;
+    private boolean isReactingToFirstInformationOnly = true;
 
 
     public ReactionParameter(String command) {
         this(new JSONObject(command));
     }
-
 
 
     public ReactionParameter(JSONObject command) {
@@ -43,6 +44,24 @@ public class ReactionParameter {
                 dist.put(i, new DistParameters(multipleDists.getJSONObject(i)));
             }
         }
+    }
+
+    public boolean isReactingToRecurringInformation(){
+        String key = "isReactingToRecurringInformation";
+
+        if (rawCommand.has(key)) {
+            return rawCommand.getBoolean(key);
+        }
+        return isReactingToRecurringInformation;
+    }
+
+    public boolean isReactingToFirstInformationOnly(){
+        String key = "isReactingToFirstInformationOnly";
+
+        if (rawCommand.has(key)) {
+            return rawCommand.getBoolean(key);
+        }
+        return isReactingToFirstInformationOnly;
     }
 
 

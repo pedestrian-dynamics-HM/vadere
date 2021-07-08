@@ -2,6 +2,7 @@ package org.vadere.state.psychology;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.perception.types.KnowledgeItem;
 
 import java.util.ArrayList;

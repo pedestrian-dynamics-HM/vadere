@@ -17,6 +17,7 @@ import org.vadere.manager.traci.response.TraCIGetVersionResponse;
 import org.vadere.manager.traci.response.TraCIResponse;
 import org.vadere.manager.traci.response.TraCISimTimeResponse;
 import org.vadere.manager.traci.response.TraCIStatusResponse;
+import org.vadere.simulator.control.simulation.SimThreadState;
 
 import java.util.HashMap;
 
@@ -31,8 +32,7 @@ public class ControlCommandHandlerTest extends CommandHandlerTest {
 
 	private ControlCommandHandler ctrCmdHandler = ControlCommandHandler.instance;
 
-	@Test
-	public void process_close() {
+	private void process_close_(SimThreadState simThreadState) {
 
 		TraCICmd traciCmd = TraCICmd.CLOSE;
 		CmdType cmdType = traciCmd.type;
@@ -40,6 +40,7 @@ public class ControlCommandHandlerTest extends CommandHandlerTest {
 		TraCICloseCommand rawCmd = (TraCICloseCommand) getFirstCommand(TraCICloseCommand.build());
 		RemoteManager rm = mock(RemoteManager.class, Mockito.RETURNS_DEEP_STUBS);
 		doNothing().when(rm).setClientCloseCommandReceived(true);
+		when(rm.getCurrentSimThreadState()).thenReturn(simThreadState);
 		TraCICommand cmd = ctrCmdHandler.process_close(rawCmd, rm);
 
 		testTraCICommand(cmd, traciCmd, cmdType);
@@ -49,6 +50,23 @@ public class ControlCommandHandlerTest extends CommandHandlerTest {
 		assertThat(closeCommand.getResponse().getStatusResponse().getResponse(), equalTo(TraCIStatusResponse.OK));
 		TraCIResponse res = closeCommand.getResponse();
 	}
+
+	@Test
+	public void process_close(){
+		process_close_(SimThreadState.INIT);
+	}
+
+	@Test
+	public void process_close_mainLoop(){
+		process_close_(SimThreadState.MAIN_LOOP);
+	}
+
+	@Test
+	public void process_close_postLoop(){
+		process_close_(SimThreadState.POST_LOOP);
+	}
+
+
 
 	@Test
 	public void process_simStep() {

@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.visualization.ColorHelper;
 
@@ -51,6 +51,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private Map<Integer, Color> randomColors = new HashMap<>();
 	private Map<Integer, Color> selfCategoryColors = new HashMap<>();
 	private Map<Integer, Color> infectionStatusColors = new HashMap<>();
+	private Map<Integer, Color> informationStateColors = new HashMap<>();
 	private double gridWidth = CONFIG.getDouble("ProjectView.cellWidth");
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
 	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
@@ -67,6 +68,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.pedestrianColors = new HashMap<>();
 		this.selfCategoryColors = new HashMap<>();
 		this.infectionStatusColors = new HashMap<>();
+		this.informationStateColors = new HashMap<>();
 
 		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
 			this.pedestrianColors.put(new Integer(entry.getKey()), new Color(entry.getValue().getRed(), entry
@@ -339,6 +341,12 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
+	public void setInformationStateColor(InformationState informationState, final Color color) {
+		this.informationStateColors.put(informationState.ordinal(), color);
+		setChanged();
+	}
+
+
 	public Color getSelfCategoryColor(SelfCategory selfCategory) {
 		Color color = getPedestrianDefaultColor();
 
@@ -353,6 +361,16 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 		if (infectionStatusColors.containsKey(infectionStatus.ordinal())) {
 			color = infectionStatusColors.get(infectionStatus.ordinal());
+		}
+
+		return color;
+	}
+
+	public Color getInformationStateColor(InformationState informationState) {
+		Color color = getPedestrianDefaultColor();
+
+		if (informationStateColors.containsKey(informationState.ordinal())) {
+			color = informationStateColors.get(informationState.ordinal());
 		}
 
 		return color;

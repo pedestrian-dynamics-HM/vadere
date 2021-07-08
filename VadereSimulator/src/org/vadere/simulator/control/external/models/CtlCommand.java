@@ -3,13 +3,17 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.time.temporal.ValueRange;
 
 
 public class CtlCommand {
 
+    private int commandId = 0;
     JSONObject rawCommand;
-    VCircle space;
+    VShape space;
     Double time;
     JSONObject pedCommand;
 
@@ -39,26 +43,42 @@ public class CtlCommand {
         return time;
     }
 
-    public VCircle getSpace(){
+    public VShape getSpace(){
         // only radius
 
         VShape shape;
         double x = 0;
         double y = 0;
         double radius = 0;
+        double height = 0;
+        double width = 0;
         try {
             JSONObject space = rawCommand.getJSONObject("space");
             x = space.getDouble("x");
             y = space.getDouble("y");
-            radius = space.getDouble("radius");
-
-            if (radius>=0) {
-                this.space = new VCircle(x, y, radius);
-            }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        try {
+            JSONObject space = rawCommand.getJSONObject("space");
+            radius = space.getDouble("radius");
+
+            if (radius > 0) {
+                this.space = new VCircle(x, y, radius);
+            }
+        } catch (JSONException ignored) {}
+
+        try {
+            JSONObject space = rawCommand.getJSONObject("space");
+            height = space.getDouble("height");
+            width = space.getDouble("width");
+
+            if ((height > 0) && (width > 0)) {
+                this.space = new VRectangle(x, y, width, height);
+            }
+        } catch (JSONException ignored) {}
+
         return this.space;
 
     }
@@ -66,7 +86,6 @@ public class CtlCommand {
     public boolean isSpaceBounded(){
         return (getSpace() != null);
     }
-
 
 
 
@@ -80,8 +99,11 @@ public class CtlCommand {
 
     }
 
-
-
-
+    public int getCommandId() {
+        try {
+            commandId = rawCommand.getInt("commandId");
+        } catch (JSONException ignored) { }
+        return commandId;
+    }
 
 }

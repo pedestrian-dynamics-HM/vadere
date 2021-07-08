@@ -13,6 +13,7 @@ import org.vadere.manager.traci.commands.TraCIGetCommand;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.KnowledgeItem;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.traci.CompoundObject;
@@ -419,6 +420,7 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
 			if (checkIfPedestrianExists(ped, cmd)) {
 				KnowledgeItem s = new KnowledgeItem(start_t, obsolete_at, information);
 				ped.getKnowledgeBase().addInformation(s);
+				ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
 				cmd.setOK();
 			}
 		});

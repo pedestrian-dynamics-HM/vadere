@@ -53,8 +53,11 @@ public class RemoteScenarioRun extends ScenarioRun implements RemoteRunListener 
 		return true;
 	}
 
-	synchronized public SimThreadState  getCurrentSimThreadState(){
+	synchronized public SimThreadState getCurrentSimThreadState(){
 		if (simulation == null){
+			return SimThreadState.INIT;
+		}
+		else if (simulation.getThreadState() == null){
 			return SimThreadState.INIT;
 		}
 		return simulation.getThreadState();

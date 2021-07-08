@@ -1,11 +1,13 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
+import org.lwjgl.system.CallbackI;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +26,20 @@ public class SimplePerceptionModel implements IPerceptionModel {
     }
 
     @Override
-    public void update(Collection<Pedestrian> pedestrians, List<Stimulus> stimuli) {
-        for (Pedestrian pedestrian : pedestrians) {
-            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(stimuli, pedestrian);
+    public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {
+        for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
+            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
+
+    public void update(Collection<Pedestrian> pedestrians, List<Stimulus> generalStimuli) {
+        for (Pedestrian pedestrian :pedestrians) {
+            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(generalStimuli, pedestrian);
+            pedestrian.setMostImportantStimulus(mostImportantStimulus);
+        }
+    }
+
 
     private Stimulus rankChangeTargetAndThreatHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
         // Assume the "ElapsedTime" is the most important stimulus
