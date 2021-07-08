@@ -1,7 +1,8 @@
 {
-  "name" : "infectionModel_basic_2_density_discrete_ca_5_sources",
+  "name" : "basic_2_density_discrete_ca_5_sources",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

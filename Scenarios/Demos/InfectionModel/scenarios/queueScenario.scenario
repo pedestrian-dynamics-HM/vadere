@@ -1,7 +1,8 @@
 {
-  "name" : "infectionModel_queue_small_ex2",
+  "name" : "queueScenario",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -148,19 +149,19 @@
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 1.0E-4,
+        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
-        "aerosolCloudHalfLife" : 100.0,
-        "aerosolCloudInitialArea" : 3.0
+        "aerosolCloudHalfLife" : 120.0,
+        "aerosolCloudInitialArea" : 3.14
       }
     },
     "attributesSimulation" : {
       "finishTime" : 1200.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.0,
+      "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,

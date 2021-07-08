@@ -54,6 +54,7 @@ public class Simulation implements ControllerProvider{
 	private final List<RemoteRunListener> remoteRunListeners;
 	private List<Model> models;
 
+	private SimThreadState threadState = SimThreadState.INIT;
 	private boolean isRunSimulation = false;
 	private boolean isPaused = false;
 	private boolean singleStepMode; // constructor
@@ -246,10 +247,22 @@ public class Simulation implements ControllerProvider{
 		// Models and processors require the latest topography for post processing.
 		// Therefore, reset topography afterwards (I guess resetting the topography was introduced by Stefan).
 		topographyController.postLoop(this.simTimeInSec);
-		// Notify remoteManger that simulation ended. If a command waited for the next
-		// simulation step notify it and execute command with current SimulationState.
-		setWaitForSimCommand(true); // its save to read the state now.
-		remoteRunListeners.forEach(RemoteRunListener::lastSimulationStepFinishedListener);
+
+
+		if (attributesSimulation.isWriteSimulationData()) {
+			processorManager.writeOutput();
+		}
+		logger.info("Finished writing all output files");
+
+		// Notify remoteManger that simulation ended.
+		logger.info("Post-loop: before waitForTraci");
+
+		if (singleStepMode) {
+			synchronized (this){
+				waitForTraci();
+			}
+		}
+		logger.info("Post-loop: finished.");
 	}
 
 	/**
@@ -257,14 +270,17 @@ public class Simulation implements ControllerProvider{
 	 */
 	public void run() {
 		try {
+
+
 			if (attributesSimulation.isWriteSimulationData()) {
 				processorManager.setMainModel(mainModel);
 				processorManager.initOutputFiles();
 			}
-
+			threadState = SimThreadState.PRE_LOOP;
 			preLoop();
 			logger.info("preLoop finished.");
 
+			threadState = SimThreadState.MAIN_LOOP;
 			while (isRunSimulation) {
 				synchronized (this) {
 					while (isPaused) {
@@ -326,19 +342,7 @@ public class Simulation implements ControllerProvider{
 						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
 						if (timeReached || simulateUntilInSec == -1){
 							logger.debugf("Simulated until: %.4f", simTimeInSec);
-
-							setWaitForSimCommand(true);
-							remoteRunListeners.forEach(RemoteRunListener::simulationStepFinishedListener);
-							while (waitForSimCommand){
-								logger.debugf("wait for next SimCommand...");
-								try {
-									wait();
-								} catch (InterruptedException e) {
-									waitForSimCommand = false;
-									Thread.currentThread().interrupt();
-									logger.warn("interrupt while waitForSimCommand");
-								}
-							}
+							waitForTraci();
 						}
 					}
 				}
@@ -355,18 +359,45 @@ public class Simulation implements ControllerProvider{
 
 				if (Thread.interrupted()) {
 					isRunSimulation = false;
-					simulationResult.setState("Simulation interrupted");
+					simulationResult.setState("Simulation interrupted.");
 					logger.info("Simulation interrupted.");
 				}
 			}
 		} finally {
-			// this is necessary to free the resources (files), the SimulationWriter and processor are writing in!
+			// Always execute postLoop
+			isRunSimulation = false;
+			threadState = SimThreadState.POST_LOOP;
 			postLoop();
+			threadState = SimThreadState.FINISHED;
+		}
+	}
 
-			if (attributesSimulation.isWriteSimulationData()) {
-				processorManager.writeOutput();
+	private void waitForTraci()  {
+
+
+		setWaitForSimCommand(true);
+
+		if (threadState.equals(SimThreadState.MAIN_LOOP)){
+			remoteRunListeners.forEach(RemoteRunListener::notifySimStepListener);
+		}
+		else if (threadState.equals(SimThreadState.POST_LOOP))
+		{
+			remoteRunListeners.forEach(RemoteRunListener::notifySimulationEndListener);
+		}
+		else{
+			logger.errorf("Wrong thread state: %s ", threadState);
+			return;
+		}
+
+		while (isWaitForSimCommand()){
+			logger.debugf("wait for next SimCommand...");
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				setWaitForSimCommand(false);
+				Thread.currentThread().interrupt();
+				logger.warn("interrupt while waitForSimCommand");
 			}
-			logger.info("Finished writing all output files");
 		}
 	}
 
@@ -467,6 +498,10 @@ public class Simulation implements ControllerProvider{
 
 	public synchronized boolean isRunning() {
 		return isRunSimulation && !isPaused() && !isWaitForSimCommand();
+	}
+
+	public synchronized SimThreadState getThreadState(){
+		return threadState;
 	}
 
 	synchronized boolean isSingleStepMode(){ return singleStepMode;}
@@ -591,4 +626,5 @@ public class Simulation implements ControllerProvider{
 	public ProcessorManager getProcessorManager() {
 		return processorManager;
 	}
+
 }

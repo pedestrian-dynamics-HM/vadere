@@ -204,8 +204,10 @@ public class ScenarioRun implements Runnable {
 			throw new RuntimeException("Simulation failed.", e);
 		} finally {
 			simulationResult.stopTime();
+			logger.info("Simulation run finished.");
 			doAfterSimulation();
 			VadereContext.remove(scenarioStore.getTopography().getContextId());
+
 		}
 	}
 
@@ -267,6 +269,8 @@ public class ScenarioRun implements Runnable {
 		return simulation != null && simulation.isRunning();
 	}
 
+
+
 	public boolean isScenarioInSingleStepMode(){
 		return simulation != null && simulation.isSingleStepMode();
 	}
@@ -278,6 +282,13 @@ public class ScenarioRun implements Runnable {
 
 	public boolean isWaitForSimCommand(){
 		return simulation != null && simulation.isWaitForSimCommand();
+	}
+
+	public boolean checkValidThreadState(){
+		if (simulation == null){
+			return false;
+		}
+		return SimThreadState.MAIN_LOOP.equals(simulation.getThreadState()) || SimThreadState.POST_LOOP.equals(simulation.getThreadState());
 	}
 
 	public void nextSimCommand(double simulateUntilInSec){

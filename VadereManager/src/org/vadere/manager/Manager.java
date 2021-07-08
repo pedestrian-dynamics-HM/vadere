@@ -40,6 +40,7 @@ public class Manager {
 				server = new VadereServer(serverSocket, pool, Paths.get(ns.getString("output-dir")), ns.getBoolean("guiMode"), ns.getBoolean("trace"));
 			}
 			server.run();
+			logger.info("Run finished.");
 
 		} catch (HelpScreenException ignored) {
 
@@ -47,6 +48,7 @@ public class Manager {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		logger.info("Close Vadere.");
 	}
 
 	private static VadereArgumentParser createArgumentParser() {
