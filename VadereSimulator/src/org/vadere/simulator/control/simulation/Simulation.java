@@ -341,6 +341,7 @@ public class Simulation implements ControllerProvider{
 							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
 						}
+						// use received information for behavior change (independently from the locomotion layer)
 						this.updatePsychologyLayer(simTimeInSec);
 					}
 				}

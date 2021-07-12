@@ -45,36 +45,13 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
 		}
 
-		SelfCategory selfCategory = pedestrian.getSelfCategory();
+		//TODO refactor -> use osmBehaviorcontroller. makeStepToTarget instead of stepForward
+		stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 
-		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
-			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-		} else if (selfCategory == SelfCategory.COOPERATIVE) {
-			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-
-			if(candidate != null) {
-				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-				// We update "this" pedestrian and "candidate" here. Therefore, candidate is already treated and will be skipped.
-				skipUdate.add(candidate);
-			} else {
-				stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-			}
-		} else if (selfCategory == SelfCategory.THREATENED) {
-			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
-			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-		} else if (selfCategory == SelfCategory.COMMON_FATE) {
-			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
-			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
-		} else if (selfCategory == SelfCategory.WAIT) {
-			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
-		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
-			osmBehaviorController.changeTarget(pedestrian, topography);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
-		}
 	}
 
 	private void stepForward(@NotNull final PedestrianOSM pedestrian, final double simTimeInSec, final double timeStepInSec) {
+
 		while (pedestrian.getTimeOfNextStep() < simTimeInSec) {
 			pedestrian.updateNextPosition();
 			osmBehaviorController.makeStep(pedestrian, topography, timeStepInSec);

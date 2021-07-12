@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
+import org.vadere.simulator.models.psychology.selfcategorization.PedestrianSelfCatThreat;
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
@@ -78,23 +79,21 @@ public class OSMBehaviorController {
                 pedestrianEventsQueue.remove(candidate);
                 swapPedestrians(pedestrian, candidate, topography);
                 pedestrianEventsQueue.add(candidate);
-            } else {
-               //makeStepToTarget(pedestrian, topography);
             }
         } else if (selfCategory == SelfCategory.THREATENED) {
             changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
-            //makeStepToTarget(pedestrian, topography);
         } else if (selfCategory == SelfCategory.COMMON_FATE) {
+            //TODO: check whether we need some more here
             changeTargetToSafeZone(pedestrian, topography);
-            //makeStepToTarget(pedestrian, topography);
         } else if (selfCategory == SelfCategory.WAIT) {
             wait(pedestrian, topography, timeStepInSec);
-            //pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
         } else if (selfCategory == SelfCategory.CHANGE_TARGET) {
             changeTarget(pedestrian, topography);
-            //pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
         }
     }
+
+
+
 
 
     // Methods -> locomotion layer

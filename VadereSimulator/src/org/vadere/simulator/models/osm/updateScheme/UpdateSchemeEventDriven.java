@@ -47,35 +47,6 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			pedestrian.setTimeOfNextStep(currentTimeInSec);
 			return;
 		}
-
-		SelfCategory selfCategory = pedestrian.getSelfCategory();
-
-/*		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
-		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.COOPERATIVE) {
-			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-
-			if (candidate != null) {
-				pedestrianEventsQueue.remove(candidate);
-				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-				pedestrianEventsQueue.add(candidate);
-			} else {
-				osmBehaviorController.makeStepToTarget(pedestrian, topography);
-			}
-		} else if (selfCategory == SelfCategory.THREATENED) {
-			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.COMMON_FATE) {
-			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.WAIT) {
-			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
-		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
-			osmBehaviorController.changeTarget(pedestrian, topography);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
-		}*/
 		osmBehaviorController.makeStepToTarget(pedestrian, topography);
 	}
 

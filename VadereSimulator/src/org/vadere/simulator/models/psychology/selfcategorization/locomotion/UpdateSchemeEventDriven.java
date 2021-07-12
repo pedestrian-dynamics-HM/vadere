@@ -52,36 +52,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			return;
 		}
 
-		SelfCategory selfCategory = pedestrian.getSelfCategory();
-
-		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
-		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.COOPERATIVE) {
-			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
-
-			if (candidate != null) {
-				pedestrianEventsQueue.remove(candidate);
-				osmBehaviorController.swapPedestrians(pedestrian, candidate, topography);
-				pedestrianEventsQueue.add((PedestrianSelfCatThreat) candidate);
-			} else {
-				osmBehaviorController.makeStepToTarget(pedestrian, topography);
-			}
-		} else if (selfCategory == SelfCategory.THREATENED) {
-			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.COMMON_FATE) {
-			// TODO: Check if "changeToTargetRepulsionStrategyAndIncreaseSpeed()" is really necessary here.
-			//   It is necessary here if pedestrian was "THREATENED" before but locomotion layer
-			//   had no time to call this method.
-			osmBehaviorController.changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
-			osmBehaviorController.changeTargetToSafeZone(pedestrian, topography);
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
-		} else if (selfCategory == SelfCategory.WAIT) {
-			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
-		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
-			osmBehaviorController.changeTarget(pedestrian, topography);
-		}
+		osmBehaviorController.makeStepToTarget(pedestrian, topography);
 	}
 
 	@Override
