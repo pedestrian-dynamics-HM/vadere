@@ -19,8 +19,10 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * A class to encapsulate the behavior of a single {@link PedestrianOSM}.
@@ -42,8 +44,60 @@ public class OSMBehaviorController {
 
     // Static Variables
     private static Logger logger = Logger.getLogger(OSMBehaviorController.class);
+    private final Topography topography;
+    protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
 
-    // Methods
+
+    public OSMBehaviorController(final Topography topography) {
+        this.topography = topography;
+    }
+
+    public void update(Collection<Pedestrian> pedestrians, final double timeStepInSec, final double currentTimeInSec){
+        for (Pedestrian ped : pedestrians){
+            update((PedestrianOSM) ped, timeStepInSec, currentTimeInSec);
+        }
+    }
+
+
+    public void update(@NotNull final PedestrianOSM pedestrian, final double timeStepInSec, final double currentTimeInSec) {
+        // for the first step after creation, timeOfNextStep has to be initialized
+        if (pedestrian.getTimeOfNextStep() == Pedestrian.INVALID_NEXT_EVENT_TIME) {
+            pedestrian.setTimeOfNextStep(currentTimeInSec);
+            return;
+        }
+
+        SelfCategory selfCategory = pedestrian.getSelfCategory();
+
+        // TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
+        if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+           // makeStepToTarget(pedestrian, topography);
+        } else if (selfCategory == SelfCategory.COOPERATIVE) {
+            PedestrianOSM candidate = findSwapCandidate(pedestrian, topography);
+
+            if (candidate != null) {
+                pedestrianEventsQueue.remove(candidate);
+                swapPedestrians(pedestrian, candidate, topography);
+                pedestrianEventsQueue.add(candidate);
+            } else {
+               //makeStepToTarget(pedestrian, topography);
+            }
+        } else if (selfCategory == SelfCategory.THREATENED) {
+            changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
+            //makeStepToTarget(pedestrian, topography);
+        } else if (selfCategory == SelfCategory.COMMON_FATE) {
+            changeTargetToSafeZone(pedestrian, topography);
+            //makeStepToTarget(pedestrian, topography);
+        } else if (selfCategory == SelfCategory.WAIT) {
+            wait(pedestrian, topography, timeStepInSec);
+            //pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+        } else if (selfCategory == SelfCategory.CHANGE_TARGET) {
+            changeTarget(pedestrian, topography);
+            //pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+        }
+    }
+
+
+    // Methods -> locomotion layer
     public void makeStepToTarget(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
         // this can cause problems if the pedestrian desired speed is 0 (see speed adjuster)
         pedestrian.updateNextPosition();
@@ -66,7 +120,12 @@ public class OSMBehaviorController {
      */
     public void makeStep(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography, final double stepTime) {
         VPoint currentPosition = pedestrian.getPosition();
-        VPoint nextPosition = pedestrian.getNextPosition();
+        VPoint nextPosition;
+        if (pedestrian.getSelfCategory() == SelfCategory.WAIT){
+            nextPosition = currentPosition;
+        }else{
+            nextPosition = pedestrian.getNextPosition();
+        }
 
         // start time
         double stepStartTime = pedestrian.getTimeOfNextStep();

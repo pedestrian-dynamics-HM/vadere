@@ -9,7 +9,10 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
+import org.vadere.simulator.models.osm.OSMBehaviorController;
+import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
@@ -85,6 +88,7 @@ public class Simulation implements ControllerProvider{
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
+	private final OSMBehaviorController strategyModel;
 
 
 	public Simulation(MainModel mainModel, IPerceptionModel perceptionModel,
@@ -98,8 +102,7 @@ public class Simulation implements ControllerProvider{
 
 		this.name = name;
 		this.mainModel = mainModel;
-		this.perceptionModel = perceptionModel;
-		this.cognitionModel = cognitionModel;
+
 
 
 		this.scenarioStore = scenarioStore;
@@ -140,6 +143,10 @@ public class Simulation implements ControllerProvider{
 		for (PassiveCallback pc : this.passiveCallbacks) {
 			pc.setDomain(domain);
 		}
+
+		this.perceptionModel = perceptionModel;
+		this.cognitionModel = cognitionModel;
+		this.strategyModel = new OSMBehaviorController(topography);
 	}
 
 	private void createControllers(Domain domain, MainModel mainModel, Random random) {
@@ -334,6 +341,7 @@ public class Simulation implements ControllerProvider{
 							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
 						}
+						this.updatePsychologyLayer(simTimeInSec);
 					}
 				}
 
@@ -453,6 +461,7 @@ public class Simulation implements ControllerProvider{
 			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
 			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
+			strategyModel.update(pedestrians, scenarioStore.getAttributesSimulation().getSimTimeStepLength(), simTimeInSec);
 		} else {
 			ElapsedTime elapsedTime = new ElapsedTime(simTimeInSec);
 			pedestrians.stream().forEach(pedestrian -> pedestrian.setMostImportantStimulus(elapsedTime));

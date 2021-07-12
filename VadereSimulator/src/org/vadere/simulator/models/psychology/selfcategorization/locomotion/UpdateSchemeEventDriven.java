@@ -20,7 +20,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianSelfCatThreat());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianSelfCatThreat.class));
-		this.osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController(topography);
 	}
 
 	public void update(final double timeStepInSec, final double currentTimeInSec) {

@@ -24,7 +24,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		this.topography = topography;
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianOSM());
 		this.pedestrianEventsQueue.addAll(topography.getElements(PedestrianOSM.class));
-		this.osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController(topography);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 		SelfCategory selfCategory = pedestrian.getSelfCategory();
 
-		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
+/*		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
 		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.COOPERATIVE) {
@@ -75,7 +75,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
-		}
+		}*/
+		osmBehaviorController.makeStepToTarget(pedestrian, topography);
 	}
 
 	@Override

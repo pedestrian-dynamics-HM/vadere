@@ -21,7 +21,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 	public UpdateSchemeSequential(@NotNull final Topography topography) {
 		this.topography = topography;
 		this.skipUdate = new HashSet<>();
-		this.osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController(topography);
 	}
 
 	@Override

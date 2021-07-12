@@ -54,7 +54,7 @@ public class UpdateSchemeParallel implements UpdateSchemeOSM {
 		this.executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 		this.movePedestrians = new HashSet<>();
 		this.undoPedestrians = new HashSet<>();
-		this.osmBehaviorController = new OSMBehaviorController();
+		this.osmBehaviorController = new OSMBehaviorController(topography);
 	}
 
 	@Override

@@ -130,6 +130,10 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		models.add(this);
 	}
 
+	public UpdateSchemeOSM getUpdateSchemeOSM() {
+		return updateSchemeOSM;
+	}
+
 	// Dirty quick implementation to test it! TODO: refactoring!
 	private UpdateSchemeOSM createUpdateScheme(
 			@NotNull final List<Attributes> attributesList,

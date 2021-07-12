@@ -158,7 +158,7 @@ public class OSMBehaviorControllerTest {
         VPoint oldPositionPed2 = pedestrian2.getPosition().clone();
         assertNotEquals(oldPositionPed1, oldPositionPed2);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
 
         double simTimeInSec = 1;
         pedestrian1.setTimeOfNextStep(simTimeInSec);
@@ -180,7 +180,7 @@ public class OSMBehaviorControllerTest {
         pedestrian2.setTimeOfNextStep(timeOfNextStepPed2);
         double maxStepDuration = Math.max(pedestrian1.getDurationNextStep(), pedestrian2.getDurationNextStep());
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         controllerUnderTest.swapPedestrians(pedestrian1, pedestrian2, topography);
 
         double expectedTimeOfNextStep = timeOfNextStepPed1 + maxStepDuration;
@@ -195,7 +195,7 @@ public class OSMBehaviorControllerTest {
         LinkedList<Integer> noTargets = new LinkedList<>();
         pedestrian1.setTargets(noTargets);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertNull(swapCandidate);
@@ -208,7 +208,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 0.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertNull(swapCandidate);
@@ -224,7 +224,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
@@ -240,7 +240,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertNull(swapCandidate);
@@ -256,7 +256,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertNull(swapCandidate);
@@ -271,7 +271,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
@@ -289,7 +289,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
@@ -307,7 +307,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
@@ -325,7 +325,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertEquals(pedestrian2.getId(), swapCandidate.getId());
@@ -343,7 +343,7 @@ public class OSMBehaviorControllerTest {
         double searchRadius = 1.5;
         pedestrian1.getAttributes().setSearchRadius(searchRadius);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
 
         assertNull(swapCandidate);
@@ -362,7 +362,7 @@ public class OSMBehaviorControllerTest {
 
         // Exception expected because ped1 requests calculation type "BY_TARGET_CENTER",
         // but ped2 requests "BY_GRADIENT" which contradicts.
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         PedestrianOSM swapCandidate = controllerUnderTest.findSwapCandidate(pedestrian1, topography);
     }
 
@@ -376,7 +376,7 @@ public class OSMBehaviorControllerTest {
         pedestrian1.setTimeOfNextStep(timeOfNextStep);
         assertEquals(timeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
 
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController();
+        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
         controllerUnderTest.wait(pedestrian1, topography, currentSimTimeInSec);
 
         double expectedTimeOfNextStep = currentSimTimeInSec + timeOfNextStep;
