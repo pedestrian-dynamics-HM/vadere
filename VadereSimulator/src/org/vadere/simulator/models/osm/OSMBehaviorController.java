@@ -46,12 +46,20 @@ public class OSMBehaviorController {
     // Static Variables
     private static Logger logger = Logger.getLogger(OSMBehaviorController.class);
     private final Topography topography;
-    protected PriorityQueue<PedestrianOSM> pedestrianEventsQueue;
+    protected PriorityQueue<PedestrianSelfCatThreat> pedestrianEventsQueue;
 
 
     public OSMBehaviorController(final Topography topography) {
         this.topography = topography;
     }
+
+    public OSMBehaviorController(final Topography topography, final PriorityQueue<PedestrianSelfCatThreat> pedestrianEventsQueue) {
+        this.topography = topography;
+        this.pedestrianEventsQueue = pedestrianEventsQueue;
+    }
+
+
+
 
     public void update(Collection<Pedestrian> pedestrians, final double timeStepInSec, final double currentTimeInSec){
         for (Pedestrian ped : pedestrians){
@@ -91,8 +99,6 @@ public class OSMBehaviorController {
             changeTarget(pedestrian, topography);
         }
     }
-
-
 
 
 

@@ -23,6 +23,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 		this.osmBehaviorController = new OSMBehaviorController(topography);
 	}
 
+
 	public void update(final double timeStepInSec, final double currentTimeInSec) {
 		clearStrides(topography);
 		if(!pedestrianEventsQueue.isEmpty()) {

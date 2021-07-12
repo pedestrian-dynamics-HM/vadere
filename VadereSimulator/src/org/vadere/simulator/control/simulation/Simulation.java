@@ -147,6 +147,7 @@ public class Simulation implements ControllerProvider{
 		this.perceptionModel = perceptionModel;
 		this.cognitionModel = cognitionModel;
 		this.strategyModel = new OSMBehaviorController(topography);
+
 	}
 
 	private void createControllers(Domain domain, MainModel mainModel, Random random) {
@@ -462,6 +463,7 @@ public class Simulation implements ControllerProvider{
 			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
 			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
+
 			strategyModel.update(pedestrians, scenarioStore.getAttributesSimulation().getSimTimeStepLength(), simTimeInSec);
 		} else {
 			ElapsedTime elapsedTime = new ElapsedTime(simTimeInSec);
