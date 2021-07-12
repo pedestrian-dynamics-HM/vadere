@@ -368,19 +368,7 @@ public class OSMBehaviorControllerTest {
 
     @Test
     public void waitSetsTimeOfNextStepForEventDrivenUpdateScheme() {
-        createSameDirectionTopography();
-
-        double currentSimTimeInSec = 1.0;
-        double timeOfNextStep = 0.5;
-
-        pedestrian1.setTimeOfNextStep(timeOfNextStep);
-        assertEquals(timeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
-
-        OSMBehaviorController controllerUnderTest = new OSMBehaviorController(topography);
-        controllerUnderTest.wait(pedestrian1, topography, currentSimTimeInSec);
-
-        double expectedTimeOfNextStep = currentSimTimeInSec + timeOfNextStep;
-        assertEquals(expectedTimeOfNextStep, pedestrian1.getTimeOfNextStep(), ALLOWED_DOUBLE_TOLERANCE);
+        // remove test, because wait is handled as a footstep with next position = current position
     }
 
 }
