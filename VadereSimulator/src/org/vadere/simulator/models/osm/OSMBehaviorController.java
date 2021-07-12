@@ -195,7 +195,7 @@ public class OSMBehaviorController {
         pedestrian.getFootstepHistory().add(currentFootstep);
         */
 
-        pedestrian.setTimeOfNextStep(stepEndTime);
+        //pedestrian.setTimeOfNextStep(stepEndTime);
     }
 
     /**
