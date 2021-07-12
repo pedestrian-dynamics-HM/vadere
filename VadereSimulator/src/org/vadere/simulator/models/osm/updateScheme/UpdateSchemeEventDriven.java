@@ -80,4 +80,8 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			}
 		}
 	}
+
+	public PriorityQueue getPriorityQueue(){
+		return pedestrianEventsQueue;
+	}
 }

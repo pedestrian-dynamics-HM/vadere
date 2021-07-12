@@ -86,4 +86,8 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			}
 		}
 	}
+
+	public PriorityQueue getPriorityQueue(){
+		return pedestrianEventsQueue;
+	}
 }

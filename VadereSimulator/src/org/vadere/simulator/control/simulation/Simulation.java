@@ -12,7 +12,6 @@ import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
@@ -463,6 +462,13 @@ public class Simulation implements ControllerProvider{
 			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
 			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
+
+			for (Model m : models) {
+				if (m instanceof OptimalStepsModel){
+					PriorityQueue prioQueue = ((OptimalStepsModel) m).getUpdateSchemeOSM().getPriorityQueue();
+					strategyModel.setPedestrianEventsQueue(prioQueue);
+				}
+			}
 
 			strategyModel.update(pedestrians, scenarioStore.getAttributesSimulation().getSimTimeStepLength(), simTimeInSec);
 		} else {

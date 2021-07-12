@@ -3,9 +3,9 @@ package org.vadere.simulator.models.osm;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.simulator.models.osm.updateScheme.UpdateSchemeEventDriven;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
-import org.vadere.simulator.models.psychology.selfcategorization.PedestrianSelfCatThreat;
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
@@ -46,25 +46,25 @@ public class OSMBehaviorController {
     // Static Variables
     private static Logger logger = Logger.getLogger(OSMBehaviorController.class);
     private final Topography topography;
-    protected PriorityQueue<PedestrianSelfCatThreat> pedestrianEventsQueue;
-
+    private PriorityQueue pedestrianEventsQueue;
 
     public OSMBehaviorController(final Topography topography) {
         this.topography = topography;
     }
-
-    public OSMBehaviorController(final Topography topography, final PriorityQueue<PedestrianSelfCatThreat> pedestrianEventsQueue) {
-        this.topography = topography;
-        this.pedestrianEventsQueue = pedestrianEventsQueue;
-    }
-
-
 
 
     public void update(Collection<Pedestrian> pedestrians, final double timeStepInSec, final double currentTimeInSec){
         for (Pedestrian ped : pedestrians){
             update((PedestrianOSM) ped, timeStepInSec, currentTimeInSec);
         }
+    }
+
+    public PriorityQueue getPrioQueue(){
+        return pedestrianEventsQueue;
+    }
+
+    public void setPedestrianEventsQueue(PriorityQueue pedestrianEventsQueue){
+        this.pedestrianEventsQueue = pedestrianEventsQueue;
     }
 
 
@@ -78,20 +78,16 @@ public class OSMBehaviorController {
         SelfCategory selfCategory = pedestrian.getSelfCategory();
 
         // TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
-        if (selfCategory == SelfCategory.TARGET_ORIENTED) {
-           // makeStepToTarget(pedestrian, topography);
-        } else if (selfCategory == SelfCategory.COOPERATIVE) {
-            PedestrianOSM candidate = findSwapCandidate(pedestrian, topography);
-
+        if (selfCategory == SelfCategory.COOPERATIVE) {
+            PedestrianOSM candidate = (PedestrianOSM) findSwapCandidate(pedestrian, topography);
             if (candidate != null) {
-                pedestrianEventsQueue.remove(candidate);
+                if (getPrioQueue() != null) getPrioQueue().remove(candidate);
                 swapPedestrians(pedestrian, candidate, topography);
-                pedestrianEventsQueue.add(candidate);
+                if (getPrioQueue() != null) getPrioQueue().add(candidate);
             }
         } else if (selfCategory == SelfCategory.THREATENED) {
             changeToTargetRepulsionStrategyAndIncreaseSpeed(pedestrian, topography);
         } else if (selfCategory == SelfCategory.COMMON_FATE) {
-            //TODO: check whether we need some more here
             changeTargetToSafeZone(pedestrian, topography);
         } else if (selfCategory == SelfCategory.WAIT) {
             wait(pedestrian, topography, timeStepInSec);

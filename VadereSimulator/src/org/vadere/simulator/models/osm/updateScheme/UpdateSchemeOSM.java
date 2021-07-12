@@ -22,6 +22,8 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.opencl.OpenCLException;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 
+import java.awt.*;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian>, DynamicElementAddListener<Pedestrian> {
@@ -124,5 +126,9 @@ public interface UpdateSchemeOSM extends DynamicElementRemoveListener<Pedestrian
 
 	default void shutdown() {
 
+	}
+
+	default PriorityQueue getPriorityQueue(){
+		return null;
 	}
 }
