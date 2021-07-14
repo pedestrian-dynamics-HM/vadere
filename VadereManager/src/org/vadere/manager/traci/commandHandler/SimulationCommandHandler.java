@@ -202,10 +202,11 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
 				ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
+				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
 				if (!iControlModelHashMap.containsKey(controlModelName)) {
 					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
 					iControlModelHashMap.put(controlModelName, controlModel);
 				}
 
@@ -244,9 +245,10 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 					Topography topography = state.getTopography();
 					boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
 					ReactionModel reactionModel = new ReactionModel();
+					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
 					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
 					iControlModelHashMap.put(model_name, controlModel);
 				});
 			}

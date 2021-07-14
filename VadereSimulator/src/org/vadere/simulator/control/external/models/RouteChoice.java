@@ -52,20 +52,21 @@ public class RouteChoice extends ControlModel {
     }
 
     @Override
-    protected void triggerRedRaction(Pedestrian ped) {
+    protected void triggerPedReaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
 
         if (isUsePsychologyLayer()) {
-            double timeCommandExecuted = this.simTime + 0.4;
+            // in this case the targets are set in the next time step when updating the psychology layer
+            double timeCommandExecuted = getTimeOfNextStimulusAvailable();
             this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
             ped.setTargets(newTargetList);
             ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
+            // in this case the targets are set directly
             logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
         }
-
 
     }
 
