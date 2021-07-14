@@ -1,5 +1,6 @@
 package org.vadere.state.attributes;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /**

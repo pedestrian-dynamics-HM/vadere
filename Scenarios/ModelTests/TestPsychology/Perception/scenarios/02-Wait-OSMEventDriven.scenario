@@ -218,7 +218,8 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "Wait"
+        "type" : "Wait",
+        "perceptionProbability" : 1.0
       } ]
     } ]
   }
