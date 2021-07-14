@@ -4,7 +4,6 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -26,6 +25,7 @@ public abstract class ControlModel implements IControlModel {
     protected HashMap<Pedestrian,LinkedList<Integer>> processedAgents;
     protected StimulusController stimulusController;
     private boolean isUsePsychologyLayer = false;
+    private double simTimeStepLength;
 
 
     public ControlModel(){
@@ -34,6 +34,18 @@ public abstract class ControlModel implements IControlModel {
         processedAgents = new HashMap<>();
     }
 
+
+    @Override
+    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel, final double simTimeStepLength) {
+        processedAgents = new HashMap<>();
+        simTime = 0.0;
+
+        this.topography = topography;
+        this.stimulusController = stimulusController;
+        this.isUsePsychologyLayer = isUsePsychologyLayer;
+        this.reactionModel = reactionModel;
+        this.simTimeStepLength = simTimeStepLength;
+    }
 
     @Override
     public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel) {
@@ -70,7 +82,7 @@ public abstract class ControlModel implements IControlModel {
 
 
     public abstract boolean isPedReact();
-    protected abstract void triggerRedRaction(Pedestrian ped);
+    protected abstract void triggerPedReaction(Pedestrian ped);
 
 
     public void setProcessedAgents(Pedestrian ped, LinkedList<Integer> ids){
@@ -155,7 +167,7 @@ public abstract class ControlModel implements IControlModel {
 
     public void setAction(Pedestrian ped){
         if (isPedReact()){
-            triggerRedRaction(ped);
+            triggerPedReaction(ped);
         }
         else{
             ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
@@ -187,5 +199,21 @@ public abstract class ControlModel implements IControlModel {
 
     public boolean isUsePsychologyLayer() {
         return isUsePsychologyLayer;
+    }
+
+    public double getSimTimeStepLength() {
+        return simTimeStepLength;
+    }
+
+    public void setSimTimeStepLength(final double simTimeStepLength) {
+        this.simTimeStepLength = simTimeStepLength;
+    }
+
+    public double getTimeOfNextStimulusAvailable(){
+        return getTimeOfNextStimulusAvailable(this.simTime);
+    }
+
+    public double getTimeOfNextStimulusAvailable(double currentSimTime){
+        return this.simTime + getSimTimeStepLength();
     }
 }
