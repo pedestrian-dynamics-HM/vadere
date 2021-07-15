@@ -83,36 +83,28 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
                 .collect(Collectors.toList());
 
         double sumOfProbsExternalStimuli = externalStimuli.stream().map(Stimulus::getPerceptionProbability).reduce(0.0, Double::sum);
+        double probRemaining = 1.0 - sumOfProbsExternalStimuli;
 
         if (sumOfProbsExternalStimuli > 1.0){
             throw new IllegalArgumentException("The sum of probabilites = " + sumOfProbsExternalStimuli +". This exceeds 1.0");
         }
 
-        double probRemaining = 1.0 - sumOfProbsExternalStimuli;
-
-        List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
-                .mapToObj(index -> index)
-                .collect(Collectors.toList());
-
+        List<Integer> stimuliIndex = IntStream.range(0, stimuli.size()).boxed().collect(Collectors.toList());
         List<Double> probs = externalStimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
+
+        // add motivation = ElapsedTime Stimulus with adapted probability to stimuli list
         probs.add(probRemaining);
+        externalStimuli.add(mostImportantStimulus);
 
         EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, stimuliIndex.stream().mapToInt(i -> i).toArray(), probs.stream().mapToDouble(i -> i).toArray());
-        int index = dist.sample();
-        externalStimuli.add(mostImportantStimulus);
-        mostImportantStimulus = externalStimuli.get(index);
-        return mostImportantStimulus;
+        return externalStimuli.get(dist.sample());
     }
 
     private boolean isStimulusNew(final List<Stimulus> stimuli, final Pedestrian pedestrian) {
 
         if (getProcessedStimuli().containsKey(pedestrian)){
-
             List<Stimulus> oldStimuli = getProcessedStimuli().get(pedestrian);
-
-            if (oldStimuli.equals(stimuli)){
-                return false;
-            }
+            return !oldStimuli.equals(stimuli);
         }
 
         return true;

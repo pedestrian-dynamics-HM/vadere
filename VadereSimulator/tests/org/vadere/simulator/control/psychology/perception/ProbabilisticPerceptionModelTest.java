@@ -176,14 +176,10 @@ public class ProbabilisticPerceptionModelTest {
         stimuli4.add(new Wait(time4, 1));
 
 
-
-
-
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli));
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli1));
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
-
 
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli2));
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));

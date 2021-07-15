@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 /**
  * Class encodes some kind of information a pedestrian knows about.
  * The information is active from the time gien in {@link #time} and will be
@@ -41,5 +43,16 @@ public class InformationStimulus extends Stimulus {
 	@Override
 	public Stimulus clone() {
 		return new InformationStimulus(this);
+	}
+
+	@Override
+	public boolean equals(Object that){
+		if(this == that) return true;
+		if(!(that instanceof InformationStimulus)) return false;
+		InformationStimulus informationStimulus = (InformationStimulus) that;
+		boolean isProb = Precision.equals(this.perceptionProbability, informationStimulus.getPerceptionProbability(), Double.MIN_VALUE);
+		boolean isInformation = this.information.equals(informationStimulus.getInformation());
+		boolean obsolete = Precision.equals(this.obsolete_at, informationStimulus.getObsolete_at(), Double.MIN_VALUE);
+		return isProb && isInformation && obsolete;
 	}
 }

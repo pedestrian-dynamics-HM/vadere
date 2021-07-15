@@ -64,6 +64,8 @@ public class Threat extends Stimulus {
         if(!(that instanceof Threat)) return false;
         Threat threat = (Threat) that;
         boolean isProb = Precision.equals(this.perceptionProbability, threat.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb;
+        boolean loud = Precision.equals(this.loudness, threat.getLoudness(), Double.MIN_VALUE);
+        boolean radius = Precision.equals(this.radius, threat.getRadius(), Double.MIN_VALUE);
+        return isProb && loud && radius;
     }
 }

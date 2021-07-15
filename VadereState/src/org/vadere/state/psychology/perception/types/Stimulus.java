@@ -104,13 +104,7 @@ public abstract class Stimulus implements Cloneable {
     }
 
     @Override
-    public boolean equals(Object that){
-        if(this == that) return true;
-        if(!(that instanceof Stimulus)) return false;
-        Stimulus thatStimulus = (Stimulus) that;
-        boolean isProb = Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb;
-    }
+    public abstract boolean equals(Object that);
 
 
     }

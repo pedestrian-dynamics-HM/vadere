@@ -31,8 +31,7 @@ public class Wait extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof Wait)) return false;
         Wait thatStimulus = (Wait) that;
-        boolean isProb = Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb;
+        return Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
     }
 
 }
