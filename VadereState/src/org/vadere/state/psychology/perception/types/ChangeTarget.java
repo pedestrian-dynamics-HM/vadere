@@ -18,6 +18,10 @@ public class ChangeTarget extends Stimulus {
         super(time);
     }
 
+    public ChangeTarget(double time, double probability) {
+        super(time, probability);
+    }
+
     public ChangeTarget(double time, LinkedList<Integer> newTargetIds) {
         super(time);
 

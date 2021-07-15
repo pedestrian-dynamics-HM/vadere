@@ -32,17 +32,23 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
             if (isStimulusNew(pedSpecificStimuli.get(pedestrian), pedestrian)) {
                 Stimulus mostImportantStimulus = getMostImportantStimulusFromProbabilites(pedSpecificStimuli.get(pedestrian), pedestrian);
                 pedestrian.setMostImportantStimulus(mostImportantStimulus);
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " got new Stimulus " + pedestrian.getMostImportantStimulus().toString());
+                logger.info("Pedestrian with id=" + pedestrian.getId() + " got new Stimulus " + pedestrian.getMostImportantStimulus());
             }
             else {
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + pedestrian.getMostImportantStimulus().toString());
+                logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + pedestrian.getMostImportantStimulus());
             }
         }
-
-        this.processedStimuli = pedSpecificStimuli;
-
+        setProcessedStimuli(pedSpecificStimuli);
     }
 
+
+    public void setProcessedStimuli(final HashMap<Pedestrian, List<Stimulus>> processedStimuli) {
+        this.processedStimuli = processedStimuli;
+    }
+
+    public HashMap<Pedestrian, List<Stimulus>> getProcessedStimuli() {
+        return processedStimuli;
+    }
 
     private Stimulus getMostImportantStimulusFromProbabilites(List<Stimulus> stimuli, Pedestrian pedestrian) {
 
@@ -56,7 +62,13 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
                 .collect(Collectors.toList());
 
         double sumOfProbsExternalStimuli = externalStimuli.stream().map(Stimulus::getPerceptionProbability).reduce(0.0, Double::sum);
-        double probRemaining = mostImportantStimulus.getPerceptionProbability() - sumOfProbsExternalStimuli;
+
+        if (sumOfProbsExternalStimuli > 1.0){
+            throw new IllegalArgumentException("The sum of probabilites = " + sumOfProbsExternalStimuli +". This exceeds 1.0");
+        }
+
+
+        double probRemaining = 1.0 - sumOfProbsExternalStimuli;
         mostImportantStimulus.setPerceptionProbability(probRemaining);
 
         List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
@@ -74,21 +86,30 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     private boolean isStimulusNew(final List<Stimulus> stimuli, final Pedestrian pedestrian) {
 
 
-        if (processedStimuli.containsKey(pedestrian)){
+        if (getProcessedStimuli().containsKey(pedestrian)){
 
-            List<Stimulus> oldStimuli = processedStimuli.get(pedestrian).stream()
+            List<Stimulus> oldStimuli = getProcessedStimuli().get(pedestrian).stream()
                     .filter(stimulus -> !(stimulus instanceof ElapsedTime))
                     .collect(Collectors.toList());
 
             List<Stimulus> newStimuli = stimuli.stream()
                     .filter(stimulus -> !(stimulus instanceof ElapsedTime))
                     .collect(Collectors.toList());
+            
 
-            HashSet<Stimulus> stimuli1 = new HashSet<Stimulus>(oldStimuli);
-            HashSet<Stimulus> stimuli2 = new HashSet<Stimulus>(newStimuli);
-
-            if (stimuli1.equals(stimuli2)){
+            if (oldStimuli.equals(newStimuli)) {
                 return false;
+            }
+            else{
+                for (Stimulus s : oldStimuli) {
+                   s.setTime(s.getTime()+0.4);
+                }
+                if (oldStimuli.equals(newStimuli)){
+                    logger.info("was here");
+                    return false;
+                }
+
+
             }
         }
 

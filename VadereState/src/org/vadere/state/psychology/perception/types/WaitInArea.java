@@ -18,6 +18,10 @@ public class WaitInArea extends Stimulus {
         super(time);
     }
 
+    public WaitInArea(double time, double probability) {
+        super(time, probability);
+    }
+
     public WaitInArea(double time, VShape area) {
         super(time);
 

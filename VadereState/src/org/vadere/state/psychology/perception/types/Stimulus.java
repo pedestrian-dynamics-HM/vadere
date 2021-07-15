@@ -102,4 +102,13 @@ public abstract class Stimulus implements Cloneable {
         return this.getClass().getSimpleName();
     }
 
-}
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof Stimulus)) return false;
+        Stimulus thatPeople = (Stimulus) that;
+        return this.time == thatPeople.getTime() && this.perceptionProbability == thatPeople.getPerceptionProbability();
+    }
+
+
+    }

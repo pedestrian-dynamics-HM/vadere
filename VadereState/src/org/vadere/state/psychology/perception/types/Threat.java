@@ -21,11 +21,17 @@ public class Threat extends Stimulus {
         super(time);
     }
 
+    public Threat(double time, double probability) {
+        super(time, probability);
+    }
+
     public Threat(double time, int originAsTargetId) {
         super(time);
 
         this.originAsTargetId = originAsTargetId;
     }
+
+
 
     public Threat(Threat other) {
         super(other);

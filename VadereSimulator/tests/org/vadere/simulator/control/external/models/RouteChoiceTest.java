@@ -262,7 +262,7 @@ public class RouteChoiceTest {
         try {
             commandIdMissing();
         } catch (final IllegalArgumentException e) {
-            assertTrue(e.getMessage().equals("Please provide a unique commandId != 0 for each command. Otherwise, information might not be processed."));
+            assertTrue(e.getMessage().equals("The sum of probabilites = 1.3. This exceeds 1.0"));
         }
     }
 

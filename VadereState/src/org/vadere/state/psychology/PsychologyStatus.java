@@ -39,7 +39,9 @@ public class PsychologyStatus {
     }
 
     // Getter
-    public Stimulus getMostImportantStimulus() { return mostImportantStimulus; }
+    public Stimulus getMostImportantStimulus() {
+        return mostImportantStimulus;
+    }
     public ThreatMemory getThreatMemory() { return threatMemory; }
     public SelfCategory getSelfCategory() { return selfCategory; }
     public GroupMembership getGroupMembership() { return groupMembership; }

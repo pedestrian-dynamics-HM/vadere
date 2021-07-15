@@ -55,6 +55,10 @@ public class ChangeTargetScripted extends Stimulus {
         super(time);
     }
 
+    public ChangeTargetScripted(double time, double probability) {
+        super(time, probability);
+    }
+
     public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds) {
         super(time);
 
