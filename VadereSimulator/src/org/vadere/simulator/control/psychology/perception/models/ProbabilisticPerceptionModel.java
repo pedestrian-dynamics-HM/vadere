@@ -26,48 +26,49 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     @Override
     public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {
         for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
-            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
+            Stimulus mostImportantStimulus = getMostImportantStimulusFromProbabilites(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
 
     public void update(Collection<Pedestrian> pedestrians, List<Stimulus> generalStimuli) {
         for (Pedestrian pedestrian : pedestrians) {
-            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(generalStimuli, pedestrian);
+            Stimulus mostImportantStimulus = getMostImportantStimulusFromProbabilites(generalStimuli, pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
     }
 
 
-    private Stimulus rankChangeTargetAndThreatHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
+    private Stimulus getMostImportantStimulusFromProbabilites(List<Stimulus> stimuli, Pedestrian pedestrian) {
 
-        Stimulus mostImportantStimulus = stimuli.stream()
+
+        Stimulus innerStimulus = stimuli.stream()
                 .filter(stimulus -> stimulus instanceof ElapsedTime)
                 .collect(Collectors.toList())
                 .get(0);
 
-        Stimulus areaWaitStimulus = selectWaitInAreaContainingPedestrian(pedestrian, stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()));
-        stimuli = stimuli.stream().filter(stimulus -> !(stimulus instanceof WaitInArea)).collect(Collectors.toList());
-        stimuli.add(areaWaitStimulus);
-        
-
-        if (stimuli.size() > 0) {
+        List<Stimulus> externalStimuli = stimuli.stream()
+                .filter(stimulus -> !(stimulus instanceof ElapsedTime))
+                .collect(Collectors.toList());
 
 
+        //TODO: discuss -> what to do with space-bound stimuli?
+        //Stimulus areaWaitStimulus = selectWaitInAreaContainingPedestrian(pedestrian, stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()));
+        //stimuli = stimuli.stream().filter(stimulus -> !(stimulus instanceof WaitInArea)).collect(Collectors.toList());
+        //stimuli.add(areaWaitStimulus);
 
+        double sumOfProbsExternalStimuli = externalStimuli.stream().map(Stimulus::getPerceptionProbability).reduce(0.0, Double::sum);
+        double probRemaining = innerStimulus.getPerceptionProbability() - sumOfProbsExternalStimuli;
+        innerStimulus.setPerceptionProbability(probRemaining);
 
-            List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
-                    .mapToObj(index -> index)
-                    .collect(Collectors.toList());
+        List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
+                .mapToObj(index -> index)
+                .collect(Collectors.toList());
 
-            List<Double> probs = stimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
+        List<Double> probs = stimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
 
-
-            EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, stimuliIndex.stream().mapToInt(i -> i).toArray(), probs.stream().mapToDouble(i -> i).toArray());
-            return stimuli.get(dist.sample());
-        }
-
-        return mostImportantStimulus;
+        EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, stimuliIndex.stream().mapToInt(i -> i).toArray(), probs.stream().mapToDouble(i -> i).toArray());
+        return stimuli.get(dist.sample());
 
     }
 

@@ -212,7 +212,7 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 0.0,
+        "startTime" : 0.4,
         "endTime" : 100.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
