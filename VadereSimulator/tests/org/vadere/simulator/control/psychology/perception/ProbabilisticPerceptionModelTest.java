@@ -146,35 +146,51 @@ public class ProbabilisticPerceptionModelTest {
         double time = 0.0;
         double time1 = 0.4;
         double time2 = 0.8;
+        double time3 = 1.2;
+        double time4 = 1.6;
 
         List<Stimulus> stimuli = new ArrayList<>();
         stimuli.add(new ElapsedTime(time));
         stimuli.add(new ChangeTarget(time, 0));
-        stimuli.add(new Wait(time, 1));
+        stimuli.add(new Wait(time, 0));
 
         List<Stimulus> stimuli1 = new ArrayList<>();
         stimuli1.add(new ElapsedTime(time1));
         stimuli1.add(new ChangeTarget(time1, 0));
-        stimuli1.add(new Wait(time1, 1));
+        stimuli1.add(new Wait(time1, 0));
 
 
         List<Stimulus> stimuli2 = new ArrayList<>();
         stimuli2.add(new ElapsedTime(time2));
-        stimuli2.add(new ChangeTarget(time2, 1));
-        stimuli2.add(new Wait(time2, 0));
+        stimuli2.add(new ChangeTarget(time2, 0));
+        stimuli2.add(new Wait(time2, 1));
+
+        List<Stimulus> stimuli3 = new ArrayList<>();
+        stimuli3.add(new ElapsedTime(time3));
+        stimuli3.add(new ChangeTarget(time3, 0));
+        stimuli3.add(new Wait(time3, 1));
+
+        List<Stimulus> stimuli4 = new ArrayList<>();
+        stimuli4.add(new ElapsedTime(time4));
+        stimuli4.add(new ChangeTarget(time4, 0));
+        stimuli4.add(new Wait(time4, 1));
+
+
 
 
 
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli));
-
-        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
-
+        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli1));
+        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
 
 
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli2));
-
-        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ChangeTarget));
+        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
+        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli3));
+        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
+        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli4));
+        pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
 
 
 

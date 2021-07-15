@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.commons.math3.util.Precision;
 
 import java.util.List;
 
@@ -107,7 +108,9 @@ public abstract class Stimulus implements Cloneable {
         if(this == that) return true;
         if(!(that instanceof Stimulus)) return false;
         Stimulus thatStimulus = (Stimulus) that;
-        return this.time == thatStimulus.getTime() && this.perceptionProbability == thatStimulus.getPerceptionProbability();
+        boolean isTime = Precision.equals(this.time, thatStimulus.getTime(), Double.MIN_VALUE);
+        boolean isProb = Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
+        return isTime && isProb;
     }
 
 

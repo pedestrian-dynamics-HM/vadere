@@ -8,7 +8,9 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
+import javax.management.RuntimeErrorException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,16 +33,35 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {
 
         for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
+            Stimulus mostImportantStimulus;
             if (isStimulusNew(pedSpecificStimuli.get(pedestrian), pedestrian)) {
-                Stimulus mostImportantStimulus = getMostImportantStimulusFromProbabilites(pedSpecificStimuli.get(pedestrian), pedestrian);
-                pedestrian.setMostImportantStimulus(mostImportantStimulus);
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " got new Stimulus " + pedestrian.getMostImportantStimulus());
+                mostImportantStimulus = getMostImportantStimulusFromProbabilites(pedSpecificStimuli.get(pedestrian));
+                logger.info("Pedestrian with id=" + pedestrian.getId() + " got new Stimulus " + mostImportantStimulus.toString());
             }
             else {
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + pedestrian.getMostImportantStimulus());
+                mostImportantStimulus = getStimulusExisting(pedSpecificStimuli, pedestrian);
+
+                logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + mostImportantStimulus.toString());
             }
+            pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
         setProcessedStimuli(pedSpecificStimuli);
+    }
+
+    private Stimulus getStimulusExisting(final HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli, final Pedestrian pedestrian) {
+        Stimulus mostImportantStimulus;
+        mostImportantStimulus = pedestrian.getMostImportantStimulus();
+        Stimulus finalMostImportantStimulus = mostImportantStimulus;
+        Collection<Stimulus> stimuli = pedSpecificStimuli.get(pedestrian).stream().filter(stimulus -> stimulus.getClass().equals(finalMostImportantStimulus.getClass())).collect(Collectors.toList());
+
+        if (stimuli.size() != 1){
+            throw new IllegalArgumentException("Stimulus not found");
+        }
+
+        for (Stimulus s : stimuli){
+            mostImportantStimulus = s;
+        }
+        return mostImportantStimulus;
     }
 
 
@@ -52,7 +73,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
         return processedStimuli;
     }
 
-    private Stimulus getMostImportantStimulusFromProbabilites(List<Stimulus> stimuli, Pedestrian pedestrian) {
+    private Stimulus getMostImportantStimulusFromProbabilites(List<Stimulus> stimuli) {
 
         Stimulus mostImportantStimulus = stimuli.stream()
                 .filter(stimulus -> stimulus instanceof ElapsedTime)
@@ -69,9 +90,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
             throw new IllegalArgumentException("The sum of probabilites = " + sumOfProbsExternalStimuli +". This exceeds 1.0");
         }
 
-
         double probRemaining = 1.0 - sumOfProbsExternalStimuli;
-        //mostImportantStimulus.setPerceptionProbability(probRemaining);
 
         List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
                 .mapToObj(index -> index)
@@ -89,32 +108,14 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
 
     private boolean isStimulusNew(final List<Stimulus> stimuli, final Pedestrian pedestrian) {
 
-
         if (getProcessedStimuli().containsKey(pedestrian)){
 
-            List<Stimulus> oldStimuli = getProcessedStimuli().get(pedestrian).stream()
-                    .filter(stimulus -> !(stimulus instanceof ElapsedTime))
-                    .collect(Collectors.toList());
-
-            List<Stimulus> newStimuli = stimuli.stream()
-                    .filter(stimulus -> !(stimulus instanceof ElapsedTime))
-                    .collect(Collectors.toList());
-
-            oldStimuli = getProcessedStimuli().get(pedestrian);
-            newStimuli = stimuli;
-
-
-            if (oldStimuli.equals(newStimuli)) {
-                return false;
+            List<Stimulus> oldStimuli = getProcessedStimuli().get(pedestrian);
+            for (Stimulus s : oldStimuli) {
+               s.setTime(s.getTime() + this.simulationStepLength);
             }
-            else{
-                for (Stimulus s : oldStimuli) {
-                   s.setTime(s.getTime() + this.simulationStepLength);
-                }
-                if (oldStimuli.equals(newStimuli)){
-                    logger.info("Same stimuli as before.");
-                    return false;
-                }
+            if (oldStimuli.equals(stimuli)){
+                return false;
             }
         }
 

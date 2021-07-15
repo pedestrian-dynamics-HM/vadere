@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 import java.util.LinkedList;
 
 /**
@@ -136,7 +138,9 @@ public class ChangeTargetScripted extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof ChangeTargetScripted)) return false;
         ChangeTargetScripted thatChangeTarget = (ChangeTargetScripted) that;
-        return this.time == thatChangeTarget.getTime() && this.perceptionProbability == thatChangeTarget.getPerceptionProbability() && this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
+        boolean isTime = Precision.equals(this.time, thatChangeTarget.getTime(), Double.MIN_VALUE);
+        boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
+        return isTime && isProb && this.newTargetIds == thatChangeTarget.getNewTargetIds();
     }
 
 }
