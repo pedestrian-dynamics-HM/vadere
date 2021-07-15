@@ -67,10 +67,10 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getLastPosition(), pedestrian.getLastPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		}
 	}
 
