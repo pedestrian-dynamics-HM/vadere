@@ -147,7 +147,7 @@ public class ProbabilisticPerceptionModelTest {
         double time1 = 0.4;
         double time2 = 0.8;
         double time3 = 1.2;
-        double time4 = 1.6;
+        double time4 = 1.4;
 
         List<Stimulus> stimuli = new ArrayList<>();
         stimuli.add(new ElapsedTime(time));

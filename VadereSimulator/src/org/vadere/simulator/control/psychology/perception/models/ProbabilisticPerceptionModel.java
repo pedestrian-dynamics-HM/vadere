@@ -40,7 +40,6 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
             }
             else {
                 mostImportantStimulus = getStimulusExisting(pedSpecificStimuli, pedestrian);
-
                 logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + mostImportantStimulus.toString());
             }
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
@@ -49,13 +48,12 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     }
 
     private Stimulus getStimulusExisting(final HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli, final Pedestrian pedestrian) {
-        Stimulus mostImportantStimulus;
-        mostImportantStimulus = pedestrian.getMostImportantStimulus();
-        Stimulus finalMostImportantStimulus = mostImportantStimulus;
-        Collection<Stimulus> stimuli = pedSpecificStimuli.get(pedestrian).stream().filter(stimulus -> stimulus.getClass().equals(finalMostImportantStimulus.getClass())).collect(Collectors.toList());
+        Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
+        Stimulus finalMostImportantStimulus = pedestrian.getMostImportantStimulus();
+        Collection<Stimulus> stimuli = pedSpecificStimuli.get(pedestrian).stream().filter(stimulus -> stimulus.equals(finalMostImportantStimulus)).collect(Collectors.toList());
 
         if (stimuli.size() != 1){
-            throw new IllegalArgumentException("Stimulus not found");
+            throw new IllegalArgumentException("Multiple or no recurring stimulus found.");
         }
 
         for (Stimulus s : stimuli){
@@ -111,9 +109,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
         if (getProcessedStimuli().containsKey(pedestrian)){
 
             List<Stimulus> oldStimuli = getProcessedStimuli().get(pedestrian);
-            for (Stimulus s : oldStimuli) {
-               s.setTime(s.getTime() + this.simulationStepLength);
-            }
+
             if (oldStimuli.equals(stimuli)){
                 return false;
             }

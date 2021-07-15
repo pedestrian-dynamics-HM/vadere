@@ -59,9 +59,8 @@ public class WaitInArea extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof WaitInArea)) return false;
         WaitInArea wait = (WaitInArea) that;
-        boolean isTime = Precision.equals(this.time, wait.getTime(), Double.MIN_VALUE);
         boolean isProb = Precision.equals(this.perceptionProbability, wait.getPerceptionProbability(), Double.MIN_VALUE);
-        return isTime && isProb && this.area == wait.getArea();
+        return isProb && this.area == wait.getArea();
     }
 
 }

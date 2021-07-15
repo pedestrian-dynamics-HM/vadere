@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 /**
  * Class representing an elapsed time step.
  *
@@ -22,5 +24,15 @@ public class ElapsedTime extends Stimulus {
     public ElapsedTime clone() {
         return new ElapsedTime(this);
     }
+
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof ElapsedTime)) return false;
+        ElapsedTime elapsedTime = (ElapsedTime) that;
+        boolean isProb = Precision.equals(this.perceptionProbability, elapsedTime.getPerceptionProbability(), Double.MIN_VALUE);
+        return isProb ;
+    }
+
 
 }

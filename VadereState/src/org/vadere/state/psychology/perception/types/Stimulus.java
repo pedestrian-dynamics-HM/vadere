@@ -108,9 +108,8 @@ public abstract class Stimulus implements Cloneable {
         if(this == that) return true;
         if(!(that instanceof Stimulus)) return false;
         Stimulus thatStimulus = (Stimulus) that;
-        boolean isTime = Precision.equals(this.time, thatStimulus.getTime(), Double.MIN_VALUE);
         boolean isProb = Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-        return isTime && isProb;
+        return isProb;
     }
 
 

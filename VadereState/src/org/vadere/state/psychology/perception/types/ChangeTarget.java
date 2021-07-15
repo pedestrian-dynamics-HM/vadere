@@ -56,9 +56,8 @@ public class ChangeTarget extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof ChangeTarget)) return false;
         ChangeTarget thatChangeTarget = (ChangeTarget) that;
-        boolean isTime = Precision.equals(this.time, thatChangeTarget.getTime(), Double.MIN_VALUE);
         boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
-        return isTime && isProb && this.newTargetIds == thatChangeTarget.getNewTargetIds();
+        return isProb && this.newTargetIds == thatChangeTarget.getNewTargetIds();
     }
 
 }
