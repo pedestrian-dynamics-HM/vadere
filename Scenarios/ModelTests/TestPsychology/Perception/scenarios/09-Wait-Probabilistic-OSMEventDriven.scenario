@@ -78,9 +78,9 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 150.0,
+      "finishTime" : 100.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.7,
+      "realTimeSimTimeRatio" : 0.3,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
@@ -212,31 +212,14 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 0.4,
-        "endTime" : 100.0,
+        "startTime" : 10.0,
+        "endTime" : 20.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "WaitInArea",
-        "perceptionProbability" : 0.0,
-        "area" : {
-          "x" : 15.0,
-          "y" : 0.0,
-          "width" : 6.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
-      }, {
-        "type" : "WaitInArea",
-        "perceptionProbability" : 1.0,
-        "area" : {
-          "x" : 15.0,
-          "y" : 8.0,
-          "width" : 6.0,
-          "height" : 8.0,
-          "type" : "RECTANGLE"
-        }
+        "type" : "Wait",
+        "perceptionProbability" : 0.5
       } ]
     } ]
   }

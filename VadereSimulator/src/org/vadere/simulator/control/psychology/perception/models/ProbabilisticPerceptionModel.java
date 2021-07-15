@@ -42,7 +42,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     private Stimulus getMostImportantStimulusFromProbabilites(List<Stimulus> stimuli, Pedestrian pedestrian) {
 
 
-        Stimulus innerStimulus = stimuli.stream()
+        Stimulus mostImportantStimulus = stimuli.stream()
                 .filter(stimulus -> stimulus instanceof ElapsedTime)
                 .collect(Collectors.toList())
                 .get(0);
@@ -58,8 +58,8 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
         //stimuli.add(areaWaitStimulus);
 
         double sumOfProbsExternalStimuli = externalStimuli.stream().map(Stimulus::getPerceptionProbability).reduce(0.0, Double::sum);
-        double probRemaining = innerStimulus.getPerceptionProbability() - sumOfProbsExternalStimuli;
-        innerStimulus.setPerceptionProbability(probRemaining);
+        double probRemaining = mostImportantStimulus.getPerceptionProbability() - sumOfProbsExternalStimuli;
+        mostImportantStimulus.setPerceptionProbability(probRemaining);
 
         List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
                 .mapToObj(index -> index)
@@ -68,8 +68,9 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
         List<Double> probs = stimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
 
         EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, stimuliIndex.stream().mapToInt(i -> i).toArray(), probs.stream().mapToDouble(i -> i).toArray());
-        return stimuli.get(dist.sample());
-
+        int index = dist.sample();
+        mostImportantStimulus = stimuli.get(index);
+        return mostImportantStimulus;
     }
 
     private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {
