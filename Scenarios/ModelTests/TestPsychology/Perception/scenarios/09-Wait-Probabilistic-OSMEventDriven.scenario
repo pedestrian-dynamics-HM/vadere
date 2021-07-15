@@ -78,7 +78,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 100.0,
+      "finishTime" : 150.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.3,
       "writeSimulationData" : true,
@@ -112,30 +112,13 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 1,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 36.0,
-          "y" : 10.5,
-          "width" : 2.5,
-          "height" : 4.5,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 36.0,
-          "y" : 1.0,
+          "x" : 36.2,
+          "y" : 1.1754385964912277,
           "width" : 2.5,
-          "height" : 4.5,
+          "height" : 13.724561403508773,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -149,43 +132,21 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "sources" : [ {
-        "id" : 1,
-        "shape" : {
-          "x" : 1.0,
-          "y" : 10.5,
-          "width" : 2.5,
-          "height" : 4.5,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
         "id" : 2,
         "shape" : {
           "x" : 1.0,
           "y" : 1.0,
-          "width" : 2.5,
-          "height" : 4.5,
+          "width" : 6.456140350877193,
+          "height" : 14.035087719298245,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 10,
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 0.0,
-        "spawnAtRandomPositions" : false,
+        "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 2 ],
@@ -212,14 +173,14 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 10.0,
-        "endTime" : 20.0,
+        "startTime" : 5.2,
+        "endTime" : 70.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
         "type" : "Wait",
-        "perceptionProbability" : 0.5
+        "perceptionProbability" : 1.0
       } ]
     } ]
   }
