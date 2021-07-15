@@ -21,9 +21,10 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     private double simulationStepLength;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, final double simTimeStepLengh) {
         rng = new JDKRandomGenerator(new Random().nextInt());
         processedStimuli = new HashMap<>();
+        this.simulationStepLength = simTimeStepLengh;
     }
 
     @Override
@@ -70,17 +71,19 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
 
 
         double probRemaining = 1.0 - sumOfProbsExternalStimuli;
-        mostImportantStimulus.setPerceptionProbability(probRemaining);
+        //mostImportantStimulus.setPerceptionProbability(probRemaining);
 
         List<Integer> stimuliIndex = IntStream.range(0, stimuli.size())
                 .mapToObj(index -> index)
                 .collect(Collectors.toList());
 
-        List<Double> probs = stimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
+        List<Double> probs = externalStimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
+        probs.add(probRemaining);
 
         EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, stimuliIndex.stream().mapToInt(i -> i).toArray(), probs.stream().mapToDouble(i -> i).toArray());
         int index = dist.sample();
-        mostImportantStimulus = stimuli.get(index);
+        externalStimuli.add(mostImportantStimulus);
+        mostImportantStimulus = externalStimuli.get(index);
         return mostImportantStimulus;
     }
 
@@ -96,6 +99,9 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
             List<Stimulus> newStimuli = stimuli.stream()
                     .filter(stimulus -> !(stimulus instanceof ElapsedTime))
                     .collect(Collectors.toList());
+
+            oldStimuli = getProcessedStimuli().get(pedestrian);
+            newStimuli = stimuli;
 
 
             if (oldStimuli.equals(newStimuli)) {
@@ -115,9 +121,6 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
         return true;
     }
 
-    public void setSimulationStepLength(double simStepLength){
-        this.simulationStepLength = simStepLength;
-    }
 
 
 }

@@ -31,7 +31,7 @@ public interface IPerceptionModel {
 	 * a model can acquire additional information about a pedestrian's surrounding
 	 * when evaluating pedestrian's perception.
 	 */
-	void initialize(Topography topography);
+	void initialize(Topography topography, final double simTimeStepLengh);
 
 	/**
 	 * Usually, this method iterates over the pededestrians and calls

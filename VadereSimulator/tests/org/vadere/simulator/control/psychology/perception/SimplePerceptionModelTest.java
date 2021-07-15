@@ -86,7 +86,7 @@ public class SimplePerceptionModelTest {
         List<Stimulus> stimuli = createElapsedTimeStimuli(1);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography,0 );
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -108,7 +108,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -130,7 +130,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -156,7 +156,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -189,7 +189,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulusPed2);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -212,7 +212,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography,0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -240,7 +240,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedWaitInArea);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -267,7 +267,7 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 

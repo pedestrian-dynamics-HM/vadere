@@ -4,7 +4,6 @@ package org.vadere.simulator.control.psychology.perception;
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.perception.models.ProbabilisticPerceptionModel;
-import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -86,8 +85,7 @@ public class ProbabilisticPerceptionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
-        probabilisticPerceptionModel.setSimulationStepLength(0.4);
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, 0.4);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli));
@@ -127,9 +125,8 @@ public class ProbabilisticPerceptionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
-        probabilisticPerceptionModel.setSimulationStepLength(0.4);
 
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, 0.4);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
         probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
@@ -142,7 +139,7 @@ public class ProbabilisticPerceptionModelTest {
         List<Pedestrian> pedestrians = createPedestrians(1);
 
         ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, 0.4);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
 
@@ -165,8 +162,6 @@ public class ProbabilisticPerceptionModelTest {
         stimuli2.add(new ElapsedTime(time2));
         stimuli2.add(new ChangeTarget(time2, 1));
         stimuli2.add(new Wait(time2, 0));
-
-        probabilisticPerceptionModel.setSimulationStepLength(0.4);
 
 
 

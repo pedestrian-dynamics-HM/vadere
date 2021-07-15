@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
-import org.lwjgl.system.CallbackI;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -21,7 +20,7 @@ public class SimplePerceptionModel implements IPerceptionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, final double simTimeStepLengh) {
         this.topography = topography;
     }
 

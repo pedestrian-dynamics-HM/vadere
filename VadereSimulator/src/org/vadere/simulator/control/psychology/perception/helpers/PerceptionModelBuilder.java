@@ -23,7 +23,7 @@ public class PerceptionModelBuilder {
 		DynamicClassInstantiator<IPerceptionModel> instantiator = new DynamicClassInstantiator<>();
 		IPerceptionModel perceptionModel = instantiator.createObject(fullyQualifiedClassName);
 
-		perceptionModel.initialize(scenarioStore.getTopography());
+		perceptionModel.initialize(scenarioStore.getTopography(), scenarioStore.getAttributesSimulation().getSimTimeStepLength());
 
 		return perceptionModel;
 	}
