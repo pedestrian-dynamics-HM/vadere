@@ -86,6 +86,7 @@ public class ProbabilisticPerceptionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
+        probabilisticPerceptionModel.setSimulationStepLength(0.4);
         probabilisticPerceptionModel.initialize(topography);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -126,6 +127,8 @@ public class ProbabilisticPerceptionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
+        probabilisticPerceptionModel.setSimulationStepLength(0.4);
+
         probabilisticPerceptionModel.initialize(topography);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
@@ -163,6 +166,7 @@ public class ProbabilisticPerceptionModelTest {
         stimuli2.add(new ChangeTarget(time2, 1));
         stimuli2.add(new Wait(time2, 0));
 
+        probabilisticPerceptionModel.setSimulationStepLength(0.4);
 
 
 

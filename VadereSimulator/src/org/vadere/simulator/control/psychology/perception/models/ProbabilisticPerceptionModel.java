@@ -18,6 +18,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
 
     HashMap<Pedestrian, List<Stimulus>> processedStimuli;
     private RandomGenerator rng;
+    private double simulationStepLength;
 
     @Override
     public void initialize(Topography topography) {
@@ -95,25 +96,28 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
             List<Stimulus> newStimuli = stimuli.stream()
                     .filter(stimulus -> !(stimulus instanceof ElapsedTime))
                     .collect(Collectors.toList());
-            
+
 
             if (oldStimuli.equals(newStimuli)) {
                 return false;
             }
             else{
                 for (Stimulus s : oldStimuli) {
-                   s.setTime(s.getTime()+0.4);
+                   s.setTime(s.getTime() + this.simulationStepLength);
                 }
                 if (oldStimuli.equals(newStimuli)){
-                    logger.info("was here");
+                    logger.info("Same stimuli as before.");
                     return false;
                 }
-
-
             }
         }
 
         return true;
     }
+
+    public void setSimulationStepLength(double simStepLength){
+        this.simulationStepLength = simStepLength;
+    }
+
 
 }

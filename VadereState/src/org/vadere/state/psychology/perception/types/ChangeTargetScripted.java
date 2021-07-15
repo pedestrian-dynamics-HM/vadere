@@ -131,4 +131,12 @@ public class ChangeTargetScripted extends Stimulus {
         return new ChangeTargetScripted(this);
     }
 
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof ChangeTargetScripted)) return false;
+        ChangeTargetScripted thatChangeTarget = (ChangeTargetScripted) that;
+        return this.time == thatChangeTarget.getTime() && this.perceptionProbability == thatChangeTarget.getPerceptionProbability() && this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
+    }
+
 }

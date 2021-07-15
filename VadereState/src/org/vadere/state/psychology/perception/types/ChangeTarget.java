@@ -49,4 +49,12 @@ public class ChangeTarget extends Stimulus {
         return new ChangeTarget(this);
     }
 
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof ChangeTarget)) return false;
+        ChangeTarget thatChangeTarget = (ChangeTarget) that;
+        return this.time == thatChangeTarget.getTime() && this.perceptionProbability == thatChangeTarget.getPerceptionProbability() && this.newTargetIds == thatChangeTarget.getNewTargetIds();
+    }
+
 }

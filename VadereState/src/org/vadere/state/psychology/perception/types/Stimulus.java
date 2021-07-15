@@ -106,8 +106,8 @@ public abstract class Stimulus implements Cloneable {
     public boolean equals(Object that){
         if(this == that) return true;
         if(!(that instanceof Stimulus)) return false;
-        Stimulus thatPeople = (Stimulus) that;
-        return this.time == thatPeople.getTime() && this.perceptionProbability == thatPeople.getPerceptionProbability();
+        Stimulus thatStimulus = (Stimulus) that;
+        return this.time == thatStimulus.getTime() && this.perceptionProbability == thatStimulus.getPerceptionProbability();
     }
 
 

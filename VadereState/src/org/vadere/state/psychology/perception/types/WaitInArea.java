@@ -53,4 +53,12 @@ public class WaitInArea extends Stimulus {
         return new WaitInArea(this);
     }
 
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof WaitInArea)) return false;
+        WaitInArea wait = (WaitInArea) that;
+        return this.time == wait.getTime() && this.perceptionProbability == wait.getPerceptionProbability() && this.area == wait.getArea();
+    }
+
 }
