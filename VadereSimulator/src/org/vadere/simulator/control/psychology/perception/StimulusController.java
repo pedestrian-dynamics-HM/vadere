@@ -4,10 +4,9 @@ import org.jcodec.codecs.mjpeg.JpegDecoder;
 import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
-import org.vadere.state.psychology.perception.types.ElapsedTime;
-import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.psychology.perception.types.Timeframe;
+import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,6 +78,10 @@ public class StimulusController {
         return stimuli;
     }
 
+    public void setPedSpecificStimuli(final HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli) {
+        this.pedSpecificStimuli = pedSpecificStimuli;
+    }
+
     public HashMap<Pedestrian,List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
 
         HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
@@ -94,32 +97,92 @@ public class StimulusController {
 
         List<Stimulus> stimuli = new ArrayList<>();
         stimuli = getStimuliForTime(simulationTime);
-        stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime));
 
-        return stimuli;
+        List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
+        List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
+
+        Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(ped, waitInAreaStimuli);
+        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(ped,threatStimuli);
+
+        stimuli.removeAll(waitInAreaStimuli);
+        stimuli.removeAll(threatStimuli);
+        if (mostImportantThrea!= null) stimuli.add(mostImportantThrea);
+        if (mostImportantWaitInArea != null)stimuli.add(mostImportantWaitInArea);
+
+
+        stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime, stimuli));
+
+
+        return stimuli.stream().distinct().collect(Collectors.toList());
 
     }
 
-    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime){
+    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime, List<Stimulus> stimuli){
         List<Stimulus> activeStimuli = new ArrayList<>();
         if (pedSpecificStimuli.containsKey(pedestrian)){
             pedSpecificStimuli.get(pedestrian).stream()
                     .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
                     .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-
         }
-        return activeStimuli;
 
+        List<Stimulus> waitInAreaStimuli = activeStimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
+        List<Stimulus> threatStimuli = activeStimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
+
+        Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(pedestrian, waitInAreaStimuli);
+        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(pedestrian,threatStimuli);
+
+        activeStimuli.removeAll(waitInAreaStimuli);
+        activeStimuli.removeAll(threatStimuli);
+        if (mostImportantThrea!= null) activeStimuli.add(mostImportantThrea);
+        if (mostImportantWaitInArea != null) activeStimuli.add(mostImportantWaitInArea);
+
+        List<Stimulus> finalstimuli = stimuli;
+        List<Stimulus> sorted = activeStimuli.stream().filter(stimulus -> finalstimuli.contains(stimulus) == false).collect(Collectors.toList());
+
+        return sorted;
     }
 
-    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian){
-        List<Stimulus> activeStimuli = new ArrayList<>();
-        if (pedSpecificStimuli.containsKey(pedestrian)){
-            pedSpecificStimuli.get(pedestrian).forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-        }
-        return activeStimuli;
+    private Stimulus selectClosestAndPerceptibleThreat(Pedestrian pedestrian, List<Stimulus> threatStimuli) {
+        Threat closestAndPerceptibleThreat = null;
+        double distanceToClosestThreat = -1;
 
+        for (Stimulus stimulus : threatStimuli) {
+            Threat currentThreat = (Threat) stimulus;
+
+            VPoint threatOrigin = this.scenarioStore.getTopography().getTarget(currentThreat.getOriginAsTargetId()).getShape().getCentroid();
+            double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
+
+            if (distanceToThreat <= currentThreat.getRadius()) {
+                if (closestAndPerceptibleThreat == null) {
+                    closestAndPerceptibleThreat = currentThreat;
+                    distanceToClosestThreat = distanceToThreat;
+                } else {
+                    if (distanceToThreat < distanceToClosestThreat) {
+                        closestAndPerceptibleThreat = currentThreat;
+                        distanceToClosestThreat = distanceToThreat;
+                    }
+                }
+            }
+        }
+
+        return closestAndPerceptibleThreat;
     }
+
+    private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {
+        WaitInArea selectedWaitInArea = null;
+
+        for (Stimulus stimulus : waitInAreaStimuli) {
+            WaitInArea waitInArea = (WaitInArea) stimulus;
+            boolean pedInArea = waitInArea.getArea().contains(pedestrian.getPosition());
+
+            if (pedInArea) {
+                selectedWaitInArea = waitInArea;
+            }
+        }
+
+        return selectedWaitInArea;
+    }
+
 
     public void setDynamicStimulus(StimulusInfo stimulusInfo){
         List<StimulusInfo> stimuliList = new ArrayList<>();
@@ -167,11 +230,6 @@ public class StimulusController {
         pedSpecificStimuli.put(ped, stimuliList);
 
     }
-
-
-
-
-
 
 
     private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {

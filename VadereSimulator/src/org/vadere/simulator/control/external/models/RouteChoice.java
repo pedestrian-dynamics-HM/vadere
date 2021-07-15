@@ -51,23 +51,32 @@ public class RouteChoice extends ControlModel {
 
     }
 
+
+
     @Override
-    protected void triggerRedRaction(Pedestrian ped) {
+    protected void triggerPedReaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
 
         if (isUsePsychologyLayer()) {
-            double timeCommandExecuted = this.simTime + 0.4;
-            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
+            double timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
-            ped.setTargets(newTargetList);
-            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
-            logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+            if (isPedReact()){
+                ped.setTargets(newTargetList);
+                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
+                logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+            }
+            else{
+                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
+            }
         }
 
 
     }
+
+
 
 
     private LinkedList<Integer> getTargetFromNavigationApp() {

@@ -26,7 +26,11 @@ public class ChangeTarget extends Stimulus {
 
     public ChangeTarget(double time, LinkedList<Integer> newTargetIds) {
         super(time);
+        this.newTargetIds = newTargetIds;
+    }
 
+    public ChangeTarget(double time, double probability, LinkedList<Integer> newTargetIds) {
+        super(time, probability);
         this.newTargetIds = newTargetIds;
     }
 

@@ -4,8 +4,6 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -26,6 +24,7 @@ public abstract class ControlModel implements IControlModel {
     protected HashMap<Pedestrian,LinkedList<Integer>> processedAgents;
     protected StimulusController stimulusController;
     private boolean isUsePsychologyLayer = false;
+    private double simTimeStepLength;
 
 
     public ControlModel(){
@@ -36,7 +35,7 @@ public abstract class ControlModel implements IControlModel {
 
 
     @Override
-    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel) {
+    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel, final double simTimeStepLength) {
         processedAgents = new HashMap<>();
         simTime = 0.0;
 
@@ -44,6 +43,7 @@ public abstract class ControlModel implements IControlModel {
         this.stimulusController = stimulusController;
         this.isUsePsychologyLayer = isUsePsychologyLayer;
         this.reactionModel = reactionModel;
+        this.simTimeStepLength = simTimeStepLength;
     }
 
     @Override
@@ -67,10 +67,14 @@ public abstract class ControlModel implements IControlModel {
         this.reactionModel = reactionModel;
     }
 
+    public double getBernoulliParameter(){
+        return this.reactionModel.getBernoulliParameter();
+    }
 
 
     public abstract boolean isPedReact();
-    protected abstract void triggerRedRaction(Pedestrian ped);
+    protected abstract void triggerPedReaction(Pedestrian ped);
+
 
 
     public void setProcessedAgents(Pedestrian ped, LinkedList<Integer> ids){
@@ -112,7 +116,7 @@ public abstract class ControlModel implements IControlModel {
             if (this.isInformationProcessed(ped, getCommandId())){
                 if (isInfoInTime() && isPedInDefinedArea(ped)) {
                     this.getControlAction(ped, command.getPedCommand());
-                    this.setAction(ped);
+                    this.triggerPedReaction(ped);
                     this.setProcessedAgents(ped,getCommandId());
                 }
             }
@@ -152,16 +156,6 @@ public abstract class ControlModel implements IControlModel {
         return command.getCommandId();
     }
 
-
-    public void setAction(Pedestrian ped){
-        if (isPedReact()){
-            triggerRedRaction(ped);
-        }
-        else{
-            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
-        }
-    }
-
     public boolean isInformationProcessed(Pedestrian ped, int commandId){
 
         // 1. handle conflicting instructions over time
@@ -187,5 +181,9 @@ public abstract class ControlModel implements IControlModel {
 
     public boolean isUsePsychologyLayer() {
         return isUsePsychologyLayer;
+    }
+
+    public double getSimTimeStepLength() {
+        return simTimeStepLength;
     }
 }

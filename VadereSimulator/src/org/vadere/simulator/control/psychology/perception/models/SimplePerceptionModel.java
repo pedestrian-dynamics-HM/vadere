@@ -32,13 +32,6 @@ public class SimplePerceptionModel implements IPerceptionModel {
         }
     }
 
-    public void update(Collection<Pedestrian> pedestrians, List<Stimulus> generalStimuli) {
-        for (Pedestrian pedestrian :pedestrians) {
-            Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(generalStimuli, pedestrian);
-            pedestrian.setMostImportantStimulus(mostImportantStimulus);
-        }
-    }
-
 
     private Stimulus rankChangeTargetAndThreatHigherThanWait(List<Stimulus> stimuli, Pedestrian pedestrian) {
         // Assume the "ElapsedTime" is the most important stimulus
@@ -61,63 +54,17 @@ public class SimplePerceptionModel implements IPerceptionModel {
         } else if (changeTargetStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetStimuli.get(0);
         } else if (threatStimuli.size() >= 1) {
-            Stimulus closestThreat = selectClosestAndPerceptibleThreat(pedestrian, threatStimuli);
-
-            if (closestThreat != null) {
-                mostImportantStimulus = closestThreat;
-            }
+            mostImportantStimulus = threatStimuli.get(0);
         } else if (waitStimuli.size() >= 1) {
             mostImportantStimulus = waitStimuli.get(0);
         } else if (waitInAreaStimuli.size() >= 1) {
-            Stimulus selectedWaitInArea = selectWaitInAreaContainingPedestrian(pedestrian, waitInAreaStimuli);
+            mostImportantStimulus = waitInAreaStimuli.get(0);
 
-            if (selectedWaitInArea != null) {
-                mostImportantStimulus = selectedWaitInArea;
-            }
         }
         else if(true){} // place changepersonalspace here
 
         return mostImportantStimulus;
     }
 
-    private Stimulus selectClosestAndPerceptibleThreat(Pedestrian pedestrian, List<Stimulus> threatStimuli) {
-        Threat closestAndPerceptibleThreat = null;
-        double distanceToClosestThreat = -1;
 
-        for (Stimulus stimulus : threatStimuli) {
-            Threat currentThreat = (Threat) stimulus;
-
-            VPoint threatOrigin = topography.getTarget(currentThreat.getOriginAsTargetId()).getShape().getCentroid();
-            double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
-
-            if (distanceToThreat <= currentThreat.getRadius()) {
-                if (closestAndPerceptibleThreat == null) {
-                    closestAndPerceptibleThreat = currentThreat;
-                    distanceToClosestThreat = distanceToThreat;
-                } else {
-                    if (distanceToThreat < distanceToClosestThreat) {
-                        closestAndPerceptibleThreat = currentThreat;
-                        distanceToClosestThreat = distanceToThreat;
-                    }
-                }
-            }
-        }
-
-        return closestAndPerceptibleThreat;
-    }
-
-    private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {
-        WaitInArea selectedWaitInArea = null;
-
-        for (Stimulus stimulus : waitInAreaStimuli) {
-            WaitInArea waitInArea = (WaitInArea) stimulus;
-            boolean pedInArea = waitInArea.getArea().contains(pedestrian.getPosition());
-
-            if (pedInArea) {
-                selectedWaitInArea = waitInArea;
-            }
-        }
-
-        return selectedWaitInArea;
-    }
 }
