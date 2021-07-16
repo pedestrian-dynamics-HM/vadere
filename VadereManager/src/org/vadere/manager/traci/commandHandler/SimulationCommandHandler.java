@@ -247,7 +247,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 					ReactionModel reactionModel = new ReactionModel();
 					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
-
 					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
 					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
 					iControlModelHashMap.put(model_name, controlModel);
