@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 import java.util.LinkedList;
 
 /**
@@ -18,9 +20,17 @@ public class ChangeTarget extends Stimulus {
         super(time);
     }
 
+    public ChangeTarget(double time, double probability) {
+        super(time, probability);
+    }
+
     public ChangeTarget(double time, LinkedList<Integer> newTargetIds) {
         super(time);
+        this.newTargetIds = newTargetIds;
+    }
 
+    public ChangeTarget(double time, double probability, LinkedList<Integer> newTargetIds) {
+        super(time, probability);
         this.newTargetIds = newTargetIds;
     }
 
@@ -43,6 +53,15 @@ public class ChangeTarget extends Stimulus {
     @Override
     public ChangeTarget clone() {
         return new ChangeTarget(this);
+    }
+
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof ChangeTarget)) return false;
+        ChangeTarget thatChangeTarget = (ChangeTarget) that;
+        boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
+        return isProb && this.newTargetIds == thatChangeTarget.getNewTargetIds();
     }
 
 }

@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 /**
  * Class signals agents a threat. For instance that something exploded.
  *
@@ -21,11 +23,17 @@ public class Threat extends Stimulus {
         super(time);
     }
 
+    public Threat(double time, double probability) {
+        super(time, probability);
+    }
+
     public Threat(double time, int originAsTargetId) {
         super(time);
 
         this.originAsTargetId = originAsTargetId;
     }
+
+
 
     public Threat(Threat other) {
         super(other);
@@ -48,5 +56,16 @@ public class Threat extends Stimulus {
     @Override
     public Threat clone() {
         return new Threat(this);
+    }
+
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof Threat)) return false;
+        Threat threat = (Threat) that;
+        boolean isProb = Precision.equals(this.perceptionProbability, threat.getPerceptionProbability(), Double.MIN_VALUE);
+        boolean loud = Precision.equals(this.loudness, threat.getLoudness(), Double.MIN_VALUE);
+        boolean radius = Precision.equals(this.radius, threat.getRadius(), Double.MIN_VALUE);
+        return isProb && loud && radius;
     }
 }

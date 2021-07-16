@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -86,11 +87,11 @@ public class SimplePerceptionModelTest {
         List<Stimulus> stimuli = createElapsedTimeStimuli(1);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography,0 );
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         Stimulus expectedStimulus = stimuli.get(0);
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
@@ -108,11 +109,11 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
@@ -130,11 +131,11 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians,stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
@@ -156,49 +157,15 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus.getTime() == pedestrian.getMostImportantStimulus().getTime()));
     }
 
-    @Test
-    public void updateUsesClosestThreatForPedestrian() {
-        // Place threats at (0,0) and (5,0) with radius 5 and
-        // place pedestrians at (1,0) and (4,0) and check result.
-
-        Topography topography = createTopography();
-        ArrayList<Target> targets = createTwoTargets();
-        targets.forEach(target -> topography.addTarget(target));
-
-        double expectedTime1 = 0.1;
-        double expectedTime2 = 0.2;
-        Stimulus expectedStimulusPed1 = new Threat(expectedTime1, targets.get(0).getId());
-        Stimulus expectedStimulusPed2 = new Threat(expectedTime2, targets.get(1).getId());
-
-        List<Pedestrian> pedestrians = createPedestrians(2);
-        pedestrians.get(0).setPosition(new VPoint(1, 0));
-        pedestrians.get(1).setPosition(new VPoint(4, 0));
-        List<Stimulus> stimuli = new ArrayList<>();
-
-        stimuli.add(new ElapsedTime());
-        stimuli.add(expectedStimulusPed1);
-        stimuli.add(expectedStimulusPed2);
-
-        SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
-
-        pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
-
-        simplePerceptionModel.update(pedestrians, stimuli);
-
-        // Use "==" to compare if it is the same reference!
-        assertTrue(expectedStimulusPed1 == pedestrians.get(0).getMostImportantStimulus());
-        assertTrue(expectedStimulusPed2 == pedestrians.get(1).getMostImportantStimulus());
-    }
 
     @Test
     public void updateRanksWaitHigherThanElapsedTime() {
@@ -212,47 +179,17 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography,0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
     }
 
-    @Test
-    public void updateUsesWaitInAreaIfPedestriansStandsInWaitingArea() {
-        Topography topography = createTopography();
 
-        List<Pedestrian> pedestrians = createPedestrians(2);
-        pedestrians.get(0).setPosition(new VPoint(1, 0));
-        pedestrians.get(1).setPosition(new VPoint(4, 0));
-        List<Stimulus> stimuli = new ArrayList<>();
-
-        double expectedTime = 0.1;
-        VShape waitingArea = new VCircle(new VPoint(0, 0), 2);
-        Stimulus expectedWaitInArea = new WaitInArea(expectedTime, waitingArea);
-        Stimulus expectedElapsedTime = new ElapsedTime(0.2);
-
-        stimuli.add(expectedElapsedTime);
-        stimuli.add(expectedWaitInArea);
-
-        SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
-
-        pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
-
-        simplePerceptionModel.update(pedestrians, stimuli);
-
-        // Use "==" to compare if it is the same reference!
-        assertTrue(pedestrians.get(0).getMostImportantStimulus() == expectedWaitInArea);
-        assertTrue(pedestrians.get(1).getMostImportantStimulus() == expectedElapsedTime);
-
-        assertEquals(expectedTime, pedestrians.get(0).getMostImportantStimulus().getTime(), ALLOWED_DOUBLE_ERROR);
-        assertEquals(expectedElapsedTime.getTime(), pedestrians.get(1).getMostImportantStimulus().getTime(), ALLOWED_DOUBLE_ERROR);
-    }
 
     @Test
     public void updateRanksChangeTargetScriptedHigherThanChangeTarget() {
@@ -267,13 +204,21 @@ public class SimplePerceptionModelTest {
         stimuli.add(expectedStimulus);
 
         SimplePerceptionModel simplePerceptionModel = new SimplePerceptionModel();
-        simplePerceptionModel.initialize(topography);
+        simplePerceptionModel.initialize(topography, 0);
 
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        simplePerceptionModel.update(pedestrians, stimuli);
+        simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
         pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+    }
+
+    private HashMap<Pedestrian, List<Stimulus>> getPedSpecififStimuli(List<Pedestrian> pedestrians, List<Stimulus> stimuli){
+        HashMap<Pedestrian, List<Stimulus>> pedSpecififStimuli = new HashMap<Pedestrian, List<Stimulus>>();
+        for (Pedestrian pedestrian : pedestrians){
+            pedSpecififStimuli.put(pedestrian, stimuli);
+        }
+        return pedSpecififStimuli;
     }
 }
