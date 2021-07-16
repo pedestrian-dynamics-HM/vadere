@@ -200,13 +200,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -238,7 +236,6 @@
       },
       "stimuli" : [ {
         "type" : "Threat",
-        "perceptionProbability" : 1.0,
         "originAsTargetId" : 0,
         "loudness" : 1.0,
         "radius" : 10.0

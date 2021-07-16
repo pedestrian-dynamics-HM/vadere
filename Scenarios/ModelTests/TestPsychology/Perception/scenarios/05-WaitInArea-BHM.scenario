@@ -31,13 +31,12 @@
         "stepLengthDeviation" : false,
         "navigationCluster" : false,
         "navigationFollower" : false,
-        "followerProximityNavigation" : true,
-        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
+        "followerProximityNavigation" : true,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -217,7 +216,6 @@
       },
       "stimuli" : [ {
         "type" : "WaitInArea",
-        "perceptionProbability" : 1.0,
         "area" : {
           "x" : 15.0,
           "y" : 0.0,

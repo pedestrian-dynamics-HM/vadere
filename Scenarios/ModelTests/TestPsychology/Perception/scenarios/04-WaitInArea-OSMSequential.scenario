@@ -219,7 +219,6 @@
       },
       "stimuli" : [ {
         "type" : "WaitInArea",
-        "perceptionProbability" : 1.0,
         "area" : {
           "x" : 15.0,
           "y" : 0.0,
