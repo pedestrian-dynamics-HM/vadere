@@ -227,6 +227,8 @@ public class StimulusController {
         stimulusInfo.setTimeframe(new Timeframe(0, simTimeNextTimeStep, false, 0));
         stimulusInfo.setStimuli(newStimulus);
 
+        stimuliList.add(stimulusInfo);
+
         pedSpecificStimuli.put(ped, stimuliList);
 
     }
