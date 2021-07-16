@@ -38,10 +38,7 @@ public class RouteChoice extends ControlModel {
 
     @Override
     public boolean isPedReact() {
-
-        LinkedList<Integer> alternativeTargets = readTargetsFromJson();
-        int i = alternativeTargets.indexOf(newTargetList.get(0));
-
+        int i = getOptionIndex();
         try {
             return reactionModel.isPedReact(i);
         } catch (Exception e) {
@@ -51,24 +48,35 @@ public class RouteChoice extends ControlModel {
 
     }
 
+    protected int getOptionIndex() {
+        LinkedList<Integer> alternativeTargets = readTargetsFromJson();
+        return alternativeTargets.indexOf(newTargetList.get(0));
+    }
+
+
     @Override
     protected void triggerPedReaction(Pedestrian ped) {
 
         LinkedList<Integer> oldTarget = ped.getTargets();
 
         if (isUsePsychologyLayer()) {
-            // in this case the targets are set in the next time step when updating the psychology layer
-            double timeCommandExecuted = getTimeOfNextStimulusAvailable();
-            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
+            double timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
-            ped.setTargets(newTargetList);
-            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
-            // in this case the targets are set directly
-            logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+            if (isPedReact()){
+                ped.setTargets(newTargetList);
+                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
+                logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
+            }
+            else{
+                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
+            }
         }
 
     }
+
+
 
 
     private LinkedList<Integer> getTargetFromNavigationApp() {

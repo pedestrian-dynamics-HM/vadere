@@ -1,16 +1,24 @@
 package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
+import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -469,12 +477,130 @@ public class StimulusControllerTest {
 
     }
 
+    @Test
+    public void updateUsesClosestThreatForPedestrian() {
+        // Place threats at (0,0) and (5,0) with radius 5 and
+        // place pedestrians at (1,0) and (4,0) and check result.
+
+        Topography topography = createTopography();
+        ArrayList<Target> targets = createTwoTargets();
+        targets.forEach(target -> topography.addTarget(target));
+
+        double expectedTime1 = 0.1;
+        double expectedTime2 = 0.2;
+        Stimulus expectedStimulusPed1 = new Threat(expectedTime1, targets.get(0).getId());
+        Stimulus expectedStimulusPed2 = new Threat(expectedTime2, targets.get(1).getId());
+
+        List<Pedestrian> pedestrians = createPedestrians(2);
+        pedestrians.get(0).setPosition(new VPoint(1, 0));
+        pedestrians.get(1).setPosition(new VPoint(4, 0));
+
+        List<Stimulus> stimuli = new ArrayList<>();
+        stimuli.add(expectedStimulusPed1);
+        stimuli.add(expectedStimulusPed2);
+
+        StimulusInfo stimulusInfo1 = new StimulusInfo();
+        Timeframe timeFrame = new Timeframe(0, 7, false,0);
+        stimulusInfo1.setStimuli(stimuli);
+        stimulusInfo1.setTimeframe(timeFrame);
+
+        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
+        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
+        stimulusController.getScenarioStore().setTopography(topography);
 
 
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
+        Stimulus Threat1 = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
+        Stimulus Threat2 = stimuliFiltered2.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
+
+        assertEquals(Threat1, expectedStimulusPed1);
+        assertEquals(Threat2, expectedStimulusPed2);
+
+    }
+
+    @Test
+    public void updateUsesWaitInAreaIfPedestriansStandsInWaitingArea() {
+        Topography topography = createTopography();
+
+        List<Pedestrian> pedestrians = createPedestrians(2);
+        pedestrians.get(0).setPosition(new VPoint(1, 0));
+        pedestrians.get(1).setPosition(new VPoint(4, 0));
+        List<Stimulus> stimuli = new ArrayList<>();
+
+        double expectedTime = 0.1;
+        VShape waitingArea = new VCircle(new VPoint(0, 0), 2);
+        Stimulus expectedWaitInArea = new WaitInArea(expectedTime, waitingArea);
+        Stimulus expectedElapsedTime = new ElapsedTime(0.2);
+
+        stimuli.add(expectedElapsedTime);
+        stimuli.add(expectedWaitInArea);
+
+        StimulusInfo stimulusInfo1 = new StimulusInfo();
+        Timeframe timeFrame = new Timeframe(0, 7, false,0);
+        stimulusInfo1.setStimuli(stimuli);
+        stimulusInfo1.setTimeframe(timeFrame);
+
+        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
+        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
+        stimulusController.getScenarioStore().setTopography(topography);
+
+
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
+        Stimulus WaitInArea = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()).get(0);
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
+
+        assertEquals(WaitInArea, expectedWaitInArea);
+        assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof WaitInArea));
+
+    }
 
 
 
     private void assertTimeStamp(List<Stimulus> stimuli, double simTime){
         stimuli.forEach(e -> assertEquals(e.getTime(), simTime, 1e-3));
+    }
+
+    private Topography createTopography() {
+        Topography topography = new Topography();
+
+        return topography;
+    }
+
+    private ArrayList<Target> createTwoTargets() {
+        ArrayList<Target> targets = new ArrayList<>();
+
+        Target target1 = createTarget(new VPoint(0, 0), 5, 1);
+        Target target2 = createTarget(new VPoint(5, 0), 5, 2);
+
+        targets.add(target1);
+        targets.add(target2);
+
+        return targets;
+    }
+
+    private Target createTarget(VPoint center, double radius, int id) {
+        VShape shape = new VCircle(center, radius);
+        boolean absorbing = true;
+
+        AttributesTarget attributesTarget = new AttributesTarget(shape, id, absorbing);
+        Target target = new Target(attributesTarget);
+
+        return target;
+    }
+
+    private List<Pedestrian> createPedestrians(int totalPedestrians) {
+        List<Pedestrian> pedestrians = new ArrayList<>();
+
+        for (int i = 0; i < totalPedestrians; i++) {
+            long seed = 0;
+            Random random = new Random(seed);
+            AttributesAgent attributesAgent = new AttributesAgent(i);
+
+            Pedestrian currentPedestrian = new Pedestrian(attributesAgent, random);
+            pedestrians.add(currentPedestrian);
+        }
+
+        return pedestrians;
     }
 }

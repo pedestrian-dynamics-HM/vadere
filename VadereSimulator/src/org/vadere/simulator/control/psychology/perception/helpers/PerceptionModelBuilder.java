@@ -15,7 +15,7 @@ public class PerceptionModelBuilder {
 
 	public static final String JAVA_PACKAGE_SEPARATOR = ".";
 
-	public static IPerceptionModel instantiateModel(ScenarioStore scenarioStore) {
+	public static IPerceptionModel instantiateModel(final ScenarioStore scenarioStore) {
 		String simpleClassName = scenarioStore.getAttributesPsychology().getPsychologyLayer().getPerception();
 		String classSearchPath = IPerceptionModel.class.getPackageName();
 		String fullyQualifiedClassName = classSearchPath + JAVA_PACKAGE_SEPARATOR + simpleClassName;
@@ -23,7 +23,7 @@ public class PerceptionModelBuilder {
 		DynamicClassInstantiator<IPerceptionModel> instantiator = new DynamicClassInstantiator<>();
 		IPerceptionModel perceptionModel = instantiator.createObject(fullyQualifiedClassName);
 
-		perceptionModel.initialize(scenarioStore.getTopography());
+		perceptionModel.initialize(scenarioStore.getTopography(), scenarioStore.getAttributesSimulation().getSimTimeStepLength());
 
 		return perceptionModel;
 	}

@@ -59,7 +59,9 @@ public class ReactionModel implements IReactModel{
         return isPedReact(0);
     }
 
-    private double getBernoulliParameter(int i){
+
+
+    public double getBernoulliParameter(int i){
 
         if (numberOfReactionBehaviors == 1){
             i = 0;
