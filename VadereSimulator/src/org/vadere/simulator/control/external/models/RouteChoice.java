@@ -38,10 +38,7 @@ public class RouteChoice extends ControlModel {
 
     @Override
     public boolean isPedReact() {
-
-        LinkedList<Integer> alternativeTargets = readTargetsFromJson();
-        int i = alternativeTargets.indexOf(newTargetList.get(0));
-
+        int i = getOptionIndex();
         try {
             return reactionModel.isPedReact(i);
         } catch (Exception e) {
@@ -51,6 +48,10 @@ public class RouteChoice extends ControlModel {
 
     }
 
+    protected int getOptionIndex() {
+        LinkedList<Integer> alternativeTargets = readTargetsFromJson();
+        return alternativeTargets.indexOf(newTargetList.get(0));
+    }
 
 
     @Override

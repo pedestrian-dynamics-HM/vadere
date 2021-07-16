@@ -24,7 +24,7 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
 
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh) {
-        rng = new JDKRandomGenerator(new Random().nextInt());
+        rng = new JDKRandomGenerator(0); //TODO: use seed from json?
         processedStimuli = new HashMap<>();
         this.simulationStepLength = simTimeStepLengh;
     }
@@ -32,17 +32,18 @@ public class ProbabilisticPerceptionModel implements IPerceptionModel {
     @Override
     public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {
 
-        for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
+
+        for (Map.Entry<Pedestrian, List<Stimulus>> entry : pedSpecificStimuli.entrySet()) {
             Stimulus mostImportantStimulus;
-            if (isStimulusNew(pedSpecificStimuli.get(pedestrian), pedestrian)) {
-                mostImportantStimulus = getMostImportantStimulusFromProbabilites(pedSpecificStimuli.get(pedestrian));
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " got new Stimulus " + mostImportantStimulus.toString());
+            if (isStimulusNew(entry.getValue(), entry.getKey())) {
+                mostImportantStimulus = getMostImportantStimulusFromProbabilites(entry.getValue());
+                logger.info("Pedestrian with id=" + entry.getKey().getId() + " got new Stimulus " + mostImportantStimulus.toString());
             }
             else {
-                mostImportantStimulus = getStimulusExisting(pedSpecificStimuli, pedestrian);
-                logger.info("Pedestrian with id=" + pedestrian.getId() + " has most important stimulus " + mostImportantStimulus.toString());
+                mostImportantStimulus = getStimulusExisting(pedSpecificStimuli, entry.getKey());
+                logger.info("Pedestrian with id=" + entry.getKey().getId() + " has most important stimulus " + mostImportantStimulus.toString());
             }
-            pedestrian.setMostImportantStimulus(mostImportantStimulus);
+            entry.getKey().setMostImportantStimulus(mostImportantStimulus);
         }
         setProcessedStimuli(pedSpecificStimuli);
     }

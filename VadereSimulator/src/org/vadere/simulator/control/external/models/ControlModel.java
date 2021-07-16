@@ -68,12 +68,17 @@ public abstract class ControlModel implements IControlModel {
     }
 
     public double getBernoulliParameter(){
-        return this.reactionModel.getBernoulliParameter();
+        return this.reactionModel.getBernoulliParameter(getOptionIndex());
     }
 
 
     public abstract boolean isPedReact();
     protected abstract void triggerPedReaction(Pedestrian ped);
+
+    int getOptionIndex(){
+        // if there is one option only
+        return 0;
+    };
 
 
 
