@@ -185,9 +185,9 @@ public class InfectionModel extends AbstractSirModel {
 		/*
 		 * Parameters for JSON // ToDo integrate these parameters in attributesInfectionModel
 		 */
-		double dropletExhalationFrequency = 10.0; // droplets are exhaled every 10 sec
-		double radius = 1.5;
-		double openingAngleInRad = Math.toRadians(45.0);
+		double dropletExhalationFrequency = 1 / 30.0; // droplets are exhaled approximately every 30 sec
+		double distanceOfSpread = 1.5;
+		double angleOfSpreadInRad = Math.toRadians(30.0);
 		double lifeTime = 1.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
 		double emittedPathogenLoad = pedestrian.getSusceptibility() / attributesInfectionModel.getPedestrianPathogenAbsorptionRate();
 
@@ -210,9 +210,9 @@ public class InfectionModel extends AbstractSirModel {
 		viewingDirections.put(pedestrianId, viewingDirection);
 		lastPedestrianPositions.put(pedestrianId, currentPosition);
 
-		if (simTimeInSec % dropletExhalationFrequency <= simTimeStepLength) {
+		if (simTimeInSec % (1 / dropletExhalationFrequency) <= simTimeStepLength) {
 
-			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), viewingDirection, radius, openingAngleInRad);
+			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), viewingDirection, distanceOfSpread, angleOfSpreadInRad);
 
 			DropletCloud dropletCloud = new DropletCloud(new AttributesDropletCloud(1,
 					shape,

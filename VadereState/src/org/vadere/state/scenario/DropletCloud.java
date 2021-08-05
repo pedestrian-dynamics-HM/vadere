@@ -101,12 +101,12 @@ public class DropletCloud extends AerosolParticles {
         } else return attributes.equals(other.attributes);
     }
 
-    public static VShape createTransformedDropletCloudShape(VPoint origin, Vector2D direction, double radius, double openingAngleInRad) {
+    public static VShape createTransformedDropletCloudShape(VPoint origin, Vector2D direction, double radius, double centralAngleInRad) {
         VPolygon shape;
 
         Path2D path = new Path2D.Double();
         path.moveTo(0, 0); // define stating point
-        for (double angle = 0.0; angle <= openingAngleInRad; angle += openingAngleInRad / numberOfCircularSections) {
+        for (double angle = 0.0; angle <= centralAngleInRad; angle += centralAngleInRad / numberOfCircularSections) {
             path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
         }
         path.closePath();
@@ -115,7 +115,7 @@ public class DropletCloud extends AerosolParticles {
 
         AffineTransform transform = new AffineTransform();
         transform.translate(origin.x, origin.y);
-        transform.rotate(theta - openingAngleInRad / 2.0);
+        transform.rotate(theta - centralAngleInRad / 2.0);
 
         shape = new VPolygon(transform.createTransformedShape(polygon));
 
