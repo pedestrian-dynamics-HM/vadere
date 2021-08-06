@@ -11,8 +11,6 @@ import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.vadere.util.opencl.CLDemo.logger;
-
 /**
  * This class models aerosolClouds. AerosolClouds represent one mode of transmission how pathogen can spread among
  * pedestrians. They are created, updated and deleted in the InfectionModel:
@@ -26,7 +24,7 @@ import static org.vadere.util.opencl.CLDemo.logger;
  *     concentration</li>
  * </ul>
  */
-public class AerosolCloud extends AerosolParticles {
+public class AerosolCloud extends InfectiousParticleDispersion {
 
     private AttributesAerosolCloud attributes;
 

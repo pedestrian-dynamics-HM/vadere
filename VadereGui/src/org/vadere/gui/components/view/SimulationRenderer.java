@@ -18,12 +18,8 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Stream;
-
-import static com.bazaarvoice.jolt.modifier.function.Function.isPresent;
 
 public abstract class SimulationRenderer extends DefaultRenderer {
 
@@ -112,9 +108,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
         }
 
-        if (model.config.isShowDropletClouds()) {
+        if (model.config.isShowDroplets()) {
             // ToDo use renderScenarioElement() instead?
-            renderDropletClouds(model.getTopography().getDropletClouds(), graphics, model.config.getDropletCloudColor());
+            renderAllDroplets(model.getTopography().getDroplets(), graphics, model.config.getDropletsColor());
         }
 
         if (model.config.isShowSources()) {

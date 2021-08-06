@@ -6,12 +6,12 @@ import org.vadere.gui.components.model.SimulationModel;
 import javax.swing.*;
 import java.awt.*;
 
-public class ActionSetDropletCloudColor extends ActionSetColor {
+public class ActionSetDropletsColor extends ActionSetColor {
 
-    public ActionSetDropletCloudColor(String name, SimulationModel<? extends DefaultSimulationConfig> model, JPanel coloredPanel){
+    public ActionSetDropletsColor(String name, SimulationModel<? extends DefaultSimulationConfig> model, JPanel coloredPanel){
         super(name, model, coloredPanel);
     }
 
     @Override
-    protected void saveColor(Color color) { model.config.setDropletCloudColor(color); }
+    protected void saveColor(Color color) { model.config.setDropletsColor(color); }
 }

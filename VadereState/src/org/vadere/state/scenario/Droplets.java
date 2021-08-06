@@ -2,7 +2,7 @@ package org.vadere.state.scenario;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.scenario.AttributesDropletCloud;
+import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -12,17 +12,17 @@ import org.vadere.util.geometry.shapes.Vector2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 
-public class DropletCloud extends AerosolParticles {
+public class Droplets extends InfectiousParticleDispersion {
 
-    private AttributesDropletCloud attributes;
+    private AttributesDroplets attributes;
     final static int numberOfCircularSections = 5;
 
     // Constructors
-    public DropletCloud() {
-        this(new AttributesDropletCloud());
+    public Droplets() {
+        this(new AttributesDroplets());
     }
 
-    public DropletCloud(@NotNull AttributesDropletCloud attributes) {
+    public Droplets(@NotNull AttributesDroplets attributes) {
         this.attributes = attributes;
     }
 
@@ -39,7 +39,7 @@ public class DropletCloud extends AerosolParticles {
 
     @Override
     public ScenarioElementType getType() {
-        return ScenarioElementType.DROPLET_CLOUD;
+        return ScenarioElementType.DROPLETS;
     }
 
     @Override
@@ -63,17 +63,17 @@ public class DropletCloud extends AerosolParticles {
 
     @Override
     public void setAttributes(Attributes attributes) {
-        this.attributes = (AttributesDropletCloud) attributes;
+        this.attributes = (AttributesDroplets) attributes;
     }
 
     public void setId(int id) {
-        ((AttributesDropletCloud) getAttributes()).setId(id);
+        ((AttributesDroplets) getAttributes()).setId(id);
     }
 
     // Other methods
     @Override
-    public DropletCloud clone() {
-        return new DropletCloud(((AttributesDropletCloud) attributes.clone()));
+    public Droplets clone() {
+        return new Droplets(((AttributesDroplets) attributes.clone()));
     }
 
     @Override
@@ -92,16 +92,16 @@ public class DropletCloud extends AerosolParticles {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof DropletCloud)) {
+        if (!(obj instanceof Droplets)) {
             return false;
         }
-        DropletCloud other = (DropletCloud) obj;
+        Droplets other = (Droplets) obj;
         if (attributes == null) {
             return other.attributes == null;
         } else return attributes.equals(other.attributes);
     }
 
-    public static VShape createTransformedDropletCloudShape(VPoint origin, Vector2D direction, double radius, double centralAngleInRad) {
+    public static VShape createTransformedDropletsShape(VPoint origin, Vector2D direction, double radius, double centralAngleInRad) {
         VPolygon shape;
 
         Path2D path = new Path2D.Double();

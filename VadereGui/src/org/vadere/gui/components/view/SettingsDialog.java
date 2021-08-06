@@ -234,9 +234,9 @@ public class SettingsDialog extends JDialog {
 
 		final JButton bDropletCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pDropletCloudColor = new JPanel();
-		pDropletCloudColor.setBackground(model.config.getDropletCloudColor());
+		pDropletCloudColor.setBackground(model.config.getDropletsColor());
 		pDropletCloudColor.setPreferredSize(new Dimension(130, 20));
-		bDropletCloudColor.addActionListener(new ActionSetDropletCloudColor("Set Droplet Cloud Color", model, pDropletCloudColor));
+		bDropletCloudColor.addActionListener(new ActionSetDropletsColor("Set Droplet Cloud Color", model, pDropletCloudColor));
 		colorSettingsPane.add(pDropletCloudColor, cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(bDropletCloudColor, cc.xy(column3, row));
 	}
@@ -538,9 +538,9 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
-		chShowDropletClouds.setSelected(model.config.isShowDropletClouds());
+		chShowDropletClouds.setSelected(model.config.isShowDroplets());
 		chShowDropletClouds.addItemListener(e -> {
-			model.config.setShowDropletClouds(!model.config.isShowDropletClouds());
+			model.config.setShowDroplets(!model.config.isShowDroplets());
 			model.notifyObservers();
 		});
 

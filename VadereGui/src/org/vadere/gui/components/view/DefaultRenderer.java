@@ -314,21 +314,21 @@ public abstract class DefaultRenderer {
 		graphics.setColor(tmpColor);
 	}
 
-	protected void renderDropletClouds(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
-									   final Color color){
+	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+									 final Color color){
 		for (ScenarioElement e : elements){
-			renderDropletCloud(e, g, color);
+			renderDroplets(e, g, color);
 		}
 	}
 
-	protected void renderDropletCloud(ScenarioElement element, final Graphics2D graphics, Color color){
+	protected void renderDroplets(ScenarioElement element, final Graphics2D graphics, Color color){
 		final Color tmpColor = graphics.getColor();
-		DropletCloud cloud = (DropletCloud) element;
+		Droplets droplets = (Droplets) element;
 		int currentAlpha = 100;
 
 		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
-		if (cloud.getShape() instanceof VPolygon){
-			VPolygon p = (VPolygon) cloud.getShape();
+		if (droplets.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) droplets.getShape();
 			if (p.getPoints().size() == 2){
 				graphics.setStroke(new BasicStroke(3*getLineWidth()));
 				graphics.draw(p);

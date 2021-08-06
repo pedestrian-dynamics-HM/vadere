@@ -1,31 +1,29 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.scenario.DropletCloud;
+import org.vadere.state.scenario.Droplets;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.ArrayList;
-
 /**
- * This class defines the attributes of a {@link DropletCloud}.
+ * This class defines the attributes of a {@link Droplets}.
  */
-public class AttributesDropletCloud extends AttributesAerosolParticles {
+public class AttributesDroplets extends AttributesParticleDispersion {
 
     private VShape shape;
     private double lifeTime;
 
     // Constructors
-    public AttributesDropletCloud() {
+    public AttributesDroplets() {
         super();
         // ToDo this.shape = some circularSector ...
     }
 
-    public AttributesDropletCloud(VShape shape, double lifeTime) {
+    public AttributesDroplets(VShape shape, double lifeTime) {
         super();
         this.shape = shape;
         this.lifeTime = lifeTime;
     }
 
-    public AttributesDropletCloud(int id, VShape shape, double creationTime, double lifeTime, double initialPathogenLoad) {
+    public AttributesDroplets(int id, VShape shape, double creationTime, double lifeTime, double initialPathogenLoad) {
         super(id, creationTime, initialPathogenLoad, initialPathogenLoad);
         this.shape = shape;
         this.lifeTime = lifeTime;

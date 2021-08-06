@@ -42,8 +42,8 @@ public class TopographyIterator implements Iterator<ScenarioElement> {
 			elements.add(topography.getAerosolClouds());
 		}
 
-		if (!topography.getDropletClouds().isEmpty()) {
-			elements.add(topography.getDropletClouds());
+		if (!topography.getDroplets().isEmpty()) {
+			elements.add(topography.getDroplets());
 		}
 
 		if (!topography.getTargetChangers().isEmpty()) {

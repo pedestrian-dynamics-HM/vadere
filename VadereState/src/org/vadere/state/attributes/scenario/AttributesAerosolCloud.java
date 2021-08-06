@@ -1,7 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
 import org.vadere.state.scenario.AerosolCloud;
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -12,7 +11,7 @@ import java.util.Arrays;
 /**
  * This class defines the attributes of an {@link AerosolCloud}.
  */
-public class AttributesAerosolCloud extends AttributesAerosolParticles {
+public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
     private VShape shape;
     private double area;

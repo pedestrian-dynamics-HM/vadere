@@ -11,7 +11,7 @@ import org.vadere.state.attributes.models.AttributesInfectionModel;
 import org.vadere.state.attributes.models.InfectionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesDropletCloud;
+import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.*;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
-import static org.vadere.state.scenario.DropletCloud.createTransformedDropletCloudShape;
+import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
 import org.vadere.state.health.*;
 
 /**
@@ -107,7 +107,7 @@ public class InfectionModel extends AbstractSirModel {
 
 		executePathogenEmissionEvents(simTimeInSec);
 		updateAerosolClouds(simTimeInSec);
-		updateDropletClouds(simTimeInSec);
+		updateDroplets(simTimeInSec);
 		updatePedestrians(simTimeInSec);
 	}
 
@@ -116,7 +116,7 @@ public class InfectionModel extends AbstractSirModel {
 		for (Pedestrian pedestrian : infectedPedestrians) {
 			// ... for each user-defined event
 			createAerosolClouds(simTimeInSec, pedestrian);
-			createDropletClouds(simTimeInSec, pedestrian);
+			createDroplets(simTimeInSec, pedestrian);
 		}
 	}
 
@@ -126,9 +126,9 @@ public class InfectionModel extends AbstractSirModel {
 		deleteExpiredAerosolClouds();
 	}
 
-	public void updateDropletClouds(double simTimeInSec) {
-		// dropletCloudPathogenLoad remains unchanged until deletion
-		deleteExpiredDropletClouds(simTimeInSec);
+	public void updateDroplets(double simTimeInSec) {
+		// dropletsPathogenLoad remains unchanged until deletion
+		deleteExpiredDroplets(simTimeInSec);
 	}
 
 	public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
@@ -181,7 +181,7 @@ public class InfectionModel extends AbstractSirModel {
 		return aerosolCloud;
 	}
 
-	private void createDropletClouds(double simTimeInSec, Pedestrian pedestrian) {
+	private void createDroplets(double simTimeInSec, Pedestrian pedestrian) {
 		/*
 		 * Parameters for JSON // ToDo integrate these parameters in attributesInfectionModel
 		 */
@@ -212,15 +212,15 @@ public class InfectionModel extends AbstractSirModel {
 
 		if (simTimeInSec % (1 / dropletExhalationFrequency) <= simTimeStepLength) {
 
-			VShape shape = createTransformedDropletCloudShape(pedestrian.getPosition(), viewingDirection, distanceOfSpread, angleOfSpreadInRad);
+			VShape shape = createTransformedDropletsShape(pedestrian.getPosition(), viewingDirection, distanceOfSpread, angleOfSpreadInRad);
 
-			DropletCloud dropletCloud = new DropletCloud(new AttributesDropletCloud(1,
+			Droplets droplets = new Droplets(new AttributesDroplets(1,
 					shape,
 					simTimeInSec,
 					lifeTime,
 					emittedPathogenLoad));
 
-			topography.addDropletCloud(dropletCloud);
+			topography.addDroplets(droplets);
 		}
 	}
 
@@ -263,13 +263,13 @@ public class InfectionModel extends AbstractSirModel {
 		}
 	}
 
-	public void deleteExpiredDropletClouds(double simTimeInSec) {
-		Collection<DropletCloud> dropletCloudsToBeDeleted = topography.getDropletClouds()
+	public void deleteExpiredDroplets(double simTimeInSec) {
+		Collection<Droplets> dropletsToBeDeleted = topography.getDroplets()
 				.stream()
 				.filter(d -> d.getLifeTime() + d.getCreationTime() < simTimeInSec)
 				.collect(Collectors.toSet());
-		for (DropletCloud dropletCloud : dropletCloudsToBeDeleted) {
-			topography.getDropletClouds().remove(dropletCloud);
+		for (Droplets droplets : dropletsToBeDeleted) {
+			topography.getDroplets().remove(droplets);
 		}
 	}
 
@@ -295,7 +295,7 @@ public class InfectionModel extends AbstractSirModel {
 
 		pathogenFromAerosolClouds(breathingInPeds);
 
-		pathogenFromDropletClouds(breathingInPeds);
+		pathogenFromDroplets(breathingInPeds);
 	}
 
 	private void pathogenFromAerosolClouds(Collection<Pedestrian> breathingInPeds) {
@@ -320,15 +320,15 @@ public class InfectionModel extends AbstractSirModel {
 		}
 	}
 
-	private void pathogenFromDropletClouds(Collection<Pedestrian> breathingInPeds) {
-		Collection<DropletCloud> allDropletClouds = topography.getDropletClouds();
-		for (DropletCloud dropletCloud : allDropletClouds) {
-			Collection<Pedestrian> breathingInPedsInDropletCloud = breathingInPeds
+	private void pathogenFromDroplets(Collection<Pedestrian> breathingInPeds) {
+		Collection<Droplets> allDroplets = topography.getDroplets();
+		for (Droplets droplets : allDroplets) {
+			Collection<Pedestrian> breathingInPedsInDroplets = breathingInPeds
 					.stream()
-					.filter(p -> dropletCloud.getShape().contains(p.getPosition()))
+					.filter(p -> droplets.getShape().contains(p.getPosition()))
 					.collect(Collectors.toSet());
-			for (Pedestrian ped : breathingInPedsInDropletCloud) {
-				ped.absorbPathogen(dropletCloud.getCurrentPathogenLoad());
+			for (Pedestrian ped : breathingInPedsInDroplets) {
+				ped.absorbPathogen(droplets.getCurrentPathogenLoad());
 			}
 		}
 	}

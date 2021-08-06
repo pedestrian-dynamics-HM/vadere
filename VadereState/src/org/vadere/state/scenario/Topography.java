@@ -95,10 +95,10 @@ public class Topography implements DynamicElementMover{
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<AerosolCloud> aerosolClouds;
 	/**
-	 * DropletClouds.
+	 * Droplets.
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private final LinkedList<DropletCloud> dropletClouds;
+	private final LinkedList<Droplets> droplets;
 	/**
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
@@ -153,7 +153,7 @@ public class Topography implements DynamicElementMover{
 		boundaryObstacles = new LinkedList<>();
 		measurementAreas = new LinkedList<>();
 		aerosolClouds = new LinkedList<>();
-		dropletClouds = new LinkedList<>();
+		droplets = new LinkedList<>();
 
 		allScenarioElements.add(obstacles);
 		allScenarioElements.add(stairs);
@@ -163,7 +163,7 @@ public class Topography implements DynamicElementMover{
 		allScenarioElements.add(boundaryObstacles);
 		allScenarioElements.add(measurementAreas);
 		allScenarioElements.add(aerosolClouds);
-		allScenarioElements.add(dropletClouds);
+		allScenarioElements.add(droplets);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -476,7 +476,7 @@ public class Topography implements DynamicElementMover{
 
 	public List<AerosolCloud> getAerosolClouds() { return aerosolClouds; }
 
-	public List<DropletCloud> getDropletClouds() { return dropletClouds; }
+	public List<Droplets> getDroplets() { return droplets; }
 
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;
@@ -510,7 +510,7 @@ public class Topography implements DynamicElementMover{
 
 	public void addAerosolCloud(AerosolCloud aerosolCloud) { this.aerosolClouds.add(aerosolCloud); }
 
-	public void addDropletCloud(DropletCloud dropletCloud) { this.dropletClouds.add(dropletCloud); }
+	public void addDroplets(Droplets droplets) { this.droplets.add(droplets); }
 
 	public void addStairs(Stairs stairs) {
 		this.stairs.add(stairs);
@@ -641,8 +641,8 @@ public class Topography implements DynamicElementMover{
 		for (AerosolCloud aerosolCloud : this.getAerosolClouds()){
 			s.addAerosolCloud(aerosolCloud);
 		}
-		for (DropletCloud dropletCloud : this.getDropletClouds()){
-			s.addDropletCloud(dropletCloud);
+		for (Droplets droplets : this.getDroplets()){
+			s.addDroplets(droplets);
 		}
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs.clone());
@@ -659,8 +659,8 @@ public class Topography implements DynamicElementMover{
 		for (AerosolCloud aerosolCloud: getAerosolClouds()) {
 			s.addAerosolCloud(aerosolCloud.clone());
 		}
-		for (DropletCloud dropletCloud: getDropletClouds()) {
-			s.addDropletCloud(dropletCloud.clone());
+		for (Droplets droplets : getDroplets()) {
+			s.addDroplets(droplets.clone());
 		}
 		for (Source source : getSources()) {
 			s.addSource(source.clone());
@@ -756,7 +756,7 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(getInitialElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toSet()));
 		usedIds.addAll(aerosolClouds.stream().map(AerosolCloud::getId).collect(Collectors.toSet()));
-		usedIds.addAll(dropletClouds.stream().map(DropletCloud::getId).collect(Collectors.toSet()));
+		usedIds.addAll(droplets.stream().map(Droplets::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -794,7 +794,7 @@ public class Topography implements DynamicElementMover{
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 
-		dropletClouds.stream()
+		droplets.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 	}
@@ -827,7 +827,7 @@ public class Topography implements DynamicElementMover{
 		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
 		all.addAll(aerosolClouds);
-		all.addAll(dropletClouds);
+		all.addAll(droplets);
 		return  all;
 
 	}
