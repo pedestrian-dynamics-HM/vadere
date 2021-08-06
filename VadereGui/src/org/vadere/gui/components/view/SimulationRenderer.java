@@ -334,7 +334,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case INFECTION_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return adaptInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad(), pedestrian.getSusceptibility());
+                    return adaptInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad(), pedestrian.getMinInfectiousDose());
                 }
             }
 		    default: return model.config.getPedestrianColor();

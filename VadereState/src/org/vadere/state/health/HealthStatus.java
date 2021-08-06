@@ -13,7 +13,7 @@ import org.vadere.state.scenario.Pedestrian;
  *     <li>{@link #pathogenAbsorptionRate}: tidal volume in m^3; one could account for protective measures such as
  *     masks by multiplying the tidal volume by a "mask efficiency factor [0, 1]"</li>
  *     <li>{@link #pathogenAbsorbedLoad}: current pathogen load that a pedestrian has accumulated</li>
- *     <li>{@link #susceptibility}: min absorbed pathogen load that leads to change from infectionStatus susceptible
+ *     <li>{@link #minInfectiousDose}: min absorbed pathogen load that leads to change from infectionStatus susceptible
  *     to exposed.</li>
  *     <li>{@link #exposedPeriod}, {@link #infectiousPeriod}, {@link #recoveredPeriod}: time that must pass until the
  *     infectionStatus changes to the next status.</li>
@@ -33,7 +33,7 @@ public class HealthStatus {
 
     private double pathogenEmissionCapacity;
     private double pathogenAbsorptionRate;
-    private double susceptibility;
+    private double minInfectiousDose;
     private double exposedPeriod;
     private double infectiousPeriod;
     private double recoveredPeriod;
@@ -44,7 +44,7 @@ public class HealthStatus {
     // Constructors
     public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
                         VPoint startBreatheOutPosition, double respiratoryTimeOffset, boolean breathingIn,
-                        double pathogenEmissionCapacity, double pathogenAbsorptionRate, double susceptibility,
+                        double pathogenEmissionCapacity, double pathogenAbsorptionRate, double minInfectiousDose,
                         double exposedPeriod, double infectiousPeriod, double recoveredPeriod) {
         this.infectionStatus = infectionStatus;
         this.lastInfectionStatusUpdateTime = lastInfectionStatusUpdateTime;
@@ -54,7 +54,7 @@ public class HealthStatus {
         this.breathingIn = breathingIn;
         this.pathogenEmissionCapacity = pathogenEmissionCapacity;
         this.pathogenAbsorptionRate = pathogenAbsorptionRate;
-        this.susceptibility = susceptibility;
+        this.minInfectiousDose = minInfectiousDose;
         this.exposedPeriod = exposedPeriod;
         this.infectiousPeriod = infectiousPeriod;
         this.recoveredPeriod = recoveredPeriod;
@@ -74,7 +74,7 @@ public class HealthStatus {
         this.respiratoryTimeOffset = other.getRespiratoryTimeOffset();
         this.pathogenEmissionCapacity = other.getPathogenEmissionCapacity();
         this.pathogenAbsorptionRate = other.getPathogenAbsorptionRate();
-        this.susceptibility = other.getSusceptibility();
+        this.minInfectiousDose = other.getMinInfectiousDose();
         this.exposedPeriod = other.getExposedPeriod();
         this.infectiousPeriod = other.getInfectiousPeriod();
         this.recoveredPeriod = other.getRecoveredPeriod();
@@ -111,8 +111,8 @@ public class HealthStatus {
         return pathogenAbsorptionRate;
     }
 
-    public double getSusceptibility() {
-        return susceptibility;
+    public double getMinInfectiousDose() {
+        return minInfectiousDose;
     }
 
     public double getExposedPeriod() {
@@ -160,8 +160,8 @@ public class HealthStatus {
         this.pathogenAbsorptionRate = pathogenAbsorptionRate;
     }
 
-    public void setSusceptibility(double susceptibility) {
-        this.susceptibility = susceptibility;
+    public void setMinInfectiousDose(double minInfectiousDose) {
+        this.minInfectiousDose = minInfectiousDose;
     }
 
     public void setExposedPeriod(double exposedPeriod) {
@@ -219,7 +219,7 @@ public class HealthStatus {
     public void updateInfectionStatus(double simTimeInSec) {
         switch (infectionStatus) {
             case SUSCEPTIBLE:
-                if (pathogenAbsorbedLoad >= susceptibility) {
+                if (pathogenAbsorbedLoad >= minInfectiousDose) {
                     setInfectionStatus(InfectionStatus.EXPOSED);
                     setLastInfectionStatusUpdateTime(simTimeInSec);
                 }

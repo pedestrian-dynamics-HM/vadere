@@ -100,12 +100,17 @@
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
-        "pedestrianSusceptibility" : 1000.0,
-        "exposedPeriod" : 172800.0,
+		"pedestrianMinInfectiousDose" : 1000.0,
+        "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
-        "recoveredPeriod" : 3.1536E7,
+        "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 0.75
+        "aerosolCloudInitialArea" : 3.14,
+		"dropletsExhalationFrequency" : 0.0,
+		"dropletsDistanceOfSpread" : 1.5,
+		"dropletsAngleOfSpreadInDeg" : 30,
+		"dropletsLifeTime" : 1.001,
+		"dropletsPathogenLoadFactor" : 200
       }
     },
     "attributesSimulation" : {

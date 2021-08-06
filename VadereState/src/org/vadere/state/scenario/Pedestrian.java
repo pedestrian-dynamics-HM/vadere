@@ -172,8 +172,8 @@ public class Pedestrian extends Agent {
     	return healthStatus.isBreathingIn();
     }
 
-	public double getSusceptibility() {
-    	return healthStatus.getSusceptibility();
+	public double getMinInfectiousDose() {
+    	return healthStatus.getMinInfectiousDose();
     }
 
 
@@ -266,8 +266,8 @@ public class Pedestrian extends Agent {
     	healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
     }
 
-	public void setSusceptibility(double susceptibility) {
-    	healthStatus.setSusceptibility(susceptibility);
+	public void setMinInfectiousDose(double minInfectiousDose) {
+    	healthStatus.setMinInfectiousDose(minInfectiousDose);
     }
 
 	public void setExposedPeriod(double exposedPeriod) {

@@ -190,45 +190,48 @@ public class TransmissionModel implements Model {
 	}
 
 	private void createDroplets(double simTimeInSec, Pedestrian pedestrian) {
-		/*
-		 * Parameters for JSON // ToDo integrate these parameters in attributesInfectionModel
-		 */
-		double dropletExhalationFrequency = 1 / 30.0; // droplets are exhaled approximately every 30 sec
-		double distanceOfSpread = 1.5;
-		double angleOfSpreadInRad = Math.toRadians(30.0);
-		double lifeTime = 1.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
-		double emittedPathogenLoad = pedestrian.getSusceptibility() / attributesTransmissionModel.getPedestrianPathogenAbsorptionRate();
 
-		// ToDo: remove this quick solution; it would be better to have the walking directions stored in pedestrian
-		int pedestrianId = pedestrian.getId();
-		Vector2D viewingDirection;
-		VPoint currentPosition = pedestrian.getPosition();
-		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
-		if (lastPedestrianPositions.get(pedestrianId) == null) {
-			viewingDirection = new Vector2D(Math.random(), Math.random());
-		} else {
-			if (lastPosition.distance(currentPosition) < MIN_STEP_LENGTH) {
-				viewingDirection = viewingDirections.get(pedestrianId);
+		if (attributesTransmissionModel.getDropletsExhalationFrequency() > 0) {
+
+			// ToDo: remove this quick solution; it would be better to have the walking directions stored in pedestrian
+			int pedestrianId = pedestrian.getId();
+			Vector2D viewingDirection;
+			VPoint currentPosition = pedestrian.getPosition();
+			VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
+			if (lastPedestrianPositions.get(pedestrianId) == null) {
+				viewingDirection = new Vector2D(Math.random(), Math.random());
 			} else {
-				viewingDirection = new Vector2D(currentPosition.getX() - lastPosition.getX(),
-						currentPosition.getY() - lastPosition.getY());
+				if (lastPosition.distance(currentPosition) < MIN_STEP_LENGTH) {
+					viewingDirection = viewingDirections.get(pedestrianId);
+				} else {
+					viewingDirection = new Vector2D(currentPosition.getX() - lastPosition.getX(),
+							currentPosition.getY() - lastPosition.getY());
+				}
 			}
-		}
-		viewingDirection.normalize(1);
-		viewingDirections.put(pedestrianId, viewingDirection);
-		lastPedestrianPositions.put(pedestrianId, currentPosition);
+			viewingDirection.normalize(1);
+			viewingDirections.put(pedestrianId, viewingDirection);
+			lastPedestrianPositions.put(pedestrianId, currentPosition);
 
-		if (simTimeInSec % (1 / dropletExhalationFrequency) <= simTimeStepLength) {
+			// period between two droplet generating respiratory events
+			double dropletExhalationPeriod = 1 / attributesTransmissionModel.getDropletsExhalationFrequency();
 
-			VShape shape = createTransformedDropletsShape(pedestrian.getPosition(), viewingDirection, distanceOfSpread, angleOfSpreadInRad);
+			if (simTimeInSec % dropletExhalationPeriod < simTimeStepLength) {
 
-			Droplets droplets = new Droplets(new AttributesDroplets(1,
-					shape,
-					simTimeInSec,
-					lifeTime,
-					emittedPathogenLoad));
+				VShape shape = createTransformedDropletsShape(pedestrian.getPosition(),
+						viewingDirection,
+						attributesTransmissionModel.getDropletsDistanceOfSpread(),
+						Math.toRadians(attributesTransmissionModel.getDropletsAngleOfSpreadInDeg()));
 
-			topography.addDroplets(droplets);
+				double emittedPathogenLoad = pedestrian.emitPathogen() * attributesTransmissionModel.getDropletsPathogenLoadFactor();
+
+				Droplets droplets = new Droplets(new AttributesDroplets(1,
+						shape,
+						simTimeInSec,
+						attributesTransmissionModel.getDropletsLifeTime(),
+						emittedPathogenLoad));
+
+				topography.addDroplets(droplets);
+			}
 		}
 	}
 
@@ -359,7 +362,7 @@ public class TransmissionModel implements Model {
 		ped.setPathogenEmissionCapacity(attributesTransmissionModel.getPedestrianPathogenEmissionCapacity());
 		ped.setPathogenAbsorptionRate(attributesTransmissionModel.getPedestrianPathogenAbsorptionRate());
 		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
-		ped.setSusceptibility(attributesTransmissionModel.getPedestrianSusceptibility());
+		ped.setMinInfectiousDose(attributesTransmissionModel.getPedestrianMinInfectiousDose());
 		ped.setExposedPeriod(attributesTransmissionModel.getExposedPeriod());
 		ped.setInfectiousPeriod(attributesTransmissionModel.getInfectiousPeriod());
 		ped.setRecoveredPeriod(attributesTransmissionModel.getRecoveredPeriod());
