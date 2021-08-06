@@ -8,7 +8,7 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public class AttributesDroplets extends AttributesParticleDispersion {
 
-    private VShape shape;
+    //private VShape shape;
     private double lifeTime;
 
     // Constructors
@@ -17,27 +17,12 @@ public class AttributesDroplets extends AttributesParticleDispersion {
         // ToDo this.shape = some circularSector ...
     }
 
-    public AttributesDroplets(VShape shape, double lifeTime) {
-        super();
-        this.shape = shape;
-        this.lifeTime = lifeTime;
-    }
 
     public AttributesDroplets(int id, VShape shape, double creationTime, double lifeTime, double initialPathogenLoad) {
-        super(id, creationTime, initialPathogenLoad, initialPathogenLoad);
-        this.shape = shape;
+        super(id, creationTime, initialPathogenLoad, initialPathogenLoad, shape);
         this.lifeTime = lifeTime;
     }
 
     // Getter
-    public VShape getShape() {
-        return shape;
-    }
-
     public double getLifeTime() { return lifeTime; }
-
-    // Setter
-    public void setShape(VShape shape) {
-        this.shape = shape;
-    }
 }

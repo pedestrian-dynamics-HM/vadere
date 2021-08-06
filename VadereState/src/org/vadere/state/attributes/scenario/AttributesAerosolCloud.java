@@ -13,7 +13,6 @@ import java.util.Arrays;
  */
 public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
-    private VShape shape;
     private double area;
     private double height;
     private VPoint center;
@@ -25,7 +24,6 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
         super();
         VPoint center = new VPoint(0, 0);
         double radius = 0.75;
-        this.shape = new VCircle(center, radius);
         this.height = 1.0;
         this.area = radius * radius * Math.PI;
         this.center = center;
@@ -34,13 +32,11 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
     }
 
     public AttributesAerosolCloud(VShape shape, double creationTime){
-        super(creationTime);
-        this.shape = shape;
+        super(creationTime, shape);
     }
 
     public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad) {
-        super(id, creationTime, initialPathogenLoad, currentPathogenLoad);
-        this.shape = shape;
+        super(id, creationTime, initialPathogenLoad, currentPathogenLoad, shape);
         this.area = area;
         this.height = height;
         this.center = center;
@@ -49,9 +45,6 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
     }
 
     // Getter
-    public VShape getShape() {
-        return shape;
-    }
 
     public double getArea() {
         return  area;
@@ -72,9 +65,6 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
     public double getHalfLife() { return halfLife; }
 
     // Setter
-    public void setShape(VShape shape) {
-        this.shape = shape;
-    }
 
     public void setArea(double area) {
         this.area = area;
