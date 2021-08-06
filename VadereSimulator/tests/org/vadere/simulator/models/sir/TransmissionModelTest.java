@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesInfectionModel;
+import org.vadere.state.attributes.models.AttributesTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -22,15 +22,15 @@ import java.awt.geom.Path2D;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.vadere.simulator.models.sir.InfectionModel.*;
+import static org.vadere.simulator.models.sir.TransmissionModel.*;
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 
-public class InfectionModelTest {
+public class TransmissionModelTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
     static final double simTimeStepLength = 0.4;
 
     List<Attributes> attributeList;
-    InfectionModel infectionModel;
+    TransmissionModel transmissionModel;
     Topography topography;
     VadereContext ctx;
 
@@ -51,12 +51,12 @@ public class InfectionModelTest {
     @Before
     public void setUp() {
         attributeList = getAttributeList();
-        infectionModel = new InfectionModel();
+        transmissionModel = new TransmissionModel();
         topography = new Topography();
         topography.setContextId("testId");
 
         ctx = new VadereContext();
-        ctx.put(InfectionModel.simStepLength, simTimeStepLength);
+        ctx.put(TransmissionModel.simStepLength, simTimeStepLength);
         VadereContext.add(topography.getContextId(), ctx);
 
         polygon = createTransformedAerosolCloudShape(vertex1, vertex2, area);
@@ -73,16 +73,16 @@ public class InfectionModelTest {
     @Test
     public void testInitializeOk() {
         // initialize must find the AttributesInfectionModel from the  attributeList
-        infectionModel.initialize(attributeList, new Domain(topography),null,null);
+        transmissionModel.initialize(attributeList, new Domain(topography),null,null);
 
-        AttributesInfectionModel attributesInfectionModel = infectionModel.getAttributesInfectionModel();
+        AttributesTransmissionModel attributesTransmissionModel = transmissionModel.getAttributesTransmissionModel();
 
-        Assert.assertEquals(attributeList.get(0), attributesInfectionModel);
+        Assert.assertEquals(attributeList.get(0), attributesTransmissionModel);
     }
 
     public List<Attributes> getAttributeList() {
         ArrayList<Attributes> attrList = new ArrayList<>();
-        var att = new AttributesInfectionModel();
+        var att = new AttributesTransmissionModel();
 
         attrList.add(att);
 
@@ -170,7 +170,7 @@ public class InfectionModelTest {
     @Test
     public void testUpdateNumberOfGeneratedAerosolClouds() {
 
-        infectionModel.initialize(attributeList, new Domain(topography),null,null);
+        transmissionModel.initialize(attributeList, new Domain(topography),null,null);
 
         createPedestrian(topography, new VPoint(10, 10), 1, -1, InfectionStatus.INFECTIOUS);
 
@@ -179,11 +179,11 @@ public class InfectionModelTest {
         double simEndTime = 100;
 
         while(simTimeInSec <= simEndTime) {
-            infectionModel.update(simTimeInSec);
+            transmissionModel.update(simTimeInSec);
             simTimeInSec += simTimeStepLength;
         }
 
-        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / infectionModel.getAttributesInfectionModel().getPedestrianRespiratoryCyclePeriod());
+        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / transmissionModel.getAttributesTransmissionModel().getPedestrianRespiratoryCyclePeriod());
         int actualNumberOfAerosolClouds = topography.getAerosolClouds().size();
 
         assertEquals(actualNumberOfAerosolClouds, expectedNumberOfAerosolClouds);

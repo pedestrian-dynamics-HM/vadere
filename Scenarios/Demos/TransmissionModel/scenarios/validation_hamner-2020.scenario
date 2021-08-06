@@ -1,6 +1,6 @@
 {
-  "name" : "queueScenario_modelComparison",
-  "description" : "This scenario is used for comparing the simulation output between the implementations of the infection model in crowd:it and vadere.",
+  "name" : "validation_hamner-2020",
+  "description" : "",
   "release" : "1.15",
   "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
   "processWriters" : {
@@ -16,38 +16,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "pathogenLoad.txt",
-      "processors" : [ 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "numberOfAerosolClouds.txt",
-      "processors" : [ 6 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
-      "filename" : "pathogenConcentration.txt",
-      "processors" : [ 7 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "infectionStatusPerPedestrian.txt",
-      "processors" : [ 8 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.IdOutputFile",
-      "filename" : "aerosolCloudLifeTime.txt",
-      "processors" : [ 9 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "pedestrianHealthStatust.txt",
-      "processors" : [ 10 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
-      "filename" : "aerosolCloudArea.txt",
-      "processors" : [ 11 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
-      "filename" : "aerosolCloudData.txt",
-      "processors" : [ 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -65,35 +33,6 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
-      "id" : 5
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudCountingProcessor",
-      "id" : 6
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PathogenConcentrationProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPathogenConcentrationProcessor",
-      "attributes" : {
-        "gridResolution" : 0.5,
-        "timeResolution" : 4.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
-      "id" : 8
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudLifeTimeProcessor",
-      "id" : 9
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianHealthStatusProcessor",
-      "id" : 10
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudAreaProcessor",
-      "id" : 11
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
-      "id" : 12
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -116,11 +55,11 @@
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : true,
+        "seeSmallWalls" : false,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ "org.vadere.simulator.models.sir.InfectionModel" ]
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -136,7 +75,7 @@
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
-        "targetAttractionStrength" : 0.4,
+        "targetAttractionStrength" : 1.0,
         "cacheType" : "NO_CACHE",
         "cacheDir" : "",
         "timeCostAttributes" : {
@@ -153,36 +92,33 @@
           "height" : 1.0
         }
       },
-      "org.vadere.state.attributes.models.AttributesInfectionModel" : {
-        "infectionModelSourceParameters" : [ {
-          "sourceId" : 2,
+      "org.vadere.state.attributes.models.AttributesTransmissionModel" : {
+        "transmissionModelSourceParameters" : [ {
+          "sourceId" : -1,
           "infectionStatus" : "SUSCEPTIBLE"
-        }, {
-          "sourceId" : 1,
-          "infectionStatus" : "INFECTIOUS"
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
         "pedestrianSusceptibility" : 1000.0,
-        "exposedPeriod" : 432000.0,
+        "exposedPeriod" : 172800.0,
         "infectiousPeriod" : 1209600.0,
-        "recoveredPeriod" : 1.296E7,
+        "recoveredPeriod" : 3.1536E7,
         "aerosolCloudHalfLife" : 120.0,
         "aerosolCloudInitialArea" : 0.75
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1200.0,
-      "simTimeStepLength" : 0.5,
+      "finishTime" : 500.0,
+      "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : 1436250873317888407,
-      "simulationSeed" : 1436250873317888407
+      "fixedSeed" : -4796889693435238390,
+      "simulationSeed" : 0
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
@@ -196,90 +132,95 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 5.8,
-          "height" : 11.0
+          "width" : 23.0,
+          "height" : 24.0
         },
-        "boundingBoxWidth" : 0.5,
+        "boundingBoxWidth" : 1.0,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ {
-        "shape" : {
-          "x" : 0.5,
-          "y" : 10.0,
-          "width" : 4.8,
-          "height" : 0.5,
-          "type" : "RECTANGLE"
-        },
-        "id" : 2
-      }, {
-        "shape" : {
-          "x" : 4.8,
-          "y" : 1.0,
-          "width" : 0.5,
-          "height" : 9.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 3
-      }, {
-        "shape" : {
-          "x" : 0.5,
-          "y" : 0.5,
-          "width" : 4.8,
-          "height" : 0.5,
-          "type" : "RECTANGLE"
-        },
-        "id" : 4
-      }, {
-        "shape" : {
-          "x" : 1.8,
-          "y" : 1.8,
-          "width" : 0.2,
-          "height" : 8.2,
-          "type" : "RECTANGLE"
-        },
-        "id" : 5
-      }, {
-        "shape" : {
-          "x" : 3.8,
-          "y" : 1.8,
-          "width" : 0.2,
-          "height" : 8.2,
-          "type" : "RECTANGLE"
-        },
-        "id" : 8
-      }, {
-        "shape" : {
-          "x" : 2.8,
-          "y" : 1.0,
-          "width" : 0.2,
-          "height" : 8.2,
-          "type" : "RECTANGLE"
-        },
-        "id" : 15
-      }, {
-        "shape" : {
-          "x" : 0.5,
-          "y" : 1.0,
-          "width" : 0.5,
-          "height" : 9.0,
-          "type" : "RECTANGLE"
-        },
-        "id" : 7
-      } ],
+      "obstacles" : [ ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
+        "id" : 1,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 4.0,
+          "y" : 4.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 5.3,
+          "y" : 4.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
         "id" : 3,
         "absorbing" : true,
         "shape" : {
-          "x" : 4.15,
-          "y" : 8.9,
-          "width" : 0.5,
-          "height" : 1.05,
+          "x" : 6.6,
+          "y" : 4.0,
+          "width" : 1.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 90.0,
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 4,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 7.9,
+          "y" : 4.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 5,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 9.2,
+          "y" : 4.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -290,52 +231,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
-      "dropletClouds" : [ ],
-      "sources" : [ {
-        "id" : 1,
-        "shape" : {
-          "x" : 1.2,
-          "y" : 9.45,
-          "width" : 0.5,
-          "height" : 0.5,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 1,
-        "startTime" : 7.0,
-        "endTime" : 20.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 3 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      }, {
-        "id" : 2,
-        "shape" : {
-          "x" : 1.2,
-          "y" : 8.9,
-          "width" : 0.5,
-          "height" : 0.5,
-          "type" : "RECTANGLE"
-        },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 2.0 ],
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : 10,
-        "startTime" : 0.0,
-        "endTime" : 50.0,
-        "spawnAtRandomPositions" : false,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
-        "targetIds" : [ 3 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
-      } ],
+      "sources" : [ ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.2,
@@ -355,8 +251,8 @@
         "id" : -1,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.0,
-        "speedDistributionStandardDeviation" : 0.0,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,

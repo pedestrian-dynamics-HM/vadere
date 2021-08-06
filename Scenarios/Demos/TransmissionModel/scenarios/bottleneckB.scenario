@@ -1,5 +1,5 @@
 {
-  "name" : "bottleneckB_socialDistancing",
+  "name" : "bottleneckB",
   "description" : "",
   "release" : "1.15",
   "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
@@ -84,12 +84,12 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ "org.vadere.simulator.models.sir.InfectionModel" ]
+        "submodels" : [ "org.vadere.simulator.models.sir.TransmissionModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
-        "pedPotentialPersonalSpaceWidth" : 1.325,
-        "pedPotentialHeight" : 750.0,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 50.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
@@ -117,8 +117,8 @@
           "height" : 1.0
         }
       },
-      "org.vadere.state.attributes.models.AttributesInfectionModel" : {
-        "infectionModelSourceParameters" : [ {
+      "org.vadere.state.attributes.models.AttributesTransmissionModel" : {
+        "transmissionModelSourceParameters" : [ {
           "sourceId" : 3,
           "infectionStatus" : "SUSCEPTIBLE"
         }, {
@@ -171,6 +171,18 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
+            "x" : 16.0,
+            "y" : 9.5
+          }, {
+            "x" : 16.0,
+            "y" : 2.0
+          }, {
+            "x" : 4.0,
+            "y" : 2.0
+          }, {
+            "x" : 2.0,
+            "y" : 2.0
+          }, {
             "x" : 2.0,
             "y" : 13.0
           }, {
@@ -199,7 +211,7 @@
             "y" : 11.0
           }, {
             "x" : 18.0,
-            "y" : 11.3
+            "y" : 11.4
           }, {
             "x" : 18.0,
             "y" : 11.5
@@ -244,7 +256,7 @@
             "y" : 1.0
           }, {
             "x" : 17.0,
-            "y" : 8.999999999999991
+            "y" : 8.999999999999993
           }, {
             "x" : 18.0,
             "y" : 9.0
@@ -253,9 +265,9 @@
             "y" : 9.5
           }, {
             "x" : 18.0,
-            "y" : 9.8
+            "y" : 10.0
           }, {
-            "x" : 18.0,
+            "x" : 16.9,
             "y" : 10.0
           }, {
             "x" : 16.5,
@@ -266,21 +278,9 @@
           }, {
             "x" : 16.1,
             "y" : 9.7
-          }, {
-            "x" : 16.0,
-            "y" : 9.5
-          }, {
-            "x" : 16.0,
-            "y" : 2.0
-          }, {
-            "x" : 4.0,
-            "y" : 2.0
-          }, {
-            "x" : 2.0,
-            "y" : 2.0
           } ]
         },
-        "id" : 2
+        "id" : 6
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -305,7 +305,7 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
-      "dropletClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 3,
         "shape" : {
@@ -317,7 +317,7 @@
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
         "distributionParameters" : [ 1.0 ],
-        "spawnNumber" : 1,
+        "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 300.0,

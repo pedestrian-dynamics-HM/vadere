@@ -13,19 +13,19 @@ import org.vadere.state.health.HealthStatus;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
- * This class defines the attributes of the corresponding InfectionModel. All attributes are defined by the user and
+ * This class defines the attributes of the corresponding TransmissionModel. All attributes are defined by the user and
  * relate to
  * <ul>
- *     <li>the InfectionModel: {@link #infectionModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
+ *     <li>the TransmissionModel: {@link #transmissionModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
  *     <li>the {@link HealthStatus} of the {@link Pedestrian}s</li>
- *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the InfectionModel</li>
+ *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the TransmissionModel</li>
  * </ul>
  */
 @ModelAttributeClass
-public class AttributesInfectionModel extends Attributes {
+public class AttributesTransmissionModel extends Attributes {
 
-	// Attributes that are required by the InfectionModel
-	private ArrayList<InfectionModelSourceParameters> infectionModelSourceParameters;
+	// Attributes that are required by the TransmissionModel
+	private ArrayList<TransmissionModelSourceParameters> transmissionModelSourceParameters;
 	private double pedestrianRespiratoryCyclePeriod; // equals 1/(pedestrians' average breathing rate) in seconds
 
 	// Pedestrians' healthStatus related attributes
@@ -40,8 +40,8 @@ public class AttributesInfectionModel extends Attributes {
 	private double aerosolCloudHalfLife;
 	private double aerosolCloudInitialArea;
 
-	public AttributesInfectionModel() {
-		this.infectionModelSourceParameters = new ArrayList<>(Arrays.asList(new InfectionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, InfectionStatus.SUSCEPTIBLE)));
+	public AttributesTransmissionModel() {
+		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new TransmissionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, InfectionStatus.SUSCEPTIBLE)));
 		this.pedestrianRespiratoryCyclePeriod = 4; // respiratory cycle in seconds
 		this.pedestrianPathogenEmissionCapacity = 4;
 		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume (per breath) 0.5 l in m^3
@@ -57,8 +57,8 @@ public class AttributesInfectionModel extends Attributes {
 		return pedestrianRespiratoryCyclePeriod;
 	}
 
-	public ArrayList<InfectionModelSourceParameters> getInfectionModelSourceParameters() {
-		return infectionModelSourceParameters;
+	public ArrayList<TransmissionModelSourceParameters> getTransmissionModelSourceParameters() {
+		return transmissionModelSourceParameters;
 	}
 
 	public double getPedestrianPathogenEmissionCapacity() {

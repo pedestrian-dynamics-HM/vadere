@@ -6,7 +6,8 @@ import org.vadere.util.logging.Logger;
 
 import java.util.Random;
 
-public abstract class AbstractSirModel implements SirModel{
+// TODO remove class AbstractSirModel if no additional models similar to TransmissionModel are implemented
+public abstract class AbstractSirModel implements SirModel {
 
 	// add default implementations and shared fields here to keep SirModel interface clean
 

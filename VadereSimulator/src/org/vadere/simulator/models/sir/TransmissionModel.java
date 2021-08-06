@@ -7,8 +7,8 @@ import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesInfectionModel;
-import org.vadere.state.attributes.models.InfectionModelSourceParameters;
+import org.vadere.state.attributes.models.AttributesTransmissionModel;
+import org.vadere.state.attributes.models.TransmissionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
 import org.vadere.state.health.*;
+import org.vadere.util.logging.Logger;
 
 /**
  * This class models the spread of infectious pathogen among pedestrians.
@@ -36,9 +37,16 @@ import org.vadere.state.health.*;
  * </ul>
  */
 @ModelClass
-public class InfectionModel extends AbstractSirModel {
+public class TransmissionModel implements Model {
 
-	private AttributesInfectionModel attributesInfectionModel;
+	protected static Logger logger = Logger.getLogger(TransmissionModel.class);
+
+	// this random provider everywhere to keep simulation reproducible
+	protected Random random;
+	protected Domain domain;
+	protected AttributesAgent attributesAgent;
+
+	private AttributesTransmissionModel attributesTransmissionModel;
 	double simTimeStepLength;
 	Topography topography;
 	int aerosolCloudIdCounter;
@@ -79,7 +87,7 @@ public class InfectionModel extends AbstractSirModel {
 			this.domain = domain;
 			this.random = random;
 			this.attributesAgent = attributesPedestrian;
-			this.attributesInfectionModel = Model.findAttributes(attributesList, AttributesInfectionModel.class);
+			this.attributesTransmissionModel = Model.findAttributes(attributesList, AttributesTransmissionModel.class);
 			this.topography = domain.getTopography();
 			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
 			this.aerosolCloudIdCounter = 1;
@@ -149,7 +157,7 @@ public class InfectionModel extends AbstractSirModel {
 	}
 
 	private AerosolCloud generateAerosolCloud(double simTimeInSec, Pedestrian pedestrian, VPoint v1, VPoint v2) {
-		double initialArea = attributesInfectionModel.getAerosolCloudInitialArea();
+		double initialArea = attributesTransmissionModel.getAerosolCloudInitialArea();
 		VShape shape = createTransformedAerosolCloudShape(v1, v2, initialArea);
 		ArrayList<VPoint> vertices = new ArrayList<>(Arrays.asList(v1, v2));
 		VPoint center = new VPoint((v1.x + v2.x) / 2.0, (v1.y + v2.y) / 2.0);
@@ -172,7 +180,7 @@ public class InfectionModel extends AbstractSirModel {
 				center,
 				vertices,
 				simTimeInSec,
-				attributesInfectionModel.getAerosolCloudHalfLife(),
+				attributesTransmissionModel.getAerosolCloudHalfLife(),
 				pedestrian.emitPathogen(),
 				pedestrian.emitPathogen()));
 
@@ -189,7 +197,7 @@ public class InfectionModel extends AbstractSirModel {
 		double distanceOfSpread = 1.5;
 		double angleOfSpreadInRad = Math.toRadians(30.0);
 		double lifeTime = 1.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
-		double emittedPathogenLoad = pedestrian.getSusceptibility() / attributesInfectionModel.getPedestrianPathogenAbsorptionRate();
+		double emittedPathogenLoad = pedestrian.getSusceptibility() / attributesTransmissionModel.getPedestrianPathogenAbsorptionRate();
 
 		// ToDo: remove this quick solution; it would be better to have the walking directions stored in pedestrian
 		int pedestrianId = pedestrian.getId();
@@ -256,7 +264,7 @@ public class InfectionModel extends AbstractSirModel {
 	public void deleteExpiredAerosolClouds() {
 		Collection<AerosolCloud> aerosolCloudsToBeDeleted = topography.getAerosolClouds()
 				.stream()
-				.filter(a -> a.getCurrentPathogenLoad() / a.getArea() < minimumPercentage * a.getInitialPathogenLoad() / attributesInfectionModel.getAerosolCloudInitialArea())
+				.filter(a -> a.getCurrentPathogenLoad() / a.getArea() < minimumPercentage * a.getInitialPathogenLoad() / attributesTransmissionModel.getAerosolCloudInitialArea())
 				.collect(Collectors.toSet());
 		for (AerosolCloud aerosolCloud : aerosolCloudsToBeDeleted) {
 			topography.getAerosolClouds().remove(aerosolCloud);
@@ -282,7 +290,7 @@ public class InfectionModel extends AbstractSirModel {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
 			pedestrian.updateInfectionStatus(simTimeInSec);
-			pedestrian.updateRespiratoryCycle(simTimeInSec, attributesInfectionModel.getPedestrianRespiratoryCyclePeriod());
+			pedestrian.updateRespiratoryCycle(simTimeInSec, attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		}
 	}
 
@@ -300,7 +308,7 @@ public class InfectionModel extends AbstractSirModel {
 
 	private void pathogenFromAerosolClouds(Collection<Pedestrian> breathingInPeds) {
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
-		double timeNormalizationConst = simTimeStepLength / (attributesInfectionModel.getPedestrianRespiratoryCyclePeriod() / 2.0);
+		double timeNormalizationConst = simTimeStepLength / (attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod() / 2.0);
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			Collection<Pedestrian> breathingInPedsInAerosolCloud = breathingInPeds
@@ -344,31 +352,31 @@ public class InfectionModel extends AbstractSirModel {
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
 		// SourceControllerListener. This will be called  *after* a pedestrian is inserted into the
 		// topography by the given SourceController. Change model state on Agent here
-		InfectionModelSourceParameters sourceParameters = defineSourceParameters(controller);
+		TransmissionModelSourceParameters sourceParameters = defineSourceParameters(controller);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
-		ped.setPathogenEmissionCapacity(attributesInfectionModel.getPedestrianPathogenEmissionCapacity());
-		ped.setPathogenAbsorptionRate(attributesInfectionModel.getPedestrianPathogenAbsorptionRate());
-		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesInfectionModel.getPedestrianRespiratoryCyclePeriod());
-		ped.setSusceptibility(attributesInfectionModel.getPedestrianSusceptibility());
-		ped.setExposedPeriod(attributesInfectionModel.getExposedPeriod());
-		ped.setInfectiousPeriod(attributesInfectionModel.getInfectiousPeriod());
-		ped.setRecoveredPeriod(attributesInfectionModel.getRecoveredPeriod());
+		ped.setPathogenEmissionCapacity(attributesTransmissionModel.getPedestrianPathogenEmissionCapacity());
+		ped.setPathogenAbsorptionRate(attributesTransmissionModel.getPedestrianPathogenAbsorptionRate());
+		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+		ped.setSusceptibility(attributesTransmissionModel.getPedestrianSusceptibility());
+		ped.setExposedPeriod(attributesTransmissionModel.getExposedPeriod());
+		ped.setInfectiousPeriod(attributesTransmissionModel.getInfectiousPeriod());
+		ped.setRecoveredPeriod(attributesTransmissionModel.getRecoveredPeriod());
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
 	}
 
-	private InfectionModelSourceParameters defineSourceParameters(SourceController controller) {
+	private TransmissionModelSourceParameters defineSourceParameters(SourceController controller) {
 		int sourceId = controller.getSourceId();
 		int defaultSourceId = -1;
-		Optional<InfectionModelSourceParameters> sourceParameters = attributesInfectionModel
-				.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
+		Optional<TransmissionModelSourceParameters> sourceParameters = attributesTransmissionModel
+				.getTransmissionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
 
 		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
 		if (sourceParameters.isEmpty()) {
-			sourceParameters = attributesInfectionModel.getInfectionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
+			sourceParameters = attributesTransmissionModel.getTransmissionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
 
 			// if no user defined default values: use attributesInfectionModel default values
 			if (sourceParameters.isPresent()) {
@@ -380,8 +388,8 @@ public class InfectionModel extends AbstractSirModel {
 			return sourceParameters.get();
 	}
 
-	public AttributesInfectionModel getAttributesInfectionModel() {
-		return attributesInfectionModel;
+	public AttributesTransmissionModel getAttributesTransmissionModel() {
+		return attributesTransmissionModel;
 	}
 
 	public static Collection<Pedestrian> getDynamicElementsNearAerosolCloud(Topography topography, AerosolCloud aerosolCloud) {

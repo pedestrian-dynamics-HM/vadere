@@ -20,7 +20,7 @@ import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
-import org.vadere.simulator.models.sir.InfectionModel;
+import org.vadere.simulator.models.sir.TransmissionModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
@@ -122,7 +122,7 @@ public class ScenarioRun implements Runnable {
 			ctx.setEikonalSolverProvider(new EikonalSolverCacheProvider(scenarioCache)); // cache found use CacheProvider if possible
 
 		ctx.put("cache", scenarioCache);
-		ctx.put(InfectionModel.simStepLength, scenario.getAttributesSimulation().getSimTimeStepLength());
+		ctx.put(TransmissionModel.simStepLength, scenario.getAttributesSimulation().getSimTimeStepLength());
 
 		VadereContext.add(scenarioName, ctx);
 		logger.info("scenario context initialized.");

@@ -1,8 +1,7 @@
 {
-  "name" : "validation_hamner-2020",
+  "name" : "exposedCalibration",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -16,6 +15,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "pedestrianPathogenLoad.txt",
+      "processors" : [ 5 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -33,6 +36,9 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -59,11 +65,11 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.sir.TransmissionModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.45,
-        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialIntimateSpaceWidth" : 0.0,
+        "pedPotentialPersonalSpaceWidth" : 0.0,
         "pedPotentialHeight" : 50.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
@@ -92,33 +98,36 @@
           "height" : 1.0
         }
       },
-      "org.vadere.state.attributes.models.AttributesInfectionModel" : {
-        "infectionModelSourceParameters" : [ {
-          "sourceId" : -1,
+      "org.vadere.state.attributes.models.AttributesTransmissionModel" : {
+        "transmissionModelSourceParameters" : [ {
+          "sourceId" : 15,
           "infectionStatus" : "SUSCEPTIBLE"
+        }, {
+          "sourceId" : 16,
+          "infectionStatus" : "INFECTIOUS"
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
+        "pedestrianPathogenAbsorptionRate" : 1.0E-4,
         "pedestrianSusceptibility" : 1000.0,
         "exposedPeriod" : 172800.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 3.1536E7,
-        "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 0.75
+        "aerosolCloudHalfLife" : 1000.0,
+        "aerosolCloudInitialArea" : 3.0
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : -4796889693435238390,
-      "simulationSeed" : 0
+      "fixedSeed" : 8838372581797678424,
+      "simulationSeed" : 8838372581797678424
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
@@ -132,10 +141,10 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 23.0,
-          "height" : 24.0
+          "width" : 5.0,
+          "height" : 5.0
         },
-        "boundingBoxWidth" : 1.0,
+        "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
@@ -143,16 +152,16 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 1,
+        "id" : 17,
         "absorbing" : true,
         "shape" : {
-          "x" : 4.0,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
+          "x" : 2.1,
+          "y" : 2.4,
+          "width" : 0.41,
+          "height" : 0.41,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
+        "waitingTime" : 1200.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -160,67 +169,16 @@
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
       }, {
-        "id" : 2,
+        "id" : 18,
         "absorbing" : true,
         "shape" : {
-          "x" : 5.3,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
+          "x" : 2.55,
+          "y" : 2.4,
+          "width" : 0.41,
+          "height" : 0.41,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 3,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 6.6,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 4,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 7.9,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 5,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 9.2,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
+        "waitingTime" : 1200.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
         "individualWaiting" : true,
@@ -231,7 +189,52 @@
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
-      "sources" : [ ],
+      "droplets" : [ ],
+      "sources" : [ {
+        "id" : 15,
+        "shape" : {
+          "x" : 2.1,
+          "y" : 2.4,
+          "width" : 0.41,
+          "height" : 0.41,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 17 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      }, {
+        "id" : 16,
+        "shape" : {
+          "x" : 2.55,
+          "y" : 2.4,
+          "width" : 0.41,
+          "height" : 0.41,
+          "type" : "RECTANGLE"
+        },
+        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
+        "distributionParameters" : [ 1.0 ],
+        "spawnNumber" : 1,
+        "maxSpawnNumberTotal" : -1,
+        "startTime" : 0.0,
+        "endTime" : 0.0,
+        "spawnAtRandomPositions" : false,
+        "spawnAtGridPositionsCA" : false,
+        "useFreeSpaceOnly" : true,
+        "targetIds" : [ 18 ],
+        "groupSizeDistribution" : [ 1.0 ],
+        "dynamicElementType" : "PEDESTRIAN",
+        "attributesPedestrian" : null
+      } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
         "radius" : 0.2,
@@ -252,7 +255,7 @@
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.26,
+        "speedDistributionStandardDeviation" : 0.0,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
