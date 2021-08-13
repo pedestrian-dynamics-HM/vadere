@@ -1,7 +1,8 @@
 {
-  "name" : "exposedCalibration",
+  "name" : "closeContact",
   "description" : "",
   "release" : "1.15",
+  "commithash" : "2add166d3f5279236a7498b8ccaf6ae7566f39b2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -109,21 +110,21 @@
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
-        "pedestrianMinInfectiousDose" : 1000.0,
+        "pedestrianMinInfectiousDose" : 1700.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 3.14,
-		"dropletsExhalationFrequency" : 0.0,
-		"dropletsDistanceOfSpread" : 1.5,
-		"dropletsAngleOfSpreadInDeg" : 30,
-		"dropletsLifeTime" : 1.001,
-		"dropletsPathogenLoadFactor" : 200
+        "aerosolCloudInitialArea" : 7.1,
+        "dropletsExhalationFrequency" : 0.0,
+        "dropletsDistanceOfSpread" : 1.5,
+        "dropletsAngleOfSpreadInDeg" : 30.0,
+        "dropletsLifeTime" : 1.001,
+        "dropletsPathogenLoadFactor" : 200.0
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1000.0,
+      "finishTime" : 900.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
