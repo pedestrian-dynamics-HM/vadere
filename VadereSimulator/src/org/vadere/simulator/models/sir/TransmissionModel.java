@@ -249,7 +249,7 @@ public class TransmissionModel implements Model {
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 
 			// Increasing extent due to diffusion
-			aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
+			// aerosolCloud.increaseShape(rateOfSpread * simTimeStepLength);
 
 			// Increasing extent due to moving air caused by agents
 			// Increase aerosolCloudRadius about deltaRadius due to moving agents within the cloud
