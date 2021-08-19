@@ -16,8 +16,9 @@ import java.util.Collection;
  *
  * {@link SelfCategory#COOPERATIVE} should motivate pedestrians to swap places
  * instead of blindly walking to a target and colliding with other pedestrians.
+ *
  */
-public class CooperativeAndOtherBehaviorsModel implements ICognitionModel {
+public class CooperativeAndOtherBehaviorsModel extends CooperativeCognitionModel {
 
     private Topography topography;
 
@@ -32,6 +33,8 @@ public class CooperativeAndOtherBehaviorsModel implements ICognitionModel {
             if (pedestrianCannotMove(pedestrian)) {
                 pedestrian.setSelfCategory(SelfCategory.COOPERATIVE);
             } else {
+
+                // in the super class CooperativeCognitionModel, there is no differentiation between sub-behaviors.
 
                 Stimulus stimulus = pedestrian.getMostImportantStimulus();
                 SelfCategory nextSelfCategory;
@@ -56,17 +59,4 @@ public class CooperativeAndOtherBehaviorsModel implements ICognitionModel {
         }
     }
 
-    private boolean pedestrianCannotMove(Pedestrian pedestrian) {
-        boolean cannotMove = false;
-
-        FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
-        int requiredFootSteps = 2;
-
-        if (footstepHistory.size() >= requiredFootSteps
-                && footstepHistory.getAverageSpeedInMeterPerSecond() <= 0.05) {
-            cannotMove = true;
-        }
-
-        return cannotMove;
-    }
 }
