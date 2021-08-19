@@ -61,6 +61,7 @@ public class RouteChoice extends ControlModel {
 
         if (isUsePsychologyLayer()) {
             double timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
             this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
