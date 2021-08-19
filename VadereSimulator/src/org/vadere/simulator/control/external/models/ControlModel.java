@@ -4,11 +4,14 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 import rx.Subscription;
 
+import java.text.CollationElementIterator;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
@@ -81,14 +84,22 @@ public abstract class ControlModel implements IControlModel {
     };
 
 
-
     public void setProcessedAgents(Pedestrian ped, LinkedList<Integer> ids){
 
-        if (processedAgents.containsKey(ped)){
-            LinkedList<Integer> idsOld  = processedAgents.get(ped);
-            ids.addAll(idsOld);
+        // group members are always processed together, they share the same opinion
+        LinkedList<Pedestrian> pedestrians = ped.getPedGroupMembers();
+        pedestrians.add(ped);
+
+        for (Pedestrian pedestrian : pedestrians) {
+            if (processedAgents.containsKey(ped)) {
+                LinkedList<Integer> idsOld = processedAgents.get(pedestrian);
+                ids.addAll(idsOld);
+            }
+            processedAgents.put(pedestrian, ids);
+            if (!(pedestrian.equals(ped))){
+                pedestrian.getKnowledgeBase().setInformationState(InformationState.FOLLOW_INFORMED_GROUP_MEMBER);
+            }
         }
-        processedAgents.put(ped, ids);
     }
 
     public void setProcessedAgents(Pedestrian ped, int id){
@@ -180,7 +191,7 @@ public abstract class ControlModel implements IControlModel {
         if (processedAgents.containsKey(ped)) {
             return processedAgents.get(ped).isEmpty();
         }
-        return false;
+        return true;
     }
 
 
