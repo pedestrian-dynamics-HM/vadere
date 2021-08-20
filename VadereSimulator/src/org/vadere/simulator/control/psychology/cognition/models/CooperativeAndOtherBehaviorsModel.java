@@ -17,6 +17,7 @@ import java.util.Collection;
  * {@link SelfCategory#COOPERATIVE} should motivate pedestrians to swap places
  * instead of blindly walking to a target and colliding with other pedestrians.
  *
+ * author: Christina Mayr
  */
 public class CooperativeAndOtherBehaviorsModel extends CooperativeCognitionModel {
 
@@ -35,12 +36,19 @@ public class CooperativeAndOtherBehaviorsModel extends CooperativeCognitionModel
             } else {
 
                 // in the super class CooperativeCognitionModel, there is no differentiation between sub-behaviors.
-
                 Stimulus stimulus = pedestrian.getMostImportantStimulus();
                 SelfCategory nextSelfCategory;
 
                 if (stimulus instanceof ChangeTarget) {
                     nextSelfCategory = SelfCategory.CHANGE_TARGET;
+                    // make sure that the target is set directly
+                    // this is necessary, because the target is set in the update scheme only, it the agent takes a step
+                    // if agents are not in the event queue or their timeOfNextStep > simeTimeStep, the target will not be set properly in the locomotion layer
+                    // In the {@link ChangeTargetScriptedCognitionModel}, the target is also set twice.
+                    ChangeTarget changeTarget = (ChangeTarget) pedestrian.getMostImportantStimulus();
+                    pedestrian.setTargets(changeTarget.getNewTargetIds());
+                    pedestrian.setNextTargetListIndex(0);
+
                 } else if (stimulus instanceof Threat) {
                     nextSelfCategory = SelfCategory.THREATENED;
                 } else if (stimulus instanceof Wait || stimulus instanceof WaitInArea) {
