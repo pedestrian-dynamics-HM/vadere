@@ -65,11 +65,12 @@ public class RouteChoice extends ControlModel {
         if (isUsePsychologyLayer()) {
             double timeCommandExecuted;
             timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            /* this is no longer necessary, because the functionality was moved from the locomtion layer to the cognition model.
             if (ped instanceof PedestrianOSM) {
                 // make sure that the discrete update scheme works
                 // getTimeOfNextStep() (->this.simTime) < currentTimeInSec (timeCommandExecuted)
                 ((PedestrianOSM) ped).setTimeOfNextStep(this.simTime);
-            }
+            }*/
 
             ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
             this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
