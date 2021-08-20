@@ -6,6 +6,9 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.models.bhm.PedestrianBHM;
+import org.vadere.simulator.models.osm.OptimalStepsModel;
+import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.scenario.Pedestrian;
@@ -60,7 +63,14 @@ public class RouteChoice extends ControlModel {
         LinkedList<Integer> oldTarget = ped.getTargets();
 
         if (isUsePsychologyLayer()) {
-            double timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            double timeCommandExecuted;
+            timeCommandExecuted = this.simTime + getSimTimeStepLength();
+            if (ped instanceof PedestrianOSM) {
+                // make sure that the discrete update scheme works
+                // getTimeOfNextStep() (->this.simTime) < currentTimeInSec (timeCommandExecuted)
+                ((PedestrianOSM) ped).setTimeOfNextStep(this.simTime);
+            }
+
             ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
             this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
