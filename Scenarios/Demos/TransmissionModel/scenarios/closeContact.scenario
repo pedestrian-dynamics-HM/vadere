@@ -20,6 +20,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "pedestrianPathogenLoad.txt",
       "processors" : [ 5 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
+      "filename" : "pathogenConcentration.txt",
+      "processors" : [ 6 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -40,6 +44,14 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
       "id" : 5
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PathogenConcentrationProcessor",
+      "id" : 6,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPathogenConcentrationProcessor",
+      "attributes" : {
+        "gridResolution" : 1.0,
+        "timeResolution" : 4.0
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
