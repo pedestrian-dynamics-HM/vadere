@@ -439,7 +439,7 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	}
 
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.OUTPUT_DIR,
-			name = "getHash", dataTypeStr = "String", ignoreElementId = true)
+			name = "getOutputDir", dataTypeStr = "String", ignoreElementId = true)
 	public TraCICommand process_getOutputDir(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
 
 		TraCIGetCommand cmd = (TraCIGetCommand) rawCmd;
