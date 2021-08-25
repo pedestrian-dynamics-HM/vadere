@@ -30,6 +30,7 @@ public enum SimulationVar {
 	DATA_PROCESSOR(0x7f, TraCIDataType.COMPOUND_OBJECT),
 	EXTERNAL_INPUT(0x20, TraCIDataType.COMPOUND_OBJECT),
 	EXTERNAL_INPUT_INIT(0x21, TraCIDataType.COMPOUND_OBJECT),
+	OUTPUT_DIR(0x22, TraCIDataType.STRING),
 	;
 
 	public int id;

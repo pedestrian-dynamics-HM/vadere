@@ -438,4 +438,23 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 
 	}
 
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.OUTPUT_DIR,
+			name = "getHash", dataTypeStr = "String", ignoreElementId = true)
+	public TraCICommand process_getOutputDir(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
+
+		TraCIGetCommand cmd = (TraCIGetCommand) rawCmd;
+		try {
+			String resultDir = remoteManager.getOutputDirectory().toString();
+			cmd.setResponse(responseOK(SimulationVar.OUTPUT_DIR.type, resultDir));
+			return cmd;
+
+		} catch (TraCICommandCreationException ee) {
+			rawCmd.setResponse(responseERR(SimulationVar.OUTPUT_DIR, "Failed to provide output directory."));
+		}
+		return cmd;
+	}
+
+
+
+
 }
