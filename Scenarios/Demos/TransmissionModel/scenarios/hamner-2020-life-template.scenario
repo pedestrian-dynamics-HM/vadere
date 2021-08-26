@@ -1,8 +1,8 @@
 {
-  "name" : "validation_hamner-2020",
+  "name" : "hamner-2020-life-template",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
+  "commithash" : "2add166d3f5279236a7498b8ccaf6ae7566f39b2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -59,12 +59,12 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.sir.TransmissionModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
         "pedPotentialPersonalSpaceWidth" : 1.2,
-        "pedPotentialHeight" : 50.0,
+        "pedPotentialHeight" : 5.0,
         "obstPotentialWidth" : 0.8,
         "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
@@ -96,33 +96,36 @@
         "transmissionModelSourceParameters" : [ {
           "sourceId" : -1,
           "infectionStatus" : "SUSCEPTIBLE"
+        }, {
+          "sourceId" : 1,
+          "infectionStatus" : "INFECTIOUS"
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
-		"pedestrianMinInfectiousDose" : 1000.0,
-        "exposedPeriod" : 432000.0,
+        "pedestrianMinInfectiousDose" : 1600.0,
+        "exposedPeriod" : 172800.0,
         "infectiousPeriod" : 1209600.0,
-        "recoveredPeriod" : 1.296E7,
+        "recoveredPeriod" : 3.1536E7,
         "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 3.14,
-		"dropletsExhalationFrequency" : 0.0,
-		"dropletsDistanceOfSpread" : 1.5,
-		"dropletsAngleOfSpreadInDeg" : 30,
-		"dropletsLifeTime" : 1.001,
-		"dropletsPathogenLoadFactor" : 200
+        "aerosolCloudInitialArea" : 7.1,
+        "dropletsExhalationFrequency" : 0.0,
+        "dropletsDistanceOfSpread" : 1.5,
+        "dropletsAngleOfSpreadInDeg" : 30.0,
+        "dropletsLifeTime" : 1.001,
+        "dropletsPathogenLoadFactor" : 200.0
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 500.0,
+      "finishTime" : 9000.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.01,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : -4796889693435238390,
+      "fixedSeed" : -2054058476485033808,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
@@ -137,105 +140,21 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 23.0,
-          "height" : 24.0
+          "width" : 10.0,
+          "height" : 10.0
         },
-        "boundingBoxWidth" : 1.0,
+        "boundingBoxWidth" : 0.5,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
-      "targets" : [ {
-        "id" : 1,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 4.0,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 2,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 5.3,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 3,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 6.6,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 4,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 7.9,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      }, {
-        "id" : 5,
-        "absorbing" : true,
-        "shape" : {
-          "x" : 9.2,
-          "y" : 4.0,
-          "width" : 1.0,
-          "height" : 1.0,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
-      } ],
+      "targets" : [ ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
