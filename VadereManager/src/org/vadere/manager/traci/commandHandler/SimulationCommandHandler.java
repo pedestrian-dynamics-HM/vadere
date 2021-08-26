@@ -1,11 +1,14 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.apache.commons.math3.util.Pair;
+import org.jfree.data.json.impl.JSONObject;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.commandHandler.annotation.PolygonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
+import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -25,9 +28,13 @@ import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.traci.*;
+import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -292,6 +299,25 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return cmd;
 	}
 
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.SIM_CONFIG,
+			name = "getSimConfig", ignoreElementId = true)
+	public TraCICommand process_getSimConfig(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
+
+		TraCIGetCacheHashCommand cmd = TraCIGetCacheHashCommand.create(rawCmd);
+
+		try {
+			CompoundObject simConfig = remoteManager.getSimCfg().getCompoundObject();
+			cmd.setResponse(responseOK(SimulationVar.SIM_CONFIG.type, simConfig));
+
+		} catch (TraCIException ex) {
+			cmd.setResponse(responseERR(SimulationVar.SIM_CONFIG, "cannot send simConfig"));
+		}
+		return cmd;
+	}
+
+
+
+
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CACHE_HASH,
 			name = "getHash", dataTypeStr = "String", ignoreElementId = true)
 	public TraCICommand process_getCacheHash(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
@@ -453,6 +479,38 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		}
 		return cmd;
 	}
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.OBSTACLES, name = "getObstacles", dataTypeStr = "String",  ignoreElementId = true)
+	public TraCICommand process_getObstacles(TraCIGetCommand cmd, RemoteManager remoteManager) {
+		try {
+			remoteManager.accessState((manager, state) -> {
+				List<ScenarioElement> obstacles = state.getTopography().getAllScenarioElements()
+						.stream()
+						.filter(p -> p.getType() == ScenarioElementType.OBSTACLE)
+						.collect(Collectors.toList());
+
+				JSONObject obstacleShapes = new JSONObject();
+				for (ScenarioElement scenarioElement : obstacles) {
+					VPolygon polygon = null;
+					if (scenarioElement.getShape() instanceof VRectangle){
+						polygon = ((VRectangle) scenarioElement.getShape()).toPolygon();
+					}
+					else if (scenarioElement.getShape() instanceof VPolygon){
+						polygon = (VPolygon) scenarioElement.getShape();
+					}
+					else{
+						cmd.setResponse(responseERR(SimulationVar.OBSTACLES, "Obstacle must be of type polygon."));
+					}
+					obstacleShapes.put(scenarioElement.getId(), polygon);
+				}
+				cmd.setResponse(responseOK(SimulationVar.OBSTACLES.type, obstacleShapes.toJSONString()));
+			});
+		} catch (TraCICommandCreationException ee) {
+			cmd.setResponse(responseERR(SimulationVar.OBSTACLES, "Failed to provide obstacles."));
+		}
+		return cmd;
+	}
+
 
 
 
