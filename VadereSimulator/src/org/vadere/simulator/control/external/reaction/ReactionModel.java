@@ -26,7 +26,7 @@ public class ReactionModel implements IReactModel{
     }
 
     public void setParameters(String commandStr) {
-        ReactionParameter reactionParameter = new ReactionParameter(commandStr);
+        InformationFilterSettings reactionParameter = new InformationFilterSettings(commandStr);
         numberOfReactionBehaviors = reactionParameter.getNrOptions();
         distParameters = reactionParameter.getDist();
         isReactingToRecurringInformation = reactionParameter.isReactingToRecurringInformation();

@@ -14,8 +14,9 @@ public class CtlCommand {
     private int commandId = 0;
     JSONObject rawCommand;
     VShape space;
-    Double time;
     JSONObject pedCommand;
+    boolean isReactToFirstInfomrationOnly = true;
+    boolean isReactToRecurringInformation = false;
 
 
     public CtlCommand(JSONObject command){
@@ -104,6 +105,20 @@ public class CtlCommand {
             commandId = rawCommand.getInt("commandId");
         } catch (JSONException ignored) { }
         return commandId;
+    }
+
+    public boolean isReactToFirstInformationOnly() {
+        try {
+            isReactToFirstInfomrationOnly = rawCommand.getBoolean("isReactToFirstInformationOnly");
+        } catch (JSONException ignored) { }
+        return isReactToFirstInfomrationOnly;
+    }
+
+    public boolean isReactToRecurringInformation() {
+        try {
+            isReactToRecurringInformation = rawCommand.getBoolean("isReactToRecurringInformation");
+        } catch (JSONException ignored) { }
+        return isReactToRecurringInformation;
     }
 
 }
