@@ -63,7 +63,11 @@ public class ChangeTargetScripted extends Stimulus {
 
     public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds) {
         super(time);
+        this.newTargetIds = newTargetIds;
+    }
 
+    public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds, int id) {
+        super(time, id);
         this.newTargetIds = newTargetIds;
     }
 

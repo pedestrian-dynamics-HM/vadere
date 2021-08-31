@@ -73,7 +73,7 @@ public class RouteChoice extends ControlModel {
             }*/
 
             ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
-            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList), timeCommandExecuted);
+            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList, getCommandId()), timeCommandExecuted);
             logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
         }else{
             if (isPedReact()){
