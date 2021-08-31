@@ -5,10 +5,8 @@ import org.jfree.data.json.impl.JSONObject;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.commandHandler.annotation.PolygonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
-import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -209,12 +207,16 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
+				if (!isUsePsychologyLayer){
+					cmd.setErr("Psychology layer must be active. Set isUsePsychologyLayer: true in *.scenario file.");
+				}
+
 				ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
 				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
 				if (!iControlModelHashMap.containsKey(controlModelName)) {
 					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
+					controlModel.init(topography, stimulusController, reactionModel, simTimeStepLength);
 					iControlModelHashMap.put(controlModelName, controlModel);
 				}
 
@@ -256,7 +258,7 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
 					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
+					controlModel.init(topography, stimulusController, reactionModel, simTimeStepLength);
 					iControlModelHashMap.put(model_name, controlModel);
 				});
 			}

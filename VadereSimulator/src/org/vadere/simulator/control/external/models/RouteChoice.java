@@ -60,31 +60,18 @@ public class RouteChoice extends ControlModel {
     @Override
     protected void triggerPedReaction(Pedestrian ped) {
 
-        LinkedList<Integer> oldTarget = ped.getTargets();
+        double timeCommandExecuted;
+        timeCommandExecuted = this.simTime + getSimTimeStepLength();
+        /* this is no longer necessary, because the functionality was moved from the locomtion layer to the cognition model.
+        if (ped instanceof PedestrianOSM) {
+            // make sure that the discrete update scheme works
+            // getTimeOfNextStep() (->this.simTime) < currentTimeInSec (timeCommandExecuted)
+            ((PedestrianOSM) ped).setTimeOfNextStep(this.simTime);
+        }*/
 
-        if (isUsePsychologyLayer()) {
-            double timeCommandExecuted;
-            timeCommandExecuted = this.simTime + getSimTimeStepLength();
-            /* this is no longer necessary, because the functionality was moved from the locomtion layer to the cognition model.
-            if (ped instanceof PedestrianOSM) {
-                // make sure that the discrete update scheme works
-                // getTimeOfNextStep() (->this.simTime) < currentTimeInSec (timeCommandExecuted)
-                ((PedestrianOSM) ped).setTimeOfNextStep(this.simTime);
-            }*/
-
-            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
-            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList, getCommandId()), timeCommandExecuted);
-            logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
-        }else{
-            if (isPedReact()){
-                ped.setTargets(newTargetList);
-                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
-                logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
-            }
-            else{
-                ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_UNCONVINCING_RECEIVED);
-            }
-        }
+        ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
+        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, getBernoulliParameter() , newTargetList, getCommandId()), timeCommandExecuted);
+        logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
 
     }
 

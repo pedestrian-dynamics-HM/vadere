@@ -10,8 +10,6 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 import rx.Subscription;
 
-import java.text.CollationElementIterator;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
@@ -38,13 +36,12 @@ public abstract class ControlModel implements IControlModel {
 
 
     @Override
-    public void init(final Topography topography, final StimulusController stimulusController, final boolean isUsePsychologyLayer, final ReactionModel reactionModel, final double simTimeStepLength) {
+    public void init(final Topography topography, final StimulusController stimulusController, final ReactionModel reactionModel, final double simTimeStepLength) {
         processedAgents = new HashMap<>();
         simTime = 0.0;
 
         this.topography = topography;
         this.stimulusController = stimulusController;
-        this.isUsePsychologyLayer = isUsePsychologyLayer;
         this.reactionModel = reactionModel;
         this.simTimeStepLength = simTimeStepLength;
     }
