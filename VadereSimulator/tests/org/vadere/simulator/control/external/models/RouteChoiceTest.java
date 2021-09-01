@@ -3,6 +3,7 @@ package org.vadere.simulator.control.external.models;
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
+import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -23,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 
 public class RouteChoiceTest {
-
 
     private List<Pedestrian> createPedestrians(int totalPedestrians) {
         LinkedList<Integer> initialTarget = new LinkedList<>();
@@ -97,47 +97,19 @@ public class RouteChoiceTest {
         return msg;
     }
 
-    private String readInputFile3(){
-        String dataPath = "testResources/control/external/CorridorChoiceData3.json";
-        String msg = "";
-
-        try {
-            msg = IOUtils.readTextFile(dataPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return msg;
-    }
-
-
-
-
-    private String readInputFile2(){
-        String dataPath = "testResources/control/external/CorridorChoiceData2.json";
-        String msg = "";
-
-        try {
-            msg = IOUtils.readTextFile(dataPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return msg;
-    }
-
 
     @Test
     public void updateState() {
 
         int nr_peds = 10000;
-        double[] probs = { 0.25, 0, 0.25, 0.5 };
+        double[] probs = {0.25, 0, 0.25, 0.5 };
         int[] targets = { 1, 2, 3, 4};
         String msg = readInputFile();
 
-        RouteChoice routeChoice = new RouteChoice();
         Topography topo = createTopography(createPedestrians(nr_peds));
-        routeChoice.init(topo, new ReactionModel());
 
-        routeChoice.update(msg, -1.0);
+        RouteChoice routeChoice = (RouteChoice) ControlModelBuilder.getModel("RouteChoice", topo, null, 0.4, new InformationFilterSettings());
+        routeChoice.update(msg, -1.0, -1);
 
         double prob;
         for (int i = 0; i < targets.length; i++) {
@@ -145,143 +117,6 @@ public class RouteChoiceTest {
             prob = 1.0 * topo.getPedestrianDynamicElements().getElements().stream().filter(p -> p.getTargets().get(0) == t).count() / nr_peds;
             assertTrue( Precision.equals(prob, probs[i], 0.02));
         }
-
-    }
-
-    @Test
-    public void timeIn() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-
-        String msg = readInputFile();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-        routeChoice.update(msg, 6.0);
-
-        int target = topo.getPedestrianDynamicElements().getElement(0).getNextTargetId();
-        assertEquals(target, 4);
-
-    }
-
-    @Test
-    public void timeOut() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-
-        String msg = readInputFile();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-
-        // keep old target nr.5 because timeout reached
-        routeChoice.update(msg, 10.0);
-
-        int target = topo.getPedestrianDynamicElements().getElement(0).getNextTargetId();
-        assertEquals(target, 5);
-
-    }
-
-    @Test
-    public void pedOutOfArea() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
-        ped.setPosition(new VPoint(-1000.,1000.));
-
-        String msg = readInputFile();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-
-        // keep old target nr.5 because timeout reached
-        routeChoice.update(msg, -1.);
-
-        int target = ped.getNextTargetId();
-        assertEquals(target, 5);
-    }
-
-    @Test
-    public void pedInArea() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
-        ped.setPosition(new VPoint(0.,0.));
-
-        String msg = readInputFile();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-
-        // keep old target nr.5 because timeout reached
-        routeChoice.update(msg, -1.);
-
-        int target = ped.getNextTargetId();
-        assertEquals(target, 4);
-    }
-
-    @Test
-    public void pedInRectangle() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
-        ped.setPosition(new VPoint(5.,5.));
-
-        String msg = readInputFile3();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-
-        // keep old target nr.5 because timeout reached
-        routeChoice.update(msg, -1.);
-
-        int target = ped.getNextTargetId();
-        assertEquals(target, 2);
-    }
-
-
-
-
-    public void commandIdMissing() {
-        // the route choice app requires a unique command id.
-
-        Topography topo = createTopography(createPedestrians(1));
-        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
-        ped.setPosition(new VPoint(0.,0.));
-
-        String msg = readInputFile2();
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo, new ReactionModel());
-
-        routeChoice.update(msg, -1.);
-    }
-
-    @Test
-    public void testCommandIdMissingWrapper() {
-        try {
-            commandIdMissing();
-        } catch (final IllegalArgumentException e) {
-            assertTrue(e.getMessage().equals("Please provide a unique commandId != 0 for each command. Otherwise, information might not be processed."));
-        }
-    }
-
-    @Test
-    public void testHandleRecurringInformation() {
-
-        // Create a single pedestrian with initial target nr. 5
-        Topography topo = createTopography(createPedestrians(1));
-        Pedestrian ped =  topo.getPedestrianDynamicElements().getElement(0);
-        ped.setPosition(new VPoint(0.,0.));
-
-        RouteChoice routeChoice = new RouteChoice();
-        routeChoice.init(topo,new ReactionModel());
-        // keep old target nr.5 because timeout reached
-        routeChoice.update(readInputFile(), -1.);
-        assertEquals(ped.getNextTargetId(), 4);
-
-        // readInputFile3() provides target 2. it is skipped because the command id is the same.
-        routeChoice.update(readInputFile3(), -1.);
-        assertEquals(ped.getNextTargetId(), 4);
 
     }
 

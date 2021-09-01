@@ -1,5 +1,6 @@
 package org.vadere.simulator.control.external.reaction;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,18 +49,20 @@ public class InformationFilterSettings {
 
     public boolean isReactingToRecurringInformation(){
         String key = "isReactingToRecurringInformation";
-
-        if (rawCommand.has(key)) {
-            return rawCommand.getBoolean(key);
+        if (rawCommand != null) {
+            if (rawCommand.has(key)) {
+                return rawCommand.getBoolean(key);
+            }
         }
         return isReactingToRecurringInformation;
     }
 
     public boolean isReactingToFirstInformationOnly(){
         String key = "isReactingToFirstInformationOnly";
-
-        if (rawCommand.has(key)) {
-            return rawCommand.getBoolean(key);
+        if (rawCommand != null) {
+            if (rawCommand.has(key)) {
+                return rawCommand.getBoolean(key);
+            }
         }
         return isReactingToFirstInformationOnly;
     }
@@ -67,13 +70,13 @@ public class InformationFilterSettings {
 
     public int getNrOptions() {
         String key = "numberOfReactionProbabilities";
-
-        if (options == -1) {
-
-            if (rawCommand.has(key)) {
-                options = rawCommand.getInt(key);
-            } else {
-                options = 1;
+        if (rawCommand != null) {
+            if (options == -1) {
+                if (rawCommand.has(key)) {
+                    options = rawCommand.getInt(key);
+                } else {
+                    options = 1;
+                }
             }
         }
         return options;
