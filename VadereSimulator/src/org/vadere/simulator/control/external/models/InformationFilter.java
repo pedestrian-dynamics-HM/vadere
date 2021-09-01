@@ -32,6 +32,7 @@ public class InformationFilter {
     public InformationFilter(InformationFilterSettings informationFilterSettings) {
         this.isReactingToFirstInformationOnly =  informationFilterSettings.isReactingToFirstInformationOnly();
         this.isReactingToRecurringInformation = informationFilterSettings.isReactingToRecurringInformation();
+        this.processedCommandIds = new HashMap<>();
     }
 
     public boolean isInformationProcessed(Pedestrian ped, VShape shape, double simTime, double executionTime,  int commandId){

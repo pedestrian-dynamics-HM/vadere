@@ -26,7 +26,7 @@ public class RouteChoice extends ControlModel {
 
 
     @Override
-    protected Stimulus addStimulusForPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
+    protected Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
 
         LinkedList<Double> probs = readProbabilitiesFromJson(command);
         LinkedList<Integer> targets = readTargetsFromJson(command);
@@ -58,7 +58,7 @@ public class RouteChoice extends ControlModel {
 
     private int getIndexFromRandomDistribution(final LinkedList<Double> probabilityValues) {
 
-        LinkedList<Integer> indices = (LinkedList<Integer>) IntStream.range(0, probabilityValues.size()).boxed().collect(Collectors.toList());
+        LinkedList<Integer> indices = IntStream.range(0, probabilityValues.size()).boxed().collect(Collectors.toCollection(LinkedList::new));
         EnumeratedIntegerDistribution dist = getDiscreteDistribution(indices, probabilityValues);
         return dist.sample();
     }
