@@ -3,24 +3,19 @@ package org.vadere.simulator.control.external.models;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.vadere.simulator.control.external.reaction.ReactionModel;
-import org.vadere.simulator.models.bhm.PedestrianBHM;
-import org.vadere.simulator.models.osm.OptimalStepsModel;
-import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class RouteChoice extends ControlModel {
 
-    private JSONObject command;
     private Random random;
 
     public RouteChoice() {
@@ -30,53 +25,55 @@ public class RouteChoice extends ControlModel {
 
 
     @Override
-    protected void generateStimulusforPed(Pedestrian ped, JSONObject pedCommand, int commandId) {
+    protected void generateStimulusforPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
 
-        command = pedCommand;
-        // get information from controller
-        final Pair<LinkedList<Integer>, Double> targetAndProb = getTargetFromNavigationApp();
+        LinkedList<Double> probs = readProbabilitiesFromJson(command);
+        LinkedList<Integer> targets = readTargetsFromJson(command);
+        LinkedList<Double> reaction = readReactionProbabilitiesFromJson(command);
 
-        double prob = targetAndProb.getValue();
-        LinkedList<Integer> targets = targetAndProb.getKey();
+        int newTargetindex = getIndexFromRandomDistribution(probs);
+        LinkedList<Integer> newTarget = getTargetFromIndex(newTargetindex, targets);
+        double acceptanceRate = getReactionProbabilityFromIndex(newTargetindex, reaction);
 
-        double timeCommandExecuted;
-        timeCommandExecuted = this.simTime + getSimTimeStepLength();
-        ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
-        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, prob, targets, commandId), timeCommandExecuted);
-        logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + targets);
-
+        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, acceptanceRate, newTarget, commandId), timeCommandExecuted);
+        logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTarget);
     }
 
 
-    private Pair<LinkedList<Integer>, Double> getTargetFromNavigationApp() {
-
-        LinkedList<Integer> targets = readTargetsFromJson();
-        LinkedList<Double> probs = readProbabilitiesFromJson();
-        LinkedList<Double> reactionsProbs = readReactionProbabilitiesFromJson();
-
-        EnumeratedIntegerDistribution dist = getDiscreteDistribution(targets, probs);
-        int newTargetId = dist.sample();
+    private LinkedList<Integer> getTargetFromIndex(int newTargetIndex, LinkedList<Integer> targets) {
 
         LinkedList<Integer> nextTarget = new LinkedList<>();
+        int newTargetId = targets.get(newTargetIndex);
         nextTarget.add(newTargetId);
-        double probability =  reactionsProbs.get(targets.indexOf(newTargetId));
+        return nextTarget;
+    }
 
-        return new Pair<>(nextTarget, probability);
+    private double getReactionProbabilityFromIndex(int newTargetIndex, LinkedList<Double> acceptanceRates) {
 
+        if (acceptanceRates.size() == 1){
+            return acceptanceRates.getFirst();
+        }
+        return acceptanceRates.get(newTargetIndex);
+    }
+
+    private int getIndexFromRandomDistribution(final LinkedList<Double> probabilityValues) {
+
+        LinkedList<Integer> indices = (LinkedList<Integer>) IntStream.range(0, probabilityValues.size()).boxed().collect(Collectors.toList());
+        EnumeratedIntegerDistribution dist = getDiscreteDistribution(indices, probabilityValues);
+        return dist.sample();
     }
 
     private EnumeratedIntegerDistribution getDiscreteDistribution(LinkedList<Integer> possibleTargets, LinkedList<Double> probs){
 
-
         RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
-
         return new EnumeratedIntegerDistribution(rng,
                 possibleTargets.stream().mapToInt(i -> i).toArray(),
                 probs.stream().mapToDouble(i -> i).toArray());
     }
 
+    // read required target distribution from json, read acceptance rate from json
 
-    private LinkedList<Integer> readTargetsFromJson() {
+    private LinkedList<Integer> readTargetsFromJson(JSONObject command) {
         LinkedList<Integer> targets = new LinkedList<>();
         JSONArray targetList = (JSONArray) command.get("targetIds");
 
@@ -86,7 +83,7 @@ public class RouteChoice extends ControlModel {
         return targets;
     }
 
-    private LinkedList<Double> readProbabilitiesFromJson() {
+    private LinkedList<Double> readProbabilitiesFromJson(JSONObject command) {
         LinkedList<Double> probs = new LinkedList<>();
         JSONArray targetList = (JSONArray) command.get("probability");
 
@@ -96,7 +93,7 @@ public class RouteChoice extends ControlModel {
         return probs;
     }
 
-    private LinkedList<Double> readReactionProbabilitiesFromJson() {
+    private LinkedList<Double> readReactionProbabilitiesFromJson(JSONObject command) {
         LinkedList<Double> probs = new LinkedList<>();
 
         JSONArray targetList = (JSONArray) command.get("reactionProbability");
@@ -104,7 +101,6 @@ public class RouteChoice extends ControlModel {
         for (int i = 0; i < targetList.length(); i++) {
             probs.add(targetList.getDouble(i));
         }
-
         return probs;
     }
 

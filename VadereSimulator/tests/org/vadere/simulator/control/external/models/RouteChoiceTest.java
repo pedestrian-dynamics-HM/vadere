@@ -3,7 +3,6 @@ package org.vadere.simulator.control.external.models;
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
-import org.vadere.simulator.control.external.reaction.ReactionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;

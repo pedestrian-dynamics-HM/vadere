@@ -6,7 +6,6 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import rx.Subscription;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -35,8 +34,8 @@ public class InformationFilter {
         this.isReactingToRecurringInformation = informationFilterSettings.isReactingToRecurringInformation();
     }
 
-    public boolean isInformationProcessed(Pedestrian ped, VShape shape, double simTime, double executationTime,  int commandId){
-        return isInfoInTime(simTime, executationTime)
+    public boolean isInformationProcessed(Pedestrian ped, VShape shape, double simTime, double executionTime,  int commandId){
+        return isInfoInTime(simTime, executionTime)
                 && isPedInDefinedArea(ped, shape)
                 && isProcessSameInfoAgain(ped, commandId)
                 && isProcessDiverseInformation(ped);
