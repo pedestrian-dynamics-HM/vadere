@@ -10,7 +10,7 @@ import java.util.Collection;
 public abstract class PerceptionModel implements IPerceptionModel {
 
 
-    void updateInformationStateSingleAgent(Pedestrian pedestrian) {
+    void setInformationState(Pedestrian pedestrian) {
         // in deterministic models, all agents react to ..
         Stimulus mostImportantStimulus = pedestrian.getMostImportantStimulus();
         if ((pedestrian.getKnowledgeBase().getInformationState() == InformationState.NO_INFORMATION)
@@ -30,7 +30,7 @@ public abstract class PerceptionModel implements IPerceptionModel {
 
     public void updateInformationState(Pedestrian pedestrian){
         // Assume that an agent is informed and reacts to information a..
-        updateInformationStateSingleAgent(pedestrian);
+        setInformationState(pedestrian);
         // handle group members separately
         setInformationStateGroupMember(pedestrian.getPedGroupMembers());
     }

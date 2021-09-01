@@ -4,7 +4,7 @@ package org.vadere.simulator.control.external.models;
 import org.json.JSONObject;
 import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.state.psychology.information.InformationState;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public abstract class ControlModel implements IControlModel, InformationModel {
+public abstract class ControlModel implements IControlModel {
 
     public static Logger logger = Logger.getLogger(Subscription.class);
 
@@ -35,40 +35,32 @@ public abstract class ControlModel implements IControlModel, InformationModel {
         this.informationFilter = new InformationFilter(informationFilterSettings);
     }
 
-    protected abstract void generateStimulusforPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted);
+    protected abstract Stimulus addStimulusForPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted);
 
     public void update(String commandRaw, Double time, int pedId)  {
 
         CtlCommand command = new CtlCommand(commandRaw);
 
         Collection<Pedestrian> pedestrians;
-        if (pedId == -1){
-            pedestrians = new ArrayList<>(topography.getPedestrianDynamicElements().getElements());
-        }
-        else{
-            pedestrians = topography.getPedestrianDynamicElements().getElements().stream().filter(pedestrian -> pedestrian.getId() == pedId).collect(Collectors.toList());
-        }
+        if (pedId == -1) pedestrians = new ArrayList<>(topography.getPedestrianDynamicElements().getElements());
+        else pedestrians = topography.getPedestrianDynamicElements().getElements().stream().filter(pedestrian -> pedestrian.getId() == pedId).collect(Collectors.toList());
 
         for (Pedestrian ped : pedestrians) {
             if (this.informationFilter.isInformationProcessed(ped, command.getSpace(), time, command.getExecTime(), command.getCommandId())){
-                this.generateStimulusforPed(ped, command.getPedCommand(), command.getCommandId(), getTimeCommandExecuted(time));
-
+                // single agent
+                Stimulus stimulus = this.addStimulusForPed(ped, command.getPedCommand(), command.getCommandId(), getTimeCommandExecuted(time));
+                this.stimulusController.setDynamicStimulus(ped, stimulus, getTimeCommandExecuted(time));
                 this.informationFilter.setPedProcessedCommandIds(ped, command.getCommandId());
-                setInformationState(ped);
 
+                // One stimulus per group is sufficient
                 for (Pedestrian groupMember : ped.getPedGroupMembers()){
-                    this.informationFilter.setPedProcessedCommandIds(ped, command.getCommandId());
-                    setInformationStateGroupMember(groupMember);
+                    this.stimulusController.setDynamicStimulus(groupMember, stimulus, getTimeCommandExecuted(time)); // necessary?
+                    this.informationFilter.setPedProcessedCommandIds(groupMember, command.getCommandId());
                 }
             }
-
-
-
         }
 
-
     }
-
 
 
     public double getTimeCommandExecuted(double currentTime) {

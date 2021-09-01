@@ -117,6 +117,6 @@ public abstract class Stimulus implements Cloneable {
 
     @Override
     public abstract boolean equals(Object that);
-
+    
 
     }

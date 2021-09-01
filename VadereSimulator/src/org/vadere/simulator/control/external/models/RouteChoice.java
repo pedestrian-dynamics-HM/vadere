@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ public class RouteChoice extends ControlModel {
 
 
     @Override
-    protected void generateStimulusforPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
+    protected Stimulus addStimulusForPed(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
 
         LinkedList<Double> probs = readProbabilitiesFromJson(command);
         LinkedList<Integer> targets = readTargetsFromJson(command);
@@ -35,8 +36,7 @@ public class RouteChoice extends ControlModel {
         LinkedList<Integer> newTarget = getTargetFromIndex(newTargetindex, targets);
         double acceptanceRate = getReactionProbabilityFromIndex(newTargetindex, reaction);
 
-        this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, acceptanceRate, newTarget, commandId), timeCommandExecuted);
-        logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTarget);
+        return new ChangeTarget(timeCommandExecuted, acceptanceRate, newTarget, commandId);
     }
 
 
