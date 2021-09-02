@@ -24,7 +24,7 @@ public class InformationFilter {
 
     public static Logger logger = Logger.getLogger(Subscription.class);
 
-    protected HashMap<Pedestrian, LinkedList<Integer>> processedCommandIds;
+    protected HashMap<Pedestrian, LinkedList<Integer>> processedCommandIds = new HashMap<>();
     protected boolean isReactingToFirstInformationOnly;
     protected boolean isReactingToRecurringInformation;
 
@@ -35,11 +35,22 @@ public class InformationFilter {
         this.processedCommandIds = new HashMap<>();
     }
 
+
+    public InformationFilter(boolean isReactingToFirstInformationOnly, boolean isReactingToRecurringInformation){
+        this.isReactingToFirstInformationOnly =  isReactingToFirstInformationOnly;
+        this.isReactingToRecurringInformation = isReactingToRecurringInformation;
+    }
+
+    public InformationFilter(){
+        this.isReactingToFirstInformationOnly = true;
+        this.isReactingToRecurringInformation = false;
+    }
+
     public boolean isInformationProcessed(Pedestrian ped, VShape shape, double simTime, double executionTime,  int commandId){
         return isInfoInTime(simTime, executionTime)
                 && isPedInDefinedArea(ped, shape)
                 && isProcessSameInfoAgain(ped, commandId)
-                && isProcessDiverseInformation(ped);
+                && isProcessFirstInformationOnly(ped);
     }
 
     public void setPedProcessedCommandIds(Pedestrian ped, int id){
@@ -53,7 +64,7 @@ public class InformationFilter {
         this.processedCommandIds.put(ped, ids);
     }
 
-    private boolean isProcessDiverseInformation(Pedestrian ped) {
+    boolean isProcessFirstInformationOnly(Pedestrian ped) {
         if (this.isReactingToFirstInformationOnly && processedCommandIds.containsKey(ped)){
             return processedCommandIds.get(ped).isEmpty();
         }
@@ -61,14 +72,16 @@ public class InformationFilter {
     }
 
 
-    private boolean isProcessSameInfoAgain(Pedestrian ped, int id) {
+    boolean isProcessSameInfoAgain(Pedestrian ped, int id) {
         if (processedCommandIds.containsKey(ped)){
-            return processedCommandIds.get(ped).contains(id);
+            if (processedCommandIds.get(ped).contains(id)){
+                return this.isReactingToRecurringInformation;
+            }
         }
         return true;
     }
 
-    private boolean isPedInDefinedArea(Pedestrian ped, VShape shape) {
+    boolean isPedInDefinedArea(Pedestrian ped, VShape shape) {
         if (shape != null) {
             return shape.contains(ped.getPosition());
         }

@@ -65,6 +65,17 @@ public class RouteChoiceTest {
 
     }
 
+    @Test
+    public void generateStimulusFromEmptyCommand() {
+        //TODO add
+
+    }
+
+    @Test
+    public void generateStimulusFromOneOptionOnly() {
+        //TODO add
+    }
+
 
 
 
