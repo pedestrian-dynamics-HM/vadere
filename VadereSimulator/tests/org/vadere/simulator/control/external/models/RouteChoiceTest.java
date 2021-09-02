@@ -4,28 +4,14 @@ package org.vadere.simulator.control.external.models;
 import org.apache.commons.math3.util.Precision;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
-import org.vadere.simulator.control.psychology.perception.StimulusController;
-import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
-import org.vadere.state.psychology.perception.types.ElapsedTime;
-import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.LinkedList;
+import java.util.Random;
 
 
 public class RouteChoiceTest {
@@ -46,27 +32,36 @@ public class RouteChoiceTest {
     @Test
     public void generateStimulusFromCommand() {
 
+        //The RouteChoice Model generates a stimulus distribution. The distribution is defined by the attribute probabilites.
+        //Example
+        //[11,12, 13] -> targetIds
+        //[0.5,0.5,0.0] -> probabilites
+        //means that 50% of the agents should go to target 11 and 50% to target 12.
+        // No agent receives the instruction to go to target 13. Whether an agent reacts
+        // to the instruction then depends on the psychological model chosen.
+
         JSONObject json;
         json = new JSONObject(readInputFile());
-
-        JSONObject commmand = json.getJSONObject("command");
+        JSONObject command = json.getJSONObject("command");
 
         int commandId = 1;
-        double acceptanceRate = 0.72;
         double timeCommandExecuted = 1.3;
         LinkedList<Integer> targetIds = new LinkedList<>();
         targetIds.add(4);
 
+
+        double[] shouldProbabilities = {0.25, 0, 0.25, 0.5}; //TODO read from json directly
+        double[] isProbabilites = {0., 0., 0., 0.};
+        int numberOfAgents = 10000;
+
         RouteChoice routeChoice = new RouteChoice();
-        Stimulus stimulus = routeChoice.getStimulusFromJsonCommand(new Pedestrian(new AttributesAgent(), new Random(42)), commmand, commandId, timeCommandExecuted);
-
-        ChangeTarget expectedStimulus = new ChangeTarget(timeCommandExecuted, acceptanceRate, targetIds, commandId);
-
-        assertEquals(stimulus, expectedStimulus);
-
-
-
-
+        ChangeTarget stimulus = null;
+        for (int i = 0; i < numberOfAgents; i++) {
+            stimulus = (ChangeTarget) routeChoice.getStimulusFromJsonCommand(new Pedestrian(new AttributesAgent(), new Random(42)), command, commandId, timeCommandExecuted);
+            int newTarget = stimulus.getNewTargetIds().getFirst();
+            isProbabilites[newTarget] += 1./numberOfAgents; // targets =  {0, 1, 2, 3}; tagetsIds = indices
+        }
+        for (int ii = 0; ii < 4 ; ii++) Precision.equals(shouldProbabilities[ii], isProbabilites[ii], 0.02);
 
     }
 
