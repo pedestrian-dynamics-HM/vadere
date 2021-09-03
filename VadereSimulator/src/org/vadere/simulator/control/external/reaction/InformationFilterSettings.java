@@ -1,12 +1,12 @@
 package org.vadere.simulator.control.external.reaction;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
-public class ReactionParameter {
+public class InformationFilterSettings {
 
     int options = -1;
     HashMap<Integer, DistParameters> dist = new HashMap<>();
@@ -14,13 +14,14 @@ public class ReactionParameter {
     private boolean isReactingToRecurringInformation = false;
     private boolean isReactingToFirstInformationOnly = true;
 
+    public InformationFilterSettings(){}
 
-    public ReactionParameter(String command) {
+    public InformationFilterSettings(String command) {
         this(new JSONObject(command));
     }
 
 
-    public ReactionParameter(JSONObject command) {
+    public InformationFilterSettings(JSONObject command) {
         rawCommand = command;
     }
 
@@ -48,18 +49,20 @@ public class ReactionParameter {
 
     public boolean isReactingToRecurringInformation(){
         String key = "isReactingToRecurringInformation";
-
-        if (rawCommand.has(key)) {
-            return rawCommand.getBoolean(key);
+        if (rawCommand != null) {
+            if (rawCommand.has(key)) {
+                return rawCommand.getBoolean(key);
+            }
         }
         return isReactingToRecurringInformation;
     }
 
     public boolean isReactingToFirstInformationOnly(){
         String key = "isReactingToFirstInformationOnly";
-
-        if (rawCommand.has(key)) {
-            return rawCommand.getBoolean(key);
+        if (rawCommand != null) {
+            if (rawCommand.has(key)) {
+                return rawCommand.getBoolean(key);
+            }
         }
         return isReactingToFirstInformationOnly;
     }
@@ -67,13 +70,13 @@ public class ReactionParameter {
 
     public int getNrOptions() {
         String key = "numberOfReactionProbabilities";
-
-        if (options == -1) {
-
-            if (rawCommand.has(key)) {
-                options = rawCommand.getInt(key);
-            } else {
-                options = 1;
+        if (rawCommand != null) {
+            if (options == -1) {
+                if (rawCommand.has(key)) {
+                    options = rawCommand.getInt(key);
+                } else {
+                    options = 1;
+                }
             }
         }
         return options;

@@ -5,10 +5,8 @@ import org.jfree.data.json.impl.JSONObject;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.manager.traci.commandHandler.annotation.PolygonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandler;
 import org.vadere.manager.traci.commandHandler.annotation.SimulationHandlers;
-import org.vadere.manager.traci.commandHandler.variables.PolygonVar;
 import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -21,7 +19,7 @@ import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.external.models.ControlModelBuilder;
 import org.vadere.simulator.control.external.models.IControlModel;
-import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
@@ -196,25 +194,26 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			name = "init_control", ignoreElementId = true )
 	public TraCICommand process_init_control(TraCISetCommand cmd, RemoteManager remoteManager) {
 		String controlModelName, controlModelType;
-		String reactionModelParameter;
+		String infoFilterConfig;
 
 		try {
 
 			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
 			controlModelName = (String) cfg.getData(0, TraCIDataType.STRING);
 			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
-			reactionModelParameter = (String) cfg.getData(2, TraCIDataType.STRING);
+			infoFilterConfig = (String) cfg.getData(2, TraCIDataType.STRING);
 
 			remoteManager.accessState((manager, state) -> {
 				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
-				ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
-				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
+				if (!isUsePsychologyLayer){
+					cmd.setErr("Psychology layer must be active. Set isUsePsychologyLayer: true in *.scenario file.");
+				}
 
+				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 				if (!iControlModelHashMap.containsKey(controlModelName)) {
-					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
+					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType, topography, stimulusController, simTimeStepLength, new InformationFilterSettings(infoFilterConfig));
 					iControlModelHashMap.put(controlModelName, controlModel);
 				}
 
@@ -251,12 +250,9 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 				remoteManager.accessState((manager, state) -> {
 					StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 					Topography topography = state.getTopography();
-					boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
-					ReactionModel reactionModel = new ReactionModel();
 					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
-					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel, simTimeStepLength);
+					IControlModel controlModel = ControlModelBuilder.getModel(model_name, topography, stimulusController, simTimeStepLength, new InformationFilterSettings());
 					iControlModelHashMap.put(model_name, controlModel);
 				});
 			}

@@ -44,14 +44,16 @@ public class ChangeTargetScripted extends Stimulus {
     // Member Variables
     private double allowedTimeDelta;
     private boolean changeRemainingPedestrians;
-    private LinkedList<Integer> originalTargetIds;
-    private LinkedList<Integer> newTargetIds;
-    private LinkedList<Double> simTimesToChangeTarget;
-    private LinkedList<Integer> totalAgentsToChangeTarget;
+    private LinkedList<Integer> originalTargetIds = new LinkedList<>();
+    private LinkedList<Integer> newTargetIds = new LinkedList<>();
+    private LinkedList<Double> simTimesToChangeTarget = new LinkedList<>();
+    private LinkedList<Integer> totalAgentsToChangeTarget = new LinkedList<>();
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
-    public ChangeTargetScripted() { super(); }
+    public ChangeTargetScripted() {
+        super();
+    }
 
     public ChangeTargetScripted(double time) {
         super(time);
@@ -63,7 +65,11 @@ public class ChangeTargetScripted extends Stimulus {
 
     public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds) {
         super(time);
+        this.newTargetIds = newTargetIds;
+    }
 
+    public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds, int id) {
+        super(time, id);
         this.newTargetIds = newTargetIds;
     }
 
@@ -139,7 +145,7 @@ public class ChangeTargetScripted extends Stimulus {
         if(!(that instanceof ChangeTargetScripted)) return false;
         ChangeTargetScripted thatChangeTarget = (ChangeTargetScripted) that;
         boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb && this.newTargetIds == thatChangeTarget.getNewTargetIds();
+        return isProb && this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
     }
 
 }

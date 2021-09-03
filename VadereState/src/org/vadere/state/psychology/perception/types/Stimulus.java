@@ -47,22 +47,32 @@ public abstract class Stimulus implements Cloneable {
     protected double time;
     protected double perceptionProbability;
 
+
+    protected int id;
+
     // Constructors
     // Default constructor required for JSON de-/serialization.
     protected Stimulus() {
 
         this.time = 0;
         this.perceptionProbability = 1.0;
+        this.id = -1;
     }
 
     protected Stimulus(double time) {
         this.time = time;
         this.perceptionProbability = 1.0;
+        this.id = -1;
     }
 
     protected Stimulus(double time, double perceptionProbability) {
         this.time = time;
         this.perceptionProbability = perceptionProbability;
+    }
+    protected Stimulus(double time, double perceptionProbability, int id) {
+        this.time = time;
+        this.perceptionProbability = perceptionProbability;
+        this.id = id;
     }
 
     protected Stimulus(Stimulus other) {
@@ -74,13 +84,15 @@ public abstract class Stimulus implements Cloneable {
         return time;
     }
     public double getPerceptionProbability() {return perceptionProbability; }
+    public int getId() { return id; }
 
     // Setter
-    public void setTime(double time) {
-        this.time = time;
-    }
+    public void setTime(double time) { this.time = time; }
     public void setPerceptionProbability(double perceptionProbability){
         this.perceptionProbability = perceptionProbability;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Methods

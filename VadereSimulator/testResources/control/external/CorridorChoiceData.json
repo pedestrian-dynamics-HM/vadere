@@ -6,8 +6,9 @@
      "radius": 100
   },
   "command" : {
-    "targetIds" : [1,2,3,4] ,
-    "probability" : [0.25, 0, 0.25, 0.5]
+    "targetIds" : [0,1,2,3] ,
+    "probability" : [0.25, 0, 0.25, 0.5],
+    "reactionProbability" : [0.8, 0.9, 0.7, 0.72]
   },
   "commandId" : 1
 }
