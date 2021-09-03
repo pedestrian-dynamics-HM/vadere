@@ -22,10 +22,18 @@ public class WaitInArea extends Stimulus {
     public WaitInArea(double time, double probability) {
         super(time, probability);
     }
+    public WaitInArea(double time, double probability, int id) {
+        super(time, probability, id);
+    }
+
 
     public WaitInArea(double time, VShape area) {
         super(time);
+        this.area = area;
+    }
 
+    public WaitInArea(double time, VShape area, int id) {
+        super(time, id);
         this.area = area;
     }
 

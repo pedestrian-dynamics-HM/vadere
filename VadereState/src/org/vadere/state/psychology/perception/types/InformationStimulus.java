@@ -24,11 +24,19 @@ public class InformationStimulus extends Stimulus {
 		this.obsolete_at = obsolete_at;
 	}
 
+	public InformationStimulus(double time, double obsolete_at, String information, int id) {
+		super(time, id);
+		this.information = information;
+		this.obsolete_at = obsolete_at;
+	}
+
 	public InformationStimulus(InformationStimulus other) {
 		super(other.time);
 		this.information = other.information;
 		this.obsolete_at  = other.obsolete_at;
 	}
+
+
 
 	public String getInformation() {
 		return information;

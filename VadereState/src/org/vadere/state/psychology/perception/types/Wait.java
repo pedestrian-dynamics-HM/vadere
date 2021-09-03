@@ -18,6 +18,11 @@ public class Wait extends Stimulus {
         super(time, probability);
     }
 
+    public Wait(double time, double probability, int id) {
+        super(time, probability, id);
+    }
+
+
     public Wait(Wait other) { super(other.time); }
 
     // Methods

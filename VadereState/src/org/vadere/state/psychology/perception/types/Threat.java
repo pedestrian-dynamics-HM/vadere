@@ -27,6 +27,11 @@ public class Threat extends Stimulus {
         super(time, probability);
     }
 
+    public Threat(double time, double probability, int id) {
+        super(time, probability, id);
+    }
+
+
     public Threat(double time, int originAsTargetId) {
         super(time);
 

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *
  * ChangeTargetScripted > ChangeTarget > Threat > Wait > WaitInArea > ElapsedTime
  */
-public class SimplePerceptionModel implements IPerceptionModel {
+public class SimplePerceptionModel extends PerceptionModel {
 
     private Topography topography;
 
@@ -29,6 +29,7 @@ public class SimplePerceptionModel implements IPerceptionModel {
         for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
             Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
+            updateInformationState(pedestrian);
         }
     }
 

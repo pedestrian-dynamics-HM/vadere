@@ -24,6 +24,13 @@ public class KnowledgeItem extends Stimulus {
 		this.obsoleteAt = obsoleteAt;
 	}
 
+
+	public KnowledgeItem(double time, double obsoleteAt, String informationId, int id) {
+		super(time, id);
+		this.informationId = informationId;
+		this.obsoleteAt = obsoleteAt;
+	}
+
 	public KnowledgeItem(KnowledgeItem other) {
 		super(other.time);
 		this.informationId = other.informationId;
