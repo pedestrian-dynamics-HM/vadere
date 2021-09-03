@@ -44,14 +44,16 @@ public class ChangeTargetScripted extends Stimulus {
     // Member Variables
     private double allowedTimeDelta;
     private boolean changeRemainingPedestrians;
-    private LinkedList<Integer> originalTargetIds;
-    private LinkedList<Integer> newTargetIds;
-    private LinkedList<Double> simTimesToChangeTarget;
-    private LinkedList<Integer> totalAgentsToChangeTarget;
+    private LinkedList<Integer> originalTargetIds = new LinkedList<>();
+    private LinkedList<Integer> newTargetIds = new LinkedList<>();
+    private LinkedList<Double> simTimesToChangeTarget = new LinkedList<>();
+    private LinkedList<Integer> totalAgentsToChangeTarget = new LinkedList<>();
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
-    public ChangeTargetScripted() { super(); }
+    public ChangeTargetScripted() {
+        super();
+    }
 
     public ChangeTargetScripted(double time) {
         super(time);

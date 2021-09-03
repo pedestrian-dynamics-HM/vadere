@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class ChangeTarget extends Stimulus {
 
     // Member Variables
-    private LinkedList<Integer> newTargetIds;
+    private LinkedList<Integer> newTargetIds = new LinkedList<>();
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
