@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.external.models;
 
-import javafx.scene.shape.Rectangle;
 import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -13,12 +12,10 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.io.IOUtils;
 
-import java.io.IOException;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 public class InformationFilterTest {
 
@@ -133,32 +130,44 @@ public class InformationFilterTest {
 
 
     @Test
-    public void testPedInArea(){
+    public void testPedInNullArea() {
         int commandId = 55;
         Topography topo = createTopography(createPedestrians(2));
         InformationFilter filter = new InformationFilter(false, false);
 
         VRectangle rectangle = new VRectangle(0, 0, 5, 5);
-
         Collection<Pedestrian> peds = topo.getPedestrianDynamicElements().getElements();
-        peds.stream().forEach(pedestrian -> pedestrian.setPosition(new VPoint(0, 5.0 * pedestrian.getId())));
+        peds.stream().forEach(pedestrian -> pedestrian.setPosition(new VPoint(1, 4.0 * pedestrian.getId())));
 
 
-        for (Pedestrian ped : topo.getPedestrianDynamicElements().getElements()){
+        for (Pedestrian ped : topo.getPedestrianDynamicElements().getElements()) {
             filter.setPedProcessedCommandIds(ped, commandId);
-            assert(filter.isPedInDefinedArea(ped, null));
-            if (ped.getId() == 2) {
-                assertFalse(filter.isPedInDefinedArea(ped, rectangle));
+            assert (filter.isPedInDefinedArea(ped, null));
+        }
+    }
+
+        @Test
+        public void testPedInArea() {
+            int commandId = 55;
+            Topography topo = createTopography(createPedestrians(2));
+            InformationFilter filter = new InformationFilter(false, false);
+
+            VRectangle rectangle = new VRectangle(0, 0, 5, 5);
+            Collection<Pedestrian> peds = topo.getPedestrianDynamicElements().getElements();
+            peds.stream().forEach(pedestrian -> pedestrian.setPosition(new VPoint(1, 4.0 * pedestrian.getId())));
+
+
+            for (Pedestrian ped : topo.getPedestrianDynamicElements().getElements()) {
+                filter.setPedProcessedCommandIds(ped, commandId);
+                if (ped.getId() == 2) {
+                    // only ped with id = 2 is outside area
+                    assertFalse(filter.isPedInDefinedArea(ped, rectangle));
+                } else assert (filter.isPedInDefinedArea(ped, rectangle));
             }
-            else assert(filter.isPedInDefinedArea(ped, rectangle)); // TODO Vshape problem
         }
 
 
 
-
-
-
-    }
 
 
 
