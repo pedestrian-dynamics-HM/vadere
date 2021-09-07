@@ -5,13 +5,17 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.traci.CompoundObject;
+import org.vadere.state.traci.CompoundObjectBuilder;
+import org.vadere.state.traci.CompoundObjectProvider;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.util.logging.Logger;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @DataProcessorClass
-public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer> {
+public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer>  implements CompoundObjectProvider {
 
 	private static Logger logger = Logger.getLogger(PedestrianGroupIDProcessor.class);
 	private LinkedList<Integer> processedAgentIds;
@@ -71,4 +75,28 @@ public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<Ti
 	public void resetProcessedAgentIds() {
 		this.processedAgentIds = new LinkedList<>();
 	}
+
+	@Override
+	public CompoundObject provide(CompoundObjectBuilder builder) {
+		int timestep = this.getLastKey().getTimestep();
+		List<TimestepPedestrianIdKey> keys = this.getKeys().stream().filter(key -> key.getTimestep() == timestep).collect(Collectors.toList());
+
+		ArrayList<String> pedIds = new ArrayList<>();
+		ArrayList<String> commandIds = new ArrayList<>();
+
+		for (TimestepPedestrianIdKey key : keys){
+			Integer commandId = this.getData().get(key);
+			Integer pedId = key.getPedestrianId();
+
+			commandIds.add(commandId.toString());
+			pedIds.add(pedId.toString());
+		}
+
+		return builder.rest()
+				.add(TraCIDataType.INTEGER) // timestep
+				.add(TraCIDataType.STRING_LIST) //  pedestrian Id
+				.add(TraCIDataType.STRING_LIST) // command Id
+				.build(timestep, pedIds, commandIds);
+	}
+
 }
