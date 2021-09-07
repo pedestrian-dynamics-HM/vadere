@@ -81,10 +81,11 @@ public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<Ti
 		int timestep = this.getLastKey().getTimestep();
 		List<TimestepPedestrianIdKey> keys = this.getKeys().stream().filter(key -> key.getTimestep() == timestep).collect(Collectors.toList());
 
-		ArrayList<String> pedIds = new ArrayList<>();
-		ArrayList<String> commandIds = new ArrayList<>();
+		List<String> pedIds = new ArrayList<>();
+		List<String> commandIds = new ArrayList<>();
 
 		for (TimestepPedestrianIdKey key : keys){
+
 			Integer commandId = this.getData().get(key);
 			Integer pedId = key.getPedestrianId();
 
