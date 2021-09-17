@@ -111,7 +111,7 @@ public class TransmissionModel implements Model {
 
 	@Override
 	public void update(double simTimeInSec) {
-		logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
+		// logger.infof(">>>>>>>>>>>InfectionModelModel update  %f", simTimeInSec);
 
 		executePathogenEmissionEvents(simTimeInSec);
 		updateAerosolClouds(simTimeInSec);
