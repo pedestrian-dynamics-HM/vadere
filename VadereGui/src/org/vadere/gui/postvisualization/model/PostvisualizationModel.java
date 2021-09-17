@@ -7,6 +7,7 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
@@ -271,6 +272,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		if(trajectories.groupMembershipCol != -1) {
 			String groupMembershipString = row.getString(trajectories.groupMembershipCol);
 			pedestrian.setGroupMembership(GroupMembership.valueOf(groupMembershipString));
+		}
+
+		if(trajectories.infectionStatusCol != -1) {
+			String infectionStatusString = row.getString(trajectories.infectionStatusCol);
+			pedestrian.setInfectionStatus(InfectionStatus.valueOf(infectionStatusString));
+		}
+
+		if(trajectories.absorbedPathogenLoadCol != -1) {
+			pedestrian.setPathogenAbsorbedLoad(row.getDouble(trajectories.absorbedPathogenLoadCol));
+		}
+
+		if(trajectories.minInfectiousDoseCol != -1) {
+			pedestrian.setMinInfectiousDose(row.getDouble(trajectories.minInfectiousDoseCol));
 		}
 
 		return pedestrian;

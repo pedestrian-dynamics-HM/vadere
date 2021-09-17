@@ -266,6 +266,10 @@ public class Pedestrian extends Agent {
     	healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
     }
 
+    public void setPathogenAbsorbedLoad(double absorbedLoad) {
+        healthStatus.setPathogenAbsorbedLoad(absorbedLoad);
+    }
+
 	public void setMinInfectiousDose(double minInfectiousDose) {
     	healthStatus.setMinInfectiousDose(minInfectiousDose);
     }

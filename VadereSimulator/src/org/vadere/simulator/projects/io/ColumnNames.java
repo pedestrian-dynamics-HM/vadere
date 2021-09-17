@@ -26,6 +26,9 @@ public final class ColumnNames {
 	private Set<String> selfCategoryKeys;
 	private Set<String> informationStateKeys;
 	private Set<String> groupMembershipKeys;
+	private Set<String> infectionStatusKeys;
+	private Set<String> absorbedPathogenLoadKeys;
+	private Set<String> minInfectiousDoseKeys;
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -54,6 +57,9 @@ public final class ColumnNames {
 		selfCategoryKeys = new HashSet<>();
 		informationStateKeys = new HashSet<>();
 		groupMembershipKeys = new HashSet<>();
+		infectionStatusKeys = new HashSet<>();
+		absorbedPathogenLoadKeys = new HashSet<>();
+		minInfectiousDoseKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 		durationKeys = new HashSet<>();
@@ -89,6 +95,9 @@ public final class ColumnNames {
 		selfCategoryKeys.add("selfCategory");
 		informationStateKeys.add("informationState");
 		groupMembershipKeys.add("groupMembership");
+		infectionStatusKeys.add("infectionStatus");
+		absorbedPathogenLoadKeys.add("absorbedPathogenLoad");
+		minInfectiousDoseKeys.add("minInfectiousDose");
 
 		keys.add(pedestrianIdKeys);
 		keys.add(secondPedestrianIdKeys);
@@ -103,6 +112,9 @@ public final class ColumnNames {
 		keys.add(selfCategoryKeys);
 		keys.add(informationStateKeys);
 		keys.add(groupMembershipKeys);
+		keys.add(infectionStatusKeys);
+		keys.add(absorbedPathogenLoadKeys);
+		keys.add(minInfectiousDoseKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
 		keys.add(durationKeys);
@@ -124,6 +136,17 @@ public final class ColumnNames {
 		return getColId(dataFrame, groupMembershipKeys);
 	}
 
+	public int getInfectionStatusCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, infectionStatusKeys);
+	}
+
+	public int getAbsorbedPathogenLoadCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, absorbedPathogenLoadKeys);
+	}
+
+	public int getMinInfectiousDoseCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, minInfectiousDoseKeys);
+	}
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, pedestrianIdKeys);
