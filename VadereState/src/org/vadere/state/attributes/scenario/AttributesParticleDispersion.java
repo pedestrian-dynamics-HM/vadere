@@ -4,6 +4,8 @@ import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.awt.geom.Path2D;
+
 
 public abstract class AttributesParticleDispersion extends AttributesEmbedShape {
 
@@ -18,7 +20,10 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
         this.creationTime = -1;
         this.initialPathogenLoad = -1;
         this.currentPathogenLoad = -1;
-        this.shape = new VPolygon();
+
+        Path2D path = new Path2D.Double();
+        path.moveTo(0,0);
+        this.shape = new VPolygon(path);
     }
 
     public AttributesParticleDispersion(double creationTime, VShape shape){
