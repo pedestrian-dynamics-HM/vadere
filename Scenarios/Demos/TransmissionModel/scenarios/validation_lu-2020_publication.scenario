@@ -2,12 +2,12 @@
   "name" : "validation_lu-2020_publication",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "2add166d3f5279236a7498b8ccaf6ae7566f39b2",
+  "commithash" : "4931a4b110a6b8a27b180270ad76caf466e7de1d",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2 ]
+      "processors" : [ 1, 2, 5 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -33,6 +33,9 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
+      "id" : 5
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
