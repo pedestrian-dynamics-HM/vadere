@@ -1,0 +1,6 @@
+# ignore all supporting files and folders that do not originally belong to vadere
+
+*.md
+TopographySupportingMaterial/
+runAllScenarios/
+evaluation/
