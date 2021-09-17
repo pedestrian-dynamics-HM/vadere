@@ -5,95 +5,84 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.vadere.simulator.control.external.reaction.ReactionModel;
-import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
+import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+/*
+RouteChoice divides agents into different corridors. How the agents are to be distributed in percentage to the respective aisles is described with the help of a probability distribution.
+For a distribution
+[1,2,5] -> aisle name
+[0.8,0.2,0.0] -> probability == desired distribution
+80% of the people should take aisle 1 and 20% aisle 2.
+In reality, the drawing of the random aisle could be done with the help of an app.
+* */
 
 public class RouteChoice extends ControlModel {
 
-    private JSONObject command;
     private Random random;
-    private LinkedList<Integer> newTargetList;
-
-
 
     public RouteChoice() {
         super();
+        // The seed for generating the random distribution is simply set to 0,
+        // since the allocation should actually be deterministic (people should always be divided in the same way).
         random = new Random(0);
-        reactionModel = new ReactionModel();
     }
 
-
-
-    public void getControlAction(Pedestrian ped, JSONObject pedCommand) {
-
-        command = pedCommand;
-        // get information from controller
-        newTargetList = getTargetFromNavigationApp();
-    }
 
     @Override
-    public boolean isPedReact() {
+    protected Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
 
-        LinkedList<Integer> alternativeTargets = readTargetsFromJson();
-        int i = alternativeTargets.indexOf(newTargetList.get(0));
+        LinkedList<Double> probs = readProbabilitiesFromJson(command);
+        LinkedList<Integer> targets = readTargetsFromJson(command);
+        LinkedList<Double> reaction = readReactionProbabilitiesFromJson(command);
 
-        try {
-            return reactionModel.isPedReact(i);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
+        int newTargetindex = getIndexFromRandomDistribution(probs);
+        LinkedList<Integer> newTarget = getTargetFromIndex(newTargetindex, targets);
+        double acceptanceRate = getReactionProbabilityFromIndex(newTargetindex, reaction);
 
-    }
-
-    @Override
-    protected void triggerRedRaction(Pedestrian ped) {
-
-        LinkedList<Integer> oldTarget = ped.getTargets();
-
-        if (isUsePsychologyLayer()) {
-            double timeCommandExecuted = this.simTime + 0.4;
-            this.stimulusController.setDynamicStimulus(ped, new ChangeTarget(timeCommandExecuted, newTargetList), timeCommandExecuted);
-            logger.debug("Pedestrian " + ped.getId() + ": created Stimulus ChangeTarget. New target list " + newTargetList);
-        }else{
-            ped.setTargets(newTargetList);
-            ped.getKnowledgeBase().setInformationState(InformationState.INFORMATION_CONVINCING_RECEIVED);
-            logger.debug("Pedestrian " + ped.getId() + ": changed target list from " + oldTarget + " to " + newTargetList);
-        }
-
-
+        return new ChangeTarget(timeCommandExecuted, acceptanceRate, newTarget, commandId);
     }
 
 
-    private LinkedList<Integer> getTargetFromNavigationApp() {
+    private LinkedList<Integer> getTargetFromIndex(int newTargetIndex, LinkedList<Integer> targets) {
 
-        EnumeratedIntegerDistribution dist = getDiscreteDistribution(readTargetsFromJson(), readProbabilitiesFromJson());
         LinkedList<Integer> nextTarget = new LinkedList<>();
-
-        nextTarget.add(dist.sample());
+        int newTargetId = targets.get(newTargetIndex);
+        nextTarget.add(newTargetId);
         return nextTarget;
-
     }
+
+    private double getReactionProbabilityFromIndex(int newTargetIndex, LinkedList<Double> acceptanceRates) {
+
+        if (acceptanceRates.size() == 1){
+            return acceptanceRates.getFirst();
+        }
+        return acceptanceRates.get(newTargetIndex);
+    }
+
+    private int getIndexFromRandomDistribution(final LinkedList<Double> probabilityValues) {
+
+        LinkedList<Integer> indices = IntStream.range(0, probabilityValues.size()).boxed().collect(Collectors.toCollection(LinkedList::new));
+        EnumeratedIntegerDistribution dist = getDiscreteDistribution(indices, probabilityValues);
+        return dist.sample();
+    }
+
 
     private EnumeratedIntegerDistribution getDiscreteDistribution(LinkedList<Integer> possibleTargets, LinkedList<Double> probs){
 
-        /**
-         * Used for distributions from Apache Commons Math.
-         */
         RandomGenerator rng = new JDKRandomGenerator(random.nextInt());
-
         return new EnumeratedIntegerDistribution(rng,
                 possibleTargets.stream().mapToInt(i -> i).toArray(),
                 probs.stream().mapToDouble(i -> i).toArray());
     }
 
-
-    private LinkedList<Integer> readTargetsFromJson() {
+    private LinkedList<Integer> readTargetsFromJson(JSONObject command) {
         LinkedList<Integer> targets = new LinkedList<>();
         JSONArray targetList = (JSONArray) command.get("targetIds");
 
@@ -103,49 +92,25 @@ public class RouteChoice extends ControlModel {
         return targets;
     }
 
-    private LinkedList<Double> readProbabilitiesFromJson() {
+    private LinkedList<Double> readProbabilitiesFromJson(JSONObject command) {
         LinkedList<Double> probs = new LinkedList<>();
-
-        String jsonkey = "probability";
-
         JSONArray targetList = (JSONArray) command.get("probability");
 
         for (int i = 0; i < targetList.length(); i++) {
             probs.add(targetList.getDouble(i));
         }
-
         return probs;
     }
 
-    public boolean isInformationProcessed(Pedestrian ped, int commandId){
+    private LinkedList<Double> readReactionProbabilitiesFromJson(JSONObject command) {
+        LinkedList<Double> probs = new LinkedList<>();
 
-        // 1. handle conflicting instructions over time
-        if (reactionModel.isReactingToFirstInformationOnly()){
-            return isFirstInformation(ped);
+        JSONArray targetList = (JSONArray) command.get("reactionProbability");
+
+        for (int i = 0; i < targetList.length(); i++) {
+            probs.add(targetList.getDouble(i));
         }
-
-        // 2. handle recurring information that is received multiple times.
-
-        // If a command is received, the naviation app checks
-        // whether the command has already been displayed in an agent's app.
-
-        // This is necessary when the information is disseminated through the mobile network
-        // and can be received multiple times with different delays.
-        // In this case, the information is not further processed.
-
-        // Note: In the {@link ControlModel}, the agent makes the decision how to handle recurring information based on the reaction model setup.
-        // Here, the navigation app decides on how to proceed recurring information (do not proceed it).
-
-        return !isIdInList(ped, commandId);
-    }
-
-    public int getCommandId(){
-        // The navigation app requires a unique command identifier.
-        int id = super.getCommandId();
-        if (id == 0){
-            throw new IllegalArgumentException("Please provide a unique commandId != 0 for each command. Otherwise, information might not be processed.");
-        }
-        return id;
+        return probs;
     }
 
 

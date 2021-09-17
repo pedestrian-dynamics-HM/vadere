@@ -220,5 +220,9 @@ public class RemoteManager implements RunnableFinishedListener {
 		this.simCfg = simCfg;
 	}
 
+	public Path getOutputDirectory(){
+		return this.defaultOutputdir;
+	}
+
 
 }

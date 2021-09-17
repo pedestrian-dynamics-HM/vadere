@@ -14,7 +14,6 @@ public class CtlCommand {
     private int commandId = 0;
     JSONObject rawCommand;
     VShape space;
-    Double time;
     JSONObject pedCommand;
 
 
@@ -105,5 +104,7 @@ public class CtlCommand {
         } catch (JSONException ignored) { }
         return commandId;
     }
+
+
 
 }

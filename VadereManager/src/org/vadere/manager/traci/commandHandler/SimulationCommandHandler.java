@@ -1,6 +1,7 @@
 package org.vadere.manager.traci.commandHandler;
 
 import org.apache.commons.math3.util.Pair;
+import org.jfree.data.json.impl.JSONObject;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
@@ -18,16 +19,20 @@ import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.simulator.control.external.models.ControlModelBuilder;
 import org.vadere.simulator.control.external.models.IControlModel;
-import org.vadere.simulator.control.external.reaction.ReactionModel;
+import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
+import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.traci.*;
+import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -37,6 +42,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.nio.file.Path;
 
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Simulation
@@ -188,24 +194,26 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			name = "init_control", ignoreElementId = true )
 	public TraCICommand process_init_control(TraCISetCommand cmd, RemoteManager remoteManager) {
 		String controlModelName, controlModelType;
-		String reactionModelParameter;
+		String infoFilterConfig;
 
 		try {
 
 			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
 			controlModelName = (String) cfg.getData(0, TraCIDataType.STRING);
 			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
-			reactionModelParameter = (String) cfg.getData(2, TraCIDataType.STRING);
+			infoFilterConfig = (String) cfg.getData(2, TraCIDataType.STRING);
 
 			remoteManager.accessState((manager, state) -> {
 				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
-				ReactionModel reactionModel = new ReactionModel(reactionModelParameter);
+				if (!isUsePsychologyLayer){
+					cmd.setErr("Psychology layer must be active. Set isUsePsychologyLayer: true in *.scenario file.");
+				}
 
+				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 				if (!iControlModelHashMap.containsKey(controlModelName)) {
-					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType, topography, stimulusController, simTimeStepLength, new InformationFilterSettings(infoFilterConfig));
 					iControlModelHashMap.put(controlModelName, controlModel);
 				}
 
@@ -242,11 +250,9 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 				remoteManager.accessState((manager, state) -> {
 					StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 					Topography topography = state.getTopography();
-					boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
-					ReactionModel reactionModel = new ReactionModel();
+					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
-					IControlModel controlModel = ControlModelBuilder.getModel(model_name);
-					controlModel.init(topography, stimulusController, isUsePsychologyLayer, reactionModel);
+					IControlModel controlModel = ControlModelBuilder.getModel(model_name, topography, stimulusController, simTimeStepLength, new InformationFilterSettings());
 					iControlModelHashMap.put(model_name, controlModel);
 				});
 			}
@@ -288,6 +294,25 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		}
 		return cmd;
 	}
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.SIM_CONFIG,
+			name = "getSimConfig", ignoreElementId = true)
+	public TraCICommand process_getSimConfig(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
+
+		TraCIGetCacheHashCommand cmd = TraCIGetCacheHashCommand.create(rawCmd);
+
+		try {
+			CompoundObject simConfig = remoteManager.getSimCfg().getCompoundObject();
+			cmd.setResponse(responseOK(SimulationVar.SIM_CONFIG.type, simConfig));
+
+		} catch (TraCIException ex) {
+			cmd.setResponse(responseERR(SimulationVar.SIM_CONFIG, "cannot send simConfig"));
+		}
+		return cmd;
+	}
+
+
+
 
 	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.CACHE_HASH,
 			name = "getHash", dataTypeStr = "String", ignoreElementId = true)
@@ -435,5 +460,55 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		return invokeHandler(m, this, cmd, remoteManager);
 
 	}
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.OUTPUT_DIR,
+			name = "getOutputDir", dataTypeStr = "String", ignoreElementId = true)
+	public TraCICommand process_getOutputDir(TraCIGetCommand cmd, RemoteManager remoteManager) {
+
+		try {
+			remoteManager.accessState((manager, state) -> {
+				Path resultDir = remoteManager.getRemoteSimulationRun().getOutputPath();
+				cmd.setResponse(responseOK(SimulationVar.OUTPUT_DIR.type, resultDir.toAbsolutePath().toString()));
+			});
+		} catch (TraCICommandCreationException ee) {
+			cmd.setResponse(responseERR(SimulationVar.OUTPUT_DIR, "Failed to provide output directory."));
+		}
+		return cmd;
+	}
+
+	@SimulationHandler(cmd = TraCICmd.GET_SIMULATION_VALUE, var = SimulationVar.OBSTACLES, name = "getObstacles", dataTypeStr = "String",  ignoreElementId = true)
+	public TraCICommand process_getObstacles(TraCIGetCommand cmd, RemoteManager remoteManager) {
+		try {
+			remoteManager.accessState((manager, state) -> {
+				List<ScenarioElement> obstacles = state.getTopography().getAllScenarioElements()
+						.stream()
+						.filter(p -> p.getType() == ScenarioElementType.OBSTACLE)
+						.collect(Collectors.toList());
+
+				JSONObject obstacleShapes = new JSONObject();
+				for (ScenarioElement scenarioElement : obstacles) {
+					VPolygon polygon = null;
+					if (scenarioElement.getShape() instanceof VRectangle){
+						polygon = ((VRectangle) scenarioElement.getShape()).toPolygon();
+					}
+					else if (scenarioElement.getShape() instanceof VPolygon){
+						polygon = (VPolygon) scenarioElement.getShape();
+					}
+					else{
+						cmd.setResponse(responseERR(SimulationVar.OBSTACLES, "Obstacle must be of type polygon."));
+					}
+					obstacleShapes.put(scenarioElement.getId(), polygon);
+				}
+				cmd.setResponse(responseOK(SimulationVar.OBSTACLES.type, obstacleShapes.toJSONString()));
+			});
+		} catch (TraCICommandCreationException ee) {
+			cmd.setResponse(responseERR(SimulationVar.OBSTACLES, "Failed to provide obstacles."));
+		}
+		return cmd;
+	}
+
+
+
+
 
 }

@@ -1,5 +1,6 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
 import org.vadere.util.geometry.shapes.VShape;
 
 /**
@@ -18,9 +19,21 @@ public class WaitInArea extends Stimulus {
         super(time);
     }
 
+    public WaitInArea(double time, double probability) {
+        super(time, probability);
+    }
+    public WaitInArea(double time, double probability, int id) {
+        super(time, probability, id);
+    }
+
+
     public WaitInArea(double time, VShape area) {
         super(time);
+        this.area = area;
+    }
 
+    public WaitInArea(double time, VShape area, int id) {
+        super(time, id);
         this.area = area;
     }
 
@@ -47,6 +60,15 @@ public class WaitInArea extends Stimulus {
     @Override
     public WaitInArea clone() {
         return new WaitInArea(this);
+    }
+
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof WaitInArea)) return false;
+        WaitInArea wait = (WaitInArea) that;
+        boolean isProb = Precision.equals(this.perceptionProbability, wait.getPerceptionProbability(), Double.MIN_VALUE);
+        return isProb && this.area == wait.getArea();
     }
 
 }

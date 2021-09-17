@@ -1,8 +1,11 @@
 package org.vadere.manager.traci.commandHandler;
 
+import org.jfree.data.json.impl.JSONObject;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.commandHandler.variables.SimulationVar;
+import org.vadere.state.traci.TraCICommandCreationException;
 import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.PolygonHandler;
 import org.vadere.manager.traci.commandHandler.annotation.PolygonHandlers;
@@ -14,6 +17,7 @@ import org.vadere.manager.traci.response.TraCIGetResponse;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
@@ -22,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Polygon API In
@@ -176,6 +181,9 @@ public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
 		return cmd;
 	}
 
+
+
+
 	@PolygonHandler(cmd = TraCICmd.GET_POLYGON, var = PolygonVar.DISTANCE, name = "getDistance", dataTypeStr = "ArrayList<String>")
 	public TraCICommand process_getDistance(TraCIGetCommand rawCmd, RemoteManager remoteManager) {
 		TraCIGetDistanceCommand cmd = TraCIGetDistanceCommand.create(rawCmd);
@@ -232,6 +240,7 @@ public class PolygonCommandHandler extends CommandHandler<PolygonVar> {
 		cmd.setResponse(responseERR("Not Implemented"));
 		return cmd;
 	}
+
 
 	public TraCICommand processValueSub(TraCICommand rawCmd, RemoteManager remoteManager) {
 		return processValueSub(rawCmd, remoteManager, this::processGet,

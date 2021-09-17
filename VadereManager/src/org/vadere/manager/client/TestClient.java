@@ -477,6 +477,16 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	}
 
 	@Override
+	public void simulationapi_getOutputDir(final String[] args) throws IOException {
+
+	}
+
+	@java.lang.Override
+	public void simulationapi_getObstacles(String[] args) throws IOException {
+
+	}
+
+	@Override
 	public void simulationapi_getTime(String[] args) throws IOException {
 		TraCIResponse res = simulationapi.getTime();
 		System.out.println(res.toString());
@@ -505,6 +515,11 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 	@Override
 	public void simulationapi_setSimConfig(String[] args) throws IOException {
 		System.out.println("not implemented");
+	}
+
+	@Override
+	public void simulationapi_getSimConfig(String[] args) throws IOException {
+
 	}
 
 	// polygonapi
@@ -564,6 +579,7 @@ public class TestClient extends org.vadere.manager.client.AbstractTestClient imp
 		TraCIResponse res = polygonapi.getCentroid(elementID); // 0. is a dummy
 		System.out.println(res.toString());
 	}
+
 
 	@Override
 	public void polygonapi_getPosition2D(String[] args) throws IOException {

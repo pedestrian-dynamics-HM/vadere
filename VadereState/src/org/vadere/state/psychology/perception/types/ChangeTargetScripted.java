@@ -1,5 +1,7 @@
 package org.vadere.state.psychology.perception.types;
 
+import org.apache.commons.math3.util.Precision;
+
 import java.util.LinkedList;
 
 /**
@@ -42,22 +44,32 @@ public class ChangeTargetScripted extends Stimulus {
     // Member Variables
     private double allowedTimeDelta;
     private boolean changeRemainingPedestrians;
-    private LinkedList<Integer> originalTargetIds;
-    private LinkedList<Integer> newTargetIds;
-    private LinkedList<Double> simTimesToChangeTarget;
-    private LinkedList<Integer> totalAgentsToChangeTarget;
+    private LinkedList<Integer> originalTargetIds = new LinkedList<>();
+    private LinkedList<Integer> newTargetIds = new LinkedList<>();
+    private LinkedList<Double> simTimesToChangeTarget = new LinkedList<>();
+    private LinkedList<Integer> totalAgentsToChangeTarget = new LinkedList<>();
 
     // Constructors
     // Default constructor required for JSON de-/serialization.
-    public ChangeTargetScripted() { super(); }
+    public ChangeTargetScripted() {
+        super();
+    }
 
     public ChangeTargetScripted(double time) {
         super(time);
     }
 
+    public ChangeTargetScripted(double time, double probability) {
+        super(time, probability);
+    }
+
     public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds) {
         super(time);
+        this.newTargetIds = newTargetIds;
+    }
 
+    public ChangeTargetScripted(double time, LinkedList<Integer> newTargetIds, int id) {
+        super(time, id);
         this.newTargetIds = newTargetIds;
     }
 
@@ -125,6 +137,15 @@ public class ChangeTargetScripted extends Stimulus {
     @Override
     public ChangeTargetScripted clone() {
         return new ChangeTargetScripted(this);
+    }
+
+    @Override
+    public boolean equals(Object that){
+        if(this == that) return true;
+        if(!(that instanceof ChangeTargetScripted)) return false;
+        ChangeTargetScripted thatChangeTarget = (ChangeTargetScripted) that;
+        boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
+        return isProb && this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
     }
 
 }

@@ -72,6 +72,24 @@ public class SimulationCfg {
 						useVadereSeed);
 	}
 
+	public CompoundObject getCompoundObject(){
+		return CompoundObjectBuilder.builder()
+				.rest()
+				.add(TraCIDataType.STRING, 8)
+				.add(TraCIDataType.INTEGER)
+				.add(TraCIDataType.U_BYTE)
+				.build(configName,
+						experiment,
+						dateTime,
+						resultRootDir,
+						iterationVariables,
+						repetition,
+						outputScalarFile,
+						outputVecFile,
+						seed,
+						useVadereSeed);
+	}
+
 	public String outputPath() {
 		return String.format("%s/%s_%s/vadere.d",
 				resultRootDir,

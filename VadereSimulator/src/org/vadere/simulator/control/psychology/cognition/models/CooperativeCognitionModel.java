@@ -37,7 +37,7 @@ public class CooperativeCognitionModel implements ICognitionModel {
         }
     }
 
-    private boolean pedestrianCannotMove(Pedestrian pedestrian) {
+    protected boolean pedestrianCannotMove(Pedestrian pedestrian) {
         boolean cannotMove = false;
 
         FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
