@@ -472,9 +472,10 @@ public class Simulation implements ControllerProvider{
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
 			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
+			int aerosolCloudsInSimulation = this.simulationState.getTopography().getAerosolClouds().size();
 
-			// Only update until there are pedestrians in the scenario or pedestrian to spawn
-			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 ) {
+			// Only update until there are pedestrians in the scenario or pedestrian to spawn or aerosol clouds persist
+			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 || aerosolCloudsInSimulation > 0) {
 				m.update(simTimeInSec);
 
 				if (topography.isRecomputeCells()) {
