@@ -51,11 +51,6 @@ public class AerosolCloudTest {
         aerosolCloudEllip = new AerosolCloud(attributesEllip);
     }
 
-    @Test
-    public void testGetShape() {
-        VCircle expectedShape = new VCircle(0.75);
-        Assert.assertEquals(expectedShape, aerosolCloud.getShape());
-    }
 
     @Test
     public void testGetId() {
