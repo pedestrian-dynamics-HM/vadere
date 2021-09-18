@@ -43,6 +43,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
       "filename" : "cont__1_25m.txt",
       "processors" : [ 10 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
+      "filename" : "evacuationTime.txt",
+      "processors" : [ 11 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -113,6 +117,23 @@
         "allowedAbsenceTimestepsIfContactReturns" : 0,
         "minTimespanOfContactTimesteps" : 1
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProcessor",
+      "id" : 11,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianEvacuationTimeProcessorId" : 12
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianEvacuationTimeProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianEvacuationTimeProcessor",
+      "attributes" : {
+        "pedestrianStartTimeProcessorId" : 13
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianStartTimeProcessor",
+      "id" : 13
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -174,7 +195,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 100.0,
+      "finishTime" : 1500.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -209,19 +230,37 @@
           "x" : 3.0,
           "y" : 11.1,
           "width" : 6.0,
-          "height" : 9.4,
+          "height" : 10.0,
           "type" : "RECTANGLE"
         },
         "id" : 1
       }, {
         "shape" : {
-          "x" : 3.0,
-          "y" : 0.5,
-          "width" : 6.0,
-          "height" : 9.4,
+          "x" : 6.8,
+          "y" : 14.2,
+          "width" : 1.0,
+          "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "id" : 2
+        "id" : 7
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 3.0,
+            "y" : 9.9
+          }, {
+            "x" : 3.0,
+            "y" : 0.5
+          }, {
+            "x" : 9.0,
+            "y" : 0.5
+          }, {
+            "x" : 9.0,
+            "y" : 9.9
+          } ]
+        },
+        "id" : 4
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
