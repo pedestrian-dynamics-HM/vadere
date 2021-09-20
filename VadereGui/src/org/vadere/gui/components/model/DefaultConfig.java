@@ -21,6 +21,7 @@ public class DefaultConfig {
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
 	private int aerosolCloudAlphaMax = 128;
+	private int aerosolCloudAlphaMin = 10;
 	private Color dropletsColor = new Color(190, 210, 20);
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private HashMap<InfectionStatus, Color> infectionStatusColors = new HashMap<>();
@@ -45,6 +46,7 @@ public class DefaultConfig {
 		this.measurementAreaAlpha = config.measurementAreaAlpha;
 		this.aerosolCloudColor = config.aerosolCloudColor;
 		this.aerosolCloudAlphaMax = config.aerosolCloudAlphaMax;
+		this.aerosolCloudAlphaMin = config.aerosolCloudAlphaMin;
 		this.dropletsColor = config.dropletsColor;
 		initGroupMembershipColor();
 		initInfectionStatusColor();
@@ -110,6 +112,7 @@ public class DefaultConfig {
 	}
 	public Color getAerosolCloudColor() {return aerosolCloudColor;}
 	public int getAerosolCloudAlphaMax() { return aerosolCloudAlphaMax; }
+	public int getAerosolCloudAlphaMin() { return aerosolCloudAlphaMin; }
 	public Color getDropletsColor() {return dropletsColor;}
 	public Color getDefaultInfectionStatusColor(InfectionStatus infectionStatus) {
 		return infectionStatusColors.get(infectionStatus);
