@@ -28,7 +28,7 @@ public class AerosolCloud extends InfectiousParticleDispersion {
 
     private AttributesAerosolCloud attributes;
 
-    final static int numberOfNodesAlongEllipseBound = 50;
+    final static int numberOfNodesAlongShapeBound = 20;
 
     // ToDo: implement AerosolCloudListener (or remove commented code)
     // private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
@@ -343,7 +343,7 @@ public class AerosolCloud extends InfectiousParticleDispersion {
             // Use VPolygon with points that yield a circular shape instead of VCircle (shape = new VCircle(new VPoint(center.getX(), center.getY()), radius);) to keep the shape consistent
             Path2D path = new Path2D.Double();
             path.moveTo(radius, 0);
-            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongEllipseBound) {
+            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongShapeBound) {
                 path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
             }
             path.closePath();
@@ -357,7 +357,7 @@ public class AerosolCloud extends InfectiousParticleDispersion {
             // return ellipse (approximated ellipse with edges)
             Path2D path = new Path2D.Double();
             path.moveTo(semiMajorAxis, 0); // define stating point
-            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongEllipseBound) {
+            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongShapeBound) {
                 double radius = semiMinorAxis / Math.sqrt(1 - Math.pow(eccentricity * Math.cos(angle), 2)); // radius(angle) from ellipse center to its bound
                 path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius); // convert polar to cartesian coordinates
             }
