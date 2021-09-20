@@ -35,6 +35,10 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
         super(creationTime, shape);
     }
 
+    public AttributesAerosolCloud(int id, VShape shape, double currentPathogenLoad){
+        super(id, shape, currentPathogenLoad);
+    }
+
     public AttributesAerosolCloud(int id, VShape shape, double area, double height, VPoint center, ArrayList<VPoint> vertices, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad) {
         super(id, creationTime, initialPathogenLoad, currentPathogenLoad, shape);
         this.area = area;

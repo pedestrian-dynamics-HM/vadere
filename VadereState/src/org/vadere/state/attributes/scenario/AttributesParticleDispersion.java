@@ -32,6 +32,13 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
         this.shape = shape;
     }
 
+    public AttributesParticleDispersion(int id, VShape shape, double currentPathogenLoad){
+        this();
+        this.id = id;
+        this.shape = shape;
+        this.currentPathogenLoad = currentPathogenLoad;
+    }
+
     public AttributesParticleDispersion(int id, double creationTime, double initialPathogenLoad, double currentPathogenLoad, VShape shape) {
         this.id = id;
 
