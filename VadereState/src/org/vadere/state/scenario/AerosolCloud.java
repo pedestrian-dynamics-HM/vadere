@@ -236,7 +236,6 @@ public class AerosolCloud extends InfectiousParticleDispersion {
     public void increaseShape(double deltaRadius) {
         if (deltaRadius > 0.0) {
 
-            VShape shape = attributes.getShape();
             VPoint center = attributes.getCenter();
             VPoint vertex1 = attributes.getVertices().get(0);
             double radius = Math.sqrt(attributes.getArea() / Math.PI);
@@ -246,9 +245,9 @@ public class AerosolCloud extends InfectiousParticleDispersion {
             attributes.setArea(newArea);
 
             // define new shape and vertices
-            if (shape instanceof VPolygon) {
+            if (center.distance(vertex1) > radius) {
                 increaseEllipticalShape(radius, deltaRadius, newArea, center, vertex1);
-            } else if (shape instanceof VCircle) {
+            } else if (center.distance(vertex1) <= radius) {
                 increaseCircularShape(newArea, center);
             }
 
@@ -339,10 +338,23 @@ public class AerosolCloud extends InfectiousParticleDispersion {
         VShape shape;
 
         if (majorAxis <= minorAxis) {
-            // return circle, i.e. ellipse with (semiMajorAxis' = semiMinorAxis' = radius)
-            shape = new VCircle(new VPoint(center.getX(), center.getY()), Math.sqrt(area / Math.PI));
+            // return circle (approximated circle with edges)
+            double radius = Math.sqrt(area / Math.PI);
+            // Use VPolygon with points that yield a circular shape instead of VCircle (shape = new VCircle(new VPoint(center.getX(), center.getY()), radius);) to keep the shape consistent
+            Path2D path = new Path2D.Double();
+            path.moveTo(radius, 0);
+            for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongEllipseBound) {
+                path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            }
+            path.closePath();
+            VShape circle = new VPolygon(path);
+            AffineTransform transform = new AffineTransform();
+            transform.translate(center.getX(), center.getY());
+
+            shape = new VPolygon(transform.createTransformedShape(circle));
+
         } else {
-            // return polygon (approximated ellipse with edges)
+            // return ellipse (approximated ellipse with edges)
             Path2D path = new Path2D.Double();
             path.moveTo(semiMajorAxis, 0); // define stating point
             for (double angle = 0.0; angle < 2.0 * Math.PI; angle += 2.0 * Math.PI / numberOfNodesAlongEllipseBound) {
@@ -350,13 +362,13 @@ public class AerosolCloud extends InfectiousParticleDispersion {
                 path.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius); // convert polar to cartesian coordinates
             }
             path.closePath();
-            VShape polygon = new VPolygon(path);
+            VShape ellipse = new VPolygon(path);
             double theta = Math.atan2(vertex2.y - vertex1.y, vertex2.x - vertex1.x); // get orientation of shape
             AffineTransform transform = new AffineTransform();
             transform.translate(center.getX(), center.getY());
             transform.rotate(theta);
 
-            shape = new VPolygon(transform.createTransformedShape(polygon));
+            shape = new VPolygon(transform.createTransformedShape(ellipse));
         }
         return shape;
     }
