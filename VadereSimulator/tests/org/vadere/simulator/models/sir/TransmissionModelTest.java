@@ -89,30 +89,6 @@ public class TransmissionModelTest {
         return attrList;
     }
 
-    @Test
-    public void throwIfTransformedAerosolCloudShapeWithFarDistancedVerticesNotTypeVPolygon() {
-        // create any polygon
-        Path2D path = new Path2D.Double();
-        path.moveTo(0, 0);
-        path.lineTo(1, 0);
-        path.lineTo(1, 1);
-        path.closePath();
-        ShapeType expectedType = (new VPolygon(path)).getType();
-
-        Assert.assertEquals(polygon.getType(), expectedType);
-    }
-
-    @Test
-    public void throwIfTransformedAerosolCloudShapeWithCloseVerticesNotTypeVCircle() {
-        ShapeType expectedType = new VCircle(new VPoint(1,1), 1).getType();
-        Assert.assertEquals(circle1.getType(), expectedType);
-    }
-
-    @Test
-    public void throwIfTransformedAerosolCloudShapeWithCoincidentVerticesNotTypeVCircle() {
-        ShapeType expectedType = new VCircle(new VPoint(1,1), 1).getType();
-        Assert.assertEquals(circle2.getType(), expectedType);
-    }
 
     @Test
     public void throwIfTransformedShapeVPolygonCenterNotBetweenVertices() {
