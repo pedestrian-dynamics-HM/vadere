@@ -2,7 +2,7 @@
   "name" : "queueScenario",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "4931a4b110a6b8a27b180270ad76caf466e7de1d",
+  "commithash" : "0519e4921894d384477955d27a3c6ecacdb35bd1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -40,6 +40,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.IdOutputFile",
       "filename" : "aerosolCloudLifeTime.txt",
       "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudShapes.txt",
+      "processors" : [ 12 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
+      "filename" : "contacts.txt",
+      "processors" : [ 13 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -83,6 +91,23 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 11
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributes" : {
+        "sampleEveryNthSimStep" : 75
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
+      "id" : 13,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
+      "attributes" : {
+        "maxDistanceForANearbyPedestrian" : 1.0,
+        "sampleEveryNthStep" : 1,
+        "allowedAbsenceTimestepsIfContactReturns" : 0,
+        "minTimespanOfContactTimesteps" : 1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -169,7 +194,7 @@
     "attributesSimulation" : {
       "finishTime" : 1600.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.1,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,

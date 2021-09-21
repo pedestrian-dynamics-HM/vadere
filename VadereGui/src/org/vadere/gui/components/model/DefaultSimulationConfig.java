@@ -31,6 +31,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
 	private boolean showAerosolClouds = true;
+	private boolean aerosolCloudsRecorded = false;
 	private boolean showDroplets = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
@@ -162,6 +163,14 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public boolean isShowAerosolClouds() {
 		return showAerosolClouds;
+	}
+
+	public boolean isAerosolCloudsRecorded() {
+		return aerosolCloudsRecorded;
+	}
+
+	public void setAerosolCloudsRecorded(boolean aerosolCloudsRecorded) {
+		this.aerosolCloudsRecorded = aerosolCloudsRecorded;
 	}
 
 	public boolean isShowDroplets() {

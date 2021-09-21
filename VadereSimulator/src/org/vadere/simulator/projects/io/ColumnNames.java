@@ -29,6 +29,15 @@ public final class ColumnNames {
 	private Set<String> infectionStatusKeys;
 	private Set<String> absorbedPathogenLoadKeys;
 	private Set<String> minInfectiousDoseKeys;
+	private Set<String> aerosolCloudIdKeys;
+	private Set<String> aerosolCloudPathogenLoadKeys;
+	private Set<String> aerosolCloudAreaKeys;
+	private Set<String> aerosolCloudVertex1XKeys; // ToDo use one key for vertices instead of 4 individual keys?
+	private Set<String> aerosolCloudVertex1YKeys;
+	private Set<String> aerosolCloudVertex2XKeys;
+	private Set<String> aerosolCloudVertex2YKeys;
+	private Set<String> timeStepKeys; //ToDo replace timeStepKeys by start/endTimeKeys?
+
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -60,6 +69,14 @@ public final class ColumnNames {
 		infectionStatusKeys = new HashSet<>();
 		absorbedPathogenLoadKeys = new HashSet<>();
 		minInfectiousDoseKeys = new HashSet<>();
+		aerosolCloudIdKeys = new HashSet<>();
+		aerosolCloudPathogenLoadKeys = new HashSet<>();
+		aerosolCloudAreaKeys = new HashSet<>();
+		aerosolCloudVertex1XKeys = new HashSet<>();
+		aerosolCloudVertex1YKeys = new HashSet<>();
+		aerosolCloudVertex2XKeys = new HashSet<>();
+		aerosolCloudVertex2YKeys = new HashSet<>();
+		timeStepKeys = new HashSet<>();
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 		durationKeys = new HashSet<>();
@@ -95,9 +112,20 @@ public final class ColumnNames {
 		selfCategoryKeys.add("selfCategory");
 		informationStateKeys.add("informationState");
 		groupMembershipKeys.add("groupMembership");
+
 		infectionStatusKeys.add("infectionStatus");
 		absorbedPathogenLoadKeys.add("absorbedPathogenLoad");
 		minInfectiousDoseKeys.add("minInfectiousDose");
+
+		aerosolCloudIdKeys.add("id");
+		aerosolCloudPathogenLoadKeys.add("pathogenLoad");
+		aerosolCloudAreaKeys.add("area");
+		aerosolCloudVertex1XKeys.add("vertex1X");
+		aerosolCloudVertex1YKeys.add("vertex1Y");
+		aerosolCloudVertex2XKeys.add("vertex2X");
+		aerosolCloudVertex2YKeys.add("vertex2Y");
+
+		timeStepKeys.add("timeStep");
 
 		keys.add(pedestrianIdKeys);
 		keys.add(secondPedestrianIdKeys);
@@ -115,6 +143,14 @@ public final class ColumnNames {
 		keys.add(infectionStatusKeys);
 		keys.add(absorbedPathogenLoadKeys);
 		keys.add(minInfectiousDoseKeys);
+		keys.add(aerosolCloudIdKeys);
+		keys.add(aerosolCloudPathogenLoadKeys);
+		keys.add(aerosolCloudAreaKeys);
+		keys.add(aerosolCloudVertex1XKeys);
+		keys.add(aerosolCloudVertex1YKeys);
+		keys.add(aerosolCloudVertex2XKeys);
+		keys.add(aerosolCloudVertex2YKeys);
+		keys.add(timeStepKeys);
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
 		keys.add(durationKeys);
@@ -146,6 +182,35 @@ public final class ColumnNames {
 
 	public int getMinInfectiousDoseCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, minInfectiousDoseKeys);
+	}
+
+	public int getAerosolCloudIdCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudIdKeys);
+	}
+
+	public int getAerosolCloudPathogenLoadCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudPathogenLoadKeys);
+	}
+
+	public int getAerosolCloudAreaCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudAreaKeys);
+	}
+
+	public int getAerosolCloudVertex1XCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudVertex1XKeys);
+	}
+	public int getAerosolCloudVertex1YCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudVertex1YKeys);
+	}
+	public int getAerosolCloudVertex2XCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudVertex2XKeys);
+	}
+	public int getAerosolCloudVertex2YCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, aerosolCloudVertex2YKeys);
+	}
+
+	public int getTimeStepCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, timeStepKeys);
 	}
 
 	public int getPedestrianIdCol(@NotNull final Table dataFrame) {

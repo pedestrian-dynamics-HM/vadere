@@ -5,6 +5,7 @@ import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.gui.renderer.agent.AgentRender;
+import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -42,6 +43,8 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 		if (!model.isEmpty()) {
 			Color savedColor = g.getColor();
+
+			renderAerosolCloudData(g);
 
 			Table slice = (model.config.isShowAllTrajectories()) ? model.getAppearedPedestrians() : model.getAlivePedestrians() ;
 			Collection<Pedestrian> pedestrians = model.getPedestrians();
@@ -196,4 +199,18 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		}
 	}
 
+	private void renderAerosolCloudData(Graphics2D g) {
+		boolean showAerosolClouds = model.config.isShowAerosolClouds() && model.getTableAerosolCloudData() != null;
+
+		if (showAerosolClouds) {
+			Collection<AerosolCloud> aerosolClouds = model.getTableAerosolCloudData().toAerosolCloudCollection(getModel().getStep());
+			//TODO something is wrong here. previous line is executed every second loop if program runs without
+			// debugging -> System.out.println(aerosolClouds.size()) yields 0, 1, 0, ... , 0, 2, 0, ...
+			// This leads to flickering aerosol clouds in the gui;
+			// With breakpoints System.out.println(aerosolClouds.size()) yields 1, 1, 1, ... , 2, 2, 2, ...
+			if (!aerosolClouds.isEmpty()) {
+				renderAerosolClouds(aerosolClouds, g, model.config.getAerosolCloudColor());
+			}
+		}
+	}
 }
