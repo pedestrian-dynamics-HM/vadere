@@ -406,7 +406,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 			} else if(contactsTrajectoryFile != null && aerosolCloudShapeFile == null) {
 				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
 			} else if(contactsTrajectoryFile == null && aerosolCloudShapeFile != null) {
-				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), null, IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), null, IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, aerosolCloudShapeFile.getParent());
 			} else {
 				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
 			}
