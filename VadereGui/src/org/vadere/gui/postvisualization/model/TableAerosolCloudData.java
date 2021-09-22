@@ -1,5 +1,6 @@
 package org.vadere.gui.postvisualization.model;
 
+import org.jcodec.common.DictionaryCompressor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
@@ -22,6 +23,8 @@ import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolClo
 public class TableAerosolCloudData {
 
     private final int sampleStepWidth;
+
+    private final List<Integer> sampleSteps;
 
     private final Table cloudDataFrame;
 
@@ -59,6 +62,7 @@ public class TableAerosolCloudData {
         this.cloudDataFrame = dataFrame;
         this.currentSlice = cloudDataFrame;
         this.sampleStepWidth = getTimeStepSampleStepWidth();
+        this.sampleSteps = getSampleSteps();
     }
 
     protected AerosolCloud toAerosolCloud(@NotNull final Row row) {
@@ -92,21 +96,23 @@ public class TableAerosolCloudData {
 
     public void setCurrentSlice(int timeStep) {
         IntColumn timeSteps = getTimeStep(cloudDataFrame);
-        if (sampleStepWidth == 1) {
-            currentSlice = cloudDataFrame.where(timeSteps.isEqualTo(getSampleIntervalStart(timeStep)));
+        List<Integer> sampleInterval = getCurrentSampleInterval(timeStep);
+
+        if (!sampleInterval.isEmpty()) {
+            currentSlice = cloudDataFrame.where(timeSteps.isGreaterThanOrEqualTo(sampleInterval.get(0))
+                    .and(timeSteps.isLessThan(sampleInterval.get(1))));
         } else {
-            currentSlice = cloudDataFrame.where(timeSteps.isGreaterThanOrEqualTo(getSampleIntervalStart(timeStep))
-                    .and(timeSteps.isLessThan(getSampleIntervalEnd(timeStep))));
+            currentSlice = cloudDataFrame.emptyCopy();
         }
-
     }
 
-    private int getSampleIntervalStart(int timeStep) {
-        return (int) Math.floor(((double) timeStep) / sampleStepWidth) * sampleStepWidth;
-    }
-
-    private int getSampleIntervalEnd(int timeStep) {
-        return (int) Math.ceil(((double) timeStep) / sampleStepWidth) * sampleStepWidth;
+    private List<Integer> getCurrentSampleInterval(int timeStep) {
+        int intervalStart = sampleSteps.stream().filter(i -> (i.intValue() >= timeStep && i.intValue() <= timeStep + sampleStepWidth)).findFirst().orElse(-1);
+        if (intervalStart != -1) {
+            return  Arrays.asList(intervalStart, intervalStart + sampleStepWidth);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private int getTimeStepSampleStepWidth() {
@@ -117,6 +123,16 @@ public class TableAerosolCloudData {
         // exclude value 0
         timeStepsDiff = timeStepsDiff.stream().filter(i -> i > 0).collect(Collectors.toSet());
         return Math.max(minStepWidth, Collections.min(timeStepsDiff));
+    }
+
+    private List<Integer> getSampleSteps() {
+        int firstSampledStep = (int) getTimeStep(cloudDataFrame).min();
+        int lastSampledStep = (int) getTimeStep(cloudDataFrame).max();
+        List<Integer> sampleSteps = new ArrayList<>();
+        for (int i = firstSampledStep; i <= lastSampledStep; i = i + sampleStepWidth) {
+            sampleSteps.add(i);
+        }
+        return sampleSteps;
     }
 
     private IntColumn getTimeStep(@NotNull final Table table) {

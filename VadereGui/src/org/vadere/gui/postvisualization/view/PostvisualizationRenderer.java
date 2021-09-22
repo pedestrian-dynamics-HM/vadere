@@ -204,10 +204,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 		if (showAerosolClouds) {
 			Collection<AerosolCloud> aerosolClouds = model.getTableAerosolCloudData().toAerosolCloudCollection(getModel().getStep());
-			//TODO something is wrong here. previous line is executed every second loop if program runs without
-			// debugging -> System.out.println(aerosolClouds.size()) yields 0, 1, 0, ... , 0, 2, 0, ...
-			// This leads to flickering aerosol clouds in the gui;
-			// With breakpoints System.out.println(aerosolClouds.size()) yields 1, 1, 1, ... , 2, 2, 2, ...
 			if (!aerosolClouds.isEmpty()) {
 				renderAerosolClouds(aerosolClouds, g, model.config.getAerosolCloudColor());
 			}
