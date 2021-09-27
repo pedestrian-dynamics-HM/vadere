@@ -33,6 +33,7 @@ public interface IPerceptionModel {
 	 */
 	void initialize(Topography topography, final double simTimeStepLengh);
 
+
 	/**
 	 * Usually, this method iterates over the pededestrians and calls
 	 * {@link Pedestrian#setMostImportantStimulus(Stimulus)}.

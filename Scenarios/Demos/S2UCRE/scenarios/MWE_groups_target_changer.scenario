@@ -1,7 +1,7 @@
 {
   "name" : "MWE_groups_target_changer",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -114,10 +114,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
@@ -252,6 +248,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

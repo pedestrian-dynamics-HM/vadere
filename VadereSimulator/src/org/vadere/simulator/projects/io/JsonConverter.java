@@ -56,7 +56,7 @@ public class JsonConverter {
 				scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).isNull()) ? null : scenarioNode.get(StateJsonConverter.MAIN_MODEL_KEY).asText();
 		List<Attributes> attributesModel = StateJsonConverter.deserializeAttributesListFromNode(attributesModelNode);
 		Topography topography = StateJsonConverter.deserializeTopographyFromNode(scenarioNode.get("topography"));
-		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode.get("stimulusInfos"));
+		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode);
 
 		ScenarioStore scenarioStore = new ScenarioStore(scenarioName, scenarioDescription,
 				mainModel, attributesModel,
@@ -149,7 +149,7 @@ public class JsonConverter {
 				StateJsonConverter.deserializeAttributesSimulationFromNode(attributesSimulationNode),
 				StateJsonConverter.deserializeAttributesPsychologyFromNode(attributesPsychologyNode),
 				StateJsonConverter.deserializeTopographyFromNode(topographyNode),
-				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusInfosArrayNode)
+				StateJsonConverter.deserializeStimuliFromArrayNode(stimulusNode)
 				);
 	}
 }
