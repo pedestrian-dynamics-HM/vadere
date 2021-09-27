@@ -1,7 +1,7 @@
 {
   "name" : "rimea_12_evacuation_nelder_mead",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -220,6 +220,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

@@ -40,7 +40,8 @@ import java.util.List;
         @Type(value = ChangeTargetScripted.class, name = "ChangeTargetScripted")
 })
 // "time" is set when the stimulus is injected into the simulation run and must not be de-/serialized.
-@JsonIgnoreProperties({ "time" })
+// "perceptionProbability" is assigned by the StimulusController
+@JsonIgnoreProperties({ "time", "perceptionProbability" })
 public abstract class Stimulus implements Cloneable {
 
     // Member Variables

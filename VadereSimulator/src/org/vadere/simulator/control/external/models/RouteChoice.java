@@ -36,17 +36,15 @@ public class RouteChoice extends ControlModel {
 
 
     @Override
-    protected Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted) {
+    protected Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int stimulusId, double timeCommandExecuted) {
 
         LinkedList<Double> probs = readProbabilitiesFromJson(command);
         LinkedList<Integer> targets = readTargetsFromJson(command);
-        LinkedList<Double> reaction = readReactionProbabilitiesFromJson(command);
 
         int newTargetindex = getIndexFromRandomDistribution(probs);
         LinkedList<Integer> newTarget = getTargetFromIndex(newTargetindex, targets);
-        double acceptanceRate = getReactionProbabilityFromIndex(newTargetindex, reaction);
 
-        return new ChangeTarget(timeCommandExecuted, acceptanceRate, newTarget, commandId);
+        return new ChangeTarget(timeCommandExecuted, newTarget, stimulusId);
     }
 
 
@@ -56,14 +54,6 @@ public class RouteChoice extends ControlModel {
         int newTargetId = targets.get(newTargetIndex);
         nextTarget.add(newTargetId);
         return nextTarget;
-    }
-
-    private double getReactionProbabilityFromIndex(int newTargetIndex, LinkedList<Double> acceptanceRates) {
-
-        if (acceptanceRates.size() == 1){
-            return acceptanceRates.getFirst();
-        }
-        return acceptanceRates.get(newTargetIndex);
     }
 
     private int getIndexFromRandomDistribution(final LinkedList<Double> probabilityValues) {
@@ -101,17 +91,5 @@ public class RouteChoice extends ControlModel {
         }
         return probs;
     }
-
-    private LinkedList<Double> readReactionProbabilitiesFromJson(JSONObject command) {
-        LinkedList<Double> probs = new LinkedList<>();
-
-        JSONArray targetList = (JSONArray) command.get("reactionProbability");
-
-        for (int i = 0; i < targetList.length(); i++) {
-            probs.add(targetList.getDouble(i));
-        }
-        return probs;
-    }
-
 
 }

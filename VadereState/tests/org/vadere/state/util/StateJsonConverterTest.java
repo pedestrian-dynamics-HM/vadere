@@ -61,7 +61,7 @@ public class StateJsonConverterTest {
         ObjectMapper mapper = new JacksonObjectMapper();
         JsonNode jsonNode = mapper.convertValue(expectedStimulusInfoStore, JsonNode.class);
 
-        StimulusInfoStore actualStimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(jsonNode.get("stimulusInfos"));
+        StimulusInfoStore actualStimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(jsonNode);
 
         StimulusInfo expectedStimulusInfo = expectedStimulusInfoStore.getStimulusInfos().get(0);
         StimulusInfo actualStimulusInfo = actualStimulusInfoStore.getStimulusInfos().get(0);

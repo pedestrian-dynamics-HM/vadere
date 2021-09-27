@@ -1,7 +1,7 @@
 {
   "name" : "05-WaitInArea-BHM",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -31,12 +31,13 @@
         "stepLengthDeviation" : false,
         "navigationCluster" : false,
         "navigationFollower" : false,
+        "followerProximityNavigation" : true,
+        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : false,
-        "followerProximityNavigation" : true,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -216,6 +217,7 @@
       },
       "stimuli" : [ {
         "type" : "WaitInArea",
+        "id" : -1,
         "area" : {
           "x" : 15.0,
           "y" : 0.0,
@@ -224,6 +226,10 @@
           "type" : "RECTANGLE"
         }
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

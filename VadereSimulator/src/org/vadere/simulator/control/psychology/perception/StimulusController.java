@@ -3,6 +3,7 @@ package org.vadere.simulator.control.psychology.perception;
 import org.jcodec.codecs.mjpeg.JpegDecoder;
 import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
@@ -27,6 +28,7 @@ public class StimulusController {
     private ScenarioStore scenarioStore;
     private List<StimulusInfo> oneTimeStimuli;
     private List<StimulusInfo> recurringStimuli;
+    private HashMap<Integer, Double> reactionProbabilities;
 
     private HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli;
 
@@ -35,13 +37,22 @@ public class StimulusController {
         this.scenarioStore = scenarioStore;
 
         oneTimeStimuli = filterOneTimeStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
-
         recurringStimuli = filterRecurringStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
+
 
         oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
         recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
 
+        reactionProbabilities = getReactionProbabilites(scenarioStore.getStimulusInfoStore().getReactionProbabilities());
         pedSpecificStimuli = new HashMap<>();
+    }
+
+    private HashMap<Integer, Double> getReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
+
+        reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
+        return (HashMap<Integer, Double>) reactionProbabilities
+                .stream()
+                .collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
     }
 
     // Getters
@@ -75,8 +86,24 @@ public class StimulusController {
         stimuli.addAll(activeOneTimeStimuli);
         stimuli.addAll(activeRecurringStimuli);
 
+        addReactionProbabilityToStimulus(stimuli);
+
         return stimuli;
     }
+
+    private void addReactionProbabilityToStimulus(final List<Stimulus> stimuli) {
+        for (Stimulus stimulus : stimuli){
+            if (!(stimulus instanceof ElapsedTime)){
+                if (reactionProbabilities.containsKey(stimulus.getId())){
+                    stimulus.setPerceptionProbability(reactionProbabilities.get(stimulus.getId()));
+                }
+                else{
+                    throw new RuntimeException("Stimulus id = "+ stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities." );
+                }
+            }
+        }
+    }
+
 
     public void setPedSpecificStimuli(final HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli) {
         this.pedSpecificStimuli = pedSpecificStimuli;
@@ -111,7 +138,6 @@ public class StimulusController {
 
 
         stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime, stimuli));
-
 
         return stimuli.stream().distinct().collect(Collectors.toList());
 
@@ -339,5 +365,16 @@ public class StimulusController {
             throw new IllegalArgumentException(String.format("Timeframe: \"repeat=%b\" expected!", expectRecurring));
         }
     }
+
+    /**
+     * Throw {@link IllegalArgumentException} if probability is not in 0..1
+     */
+    private static void throwExceptionIfReactionProbabilityIsInvalid(ReactionProbability reactionProbability) {
+        double probability = reactionProbability.getReactionProbability();
+        if ( probability > 1.0 || probability < 0.0) {
+            throw new IllegalArgumentException("ReactionProbability: probability must be in [0,1]. Got " + probability);
+        }
+    }
+
 
 }

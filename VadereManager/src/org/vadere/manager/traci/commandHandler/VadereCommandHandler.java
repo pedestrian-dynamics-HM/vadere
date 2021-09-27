@@ -6,6 +6,7 @@ import org.apache.commons.collections.ListUtils;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
+import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandler;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandlers;
@@ -135,6 +136,10 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 			List<StimulusInfo> lsi = ListUtils.union(sic.getRecurringStimuli(), sic.getOneTimeStimuli());
 			StimulusInfoStore sis = new StimulusInfoStore();
 			sis.setStimulusInfos(lsi);
+
+			List<ReactionProbability> reactionProbabilities = sic.getScenarioStore().getStimulusInfoStore().getReactionProbabilities();
+			sis.setReactionProbabilities(reactionProbabilities);
+
 			TraCIGetResponse res;
 			String data;
 			try {

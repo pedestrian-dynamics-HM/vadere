@@ -156,5 +156,7 @@ public class ScenarioStore {
 		return name;
 	}
 
-	public StimulusInfoStore getStimulusInfoStore() { return stimulusInfoStore; }
+	public StimulusInfoStore getStimulusInfoStore() {
+		return stimulusInfoStore;
+	}
 }

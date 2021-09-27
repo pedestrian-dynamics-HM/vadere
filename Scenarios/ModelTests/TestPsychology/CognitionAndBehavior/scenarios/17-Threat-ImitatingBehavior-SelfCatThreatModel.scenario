@@ -1,7 +1,7 @@
 {
   "name" : "17-Threat-ImitatingBehavior-SelfCatThreatModel",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -320,11 +320,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -371,11 +373,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "IN_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -422,11 +426,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -458,10 +464,15 @@
       },
       "stimuli" : [ {
         "type" : "Threat",
+        "id" : -1,
         "originAsTargetId" : 0,
         "loudness" : 1.0,
         "radius" : 10.0
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

@@ -1,8 +1,7 @@
 {
   "name" : "RichardWagnerStrasseScaled",
   "description" : "",
-  "release" : "1.14",
-  "commithash" : "cedd287311991310787a4513609cbbc62f22d05a",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -134,12 +133,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "CooperativeCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null,
-      "arguments" : [ ],
-      "requiredDataProcessorIds" : [ ]
     },
     "topography" : {
       "attributes" : {
@@ -1220,6 +1213,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

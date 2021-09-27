@@ -7,9 +7,8 @@ import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class bundles multiple @see StimulusInfo objects.
@@ -40,20 +39,29 @@ public class StimulusInfoStore {
 
     // Member Variables
     private List<StimulusInfo> stimulusInfos;
+    private List<ReactionProbability> reactionProbabilities;
 
     // Constructors
     public StimulusInfoStore() {
         this.stimulusInfos = new ArrayList<>();
+        this.reactionProbabilities = new ArrayList<>();
     }
 
     // Getter
     public List<StimulusInfo> getStimulusInfos() {
         return stimulusInfos;
     }
+    public List<ReactionProbability> getReactionProbabilities() {
+        return reactionProbabilities;
+    }
 
     // Setter
     public void setStimulusInfos(List<StimulusInfo> stimulusInfos) {
         this.stimulusInfos = stimulusInfos;
+    }
+
+    public void setReactionProbabilities(final List<ReactionProbability> reactionProbabilities) {
+        this.reactionProbabilities = reactionProbabilities;
     }
 
     public static void main(String... args) {
@@ -72,8 +80,13 @@ public class StimulusInfoStore {
         List<StimulusInfo> stimulusInfos = new ArrayList<>();
         stimulusInfos.add(stimulusInfo1);
 
+        List<ReactionProbability> reactionProbabilities = new ArrayList<>();
+        reactionProbabilities.add(new ReactionProbability());
+
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
+        stimulusInfoStore.setReactionProbabilities(reactionProbabilities);
+
 
         // Use annotations at stimulus classes to specify how JSON <-> Java mapping should look like.
         // "VShape" are mapped by "JacksonObjectMapper" implementation.
@@ -92,6 +105,7 @@ public class StimulusInfoStore {
             for (StimulusInfo stimulusInfo : deserializedStimulusInfoStore.getStimulusInfos()) {
                 System.out.print(stimulusInfo.getTimeframe());
                 System.out.print(stimulusInfo.getStimuli());
+                System.out.println(reactionProbabilities);
             }
             System.out.println();
         } catch (IOException e) {
@@ -113,4 +127,8 @@ public class StimulusInfoStore {
         }
 
     }
+
+
+
+
 }

@@ -34,8 +34,13 @@ public class ChangeTarget extends Stimulus {
         this.newTargetIds = newTargetIds;
     }
 
-    public ChangeTarget(double time, double probability, LinkedList<Integer> newTargetIds, int id) {
-        super(time, probability, id);
+    public ChangeTarget(double time, double probability, LinkedList<Integer> newTargetIds, int stimulusId) {
+        super(time, probability, stimulusId);
+        this.newTargetIds = newTargetIds;
+    }
+
+    public ChangeTarget(double time,  LinkedList<Integer> newTargetIds, int stimulusId){
+        super(time, stimulusId);
         this.newTargetIds = newTargetIds;
     }
 
