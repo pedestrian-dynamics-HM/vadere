@@ -249,6 +249,7 @@ public class StimulusController {
 
         List<Stimulus> newStimulus = new ArrayList<>();
         newStimulus.add(stimulus);
+        addReactionProbabilityToStimulus(newStimulus);
         StimulusInfo stimulusInfo = new StimulusInfo();
         stimulusInfo.setTimeframe(new Timeframe(0, simTimeNextTimeStep, false, 0));
         stimulusInfo.setStimuli(newStimulus);

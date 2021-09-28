@@ -36,9 +36,7 @@ public class CtlCommand {
 
         try {
             time = rawCommand.getDouble("time");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        } catch (JSONException ignored) { }
 
         return time;
     }
@@ -112,7 +110,7 @@ public class CtlCommand {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return commandId;
+        return stimulusId;
     }
 
 

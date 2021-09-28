@@ -66,6 +66,12 @@ public abstract class Stimulus implements Cloneable {
         this.id = -1;
     }
 
+    protected Stimulus(double time, int id) {
+        this.time = time;
+        this.id = id;
+        this.perceptionProbability = 1.0;
+    }
+
     protected Stimulus(double time, double perceptionProbability) {
         this.time = time;
         this.perceptionProbability = perceptionProbability;
