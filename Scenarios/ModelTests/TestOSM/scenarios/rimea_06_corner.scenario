@@ -1,7 +1,7 @@
 {
   "name" : "rimea_06_corner",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -275,11 +275,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -326,11 +328,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -353,6 +357,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

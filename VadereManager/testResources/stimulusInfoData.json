@@ -8,8 +8,11 @@
     },
     "stimuli" : [ {
       "type" : "Wait",
-      "perceptionProbability" : 1.0,
       "id" : -1
     } ]
+  } ],
+  "reactionProbabilities" : [ {
+    "stimulusId" : -1,
+    "reactionProbability" : 0.75
   } ]
 }

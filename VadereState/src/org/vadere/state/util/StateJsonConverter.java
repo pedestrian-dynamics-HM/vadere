@@ -10,10 +10,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.*;
+import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
@@ -30,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public abstract class StateJsonConverter {
 
@@ -189,17 +192,34 @@ public abstract class StateJsonConverter {
 	 * Usually, this array is extracted by reading in a scenario file as @see JsonNode
 	 * and you call "get("stimulusInfos") on this @see JsonNode.
 	 */
-	public static StimulusInfoStore deserializeStimuliFromArrayNode(JsonNode node) throws IllegalArgumentException {
+	public static StimulusInfoStore deserializeStimuliFromArrayNode(JsonNode nodef) throws IllegalArgumentException {
 		StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
 
-		if (node != null) {
-			List<StimulusInfo> stimulusInfoList = new ArrayList<>();
-			node.forEach(stimulusInfoNode -> stimulusInfoList.add(mapper.convertValue(stimulusInfoNode, StimulusInfo.class)));
-			stimulusInfoStore.setStimulusInfos(stimulusInfoList);
+		if (nodef != null) {
+			JsonNode node;
+			String key = "stimulusInfos";
+			if (nodef.has(key)) {
+				node = nodef.get(key);
+				List<StimulusInfo> stimulusInfoList = new ArrayList<>();
+				node.forEach(stimulusInfoNode -> stimulusInfoList.add(mapper.convertValue(stimulusInfoNode, StimulusInfo.class)));
+				stimulusInfoStore.setStimulusInfos(stimulusInfoList);
+			}
+
+			key = "reactionProbabilities";
+			if (nodef.has(key)) {
+				node = nodef.get(key);
+				List<ReactionProbability> reactionProbabilities = new ArrayList<>();
+				node.forEach(reactionProbabilityNode -> reactionProbabilities.add(mapper.convertValue(reactionProbabilityNode, ReactionProbability.class)));
+				stimulusInfoStore.setReactionProbabilities(reactionProbabilities);
+			}
 		}
 
 		return stimulusInfoStore;
 	}
+
+
+
+
 
 	public static StimulusInfoStore deserializeStimuli(String json) throws IOException {
 		return mapper.readValue(json, StimulusInfoStore.class);
@@ -396,6 +416,7 @@ public abstract class StateJsonConverter {
 	public static ObjectNode serializeStimuliToNode(StimulusInfoStore stimulusInfoStore) {
 		return mapper.valueToTree(stimulusInfoStore);
 	}
+
 
 	public static ObjectNode serializeAttributesStrategyModelToNode(AttributesStrategyModel attributesStrategyModel) {
 		return mapper.valueToTree(attributesStrategyModel);

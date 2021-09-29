@@ -1,7 +1,7 @@
 {
   "name" : "scenario001",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -115,10 +115,6 @@
         "cognition" : "CooperativeCognitionModel"
       }
     },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
-    },
     "topography" : {
       "attributes" : {
         "bounds" : {
@@ -212,6 +208,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

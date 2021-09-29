@@ -1,7 +1,7 @@
 {
   "name" : "09-Wait-Probabilistic-OSMEventDriven",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -180,8 +180,12 @@
       },
       "stimuli" : [ {
         "type" : "Wait",
-        "perceptionProbability" : 1.0
+        "id" : -1
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

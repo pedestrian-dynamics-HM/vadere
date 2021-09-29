@@ -12,6 +12,7 @@ import java.time.temporal.ValueRange;
 public class CtlCommand {
 
     private int commandId = 0;
+    private int stimulusId = -1;
     JSONObject rawCommand;
     VShape space;
     JSONObject pedCommand;
@@ -35,9 +36,7 @@ public class CtlCommand {
 
         try {
             time = rawCommand.getDouble("time");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        } catch (JSONException ignored) { }
 
         return time;
     }
@@ -103,6 +102,15 @@ public class CtlCommand {
             commandId = rawCommand.getInt("commandId");
         } catch (JSONException ignored) { }
         return commandId;
+    }
+
+    public int getStimulusId() {
+        try {
+            stimulusId = rawCommand.getInt("stimulusId");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return stimulusId;
     }
 
 

@@ -1,7 +1,7 @@
 {
   "name" : "18-ScriptAgents-ChangeTargetScriptedCognitionModel",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -312,6 +312,7 @@
       },
       "stimuli" : [ {
         "type" : "ChangeTargetScripted",
+        "id" : -1,
         "allowedTimeDelta" : 0.4,
         "changeRemainingPedestrians" : false,
         "originalTargetIds" : [ 1, 2 ],
@@ -319,6 +320,10 @@
         "simTimesToChangeTarget" : [ 4.0, 8.0 ],
         "totalAgentsToChangeTarget" : [ 1, 2 ]
       } ]
+    } ],
+    "reactionProbabilities" : [ {
+      "stimulusId" : -1,
+      "reactionProbability" : 1.0
     } ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_nelder_mead_ok",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -328,11 +328,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -379,11 +381,13 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -406,6 +410,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

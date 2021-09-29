@@ -1,7 +1,7 @@
 {
   "name" : "s2ucre_dynamic_waiting_less_targets_groups",
   "description" : "",
-  "release" : "1.14",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -96,10 +96,6 @@
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel"
       }
-    },
-    "attributesStrategy" : {
-      "useStrategyModel" : false,
-      "strategyModel" : null
     },
     "topography" : {
       "attributes" : {
@@ -668,6 +664,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

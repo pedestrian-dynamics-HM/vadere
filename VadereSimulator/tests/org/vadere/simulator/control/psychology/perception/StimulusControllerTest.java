@@ -5,6 +5,7 @@ import org.vadere.simulator.control.psychology.perception.models.SimplePerceptio
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.*;
@@ -60,6 +61,7 @@ public class StimulusControllerTest {
 
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
+        stimulusInfoStore.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
 
         return stimulusInfoStore;
     }
@@ -67,6 +69,7 @@ public class StimulusControllerTest {
     private StimulusInfoStore getStimulusInfoStore(List<StimulusInfo> stimulusList){
         StimulusInfoStore store = new StimulusInfoStore();
         store.setStimulusInfos(stimulusList);
+        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
         return store;
     }
 
@@ -552,6 +555,29 @@ public class StimulusControllerTest {
 
         assertEquals(WaitInArea, expectedWaitInArea);
         assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof WaitInArea));
+
+    }
+
+    @Test
+    public void assignReactionProbabilites() {
+        double expectedProbVal = 0.77;
+        double time = 1.2;
+
+        StimulusInfo stimulusInfo1 = getStimulusInfo(
+                new Timeframe(time, 7, false,0),
+                new Wait(time)
+        );
+
+        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList((stimulusInfo1)));
+        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability(expectedProbVal)));
+        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
+
+        List<Stimulus> stimuli = stimulusController.getStimuliForTime(time);
+        Stimulus waitStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList()).get(0);
+        Stimulus elapsedTimeStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof ElapsedTime).collect(Collectors.toList()).get(0);
+
+        assertEquals(expectedProbVal, waitStimulus.getPerceptionProbability(), Double.MIN_VALUE);
+        assertEquals(1.0, elapsedTimeStimulus.getPerceptionProbability(), Double.MIN_VALUE);
 
     }
 

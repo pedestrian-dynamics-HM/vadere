@@ -1,7 +1,7 @@
 {
   "name" : "T-240-120-240_BHM",
   "description" : "",
-  "release" : "1.15",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -222,12 +222,13 @@
         "stepLengthDeviation" : true,
         "navigationCluster" : false,
         "navigationFollower" : true,
+        "followerProximityNavigation" : true,
+        "navigationModel" : "NavigationProximity",
         "directionWallDistance" : false,
         "tangentialEvasion" : true,
         "sidewaysEvasion" : false,
         "onlyEvadeContraFlow" : false,
         "makeSmallSteps" : true,
-        "followerProximityNavigation" : true,
         "differentBehaviour" : false,
         "differentEvasionBehaviourPercentage" : [ ],
         "varyingBehaviour" : false,
@@ -515,6 +516,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

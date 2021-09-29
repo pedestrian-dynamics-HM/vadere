@@ -35,7 +35,7 @@ public abstract class ControlModel implements IControlModel {
         this.informationFilter = new InformationFilter(informationFilterSettings);
     }
 
-    protected abstract Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int commandId, double timeCommandExecuted);
+    protected abstract Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int stimulusId, double timeCommandExecuted);
 
     public void update(String commandRaw, Double time, int pedId)  {
 
@@ -48,7 +48,7 @@ public abstract class ControlModel implements IControlModel {
         for (Pedestrian ped : pedestrians) {
             if (this.informationFilter.isInformationProcessed(ped, command.getSpace(), time, command.getExecTime(), command.getCommandId())){
                 // single agent
-                Stimulus stimulus = this.getStimulusFromJsonCommand(ped, command.getPedCommand(), command.getCommandId(), getTimeCommandExecuted(time));
+                Stimulus stimulus = this.getStimulusFromJsonCommand(ped, command.getPedCommand(), command.getStimulusId(), getTimeCommandExecuted(time));
                 this.stimulusController.setDynamicStimulus(ped, stimulus, getTimeCommandExecuted(time));
                 this.informationFilter.setPedProcessedCommandIds(ped, command.getCommandId());
 
@@ -59,7 +59,6 @@ public abstract class ControlModel implements IControlModel {
                 }
             }
         }
-
     }
 
 
