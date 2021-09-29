@@ -2,7 +2,7 @@
   "name" : "hamner-2020-life_postvis_template",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "4931a4b110a6b8a27b180270ad76caf466e7de1d",
+  "commithash" : "7a8485fe9f2f0d26e432c4e2d07c4aa9c46fdf59",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
@@ -20,6 +20,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 5 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudShapes.txt",
+      "processors" : [ 7 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
@@ -38,11 +42,18 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
       "attributes" : {
-        "pedestrianOverlapProcessorId" : 0
+        "pedestrianOverlapProcessorId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 6
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
+      "id" : 7,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributes" : {
+        "sampleEveryNthSimStep" : 100
+      }
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false

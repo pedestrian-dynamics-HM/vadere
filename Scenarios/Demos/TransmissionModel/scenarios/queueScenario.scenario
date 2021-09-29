@@ -2,7 +2,7 @@
   "name" : "queueScenario",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "0519e4921894d384477955d27a3c6ecacdb35bd1",
+  "commithash" : "26f81a3be07efb08ead7b8c19c4b9d4fd1aea928",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -44,10 +44,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
       "filename" : "aerosolCloudShapes.txt",
       "processors" : [ 12 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestriansNearbyIdOutputFile",
-      "filename" : "contacts.txt",
-      "processors" : [ 13 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -96,17 +92,7 @@
       "id" : 12,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
       "attributes" : {
-        "sampleEveryNthSimStep" : 75
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestriansNearbyProcessor",
-      "id" : 13,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianNearbyProcessor",
-      "attributes" : {
-        "maxDistanceForANearbyPedestrian" : 1.0,
-        "sampleEveryNthStep" : 1,
-        "allowedAbsenceTimestepsIfContactReturns" : 0,
-        "minTimespanOfContactTimesteps" : 1
+        "sampleEveryNthSimStep" : 1
       }
     } ],
     "isTimestamped" : true,

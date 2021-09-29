@@ -2,7 +2,7 @@
   "name" : "queueScenario_publication",
   "description" : "",
   "release" : "1.15",
-  "commithash" : "4931a4b110a6b8a27b180270ad76caf466e7de1d",
+  "commithash" : "7a8485fe9f2f0d26e432c4e2d07c4aa9c46fdf59",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -40,6 +40,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.IdOutputFile",
       "filename" : "aerosolCloudLifeTime.txt",
       "processors" : [ 9 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudShapes.txt",
+      "processors" : [ 12 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -83,8 +87,15 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 11
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
+      "id" : 12,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributes" : {
+        "sampleEveryNthSimStep" : 1
+      }
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {
@@ -169,7 +180,7 @@
     "attributesSimulation" : {
       "finishTime" : 1400.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.001,
+      "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
