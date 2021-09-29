@@ -20,8 +20,8 @@ public class DefaultConfig {
 	private Color measurementAreaColor = Color.RED;
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
-	private int aerosolCloudAlphaMax = 128;
-	private int aerosolCloudAlphaMin = 10;
+	private int aerosolCloudAlphaMax = 10;
+	private int aerosolCloudAlphaMin = 0;
 	private Color dropletsColor = new Color(190, 210, 20);
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private HashMap<InfectionStatus, Color> infectionStatusColors = new HashMap<>();
