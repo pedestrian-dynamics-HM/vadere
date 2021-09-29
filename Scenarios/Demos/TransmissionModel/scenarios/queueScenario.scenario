@@ -1,8 +1,7 @@
 {
   "name" : "queueScenario",
   "description" : "",
-  "release" : "1.15",
-  "commithash" : "26f81a3be07efb08ead7b8c19c4b9d4fd1aea928",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -377,6 +376,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

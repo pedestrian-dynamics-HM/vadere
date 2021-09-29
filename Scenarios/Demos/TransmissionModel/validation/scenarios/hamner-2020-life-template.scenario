@@ -1,8 +1,7 @@
 {
   "name" : "hamner-2020-life-template",
   "description" : "",
-  "release" : "1.15",
-  "commithash" : "0687461b62817679f5109d2112649bebb5dd5dc3",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
@@ -171,6 +170,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

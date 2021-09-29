@@ -1,8 +1,7 @@
 {
   "name" : "queueScenario_modelComparison",
   "description" : "This scenario is used for comparing the simulation output between the implementations of the infection model in crowd:it and vadere.",
-  "release" : "1.15",
-  "commithash" : "a790c934522f3e632096e773981e5a6025ccdac0",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -170,11 +169,11 @@
         "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 120.0,
         "aerosolCloudInitialArea" : 3.14,
-		"dropletsExhalationFrequency" : 0,
-		"dropletsDistanceOfSpread" : 1.5,
-		"dropletsAngleOfSpreadInDeg" : 30,
-		"dropletsLifeTime" : 1.001,
-		"dropletsPathogenLoadFactor" : 200
+        "dropletsExhalationFrequency" : 0.0,
+        "dropletsDistanceOfSpread" : 1.5,
+        "dropletsAngleOfSpreadInDeg" : 30.0,
+        "dropletsLifeTime" : 1.001,
+        "dropletsPathogenLoadFactor" : 200.0
       }
     },
     "attributesSimulation" : {
@@ -377,6 +376,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }

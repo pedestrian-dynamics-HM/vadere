@@ -1,8 +1,7 @@
 {
   "name" : "closeContact",
   "description" : "",
-  "release" : "1.15",
-  "commithash" : "4931a4b110a6b8a27b180270ad76caf466e7de1d",
+  "release" : "1.16",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -292,6 +291,7 @@
         }
       }
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }
