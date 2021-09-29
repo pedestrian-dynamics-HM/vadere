@@ -1,8 +1,8 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.distribution.RealDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
+import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
@@ -19,13 +19,16 @@ import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.math.TruncatedNormalDistribution;
+import org.vadere.util.logging.Logger;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class SourceController {
+public abstract class SourceController extends ScenarioElementController implements ControllerEventProvider<Agent, SourceController> {
+
+	protected static Logger logger = Logger.getLogger(SourceController.class);
 
 	protected final double BUFFER_CA = 0.01; // amount of overlap between spawned agents that is allowed in order to allow touching agents in CA
 	protected final double NO_EVENT = Double.MAX_VALUE;
@@ -36,6 +39,8 @@ public abstract class SourceController {
 
 	private final Topography topography;
 	protected final Random random;
+
+	protected ArrayList<ControllerEventListener<Agent, SourceController>> eventListener;
 
 	/**
 	 * <code>null</code>, if there is no next event.
@@ -57,6 +62,7 @@ public abstract class SourceController {
 		this.dynamicElementFactory = dynamicElementFactory;
 		this.topography = scenario;
 		this.random = random;
+		this.eventListener = new ArrayList<>();
 
 		timeOfNextEvent = sourceAttributes.getStartTime();
 		try {
@@ -145,11 +151,11 @@ public abstract class SourceController {
 	 * note that most models create their own pedestrians and ignore the attributes given here. the
 	 * source is mostly used to set the position and target ids, not the attributes.
 	 */
-	protected void addNewAgentToScenario(final List<VPoint> position) {
-		position.forEach(p -> addNewAgentToScenario(p));
+	protected void addNewAgentToScenario(final List<VPoint> position, double simTimeInSec) {
+		position.forEach(p -> addNewAgentToScenario(p, simTimeInSec));
 	}
 
-	protected void addNewAgentToScenario(final VPoint position) {
+	protected void addNewAgentToScenario(final VPoint position, double simTimeInSec) {
 		Agent newElement = (Agent) createDynamicElement(position);
 
 		// TODO [priority=high] [task=refactoring] this is bad programming. Why is the target list added later?
@@ -163,6 +169,7 @@ public abstract class SourceController {
 		}
 
 		topography.addElement(newElement);
+		notifyListeners(simTimeInSec, newElement);
 	}
 
 
@@ -185,4 +192,26 @@ public abstract class SourceController {
 		result.setSource(source);
 		return result;
 	}
+
+
+
+	@Override
+	public void register(ControllerEventListener<Agent, SourceController> listener) {
+		if (! eventListener.contains(listener)){
+			eventListener.add(listener);
+		}
+	}
+
+	@Override
+	public void unregister(ControllerEventListener<Agent, SourceController> listener) {
+		eventListener.remove(listener);
+	}
+
+	protected void notifyListeners(double simTimeInSec, Agent pedestrian){
+		for (var listener: eventListener){
+			listener.notify(this, simTimeInSec, pedestrian);
+		}
+	}
+
+	public int getSourceId() { return source.getId(); }
 }

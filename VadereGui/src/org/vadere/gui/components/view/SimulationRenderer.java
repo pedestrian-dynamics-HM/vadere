@@ -5,6 +5,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -101,6 +102,15 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
         if (model.config.isShowAbsorbingAreas()) {
             renderScenarioElement(model.getTopography().getAbsorbingAreas(), graphics, model.config.getAbsorbingAreaColor());
+        }
+
+        if (model.config.isShowAerosolClouds()) {
+            renderAerosolClouds(model.getTopography().getAerosolClouds(), graphics, model.config.getAerosolCloudColor());
+        }
+
+        if (model.config.isShowDroplets()) {
+            // ToDo use renderScenarioElement() instead?
+            renderAllDroplets(model.getTopography().getDroplets(), graphics, model.config.getDropletsColor());
         }
 
         if (model.config.isShowSources()) {
@@ -321,8 +331,53 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 				    return model.getGroupColor((Pedestrian)agent);
 			    }
 		    }
+            case INFECTION_STATUS: {
+                if (agent instanceof Pedestrian) {
+                    Pedestrian pedestrian = (Pedestrian) agent;
+                    return getInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad(), pedestrian.getMinInfectiousDose());
+                }
+            }
 		    default: return model.config.getPedestrianColor();
 
 	    }
     }
+
+    public Color getInfectionStatusColor(InfectionStatus infectionStatus, double absorbedPathogenLoad, double minInfectiousDose) {
+        Color color = model.config.getInfectionStatusColor(infectionStatus);
+		boolean interpolateColors = true; // ToDo define as checkbox in settings dialog
+
+		double minAbsorbedPathogenLoad = 0;
+		double maxAbsorbedPathogenLoad = minInfectiousDose;
+		float t = (float) ((absorbedPathogenLoad - minAbsorbedPathogenLoad) / maxAbsorbedPathogenLoad);
+
+		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values
+        for (InfectionStatus status : InfectionStatus.values()) {
+            if (model.config.getInfectionStatusColor(status).equals(model.config.getDefaultInfectionStatusColor(InfectionStatus.SUSCEPTIBLE))) {
+                model.config.setInfectionStatusColor(status, model.config.getDefaultInfectionStatusColor(status));
+            }
+        }
+
+        Color susceptibleColor = model.config.getInfectionStatusColor(InfectionStatus.SUSCEPTIBLE);
+        Color exposedColor = model.config.getInfectionStatusColor(InfectionStatus.EXPOSED);
+
+        if (interpolateColors) {
+            switch (infectionStatus) {
+                case SUSCEPTIBLE:
+                case EXPOSED:
+                    if (absorbedPathogenLoad <= minAbsorbedPathogenLoad) { // if (t < 0)
+                        color = susceptibleColor;
+                    } else if (absorbedPathogenLoad >= maxAbsorbedPathogenLoad) { // if (t > 1)
+                        color = exposedColor;
+                    } else {
+                        // color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
+                        color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
+                    }
+                    break;
+                case INFECTIOUS:
+                case RECOVERED:
+            }
+        }
+		return color;
+    }
+
 }

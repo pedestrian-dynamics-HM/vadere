@@ -1,5 +1,6 @@
 package org.vadere.simulator.models;
 
+import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
@@ -25,6 +26,11 @@ public interface Model {
 	 */
 	void initialize(List<Attributes> attributesList, Domain domain,
 	                AttributesAgent attributesPedestrian, Random random);
+
+
+	default void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider){
+		//do nothing on default
+	}
 
 	void preLoop(final double simTimeInSec);
 

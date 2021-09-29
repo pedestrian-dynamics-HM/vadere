@@ -7,15 +7,12 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.StimulusFactory;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.scenario.TopographyIterator;
+import org.vadere.state.scenario.*;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.Step;
 import org.vadere.state.simulation.Trajectory;
@@ -60,6 +57,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private PotentialFieldContainer potentialContainer;
 
+	private TableAerosolCloudData tableAerosolCloudData;
+
 	private PredicateColoringModel predicateColoringModel;
 
 	private TableTrajectoryFootStep trajectories;
@@ -79,18 +78,21 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.scenario = new Scenario("");
 		this.topographyId = 0;
 		this.potentialContainer = null;
+		this.tableAerosolCloudData = null;
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
 		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
 		this.predicateColoringModel = new PredicateColoringModel();
 		this.outputChanged = false;
 	}
-
+	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath) {
+		init(trajectories, contactTrajectories, aerosolCloudData, scenario, projectPath, new AttributesAgent());
+	}
 	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, contactTrajectories, scenario, projectPath, new AttributesAgent());
+		init(trajectories, contactTrajectories, null, scenario, projectPath, new AttributesAgent());
 	}
 	public synchronized void init(final Table trajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, null, scenario, projectPath, new AttributesAgent());
+		init(trajectories, null, null, scenario, projectPath, new AttributesAgent());
 	}
 
 	/**
@@ -100,13 +102,17 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	 *                      This scenario will not contain any agents.
 	 * @param projectPath   the path to the project.
 	 */
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
+	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
 		this.scenario = scenario;
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
 		if (contactTrajectories != null) {
 			this.config.setContactsRecorded(true);
 			this.contactData = new ContactData(contactTrajectories);
+		}
+		if (aerosolCloudData != null) {
+			this.config.setAerosolCloudsRecorded(true);
+			this.tableAerosolCloudData = new TableAerosolCloudData(aerosolCloudData);
 		}
 		this.visTime = 0;
 		this.attributesAgent = attributesAgent;
@@ -212,6 +218,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.getAgentsWithDisappearedAgents(getSimTimeInSec());
 	}
 
+	public synchronized TableAerosolCloudData getTableAerosolCloudData() {
+		return tableAerosolCloudData;
+	}
+
 	public synchronized DoubleColumn getDeathTime() {
 		return trajectories.getDeathTime();
 	}
@@ -271,6 +281,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		if(trajectories.groupMembershipCol != -1) {
 			String groupMembershipString = row.getString(trajectories.groupMembershipCol);
 			pedestrian.setGroupMembership(GroupMembership.valueOf(groupMembershipString));
+		}
+
+		if(trajectories.infectionStatusCol != -1) {
+			String infectionStatusString = row.getString(trajectories.infectionStatusCol);
+			pedestrian.setInfectionStatus(InfectionStatus.valueOf(infectionStatusString));
+		}
+
+		if(trajectories.absorbedPathogenLoadCol != -1) {
+			pedestrian.setPathogenAbsorbedLoad(row.getDouble(trajectories.absorbedPathogenLoadCol));
+		}
+
+		if(trajectories.minInfectiousDoseCol != -1) {
+			pedestrian.setMinInfectiousDose(row.getDouble(trajectories.minInfectiousDoseCol));
 		}
 
 		return pedestrian;

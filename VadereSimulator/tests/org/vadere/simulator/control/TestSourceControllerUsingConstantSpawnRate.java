@@ -34,6 +34,8 @@ public class TestSourceControllerUsingConstantSpawnRate extends TestSourceContro
 		assertEquals("wrong pedestrian number", 1, countPedestrians(0));
 	}
 
+
+
 	/**
 	 * Test method for {@link SourceController#update(double)}.
 	 */

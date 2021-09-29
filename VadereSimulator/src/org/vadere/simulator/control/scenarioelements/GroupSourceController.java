@@ -73,7 +73,7 @@ public class GroupSourceController extends SourceController {
 							);
 							if (newGroup.size() > 0) {
 								// add immediately to Scenario to update DynElementsAtSource
-								addElementToScenario(newGroup);
+								addElementToScenario(newGroup, simTimeInSec);
 								iter.remove();
 							} else {
 								break; // FIFO Spawn. The rest of the queue at next time step
@@ -96,7 +96,7 @@ public class GroupSourceController extends SourceController {
 										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
 										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
 										"to queue groups.");
-							addElementToScenario(newGroup);
+							addElementToScenario(newGroup, simTimeInSec);
 							iter.remove();
 						}
 					}
@@ -116,7 +116,7 @@ public class GroupSourceController extends SourceController {
 							);
 							if (newGroup != null && !newGroup.isEmpty()) {
 								// add immediately to Scenario to update DynElementsAtSource
-								addElementToScenario(newGroup);
+								addElementToScenario(newGroup, simTimeInSec);
 								iter.remove();
 							} else {
 								break; // FIFO Spawn. The rest of the queue at next time step
@@ -138,7 +138,7 @@ public class GroupSourceController extends SourceController {
 										"to useFreeSpaceOnly == false but no space is left to spawn group without exactly" +
 										"overlapping with neighbours which can cause numerical problems. Use useFreeSpaceOnly == true (default)" +
 										"to queue groups.");
-							addElementToScenario(newGroup);
+							addElementToScenario(newGroup, simTimeInSec);
 							iter.remove();
 						}
 					}
@@ -216,9 +216,9 @@ public class GroupSourceController extends SourceController {
 		return ret;
 	}
 
-	private void addElementToScenario(List<VPoint> group) {
+	private void addElementToScenario(List<VPoint> group, double simTimeInSec) {
 		if (!group.isEmpty() && !isMaximumNumberOfSpawnedElementsReached()) {
-			addNewAgentToScenario(group);
+			addNewAgentToScenario(group, simTimeInSec);
 			dynamicElementsCreatedTotal += group.size();
 		}
 	}

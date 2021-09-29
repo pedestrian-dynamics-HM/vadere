@@ -150,6 +150,7 @@ public class TikzGenerator {
 		generatedCode += createTikzCodeForScenarioElement(config.isShowTargets(), topography.getTargets(), "Target", "TargetColor");
 		generatedCode += createTikzCodeForScenarioElement(config.isShowAbsorbingAreas(), topography.getAbsorbingAreas(), "AbsorbingArea", "AbsorbingAreaColor");
 		generatedCode += createTikzCodeForScenarioElement(config.isShowObstacles(), topography.getObstacles(), "Obstacle", "ObstacleColor");
+		generatedCode += createTikzCodeForScenarioElement(config.isShowAerosolClouds(), topography.getAerosolClouds(), "AerosolClouds", "AerosolCloudColor");
 
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";

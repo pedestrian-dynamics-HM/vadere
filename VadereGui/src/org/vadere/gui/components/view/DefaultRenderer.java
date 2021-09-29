@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.*;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
@@ -275,6 +274,62 @@ public abstract class DefaultRenderer {
 				defaultModel.getConfig().getMeasurementAreaAlpha()));
 		if (area.getShape() instanceof VPolygon){
 			VPolygon p = (VPolygon) area.getShape();
+			if (p.getPoints().size() == 2){
+				graphics.setStroke(new BasicStroke(3*getLineWidth()));
+				graphics.draw(p);
+			}
+		}
+		fill(element.getShape(), graphics);
+
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderAerosolClouds(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+										  final Color color){
+		for (ScenarioElement e : elements){
+			renderAerosolCloud(e, g, color);
+		}
+	}
+
+	protected void renderAerosolCloud(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		AerosolCloud cloud = (AerosolCloud) element;
+		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
+		float minAlpha = defaultModel.getConfig().getAerosolCloudAlphaMin();
+		//ToDo this is hard coded!
+		double maxPathogensPerArea = 10000;
+		double pathogensPerArea = cloud.getCurrentPathogenLoad() / cloud.getArea();
+		pathogensPerArea = Math.min(pathogensPerArea, maxPathogensPerArea); // make sure that maxPathogensPerArea is not exceeded
+		int currentAlpha = (int) ((pathogensPerArea / maxPathogensPerArea) * (maxAlpha - minAlpha) + minAlpha);
+
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
+		if (cloud.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) cloud.getShape();
+			if (p.getPoints().size() == 2){
+				graphics.setStroke(new BasicStroke(3*getLineWidth()));
+				graphics.draw(p);
+			}
+		}
+		fill(element.getShape(), graphics);
+
+		graphics.setColor(tmpColor);
+	}
+
+	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
+									 final Color color){
+		for (ScenarioElement e : elements){
+			renderDroplets(e, g, color);
+		}
+	}
+
+	protected void renderDroplets(ScenarioElement element, final Graphics2D graphics, Color color){
+		final Color tmpColor = graphics.getColor();
+		Droplets droplets = (Droplets) element;
+		int currentAlpha = 100;
+
+		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
+		if (droplets.getShape() instanceof VPolygon){
+			VPolygon p = (VPolygon) droplets.getShape();
 			if (p.getPoints().size() == 2){
 				graphics.setStroke(new BasicStroke(3*getLineWidth()));
 				graphics.draw(p);

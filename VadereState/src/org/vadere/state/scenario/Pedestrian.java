@@ -3,6 +3,8 @@ package org.vadere.state.scenario;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
+import org.vadere.state.health.InfectionStatus;
+import org.vadere.state.health.HealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
@@ -31,8 +33,10 @@ public class Pedestrian extends Agent {
 
     private PsychologyStatus psychologyStatus;
 
-    private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
-    private LinkedList<Integer> groupSizes;
+	private HealthStatus healthStatus;
+
+	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
+	private LinkedList<Integer> groupSizes;
 
     private LinkedList<Pedestrian> agentsInGroup = new LinkedList<>();
 
@@ -66,16 +70,17 @@ public class Pedestrian extends Agent {
     public Pedestrian(AttributesAgent attributesAgent, Random random) {
         super(attributesAgent, random);
 
-        idAsTarget = -1;
-        isChild = false;
-        isLikelyInjured = false;
-        psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
-        groupIds = new LinkedList<>();
-        groupSizes = new LinkedList<>();
-        modelPedestrianMap = new HashMap<>();
-        trajectory = new VTrajectory();
-        footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
-    }
+		idAsTarget = -1;
+		isChild = false;
+		isLikelyInjured = false;
+		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
+		healthStatus = new HealthStatus();
+		groupIds = new LinkedList<>();
+		groupSizes = new LinkedList<>();
+		modelPedestrianMap = new HashMap<>();
+		trajectory = new VTrajectory();
+		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
+	}
 
     protected Pedestrian(Pedestrian other) {
         super(other);
@@ -84,7 +89,9 @@ public class Pedestrian extends Agent {
         isChild = other.isChild;
         isLikelyInjured = other.isLikelyInjured;
 
-        psychologyStatus = new PsychologyStatus(other.psychologyStatus);
+		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
+
+		healthStatus = new HealthStatus(other.healthStatus);
 
         if (other.groupIds != null) {
             groupIds = new LinkedList<>(other.groupIds);
@@ -148,6 +155,27 @@ public class Pedestrian extends Agent {
     public ScenarioElementType getType() {
         return ScenarioElementType.PEDESTRIAN;
     }
+
+    public InfectionStatus getInfectionStatus() {
+    	return healthStatus.getInfectionStatus();
+    }
+
+	public double getPathogenAbsorbedLoad() {
+    	return healthStatus.getPathogenAbsorbedLoad();
+    }
+
+	public VPoint getStartBreatheOutPosition() {
+    	return healthStatus.getStartBreatheOutPosition();
+    }
+
+	public boolean isBreathingIn() {
+    	return healthStatus.isBreathingIn();
+    }
+
+	public double getMinInfectiousDose() {
+    	return healthStatus.getMinInfectiousDose();
+    }
+
 
     public VTrajectory getTrajectory() {
         return trajectory;
@@ -218,6 +246,46 @@ public class Pedestrian extends Agent {
         return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
     }
 
+	public void setInfectionStatus(InfectionStatus infectionStatus) {
+    	healthStatus.setInfectionStatus(infectionStatus);
+    }
+
+	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) {
+    	healthStatus.setStartBreatheOutPosition(startBreatheOutPosition);
+    }
+
+	public void setRespiratoryTimeOffset(double respiratoryTimeOffset) {
+    	healthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset);
+    }
+
+	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) {
+    	healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity);
+    }
+
+	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) {
+    	healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
+    }
+
+    public void setPathogenAbsorbedLoad(double absorbedLoad) {
+        healthStatus.setPathogenAbsorbedLoad(absorbedLoad);
+    }
+
+	public void setMinInfectiousDose(double minInfectiousDose) {
+    	healthStatus.setMinInfectiousDose(minInfectiousDose);
+    }
+
+	public void setExposedPeriod(double exposedPeriod) {
+    	healthStatus.setExposedPeriod(exposedPeriod);
+    }
+
+	public void setInfectiousPeriod(double infectiousPeriod) {
+    	healthStatus.setInfectiousPeriod(infectiousPeriod);
+    }
+
+	public void setRecoveredPeriod(double recoveredPeriod) {
+    	healthStatus.setRecoveredPeriod(recoveredPeriod);
+    }
+
     // Methods
     public boolean isTarget() {
         return this.idAsTarget != -1;
@@ -238,7 +306,30 @@ public class Pedestrian extends Agent {
         }
     }
 
-    // Overridden Methods
+	public double emitPathogen() {
+    	return healthStatus.emitPathogen();
+    }
+
+	public void absorbPathogen(double pathogenConcentration) {
+		healthStatus.absorbPathogen(pathogenConcentration);
+	}
+
+	public void updateInfectionStatus(double simTimeInSec)	{
+		healthStatus.updateInfectionStatus(simTimeInSec);
+	}
+
+	public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
+		healthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
+	}
+	public boolean isStartingBreatheOut() {
+		return healthStatus.isStartingBreatheOut();
+	}
+
+	public boolean isStartingBreatheIn() {
+		return healthStatus.isStartingBreatheIn();
+	}
+
+	// Overridden Methods
 
     @Override
     public Pedestrian clone() {

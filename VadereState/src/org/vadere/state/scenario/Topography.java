@@ -90,6 +90,16 @@ public class Topography implements DynamicElementMover{
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private final LinkedList<MeasurementArea> measurementAreas;
 	/**
+	 * AerosolClouds.
+	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private final LinkedList<AerosolCloud> aerosolClouds;
+	/**
+	 * Droplets.
+	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private final LinkedList<Droplets> droplets;
+	/**
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
 	private List<Obstacle> boundaryObstacles;
@@ -142,6 +152,8 @@ public class Topography implements DynamicElementMover{
 		absorbingAreas = new LinkedList<>();
 		boundaryObstacles = new LinkedList<>();
 		measurementAreas = new LinkedList<>();
+		aerosolClouds = new LinkedList<>();
+		droplets = new LinkedList<>();
 
 		allScenarioElements.add(obstacles);
 		allScenarioElements.add(stairs);
@@ -150,6 +162,8 @@ public class Topography implements DynamicElementMover{
 		allScenarioElements.add(targetChangers);
 		allScenarioElements.add(boundaryObstacles);
 		allScenarioElements.add(measurementAreas);
+		allScenarioElements.add(aerosolClouds);
+		allScenarioElements.add(droplets);
 
 		RectangularShape bounds = this.getBounds();
 
@@ -460,6 +474,10 @@ public class Topography implements DynamicElementMover{
 		return measurementAreas.stream().filter(area -> area.getId() == id).findFirst().orElse(null);
 	}
 
+	public List<AerosolCloud> getAerosolClouds() { return aerosolClouds; }
+
+	public List<Droplets> getDroplets() { return droplets; }
+
 	public DynamicElementContainer<Pedestrian> getPedestrianDynamicElements() {
 		return pedestrians;
 	}
@@ -490,9 +508,14 @@ public class Topography implements DynamicElementMover{
 		this.measurementAreas.add(measurementArea);
 	}
 
+	public void addAerosolCloud(AerosolCloud aerosolCloud) { this.aerosolClouds.add(aerosolCloud); }
+
+	public void addDroplets(Droplets droplets) { this.droplets.add(droplets); }
+
 	public void addStairs(Stairs stairs) {
 		this.stairs.add(stairs);
 	}
+
 
 	public void setTeleporter(Teleporter teleporter) {
 		allScenarioElements.remove(this.teleporter); // remove old teleporter
@@ -615,6 +638,12 @@ public class Topography implements DynamicElementMover{
 		for (MeasurementArea measurementArea : this.getMeasurementAreas()){
 			s.addMeasurementArea(measurementArea);
 		}
+		for (AerosolCloud aerosolCloud : this.getAerosolClouds()){
+			s.addAerosolCloud(aerosolCloud);
+		}
+		for (Droplets droplets : this.getDroplets()){
+			s.addDroplets(droplets);
+		}
 		for (Stairs stairs : getStairs()) {
 			s.addStairs(stairs.clone());
 		}
@@ -626,6 +655,12 @@ public class Topography implements DynamicElementMover{
 		}
 		for (AbsorbingArea absorbingArea: getAbsorbingAreas()) {
 			s.addAbsorbingArea(absorbingArea.clone());
+		}
+		for (AerosolCloud aerosolCloud: getAerosolClouds()) {
+			s.addAerosolCloud(aerosolCloud.clone());
+		}
+		for (Droplets droplets : getDroplets()) {
+			s.addDroplets(droplets.clone());
 		}
 		for (Source source : getSources()) {
 			s.addSource(source.clone());
@@ -720,6 +755,8 @@ public class Topography implements DynamicElementMover{
 		usedIds.addAll(measurementAreas.stream().map(MeasurementArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(absorbingAreas.stream().map(AbsorbingArea::getId).collect(Collectors.toSet()));
 		usedIds.addAll(getInitialElements(Pedestrian.class).stream().map(Agent::getId).collect(Collectors.toSet()));
+		usedIds.addAll(aerosolClouds.stream().map(AerosolCloud::getId).collect(Collectors.toSet()));
+		usedIds.addAll(droplets.stream().map(Droplets::getId).collect(Collectors.toSet()));
 
 		sources.stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
@@ -749,10 +786,17 @@ public class Topography implements DynamicElementMover{
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
 
-
 		getInitialElements(Pedestrian.class).stream()
 				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
 				.forEach(s -> s.getAttributes().setId(nextIdNotInSet(usedIds)));
+
+		aerosolClouds.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
+
+		droplets.stream()
+				.filter(s -> s.getId() == Attributes.ID_NOT_SET)
+				.forEach(s -> s.setId(nextIdNotInSet(usedIds)));
 	}
 
 	private int nextIdNotInSet(Set<Integer> usedIDs){
@@ -782,6 +826,8 @@ public class Topography implements DynamicElementMover{
 		all.addAll(boundaryObstacles);
 		all.addAll(measurementAreas);
 		all.addAll(absorbingAreas);
+		all.addAll(aerosolClouds);
+		all.addAll(droplets);
 		return  all;
 
 	}
@@ -809,4 +855,5 @@ public class Topography implements DynamicElementMover{
 	public void setContextId(String contextId) {
 		this.contextId = contextId;
 	}
+
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * - {@link org.vadere.state.attributes.scenario.AttributesAbsorbingArea#getDeletionDistance()}
  * <p>
  */
-public class AbsorbingAreaController {
+public class AbsorbingAreaController extends ScenarioElementController {
 
     // Variables
     private static final Logger log = Logger.getLogger(AbsorbingAreaController.class);

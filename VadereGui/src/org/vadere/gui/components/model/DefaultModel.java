@@ -108,6 +108,12 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 			case ABSORBING_AREA:
 				c = getConfig().getAbsorbingAreaColor();
 				break;
+			case AEROSOL_CLOUD:
+				c = getConfig().getAerosolCloudColor();
+				break;
+			case DROPLETS:
+				c = getConfig().getDropletsColor();
+				break;
 			default:
 				c = Color.RED;
 		}

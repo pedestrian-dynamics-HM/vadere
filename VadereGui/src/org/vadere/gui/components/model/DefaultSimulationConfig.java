@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
@@ -29,6 +30,9 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
+	private boolean showAerosolClouds = true;
+	private boolean aerosolCloudsRecorded = false;
+	private boolean showDroplets = true;
 	private boolean showSources = true;
 	private boolean showObstacles = true;
 	private boolean showMeasurementArea = true;
@@ -48,6 +52,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
 	private Map<Integer, Color> selfCategoryColors = new HashMap<>();
+	private Map<Integer, Color> infectionStatusColors = new HashMap<>();
 	private Map<Integer, Color> informationStateColors = new HashMap<>();
 	private double gridWidth = CONFIG.getDouble("ProjectView.cellWidth");
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
@@ -64,6 +69,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.randomColors = new HashMap<>();
 		this.pedestrianColors = new HashMap<>();
 		this.selfCategoryColors = new HashMap<>();
+		this.infectionStatusColors = new HashMap<>();
 		this.informationStateColors = new HashMap<>();
 
 		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
@@ -155,6 +161,22 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return showAbsorbingAreas;
 	}
 
+	public boolean isShowAerosolClouds() {
+		return showAerosolClouds;
+	}
+
+	public boolean isAerosolCloudsRecorded() {
+		return aerosolCloudsRecorded;
+	}
+
+	public void setAerosolCloudsRecorded(boolean aerosolCloudsRecorded) {
+		this.aerosolCloudsRecorded = aerosolCloudsRecorded;
+	}
+
+	public boolean isShowDroplets() {
+		return showDroplets;
+	}
+
 	public boolean isShowMeasurementAreas() {
 		return showMeasurementArea;
 	}
@@ -189,6 +211,16 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public void setShowAbsorbingAreas(boolean showAbsorbingAreas) {
 		this.showAbsorbingAreas = showAbsorbingAreas;
+		setChanged();
+	}
+
+	public void setShowAerosolClouds(boolean showAerosolClouds) {
+		this.showAerosolClouds = showAerosolClouds;
+		setChanged();
+	}
+
+	public void setShowDroplets(boolean showDroplets) {
+		this.showDroplets = showDroplets;
 		setChanged();
 	}
 
@@ -343,6 +375,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 		return color;
 	}
+	public Color getInfectionStatusColor(InfectionStatus infectionStatus) {
+		Color color = getPedestrianDefaultColor();
+
+		if (infectionStatusColors.containsKey(infectionStatus.ordinal())) {
+			color = infectionStatusColors.get(infectionStatus.ordinal());
+		}
+
+		return color;
+	}
 
 	public Color getInformationStateColor(InformationState informationState) {
 		Color color = getPedestrianDefaultColor();
@@ -354,7 +395,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return color;
 	}
 
-
+	public void setInfectionStatusColor(InfectionStatus infectionStatus, final Color color) {
+		this.infectionStatusColors.put(infectionStatus.ordinal(), color);
+		setChanged();
+	}
 
 	public void setGridWidth(final double gridWidth) {
 		this.gridWidth = gridWidth;

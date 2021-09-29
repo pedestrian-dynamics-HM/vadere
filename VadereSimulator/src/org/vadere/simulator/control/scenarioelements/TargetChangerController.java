@@ -34,7 +34,7 @@ import java.util.Random;
  *     </li>
  * </ul>
  */
-public class TargetChangerController {
+public class TargetChangerController  extends ScenarioElementController  {
 
     // Static Variables
     private static final Logger log = Logger.getLogger(TargetChangerController.class);

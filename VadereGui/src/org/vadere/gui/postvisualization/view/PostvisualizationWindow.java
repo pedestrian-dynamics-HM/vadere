@@ -227,6 +227,26 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				}, "ProjectView.btnShowContacts.tooltip");
 		toolbar.addSeparator(new Dimension(5, 50));
 
+		// Other information (neither related to pedestrians nor to measuring tools)
+		addActionToToolbar(
+				toolbar,
+				new ActionVisualization(
+						"show_aerosolClouds",
+						resources.getIcon("aerosolCloud_icon.png", iconWidth, iconHeight),
+						model) {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!model.config.isAerosolCloudsRecorded()) {
+							JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
+									Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text"));
+						} else {
+							model.config.setShowAerosolClouds(!model.config.isShowAerosolClouds());
+							model.notifyObservers();
+						}
+					}
+				}, "ProjectView.btnShowAerosolClouds.tooltip");
+		toolbar.addSeparator(new Dimension(5, 50));
+
 		// "Measuring" tools
 		addActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
@@ -377,12 +397,16 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		return menuBar;
 	}
 
-	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final Scenario scenario) throws IOException {
+	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final File aerosolCloudShapeFile, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
 
 		try {
-			if (contactsTrajectoryFile != null) {
+			if (contactsTrajectoryFile != null && aerosolCloudShapeFile != null) {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+			} else if(contactsTrajectoryFile != null && aerosolCloudShapeFile == null) {
 				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
+			} else if(contactsTrajectoryFile == null && aerosolCloudShapeFile != null) {
+				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), null, IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, aerosolCloudShapeFile.getParent());
 			} else {
 				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
 			}
@@ -393,7 +417,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 	}
 
 	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
-		loadOutputFile(trajectoryFile, null, scenario);
+		loadOutputFile(trajectoryFile, null, null, scenario);
 	}
 
 	public void loadOutputFile(final Scenario scenario) {

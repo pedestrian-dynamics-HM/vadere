@@ -256,6 +256,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			case GROUP:
 			case RANDOM:
 			case SELF_CATEGORY:
+			case INFECTION_STATUS:
 				config.setAgentColoring(agentColoring);
 				break;
 			case INFORMATION_STATE:

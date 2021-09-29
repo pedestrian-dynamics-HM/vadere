@@ -628,12 +628,22 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 						contactsTrajectoryFile = Optional.of(f);
 					}
 				}
+				Optional<File> aerosolCloudShapeFile = Optional.empty();
+				for (File f :txtFiles) {
+					if (f.getName().contains("aerosolCloudShapes")) {
+						aerosolCloudShapeFile = Optional.of(f);
+					}
+				}
 
 				if (trajectoryFile.isPresent()) {
-					if (contactsTrajectoryFile.isPresent()) {
+					if (contactsTrajectoryFile.isPresent() && aerosolCloudShapeFile.isPresent()) {
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), contactsTrajectoryFile.get(), aerosolCloudShapeFile.get(), scenarioRM);
+					} else if (contactsTrajectoryFile.isPresent() && !aerosolCloudShapeFile.isPresent()) {
 						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), contactsTrajectoryFile.get(), scenarioRM);
+					} else if (!contactsTrajectoryFile.isPresent() && aerosolCloudShapeFile.isPresent()) {
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), null, aerosolCloudShapeFile.get(), scenarioRM);
 					} else {
-						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), scenarioRM);
+							scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), scenarioRM);
 					}
 				} else {
 					scenarioJPanel.loadOutputFileForPostVis(scenarioRM);

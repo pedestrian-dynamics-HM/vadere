@@ -68,45 +68,7 @@ public class TestSourceController {
         d.random = new Random(builder.getRandomSeed());
 
         d.source = new Source(d.attributesSource);
-        d.pedestrianFactory = new DynamicElementFactory() {
-            private int pedestrianIdCounter = 0;
-
-            @Override
-            public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
-                AttributesAgent att = new AttributesAgent(
-                        d.attributesPedestrian, registerDynamicElementId(null, id));
-                Pedestrian ped = new Pedestrian(att, d.random);
-                ped.setPosition(position);
-                return ped;
-            }
-
-            @Override
-            public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
-                AttributesAgent att = new AttributesAgent(
-                        d.attributesPedestrian, registerDynamicElementId(null, id));
-                Pedestrian ped = new Pedestrian(att, d.random);
-                ped.setPosition(position);
-                return ped;
-            }
-
-            @Override
-            public int registerDynamicElementId(Topography topography, int id) {
-                return id > 0 ? id : ++pedestrianIdCounter;
-            }
-
-            @Override
-            public int getNewDynamicElementId(Topography topography) {
-                return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
-            }
-
-            @Override
-            public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
-                return createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class).getShape();
-            }
-
-
-        };
-
+        d.pedestrianFactory = new TestDynamicElementFactory(d);
         d.sourceControllerFactory = getSourceControllerFactory(d);
 
         d.sourceController = d.sourceControllerFactory.create(d.topography, d.source,
@@ -115,11 +77,54 @@ public class TestSourceController {
         sourceTestData.add(d);
     }
 
+    class TestDynamicElementFactory implements DynamicElementFactory {
+
+        public int pedestrianIdCounter = 0;
+        public  SourceTestData d;
+
+        public TestDynamicElementFactory(SourceTestData d) {
+            this.d = d;
+        }
+
+        @Override
+        public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Class<T> type) {
+            AttributesAgent att = new AttributesAgent(
+                    d.attributesPedestrian, registerDynamicElementId(null, id));
+            Pedestrian ped = new Pedestrian(att, d.random);
+            ped.setPosition(position);
+            return ped;
+        }
+
+        @Override
+        public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+            AttributesAgent att = new AttributesAgent(
+                    d.attributesPedestrian, registerDynamicElementId(null, id));
+            Pedestrian ped = new Pedestrian(att, d.random);
+            ped.setPosition(position);
+            return ped;
+        }
+
+        @Override
+        public int registerDynamicElementId(Topography topography, int id) {
+            return id > 0 ? id : ++pedestrianIdCounter;
+        }
+
+        @Override
+        public int getNewDynamicElementId(Topography topography) {
+            return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
+        }
+
+        @Override
+        public VShape getDynamicElementRequiredPlace(@NotNull VPoint position) {
+            return createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class).getShape();
+        }
+
+    }
 
     class SourceTestData {
         public Random random;
         public AttributesAgent attributesPedestrian;
-        public DynamicElementFactory pedestrianFactory;
+        public TestDynamicElementFactory pedestrianFactory;
         public Source source;
         public Topography topography = new Topography();
         public SourceController sourceController;

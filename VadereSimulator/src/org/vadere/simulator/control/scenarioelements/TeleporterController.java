@@ -1,13 +1,13 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import java.util.Collection;
-
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Teleporter;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class TeleporterController {
+import java.util.Collection;
+
+public class TeleporterController extends ScenarioElementController  {
 	private final Teleporter teleporter;
 	private final Topography scenario;
 

@@ -137,4 +137,52 @@ public class ColorHelper {
 				Math.abs(190 - c.getGreen()),
 				Math.abs(190 - c.getBlue()));
 	}
+
+	public static Color standardColorInterpolation (Color a, Color b, float t)
+	{
+		return new Color
+				(
+						(int) (a.getRed() + (b.getRed() - a.getRed()) * t),
+						(int) (a.getGreen() + (b.getGreen()  - a.getGreen() ) * t),
+						(int) (a.getBlue() + (b.getBlue() - a.getBlue()) * t),
+						(int) (a.getAlpha() + (b.getAlpha() - a.getAlpha()) * t)
+				);
+	}
+
+	/**
+	 * Color interpolation following https://www.alanzucconi.com/2016/01/06/colour-interpolation/
+	 */
+	public static Color improvedColorInterpolation(Color aRgb, Color bRgb, float t){
+		// convert rgb colors to hsb, where hsb[i]: i = 0 hue, i = 1 saturation, i = 2 brightness / value
+		float[] a = new float[3];
+		float[] b = new float[3];
+		java.awt.Color.RGBtoHSB(aRgb.getRed(), aRgb.getGreen(), aRgb.getBlue(), a);
+		java.awt.Color.RGBtoHSB(bRgb.getRed(), bRgb.getGreen(), bRgb.getBlue(), b);
+
+		// Hue interpolation
+		float h;
+		float d = b[0] - a[0];
+		if (a[0] > b[0])
+		{
+			// Swap (a.h, b.h)
+			float h3 = b[0]; // h3 = b.h2
+			b[0] = a[0];
+			a[0] = h3;
+			d = -d;
+			t = 1 - t;
+		}
+		if (d > 0.5) // 180deg
+		{
+			a[0] = a[0] + 1; // 360deg
+			h = ( a[0] + t * (b[0] - a[0]) ) % 1; // 360deg
+		}
+		// if (d <= 0.5) // 180deg
+		else {
+			h = a[0] + t * d;
+		}
+
+		// Interpolate
+		// int alpha = (int) (aRgb.getAlpha() + t * (bRgb.getAlpha() - aRgb.getAlpha()));
+		return new Color(java.awt.Color.HSBtoRGB(h, a[1] + t * (b[1]-a[1]), a[2] + t * (b[2]-a[2])));
+	}
 }

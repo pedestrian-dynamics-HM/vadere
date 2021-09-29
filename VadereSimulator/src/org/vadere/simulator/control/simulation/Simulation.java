@@ -2,8 +2,8 @@ package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
-import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
+import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.control.scenarioelements.*;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
@@ -29,6 +29,8 @@ import org.vadere.util.logging.Logger;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 
 public class Simulation implements ControllerProvider{
 
@@ -135,6 +137,11 @@ public class Simulation implements ControllerProvider{
 		// this code is to visualize the potential fields. It may be refactored later.
 		if(attributesSimulation.isVisualizationEnabled()) {
 			initPotentialFieldsForVisualization(mainModel);
+		}
+
+		// allow models to register to Controllers
+		for(var model : this.models){
+			model.registerToScenarioElementControllerEvents(this);
 		}
 
 		for (PassiveCallback pc : this.passiveCallbacks) {
@@ -465,9 +472,10 @@ public class Simulation implements ControllerProvider{
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
 			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
+			int aerosolCloudsInSimulation = this.simulationState.getTopography().getAerosolClouds().size();
 
-			// Only update until there are pedestrians in the scenario or pedestrian to spawn
-			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 ) {
+			// Only update until there are pedestrians in the scenario or pedestrian to spawn or aerosol clouds persist
+			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 || aerosolCloudsInSimulation > 0) {
 				m.update(simTimeInSec);
 
 				if (topography.isRecomputeCells()) {
