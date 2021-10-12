@@ -1,9 +1,8 @@
-package org.vadere.simulator.control.psychology.perception;
+package org.vadere.simulator.control.psychology.cognition.models;
 
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
-import org.vadere.simulator.control.psychology.cognition.models.ProbabilisticCognitionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
