@@ -3,7 +3,6 @@ package org.vadere.simulator.control.psychology.cognition.models;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
@@ -14,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ProbabilisticCognitionModel implements ICognitionModel {
+public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
     private static Logger logger = Logger.getLogger(ProbabilisticCognitionModel.class);
 
@@ -39,10 +38,9 @@ public class ProbabilisticCognitionModel implements ICognitionModel {
                 setInformationState(pedestrian, mostImportantStimulus,newStimuli);
             }
             pedestrian.setNextPerceivedStimuli(newStimuli);
-            setInformationStateGroupMember(ped.getPedGroupMembers());
+            setInformationStateGroupMember(pedestrian.getPedGroupMembers());
         }
     }
-
 
 
 
@@ -70,11 +68,13 @@ public class ProbabilisticCognitionModel implements ICognitionModel {
 
         // collect possible stimuli in a list: [stimulus 1,     stimulus 2, ...     stimulus n,     ElapsedTimeStimulus]
         List<Stimulus> stimuli = externalStimuli;
-        stimuli.add(elapsedTimeStimulus);
+
 
         // collect assigned probabilities in a list [probability 1   probability 2 ...   probability n   1 - sum(..9    ]
         List<Double> acceptanceDistribution = externalStimuli.stream().map(Stimulus::getPerceptionProbability).collect(Collectors.toList());
+
         acceptanceDistribution.add(1 - getSumOfProbsExternalStimuli(externalStimuli));
+        stimuli.add(elapsedTimeStimulus);
 
         // setup distribution and draw index
         EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng,
