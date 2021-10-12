@@ -8,6 +8,8 @@ import org.vadere.state.psychology.perception.ThreatMemory;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 
+import java.util.LinkedList;
+
 public class PsychologyStatus {
 
     // Member Variables
@@ -16,6 +18,12 @@ public class PsychologyStatus {
     private SelfCategory selfCategory;
     private GroupMembership groupMembership;
     private KnowledgeBase knowledgeBase;
+
+    public LinkedList<Stimulus> getPerceivedStimuli() {
+        return perceivedStimuli;
+    }
+
+    private LinkedList<Stimulus> perceivedStimuli;
 
     // Constructors
     public PsychologyStatus() {
@@ -51,6 +59,10 @@ public class PsychologyStatus {
         if (!(mostImportantStimulus instanceof ElapsedTime)){
             this.getKnowledgeBase().setInformationState(InformationState.INFORMATION_STIMULUS);
         }
+    }
+
+    public void setPerceivedStimuli(LinkedList<Stimulus> perceivedStimuli){
+        this.perceivedStimuli = perceivedStimuli;
     }
 
     public void setThreatMemory(ThreatMemory threatMemory) { this.threatMemory = threatMemory; }
