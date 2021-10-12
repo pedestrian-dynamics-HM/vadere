@@ -18,12 +18,15 @@ public class PsychologyStatus {
     private SelfCategory selfCategory;
     private GroupMembership groupMembership;
     private KnowledgeBase knowledgeBase;
-
-    public LinkedList<Stimulus> getPerceivedStimuli() {
-        return perceivedStimuli;
-    }
-
     private LinkedList<Stimulus> perceivedStimuli;
+    private LinkedList<Stimulus> nextPerceivedStimuli;
+
+
+
+
+
+
+
 
     // Constructors
     public PsychologyStatus() {
@@ -52,6 +55,10 @@ public class PsychologyStatus {
     public SelfCategory getSelfCategory() { return selfCategory; }
     public GroupMembership getGroupMembership() { return groupMembership; }
     public KnowledgeBase getKnowledgeBase() { return knowledgeBase; }
+    public LinkedList<Stimulus> getPerceivedStimuli() { return perceivedStimuli; }
+    public LinkedList<Stimulus> getNextPerceivedStimuli() { return nextPerceivedStimuli; }
+
+
 
     // Setter
     public void setMostImportantStimulus(Stimulus mostImportantStimulus) {
@@ -74,5 +81,8 @@ public class PsychologyStatus {
     public void setGroupMembership(GroupMembership groupMembership) {
         this.groupMembership = groupMembership;
     }
+
+    public void setNextPerceivedStimuli(final LinkedList<Stimulus> nextPerceivedStimuli) { this.nextPerceivedStimuli = nextPerceivedStimuli; }
+
 
 }

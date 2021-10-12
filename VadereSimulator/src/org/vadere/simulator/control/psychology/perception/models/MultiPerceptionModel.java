@@ -14,7 +14,6 @@ import java.util.*;
 public class MultiPerceptionModel extends PerceptionModel {
 
     private Topography topography;
-    HashMap<Pedestrian, List<Stimulus>> processedStimuli;
 
 
     @Override
@@ -29,37 +28,9 @@ public class MultiPerceptionModel extends PerceptionModel {
 
             List<Stimulus> stimuli = pedStimuli.getValue();
             Pedestrian ped = pedStimuli.getKey();
-
-            if (isStimuliRandomDistributionNew(stimuli, ped)) {
-                ped.
-            } else {
-                updateStimulusTimes(stimuli, ped);
-            }
-            setInformationStateGroupMember(ped.getPedGroupMembers());
+            ped.setNextPerceivedStimuli((LinkedList<Stimulus>) stimuli);
         }
 
     }
-
-
-    private boolean isStimuliRandomDistributionNew(final List<Stimulus> stimuli, final Pedestrian pedestrian) {
-        if (processedStimuli.containsKey(pedestrian)){
-            List<Stimulus> oldStimuli = processedStimuli.get(pedestrian);
-            return !oldStimuli.equals(stimuli);
-        }
-        return true;
-    }
-
-    protected void updateStimulusTimes(List<Stimulus> newStimuli, final Pedestrian pedestrian) {
-
-        LinkedList<Stimulus> oldStimuli = pedestrian.getPerceivedStimuli();
-        if (oldStimuli.equals(newStimuli)) {
-            pedestrian.setPerceivedStimuli((LinkedList<Stimulus>) newStimuli);
-        }
-    }
-
-    public void setProcessedStimuli(HashMap<Pedestrian, List<Stimulus>> processedStimuli) {
-        this.processedStimuli = processedStimuli;
-    }
-
 
 }

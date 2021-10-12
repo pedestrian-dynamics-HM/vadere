@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ProbabilisticCognitionModel extends ICognitionModel {
+public class ProbabilisticCognitionModel implements ICognitionModel {
 
     private static Logger logger = Logger.getLogger(ProbabilisticCognitionModel.class);
 
@@ -23,27 +23,24 @@ public class ProbabilisticCognitionModel extends ICognitionModel {
     @Override
     public void initialize(Topography topography) {
         rng = new JDKRandomGenerator(0); //TODO: use seed from json?
-        processedStimuli = new HashMap<>();
     }
 
     @Override
     public void update(Collection<Pedestrian> pedestrians) {
 
-        for (Map.Entry<Pedestrian, List<Stimulus>> pedStimuli : pedSpecificStimuli.entrySet()) {
+        for (Pedestrian pedestrian : pedestrians) {
 
-            List<Stimulus> stimuli = pedStimuli.getValue();
-            Pedestrian ped = pedStimuli.getKey();
+            LinkedList<Stimulus> oldStimuli = pedestrian.getPerceivedStimuli();
+            LinkedList<Stimulus> newStimuli = pedestrian.getNextPerceivedStimuli();
 
-            if (isStimuliRandomDistributionNew(stimuli, ped)) {
-                Stimulus mostImportantStimulus = drawStimulusFromRandomDistribution(getMostImportStimulus(stimuli), getExternalStimuli(stimuli));
-                ped.setMostImportantStimulus(mostImportantStimulus);
-                setInformationState(ped, mostImportantStimulus,stimuli);
-            } else {
-                updateTimeOfMostImportantStimulus(pedSpecificStimuli, ped);
+            if (!oldStimuli.equals(newStimuli)) {
+                Stimulus mostImportantStimulus = drawStimulusFromRandomDistribution(newStimuli);
+                pedestrian.setMostImportantStimulus(mostImportantStimulus);
+                setInformationState(pedestrian, mostImportantStimulus,newStimuli);
             }
+            pedestrian.setPerceivedStimuli(newStimuli);
             setInformationStateGroupMember(ped.getPedGroupMembers());
         }
-        setProcessedStimuli(pedSpecificStimuli);
     }
 
 
@@ -66,12 +63,13 @@ public class ProbabilisticCognitionModel extends ICognitionModel {
     // private
 
 
-    private Stimulus drawStimulusFromRandomDistribution(Stimulus elapsedTimeStimulus, final List<Stimulus> externalStimuli) {
-
+    private Stimulus drawStimulusFromRandomDistribution(List<Stimulus> newStimuli) {
+        Stimulus elapsedTimeStimulus = newStimuli.stream().filter(stimulus -> stimulus instanceof ElapsedTime).findFirst().orElseThrow();
+        List<Stimulus> externalStimuli = newStimuli.stream().filter(stimulus -> !(stimulus instanceof ElapsedTime)).collect(Collectors.toList());
         checkIfProbabiliesValid(externalStimuli);
 
         // collect possible stimuli in a list: [stimulus 1,     stimulus 2, ...     stimulus n,     ElapsedTimeStimulus]
-        List<Stimulus> stimuli = externalStimuli.stream().collect(Collectors.toList());
+        List<Stimulus> stimuli = externalStimuli;
         stimuli.add(elapsedTimeStimulus);
 
         // collect assigned probabilities in a list [probability 1   probability 2 ...   probability n   1 - sum(..9    ]
@@ -86,7 +84,6 @@ public class ProbabilisticCognitionModel extends ICognitionModel {
         int indexDrawn = dist.sample();
         return stimuli.get(indexDrawn);
     }
-
 
 
 
