@@ -38,7 +38,7 @@ public class ProbabilisticCognitionModel implements ICognitionModel {
                 pedestrian.setMostImportantStimulus(mostImportantStimulus);
                 setInformationState(pedestrian, mostImportantStimulus,newStimuli);
             }
-            pedestrian.setPerceivedStimuli(newStimuli);
+            pedestrian.setNextPerceivedStimuli(newStimuli);
             setInformationStateGroupMember(ped.getPedGroupMembers());
         }
     }
