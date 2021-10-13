@@ -1,9 +1,8 @@
-package org.vadere.simulator.control.psychology.perception;
+package org.vadere.simulator.control.psychology.cognition.models;
 
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
-import org.vadere.simulator.control.psychology.perception.models.ProbabilisticPerceptionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -17,7 +16,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class ProbabilisticPerceptionModelTest {
+public class ProbabilisticCognitionModelTest {
 
 
 
@@ -57,13 +56,6 @@ public class ProbabilisticPerceptionModelTest {
         return topography;
     }
 
-    private HashMap<Pedestrian, List<Stimulus>> getPedSpecififStimuli(List<Pedestrian> pedestrians, List<Stimulus> stimuli){
-        HashMap<Pedestrian, List<Stimulus>> pedSpecififStimuli = new HashMap<Pedestrian, List<Stimulus>>();
-        for (Pedestrian pedestrian : pedestrians){
-            pedSpecififStimuli.put(pedestrian, stimuli);
-        }
-        return pedSpecififStimuli;
-    }
 
 
     @Test
@@ -79,17 +71,21 @@ public class ProbabilisticPerceptionModelTest {
         double prob1Is = 1.0-prob2Is-prob3Is;
 
         List<Pedestrian> pedestrians = createPedestrians(sampleSize);
-        List<Stimulus> stimuli = new ArrayList<>();
+        LinkedList<Stimulus> stimuli = new LinkedList<>();
         stimuli.add(new ElapsedTime(time));
         stimuli.add(new ChangeTarget(time, prob2Is));
         stimuli.add(new Wait(time, prob3Is));
 
-        ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
-        probabilisticPerceptionModel.initialize(topography, 0.4);
-        pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
+        ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
+        probabilisticPerceptionModel.initialize(topography);
 
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli));
+        for (Pedestrian pedestrian : pedestrians){
+            pedestrian.setPerceivedStimuli(new LinkedList<>());
+            pedestrian.setNextPerceivedStimuli(stimuli);
+        }
 
+
+        probabilisticPerceptionModel.update(pedestrians);
         double prob1 = 1.0 * pedestrians.stream().filter(ped -> ped.getMostImportantStimulus() instanceof ElapsedTime).count() / sampleSize;
         double prob2 = 1.0 * pedestrians.stream().filter(ped -> ped.getMostImportantStimulus() instanceof ChangeTarget).count() / sampleSize;
         double prob3 = 1.0 * pedestrians.stream().filter(ped -> ped.getMostImportantStimulus() instanceof Wait).count() / sampleSize;
@@ -119,17 +115,19 @@ public class ProbabilisticPerceptionModelTest {
         double prob2Is = 0.4;
 
         List<Pedestrian> pedestrians = createPedestrians(sampleSize);
-        List<Stimulus> stimuli = new ArrayList<>();
+        LinkedList<Stimulus> stimuli = new LinkedList<>();
         stimuli.add(new ElapsedTime(time));
         stimuli.add(new ChangeTarget(time, prob2Is));
         stimuli.add(new Wait(time, prob3Is));
 
-        ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
 
-        probabilisticPerceptionModel.initialize(topography, 0.4);
+        ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
+
+        probabilisticPerceptionModel.initialize(topography);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli);
+
     }
 
     @Test
@@ -138,8 +136,8 @@ public class ProbabilisticPerceptionModelTest {
         Topography topography = createTopography();
         List<Pedestrian> pedestrians = createPedestrians(1);
 
-        ProbabilisticPerceptionModel probabilisticPerceptionModel = new ProbabilisticPerceptionModel();
-        probabilisticPerceptionModel.initialize(topography, 0.4);
+        ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
+        probabilisticPerceptionModel.initialize(topography);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
 
@@ -149,49 +147,56 @@ public class ProbabilisticPerceptionModelTest {
         double time3 = 1.2;
         double time4 = 1.4;
 
-        List<Stimulus> stimuli = new ArrayList<>();
+        LinkedList<Stimulus> stimuli = new LinkedList<>();
         stimuli.add(new ElapsedTime(time));
         stimuli.add(new ChangeTarget(time, 0));
         stimuli.add(new Wait(time, 0));
 
-        List<Stimulus> stimuli1 = new ArrayList<>();
+        LinkedList<Stimulus> stimuli1 = new LinkedList<>();
         stimuli1.add(new ElapsedTime(time1));
         stimuli1.add(new ChangeTarget(time1, 0));
         stimuli1.add(new Wait(time1, 0));
 
 
-        List<Stimulus> stimuli2 = new ArrayList<>();
+        LinkedList<Stimulus> stimuli2 =new LinkedList<>();
         stimuli2.add(new ElapsedTime(time2));
         stimuli2.add(new ChangeTarget(time2, 0));
         stimuli2.add(new Wait(time2, 1));
 
-        List<Stimulus> stimuli3 = new ArrayList<>();
+        LinkedList<Stimulus> stimuli3 = new LinkedList<>();
         stimuli3.add(new ElapsedTime(time3));
         stimuli3.add(new ChangeTarget(time3, 0));
         stimuli3.add(new Wait(time3, 1));
 
-        List<Stimulus> stimuli4 = new ArrayList<>();
+        LinkedList<Stimulus> stimuli4 = new LinkedList<>();
         stimuli4.add(new ElapsedTime(time4));
         stimuli4.add(new ChangeTarget(time4, 0));
         stimuli4.add(new Wait(time4, 1));
 
-
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli);
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli1));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli1);
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof ElapsedTime));
 
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli2));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli2);
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli3));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli3);
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
-        probabilisticPerceptionModel.update(getPedSpecififStimuli(pedestrians,stimuli4));
+        updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli4);
         pedestrians.forEach(pedestrian -> assertTrue(pedestrian.getMostImportantStimulus() instanceof Wait));
 
 
 
     }
 
+    private void updateStimuli(final List<Pedestrian> pedestrians, final ProbabilisticCognitionModel probabilisticPerceptionModel, final LinkedList<Stimulus> stimuli) {
+        for (Pedestrian pedestrian : pedestrians){
+            pedestrian.setPerceivedStimuli(new LinkedList<>());
+            pedestrian.setNextPerceivedStimuli(stimuli);
+        }
+
+        probabilisticPerceptionModel.update(pedestrians);
+    }
 
 
 }
