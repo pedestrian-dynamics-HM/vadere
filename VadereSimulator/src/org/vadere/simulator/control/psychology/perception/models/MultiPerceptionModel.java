@@ -5,6 +5,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Use a very simple strategy to rank stimulus priority:
@@ -26,9 +27,9 @@ public class MultiPerceptionModel extends PerceptionModel {
 
         for (Map.Entry<Pedestrian, List<Stimulus>> pedStimuli : pedSpecificStimuli.entrySet()) {
 
-            List<Stimulus> stimuli = pedStimuli.getValue();
+            LinkedList<Stimulus> stimuli = pedStimuli.getValue().stream().collect(Collectors.toCollection(LinkedList::new));
             Pedestrian ped = pedStimuli.getKey();
-            ped.setNextPerceivedStimuli((LinkedList<Stimulus>) stimuli);
+            ped.setNextPerceivedStimuli(stimuli);
         }
 
     }

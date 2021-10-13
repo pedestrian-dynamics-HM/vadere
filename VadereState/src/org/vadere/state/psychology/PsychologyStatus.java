@@ -24,10 +24,6 @@ public class PsychologyStatus {
 
 
 
-
-
-
-
     // Constructors
     public PsychologyStatus() {
         this(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
@@ -39,6 +35,8 @@ public class PsychologyStatus {
         this.selfCategory = selfCategory;
         this.groupMembership = groupMembership;
         this.knowledgeBase = knowledgeBase;
+        this.perceivedStimuli = new LinkedList<>();
+        this.nextPerceivedStimuli = new LinkedList<>();
     }
 
     public PsychologyStatus(PsychologyStatus other) {
@@ -47,6 +45,8 @@ public class PsychologyStatus {
         this.selfCategory = other.getSelfCategory();
         this.groupMembership = other.getGroupMembership();
         this.knowledgeBase = other.getKnowledgeBase();
+        this.perceivedStimuli = other.getPerceivedStimuli();
+        this.nextPerceivedStimuli = other.getNextPerceivedStimuli();
     }
 
     // Getter
@@ -57,7 +57,6 @@ public class PsychologyStatus {
     public KnowledgeBase getKnowledgeBase() { return knowledgeBase; }
     public LinkedList<Stimulus> getPerceivedStimuli() { return perceivedStimuli; }
     public LinkedList<Stimulus> getNextPerceivedStimuli() { return nextPerceivedStimuli; }
-
 
 
     // Setter
