@@ -92,8 +92,8 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "ProbabilisticPerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "perception" : "MultiPerceptionModel",
+        "cognition" : "ProbabilisticCognitionModel"
       }
     },
     "topography" : {

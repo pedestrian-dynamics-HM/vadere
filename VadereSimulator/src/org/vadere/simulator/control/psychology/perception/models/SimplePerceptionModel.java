@@ -29,7 +29,6 @@ public class SimplePerceptionModel extends PerceptionModel {
         for (Pedestrian pedestrian : pedSpecificStimuli.keySet()) {
             Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
-            updateInformationState(pedestrian);
         }
     }
 

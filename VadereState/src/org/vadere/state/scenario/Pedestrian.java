@@ -123,6 +123,13 @@ public class Pedestrian extends Agent {
         return psychologyStatus.getMostImportantStimulus();
     }
 
+    public LinkedList<Stimulus> getPerceivedStimuli(){ return psychologyStatus.getPerceivedStimuli(); }
+
+    public LinkedList<Stimulus> getNextPerceivedStimuli(){ return psychologyStatus.getNextPerceivedStimuli(); }
+
+
+
+
     public ThreatMemory getThreatMemory() {
         return psychologyStatus.getThreatMemory();
     }
@@ -221,6 +228,11 @@ public class Pedestrian extends Agent {
     public void setMostImportantStimulus(Stimulus mostImportantStimulus) {
         psychologyStatus.setMostImportantStimulus(mostImportantStimulus);
     }
+
+    public void setPerceivedStimuli(LinkedList<Stimulus> stimuli){ psychologyStatus.setPerceivedStimuli(stimuli); }
+
+    public void setNextPerceivedStimuli(LinkedList<Stimulus> stimuli){ psychologyStatus.setNextPerceivedStimuli(stimuli); }
+
 
     public void setThreatMemory(ThreatMemory threatMemory) {
         psychologyStatus.setThreatMemory(threatMemory);
