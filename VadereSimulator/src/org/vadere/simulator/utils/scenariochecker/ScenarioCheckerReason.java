@@ -56,7 +56,11 @@ public enum ScenarioCheckerReason {
 	GROUP_SETUP_IGNORED("ScenarioChecker.simAttr.GroupSetup.ignored"),
 
 	// Model reasons
-	CA_SPAWNING("ScenarioChecker.models.ca.spawning.setup.err");
+	CA_SPAWNING("ScenarioChecker.models.ca.spawning.setup.err"),
+
+	// Psychology layer
+	SOCIAL_DISTANCING("ScenarioChecker.models.psychology.socialDistanceValueOutofRange");
+
 
 
 	private String msgId;

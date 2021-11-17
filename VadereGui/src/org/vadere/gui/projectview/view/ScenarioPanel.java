@@ -207,7 +207,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		attributesPsychologyView =
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.PSYCHOLOGY);
-		attributesPsychologyView.isEditable(true);
+		attributesPsychologyView.setScenarioChecker(model); // use .isEditable(true); to save time (no check!)
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
 
 
@@ -216,7 +216,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
 
 		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
-		perceptionFileView.isEditable(true);
+		perceptionFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
 
 		dataProcessingGUIview = new DataProcessingView(model);

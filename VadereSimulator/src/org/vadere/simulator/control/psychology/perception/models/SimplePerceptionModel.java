@@ -46,8 +46,9 @@ public class SimplePerceptionModel extends PerceptionModel {
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
         List<Stimulus> changeTargetScriptedStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTargetScripted).collect(Collectors.toList());
-
         // place List changepersonalspace here
+        List<Stimulus> distanceRecommendationStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof DistanceRecommendation).collect(Collectors.toList());
+
 
         if (changeTargetScriptedStimuli.size() >= 1) {
             mostImportantStimulus = changeTargetScriptedStimuli.get(0);
@@ -59,7 +60,8 @@ public class SimplePerceptionModel extends PerceptionModel {
             mostImportantStimulus = waitStimuli.get(0);
         } else if (waitInAreaStimuli.size() >= 1) {
             mostImportantStimulus = waitInAreaStimuli.get(0);
-
+        }else if (distanceRecommendationStimuli.size() >= 1){
+            mostImportantStimulus = distanceRecommendationStimuli.get(0);
         }
         else if(true){} // place changepersonalspace here
 

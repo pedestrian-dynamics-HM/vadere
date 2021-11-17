@@ -22,6 +22,7 @@ public abstract class ControlModel implements IControlModel {
     protected StimulusController stimulusController;
     private double simTimeStepLength;
     protected InformationFilter informationFilter;
+    protected boolean isBehaviorChangeEnduring;
 
     public ControlModel(){
 
@@ -33,9 +34,10 @@ public abstract class ControlModel implements IControlModel {
         this.stimulusController = stimulusController;
         this.simTimeStepLength = simTimeStepLength;
         this.informationFilter = new InformationFilter(informationFilterSettings);
+        this.isBehaviorChangeEnduring = true;
     }
 
-    protected abstract Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int stimulusId, double timeCommandExecuted);
+    protected abstract Stimulus getStimulusFromJsonCommand(JSONObject command, int stimulusId, double timeCommandExecuted);
 
     public void update(String commandRaw, Double time, int pedId)  {
 
@@ -48,16 +50,24 @@ public abstract class ControlModel implements IControlModel {
         for (Pedestrian ped : pedestrians) {
             if (this.informationFilter.isInformationProcessed(ped, command.getSpace(), time, command.getExecTime(), command.getCommandId())){
                 // single agent
-                Stimulus stimulus = this.getStimulusFromJsonCommand(ped, command.getPedCommand(), command.getStimulusId(), getTimeCommandExecuted(time));
-                this.stimulusController.setDynamicStimulus(ped, stimulus, getTimeCommandExecuted(time));
+                Stimulus stimulus = this.getStimulusFromJsonCommand(command.getPedCommand(), command.getStimulusId(), getTimeCommandExecuted(time));
+                setPedSpecificStimuli(time, ped, stimulus);
                 this.informationFilter.setPedProcessedCommandIds(ped, command.getCommandId());
 
                 // One stimulus per group is sufficient
                 for (Pedestrian groupMember : ped.getPedGroupMembers()){
-                    this.stimulusController.setDynamicStimulus(groupMember, stimulus, getTimeCommandExecuted(time)); // necessary?
+                    setPedSpecificStimuli(time, groupMember, stimulus);
                     this.informationFilter.setPedProcessedCommandIds(groupMember, command.getCommandId());
                 }
             }
+        }
+    }
+
+    protected void setPedSpecificStimuli(final Double time, final Pedestrian ped, final Stimulus stimulus) {
+        if (isBehaviorChangeEnduring()){
+            this.stimulusController.setPedSpecificDynamicStimulusEnduring(ped, stimulus);
+        } else {
+            this.stimulusController.setPedSpecificDynamicStimulus(ped, stimulus, getTimeCommandExecuted(time));
         }
     }
 
@@ -65,6 +75,12 @@ public abstract class ControlModel implements IControlModel {
     public double getTimeCommandExecuted(double currentTime) {
         return currentTime + simTimeStepLength;
     }
+
+    protected boolean isBehaviorChangeEnduring() {
+        return this.isBehaviorChangeEnduring;
+    }
+
+
 
 
 

@@ -22,6 +22,8 @@ public class StimulusFactory {
             stimulusObject = new Wait();
         } else if (stimulusAsString.matches(WaitInArea.class.getSimpleName())) {
             stimulusObject = new WaitInArea();
+        }else if (stimulusAsString.matches(DistanceRecommendation.class.getSimpleName())) {
+            stimulusObject = new DistanceRecommendation();
         }
 
         return stimulusObject;

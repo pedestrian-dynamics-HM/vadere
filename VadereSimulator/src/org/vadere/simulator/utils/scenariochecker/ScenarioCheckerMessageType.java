@@ -16,7 +16,11 @@ public enum ScenarioCheckerMessageType {
 	DATA_PROCESSOR_WARN("Warning",502, "ScenarioChecker.type.processor.warning"),
 
 	TOPOGRAPHY_ERROR("Error",103, "ScenarioChecker.type.topography.error"),
-	TOPOGRAPHY_WARN("Warning",503, "ScenarioChecker.type.topography.warning");
+	TOPOGRAPHY_WARN("Warning",503, "ScenarioChecker.type.topography.warning"),
+
+	PERCEPTION_ATTR_ERROR("Error", 104, "ScenarioChecker.type.perception.error"),
+	PERCEPTION_ATTR_WARN("Warning", 504, "ScenarioChecker.type.perception.warning");
+
 
 	private static final int ERROR_START = 100;
 	private static final int WARN_START = 500;

@@ -24,10 +24,17 @@ import java.util.Random;
 @ModelClass
 public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldAgent {
 
+	public AttributesPotentialCompactSoftshell getAttributes() {
+		return attributes;
+	}
+
 	private AttributesPotentialCompactSoftshell attributes;
 	private AttributesAgent attributesAgent;
 	private double intimateWidth; // radius of intimate zone \delta_{int}
 	private double personalWidth; // radius of personal width \delta_{per}
+
+
+
 	private double height; // intensity of repulsion \mu_p
 
 	public PotentialFieldPedestrianCompactSoftshell() {}
@@ -55,14 +62,30 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 		return closePedestrians;
 	}
 
+
+	public double getPersonalWidth() { return personalWidth; }
+	public void setPersonalWidth(final double personalWidth) { this.personalWidth = personalWidth; }
+	public double getHeight() { return height; }
+	public void setHeight(final double height) { this.height = height; }
+
 	@Override
 	public double getAgentPotential(IPoint pos, Agent pedestrian,
-	                                Agent otherPedestrian) {
+									Agent otherPedestrian) {
+
+		double width = getPersonalWidth();
+		double height = getHeight();
+		return getAgentPotential(pos, pedestrian, otherPedestrian, height, width);
+
+	}
+
+
+	public double getAgentPotential(IPoint pos, Agent pedestrian,
+	                                Agent otherPedestrian, double height, double width) {
 
 		double radii = pedestrian.getRadius() + otherPedestrian.getRadius(); // 2* r_p (sivers-2016b)
 		double potential = 0;
 		double distanceSq = otherPedestrian.getPosition().distanceSq(pos);
-		double maxDistanceSq = (Math.max(personalWidth, intimateWidth)  + radii) * (Math.max(personalWidth, intimateWidth)  + radii);
+		double maxDistanceSq = (Math.max(width, intimateWidth)  + radii) * (Math.max(width, intimateWidth)  + radii);
 
 		if (distanceSq < maxDistanceSq) {
 			double distance = otherPedestrian.getPosition().distance(pos); // Euclidean distance d_j(x) between agent j and position x
@@ -71,13 +94,13 @@ public class PotentialFieldPedestrianCompactSoftshell implements PotentialFieldA
 			int perPower = this.attributes.getPersonalSpacePower(); // not defined in sivers-2016b (perPower = 1)
 			double factor = this.attributes.getIntimateSpaceFactor(); // a_p
 
-			if (distance < personalWidth + radii) {
+			if (distance < width + radii) {
 				// implementation differs from sivers-2016b here:  \delta_{per} + r_p  (note: radii = 2*r_p)
-				potential += this.height * Math.exp(4 / (Math.pow(distance / (personalWidth + radii), (2 * perPower)) - 1));
+				potential += height * Math.exp(4 / (Math.pow(distance / (width + radii), (2 * perPower)) - 1));
 			}
 			if (distance < this.intimateWidth + radii) {
 				// implementation differs from sivers-2016b here:  \delta_{int} + r_p  (note: radii = 2*r_p)
-				potential += this.height / factor
+				potential += height / factor
 						* Math.exp(4 / (Math.pow(distance / (this.intimateWidth + radii), (2 * intPower)) - 1));
 			}
 			if (distance < radii) {

@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.Stimulus;
-import org.vadere.state.scenario.Pedestrian;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -32,11 +31,13 @@ public class RouteChoice extends ControlModel {
         // The seed for generating the random distribution is simply set to 0,
         // since the allocation should actually be deterministic (people should always be divided in the same way).
         random = new Random(0);
+        // 
+        this.isBehaviorChangeEnduring = false; // the target is set once.
     }
 
 
     @Override
-    protected Stimulus getStimulusFromJsonCommand(Pedestrian ped, JSONObject command, int stimulusId, double timeCommandExecuted) {
+    protected Stimulus getStimulusFromJsonCommand(JSONObject command, int stimulusId, double timeCommandExecuted) {
 
         LinkedList<Double> probs = readProbabilitiesFromJson(command);
         LinkedList<Integer> targets = readTargetsFromJson(command);

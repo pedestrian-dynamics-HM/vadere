@@ -14,6 +14,7 @@ import java.util.Collection;
  *
  * Note: Maybe, combine this behavior also with {@link SelfCategory#COOPERATIVE} to avoid jams.
  */
+//TODO SelfCategory.EVADE is used in BHM only, there is no implementation
 public class CounterflowCognitionModel implements ICognitionModel {
 
     private Topography topography;
