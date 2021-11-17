@@ -32,6 +32,14 @@ public class StimulusInfo {
     private Timeframe timeframe;
     private List<Stimulus> stimuli;
 
+    public StimulusInfo() {
+    }
+
+    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli) {
+        this.timeframe = timeframe;
+        this.stimuli = stimuli;
+    }
+
     // Getter
     public Timeframe getTimeframe() {
         return timeframe;

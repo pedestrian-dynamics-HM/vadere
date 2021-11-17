@@ -59,10 +59,21 @@ public class ScenarioCheckerMessageBuilder {
 		return this;
 	}
 
+	public ScenarioCheckerMessageBuilder perceptionAttrError() {
+		msg = new ScenarioCheckerMessage(ScenarioCheckerMessageType.PERCEPTION_ATTR_ERROR);
+		return this;
+	}
+
+	public ScenarioCheckerMessageBuilder perceptionAttrWarning() {
+		msg = new ScenarioCheckerMessage(ScenarioCheckerMessageType.PERCEPTION_ATTR_WARN);
+		return this;
+	}
+
 	public ScenarioCheckerMessageBuilder target(ScenarioElement... targets) {
 		msg.setMsgTarget(new ScenarioCheckerMessageTarget(targets));
 		return this;
 	}
+
 
 	public ScenarioCheckerMessageBuilder reason(ScenarioCheckerReason reason) {
 		msg.setReason(reason);

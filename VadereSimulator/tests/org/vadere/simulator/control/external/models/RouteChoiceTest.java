@@ -4,14 +4,11 @@ package org.vadere.simulator.control.external.models;
 import org.apache.commons.math3.util.Precision;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
-import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Random;
 
 
 public class RouteChoiceTest {
@@ -57,11 +54,11 @@ public class RouteChoiceTest {
         RouteChoice routeChoice = new RouteChoice();
         ChangeTarget stimulus = null;
         for (int i = 0; i < numberOfAgents; i++) {
-            stimulus = (ChangeTarget) routeChoice.getStimulusFromJsonCommand(new Pedestrian(new AttributesAgent(), new Random(42)), command, commandId, timeCommandExecuted);
+            stimulus = (ChangeTarget) routeChoice.getStimulusFromJsonCommand(command, commandId, timeCommandExecuted);
             int newTarget = stimulus.getNewTargetIds().getFirst();
             isProbabilites[newTarget] += 1./numberOfAgents; // targets =  {0, 1, 2, 3}; tagetsIds = indices
         }
-        for (int ii = 0; ii < 4 ; ii++) Precision.equals(shouldProbabilities[ii], isProbabilites[ii], 0.02);
+        for (int ii = 0; ii < 4 ; ii++) assert Precision.equals(shouldProbabilities[ii], isProbabilites[ii], 0.02);
 
     }
 

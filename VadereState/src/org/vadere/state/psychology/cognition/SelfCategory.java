@@ -29,5 +29,6 @@ public enum SelfCategory {
     COMMON_FATE,
     WAIT,
     CHANGE_TARGET,
-    EVADE
+    EVADE,
+    SOCIAL_DISTANCING,
 }

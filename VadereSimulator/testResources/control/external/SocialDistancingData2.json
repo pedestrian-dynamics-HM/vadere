@@ -1,0 +1,13 @@
+{
+  "time" : 7.0,
+  "space" : {
+     "x" : 0.0,
+     "y" : 0.0,
+     "radius": 100
+  },
+  "command" : {
+    "socialDistance" : 1.52,
+    "cloggingTimeAllowedInSecs" : 5.3
+  },
+  "commandId" : 33
+}

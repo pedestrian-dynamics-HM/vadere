@@ -3,6 +3,7 @@ package org.vadere.simulator.models.psychology.selfcategorization.locomotion;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.simulator.models.psychology.selfcategorization.PedestrianSelfCatThreat;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.*;
@@ -56,6 +57,7 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 
 		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
 		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.COOPERATIVE) {
 			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
@@ -81,6 +83,8 @@ public class UpdateSchemeEventDriven implements DynamicElementAddListener, Dynam
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
+		} else if (selfCategory == SelfCategory.SOCIAL_DISTANCING){
+			osmBehaviorController.changeRepulsion(pedestrian);
 		}
 	}
 
