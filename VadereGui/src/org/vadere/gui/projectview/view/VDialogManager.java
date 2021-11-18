@@ -129,8 +129,8 @@ public class VDialogManager {
 		JEditorPane jEditorPane = ScenarioPanel.getActiveTopographyErrorMsg();
 		if (jEditorPane != null) {
 			int ret = VDialogManager.showConfirmDialogWithBodyAndEditorPane(
-					Messages.getString("SaveDespiteTopographyCheckerErrors.title"),
-					"<html>" + Messages.getString("SaveDespiteTopographyCheckerErrors.text") + "<br><br><html>",
+					Messages.getString("SaveDespiteScenarioCheckerErrors.title"),
+					"<html>" + Messages.getString("SaveDespiteScenarioCheckerErrors.text") + "<br><br><html>",
 					jEditorPane, JOptionPane.YES_NO_OPTION);
 			if (ret == JOptionPane.YES_OPTION)
 				return false;
