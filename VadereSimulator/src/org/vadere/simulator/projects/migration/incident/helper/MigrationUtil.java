@@ -168,7 +168,7 @@ public class MigrationUtil {
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 
 				// continue traversal if not scenario
-				if (!file.getFileName().toString().endsWith("scenario"))
+				if (!file.getFileName().toString().endsWith(".scenario"))
 					return FileVisitResult.CONTINUE;
 
 				// if dirMarker is set do not migrate any scenario files in this dir
