@@ -2,6 +2,7 @@
   "name" : "validation_lu-2020_publication",
   "description" : "",
   "release" : "1.16",
+  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -36,7 +37,7 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 5
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {
@@ -64,9 +65,9 @@
         "submodels" : [ "org.vadere.simulator.models.sir.TransmissionModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.1,
-        "pedPotentialPersonalSpaceWidth" : 0.2,
-        "pedPotentialHeight" : 50.0,
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 5.0,
         "obstPotentialWidth" : 0.0,
         "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,

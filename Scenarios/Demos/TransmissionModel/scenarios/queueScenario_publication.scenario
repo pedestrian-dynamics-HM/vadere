@@ -2,6 +2,7 @@
   "name" : "queueScenario_publication",
   "description" : "",
   "release" : "1.16",
+  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -359,8 +360,8 @@
         "id" : -1,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
-        "speedDistributionMean" : 1.0,
-        "speedDistributionStandardDeviation" : 0.0,
+        "speedDistributionMean" : 1.34,
+        "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,
