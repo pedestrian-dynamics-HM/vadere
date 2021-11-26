@@ -6,6 +6,7 @@ import org.vadere.simulator.utils.scenariochecker.checks.ScenarioCheckerTest;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.CheckAreasInAreaDensityVoronoiProcessor;
 import org.vadere.simulator.utils.scenariochecker.checks.dataProcessors.DataProcessorsLinkedToMeasurementArea;
 import org.vadere.simulator.utils.scenariochecker.checks.models.CellularAutomatonSetupCheck;
+import org.vadere.simulator.utils.scenariochecker.checks.models.psychology.StimulusCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.GroupSetupCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.simulation.SimulationTimeStepLengthCheck;
 import org.vadere.simulator.utils.scenariochecker.checks.topography.*;
@@ -67,6 +68,7 @@ public class ScenarioChecker {
 		ret.addAll(runCheck(new CheckAreasInAreaDensityVoronoiProcessor()));
 		ret.addAll(runCheck(new GroupSetupCheck()));
 		ret.addAll(runCheck(new CellularAutomatonSetupCheck()));
+		ret.addAll(runCheck(new StimulusCheck()));
 		return ret;
 	}
 

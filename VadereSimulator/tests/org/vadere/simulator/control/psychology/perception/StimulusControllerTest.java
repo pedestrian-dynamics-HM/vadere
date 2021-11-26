@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
-import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -444,8 +443,8 @@ public class StimulusControllerTest {
 
         List<Stimulus> stimuli1, pedSpecificStimuli;
 
-        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 4.0, false,0), changeTargetOriginal);
-        stimulusController.setDynamicStimulus(ped, stimulusInfo2);
+        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 5.0, false,0), changeTargetOriginal);
+        stimulusController.setPedSpecificDynamicStimulus(ped, stimulusInfo2);
 
         stimuli1 = stimulusController.getStimuliForTime(4.0);
         assertEquals(2, stimuli1.size());
@@ -453,7 +452,79 @@ public class StimulusControllerTest {
         pedSpecificStimuli = stimulusController.getStimuliForTime(4.0, ped);
         assertEquals(3, pedSpecificStimuli.size());
 
+        pedSpecificStimuli = stimulusController.getStimuliForTime(5.0, ped);
+        assertEquals(3, pedSpecificStimuli.size());
+
+        pedSpecificStimuli = stimulusController.getStimuliForTime(5.2, ped);
+        assertEquals(2, pedSpecificStimuli.size());
     }
+
+    @Test
+    public void checkProbabilityMappingGeneralStimuliOnly(){
+
+        int commandIdWait = -33;
+        double probWait = 0.11;
+
+        // define stimuli and store them in stimulusInfo object
+        Stimulus wait = new Wait();
+        wait.setId(commandIdWait);
+        Timeframe timeframe = new Timeframe(0, 1, false,0);
+        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
+
+        // define probababilites for stimuli
+        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
+        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
+
+        // setup stimuluscontroller
+        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
+        stimulusController.setReactionProbabilites(reactionProbabilities);
+
+        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.4);
+        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
+        assert isProbWait == probWait;
+    }
+
+
+    @Test
+    public void checkProbabilityMappingMixedSetting(){
+
+        int commandIdWait = -33;
+        int commandIdChangeTarget = 55;
+        double probWait = 0.5;
+        double probChangeTarget = 0.75;
+
+        Pedestrian ped = new Pedestrian(new AttributesAgent(), new Random());
+
+        // define stimuli and store them in stimulusInfo object
+        Stimulus wait = new Wait();
+        wait.setId(commandIdWait);
+        Stimulus changeTargetOriginal = new ChangeTarget();
+        changeTargetOriginal.setId(commandIdChangeTarget);
+        Timeframe timeframe = new Timeframe(0, 1, false,0);
+        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
+
+        // define probababilites for stimuli
+        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
+        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
+        reactionProbabilities.add(new ReactionProbability(commandIdChangeTarget, probChangeTarget));
+
+
+        // setup stimuluscontroller
+        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
+        stimulusController.setReactionProbabilites(reactionProbabilities);
+        stimulusController.setPedSpecificDynamicStimulusEnduring(ped, changeTargetOriginal);
+
+        // check if probability is set in mixed setting (general + pedestrian specific stimuli)
+        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.0, ped);
+        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
+        double isProbChangeTarget = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).findFirst().orElseThrow().getPerceptionProbability();
+
+        assert isProbWait == probWait;
+        assert isProbChangeTarget == probChangeTarget;
+    }
+
+
+
 
     @Test
     public void getDynamicStimuli(){
@@ -470,7 +541,7 @@ public class StimulusControllerTest {
         StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
         StimulusController stimulusController = new StimulusController(getScenarioStore(store));
 
-        List<Stimulus> stimuli1, pedSpecificStimuli;
+        List<Stimulus> stimuli1;
 
         StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 4.0, false,0), changeTargetOriginal);
         stimulusController.setDynamicStimulus(stimulusInfo2);

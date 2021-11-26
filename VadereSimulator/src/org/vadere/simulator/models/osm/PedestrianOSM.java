@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
+import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell;
 import org.vadere.simulator.models.potential.combinedPotentials.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.simulator.models.SpeedAdjuster;
@@ -37,6 +38,11 @@ public class PedestrianOSM extends Pedestrian {
 
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
+
+	public PotentialFieldAgent getPotentialFieldPedestrian() {
+		return potentialFieldPedestrian;
+	}
+
 	private transient PotentialFieldAgent potentialFieldPedestrian;
 	// A setter is provided to be able to change strategy at runtime (e.g. by stimuli).
 	private transient ICombinedPotentialStrategy combinedPotentialStrategy;
@@ -369,6 +375,10 @@ public class PedestrianOSM extends Pedestrian {
 						this.potentialFieldPedestrian);
 		} else if (newStrategy == CombinedPotentialStrategy.TARGET_REPULSION_STRATEGY) {
 			this.combinedPotentialStrategy = new TargetRepulsionStrategy(this.potentialFieldTarget,
+					this.potentialFieldObstacle,
+					this.potentialFieldPedestrian);
+		} else if (newStrategy == CombinedPotentialStrategy.PEDESTRIAN_REPULSION_STRATEGY){
+			this.combinedPotentialStrategy = new PedestrianRepulsionStrategy(this.potentialFieldTarget,
 					this.potentialFieldObstacle,
 					this.potentialFieldPedestrian);
 		} else {

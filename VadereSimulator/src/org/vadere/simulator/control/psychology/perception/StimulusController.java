@@ -1,7 +1,5 @@
 package org.vadere.simulator.control.psychology.perception;
 
-import org.jcodec.codecs.mjpeg.JpegDecoder;
-import org.lwjgl.system.CallbackI;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -28,9 +26,12 @@ public class StimulusController {
     private ScenarioStore scenarioStore;
     private List<StimulusInfo> oneTimeStimuli;
     private List<StimulusInfo> recurringStimuli;
-    private HashMap<Integer, Double> reactionProbabilities;
 
+
+
+    private HashMap<Integer, Double> reactionProbabilities;
     private HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli;
+
 
     // Constructors
     public StimulusController(ScenarioStore scenarioStore) {
@@ -43,17 +44,12 @@ public class StimulusController {
         oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
         recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
 
-        reactionProbabilities = getReactionProbabilites(scenarioStore.getStimulusInfoStore().getReactionProbabilities());
+        setReactionProbabilites(scenarioStore.getStimulusInfoStore().getReactionProbabilities());
         pedSpecificStimuli = new HashMap<>();
     }
 
-    private HashMap<Integer, Double> getReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
 
-        reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
-        return (HashMap<Integer, Double>) reactionProbabilities
-                .stream()
-                .collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
-    }
+
 
     // Getters
     public ScenarioStore getScenarioStore() {
@@ -61,6 +57,8 @@ public class StimulusController {
     }
     public List<StimulusInfo> getOneTimeStimuli() { return oneTimeStimuli; }
     public List<StimulusInfo> getRecurringStimuli() { return recurringStimuli; }
+    public HashMap<Integer, Double> getReactionProbabilities() { return reactionProbabilities; }
+
 
     // Setters
     public void setScenarioStore(ScenarioStore scenarioStore) {
@@ -68,6 +66,10 @@ public class StimulusController {
     }
     public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
     public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
+    protected void setReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
+        reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
+        this.reactionProbabilities = (HashMap<Integer, Double>) reactionProbabilities.stream().collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
+    }
 
     // Methods
     public List<Stimulus> getStimuliForTime(double simulationTime) {
@@ -86,12 +88,12 @@ public class StimulusController {
         stimuli.addAll(activeOneTimeStimuli);
         stimuli.addAll(activeRecurringStimuli);
 
-        addReactionProbabilityToStimulus(stimuli);
+        setReactionProbability(stimuli);
 
         return stimuli;
     }
 
-    private void addReactionProbabilityToStimulus(final List<Stimulus> stimuli) {
+    private void setReactionProbability(final List<Stimulus> stimuli) {
         for (Stimulus stimulus : stimuli){
             if (!(stimulus instanceof ElapsedTime)){
                 if (reactionProbabilities.containsKey(stimulus.getId())){
@@ -211,9 +213,8 @@ public class StimulusController {
 
 
     public void setDynamicStimulus(StimulusInfo stimulusInfo){
-        List<StimulusInfo> stimuliList = new ArrayList<>();
-        stimuliList.add(stimulusInfo);
 
+        List<StimulusInfo> stimuliList = Collections.singletonList(stimulusInfo);
         List<StimulusInfo> oneTimeDynamicStimuli = filterOneTimeStimuli(stimuliList);
         List<StimulusInfo> recurringDynamicStimuli = filterRecurringStimuli(stimuliList);
 
@@ -222,44 +223,30 @@ public class StimulusController {
     }
 
 
-    private void setDynamicStimulus(Collection<Pedestrian> peds, StimulusInfo stimulusInfo){
-        for (Pedestrian ped : peds){
-            setDynamicStimulus(ped, stimulusInfo);
-        }
-    }
+    public void setPedSpecificDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
 
-    public void setDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
-        //TODO: check whether if-else is necessary
+        setReactionProbability(stimulusInfo.getStimuli());
+        List<StimulusInfo> stimulusInfos = new ArrayList<>();
 
         if (pedSpecificStimuli.containsKey(ped)) {
-            pedSpecificStimuli.get(ped).add(stimulusInfo);
+            stimulusInfos.addAll(pedSpecificStimuli.get(ped));
         }
-        else{
-            List<StimulusInfo> stimulusInfos = new ArrayList<>();
-            stimulusInfos.add(stimulusInfo);
-            pedSpecificStimuli.put(ped, stimulusInfos);
-        }
-    }
-
-    public void setDynamicStimulus(Pedestrian ped, Stimulus stimulus, double simTimeNextTimeStep){
-        List<StimulusInfo> stimuliList = new ArrayList<>();
-        if (pedSpecificStimuli.containsKey(ped)){
-            stimuliList.addAll(pedSpecificStimuli.get(ped));
-        }
-
-        List<Stimulus> newStimulus = new ArrayList<>();
-        newStimulus.add(stimulus);
-        addReactionProbabilityToStimulus(newStimulus);
-        StimulusInfo stimulusInfo = new StimulusInfo();
-        stimulusInfo.setTimeframe(new Timeframe(0, simTimeNextTimeStep, false, 0));
-        stimulusInfo.setStimuli(newStimulus);
-
-        stimuliList.add(stimulusInfo);
-
-        pedSpecificStimuli.put(ped, stimuliList);
+        stimulusInfos.add(stimulusInfo);
+        pedSpecificStimuli.put(ped, stimulusInfos);
 
     }
 
+    public void setPedSpecificDynamicStimulusEnduring(Pedestrian ped, Stimulus stimulus){
+        setPedSpecificDynamicStimulus(ped, stimulus, Double.MAX_VALUE);
+    }
+
+    public void setPedSpecificDynamicStimulus(Pedestrian ped, Stimulus stimulus, double stimulusEndTime){
+
+        Timeframe timeframe = new Timeframe(0, stimulusEndTime, false, 0);
+        StimulusInfo stimulusInfo = new StimulusInfo(timeframe, Collections.singletonList(stimulus));
+        setPedSpecificDynamicStimulus(ped, stimulusInfo);
+
+    }
 
     private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {
         List<Stimulus> activeStimuli = new ArrayList<>();

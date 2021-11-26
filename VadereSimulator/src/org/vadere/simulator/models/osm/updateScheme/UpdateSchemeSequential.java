@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -48,6 +49,7 @@ public class UpdateSchemeSequential implements UpdateSchemeOSM {
 		SelfCategory selfCategory = pedestrian.getSelfCategory();
 
 		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
 			stepForward(pedestrian, currentTimeInSec, timeStepInSec);
 		} else if (selfCategory == SelfCategory.COOPERATIVE) {
 			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);

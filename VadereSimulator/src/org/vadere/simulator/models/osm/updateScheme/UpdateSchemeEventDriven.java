@@ -3,6 +3,7 @@ package org.vadere.simulator.models.osm.updateScheme;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.osm.OSMBehaviorController;
 import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -52,6 +53,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 
 		// TODO: Maybe, use a state table with function pointers to a template function myFunc(ped, topography, time)
 		if (selfCategory == SelfCategory.TARGET_ORIENTED) {
+			pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.COOPERATIVE) {
 			PedestrianOSM candidate = osmBehaviorController.findSwapCandidate(pedestrian, topography);
@@ -77,6 +79,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			// needed for postvis to correctly reproduce state.
 			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+		} else if (selfCategory == SelfCategory.SOCIAL_DISTANCING){
+			osmBehaviorController.changeRepulsion(pedestrian);
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		}
 	}
 

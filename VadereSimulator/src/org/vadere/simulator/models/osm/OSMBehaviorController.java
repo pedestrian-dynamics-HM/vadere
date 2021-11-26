@@ -177,7 +177,7 @@ public class OSMBehaviorController {
      * adjusted in the future when more empirical data about safe zones is available.
      */
     public void changeTargetToSafeZone(PedestrianOSM pedestrian, Topography topography) {
-        if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
+        //if (pedestrian.getCombinedPotentialStrategy() instanceof TargetRepulsionStrategy) {
 
             ScenarioElement searchPosition = (pedestrian.getSource() == null) ? pedestrian : pedestrian.getSource();
             Target closestTarget = TopographyHelper.findClosestTargetToSource(topography, searchPosition, pedestrian.getThreatMemory().getLatestThreat());
@@ -189,7 +189,7 @@ public class OSMBehaviorController {
             }
 
             pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.TARGET_ATTRACTION_STRATEGY);
-        }
+        //}
     }
 
     public void changeTarget(PedestrianOSM pedestrian, Topography topography) {
@@ -273,4 +273,11 @@ public class OSMBehaviorController {
         pedestrian1.setTimeOfNextStep(endTimeStep);
         pedestrian2.setTimeOfNextStep(endTimeStep);
     }
+
+    public void changeRepulsion(PedestrianOSM pedestrian){
+        pedestrian.setCombinedPotentialStrategy(CombinedPotentialStrategy.PEDESTRIAN_REPULSION_STRATEGY);
+    }
+
+
+
 }
