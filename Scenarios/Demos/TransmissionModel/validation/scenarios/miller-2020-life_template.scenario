@@ -1,6 +1,6 @@
 {
-  "name" : "hamner-2020-life_template",
-  "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice — skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606–610, 2020. doi:10.15585/mmwr.mm6919e6.",
+  "name" : "miller-2020-life_template",
+  "description" : "Superspreading event during a choir rehearsal following miller-2020-life;\n\nS. L. Miller, W. W. Nazaroff, J. L. Jimenez, A. Boerstra, G. Buonanno, S. J. Dancer, J. Kurnitski, L. C. Marr, L. Morawska, and C. Noakes. Transmission of SARSCoV-2 by inhalation of respiratory aerosol in the skagit valley chorale superspreading event. Indoor Air, 31(2): 314–323, 2020. doi:10.1111/ina.12751.",
   "release" : "1.16",
   "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
@@ -8,10 +8,17 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "infectionStatus.txt",
       "processors" : [ 1 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "pathogenLoad.txt",
+      "processors" : [ 2 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
       "id" : 1
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadMaxProcessor",
+      "id" : 2
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false
