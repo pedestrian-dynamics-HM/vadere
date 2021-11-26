@@ -1,42 +1,26 @@
 {
-  "name" : "hamner-2020-life-template",
-  "description" : "",
+  "name" : "miller-2020-life_template",
+  "description" : "Superspreading event during a choir rehearsal following miller-2020-life;\n\nS. L. Miller, W. W. Nazaroff, J. L. Jimenez, A. Boerstra, G. Buonanno, S. J. Dancer, J. Kurnitski, L. C. Marr, L. Morawska, and C. Noakes. Transmission of SARSCoV-2 by inhalation of respiratory aerosol in the skagit valley chorale superspreading event. Indoor Air, 31(2): 314–323, 2020. doi:10.1111/ina.12751.",
   "release" : "1.16",
+  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
-      "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 5 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
+      "filename" : "infectionStatus.txt",
+      "processors" : [ 1 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "pathogenLoad.txt",
+      "processors" : [ 2 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
       "id" : 1
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadMaxProcessor",
       "id" : 2
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
-      "id" : 3
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
-      "id" : 5
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {
@@ -119,7 +103,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 9000.0,
+      "finishTime" : 9300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,

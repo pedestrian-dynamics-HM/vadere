@@ -2,6 +2,7 @@
   "name" : "closeContact",
   "description" : "",
   "release" : "1.16",
+  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -23,6 +24,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
       "filename" : "pathogenConcentration.txt",
       "processors" : [ 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudShapes.txt",
+      "processors" : [ 8 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -54,8 +59,15 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 7
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributes" : {
+        "sampleEveryNthSimStep" : 1
+      }
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {
@@ -147,7 +159,7 @@
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
       "fixedSeed" : 8838372581797678424,
-      "simulationSeed" : 8838372581797678424
+      "simulationSeed" : 0
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : false,
@@ -275,7 +287,7 @@
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
-        "speedDistributionStandardDeviation" : 0.0,
+        "speedDistributionStandardDeviation" : 0.26,
         "minimumSpeed" : 0.5,
         "maximumSpeed" : 2.2,
         "acceleration" : 2.0,

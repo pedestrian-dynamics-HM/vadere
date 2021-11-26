@@ -1,0 +1,9 @@
+# ignore all supporting files and folders that do not originally belong to vadere
+
+
+*.md
+validation/hamner-2020-life/
+validation/miller-2020-life/
+validation/lu-2020-life/
+validation/scenarios/*seed*
+evaluation/

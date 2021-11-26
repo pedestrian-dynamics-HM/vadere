@@ -1,12 +1,13 @@
 {
-  "name" : "validation_lu-2020_individual_targets",
-  "description" : "",
+  "name" : "lu-2020-life",
+  "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628–\n1631, 2020. doi:10.3201/eid2607.200764.",
   "release" : "1.16",
+  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2 ]
+      "processors" : [ 1, 2, 5 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -32,8 +33,11 @@
       "attributes" : {
         "pedestrianOverlapProcessorId" : 3
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
+      "id" : 5
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {
@@ -61,10 +65,10 @@
         "submodels" : [ "org.vadere.simulator.models.sir.TransmissionModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
-        "pedPotentialIntimateSpaceWidth" : 0.1,
-        "pedPotentialPersonalSpaceWidth" : 0.2,
-        "pedPotentialHeight" : 50.0,
-        "obstPotentialWidth" : 0.2,
+        "pedPotentialIntimateSpaceWidth" : 0.45,
+        "pedPotentialPersonalSpaceWidth" : 1.2,
+        "pedPotentialHeight" : 5.0,
+        "obstPotentialWidth" : 0.0,
         "obstPotentialHeight" : 6.0,
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
@@ -102,12 +106,12 @@
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
         "pedestrianPathogenAbsorptionRate" : 5.0E-4,
-        "pedestrianMinInfectiousDose" : 1000.0,
+        "pedestrianMinInfectiousDose" : 3200.0,
         "exposedPeriod" : 432000.0,
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
-        "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 3.14,
+        "aerosolCloudHalfLife" : 600.0,
+        "aerosolCloudInitialArea" : 7.1,
         "dropletsExhalationFrequency" : 0.0,
         "dropletsDistanceOfSpread" : 1.5,
         "dropletsAngleOfSpreadInDeg" : 30.0,
@@ -150,53 +154,53 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 1.45,
+            "x" : 1.85,
             "y" : 11.25
           }, {
-            "x" : 1.43477590650226,
-            "y" : 11.326536686473
+            "x" : 1.81193976625564,
+            "y" : 11.4413417161825
           }, {
-            "x" : 1.39142135623731,
-            "y" : 11.3914213562373
+            "x" : 1.70355339059327,
+            "y" : 11.6035533905933
           }, {
-            "x" : 1.32653668647302,
-            "y" : 11.4347759065023
+            "x" : 1.54134171618254,
+            "y" : 11.7119397662556
           }, {
-            "x" : 1.25,
-            "y" : 11.45
+            "x" : 1.35,
+            "y" : 11.75
           }, {
-            "x" : 1.17346331352698,
-            "y" : 11.4347759065023
+            "x" : 1.15865828381746,
+            "y" : 11.7119397662556
           }, {
-            "x" : 1.10857864376269,
-            "y" : 11.3914213562373
+            "x" : 0.996446609406726,
+            "y" : 11.6035533905933
           }, {
-            "x" : 1.06522409349774,
-            "y" : 11.326536686473
+            "x" : 0.888060233744357,
+            "y" : 11.4413417161825
           }, {
-            "x" : 1.05,
+            "x" : 0.85,
             "y" : 11.25
           }, {
-            "x" : 1.06522409349774,
-            "y" : 11.173463313527
+            "x" : 0.888060233744357,
+            "y" : 11.0586582838175
           }, {
-            "x" : 1.10857864376269,
-            "y" : 11.1085786437627
+            "x" : 0.996446609406726,
+            "y" : 10.8964466094067
           }, {
-            "x" : 1.17346331352698,
-            "y" : 11.0652240934977
+            "x" : 1.15865828381745,
+            "y" : 10.7880602337444
           }, {
-            "x" : 1.25,
-            "y" : 11.05
+            "x" : 1.35,
+            "y" : 10.75
           }, {
-            "x" : 1.32653668647302,
-            "y" : 11.0652240934977
+            "x" : 1.54134171618255,
+            "y" : 10.7880602337444
           }, {
-            "x" : 1.39142135623731,
-            "y" : 11.1085786437627
+            "x" : 1.70355339059327,
+            "y" : 10.8964466094067
           }, {
-            "x" : 1.43477590650226,
-            "y" : 11.173463313527
+            "x" : 1.81193976625564,
+            "y" : 11.0586582838175
           } ]
         },
         "id" : 1
@@ -204,53 +208,53 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 3.4,
-            "y" : 11.0
+            "x" : 3.95,
+            "y" : 11.05
           }, {
-            "x" : 3.36955181300451,
-            "y" : 11.153073372946
+            "x" : 3.90432771950677,
+            "y" : 11.2796100594191
           }, {
-            "x" : 3.28284271247462,
-            "y" : 11.2828427124746
+            "x" : 3.77426406871193,
+            "y" : 11.4742640687119
           }, {
-            "x" : 3.15307337294604,
-            "y" : 11.3695518130045
+            "x" : 3.57961005941905,
+            "y" : 11.6043277195068
           }, {
-            "x" : 3.0,
-            "y" : 11.4
+            "x" : 3.35,
+            "y" : 11.65
           }, {
-            "x" : 2.84692662705396,
-            "y" : 11.3695518130045
+            "x" : 3.12038994058095,
+            "y" : 11.6043277195068
           }, {
-            "x" : 2.71715728752538,
-            "y" : 11.2828427124746
+            "x" : 2.92573593128807,
+            "y" : 11.4742640687119
           }, {
-            "x" : 2.63044818699549,
-            "y" : 11.153073372946
+            "x" : 2.79567228049323,
+            "y" : 11.2796100594191
           }, {
-            "x" : 2.6,
-            "y" : 11.0
+            "x" : 2.75,
+            "y" : 11.05
           }, {
-            "x" : 2.63044818699549,
-            "y" : 10.846926627054
+            "x" : 2.79567228049323,
+            "y" : 10.8203899405809
           }, {
-            "x" : 2.71715728752538,
-            "y" : 10.7171572875254
+            "x" : 2.92573593128807,
+            "y" : 10.6257359312881
           }, {
-            "x" : 2.84692662705396,
-            "y" : 10.6304481869955
+            "x" : 3.12038994058095,
+            "y" : 10.4956722804932
           }, {
-            "x" : 3.0,
-            "y" : 10.6
+            "x" : 3.35,
+            "y" : 10.45
           }, {
-            "x" : 3.15307337294604,
-            "y" : 10.6304481869955
+            "x" : 3.57961005941905,
+            "y" : 10.4956722804932
           }, {
-            "x" : 3.28284271247462,
-            "y" : 10.7171572875254
+            "x" : 3.77426406871193,
+            "y" : 10.6257359312881
           }, {
-            "x" : 3.36955181300451,
-            "y" : 10.846926627054
+            "x" : 3.90432771950677,
+            "y" : 10.8203899405809
           } ]
         },
         "id" : 2
@@ -258,53 +262,53 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 5.4,
-            "y" : 11.0
+            "x" : 5.9,
+            "y" : 11.05
           }, {
-            "x" : 5.36955181300451,
-            "y" : 11.153073372946
+            "x" : 5.85432771950677,
+            "y" : 11.2796100594191
           }, {
-            "x" : 5.28284271247462,
-            "y" : 11.2828427124746
+            "x" : 5.72426406871193,
+            "y" : 11.4742640687119
           }, {
-            "x" : 5.15307337294604,
-            "y" : 11.3695518130045
+            "x" : 5.52961005941905,
+            "y" : 11.6043277195068
           }, {
-            "x" : 5.0,
-            "y" : 11.4
+            "x" : 5.3,
+            "y" : 11.65
           }, {
-            "x" : 4.84692662705396,
-            "y" : 11.3695518130045
+            "x" : 5.07038994058095,
+            "y" : 11.6043277195068
           }, {
-            "x" : 4.71715728752538,
-            "y" : 11.2828427124746
+            "x" : 4.87573593128807,
+            "y" : 11.4742640687119
           }, {
-            "x" : 4.63044818699549,
-            "y" : 11.153073372946
+            "x" : 4.74567228049323,
+            "y" : 11.2796100594191
           }, {
-            "x" : 4.6,
-            "y" : 11.0
+            "x" : 4.7,
+            "y" : 11.05
           }, {
-            "x" : 4.63044818699549,
-            "y" : 10.846926627054
+            "x" : 4.74567228049323,
+            "y" : 10.8203899405809
           }, {
-            "x" : 4.71715728752538,
-            "y" : 10.7171572875254
+            "x" : 4.87573593128807,
+            "y" : 10.6257359312881
           }, {
-            "x" : 4.84692662705396,
-            "y" : 10.6304481869955
+            "x" : 5.07038994058095,
+            "y" : 10.4956722804932
           }, {
-            "x" : 5.0,
-            "y" : 10.6
+            "x" : 5.3,
+            "y" : 10.45
           }, {
-            "x" : 5.15307337294604,
-            "y" : 10.6304481869955
+            "x" : 5.52961005941905,
+            "y" : 10.4956722804932
           }, {
-            "x" : 5.28284271247462,
-            "y" : 10.7171572875254
+            "x" : 5.72426406871193,
+            "y" : 10.6257359312881
           }, {
-            "x" : 5.36955181300451,
-            "y" : 10.846926627054
+            "x" : 5.85432771950677,
+            "y" : 10.8203899405809
           } ]
         },
         "id" : 3
@@ -315,10 +319,10 @@
         "id" : 7,
         "absorbing" : true,
         "shape" : {
-          "x" : 1.5,
-          "y" : 11.6,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 1.65,
+          "y" : 11.8,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4380.0,
@@ -332,10 +336,10 @@
         "id" : 6,
         "absorbing" : true,
         "shape" : {
-          "x" : 0.7,
-          "y" : 11.6,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 0.95,
+          "y" : 11.8,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4380.0,
@@ -349,10 +353,10 @@
         "id" : 8,
         "absorbing" : true,
         "shape" : {
-          "x" : 1.4,
-          "y" : 10.5,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 1.65,
+          "y" : 10.6,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4380.0,
@@ -366,10 +370,10 @@
         "id" : 4,
         "absorbing" : true,
         "shape" : {
-          "x" : 3.5,
-          "y" : 11.4,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 4.05,
+          "y" : 11.3,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4500.0,
@@ -383,10 +387,10 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 2.3,
-          "y" : 11.4,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 2.7,
+          "y" : 11.5,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4500.0,
@@ -400,10 +404,10 @@
         "id" : 3,
         "absorbing" : true,
         "shape" : {
-          "x" : 2.0,
-          "y" : 10.8,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 2.5,
+          "y" : 11.1,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4500.0,
@@ -417,10 +421,10 @@
         "id" : 5,
         "absorbing" : true,
         "shape" : {
-          "x" : 2.3,
-          "y" : 10.2,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 2.6,
+          "y" : 10.6,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4500.0,
@@ -434,10 +438,10 @@
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 3.4,
-          "y" : 10.2,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 3.95,
+          "y" : 10.55,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 4500.0,
@@ -451,10 +455,10 @@
         "id" : 9,
         "absorbing" : true,
         "shape" : {
-          "x" : 5.1,
-          "y" : 11.5,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 5.55,
+          "y" : 11.7,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 3180.0,
@@ -468,10 +472,10 @@
         "id" : 10,
         "absorbing" : true,
         "shape" : {
-          "x" : 5.4,
-          "y" : 10.1,
-          "width" : 0.4,
-          "height" : 0.4,
+          "x" : 5.8,
+          "y" : 10.3,
+          "width" : 0.1,
+          "height" : 0.1,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 3180.0,
