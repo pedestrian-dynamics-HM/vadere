@@ -3,8 +3,6 @@ package org.vadere.state.attributes.models;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
-import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
-import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.health.InfectionStatus;
 
 import java.util.ArrayList;
@@ -60,12 +58,12 @@ public class AttributesTransmissionModel extends Attributes {
 		this.pedestrianPathogenEmissionCapacity = 4; // pathogen particles per exhalation, logarithmized to base 10
 		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume in m^3 per inhalation
 		this.pedestrianMinInfectiousDose = 3200; // in particles
-		this.exposedPeriod = 2.59 * 10E5; // in seconds
-		this.infectiousPeriod = 3.46 * 10E5; // in seconds
-		this.recoveredPeriod = 1.56 * 10E7; // in seconds
+		this.exposedPeriod = 2.59E5; // in seconds
+		this.infectiousPeriod = 3.46E5; // in seconds
+		this.recoveredPeriod = 1.56E7; // in seconds
 		this.aerosolCloudHalfLife = 600; // in seconds
 		this.aerosolCloudInitialArea = 7.1; // in m^2, equivalent to 1.5 m radius for circular aerosolClouds
-		
+
 		this.dropletsExhalationFrequency = 0;  // 0 -> no droplets are exhaled
 		this.dropletsDistanceOfSpread = 1.5;
 		this.dropletsAngleOfSpreadInDeg = 30;
