@@ -167,6 +167,30 @@ public class Pedestrian extends Agent {
     	return healthStatus.getInfectionStatus();
     }
 
+    public double getPathogenEmissionCapacity() {
+        return healthStatus.getPathogenEmissionCapacity();
+    }
+
+    public double getPathogenAbsorptionRate() {
+        return healthStatus.getPathogenAbsorptionRate();
+    }
+
+    public double getRespiratoryTimeOffset(){
+        return healthStatus.getRespiratoryTimeOffset();
+    }
+
+    public double getExposedPeriod() {
+        return healthStatus.getExposedPeriod();
+    }
+
+    public double getInfectiousPeriod() {
+        return healthStatus.getInfectiousPeriod();
+    }
+
+    public double getRecoveredPeriod() {
+        return healthStatus.getRecoveredPeriod();
+    }
+
 	public double getPathogenAbsorbedLoad() {
     	return healthStatus.getPathogenAbsorbedLoad();
     }

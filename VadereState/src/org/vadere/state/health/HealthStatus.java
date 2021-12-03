@@ -1,5 +1,6 @@
 package org.vadere.state.health;
 
+import org.vadere.state.attributes.models.AttributesTransmissionModel;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.state.scenario.Pedestrian;
 
@@ -40,6 +41,8 @@ public class HealthStatus {
 
     private final static double defaultPathogenLoad = 0.0;
     private final static double defaultUpdateTime = -1;
+    private final static double defaultRespiratoryTimeOffset = 0.0;
+    private final static AttributesTransmissionModel meanPedHealthStatusAttributes = new AttributesTransmissionModel();
 
     // Constructors
     public HealthStatus(InfectionStatus infectionStatus, double lastInfectionStatusUpdateTime, double pathogenAbsorbedLoad,
@@ -61,9 +64,18 @@ public class HealthStatus {
     }
 
     public HealthStatus() {
-        this(InfectionStatus.SUSCEPTIBLE, defaultUpdateTime, defaultPathogenLoad, null,
-                -1, false, -1, -1, -1,
-                -1, -1, -1);
+        this(InfectionStatus.SUSCEPTIBLE,
+                defaultUpdateTime,
+                defaultPathogenLoad,
+                null,
+                defaultRespiratoryTimeOffset,
+                false,
+                meanPedHealthStatusAttributes.getPedestrianPathogenEmissionCapacity(),
+                meanPedHealthStatusAttributes.getPedestrianPathogenAbsorptionRate(),
+                meanPedHealthStatusAttributes.getPedestrianMinInfectiousDose(),
+                meanPedHealthStatusAttributes.getExposedPeriod(),
+                meanPedHealthStatusAttributes.getInfectiousPeriod(),
+                meanPedHealthStatusAttributes.getRecoveredPeriod());
     }
 
     public HealthStatus(HealthStatus other) {
