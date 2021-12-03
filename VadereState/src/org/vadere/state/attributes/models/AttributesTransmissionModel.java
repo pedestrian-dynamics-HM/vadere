@@ -3,6 +3,8 @@ package org.vadere.state.attributes.models;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
+import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
+import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.health.InfectionStatus;
 
 import java.util.ArrayList;
@@ -51,15 +53,19 @@ public class AttributesTransmissionModel extends Attributes {
 
 	public AttributesTransmissionModel() {
 		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new TransmissionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, InfectionStatus.SUSCEPTIBLE)));
-		this.pedestrianRespiratoryCyclePeriod = 4; // respiratory cycle in seconds
-		this.pedestrianPathogenEmissionCapacity = 4;
-		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume (per breath) 0.5 l in m^3
-		this.pedestrianMinInfectiousDose = 1000; // pathogen load required for changing infectionStatus to exposed
-		this.exposedPeriod = 2 * 24 * 60 * 60; // 2 days in seconds
-		this.infectiousPeriod = 14 * 24 * 60 * 60; // 14 days in seconds
-		this.recoveredPeriod = 365 * 24 * 60 * 60; // 1 year in seconds
-		this.aerosolCloudHalfLife = 120; // 2 minutes in seconds
-		this.aerosolCloudInitialArea = 3.14; // equivalent to 1 m radius for circular aerosolClouds
+
+		// Mean pedestrian healthStatus and aerosolCloud attributes, rahn-2021b-cdyn Table I;
+		// Some of these values are defined as mean values but could/should be introduced as distributions
+		this.pedestrianRespiratoryCyclePeriod = 4; // in seconds
+		this.pedestrianPathogenEmissionCapacity = 4; // pathogen particles per exhalation, logarithmized to base 10
+		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume in m^3 per inhalation
+		this.pedestrianMinInfectiousDose = 3200; // in particles
+		this.exposedPeriod = 2.59 * 10E5; // in seconds
+		this.infectiousPeriod = 3.46 * 10E5; // in seconds
+		this.recoveredPeriod = 1.56 * 10E7; // in seconds
+		this.aerosolCloudHalfLife = 600; // in seconds
+		this.aerosolCloudInitialArea = 7.1; // in m^2, equivalent to 1.5 m radius for circular aerosolClouds
+		
 		this.dropletsExhalationFrequency = 0;  // 0 -> no droplets are exhaled
 		this.dropletsDistanceOfSpread = 1.5;
 		this.dropletsAngleOfSpreadInDeg = 30;
