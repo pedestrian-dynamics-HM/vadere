@@ -6,7 +6,6 @@ import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesFloorField;
-import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
@@ -84,6 +83,15 @@ public class TopographyController extends OfflineTopographyController {
 		newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
 
 		agentWrapper.getTrajectory().getFootSteps().forEach(footStep -> newPedestrian.addFootStepToTrajectory(footStep));
+
+		newPedestrian.setInfectionStatus(agentWrapper.getInfectionStatus());
+		newPedestrian.setPathogenEmissionCapacity(agentWrapper.getPathogenEmissionCapacity());
+		newPedestrian.setPathogenAbsorptionRate(agentWrapper.getPathogenAbsorptionRate());
+		newPedestrian.setRespiratoryTimeOffset(agentWrapper.getRespiratoryTimeOffset());
+		newPedestrian.setMinInfectiousDose(agentWrapper.getMinInfectiousDose());
+		newPedestrian.setExposedPeriod(agentWrapper.getExposedPeriod());
+		newPedestrian.setInfectiousPeriod(agentWrapper.getInfectiousPeriod());
+		newPedestrian.setRecoveredPeriod(agentWrapper.getRecoveredPeriod());
 	}
 
 	public void update(double simTimeInSec) {
