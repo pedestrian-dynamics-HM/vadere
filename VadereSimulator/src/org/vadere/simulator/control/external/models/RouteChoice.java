@@ -31,8 +31,6 @@ public class RouteChoice extends ControlModel {
         // The seed for generating the random distribution is simply set to 0,
         // since the allocation should actually be deterministic (people should always be divided in the same way).
         random = new Random(0);
-        // 
-        this.isBehaviorChangeEnduring = false; // the target is set once.
     }
 
 
@@ -92,5 +90,11 @@ public class RouteChoice extends ControlModel {
         }
         return probs;
     }
+
+    protected boolean isBehaviorChangeEnduring() {
+        // Change Target is only processed once.
+        return false;
+    }
+
 
 }
