@@ -140,6 +140,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 			} else {
 				try {
 					Attributes attributes = StateJsonConverter.deserializeScenarioElementType(json, element.getType());
+					attributes.check();
 					element.setAttributes(attributes); // Replaces previous AttributeModifier.setAttributes (see #91)
 					ScenarioPanel.removeJsonParsingErrorMsg();
 					ProjectView.getMainWindow().refreshScenarioNames();

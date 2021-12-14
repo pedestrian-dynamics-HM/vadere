@@ -1,7 +1,7 @@
 {
   "name" : "DenseCrowd_withoutGroups",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -360,8 +360,10 @@
           "height" : 0.5881995133819959,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -415,13 +417,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -468,13 +468,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -521,13 +519,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -574,13 +570,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -627,13 +621,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -680,13 +672,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -733,13 +723,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -786,13 +774,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -839,13 +825,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -892,13 +876,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -945,13 +927,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -998,13 +978,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1051,13 +1029,11 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1080,7 +1056,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

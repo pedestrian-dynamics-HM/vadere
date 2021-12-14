@@ -1,7 +1,8 @@
 package org.vadere.state.attributes.scenario;
 
-import org.apache.commons.math3.distribution.RealDistribution;
-import org.vadere.state.scenario.ConstantDistribution;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.vadere.state.scenario.distribution.parameter.ConstantParameter;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -9,7 +10,6 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Path2D;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class SourceTestAttributesBuilder {
 
@@ -19,8 +19,8 @@ public class SourceTestAttributesBuilder {
 	private int spawnNumber = 1;
 	private boolean useFreeSpaceOnly = false;
 	private boolean spawnAtRandomPositions = false;
-	private Class<? extends RealDistribution> distributionClass = ConstantDistribution.class;
-	private double[] distributionParams = new double[]{1};
+	private String distributionName= "constant";
+	private ConstantParameter parameter = new ConstantParameter();
 	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
 	private Integer[] groupSizeDistributionMock = new Integer[]{};
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
@@ -33,6 +33,10 @@ public class SourceTestAttributesBuilder {
 	private double x3 = 0.0;
 	private double y3 = 5.0;
 	private long randomSeed = 0;
+
+	public SourceTestAttributesBuilder(){
+		parameter.setUpdateFrequency(1);
+	}
 
 	public AttributesSource getResult() throws IOException {
 		String json = generateSourceAttributesJson();
@@ -60,8 +64,8 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setDistributionParams(double parameter) {
-		this.distributionParams = new double[]{parameter};
+	public SourceTestAttributesBuilder setDistributionParams(double updateFruequency) {
+		this.parameter.setUpdateFrequency(updateFruequency);
 		return this;
 	}
 
@@ -75,20 +79,20 @@ public class SourceTestAttributesBuilder {
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setDistributionClass(Class<? extends RealDistribution> distributionClass) {
-		this.distributionClass = distributionClass;
-		return this;
-	}
+//	public SourceTestAttributesBuilder setDistributionClass(Class<? extends VadereDistribution> distributionClass) {
+//		this.distributionClass = distributionClass;
+//		return this;
+//	}
 
 	public SourceTestAttributesBuilder setMaxSpawnNumberTotal(int maxSpawnNumberTotal) {
 		this.maxSpawnNumberTotal = maxSpawnNumberTotal;
 		return this;
 	}
 
-	public SourceTestAttributesBuilder setDistributionParameters(double[] params) {
-		distributionParams = params;
-		return this;
-	}
+//	public SourceTestAttributesBuilder setDistributionParameters(double[] params) {
+//		distributionParams = params;
+//		return this;
+//	}
 
 	public SourceTestAttributesBuilder setId(int id) {
 		this.id = id;
@@ -176,6 +180,14 @@ public class SourceTestAttributesBuilder {
 	}
 
 	private String generateSourceAttributesJson() {
+		String paramString = "";
+		try {
+			 paramString = new ObjectMapper().writeValueAsString(parameter);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
+
 		return "{  \"id\" : " + id + "," +
 				"\"shape\": {\"type\": \"POLYGON\",\"points\":"
 				+ "[{\"x\": 0.0,\"y\": 0.0}"
@@ -184,8 +196,8 @@ public class SourceTestAttributesBuilder {
 				+ ",{\"x\": " + x3 + ",\"y\": " + y3 + "}]}"
 				+ ",\"spawnNumber\":  " + spawnNumber
 				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
-				+ ",\"interSpawnTimeDistribution\": \"" + distributionClass.getName() + "\""
-				+ ",\"distributionParameters\": " + Arrays.toString(distributionParams)
+				+ ",\"interSpawnTimeDistribution\": \"" + distributionName + "\""
+				+ ",\"distributionParameters\": " + paramString
 				+ ",\"startTime\": " + startTime
 				+ ",\"endTime\": " + endTime
 				+ ",\"spawnAtRandomPositions\": " + spawnAtRandomPositions

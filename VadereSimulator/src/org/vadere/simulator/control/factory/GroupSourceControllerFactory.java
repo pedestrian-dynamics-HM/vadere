@@ -26,6 +26,7 @@ public class GroupSourceControllerFactory extends SourceControllerFactory {
 								   AttributesDynamicElement attributesDynamicElement,
 								   Random random) {
 		GroupSizeDeterminator gsd = new GroupSizeDeterminatorRandom(source.getAttributes().getGroupSizeDistribution(), random);
-		return new GroupSourceController(scenario, source, dynamicElementFactory, attributesDynamicElement, random, groupModel, gsd);
+		return new GroupSourceController(scenario, source, dynamicElementFactory, attributesDynamicElement,
+				random, groupModel, gsd);
 	}
 }

@@ -12,6 +12,18 @@
 
 - In `postLoop()` of `Simulation.java`, clear the topography as very last step so that models and output processors can use it before.
 
+
+## v2.0
+
+### Changed
+- `SourceController`: Spawn agents according to time series. The number of agents was previously defined by a distribution function during spawning. In addition, there is now the possibility to store a time series. For this purpose, the definition of the sources was generalised.
+
+
+## v1.16
+### Added
+- `CognitionModel`: Make cognition model probabilistic. In the `GUI`, the user can define `ReactionProbabilites` that assign a probability to each stimulus using a unique id.
+
+
 ## v1.15 (2020-11-12)
 
 ### Added

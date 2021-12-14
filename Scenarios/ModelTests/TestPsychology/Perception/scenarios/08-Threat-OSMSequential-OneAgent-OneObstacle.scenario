@@ -1,7 +1,7 @@
 {
   "name" : "08-Threat-OSMSequential-OneAgent-OneObstacle",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -200,13 +200,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

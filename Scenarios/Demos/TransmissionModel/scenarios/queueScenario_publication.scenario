@@ -1,7 +1,7 @@
 {
   "name" : "queueScenario_publication",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
   "processWriters" : {
     "files" : [ {

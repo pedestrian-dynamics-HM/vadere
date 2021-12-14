@@ -1,5 +1,7 @@
 package org.vadere.state.attributes;
 
+import java.io.IOException;
+
 /**
  * Abstract base class for all static simulation attributes.
  * 
@@ -40,4 +42,6 @@ public abstract class Attributes extends DefaultSealable implements Cloneable {
 		}
 	}
 
+    public void check() throws IOException {
+    }
 }

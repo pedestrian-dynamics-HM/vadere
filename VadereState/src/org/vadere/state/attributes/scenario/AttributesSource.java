@@ -1,22 +1,26 @@
 package org.vadere.state.attributes.scenario;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.AttributesEmbedShape;
-import org.vadere.state.scenario.ConstantDistribution;
+import org.vadere.state.scenario.distribution.DistributionFactory;
+import org.vadere.state.scenario.distribution.VadereDistribution;
 import org.vadere.state.types.DynamicElementType;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class AttributesSource extends AttributesEmbedShape {
 
-	public static final String CONSTANT_DISTRIBUTION = ConstantDistribution.class.getName();
+	public static final String CONSTANT_DISTRIBUTION = "constant";
 	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
+	public static final JsonNode CONSTANT_DISTRIBUTION_PAR = StateJsonConverter.createObjectNode().put("updateFrequency", 1.0);
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private int id = ID_NOT_SET;
@@ -24,10 +28,39 @@ public class AttributesSource extends AttributesEmbedShape {
 	/** Shape and position. */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private VShape shape = null;
+
+	/**
+	 *  Distribution types:
+	 *  "binomial",
+	 *  "constant",
+	 *  "empirical",
+	 *  "linearInterpolation",
+	 *  "mixed",
+	 *  "negativeExponential",
+	 *  "normal",
+	 *  "poisson",
+	 *  "singleSpawn",
+	 *  "timeSeries"
+	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
+
+
+	/**
+	 *  Distribution parameter examples:
+	 *  "binomial" -> "trials": 1 , "p": 0.5
+	 *  "constant" -> "updateFrequency": 1.0
+	 *  "empirical" -> "values" : [0.2,0.5,1.4]
+	 *  "linearInterpolation", "spawnFrequency": 1.0, "xValues": [1.4, 2.4], "yValues": [5,9]
+	 *  "mixed",
+	 *  "negativeExponential" -> "mean": 2.4
+	 *  "normal" -> "mean":1.3, "sd":0.2
+	 *  "poisson" -> "numberPedsPerSecond" : 5.4
+	 *  "singleSpawn", "spawnTime" : 3.0
+	 *  "timeSeries" -> "intervalLength":1.2, "spawnsPerInterval" : [2,0,0,2,0,0]
+	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private List<Double> distributionParameters = Collections.singletonList(1.0);
+	private JsonNode distributionParameters = CONSTANT_DISTRIBUTION_PAR;
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private int spawnNumber = 1;
@@ -96,8 +129,7 @@ public class AttributesSource extends AttributesEmbedShape {
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesAgent attributesPedestrian = null;
-	@SuppressWarnings("unused")
-	private AttributesSource() {}
+	@SuppressWarnings("unused") private AttributesSource() {}
 
 	public AttributesSource(int id) {
 		this.id = id;
@@ -116,7 +148,7 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * least one public constructor with the following arguments: 1.
 	 * {@link org.apache.commons.math3.random.RandomGenerator},
 	 * 2. one or more arguments of type <code>double</code> for distribution parameters.
-	 * 
+	 *
 	 * @see Class#getName()
 	 *  https://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/package-summary.html
 	 */
@@ -124,11 +156,13 @@ public class AttributesSource extends AttributesEmbedShape {
 		return interSpawnTimeDistribution;
 	}
 
-	public List<Double> getDistributionParameters() {
+	public JsonNode getDistributionParameters() {
 		return distributionParameters;
 	}
 
-	/** Get number of pedestrians to be spawned at one point in time. */
+	/**
+	 * Get number of pedestrians to be spawned at one point in time.
+	 */
 	public int getSpawnNumber() {
 		return spawnNumber;
 	}
@@ -202,7 +236,7 @@ public class AttributesSource extends AttributesEmbedShape {
 		endTime = time;
 	}
 
-	public void setDistributionParameters(List<Double> distributionParameters) {
+	public void setDistributionParameters(JsonNode distributionParameters) {
 		checkSealed();
 		this.distributionParameters = distributionParameters;
 	}
@@ -256,6 +290,18 @@ public class AttributesSource extends AttributesEmbedShape {
 		this.id = id;
 	}
 
+	@Override
+	public void check() throws IOException {
+		try {
+			VadereDistribution<?> distribution = DistributionFactory.create(
+					this.getInterSpawnTimeDistribution(),
+					this.getDistributionParameters(),
+					this.getSpawnNumber(),
+					new JDKRandomGenerator(42)
+			);
+		} catch (Exception e) {
+			throw new IOException("Cannot build " + this.getInterSpawnTimeDistribution());
+		}
 
-
+	}
 }

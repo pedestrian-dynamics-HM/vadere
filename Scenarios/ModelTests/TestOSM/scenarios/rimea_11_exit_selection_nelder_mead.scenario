@@ -1,7 +1,7 @@
 {
   "name" : "rimea_11_exit_selection_nelder_mead",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -207,6 +207,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 10,
         "shape" : {
@@ -216,8 +218,10 @@
           "height" : 15.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1000,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

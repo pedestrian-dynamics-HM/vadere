@@ -171,7 +171,7 @@ public interface JsonNodeExplorer {
 	}
 
 	default Iterator<JsonNode> iteratorSources(JsonNode node) throws MigrationException{
-		JsonNode tChanger = pathMustExist(node, "scenario/topography/measurementAreas");
+		JsonNode tChanger = pathMustExist(node, "scenario/sources");
 		return new JsonFilterIterator(tChanger, n->true);
 	}
 

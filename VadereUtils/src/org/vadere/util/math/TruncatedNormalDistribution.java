@@ -17,8 +17,7 @@ public class TruncatedNormalDistribution extends NormalDistribution {
 		super(rng, mean, standardDeviation);
 
 		if (max <= min){
-			// TODO: this check should actually go into the ScenarioChecker?
-			throw new IllegalArgumentException("Parameters 'min < max'.");
+			throw new IllegalArgumentException("Parameter setting must be 'min < max'.");
 		}
 
 		this.min = min;

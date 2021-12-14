@@ -1,7 +1,7 @@
 {
   "name" : "bus_station",
   "description" : "Scenario used for TGF19 contribution",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
@@ -296,8 +296,10 @@
           "height" : 11.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 0.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        },
         "spawnNumber" : 100,
         "maxSpawnNumberTotal" : 100,
         "startTime" : 0.0,
@@ -327,7 +329,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "name" : "rimea_04_flow_gnm1_075_h",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -115,8 +115,10 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 75,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -146,7 +148,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

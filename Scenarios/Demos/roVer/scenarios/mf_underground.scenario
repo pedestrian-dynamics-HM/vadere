@@ -1,7 +1,7 @@
 {
   "name" : "mf_underground",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -955,8 +955,10 @@
             "y" : 57.6
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -986,8 +988,10 @@
             "y" : 32.4
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1020,8 +1024,10 @@
             "y" : 15.0
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1054,8 +1060,10 @@
             "y" : 11.0
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1088,8 +1096,10 @@
             "y" : 12.7
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1119,8 +1129,10 @@
             "y" : 39.2
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1153,8 +1165,10 @@
             "y" : 49.1
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1184,8 +1198,10 @@
             "y" : 120.1
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1218,8 +1234,10 @@
             "y" : 124.4
           } ]
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -1249,7 +1267,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }
