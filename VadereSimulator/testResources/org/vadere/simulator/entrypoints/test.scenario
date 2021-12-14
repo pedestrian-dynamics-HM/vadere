@@ -1,7 +1,7 @@
 {
   "name" : "basic_1_chicken_osm1",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -155,6 +155,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -164,8 +166,10 @@
           "height" : 5.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 200,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

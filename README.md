@@ -65,6 +65,16 @@ Either run the Vadere simulator by
 - Double-clicking `vadere-gui.jar` (after installing [Java](http://www.vadere.org/getting-started/))
 - Entering `path/to/openjdk/java -jar vadere-gui.jar`
 
+### Scenario Files
+
+<!---
+@author Aleksandar Ivanov(ivanov0@hm.edu)
+-->
+
+You can find some example scenarios under [Scenarios/Demos](./Scenarios/Demos)
+
+For more info see [Scenario File Specification](./Documentation/scenario/scenario-file-specification.md)
+
 ### Run Built-In Examples
 
 With the following steps, you can run a simulation with one of the built-in examples from [Scenarios](Scenarios):

@@ -15,11 +15,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GroupSourceController extends SourceController {
@@ -27,7 +23,6 @@ public class GroupSourceController extends SourceController {
 	private static final int NUMBER_OF_REPOSITION_TRIES = 20;
 
 
-    
 	private final GroupModel groupModel;
 	private final LinkedList<Integer> groupsToSpawn;
 	private final GroupSpawnArray spawnArray;

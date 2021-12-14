@@ -1,7 +1,7 @@
 {
   "name" : "mf_001",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -10774,6 +10774,8 @@
       "targets" : [ ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {

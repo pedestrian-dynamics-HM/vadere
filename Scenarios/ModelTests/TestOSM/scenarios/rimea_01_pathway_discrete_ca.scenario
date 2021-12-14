@@ -1,7 +1,7 @@
 {
   "name" : "rimea_01_pathway_discrete_ca",
   "description" : "numberOfCircles = 1, stepCircleResolution = 18, DISCRETE",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -317,6 +317,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 10,
         "shape" : {
@@ -326,8 +328,10 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 30.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

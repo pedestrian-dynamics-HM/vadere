@@ -19,6 +19,10 @@ vadere_analysis_tool/build
 .metadata/
 .classpath
 .project
+.vscode
+.apt_generated
+.apt_generated_tests
+.factorypath
 
 # Package specific
 VadereGui/*.png

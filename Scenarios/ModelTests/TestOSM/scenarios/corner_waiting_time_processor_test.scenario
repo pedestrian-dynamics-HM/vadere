@@ -1,7 +1,7 @@
 {
   "name" : "corner_waiting_time_processor_test",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -191,6 +191,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 2,
         "shape" : {
@@ -200,8 +202,10 @@
           "height" : 1.6,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 20,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -257,7 +261,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : 0.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : 4.0,
+          "pathogenAbsorptionRate" : 5.0E-4,
+          "minInfectiousDose" : 3200.0,
+          "exposedPeriod" : 259000.0,
+          "infectiousPeriod" : 346000.0,
+          "recoveredPeriod" : 1.56E7
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

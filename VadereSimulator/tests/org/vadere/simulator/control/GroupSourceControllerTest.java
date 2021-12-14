@@ -19,10 +19,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Source;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -279,7 +276,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testStartTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 1)
 				.setGroupSizeDistributionMock(3, 3, 3, 3);
@@ -297,7 +293,6 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testEndTime() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 1) // only groups of 3
@@ -465,15 +460,14 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void multipleSources() {
 		SourceTestAttributesBuilder builder1 = new SourceTestAttributesBuilder()
-				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
 				.setSourceDim(new VRectangle(0, 0, 3, 4))
 				.setEndTime(4)
 				.setMaxSpawnNumberTotal(6)
 				.setUseFreeSpaceOnly(false)
 				.setGroupSizeDistributionMock(3, 4, 4, 4, 3);
+
 		SourceTestAttributesBuilder builder2 = new SourceTestAttributesBuilder()
-				.setDistributionClass(TestSourceControllerUsingDistributions.ConstantTestDistribution.class)
 				.setGroupSizeDistribution(0.0, 1.0)
 				.setSourceDim(new VRectangle(20, 20, 3, 2))
 				.setEndTime(6)

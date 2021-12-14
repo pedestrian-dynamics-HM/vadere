@@ -84,6 +84,7 @@ public class TestSourceControllerUsingConstantSpawnRate extends TestSourceContro
 	public void testUpdateSmallSpawnDelay() throws IOException {
 
 		double endTime = 1.0;
+
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
 				.setStartTime(0).setEndTime(endTime)
 				.setDistributionParams(0.1);
@@ -93,7 +94,7 @@ public class TestSourceControllerUsingConstantSpawnRate extends TestSourceContro
 			first().sourceController.update(simTimeInSec);
 		}
 
-		assertEquals("wrong pedestrian number.", 11, countPedestrians(0));
+		assertEquals("Wrong pedestrian number.", 11, countPedestrians(0));
 	}
 
 	/**

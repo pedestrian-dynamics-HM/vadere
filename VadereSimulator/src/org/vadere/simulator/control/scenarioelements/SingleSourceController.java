@@ -1,28 +1,28 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.simulator.control.util.SingleSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.control.util.SingleSpawnArray;
 import org.vadere.util.geometry.PointPositioned;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.logging.Logger;
 
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SingleSourceController extends SourceController {
 
+	private static Logger logger = Logger.getLogger(SingleSourceController.class);
+
 	private int numberToSpawn;
 	private static final int NUMBER_OF_REPOSITION_TRIES = 10;
-	private static final int NUMBER_OF_POINT_SEARCH = 1_000; // todo based on shape and position of source
+	private static final int NUMBER_OF_POINT_SEARCH = 1_500; // todo based on shape and position of source
 
 	private SingleSpawnArray spawnArray;
 
@@ -30,9 +30,12 @@ public class SingleSourceController extends SourceController {
 								  DynamicElementFactory dynamicElementFactory,
 								  AttributesDynamicElement attributesDynamicElement,
 								  Random random) {
+
 		super(scenario, source, dynamicElementFactory, attributesDynamicElement, random);
 		VRectangle elementBound = new VRectangle(dynamicElementFactory.getDynamicElementRequiredPlace(new VPoint(0, 0)).getBounds2D());
-		this.spawnArray = new SingleSpawnArray(source.getShape(),
+
+		this.spawnArray = new SingleSpawnArray(
+				source.getShape(),
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				this.dynamicElementFactory::getDynamicElementRequiredPlace,
 				this::testFreeSpace,
@@ -42,8 +45,9 @@ public class SingleSourceController extends SourceController {
 	@Override
 	public void update(double simTimeInSec) {
 		if (!isSourceFinished(simTimeInSec)) {
-			if (simTimeInSec >= timeOfNextEvent || numberToSpawn > 0) {
-				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
+			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
+
+			if (numberToSpawn > 0) {
 				List<VPoint> spawnPoints;
 
 				if (sourceAttributes.isSpawnAtRandomPositions()) {
@@ -58,8 +62,7 @@ public class SingleSourceController extends SourceController {
 										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
+
 					}else{
 						spawnPoints = getRandomArrayPositions(
 								numberToSpawn,
@@ -69,8 +72,7 @@ public class SingleSourceController extends SourceController {
 										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
+
 					}
 
 
@@ -84,18 +86,21 @@ public class SingleSourceController extends SourceController {
 										.map(dynamicElementFactory::getDynamicElementRequiredPlace)
 										.collect(Collectors.toList())
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
+
 					} else {
 						spawnPoints = getRealPositions(
 								numberToSpawn,
 								new ArrayList<>()
 						);
-						numberToSpawn -= spawnPoints.size();
-						assert (numberToSpawn >= 0);
 					}
 
 				}
+
+				// Report nr. of agents that could not be spawned -- it is up to SpawnDistribution if it
+				// wants to try to spawn the agents in the next update.
+				int remainingAgents = numberToSpawn - spawnPoints.size();
+				assert (remainingAgents >= 0);
+				this.distribution.setRemainingSpawnAgents(remainingAgents);
 
 				for (VPoint spawnPoint : spawnPoints) {
 					if (!isMaximumNumberOfSpawnedElementsReached()) {
@@ -122,7 +127,7 @@ public class SingleSourceController extends SourceController {
 	}
 
 	private List<VPoint> getRealPositions(final int numberToSpawn, @NotNull final List<VShape> blockPedestrianShapes) {
-		List<VPoint> positions = new ArrayList<>(numberToSpawn);
+		List<VPoint> positions = new LinkedList<>();
 
 		for (int i = 0; i < numberToSpawn; i++) {
 			Optional<VPoint> optPosition = spawnArray.getNextPosition(blockPedestrianShapes);
@@ -132,6 +137,8 @@ public class SingleSourceController extends SourceController {
 				blockPedestrianShapes.add(dynamicElementFactory.getDynamicElementRequiredPlace(position));
 				positions.add(position);
 			}
+
+
 		}
 		return positions;
 	}
@@ -148,16 +155,32 @@ public class SingleSourceController extends SourceController {
 	 * @return numberToSpawn or less random feasible positions
 	 */
 	private List<VPoint> getRealRandomPositions(final int numberToSpawn, @NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes) {
-		List<VPoint> randomPositions = new ArrayList<>(numberToSpawn);
+
+		List<VPoint> randomPositions = new LinkedList<VPoint>();
+
+		int setNumberAgents = 0;
 
 		for (int i = 0; i < numberToSpawn; i++) {
-			Optional<VPoint> optRandomPosition = getNextRandomPosition(random, blockPedestrianShapes, NUMBER_OF_POINT_SEARCH, NUMBER_OF_REPOSITION_TRIES);
+			Optional<VPoint> optRandomPosition = getNextRandomPosition(
+					random,
+					blockPedestrianShapes,
+					NUMBER_OF_POINT_SEARCH,
+					NUMBER_OF_REPOSITION_TRIES);
 
 			if (optRandomPosition.isPresent()) {
 				VPoint randomPosition = optRandomPosition.get();
 				blockPedestrianShapes.add(dynamicElementFactory.getDynamicElementRequiredPlace(randomPosition));
 				randomPositions.add(randomPosition);
-			}
+				setNumberAgents = i+1;
+			}else{
+				break;
+            }
+		}
+
+		if(setNumberAgents != numberToSpawn){
+			logger.debug("Could only set " +
+					setNumberAgents + "/" + setNumberAgents +" agents. " +
+					"Either the source is too small or spawn number too high.");
 		}
 
 		return randomPositions;
@@ -165,16 +188,16 @@ public class SingleSourceController extends SourceController {
 
 
 	private Optional<VPoint> getNextRandomPosition(@NotNull final Random random, @NotNull final List<VShape> blockPedestrianShapes,
-												   final int tries_find_valid_point, final int tries_reposition) {
+												   final int triesFindValidPoint, final int triesReposition) {
 		Rectangle2D rec = source.getShape().getBounds2D();
 
-		for (int i = 0; i < tries_reposition; i++) {
+		for (int i = 0; i < triesReposition; i++) {
 			VShape freeSpaceRequired = null;
 			VPoint randomPoint = null;
 			boolean pointFound = false;
 			// find point in source boundary
 			int j = 0;
-			while (j < tries_find_valid_point && !pointFound) {
+			while (j < triesFindValidPoint && !pointFound) {
 				randomPoint = new VPoint(rec.getMinX() + random.nextDouble() * rec.getWidth(), rec.getMinY() + random.nextDouble() * rec.getHeight());
 				freeSpaceRequired = dynamicElementFactory.getDynamicElementRequiredPlace(randomPoint);
 				pointFound = source.getShape().containsShape(freeSpaceRequired);
@@ -198,8 +221,13 @@ public class SingleSourceController extends SourceController {
 
 	@Override
 	protected void determineNumberOfSpawnsAndNextEvent(double simTimeInSec) {
+
+		// The concrete distribution implements how to proceed with agents that could not all be spawned
+		// e.g. because the source is too small
+		numberToSpawn = this.distribution.getRemainingSpawnAgents();
+
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += sourceAttributes.getSpawnNumber();
+			numberToSpawn += distribution.getSpawnNumber(timeOfNextEvent);
 			createNextEvent();
 		}
 	}

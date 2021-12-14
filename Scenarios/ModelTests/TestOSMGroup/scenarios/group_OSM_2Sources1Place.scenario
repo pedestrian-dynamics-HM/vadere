@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_2Sources1Place",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -162,8 +162,10 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 4,
         "startTime" : 0.0,
@@ -184,8 +186,10 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 3,
         "startTime" : 0.0,
@@ -215,7 +219,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

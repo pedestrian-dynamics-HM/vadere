@@ -1,7 +1,7 @@
 {
   "name" : "narrow_passage_pso_ok",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -574,6 +574,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
@@ -618,7 +620,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : 0.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : 4.0,
+          "pathogenAbsorptionRate" : 5.0E-4,
+          "minInfectiousDose" : 3200.0,
+          "exposedPeriod" : 259000.0,
+          "infectiousPeriod" : 346000.0,
+          "recoveredPeriod" : 1.56E7
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],
@@ -671,7 +689,23 @@
           "knowledgeBase" : {
             "knowledge" : [ ],
             "informationState" : "NO_INFORMATION"
-          }
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
+        },
+        "healthStatus" : {
+          "infectionStatus" : "SUSCEPTIBLE",
+          "lastInfectionStatusUpdateTime" : -1.0,
+          "pathogenAbsorbedLoad" : 0.0,
+          "startBreatheOutPosition" : null,
+          "respiratoryTimeOffset" : 0.0,
+          "breathingIn" : false,
+          "pathogenEmissionCapacity" : 4.0,
+          "pathogenAbsorptionRate" : 5.0E-4,
+          "minInfectiousDose" : 3200.0,
+          "exposedPeriod" : 259000.0,
+          "infectiousPeriod" : 346000.0,
+          "recoveredPeriod" : 1.56E7
         },
         "groupIds" : [ ],
         "groupSizes" : [ ],

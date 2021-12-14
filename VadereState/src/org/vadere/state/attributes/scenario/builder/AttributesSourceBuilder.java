@@ -1,19 +1,20 @@
 package org.vadere.state.attributes.scenario.builder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public final class AttributesSourceBuilder {
 	private VShape shape = null;
 	private String interSpawnTimeDistribution = AttributesSource.CONSTANT_DISTRIBUTION;
-	private List<Double> distributionParameters = Collections.singletonList(1.0);
+	private JsonNode distributionParameters = AttributesSource.CONSTANT_DISTRIBUTION_PAR; //TODO default parameter ?
 	private int spawnNumber = 1;
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	private double startTime = 0;
@@ -42,7 +43,7 @@ public final class AttributesSourceBuilder {
 		return this;
 	}
 
-	public AttributesSourceBuilder distributionParameters(List<Double> distributionParameters) {
+	public AttributesSourceBuilder distributionParameters(JsonNode distributionParameters) {
 		this.distributionParameters = distributionParameters;
 		return this;
 	}

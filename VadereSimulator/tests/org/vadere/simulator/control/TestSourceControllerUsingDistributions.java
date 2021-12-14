@@ -18,18 +18,9 @@ import static org.junit.Assert.assertTrue;
 
 public class TestSourceControllerUsingDistributions extends TestSourceControllerUsingConstantSpawnRate {
 
-	public static class ConstantTestDistribution extends ConstantRealDistribution {
-		private static final long serialVersionUID = 1L;
-
-		public ConstantTestDistribution(RandomGenerator unused, double value) {
-			super(value);
-		}
-	}
-
 	@Test
 	public void testStartTime() {
-		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setDistributionClass(ConstantTestDistribution.class);
+		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder();
 
 		try{
 			initialize(builder);

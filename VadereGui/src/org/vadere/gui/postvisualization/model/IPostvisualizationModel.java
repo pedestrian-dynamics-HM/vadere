@@ -1,8 +1,6 @@
 package org.vadere.gui.postvisualization.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.scenario.Agent;
@@ -12,16 +10,13 @@ import org.vadere.state.scenario.TopographyIterator;
 import org.vadere.state.simulation.Step;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.io.parser.VPredicate;
 import org.vadere.util.logging.Logger;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public interface IPostvisualizationModel {
 

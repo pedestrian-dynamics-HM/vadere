@@ -1,7 +1,7 @@
 {
   "name" : "T-240-050-240_OSM_",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -472,8 +472,10 @@
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 67,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -494,8 +496,10 @@
           "height" : 4.8,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 67,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -525,7 +529,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

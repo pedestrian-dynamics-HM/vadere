@@ -1,7 +1,7 @@
 {
   "name" : "rimea_07_speeds_discrete_ca",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -173,6 +173,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 2,
         "shape" : {
@@ -182,8 +184,10 @@
           "height" : 50.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

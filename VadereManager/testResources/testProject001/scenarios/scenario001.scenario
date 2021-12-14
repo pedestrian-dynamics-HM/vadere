@@ -1,7 +1,7 @@
 {
   "name" : "scenario001",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -168,6 +168,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1,
         "shape" : {
@@ -177,8 +179,10 @@
           "height" : 1.4952380952380953,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 20.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 20.0
+        },
         "spawnNumber" : 4,
         "maxSpawnNumberTotal" : 8,
         "startTime" : 0.0,

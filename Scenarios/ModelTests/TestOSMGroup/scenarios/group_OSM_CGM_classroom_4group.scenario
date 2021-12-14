@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_classroom_4group",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -309,13 +309,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 1 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -362,13 +360,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 1 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -415,13 +411,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 1 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -468,13 +462,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 1 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -521,13 +513,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -574,13 +564,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -627,13 +615,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -680,13 +666,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 2 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -733,13 +717,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 3 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -786,13 +768,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 3 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -839,13 +819,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 3 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -892,13 +870,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 3 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -945,13 +921,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 4 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -998,13 +972,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 4 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1051,13 +1023,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 4 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1104,13 +1074,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 4 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1157,13 +1125,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 5 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1210,13 +1176,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 5 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1263,13 +1227,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 5 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1316,13 +1278,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 5 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1369,13 +1329,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 6 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1422,13 +1380,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 6 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1475,13 +1431,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 6 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1528,13 +1482,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 6 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1581,13 +1533,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 7 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1634,13 +1584,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 7 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1687,13 +1635,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 7 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1740,13 +1686,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 7 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1793,13 +1737,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 8 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1846,13 +1788,11 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ],
-            "informationState" : "NO_INFORMATION"
+            "knowledge" : [ ]
           }
         },
         "groupIds" : [ 8 ],
         "groupSizes" : [ 4 ],
-        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1875,7 +1815,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

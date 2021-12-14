@@ -1,7 +1,7 @@
 {
   "name" : "hamner-2020-life_postvis_template",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",

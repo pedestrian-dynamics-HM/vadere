@@ -1,7 +1,7 @@
 {
   "name" : "rimea_05_react",
   "description" : "",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -153,6 +153,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 4,
         "shape" : {
@@ -162,8 +164,10 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 10,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,

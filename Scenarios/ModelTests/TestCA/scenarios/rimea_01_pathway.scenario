@@ -1,7 +1,7 @@
 {
   "name" : "rimea_01_pathway",
   "description" : "numberOfCircles = 1, stepCircleResolution = 18, DISCRETE",
-  "release" : "1.16",
+  "release" : "2.0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -197,8 +197,10 @@
           "height" : 1.6,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 30.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
@@ -228,7 +230,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }
