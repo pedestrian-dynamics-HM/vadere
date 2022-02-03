@@ -26,6 +26,8 @@ public class TargetVersionV2_0 extends SimpleJsonTransformation {
 	@Override
 	protected void initDefaultHooks() {
 		addPostHookLast(this::alterDistributionDefinition);
+		addPostHookLast(this::sort);
+
 	}
 
 	private JsonNode alterDistributionDefinition(JsonNode scenarioFile) throws MigrationException {
