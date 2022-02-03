@@ -134,7 +134,9 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
     // choose  sort order based on targetVersion.
     public JsonNode sort (JsonNode node) {
 
-        if (getTargetVersion().equalOrBigger(Version.V1_14)) {
+        if (getTargetVersion().equalOrBigger(Version.V1_16)) {
+            node = sort_since_V1_16(node);
+        } else if (getTargetVersion().equalOrBigger(Version.V1_14)) {
             node = sort_since_V1_14(node);
         } else if (getTargetVersion().equalOrBigger(Version.V1_7)){
             node = sort_since_V1_7(node);
@@ -149,7 +151,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         return  node;
     }
 
-    private JsonNode sort_since_V1_15(JsonNode node) {
+    private JsonNode sort_since_V1_16(JsonNode node) {
         LinkedHashMap source = (LinkedHashMap) StateJsonConverter.convertJsonNodeToObject(node);
         LinkedHashMap<Object, Object> sortedRoot = new LinkedHashMap<>();
         putObject(sortedRoot, source, "name");
@@ -157,7 +159,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
         putObject(sortedRoot, source, "release");
         putObject(sortedRoot, source, "commithash");
         putObject(sortedRoot, source, "processWriters","files", "processors", "isTimestamped", "isWriteMetaData");
-        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, AttributesPsychology.JSON_KEY, "topography", "stimulusInfos");
+        putObject(sortedRoot, source, "scenario", "mainModel", "attributesModel", AttributesSimulation.JSON_KEY, AttributesPsychology.JSON_KEY, "topography", "stimulusInfos", "reactionProbabilities");
 
         return  StateJsonConverter.deserializeToNode(sortedRoot);
     }
@@ -238,7 +240,7 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
     public static JsonNode addNewMembersWithDefaultValues(JsonNode node) throws MigrationException{
         try {
             Scenario scenario = JsonConverter.deserializeScenarioRunManagerFromNode(node);
-            node = JsonConverter.serializeScenarioRunManagerToNode(scenario, false);
+            node = JsonConverter.serializeScenarioRunManagerToNode(scenario, true);
         } catch (IOException e) {
             throw new MigrationException("Error while serializing and deserializing scenario",e);
         }

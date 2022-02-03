@@ -2,7 +2,7 @@
   "name" : "queueScenario_publication",
   "description" : "",
   "release" : "2.0",
-  "commithash" : "6c455f2b5155c69d441920f4995746e9c0fea075",
+  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -305,8 +305,10 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 2.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 9,
         "startTime" : 0.0,
@@ -327,8 +329,10 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
         "startTime" : 7.0,

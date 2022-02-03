@@ -2,6 +2,7 @@
   "name" : "bottleneckA",
   "description" : "",
   "release" : "2.0",
+  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -219,8 +220,10 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 5,
         "maxSpawnNumberTotal" : 200,
         "startTime" : 0.0,
@@ -241,8 +244,10 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 1.0 ],
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
+        },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
         "startTime" : 20.0,
