@@ -39,7 +39,7 @@ public class PathogenConcentrationProcessor extends DataProcessor<TimeGridKey, D
                     Collection<AerosolCloud> cloudsAtNode = state.getTopography().getAerosolClouds().stream().filter(c -> c.getShape().contains(node)).collect(Collectors.toSet());
 
                     for (AerosolCloud cloud : cloudsAtNode) {
-                        pathogenConcentration = pathogenConcentration + cloud.getCurrentPathogenLoad() / (cloud.getArea() * cloud.getHeight());
+                        pathogenConcentration = pathogenConcentration + cloud.getPathogenConcentration();
                     }
                     this.putValue(new TimeGridKey(step, node.x, node.y, gridResolution * gridResolution), pathogenConcentration);
                 }

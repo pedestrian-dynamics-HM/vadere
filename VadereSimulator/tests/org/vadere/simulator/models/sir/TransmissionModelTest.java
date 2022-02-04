@@ -18,12 +18,11 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.*;
 
-import java.awt.geom.Path2D;
 import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.vadere.simulator.models.sir.TransmissionModel.*;
-import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
+import static org.vadere.state.scenario.AerosolCloud.createAerosolCloudShape;
 
 public class TransmissionModelTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
@@ -35,16 +34,9 @@ public class TransmissionModelTest {
     VadereContext ctx;
 
     // member variables defining aerosol cloud shapes
-    double area = 1;
-    double correspondingCircleRadius = Math.sqrt(area / Math.PI);
-    double vertexDistancePolygon = 2 * correspondingCircleRadius + 0.1;
-    double vertexDistanceCircle = 2 * correspondingCircleRadius - 0.1;
-    VPoint vertex1 = new VPoint(0, 0);
-    VPoint vertex2 = new VPoint(vertex1.x + vertexDistancePolygon, vertex1.y);
-    VPoint vertex3 = new VPoint(vertex1.x + vertexDistanceCircle, vertex1.y);
-    VShape polygon;
-    VShape circle1;
-    VShape circle2;
+    double radius = 1;
+    VPoint center = new VPoint(0, 0);
+    VShape circle;
 
 
     // will run before each test to setup test environment
@@ -59,9 +51,7 @@ public class TransmissionModelTest {
         ctx.put(TransmissionModel.simStepLength, simTimeStepLength);
         VadereContext.add(topography.getContextId(), ctx);
 
-        polygon = createTransformedAerosolCloudShape(vertex1, vertex2, area);
-        circle1 = createTransformedAerosolCloudShape(vertex1, vertex3, area);
-        circle2 = createTransformedAerosolCloudShape(vertex1, vertex1, area);
+        circle = createAerosolCloudShape(center, radius);
     }
 
     // cleanup test environment
@@ -87,39 +77,6 @@ public class TransmissionModelTest {
         attrList.add(att);
 
         return attrList;
-    }
-
-
-    @Test
-    public void throwIfTransformedShapeVPolygonCenterNotBetweenVertices() {
-        VPoint center = polygon.getCentroid();
-
-        VPoint expectedCenter = new VPoint((vertex1.x + vertex2.x) / 2.0, (vertex1.y + vertex2.y) / 2.0);
-        double xCoordinateDeviation = Math.abs(center.x - expectedCenter.x);
-        double yCoordinateDeviation = Math.abs(center.y - expectedCenter.y);
-
-        assertTrue(xCoordinateDeviation <= ALLOWED_DOUBLE_TOLERANCE && yCoordinateDeviation <= ALLOWED_DOUBLE_TOLERANCE);
-    }
-
-    @Test
-    public void throwIfTransformedShapeVCircleCenterNotBetweenVertices() {
-        VPoint center = circle1.getCentroid();
-
-        VPoint expectedCenter = new VPoint((vertex1.x + vertex3.x) / 2.0, (vertex1.y + vertex3.y) / 2.0);
-        double xDeviation = Math.abs(center.x - expectedCenter.x);
-        double yDeviation = Math.abs(center.y - expectedCenter.y);
-        double xyDeviation = Math.sqrt(xDeviation * xDeviation + yDeviation * yDeviation);
-
-        assertEquals(xyDeviation, 0.0, ALLOWED_DOUBLE_TOLERANCE);
-    }
-
-    @Test
-    public void circularTransformedAerosolCloudShapeDoesNotMatchRequiredArea() {
-        double width = circle1.getBounds2D().getFrame().getWidth();
-        double height = circle1.getBounds2D().getFrame().getHeight();
-        double actualArea = 1.0 / 4.0 * width * height * Math.PI;
-
-        assertEquals(actualArea, area, ALLOWED_DOUBLE_TOLERANCE);
     }
 
     private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, InfectionStatus infectionStatus) {

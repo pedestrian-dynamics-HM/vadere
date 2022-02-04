@@ -136,7 +136,7 @@
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 3.14,
+        "aerosolCloudInitialRadius" : 1,
         "dropletsExhalationFrequency" : 0.0,
         "dropletsDistanceOfSpread" : 1.5,
         "dropletsAngleOfSpreadInDeg" : 30.0,

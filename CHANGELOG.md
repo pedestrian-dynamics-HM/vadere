@@ -11,6 +11,11 @@
 ### Changed
 
 - In `postLoop()` of `Simulation.java`, clear the topography as very last step so that models and output processors can use it before.
+- `TransmissionModel`: Reduce complexity of the transmission model (: `Simulator`, `GUI`, `State`)
+* In AttributesTransmissionModel change parameter aerosolCloudInitialArea to aerosolCloudInitialRadius
+* In `AttributesAerosolCloud` reduce number of parameters that describe the shape of an `AerosolCloud`. Instead of `VPolygon`, we now use `VCircle`, which can defined by a radius and a center.
+* Adapt all methods and classes that were designed for both elliptical and circular clouds.
+- Fix bug in `TikzGenerator`: Now, the tex file (generated with tikz snapshot) also contains aerosol clouds (29e9c937: `GUI`)
 
 
 ## v2.0

@@ -49,6 +49,9 @@ public class TikzStyleGenerator {
         Color measurementAreaColor = simulationConfig.getMeasurementAreaColor();
         colorDefinitions += String.format(Locale.US, tikzColorTemplate, "MeasurementAreaColor", measurementAreaColor.getRed(), measurementAreaColor.getGreen(), measurementAreaColor.getBlue());
 
+        Color aerosolCloudColor = simulationConfig.getAerosolCloudColor();
+        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AerosolCloudColor", aerosolCloudColor.getRed(), aerosolCloudColor.getGreen(), aerosolCloudColor.getBlue());
+
         Color agentColor = simulationConfig.getPedestrianDefaultColor();
         colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
 
@@ -57,6 +60,9 @@ public class TikzStyleGenerator {
 
         double opacityBetweenZeroAndOne = simulationConfig.getMeasurementAreaAlpha() / 255.0;
         colorDefinitions += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
+
+        double aerosolCloudOpacityBetweenZeroAndOne = simulationConfig.getAerosolCloudAlphaMax() / 255.0;
+        colorDefinitions += String.format(Locale.US,"\\newcommand{\\AerosolCloudOpacity}{%f}\n", aerosolCloudOpacityBetweenZeroAndOne);
 
         colorDefinitions += "\n";
 
