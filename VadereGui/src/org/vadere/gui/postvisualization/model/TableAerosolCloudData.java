@@ -1,12 +1,10 @@
 package org.vadere.gui.postvisualization.model;
 
-import org.jcodec.common.DictionaryCompressor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -14,8 +12,6 @@ import tech.tablesaw.api.Table;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static org.vadere.state.scenario.AerosolCloud.createTransformedAerosolCloudShape;
 
 /**
  * The {@link TableAerosolCloudData}
@@ -35,11 +31,9 @@ public class TableAerosolCloudData {
     public final int timeStepCol;
     public final int cloudIdCol;
     public final int pathogenLoadCol;
-    public final int areaCol;
-    public final int vertex1XCol;
-    public final int vertex1YCol;
-    public final int vertex2XCol;
-    public final int vertex2YCol;
+    public final int radiusCol;
+    public final int centerXCol;
+    public final int centerYCol;
 
     /**
      * Default constructor.
@@ -53,11 +47,9 @@ public class TableAerosolCloudData {
         timeStepCol = columnNames.getTimeStepCol(dataFrame);
         cloudIdCol = columnNames.getAerosolCloudIdCol(dataFrame);
         pathogenLoadCol = columnNames.getAerosolCloudPathogenLoadCol(dataFrame);
-        areaCol = columnNames.getAerosolCloudAreaCol(dataFrame);
-        vertex1XCol = columnNames.getAerosolCloudVertex1XCol(dataFrame);
-        vertex1YCol = columnNames.getAerosolCloudVertex1YCol(dataFrame);
-        vertex2XCol = columnNames.getAerosolCloudVertex2XCol(dataFrame);
-        vertex2YCol = columnNames.getAerosolCloudVertex2YCol(dataFrame);
+        radiusCol = columnNames.getAerosolCloudRadiusCol(dataFrame);
+        centerXCol = columnNames.getAerosolCloudCenterXCol(dataFrame);
+        centerYCol = columnNames.getAerosolCloudCenterYCol(dataFrame);
 
         this.cloudDataFrame = dataFrame;
         this.currentSlice = cloudDataFrame;
@@ -68,16 +60,12 @@ public class TableAerosolCloudData {
     protected AerosolCloud toAerosolCloud(@NotNull final Row row) {
         int cloudId = row.getInt(cloudIdCol);
         double currentPathogenLoad = row.getDouble(pathogenLoadCol);
-        double area = row.getDouble(areaCol);
-        double vertex1X = row.getDouble(vertex1XCol);
-        double vertex1Y = row.getDouble(vertex1YCol);
-        double vertex2X = row.getDouble(vertex2XCol);
-        double vertex2Y = row.getDouble(vertex2YCol);
-        VPoint vertex1 = new VPoint(vertex1X, vertex1Y);
-        VPoint vertex2 = new VPoint(vertex2X, vertex2Y);
-        VShape shape = createTransformedAerosolCloudShape(vertex1, vertex2, area);
+        double radius = row.getDouble(radiusCol);
+        double centerX = row.getDouble(centerXCol);
+        double centerY = row.getDouble(centerYCol);
+        VPoint center = new VPoint(centerX, centerY);
 
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(cloudId, shape, currentPathogenLoad));
+        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(cloudId, radius, center, currentPathogenLoad));
 
         return aerosolCloud;
     }

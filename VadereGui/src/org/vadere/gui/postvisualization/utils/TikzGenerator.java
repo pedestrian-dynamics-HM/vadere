@@ -150,7 +150,18 @@ public class TikzGenerator {
 		generatedCode += createTikzCodeForScenarioElement(config.isShowTargets(), topography.getTargets(), "Target", "TargetColor");
 		generatedCode += createTikzCodeForScenarioElement(config.isShowAbsorbingAreas(), topography.getAbsorbingAreas(), "AbsorbingArea", "AbsorbingAreaColor");
 		generatedCode += createTikzCodeForScenarioElement(config.isShowObstacles(), topography.getObstacles(), "Obstacle", "ObstacleColor");
-		generatedCode += createTikzCodeForScenarioElement(config.isShowAerosolClouds(), topography.getAerosolClouds(), "AerosolClouds", "AerosolCloudColor");
+
+		if (config.isShowAerosolClouds()) {
+			generatedCode += "% Aerosol Clouds\n";
+			for (AerosolCloud aerosolCloud : topography.getAerosolClouds()) {
+				VPoint centroid = aerosolCloud.getShape().getCentroid();
+				generatedCode += String.format(Locale.US, "\\coordinate (AerosolCloud%d) at (%f,%f); %% Centroid: AerosolCloud %d\n", aerosolCloud.getId(), centroid.x, centroid.y, aerosolCloud.getId());
+				generatedCode += String.format(Locale.US, "\\fill[AerosolCloudColor,opacity=\\AerosolCloudOpacity] %s;\n", generatePathForScenarioElement(aerosolCloud));
+
+			}
+		} else {
+			generatedCode += "% Aerosol clouds (not enabled in config)\n";
+		}
 
 		if (config.isShowStairs()) {
 			generatedCode += "% Stairs\n";

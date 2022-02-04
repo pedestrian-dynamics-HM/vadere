@@ -90,9 +90,6 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudAreaProcessor",
       "id" : 11
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
-      "id" : 12
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -168,7 +165,7 @@
         "infectiousPeriod" : 1209600.0,
         "recoveredPeriod" : 1.296E7,
         "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialArea" : 3.14,
+        "aerosolCloudInitialRadius" : 1,
         "dropletsExhalationFrequency" : 0.0,
         "dropletsDistanceOfSpread" : 1.5,
         "dropletsAngleOfSpreadInDeg" : 30.0,

@@ -40,7 +40,7 @@ public class AttributesTransmissionModel extends Attributes {
 
 	// AerosolCloud related attributes
 	private double aerosolCloudHalfLife;
-	private double aerosolCloudInitialArea;
+	private double aerosolCloudInitialRadius;
 
 	// Droplet related attributes
 	private double dropletsExhalationFrequency;
@@ -62,7 +62,7 @@ public class AttributesTransmissionModel extends Attributes {
 		this.infectiousPeriod = 3.46E5; // in seconds
 		this.recoveredPeriod = 1.56E7; // in seconds
 		this.aerosolCloudHalfLife = 600; // in seconds
-		this.aerosolCloudInitialArea = 7.1; // in m^2, equivalent to 1.5 m radius for circular aerosolClouds
+		this.aerosolCloudInitialRadius = 1.5; // in m
 
 		this.dropletsExhalationFrequency = 0;  // 0 -> no droplets are exhaled
 		this.dropletsDistanceOfSpread = 1.5;
@@ -107,8 +107,8 @@ public class AttributesTransmissionModel extends Attributes {
 		return aerosolCloudHalfLife;
 	}
 
-	public double getAerosolCloudInitialArea() {
-		return aerosolCloudInitialArea;
+	public double getAerosolCloudInitialRadius() {
+		return aerosolCloudInitialRadius;
 	}
 
 	public double getDropletsExhalationFrequency() {

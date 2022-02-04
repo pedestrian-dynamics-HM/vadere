@@ -28,7 +28,7 @@ public class AerosolCloudShapeProcessor extends DataProcessor<TimestepIdDataKey,
     private int sampleEveryNthSimStep;
 
     public AerosolCloudShapeProcessor() {
-        super("pathogenLoad", "area", "vertex1X", "vertex1Y", "vertex2X", "vertex2Y");
+        super("pathogenLoad", "radius", "centerX", "centerY");
         setAttributes(new AttributesAerosolCloudShapeProcessor());
     }
 
@@ -52,13 +52,11 @@ public class AerosolCloudShapeProcessor extends DataProcessor<TimestepIdDataKey,
     }
 
     private String dataToString(AerosolCloud aerosolCloud) {
-        String dataAsString = String.format("%f %f %f %f %f %f",
+        String dataAsString = String.format("%f %f %f %f",
                 aerosolCloud.getCurrentPathogenLoad(),
-                aerosolCloud.getArea(),
-                aerosolCloud.getVertices().get(0).x,
-                aerosolCloud.getVertices().get(0).y,
-                aerosolCloud.getVertices().get(1).x,
-                aerosolCloud.getVertices().get(1).y
+                aerosolCloud.getRadius(),
+                aerosolCloud.getCenter().x,
+                aerosolCloud.getCenter().y
         );
 
         return dataAsString;
