@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.sir;
+package org.vadere.simulator.models.infection;
 
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributeSIR;

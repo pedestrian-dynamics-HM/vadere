@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.sir;
+package org.vadere.simulator.models.infection;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -21,7 +21,7 @@ import org.vadere.util.geometry.shapes.*;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.vadere.simulator.models.sir.TransmissionModel.*;
+import static org.vadere.simulator.models.infection.TransmissionModel.*;
 import static org.vadere.state.scenario.AerosolCloud.createAerosolCloudShape;
 
 public class TransmissionModelTest {

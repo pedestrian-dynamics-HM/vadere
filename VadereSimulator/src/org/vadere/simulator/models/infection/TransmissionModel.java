@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.sir;
+package org.vadere.simulator.models.infection;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.context.VadereContext;

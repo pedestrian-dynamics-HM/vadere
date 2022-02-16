@@ -20,7 +20,7 @@ import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
-import org.vadere.simulator.models.sir.TransmissionModel;
+import org.vadere.simulator.models.infection.TransmissionModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.RunnableFinishedListener;
 import org.vadere.simulator.projects.Scenario;
