@@ -39,14 +39,9 @@ import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
  * </ul>
  */
 @ModelClass
-public class TransmissionModel implements Model {
+public class TransmissionModel extends AbstractExposureModel {
 
 	protected static Logger logger = Logger.getLogger(TransmissionModel.class);
-
-	// this random provider everywhere to keep simulation reproducible
-	protected Random random;
-	protected Domain domain;
-	protected AttributesAgent attributesAgent;
 
 	private AttributesTransmissionModel attributesTransmissionModel;
 	double simTimeStepLength;
