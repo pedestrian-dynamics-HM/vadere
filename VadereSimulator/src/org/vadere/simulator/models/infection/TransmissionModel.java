@@ -141,6 +141,11 @@ public class TransmissionModel extends AbstractExposureModel {
 		}
 	}
 
+	@Override
+	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double degreeOfExposure) {
+		pedestrian.absorbPathogen(degreeOfExposure);
+	}
+
 	public void executeAerosolCloudEmissionEvents(double simTimeInSec) {
 		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
 		for (Pedestrian pedestrian : infectedPedestrians) {
@@ -330,7 +335,7 @@ public class TransmissionModel extends AbstractExposureModel {
 					.collect(Collectors.toSet());
 
 			for (Pedestrian ped : breathingInPedsInAerosolCloud) {
-				ped.absorbPathogen(aerosolCloud.getPathogenConcentration() * timeNormalizationConst);
+				updatePedestrianDegreeOfExposure(ped, aerosolCloud.getPathogenConcentration() * timeNormalizationConst);
 			}
 		}
 	}
@@ -349,7 +354,7 @@ public class TransmissionModel extends AbstractExposureModel {
 					.filter(p -> droplets.getShape().contains(p.getPosition()))
 					.collect(Collectors.toSet());
 			for (Pedestrian ped : breathingInPedsInDroplets) {
-				ped.absorbPathogen(droplets.getCurrentPathogenLoad());
+				updatePedestrianDegreeOfExposure(ped, droplets.getCurrentPathogenLoad());
 			}
 		}
 	}

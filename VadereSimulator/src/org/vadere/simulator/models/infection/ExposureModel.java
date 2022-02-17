@@ -1,8 +1,13 @@
 package org.vadere.simulator.models.infection;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.state.scenario.Pedestrian;
 
 public interface ExposureModel extends Model {
-    // any methods **ALL** ExposureModel models have in common.
 
+
+    /**
+     * This method updates the degree of exposure of a pedestrian.
+     */
+    void updatePedestrianDegreeOfExposure(final Pedestrian pedestrian, double degreeOfExposure);
 }
