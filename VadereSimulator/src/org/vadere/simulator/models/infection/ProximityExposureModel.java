@@ -1,0 +1,101 @@
+package org.vadere.simulator.models.infection;
+
+import org.jetbrains.annotations.NotNull;
+import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.control.simulation.ControllerProvider;
+import org.vadere.simulator.projects.Domain;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.InfectionStatus;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+/**
+ * Models the spread of infectious pathogen among pedestrians based a simple rule:
+ * Any pedestrian that approaches an infectious pedestrian so that the mutual distance falls below a defined
+ * threshold becomes exposed.
+ */
+@ModelClass
+public class ProximityExposureModel extends AbstractExposureModel {
+
+    /*
+     * defines the maximum possible degree of exposure a pedestrian can adopt
+     */
+    private static final double MAX_DEG_OF_EXPOSURE = 1;
+
+    Topography topography;
+
+    //TODO replace radius by  AttributesProximityExposureModel attributesProximityExposureModel;
+    private double radius;
+
+    @Override
+    public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
+        this.domain = domain;
+        this.random = random;
+        this.attributesAgent = attributesPedestrian;
+        this.radius = 0.5;
+        // this.attributesProximityExposureModel = Model.findAttributes(attributesList, AttributesProximityExposureModel.class);
+        this.topography = domain.getTopography();
+    }
+
+    @Override
+    public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
+        super.registerToScenarioElementControllerEvents(controllerProvider);
+    }
+
+    @Override
+    public void preLoop(double simTimeInSec) {
+
+    }
+
+    @Override
+    public void postLoop(double simTimeInSec) {
+
+    }
+
+    @Override
+    public void update(double simTimeInSec) {
+        Collection<Pedestrian> pedestrians;
+        pedestrians = topography.getPedestrianDynamicElements().getElements().stream().collect(Collectors.toSet());
+
+        Collection<Pedestrian> infectiousPedestrians = pedestrians.stream()
+                .filter(p -> p.getInfectionStatus().equals(InfectionStatus.INFECTIOUS)).collect(Collectors.toSet());
+
+        if (!infectiousPedestrians.isEmpty()) {
+            for (Pedestrian infectiousPedestrian : infectiousPedestrians) {
+                Collection<Pedestrian> exposedPedestrians = getPedestriansNearbyInfectiousPedestrian(pedestrians, infectiousPedestrian);
+
+                for (Pedestrian pedestrian : exposedPedestrians) {
+                    updatePedestrianDegreeOfExposure(pedestrian, MAX_DEG_OF_EXPOSURE);
+                }
+            }
+        }
+
+    }
+
+    @NotNull
+    private Collection<Pedestrian> getPedestriansNearbyInfectiousPedestrian(Collection<Pedestrian> pedestrians, Pedestrian infectiousPedestrian) {
+        VPoint position = infectiousPedestrian.getPosition();
+        VShape areaOfExposure = new VCircle(position, radius);
+
+        Collection<Pedestrian> exposedPedestrians = pedestrians
+                .stream()
+                .filter(p -> areaOfExposure.contains(p.getPosition())).collect(Collectors.toSet());
+        return exposedPedestrians;
+    }
+
+    @Override
+    public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double degreeOfExposure) {
+        //TODO create method in Pedestrian
+        // pedestrian.incrementDegreeOfExposure(degreeOfExposure);
+    }
+
+}
