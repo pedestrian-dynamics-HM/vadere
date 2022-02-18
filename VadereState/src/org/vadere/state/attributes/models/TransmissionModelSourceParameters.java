@@ -6,19 +6,19 @@ import org.vadere.state.health.InfectionStatus;
 public class TransmissionModelSourceParameters extends Attributes {
 
     private int sourceId = -1;
-    private InfectionStatus infectionStatus = InfectionStatus.SUSCEPTIBLE;
+    private boolean infectious = false;
 
     public TransmissionModelSourceParameters() {
     }
 
-    public TransmissionModelSourceParameters(int sourceId, InfectionStatus infectionStatus) {
+    public TransmissionModelSourceParameters(int sourceId, boolean infectious) {
         this.sourceId = sourceId;
-        this.infectionStatus = infectionStatus;
+        this.infectious = infectious;
     }
 
 
-    public InfectionStatus getInfectionStatus() {
-        return infectionStatus;
+    public boolean isInfectious() {
+        return infectious;
     }
 
     public int getSourceId() {

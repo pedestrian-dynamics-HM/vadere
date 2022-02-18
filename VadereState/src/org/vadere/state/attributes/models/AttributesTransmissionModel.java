@@ -50,7 +50,7 @@ public class AttributesTransmissionModel extends Attributes {
 	private double dropletsPathogenLoadFactor;
 
 	public AttributesTransmissionModel() {
-		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new TransmissionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, InfectionStatus.SUSCEPTIBLE)));
+		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new TransmissionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, false)));
 
 		// Mean pedestrian healthStatus and aerosolCloud attributes, rahn-2021b-cdyn Table I;
 		// Some of these values are defined as mean values but could/should be introduced as distributions

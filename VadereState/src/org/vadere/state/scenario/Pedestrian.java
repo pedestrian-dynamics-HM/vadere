@@ -2,6 +2,7 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.DoseResponseModelInfectionStatus;
+import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.health.InfectionStatus;
@@ -35,7 +36,8 @@ public class Pedestrian extends Agent {
 
     private PsychologyStatus psychologyStatus;
 
-	private HealthStatus healthStatus;
+	private HealthStatus wrapperHealthStatus;
+    private ExposureModelHealthStatus healthStatus;
     private DoseResponseModelInfectionStatus infectionStatus;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
@@ -77,7 +79,8 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
-		healthStatus = new HealthStatus();
+		wrapperHealthStatus = new HealthStatus();
+        healthStatus = null;
         infectionStatus = null;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
@@ -95,12 +98,19 @@ public class Pedestrian extends Agent {
 
 		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
 
+        if (other.healthStatus != null) {
+            healthStatus = other.healthStatus;
+        } else {
+            healthStatus = null;
+        }
+
         if (other.infectionStatus != null) {
             infectionStatus = other.infectionStatus;
         } else {
             infectionStatus = null;
         }
-		healthStatus = new HealthStatus(other.healthStatus);
+
+		wrapperHealthStatus = new HealthStatus(other.wrapperHealthStatus);
 
         if (other.groupIds != null) {
             groupIds = new LinkedList<>(other.groupIds);
@@ -172,52 +182,66 @@ public class Pedestrian extends Agent {
         return ScenarioElementType.PEDESTRIAN;
     }
 
+    //TODO return specific healthStatusModel type
+    public ExposureModelHealthStatus getHealthStatus() {
+        return healthStatus;
+    }
+
+    public boolean isInfectious() {
+        return healthStatus.isInfectious();
+    }
+
+    public double getDegreeOfExposure() {
+        return healthStatus.getDegreeOfExposure();
+    }
+
+
     public double getProbabilityOfInfection() {
         return infectionStatus.getProbabilityOfInfection();
     }
 
     public InfectionStatus getInfectionStatus() {
-    	return healthStatus.getInfectionStatus();
+    	return wrapperHealthStatus.getInfectionStatus();
     }
 
     public double getPathogenEmissionCapacity() {
-        return healthStatus.getPathogenEmissionCapacity();
+        return wrapperHealthStatus.getPathogenEmissionCapacity();
     }
 
     public double getPathogenAbsorptionRate() {
-        return healthStatus.getPathogenAbsorptionRate();
+        return wrapperHealthStatus.getPathogenAbsorptionRate();
     }
 
     public double getRespiratoryTimeOffset(){
-        return healthStatus.getRespiratoryTimeOffset();
+        return wrapperHealthStatus.getRespiratoryTimeOffset();
     }
 
     public double getExposedPeriod() {
-        return healthStatus.getExposedPeriod();
+        return wrapperHealthStatus.getExposedPeriod();
     }
 
     public double getInfectiousPeriod() {
-        return healthStatus.getInfectiousPeriod();
+        return wrapperHealthStatus.getInfectiousPeriod();
     }
 
     public double getRecoveredPeriod() {
-        return healthStatus.getRecoveredPeriod();
+        return wrapperHealthStatus.getRecoveredPeriod();
     }
 
 	public double getPathogenAbsorbedLoad() {
-    	return healthStatus.getPathogenAbsorbedLoad();
+    	return wrapperHealthStatus.getPathogenAbsorbedLoad();
     }
 
 	public VPoint getStartBreatheOutPosition() {
-    	return healthStatus.getStartBreatheOutPosition();
+    	return wrapperHealthStatus.getStartBreatheOutPosition();
     }
 
 	public boolean isBreathingIn() {
-    	return healthStatus.isBreathingIn();
+    	return wrapperHealthStatus.isBreathingIn();
     }
 
 	public double getMinInfectiousDose() {
-    	return healthStatus.getMinInfectiousDose();
+    	return wrapperHealthStatus.getMinInfectiousDose();
     }
 
 
@@ -295,48 +319,56 @@ public class Pedestrian extends Agent {
         return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
     }
 
+    public void setInfectious(boolean infectious) {
+        healthStatus.setInfectious(infectious);
+    }
+
+    public void setDegreeOfExposure(double degreeOfExposure) {
+        healthStatus.setDegreeOfExposure(degreeOfExposure);
+    }
+
     public void setProbabilityOfInfection(double probabilityOfInfection) {
         infectionStatus.setProbabilityOfInfection(probabilityOfInfection);
     }
 
 	public void setInfectionStatus(InfectionStatus infectionStatus) {
-    	healthStatus.setInfectionStatus(infectionStatus);
+    	wrapperHealthStatus.setInfectionStatus(infectionStatus);
     }
 
 	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) {
-    	healthStatus.setStartBreatheOutPosition(startBreatheOutPosition);
+    	wrapperHealthStatus.setStartBreatheOutPosition(startBreatheOutPosition);
     }
 
 	public void setRespiratoryTimeOffset(double respiratoryTimeOffset) {
-    	healthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset);
+    	wrapperHealthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset);
     }
 
 	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) {
-    	healthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity);
+    	wrapperHealthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity);
     }
 
 	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) {
-    	healthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
+    	wrapperHealthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
     }
 
     public void setPathogenAbsorbedLoad(double absorbedLoad) {
-        healthStatus.setPathogenAbsorbedLoad(absorbedLoad);
+        wrapperHealthStatus.setPathogenAbsorbedLoad(absorbedLoad);
     }
 
 	public void setMinInfectiousDose(double minInfectiousDose) {
-    	healthStatus.setMinInfectiousDose(minInfectiousDose);
+    	wrapperHealthStatus.setMinInfectiousDose(minInfectiousDose);
     }
 
 	public void setExposedPeriod(double exposedPeriod) {
-    	healthStatus.setExposedPeriod(exposedPeriod);
+    	wrapperHealthStatus.setExposedPeriod(exposedPeriod);
     }
 
 	public void setInfectiousPeriod(double infectiousPeriod) {
-    	healthStatus.setInfectiousPeriod(infectiousPeriod);
+    	wrapperHealthStatus.setInfectiousPeriod(infectiousPeriod);
     }
 
 	public void setRecoveredPeriod(double recoveredPeriod) {
-    	healthStatus.setRecoveredPeriod(recoveredPeriod);
+    	wrapperHealthStatus.setRecoveredPeriod(recoveredPeriod);
     }
 
     // Methods
@@ -360,26 +392,26 @@ public class Pedestrian extends Agent {
     }
 
 	public double emitPathogen() {
-    	return healthStatus.emitPathogen();
+    	return wrapperHealthStatus.emitPathogen();
     }
 
 	public void absorbPathogen(double pathogenConcentration) {
-		healthStatus.absorbPathogen(pathogenConcentration);
+		wrapperHealthStatus.absorbPathogen(pathogenConcentration);
 	}
 
 	public void updateInfectionStatus(double simTimeInSec)	{
-		healthStatus.updateInfectionStatus(simTimeInSec);
+		wrapperHealthStatus.updateInfectionStatus(simTimeInSec);
 	}
 
 	public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
-		healthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
+		wrapperHealthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
 	}
 	public boolean isStartingBreatheOut() {
-		return healthStatus.isStartingBreatheOut();
+		return wrapperHealthStatus.isStartingBreatheOut();
 	}
 
 	public boolean isStartingBreatheIn() {
-		return healthStatus.isStartingBreatheIn();
+		return wrapperHealthStatus.isStartingBreatheIn();
 	}
 
 	// Overridden Methods
@@ -434,6 +466,14 @@ public class Pedestrian extends Agent {
     public <T> void addInfectionStatus(Class<T> infectionStatusType) {
         try {
             infectionStatus = (DoseResponseModelInfectionStatus) infectionStatusType.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public <T> void addHealthStatus(Class<T> healthStatusType) {
+        try {
+            healthStatus = (ExposureModelHealthStatus) healthStatusType.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }

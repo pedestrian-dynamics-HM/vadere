@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.infection;
 
+import org.lwjgl.system.CallbackI;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.SourceController;
@@ -14,6 +15,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.health.HealthStatus;
 import org.vadere.state.health.InfectionStatus;
+import org.vadere.state.health.TransmissionModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -373,14 +375,14 @@ public class TransmissionModel extends AbstractExposureModel {
 		TransmissionModelSourceParameters sourceParameters = defineSourceParameters(controller);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
-		ped.setInfectionStatus(sourceParameters.getInfectionStatus());
-		ped.setPathogenEmissionCapacity(attributesTransmissionModel.getPedestrianPathogenEmissionCapacity());
-		ped.setPathogenAbsorptionRate(attributesTransmissionModel.getPedestrianPathogenAbsorptionRate());
-		ped.setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
-		ped.setMinInfectiousDose(attributesTransmissionModel.getPedestrianMinInfectiousDose());
-		ped.setExposedPeriod(attributesTransmissionModel.getExposedPeriod());
-		ped.setInfectiousPeriod(attributesTransmissionModel.getInfectiousPeriod());
-		ped.setRecoveredPeriod(attributesTransmissionModel.getRecoveredPeriod());
+		ped.addHealthStatus(TransmissionModelHealthStatus.class);
+		ped.setInfectious(sourceParameters.isInfectious());
+		ped.setDegreeOfExposure(0);
+
+		//TODO cast healthStatus in method getHealthStatus()
+		((TransmissionModelHealthStatus)ped.getHealthStatus()).setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+		((TransmissionModelHealthStatus)ped.getHealthStatus()).setBreathingIn(false);
+		//TODO check exhalation start position null?
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
