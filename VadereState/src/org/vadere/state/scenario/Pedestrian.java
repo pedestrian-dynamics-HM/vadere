@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.DoseResponseModelInfectionStatus;
 import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
 import org.vadere.state.health.InfectionStatus;
@@ -15,6 +16,7 @@ import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Pedestrian extends Agent {
@@ -34,6 +36,7 @@ public class Pedestrian extends Agent {
     private PsychologyStatus psychologyStatus;
 
 	private HealthStatus healthStatus;
+    private DoseResponseModelInfectionStatus infectionStatus;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
@@ -75,6 +78,7 @@ public class Pedestrian extends Agent {
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
 		healthStatus = new HealthStatus();
+        infectionStatus = null;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -91,6 +95,11 @@ public class Pedestrian extends Agent {
 
 		psychologyStatus = new PsychologyStatus(other.psychologyStatus);
 
+        if (other.infectionStatus != null) {
+            infectionStatus = other.infectionStatus;
+        } else {
+            infectionStatus = null;
+        }
 		healthStatus = new HealthStatus(other.healthStatus);
 
         if (other.groupIds != null) {
@@ -161,6 +170,10 @@ public class Pedestrian extends Agent {
     @Override
     public ScenarioElementType getType() {
         return ScenarioElementType.PEDESTRIAN;
+    }
+
+    public double getProbabilityOfInfection() {
+        return infectionStatus.getProbabilityOfInfection();
     }
 
     public InfectionStatus getInfectionStatus() {
@@ -280,6 +293,10 @@ public class Pedestrian extends Agent {
 
     public <T extends ModelPedestrian> ModelPedestrian setModelPedestrian(T modelPedestrian) {
         return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
+    }
+
+    public void setProbabilityOfInfection(double probabilityOfInfection) {
+        infectionStatus.setProbabilityOfInfection(probabilityOfInfection);
     }
 
 	public void setInfectionStatus(InfectionStatus infectionStatus) {
@@ -414,5 +431,11 @@ public class Pedestrian extends Agent {
         super.setTargets(targetIds);
     }
 
-
+    public <T> void addInfectionStatus(Class<T> infectionStatusType) {
+        try {
+            infectionStatus = (DoseResponseModelInfectionStatus) infectionStatusType.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
 }
