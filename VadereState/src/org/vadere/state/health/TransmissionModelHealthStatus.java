@@ -10,12 +10,20 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
 
     boolean isBreathingIn;
     double respiratoryTimeOffset;
+
+    /*
+     * defines the position at which pedestrian starts current exhalation;
+     */
     VPoint exhalationStartPosition;
 
+    /*
+     * reset value for simulation periods during which pedestrian inhales
+     */
+    private final static VPoint RESET_EXHALATION_POSITION = null;
 
     // Constructors
     public TransmissionModelHealthStatus() {
-        this(false, 0, false, 0, null);
+        this(false, 0, false, 0, RESET_EXHALATION_POSITION);
     }
 
     public TransmissionModelHealthStatus(boolean isInfectious, double degreeOfExposure, boolean isBreathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
@@ -62,7 +70,7 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
 
     }
 
-    void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
+    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
         this.degreeOfExposure += deltaDegreeOfExposure;
     }
 
@@ -100,4 +108,17 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
         double b = 2.0 * Math.PI / periodLength;
         setBreathingIn((Math.sin(b * (respiratoryTimeOffset + simTimeInSec)) > 0) || (Math.cos(b * (respiratoryTimeOffset + simTimeInSec)) == 1));
     }
+
+    public boolean isStartingExhalation() {
+        return (!isBreathingIn && exhalationStartPosition == RESET_EXHALATION_POSITION);
+    }
+
+    public boolean isStartingInhalation() {
+        return (isBreathingIn && !(exhalationStartPosition == RESET_EXHALATION_POSITION));
+    }
+
+    public void resetStartExhalationPosition() {
+        exhalationStartPosition = RESET_EXHALATION_POSITION;
+    }
+
 }
