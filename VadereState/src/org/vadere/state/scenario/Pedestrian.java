@@ -182,9 +182,8 @@ public class Pedestrian extends Agent {
         return ScenarioElementType.PEDESTRIAN;
     }
 
-    //TODO return specific healthStatusModel type
-    public ExposureModelHealthStatus getHealthStatus() {
-        return healthStatus;
+    public <T extends ExposureModelHealthStatus> T getHealthStatus(Class<T> modelType) {
+        return modelType.cast(healthStatus);
     }
 
     public boolean isInfectious() {

@@ -1,6 +1,5 @@
 package org.vadere.simulator.models.infection;
 
-import org.lwjgl.system.CallbackI;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.SourceController;
@@ -14,7 +13,6 @@ import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.health.HealthStatus;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.health.TransmissionModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VLine;
@@ -145,20 +143,20 @@ public class TransmissionModel extends AbstractExposureModel {
 
 	@Override
 	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double degreeOfExposure) {
-		pedestrian.absorbPathogen(degreeOfExposure);
+		pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).incrementDegreeOfExposure(degreeOfExposure);
 	}
 
 	public void executeAerosolCloudEmissionEvents(double simTimeInSec) {
-		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
-		for (Pedestrian pedestrian : infectedPedestrians) {
+		Collection<Pedestrian> infectiousPedestrians = getInfectiousPedestrians(topography);
+		for (Pedestrian pedestrian : infectiousPedestrians) {
 			// ... for each user-defined event
 			createAerosolClouds(simTimeInSec, pedestrian);
 		}
 	}
 
 	public void executeDropletEmissionEvents(double simTimeInSec) {
-		Collection<Pedestrian> infectedPedestrians = getInfectedPedestrians(topography);
-		for (Pedestrian pedestrian : infectedPedestrians) {
+		Collection<Pedestrian> infectiousPedestrians = getInfectiousPedestrians(topography);
+		for (Pedestrian pedestrian : infectiousPedestrians) {
 			// ... for each user-defined event
 			createDroplets(simTimeInSec, pedestrian);
 		}
@@ -177,10 +175,10 @@ public class TransmissionModel extends AbstractExposureModel {
 
 	public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
 
-		if (pedestrian.isStartingBreatheOut()) {
-			pedestrian.setStartBreatheOutPosition(pedestrian.getPosition());
+		if (pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).isStartingExhalation()) {
+			pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).setExhalationStartPosition(pedestrian.getPosition());
 
-		} else if (pedestrian.isStartingBreatheIn()) {
+		} else if (pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).isStartingInhalation()) {
 			VPoint startBreatheOutPosition = pedestrian.getStartBreatheOutPosition();
 			VPoint stopBreatheOutPosition = pedestrian.getPosition();
 			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
@@ -361,11 +359,11 @@ public class TransmissionModel extends AbstractExposureModel {
 		}
 	}
 
-	public Collection<Pedestrian> getInfectedPedestrians(Topography topography) {
+	public Collection<Pedestrian> getInfectiousPedestrians(Topography topography) {
 		return topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(p -> p.getInfectionStatus() == InfectionStatus.INFECTIOUS)
+				.filter(p -> p.isInfectious())
 				.collect(Collectors.toSet());
 	}
 
@@ -378,10 +376,8 @@ public class TransmissionModel extends AbstractExposureModel {
 		ped.addHealthStatus(TransmissionModelHealthStatus.class);
 		ped.setInfectious(sourceParameters.isInfectious());
 		ped.setDegreeOfExposure(0);
-
-		//TODO cast healthStatus in method getHealthStatus()
-		((TransmissionModelHealthStatus)ped.getHealthStatus()).setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
-		((TransmissionModelHealthStatus)ped.getHealthStatus()).setBreathingIn(false);
+		ped.getHealthStatus(TransmissionModelHealthStatus.class).setRespiratoryTimeOffset(random.nextDouble() * attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+		ped.getHealthStatus(TransmissionModelHealthStatus.class).setBreathingIn(false);
 		//TODO check exhalation start position null?
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
