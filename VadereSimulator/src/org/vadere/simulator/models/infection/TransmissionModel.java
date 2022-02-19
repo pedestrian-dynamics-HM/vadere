@@ -142,8 +142,8 @@ public class TransmissionModel extends AbstractExposureModel {
 	}
 
 	@Override
-	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double degreeOfExposure) {
-		pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).incrementDegreeOfExposure(degreeOfExposure);
+	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double deltaDegreeOfExposure) {
+		pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).incrementDegreeOfExposure(deltaDegreeOfExposure);
 	}
 
 	public void executeAerosolCloudEmissionEvents(double simTimeInSec) {
@@ -179,15 +179,14 @@ public class TransmissionModel extends AbstractExposureModel {
 			pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).setExhalationStartPosition(pedestrian.getPosition());
 
 		} else if (pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).isStartingInhalation()) {
-			VPoint startBreatheOutPosition = pedestrian.getStartBreatheOutPosition();
+			VPoint startBreatheOutPosition = pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).getExhalationStartPosition();
 			VPoint stopBreatheOutPosition = pedestrian.getPosition();
 			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
 
 			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, pedestrian, distanceWalkedDuringExhalation);
 			topography.addAerosolCloud(aerosolCloud);
 
-			// reset pedestrian's startBreatheOutPosition
-			pedestrian.setStartBreatheOutPosition(null);
+			pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).resetStartExhalationPosition();
 		}
 	}
 
@@ -201,8 +200,8 @@ public class TransmissionModel extends AbstractExposureModel {
 				center,
 				simTimeInSec,
 				attributesTransmissionModel.getAerosolCloudHalfLife(),
-				pedestrian.emitPathogen(),
-				pedestrian.emitPathogen()));
+				Math.pow(10, attributesTransmissionModel.getPedestrianPathogenEmissionCapacity()),
+				Math.pow(10, attributesTransmissionModel.getPedestrianPathogenEmissionCapacity())));
 
 		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
 
@@ -242,7 +241,7 @@ public class TransmissionModel extends AbstractExposureModel {
 						attributesTransmissionModel.getDropletsDistanceOfSpread(),
 						Math.toRadians(attributesTransmissionModel.getDropletsAngleOfSpreadInDeg()));
 
-				double emittedPathogenLoad = pedestrian.emitPathogen() * attributesTransmissionModel.getDropletsPathogenLoadFactor();
+				double emittedPathogenLoad = Math.pow(10, attributesTransmissionModel.getPedestrianPathogenEmissionCapacity()) * attributesTransmissionModel.getDropletsPathogenLoadFactor();
 
 				Droplets droplets = new Droplets(new AttributesDroplets(1,
 						shape,
@@ -314,7 +313,7 @@ public class TransmissionModel extends AbstractExposureModel {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
 			pedestrian.updateInfectionStatus(simTimeInSec);
-			pedestrian.updateRespiratoryCycle(simTimeInSec, attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+			pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).updateRespiratoryCycle(simTimeInSec, attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		}
 	}
 
@@ -322,7 +321,7 @@ public class TransmissionModel extends AbstractExposureModel {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(Pedestrian::isBreathingIn)
+				.filter(p -> p.getHealthStatus(TransmissionModelHealthStatus.class).isBreathingIn())
 				.collect(Collectors.toSet());
 
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption must be adapted with normalizationFactor:
@@ -344,7 +343,7 @@ public class TransmissionModel extends AbstractExposureModel {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(Pedestrian::isBreathingIn)
+				.filter(p -> p.getHealthStatus(TransmissionModelHealthStatus.class).isBreathingIn())
 				.collect(Collectors.toSet());
 
 		Collection<Droplets> allDroplets = topography.getDroplets();
@@ -363,7 +362,7 @@ public class TransmissionModel extends AbstractExposureModel {
 		return topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(p -> p.isInfectious())
+				.filter(Pedestrian::isInfectious)
 				.collect(Collectors.toSet());
 	}
 
