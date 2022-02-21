@@ -11,12 +11,12 @@ import org.vadere.state.simulation.FootStep;
 import java.util.LinkedList;
 
 /**
- * Log {@link Pedestrian}'s current {@link HealthStatus}
+ * Log {@link Pedestrian}'s current {@link org.vadere.state.health.ExposureModelHealthStatus}
  */
 
 @DataProcessorClass()
 public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
-    public static String[] HEADERS = {"infectionStatus", "absorbedPathogenLoad", "minInfectiousDose"};
+    public static String[] HEADERS = {"isInfectious", "degreeOfExposure"};
 
     public FootStepHealthStatusProcessor() {
         super(HEADERS);
@@ -37,10 +37,9 @@ public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedest
     }
 
     private String healthStatusToString(Pedestrian pedestrian) {
-        String statusAsString = String.format("%s %f %f",
-                pedestrian.getInfectionStatus().name(),
-                pedestrian.getPathogenAbsorbedLoad(),
-                pedestrian.getMinInfectiousDose()
+        String statusAsString = String.format("%s %f",
+                pedestrian.isInfectious(),
+                pedestrian.getDegreeOfExposure()
         );
 
         return statusAsString;

@@ -79,10 +79,10 @@ public class TransmissionModelTest {
         return attrList;
     }
 
-    private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, InfectionStatus infectionStatus) {
+    private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, boolean isInfectious) {
         Pedestrian pedestrian = new Pedestrian(new AttributesAgent(), new Random(1));
         pedestrian.setPosition(pedPosition);
-        pedestrian.setInfectionStatus(infectionStatus);
+        pedestrian.setInfectious(isInfectious);
         pedestrian.setId(pedId);
 
         LinkedList<Integer> targetsPedestrian = new LinkedList<>();
@@ -105,7 +105,7 @@ public class TransmissionModelTest {
 
         transmissionModel.initialize(attributeList, new Domain(topography),null,null);
 
-        createPedestrian(topography, new VPoint(10, 10), 1, -1, InfectionStatus.INFECTIOUS);
+        createPedestrian(topography, new VPoint(10, 10), 1, -1, true);
 
         double simTimeInSec = 0.0;
         double simTimeStepLength = 0.4;
@@ -125,7 +125,7 @@ public class TransmissionModelTest {
     @Test
     public void throwIfPedestrianInsideAerosolCloudNotDetected() {
         Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(10, 10), 1, -1, InfectionStatus.SUSCEPTIBLE);
+        createPedestrian(topography, new VPoint(10, 10), 1, -1, false);
         AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(new VCircle(new VPoint(10, 10), 1), 0.0));
         topography.addAerosolCloud(aerosolCloud);
         boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
@@ -136,7 +136,7 @@ public class TransmissionModelTest {
     @Test
     public void throwIfPedestrianOutsideAerosolCloudConsideredInside() {
         Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(5, 5), 1, -1, InfectionStatus.SUSCEPTIBLE);
+        createPedestrian(topography, new VPoint(5, 5), 1, -1, false);
         AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(new VCircle(new VPoint(10, 10), 1), 0.0));
         topography.addAerosolCloud(aerosolCloud);
         boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
@@ -151,11 +151,11 @@ public class TransmissionModelTest {
         aerosolCloud.setId(1);
         topography.addAerosolCloud(aerosolCloud);
         // pedestrians outside cloud
-        createPedestrian(topography, new VPoint(12, 12), 2, -1, InfectionStatus.SUSCEPTIBLE);
-        createPedestrian(topography, new VPoint(1, 1), 3, -1, InfectionStatus.SUSCEPTIBLE);
+        createPedestrian(topography, new VPoint(12, 12), 2, -1, false);
+        createPedestrian(topography, new VPoint(1, 1), 3, -1,false);
         // pedestrians inside cloud
-        createPedestrian(topography, new VPoint(10, 10), 4, -1, InfectionStatus.SUSCEPTIBLE);
-        createPedestrian(topography, new VPoint(10.5, 10.5), 5, -1, InfectionStatus.SUSCEPTIBLE);
+        createPedestrian(topography, new VPoint(10, 10), 4, -1, false);
+        createPedestrian(topography, new VPoint(10.5, 10.5), 5, -1, false);
 
         Collection<Pedestrian> expectedPedestriansInAerosolCloud = new LinkedList<>();
         expectedPedestriansInAerosolCloud.add(topography.getPedestrianDynamicElements().getElement(4));

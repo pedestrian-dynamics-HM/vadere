@@ -84,14 +84,7 @@ public class TopographyController extends OfflineTopographyController {
 
 		agentWrapper.getTrajectory().getFootSteps().forEach(footStep -> newPedestrian.addFootStepToTrajectory(footStep));
 
-		newPedestrian.setInfectionStatus(agentWrapper.getInfectionStatus());
-		newPedestrian.setPathogenEmissionCapacity(agentWrapper.getPathogenEmissionCapacity());
-		newPedestrian.setPathogenAbsorptionRate(agentWrapper.getPathogenAbsorptionRate());
-		newPedestrian.setRespiratoryTimeOffset(agentWrapper.getRespiratoryTimeOffset());
-		newPedestrian.setMinInfectiousDose(agentWrapper.getMinInfectiousDose());
-		newPedestrian.setExposedPeriod(agentWrapper.getExposedPeriod());
-		newPedestrian.setInfectiousPeriod(agentWrapper.getInfectiousPeriod());
-		newPedestrian.setRecoveredPeriod(agentWrapper.getRecoveredPeriod());
+		newPedestrian.setHealthStatus(agentWrapper.getHealthStatus());
 	}
 
 	public void update(double simTimeInSec) {

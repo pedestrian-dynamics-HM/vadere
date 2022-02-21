@@ -203,10 +203,6 @@ public class Pedestrian extends Agent {
     	return wrapperHealthStatus.getInfectionStatus();
     }
 
-	public double getPathogenAbsorbedLoad() {
-    	return wrapperHealthStatus.getPathogenAbsorbedLoad();
-    }
-
     public VTrajectory getTrajectory() {
         return trajectory;
     }
@@ -295,14 +291,6 @@ public class Pedestrian extends Agent {
 
 	public void setInfectionStatus(InfectionStatus infectionStatus) {
     	wrapperHealthStatus.setInfectionStatus(infectionStatus);
-    }
-
-    public void setPathogenAbsorbedLoad(double absorbedLoad) {
-        wrapperHealthStatus.setPathogenAbsorbedLoad(absorbedLoad);
-    }
-
-	public void setMinInfectiousDose(double minInfectiousDose) {
-    	wrapperHealthStatus.setMinInfectiousDose(minInfectiousDose);
     }
 
     // Methods

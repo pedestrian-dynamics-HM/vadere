@@ -334,7 +334,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case INFECTION_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return getInfectionStatusColor(pedestrian.getInfectionStatus(), pedestrian.getPathogenAbsorbedLoad(), pedestrian.getMinInfectiousDose());
+                    return getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
                 }
             }
 		    default: return model.config.getPedestrianColor();
@@ -342,40 +342,36 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	    }
     }
 
-    public Color getInfectionStatusColor(InfectionStatus infectionStatus, double absorbedPathogenLoad, double minInfectiousDose) {
-        Color color = model.config.getInfectionStatusColor(infectionStatus);
-		boolean interpolateColors = true; // ToDo define as checkbox in settings dialog
+    public Color getHealthStatusColor(boolean infectious, double degreeOfExposure) {
+        Color color;
 
-		double minAbsorbedPathogenLoad = 0;
-		double maxAbsorbedPathogenLoad = minInfectiousDose;
-		float t = (float) ((absorbedPathogenLoad - minAbsorbedPathogenLoad) / maxAbsorbedPathogenLoad);
+		double minDegreeOfExposure = 0;
+		double maxDegreeOfExposure = 1000; //TODO value to be defined in settings dialog
+		float t = (float) ((degreeOfExposure - minDegreeOfExposure) / maxDegreeOfExposure);
 
-		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values
-        for (InfectionStatus status : InfectionStatus.values()) {
-            if (model.config.getInfectionStatusColor(status).equals(model.config.getDefaultInfectionStatusColor(InfectionStatus.SUSCEPTIBLE))) {
-                model.config.setInfectionStatusColor(status, model.config.getDefaultInfectionStatusColor(status));
-            }
+//		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values
+//        for (InfectionStatus status : InfectionStatus.values()) {
+//
+//            if (model.config.getHealthStatusColor(status).equals(model.config.getDefaultInfectionStatusColor(InfectionStatus.SUSCEPTIBLE))) {
+//                model.config.setInfectionStatusColor(status, model.config.getDefaultInfectionStatusColor(status));
+//            }
+//        }
+
+        //TODO adapt model.config
+        Color susceptibleColor = model.config.getPedestrianColor();
+        Color exposedColor = model.config.getExposedColor();
+        Color infectiousColor = model.config.getInfectiousColor();
+
+        if (degreeOfExposure <= minDegreeOfExposure) {
+            color = susceptibleColor;
+        } else if (degreeOfExposure >= maxDegreeOfExposure) {
+            color = exposedColor;
+        } else {
+            // color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
+            color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
         }
-
-        Color susceptibleColor = model.config.getInfectionStatusColor(InfectionStatus.SUSCEPTIBLE);
-        Color exposedColor = model.config.getInfectionStatusColor(InfectionStatus.EXPOSED);
-
-        if (interpolateColors) {
-            switch (infectionStatus) {
-                case SUSCEPTIBLE:
-                case EXPOSED:
-                    if (absorbedPathogenLoad <= minAbsorbedPathogenLoad) { // if (t < 0)
-                        color = susceptibleColor;
-                    } else if (absorbedPathogenLoad >= maxAbsorbedPathogenLoad) { // if (t > 1)
-                        color = exposedColor;
-                    } else {
-                        // color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
-                        color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
-                    }
-                    break;
-                case INFECTIOUS:
-                case RECOVERED:
-            }
+        if (infectious) {
+            color = infectiousColor;
         }
 		return color;
     }

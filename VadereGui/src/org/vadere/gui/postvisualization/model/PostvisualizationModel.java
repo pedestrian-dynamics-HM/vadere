@@ -283,17 +283,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			pedestrian.setGroupMembership(GroupMembership.valueOf(groupMembershipString));
 		}
 
-		if(trajectories.infectionStatusCol != -1) {
-			String infectionStatusString = row.getString(trajectories.infectionStatusCol);
-			pedestrian.setInfectionStatus(InfectionStatus.valueOf(infectionStatusString));
+		if(trajectories.isInfectiousCol != -1) {
+			String isInfectiousString = row.getString(trajectories.isInfectiousCol);
+			pedestrian.setInfectious(Boolean.parseBoolean(isInfectiousString));
 		}
 
-		if(trajectories.absorbedPathogenLoadCol != -1) {
-			pedestrian.setPathogenAbsorbedLoad(row.getDouble(trajectories.absorbedPathogenLoadCol));
-		}
-
-		if(trajectories.minInfectiousDoseCol != -1) {
-			pedestrian.setMinInfectiousDose(row.getDouble(trajectories.minInfectiousDoseCol));
+		if(trajectories.degreeOfExposureCol != -1) {
+			pedestrian.setDegreeOfExposure(row.getDouble(trajectories.degreeOfExposureCol));
 		}
 
 		return pedestrian;
