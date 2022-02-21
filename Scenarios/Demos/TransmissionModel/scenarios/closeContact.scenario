@@ -128,10 +128,10 @@
       "org.vadere.state.attributes.models.AttributesTransmissionModel" : {
         "transmissionModelSourceParameters" : [ {
           "sourceId" : 15,
-          "infectionStatus" : "SUSCEPTIBLE"
+          "infectious" : false
         }, {
           "sourceId" : 16,
-          "infectionStatus" : "INFECTIOUS"
+          "infectious" : true
         } ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
         "pedestrianPathogenEmissionCapacity" : 4.0,
