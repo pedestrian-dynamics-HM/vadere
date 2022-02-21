@@ -3,22 +3,21 @@ package org.vadere.state.attributes.models;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
-import org.vadere.state.health.InfectionStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.vadere.state.health.TransmissionModelHealthStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Droplets;
-import org.vadere.state.health.HealthStatus;
 import org.vadere.state.scenario.Pedestrian;
 
 /**
- * This class defines the attributes of the corresponding TransmissionModel. All attributes are defined by the user and
+ * This class defines the attributes of the corresponding exposure model. All attributes are defined by the user and
  * relate to
  * <ul>
  *     <li>the TransmissionModel: {@link #transmissionModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
- *     <li>the {@link HealthStatus} of the {@link Pedestrian}s</li>
+ *     <li>the {@link TransmissionModelHealthStatus} of the {@link Pedestrian}s</li>
  *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the TransmissionModel</li>
  *     <li>the {@link Droplets}s' initial attributes when they are created by the TransmissionModel</li>
  * </ul>

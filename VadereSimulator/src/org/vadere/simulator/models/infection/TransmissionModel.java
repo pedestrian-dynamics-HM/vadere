@@ -12,7 +12,6 @@ import org.vadere.state.attributes.models.TransmissionModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
-import org.vadere.state.health.HealthStatus;
 import org.vadere.state.health.TransmissionModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VLine;
@@ -32,8 +31,8 @@ import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
  * For this purpose, the TransmissionModel controls the airborne transmission of pathogen from infectious pedestrians to
  * other pedestrians, i.e. it
  * <ul>
- *     <li>initializes each pedestrian's {@link HealthStatus} after a pedestrian is inserted into the topography,</li>
- *     <li>updates the pedestrian's {@link HealthStatus}</li>
+ *     <li>initializes each pedestrian's {@link TransmissionModelHealthStatus} after a pedestrian is inserted into the topography,</li>
+ *     <li>updates the pedestrian's {@link TransmissionModelHealthStatus}</li>
  *     <li>creates, updates and deletes each {@link AerosolCloud}</li>
  *     <li>creates, updates and deletes {@link Droplets}</li>
  * </ul>
@@ -109,7 +108,6 @@ public class TransmissionModel extends AbstractExposureModel {
 	@Override
 	public void update(double simTimeInSec) {
 		//ToDo: move boolean isXyModelDefined to initialize method and distinguish between:
-		// * HealthStatus
 		// * AerosolCloudModel
 		// * AlternativeAerosolCloudModel (not yet implemented)
 		// * DropletModel
@@ -312,7 +310,6 @@ public class TransmissionModel extends AbstractExposureModel {
 	private void updatePedsHealthStatus(double simTimeInSec) {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
-			pedestrian.updateInfectionStatus(simTimeInSec);
 			pedestrian.getHealthStatus(TransmissionModelHealthStatus.class).updateRespiratoryCycle(simTimeInSec, attributesTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		}
 	}

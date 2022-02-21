@@ -5,8 +5,6 @@ import org.vadere.state.health.DoseResponseModelInfectionStatus;
 import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.psychology.information.KnowledgeBase;
 import org.vadere.state.psychology.PsychologyStatus;
-import org.vadere.state.health.InfectionStatus;
-import org.vadere.state.health.HealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.ThreatMemory;
@@ -36,7 +34,6 @@ public class Pedestrian extends Agent {
 
     private PsychologyStatus psychologyStatus;
 
-	private HealthStatus wrapperHealthStatus;
     private ExposureModelHealthStatus healthStatus;
     private DoseResponseModelInfectionStatus infectionStatus;
 
@@ -79,7 +76,6 @@ public class Pedestrian extends Agent {
 		isChild = false;
 		isLikelyInjured = false;
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
-		wrapperHealthStatus = new HealthStatus();
         healthStatus = null;
         infectionStatus = null;
 		groupIds = new LinkedList<>();
@@ -109,8 +105,6 @@ public class Pedestrian extends Agent {
         } else {
             infectionStatus = null;
         }
-
-		wrapperHealthStatus = new HealthStatus(other.wrapperHealthStatus);
 
         if (other.groupIds != null) {
             groupIds = new LinkedList<>(other.groupIds);
@@ -199,9 +193,6 @@ public class Pedestrian extends Agent {
         return infectionStatus.getProbabilityOfInfection();
     }
 
-    public InfectionStatus getInfectionStatus() {
-    	return wrapperHealthStatus.getInfectionStatus();
-    }
 
     public VTrajectory getTrajectory() {
         return trajectory;
@@ -289,9 +280,7 @@ public class Pedestrian extends Agent {
         infectionStatus.setProbabilityOfInfection(probabilityOfInfection);
     }
 
-	public void setInfectionStatus(InfectionStatus infectionStatus) {
-    	wrapperHealthStatus.setInfectionStatus(infectionStatus);
-    }
+
 
     // Methods
     public boolean isTarget() {
@@ -312,10 +301,6 @@ public class Pedestrian extends Agent {
             trajectory.clear();
         }
     }
-
-	public void updateInfectionStatus(double simTimeInSec)	{
-		wrapperHealthStatus.updateInfectionStatus(simTimeInSec);
-	}
 
 	// Overridden Methods
 
