@@ -29,10 +29,6 @@
       "filename" : "pathogenConcentration.txt",
       "processors" : [ 7 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "infectionStatusPerPedestrian.txt",
-      "processors" : [ 8 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "pedestrianHealthStatus.txt",
       "processors" : [ 10 ]
