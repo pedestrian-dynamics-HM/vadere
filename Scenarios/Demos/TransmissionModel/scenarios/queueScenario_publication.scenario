@@ -79,9 +79,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudLifeTimeProcessor",
       "id" : 9
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianHealthStatusProcessor",
-      "id" : 10
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 11
     }, {
