@@ -65,7 +65,7 @@
         "pedestrianOverlapProcessorId" : 3
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDegreeOfExposureProcessor",
       "id" : 5
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudCountingProcessor",
