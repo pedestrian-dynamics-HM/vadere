@@ -9,10 +9,7 @@
       "filename" : "infectionStatus.txt",
       "processors" : [ 1 ]
     } ],
-    "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
-      "id" : 1
-    } ],
+    "processors" : [ ],
     "isTimestamped" : false,
     "isWriteMetaData" : false
   },

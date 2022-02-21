@@ -14,9 +14,6 @@
       "processors" : [ 2 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
-      "id" : 1
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadMaxProcessor",
       "id" : 2
     } ],

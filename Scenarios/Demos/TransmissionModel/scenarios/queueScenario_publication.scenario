@@ -76,9 +76,6 @@
         "timeResolution" : 4.0
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
-      "id" : 8
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudLifeTimeProcessor",
       "id" : 9
     }, {
