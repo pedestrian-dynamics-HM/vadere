@@ -252,7 +252,7 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
 		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
-		JRadioButton rbInfectionStatusColoring = createRadioButtonWithListener(AgentColoring.INFECTION_STATUS, Messages.getString("SettingsDialog.lblInfectionStatusColoring.text")+ ":");
+		JRadioButton rbInfectionStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
 		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
 
 
