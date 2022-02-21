@@ -7,7 +7,6 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;

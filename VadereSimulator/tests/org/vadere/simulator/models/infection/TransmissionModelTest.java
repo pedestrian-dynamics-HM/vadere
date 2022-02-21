@@ -11,7 +11,6 @@ import org.vadere.state.attributes.models.AttributesTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
