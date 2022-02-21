@@ -9,17 +9,17 @@ import org.vadere.state.scenario.Pedestrian;
 import java.util.Locale;
 
 /**
- * Log the absorbed pathogen load when a pedestrian reaches its final target (i.e. the maximum load). If a pedestrian
- * does not reach the target before the simulation ends, log current pathogen load (i.e., we enter the post loop and the
- * topography still holds pedestrians).
+ * Log the degree of exposure when a pedestrian reaches its final target. If a pedestrian does not reach the target
+ * before the simulation ends, log current degree of exposure (i.e., we enter the post loop and the topography still
+ * holds pedestrians).
  *
  * Use a simple map with pedestrian.getId() as key and update the value in each simulation step.
  * This is a naive and inefficient approach, but it works.
  */
 @DataProcessorClass()
-public class PedestrianPathogenLoadMaxProcessor extends DataProcessor<PedestrianIdKey, String> {
-    public PedestrianPathogenLoadMaxProcessor() {
-        super("pathogenLoad");
+public class PedestrianMaxDegreeOfExposureProcessor extends DataProcessor<PedestrianIdKey, String> {
+    public PedestrianMaxDegreeOfExposureProcessor() {
+        super("degreeOfExposure");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class PedestrianPathogenLoadMaxProcessor extends DataProcessor<Pedestrian
         state.getTopography().getElements(Pedestrian.class).stream()
                 .forEach(pedestrian -> {
                     PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
-                    this.putValue(pedId, getAbsorbedPathogenLoad(pedestrian));
+                    this.putValue(pedId, getDegreeOfExposure(pedestrian));
                 });
     }
 
@@ -36,7 +36,7 @@ public class PedestrianPathogenLoadMaxProcessor extends DataProcessor<Pedestrian
         state.getTopography().getElements(Pedestrian.class).stream()
                 .forEach(pedestrian -> {
                     PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
-                    this.putValue(pedId, getAbsorbedPathogenLoad(pedestrian));
+                    this.putValue(pedId, getDegreeOfExposure(pedestrian));
                 });
     }
 
@@ -45,8 +45,8 @@ public class PedestrianPathogenLoadMaxProcessor extends DataProcessor<Pedestrian
         super.init(manager);
     }
 
-    private String getAbsorbedPathogenLoad(Pedestrian pedestrian) {
-        double pathogenLoad = (pedestrian.hasNextTarget()) ? pedestrian.getPathogenAbsorbedLoad() : -1;
-        return String.format(Locale.US,"%s", pathogenLoad);
+    private String getDegreeOfExposure(Pedestrian pedestrian) {
+        double degreeOfExposure = (pedestrian.hasNextTarget()) ? pedestrian.getDegreeOfExposure() : -1;
+        return String.format(Locale.US,"%s", degreeOfExposure);
     }
 }

@@ -14,7 +14,7 @@
       "processors" : [ 2 ]
     } ],
     "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadMaxProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMaxDegreeOfExposureProcessor",
       "id" : 2
     } ],
     "isTimestamped" : false,
