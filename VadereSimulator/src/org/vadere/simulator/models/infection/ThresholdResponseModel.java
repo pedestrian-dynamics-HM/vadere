@@ -41,7 +41,7 @@ public class ThresholdResponseModel extends AbstractDoseResponseModel {
         Collection<Pedestrian> exposedPedestrians = topography.getPedestrianDynamicElements()
                 .getElements()
                 .stream()
-                .filter(pedestrian -> pedestrian.getPathogenAbsorbedLoad() > threshold).collect(Collectors.toSet());
+                .filter(pedestrian -> pedestrian.getDegreeOfExposure() > threshold).collect(Collectors.toSet());
 
         for (Pedestrian pedestrian : exposedPedestrians) {
             // pedestrian.setInfected(true);

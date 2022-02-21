@@ -6,7 +6,6 @@ import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -67,7 +66,7 @@ public class ProximityExposureModel extends AbstractExposureModel {
         pedestrians = topography.getPedestrianDynamicElements().getElements().stream().collect(Collectors.toSet());
 
         Collection<Pedestrian> infectiousPedestrians = pedestrians.stream()
-                .filter(p -> p.getInfectionStatus().equals(InfectionStatus.INFECTIOUS)).collect(Collectors.toSet());
+                .filter(Pedestrian::isInfectious).collect(Collectors.toSet());
 
         if (!infectiousPedestrians.isEmpty()) {
             for (Pedestrian infectiousPedestrian : infectiousPedestrians) {

@@ -203,46 +203,9 @@ public class Pedestrian extends Agent {
     	return wrapperHealthStatus.getInfectionStatus();
     }
 
-    public double getPathogenEmissionCapacity() {
-        return wrapperHealthStatus.getPathogenEmissionCapacity();
-    }
-
-    public double getPathogenAbsorptionRate() {
-        return wrapperHealthStatus.getPathogenAbsorptionRate();
-    }
-
-    public double getRespiratoryTimeOffset(){
-        return wrapperHealthStatus.getRespiratoryTimeOffset();
-    }
-
-    public double getExposedPeriod() {
-        return wrapperHealthStatus.getExposedPeriod();
-    }
-
-    public double getInfectiousPeriod() {
-        return wrapperHealthStatus.getInfectiousPeriod();
-    }
-
-    public double getRecoveredPeriod() {
-        return wrapperHealthStatus.getRecoveredPeriod();
-    }
-
 	public double getPathogenAbsorbedLoad() {
     	return wrapperHealthStatus.getPathogenAbsorbedLoad();
     }
-
-	public VPoint getStartBreatheOutPosition() {
-    	return wrapperHealthStatus.getStartBreatheOutPosition();
-    }
-
-	public boolean isBreathingIn() {
-    	return wrapperHealthStatus.isBreathingIn();
-    }
-
-	public double getMinInfectiousDose() {
-    	return wrapperHealthStatus.getMinInfectiousDose();
-    }
-
 
     public VTrajectory getTrajectory() {
         return trajectory;
@@ -334,40 +297,12 @@ public class Pedestrian extends Agent {
     	wrapperHealthStatus.setInfectionStatus(infectionStatus);
     }
 
-	public void setStartBreatheOutPosition(VPoint startBreatheOutPosition) {
-    	wrapperHealthStatus.setStartBreatheOutPosition(startBreatheOutPosition);
-    }
-
-	public void setRespiratoryTimeOffset(double respiratoryTimeOffset) {
-    	wrapperHealthStatus.setRespiratoryTimeOffset(respiratoryTimeOffset);
-    }
-
-	public void setPathogenEmissionCapacity(double pathogenEmissionCapacity) {
-    	wrapperHealthStatus.setPathogenEmissionCapacity(pathogenEmissionCapacity);
-    }
-
-	public void setPathogenAbsorptionRate(double pathogenAbsorptionRate) {
-    	wrapperHealthStatus.setPathogenAbsorptionRate(pathogenAbsorptionRate);
-    }
-
     public void setPathogenAbsorbedLoad(double absorbedLoad) {
         wrapperHealthStatus.setPathogenAbsorbedLoad(absorbedLoad);
     }
 
 	public void setMinInfectiousDose(double minInfectiousDose) {
     	wrapperHealthStatus.setMinInfectiousDose(minInfectiousDose);
-    }
-
-	public void setExposedPeriod(double exposedPeriod) {
-    	wrapperHealthStatus.setExposedPeriod(exposedPeriod);
-    }
-
-	public void setInfectiousPeriod(double infectiousPeriod) {
-    	wrapperHealthStatus.setInfectiousPeriod(infectiousPeriod);
-    }
-
-	public void setRecoveredPeriod(double recoveredPeriod) {
-    	wrapperHealthStatus.setRecoveredPeriod(recoveredPeriod);
     }
 
     // Methods
@@ -390,27 +325,8 @@ public class Pedestrian extends Agent {
         }
     }
 
-	public double emitPathogen() {
-    	return wrapperHealthStatus.emitPathogen();
-    }
-
-	public void absorbPathogen(double pathogenConcentration) {
-		wrapperHealthStatus.absorbPathogen(pathogenConcentration);
-	}
-
 	public void updateInfectionStatus(double simTimeInSec)	{
 		wrapperHealthStatus.updateInfectionStatus(simTimeInSec);
-	}
-
-	public void updateRespiratoryCycle(double simTimeInSec, double periodLength) {
-		wrapperHealthStatus.updateRespiratoryCycle(simTimeInSec, periodLength);
-	}
-	public boolean isStartingBreatheOut() {
-		return wrapperHealthStatus.isStartingBreatheOut();
-	}
-
-	public boolean isStartingBreatheIn() {
-		return wrapperHealthStatus.isStartingBreatheIn();
 	}
 
 	// Overridden Methods
