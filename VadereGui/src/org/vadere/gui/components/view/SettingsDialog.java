@@ -11,7 +11,6 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
@@ -243,7 +242,7 @@ public class SettingsDialog extends JDialog {
 
 	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
 		FormLayout pedColorLayout = new FormLayout("5dlu, pref, 2dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu",
-				createCellsWithSeparators(8));
+				createCellsWithSeparators(10)); //rows
 
 		colorSettingsPane.setLayout(pedColorLayout);
 		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.pedcolors.border.text")));
@@ -252,7 +251,7 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
 		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
-		JRadioButton rbInfectionStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
+		JRadioButton rbHealthStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
 		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
 
 
@@ -264,7 +263,7 @@ public class SettingsDialog extends JDialog {
 		group.add(rbRandomColoring);
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
-		group.add(rbInfectionStatusColoring);
+		group.add(rbHealthStatusColoring);
 		group.add(rbInformationColoring);
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
@@ -281,11 +280,39 @@ public class SettingsDialog extends JDialog {
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
-		JComboBox<InfectionStatus> cbInfectionStatuses = createInfectionStatusesComboBox();
-		final JPanel pInfectionStatus = new JPanel();
-		final JButton bChangeInfectionStatusColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JPanel pPedestrianColorLowerExposure = new JPanel();
+		final JButton bChangePedestrianColorLowerExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
-		initColoringByInfectionStatus(cbInfectionStatuses, pInfectionStatus, bChangeInfectionStatusColor);
+		final JPanel pPedestrianColorUpperExposure = new JPanel();
+		final JButton bChangePedestrianColorUpperExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+
+		final JPanel pPedestrianColorInfectious = new JPanel();
+		final JButton bChangePedestrianColorInfectious = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+
+		initColoringByHealthStatus(bChangePedestrianColorLowerExposure, pPedestrianColorLowerExposure,
+				bChangePedestrianColorUpperExposure, pPedestrianColorUpperExposure,
+				bChangePedestrianColorInfectious, pPedestrianColorInfectious);
+
+		final JSpinner spinnerLowerExposure = new JSpinner();
+		spinnerLowerExposure.setPreferredSize(new Dimension(75, 20));
+		final SpinnerNumberModel sModelLowerExposure = new SpinnerNumberModel(model.config.getLowerVisualizedExposure(), 0, model.config.getUpperVisualizedExposure(), 1);
+		spinnerLowerExposure.setModel(sModelLowerExposure);
+		spinnerLowerExposure.addChangeListener(e -> {
+			model.config.setLowerVisualizedExposure((double) sModelLowerExposure.getValue());
+			model.notifyObservers();
+		});
+
+
+		final JSpinner spinnerUpperExposure = new JSpinner();
+		spinnerUpperExposure.setPreferredSize(new Dimension(75, 20));
+		final SpinnerNumberModel sModelUpperExposure = new SpinnerNumberModel(model.config.getUpperVisualizedExposure(), model.config.getLowerVisualizedExposure(), null, 1);
+		spinnerUpperExposure.setModel(sModelUpperExposure);
+		spinnerUpperExposure.addChangeListener(e -> {
+			model.config.setUpperVisualizedExposure((double) sModelUpperExposure.getValue());
+			model.notifyObservers();
+		});
+
 
 		JComboBox<InformationState> cbInformationStates = createInformationStateComboBox();
 		final JPanel pInformationStateColor = new JPanel();
@@ -299,35 +326,46 @@ public class SettingsDialog extends JDialog {
 		int column2 = 4;
 		int column3 = 6;
 		int column4 = 8;
+		int column5 = 10;
 
 		CellConstraints cc = new CellConstraints();
 
 		colorSettingsPane.add(rbTargetColoring, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(cbTargetIds, cc.xy(column2, row));
-		colorSettingsPane.add(pTargetColor, cc.xy(column3, row));
-		colorSettingsPane.add(bChangeTargetColor, cc.xy(column4, row));
+		colorSettingsPane.add(pTargetColor, cc.xy(column4, row));
+		colorSettingsPane.add(bChangeTargetColor, cc.xy(column5, row));
 
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column3, row));
-		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column4, row));
+		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column4, row));
+		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column5, row));
 
 		colorSettingsPane.add(rbRandomColoring, cc.xyw(column1, row += NEXT_CELL, 9));
 		colorSettingsPane.add(rbGroupColoring, cc.xyw(column1, row += NEXT_CELL, 9));
 
 		colorSettingsPane.add(rbSelfCategoryColoring, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(cbSelfCategories, cc.xy(column2, row));
-		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column3, row));
-		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column4, row));
+		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column4, row));
+		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column5, row));
 
-		colorSettingsPane.add(rbInfectionStatusColoring, cc.xy(column1, row += NEXT_CELL));
-		colorSettingsPane.add(cbInfectionStatuses, cc.xy(column2, row));
-		colorSettingsPane.add(pInfectionStatus, cc.xy(column3, row));
-		colorSettingsPane.add(bChangeInfectionStatusColor, cc.xy(column4, row));
+		colorSettingsPane.add(rbHealthStatusColoring, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianLowerExposure.text") + ":"), cc.xy(column2, row));
+		colorSettingsPane.add(spinnerLowerExposure, cc.xy(column3, row));
+		colorSettingsPane.add(pPedestrianColorLowerExposure, cc.xy(column4, row));
+		colorSettingsPane.add(bChangePedestrianColorLowerExposure, cc.xy(column5, row));
+
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianUpperExposure.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(spinnerUpperExposure, cc.xy(column3, row));
+		colorSettingsPane.add(pPedestrianColorUpperExposure, cc.xy(column4, row));
+		colorSettingsPane.add(bChangePedestrianColorUpperExposure, cc.xy(column5, row));
+
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianInfectious.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(pPedestrianColorInfectious, cc.xy(column4, row));
+		colorSettingsPane.add(bChangePedestrianColorInfectious, cc.xy(column5, row));
 
 		colorSettingsPane.add(rbInformationColoring, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(cbInformationStates, cc.xy(column2, row));
-		colorSettingsPane.add(pInformationStateColor, cc.xy(column3, row));
-		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column4, row));
+		colorSettingsPane.add(pInformationStateColor, cc.xy(column4, row));
+		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
@@ -357,11 +395,6 @@ public class SettingsDialog extends JDialog {
 
 	private JComboBox<SelfCategory> createSelfCategoriesComboBox() {
 		JComboBox<SelfCategory> comboBox = new JComboBox<>(SelfCategory.values());
-		return comboBox;
-	}
-
-	private JComboBox<InfectionStatus> createInfectionStatusesComboBox() {
-		JComboBox<InfectionStatus> comboBox = new JComboBox<>(InfectionStatus.values());
 		return comboBox;
 	}
 
@@ -424,24 +457,27 @@ public class SettingsDialog extends JDialog {
 		});
 	}
 
-	private void initColoringByInfectionStatus(JComboBox<InfectionStatus> cbInfectionStatuses, JPanel pInfectionStatusColor, JButton bChangeInfectionStatusColor) {
-		cbInfectionStatuses.setSelectedIndex(0);
+	private void initColoringByHealthStatus(JButton bChangePedestrianColorLowerExposure, JPanel pPedestrianColorLowerExposure,
+											JButton bChangePedestrianColorUpperExposure, JPanel pPedestrianColorUpperExposure,
+											JButton bChangePedestrianColorInfectious, JPanel pPedestrianColorInfectious) {
 
-		InfectionStatus selectedInfectionStatus = cbInfectionStatuses.getItemAt(cbInfectionStatuses.getSelectedIndex());
-		Color infectionStatusColor = model.config.getInfectionStatusColor(selectedInfectionStatus);
-
-		pInfectionStatusColor.setBackground(infectionStatusColor);
-		pInfectionStatusColor.setPreferredSize(new Dimension(130, 20));
-
+		pPedestrianColorLowerExposure.setBackground(config.getPedestrianDefaultColor());
+		pPedestrianColorLowerExposure.setPreferredSize(new Dimension(130, 20));
 		// When user changes a color, save it in the model.
-		bChangeInfectionStatusColor.addActionListener(new ActionSetInfectionStatusColor("Set Infection Status Color", model, pInfectionStatusColor,
-				cbInfectionStatuses));
+		bChangePedestrianColorLowerExposure.addActionListener(new ActionSetPedestrianDefaultColor(
+				"Set Pedestrian Exposure Color (lower limit)", model, pPedestrianColorLowerExposure));
 
-		// Retrieve configured color from "model".
-		cbInfectionStatuses.addActionListener(e -> {
-			InfectionStatus selectedInfectionStatusInner = cbInfectionStatuses.getItemAt(cbInfectionStatuses.getSelectedIndex());
-			pInfectionStatusColor.setBackground(model.config.getInfectionStatusColor(selectedInfectionStatusInner));
-		});
+		pPedestrianColorUpperExposure.setBackground(config.getExposedColor());
+		pPedestrianColorUpperExposure.setPreferredSize(new Dimension(130, 20));
+		// When user changes a color, save it in the model.
+		bChangePedestrianColorUpperExposure.addActionListener(new ActionSetPedestrianExposedColor(
+				"Set Pedestrian Exposure Color (Upper Limit)", model, pPedestrianColorUpperExposure));
+
+		pPedestrianColorInfectious.setBackground(config.getInfectiousColor());
+		pPedestrianColorInfectious.setPreferredSize(new Dimension(130, 20));
+		// When user changes a color, save it in the model.
+		bChangePedestrianColorInfectious.addActionListener(new ActionSetPedestrianInfectiousColor(
+				"Set Pedestrian Infectious Color", model, pPedestrianColorInfectious));
 	}
 
 	private void initColoringByInformationState(JComboBox<InformationState> cbInformationStates, JPanel pInformationStateColor, JButton bChangeInformationStateColor) {

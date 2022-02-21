@@ -5,7 +5,6 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.CLGaussianCalculator;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -334,46 +333,12 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case HEALTH_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
+                    return model.config.getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
                 }
             }
 		    default: return model.config.getPedestrianColor();
 
 	    }
-    }
-
-    public Color getHealthStatusColor(boolean infectious, double degreeOfExposure) {
-        Color color;
-
-		double minDegreeOfExposure = 0;
-		double maxDegreeOfExposure = 1000; //TODO value to be defined in settings dialog
-		float t = (float) ((degreeOfExposure - minDegreeOfExposure) / maxDegreeOfExposure);
-
-//		// if no color defined explicitly for each status (= default pedestrian color is applied) -> use default values
-//        for (InfectionStatus status : InfectionStatus.values()) {
-//
-//            if (model.config.getHealthStatusColor(status).equals(model.config.getDefaultInfectionStatusColor(InfectionStatus.SUSCEPTIBLE))) {
-//                model.config.setInfectionStatusColor(status, model.config.getDefaultInfectionStatusColor(status));
-//            }
-//        }
-
-        //TODO adapt model.config
-        Color susceptibleColor = model.config.getPedestrianColor();
-        Color exposedColor = model.config.getExposedColor();
-        Color infectiousColor = model.config.getInfectiousColor();
-
-        if (degreeOfExposure <= minDegreeOfExposure) {
-            color = susceptibleColor;
-        } else if (degreeOfExposure >= maxDegreeOfExposure) {
-            color = exposedColor;
-        } else {
-            // color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
-            color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
-        }
-        if (infectious) {
-            color = infectiousColor;
-        }
-		return color;
     }
 
 }
