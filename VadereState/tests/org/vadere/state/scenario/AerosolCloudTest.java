@@ -28,10 +28,9 @@ public class AerosolCloudTest {
         double radius = 1;
         VPoint center = new VPoint(10, 10);
         double creationTime = 0;
-        double halfLife = 60;
         double initialPathogenLoad = 10e4;
 
-        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, radius, center, creationTime, halfLife, initialPathogenLoad, initialPathogenLoad);
+        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, radius, center, creationTime, initialPathogenLoad, initialPathogenLoad);
         aerosolCloudCirc = new AerosolCloud(attributesCirc);
     }
 
@@ -64,13 +63,12 @@ public class AerosolCloudTest {
         double pathogenLoad = 10e9;
         double lifeTime = 60*60*3;
 
-        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, radius, center, creationTime, pathogenLoad, pathogenLoad, lifeTime));
+        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, radius, center, creationTime, pathogenLoad, pathogenLoad));
         AerosolCloud aerosolCloudClone = aerosolCloudOriginal.clone();
 
         Assert.assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());
         Assert.assertEquals(aerosolCloudOriginal.getShape(), aerosolCloudClone.getShape());
         Assert.assertEquals(aerosolCloudOriginal.getCreationTime(), aerosolCloudClone.getCreationTime(), ALLOWED_DOUBLE_TOLERANCE);
-        Assert.assertEquals(aerosolCloudOriginal.getHalfLife(), aerosolCloudClone.getHalfLife(), ALLOWED_DOUBLE_TOLERANCE);
 
         // check that original is not affected by setters/changes to the clone
         aerosolCloudClone.setId(2);

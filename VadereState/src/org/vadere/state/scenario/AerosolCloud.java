@@ -23,8 +23,6 @@ public class AerosolCloud extends InfectiousParticleDispersion {
 
     private AttributesAerosolCloud attributes;
 
-    final static int numberOfNodesAlongShapeBound = 20;
-
     // ToDo: implement AerosolCloudListener (or remove commented code)
     // private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
 
@@ -81,10 +79,6 @@ public class AerosolCloud extends InfectiousParticleDispersion {
 
     public VPoint getCenter() {
         return attributes.getCenter();
-    }
-
-    public double getHalfLife() {
-        return attributes.getHalfLife();
     }
 
     public double getCreationTime() {

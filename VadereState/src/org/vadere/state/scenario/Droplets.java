@@ -47,13 +47,7 @@ public class Droplets extends InfectiousParticleDispersion {
         return attributes;
     }
 
-    public double getLifeTime() { return attributes.getLifeTime(); }
-
     public double getCreationTime() { return attributes.getCreationTime(); }
-
-    public double getCurrentPathogenLoad() {
-        return attributes.getCurrentPathogenLoad();
-    }
 
        // Setter
     @Override

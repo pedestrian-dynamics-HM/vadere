@@ -7,6 +7,9 @@ import org.vadere.state.attributes.AttributesEmbedShape;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.vadere.state.attributes.models.infection.AttributesTransmissionModelAerosolCloud;
+import org.vadere.state.attributes.models.infection.AttributesTransmissionModelDroplets;
+import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.health.TransmissionModelHealthStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Droplets;
@@ -25,108 +28,137 @@ import org.vadere.state.scenario.Pedestrian;
 @ModelAttributeClass
 public class AttributesTransmissionModel extends Attributes {
 
-	// Attributes that are required by the TransmissionModel
-	private ArrayList<TransmissionModelSourceParameters> transmissionModelSourceParameters;
-	private double pedestrianRespiratoryCyclePeriod; // equals 1/(pedestrians' average breathing rate) in seconds
+	private ArrayList<AttributesExposureModelSourceParameters> transmissionModelSourceParameters;
 
-	// Pedestrians' healthStatus related attributes
-	private double pedestrianPathogenEmissionCapacity;
-	private double pedestrianPathogenAbsorptionRate;
-	private double pedestrianMinInfectiousDose;
-	private double exposedPeriod;
-	private double infectiousPeriod;
-	private double recoveredPeriod;
+	/**
+	 * Attribute related to the pedestrians' health state that is shared among all pedestrians. It is not defined
+	 * for each instance of TransmissionModelHealthStatus separately to keep the TransmissionModelHealthStatus lean.
+	 * pedestrianRespiratoryCyclePeriod equals 1/(pedestrians' average breathing rate) in seconds.
+	 */
+	private double pedestrianRespiratoryCyclePeriod;
 
-	// AerosolCloud related attributes
-	private double aerosolCloudHalfLife;
-	private double aerosolCloudInitialRadius;
+	/**
+	 * Defines whether aerosol clouds are considered in the exposure model (true) or not (false).
+	 */
+	private boolean aerosolCloudsActive;
+	private AttributesTransmissionModelAerosolCloud aerosolCloudParameters;
 
-	// Droplet related attributes
-	private double dropletsExhalationFrequency;
-	private double dropletsDistanceOfSpread;
-	private double dropletsAngleOfSpreadInDeg;
-	private double dropletsLifeTime;
-	private double dropletsPathogenLoadFactor;
+	/**
+	 * Defines whether droplets are considered in the exposure model (true) or not (false).
+	 */
+	private boolean dropletsActive;
+	private AttributesTransmissionModelDroplets dropletParameters;
+
 
 	public AttributesTransmissionModel() {
-		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new TransmissionModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, false)));
+		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, false)));
 
-		// Mean pedestrian healthStatus and aerosolCloud attributes, rahn-2021b-cdyn Table I;
-		// Some of these values are defined as mean values but could/should be introduced as distributions
-		this.pedestrianRespiratoryCyclePeriod = 4; // in seconds
-		this.pedestrianPathogenEmissionCapacity = 4; // pathogen particles per exhalation, logarithmized to base 10
-		this.pedestrianPathogenAbsorptionRate = 0.0005; // tidal volume in m^3 per inhalation
-		this.pedestrianMinInfectiousDose = 3200; // in particles
-		this.exposedPeriod = 2.59E5; // in seconds
-		this.infectiousPeriod = 3.46E5; // in seconds
-		this.recoveredPeriod = 1.56E7; // in seconds
-		this.aerosolCloudHalfLife = 600; // in seconds
-		this.aerosolCloudInitialRadius = 1.5; // in m
+		this.pedestrianRespiratoryCyclePeriod = 4;
 
-		this.dropletsExhalationFrequency = 0;  // 0 -> no droplets are exhaled
-		this.dropletsDistanceOfSpread = 1.5;
-		this.dropletsAngleOfSpreadInDeg = 30;
-		this.dropletsLifeTime = 1.0 + 1.0E-3; // make sure that lifeTime is not a multiple of simTimeStepLength
-		this.dropletsPathogenLoadFactor = 200; // pathogen load of droplets is dropletsPathogenLoadFactor times greater than
+		this.aerosolCloudsActive = false;
+		this.aerosolCloudParameters = new AttributesTransmissionModelAerosolCloud();
+
+		this.dropletsActive = false;
+		this.dropletParameters = new AttributesTransmissionModelDroplets();
 	}
+
+	// Getter
 
 	public double getPedestrianRespiratoryCyclePeriod() {
 		return pedestrianRespiratoryCyclePeriod;
 	}
 
-	public ArrayList<TransmissionModelSourceParameters> getTransmissionModelSourceParameters() {
+	public ArrayList<AttributesExposureModelSourceParameters> getTransmissionModelSourceParameters() {
 		return transmissionModelSourceParameters;
 	}
 
-	public double getPedestrianPathogenEmissionCapacity() {
-		return pedestrianPathogenEmissionCapacity;
+	public boolean isAerosolCloudsActive() {
+		return aerosolCloudsActive;
 	}
 
-	public double getPedestrianPathogenAbsorptionRate() {
-		return pedestrianPathogenAbsorptionRate;
-	}
-
-	public double getPedestrianMinInfectiousDose() {
-		return pedestrianMinInfectiousDose;
-	}
-
-	public double getExposedPeriod() {
-		return exposedPeriod;
-	}
-
-	public double getInfectiousPeriod() {
-		return infectiousPeriod;
-	}
-
-	public double getRecoveredPeriod() {
-		return recoveredPeriod;
+	public double getAerosolCloudInitialPathogenLoad() {
+		return aerosolCloudParameters.getInitialPathogenLoad();
 	}
 
 	public double getAerosolCloudHalfLife() {
-		return aerosolCloudHalfLife;
+		return aerosolCloudParameters.getHalfLife();
 	}
 
 	public double getAerosolCloudInitialRadius() {
-		return aerosolCloudInitialRadius;
+		return aerosolCloudParameters.getInitialRadius();
 	}
 
-	public double getDropletsExhalationFrequency() {
-		return dropletsExhalationFrequency;
+	public double getAerosolCloudAirDispersionFactor() {
+		return aerosolCloudParameters.getAirDispersionFactor();
+	}
+
+	public double getAerosolCloudPedestrianDispersionWeight() {
+		return aerosolCloudParameters.getPedestrianDispersionWeight();
+	}
+
+	public double getAerosolCloudAbsorptionRate() {
+		return aerosolCloudParameters.getAbsorptionRate();
+	}
+
+	public boolean isDropletsActive() {
+		return dropletsActive;
+	}
+
+	public double getDropletsEmissionFrequency() {
+		return dropletParameters.getEmissionFrequency();
 	}
 
 	public double getDropletsDistanceOfSpread() {
-		return dropletsDistanceOfSpread;
+		return dropletParameters.getDistanceOfSpread();
 	}
 
 	public double getDropletsAngleOfSpreadInDeg() {
-		return dropletsAngleOfSpreadInDeg;
+		return dropletParameters.getAngleOfSpreadInDeg();
 	}
 
 	public double getDropletsLifeTime() {
-		return dropletsLifeTime;
+		return dropletParameters.getLifeTime();
 	}
 
-	public double getDropletsPathogenLoadFactor() {
-		return dropletsPathogenLoadFactor;
+	public double getDropletsPathogenLoad() {
+		return dropletParameters.getPathogenLoad();
+	}
+
+	public double getDropletsAbsorptionRate() {
+		return dropletParameters.getAbsorptionRate();
+	}
+
+	// Setter
+
+	public void setAerosolCloudsActive(boolean aerosolCloudsActive) {
+		this.aerosolCloudsActive = aerosolCloudsActive;
+	}
+
+	public void setAerosolCloudHalfLife(double aerosolCloudHalfLife) {
+		this.aerosolCloudParameters.setHalfLife(aerosolCloudHalfLife);
+	}
+
+	public void setAerosolCloudInitialRadius(double aerosolCloudInitialRadius) {
+		this.aerosolCloudParameters.setInitialRadius(aerosolCloudInitialRadius);
+	}
+
+	public void setAerosolCloudInitialPathogenLoad(double aerosolCloudInitialPathogenLoad) {
+		this.aerosolCloudParameters.setInitialPathogenLoad(aerosolCloudInitialPathogenLoad);
+	}
+
+	public void setAerosolCloudAirDispersionFactor(double aerosolCloudAirDispersionFactor) {
+		this.aerosolCloudParameters.setAirDispersionFactor(aerosolCloudAirDispersionFactor);
+	}
+
+	public void setAerosolCloudPedestrianDispersionWeight(double aerosolCloudPedestrianDispersionWeight) {
+		this.aerosolCloudParameters.setPedestrianDispersionWeight(aerosolCloudPedestrianDispersionWeight);
+	}
+
+	public void setAerosolCloudAbsorptionRate(double aerosolCloudAbsorptionRate) {
+		this.aerosolCloudParameters.setAbsorptionRate(aerosolCloudAbsorptionRate);
+	}
+
+	public void setDropletsActive(boolean dropletsActive) {
+		this.dropletsActive = dropletsActive;
 	}
 }

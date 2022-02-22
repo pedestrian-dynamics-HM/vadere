@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
+import org.vadere.state.attributes.models.infection.AttributesTransmissionModelDroplets;
 import org.vadere.state.scenario.Droplets;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -9,7 +10,6 @@ import org.vadere.util.geometry.shapes.VShape;
 public class AttributesDroplets extends AttributesParticleDispersion {
 
     //private VShape shape;
-    private double lifeTime;
 
     // Constructors
     public AttributesDroplets() {
@@ -18,11 +18,7 @@ public class AttributesDroplets extends AttributesParticleDispersion {
     }
 
 
-    public AttributesDroplets(int id, VShape shape, double creationTime, double lifeTime, double initialPathogenLoad) {
+    public AttributesDroplets(int id, VShape shape, double creationTime, double initialPathogenLoad) {
         super(id, creationTime, initialPathogenLoad, initialPathogenLoad, shape);
-        this.lifeTime = lifeTime;
     }
-
-    // Getter
-    public double getLifeTime() { return lifeTime; }
 }
