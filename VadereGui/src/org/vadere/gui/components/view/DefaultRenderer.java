@@ -297,7 +297,7 @@ public abstract class DefaultRenderer {
 		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
 		float minAlpha = defaultModel.getConfig().getAerosolCloudAlphaMin();
 		//ToDo this is hard coded!
-		double maxPathogensPerArea = 10000;
+		double maxPathogensPerArea = 1400; // results from 10000 / (1.5^2 * PI)
 		double pathogensPerArea = cloud.getCurrentPathogenLoad() / cloud.getArea();
 		pathogensPerArea = Math.min(pathogensPerArea, maxPathogensPerArea); // make sure that maxPathogensPerArea is not exceeded
 		int currentAlpha = (int) ((pathogensPerArea / maxPathogensPerArea) * (maxAlpha - minAlpha) + minAlpha);
