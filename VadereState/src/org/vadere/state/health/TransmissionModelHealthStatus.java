@@ -2,19 +2,20 @@ package org.vadere.state.health;
 
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class TransmissionModelHealthStatus implements ExposureModelHealthStatus {
+public class TransmissionModelHealthStatus extends ExposureModelHealthStatus {
 
-    // Member variables
-    boolean isInfectious;
-    double degreeOfExposure;
+    private boolean breathingIn;
 
-    boolean isBreathingIn;
-    double respiratoryTimeOffset;
+    /*
+     * Defines the start of each pedestrian's respiratory cycle. This allows to have individual respiratory cycles for
+     * all pedestrians, i.e. they in- or exhale all at different times.
+     */
+    private double respiratoryTimeOffset;
 
     /*
      * defines the position at which pedestrian starts current exhalation;
      */
-    VPoint exhalationStartPosition;
+    private VPoint exhalationStartPosition;
 
     /*
      * reset value for simulation periods during which pedestrian inhales
@@ -23,21 +24,19 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
 
     // Constructors
     public TransmissionModelHealthStatus() {
-        this(false, 0, false, 0, RESET_EXHALATION_POSITION);
+        this(false, 0, RESET_EXHALATION_POSITION);
     }
 
-    public TransmissionModelHealthStatus(boolean isInfectious, double degreeOfExposure, boolean isBreathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
-        this.isInfectious = isInfectious;
-        this.degreeOfExposure = degreeOfExposure;
-        this.isBreathingIn = isBreathingIn;
+    public TransmissionModelHealthStatus(boolean breathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
+        super();
+        this.breathingIn = breathingIn;
         this.respiratoryTimeOffset = respiratoryTimeOffset;
         this.exhalationStartPosition = exhalationStartPosition;
     }
 
     public TransmissionModelHealthStatus(TransmissionModelHealthStatus other) {
-        this.isInfectious = other.isInfectious();
-        this.degreeOfExposure = other.getDegreeOfExposure();
-        this.isBreathingIn = other.isInfectious();
+        super(other.isInfectious(), other.getDegreeOfExposure());
+        this.breathingIn = other.isBreathingIn();
         this.respiratoryTimeOffset = other.getRespiratoryTimeOffset();
         this.exhalationStartPosition = other.getExhalationStartPosition();
     }
@@ -46,7 +45,7 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
     // Getter
     @Override
     public boolean isInfectious() {
-        return isInfectious;
+        return infectious;
     }
 
     @Override
@@ -55,7 +54,7 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
     }
 
     public boolean isBreathingIn() {
-        return isBreathingIn;
+        return breathingIn;
     }
 
     public double getRespiratoryTimeOffset() {
@@ -66,18 +65,10 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
         return exhalationStartPosition;
     }
 
-    void updateRespiratoryCycle(double simTimeInSec) {
-
-    }
-
-    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
-        this.degreeOfExposure += deltaDegreeOfExposure;
-    }
-
     // Setter
     @Override
     public void setInfectious(boolean infectious) {
-        isInfectious = infectious;
+        this.infectious = infectious;
     }
 
     @Override
@@ -86,7 +77,7 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
     }
 
     public void setBreathingIn(boolean breathingIn) {
-        isBreathingIn = breathingIn;
+        this.breathingIn = breathingIn;
     }
 
     public void setRespiratoryTimeOffset(double respiratoryTimeOffset) {
@@ -99,6 +90,10 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
 
     // Methods
 
+    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
+        this.degreeOfExposure += deltaDegreeOfExposure;
+    }
+
     /*
      * Defines whether the pedestrian inhales or exhales depending on the current simulation time,
      * respiratoryTimeOffset, and periodLength. Assumes that periodLength for inhalation and exhalation are equally
@@ -110,15 +105,14 @@ public class TransmissionModelHealthStatus implements ExposureModelHealthStatus 
     }
 
     public boolean isStartingExhalation() {
-        return (!isBreathingIn && exhalationStartPosition == RESET_EXHALATION_POSITION);
+        return (!breathingIn && exhalationStartPosition == RESET_EXHALATION_POSITION);
     }
 
     public boolean isStartingInhalation() {
-        return (isBreathingIn && !(exhalationStartPosition == RESET_EXHALATION_POSITION));
+        return (breathingIn && !(exhalationStartPosition == RESET_EXHALATION_POSITION));
     }
 
     public void resetStartExhalationPosition() {
         exhalationStartPosition = RESET_EXHALATION_POSITION;
     }
-
 }

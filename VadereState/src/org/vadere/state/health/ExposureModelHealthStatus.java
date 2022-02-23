@@ -1,13 +1,34 @@
 package org.vadere.state.health;
 
-public interface ExposureModelHealthStatus {
-    // Getter
-    boolean isInfectious();
+public abstract class ExposureModelHealthStatus {
 
-    double getDegreeOfExposure();
+    boolean infectious;
+    double degreeOfExposure;
+
+    ExposureModelHealthStatus() {
+        this(false, 0);
+    }
+
+    ExposureModelHealthStatus(boolean infectious, double degreeOfExposure) {
+        this.infectious = infectious;
+        this.degreeOfExposure = degreeOfExposure;
+    }
+
+    // Getter
+    public boolean isInfectious() {
+        return infectious;
+    }
+
+    public double getDegreeOfExposure() {
+        return degreeOfExposure;
+    }
 
     // Setter
-    void setInfectious(boolean infectious);
+    public void setInfectious(boolean infectious) {
+        this.infectious = infectious;
+    }
 
-    void setDegreeOfExposure(double degreeOfExposure);
+    public void setDegreeOfExposure(double degreeOfExposure) {
+        this.degreeOfExposure = degreeOfExposure;
+    }
 }
