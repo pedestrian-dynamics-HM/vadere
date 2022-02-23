@@ -371,7 +371,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		ped.setInfectious(sourceParameters.isInfectious());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setRespiratoryTimeOffset(random.nextDouble() * attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setBreathingIn(false);
-		//TODO check exhalation start position null?
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
