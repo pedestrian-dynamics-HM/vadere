@@ -6,7 +6,7 @@ import org.vadere.state.attributes.Attributes;
  * Attributes related to droplets that are shared among all droplets. These are not defined for each
  * instance of Droplets separately to keep Droplets lean.
  */
-public class AttributesTransmissionModelDroplets extends Attributes {
+public class AttributesAirTransmissionModelDroplets extends Attributes {
 
     /**
      * Unit: 1/second
@@ -40,7 +40,7 @@ public class AttributesTransmissionModelDroplets extends Attributes {
      */
     private double absorptionRate;
 
-    public AttributesTransmissionModelDroplets() {
+    public AttributesAirTransmissionModelDroplets() {
         this.emissionFrequency = 1.0 / 60.0;
         this.distanceOfSpread = 1.5;
         this.angleOfSpreadInDeg = 30;

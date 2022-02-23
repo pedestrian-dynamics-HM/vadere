@@ -6,10 +6,10 @@ import org.vadere.state.attributes.Attributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.vadere.state.attributes.models.infection.AttributesTransmissionModelAerosolCloud;
-import org.vadere.state.attributes.models.infection.AttributesTransmissionModelDroplets;
+import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelAerosolCloud;
+import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelDroplets;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
-import org.vadere.state.health.TransmissionModelHealthStatus;
+import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Droplets;
 import org.vadere.state.scenario.Pedestrian;
@@ -18,16 +18,16 @@ import org.vadere.state.scenario.Pedestrian;
  * This class defines the attributes of the corresponding exposure model. All attributes are defined by the user and
  * relate to
  * <ul>
- *     <li>the TransmissionModel: {@link #transmissionModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
- *     <li>the {@link TransmissionModelHealthStatus} of the {@link Pedestrian}s</li>
- *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the TransmissionModel</li>
- *     <li>the {@link Droplets}s' initial attributes when they are created by the TransmissionModel</li>
+ *     <li>the AirTransmissionModel: {@link #exposureModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
+ *     <li>the {@link AirTransmissionModelHealthStatus} of the {@link Pedestrian}s</li>
+ *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the AirTransmissionModel</li>
+ *     <li>the {@link Droplets}s' initial attributes when they are created by the AirTransmissionModel</li>
  * </ul>
  */
 @ModelAttributeClass
-public class AttributesTransmissionModel extends Attributes {
+public class AttributesAirTransmissionModel extends Attributes {
 
-	private ArrayList<AttributesExposureModelSourceParameters> transmissionModelSourceParameters;
+	private ArrayList<AttributesExposureModelSourceParameters> exposureModelSourceParameters;
 
 	/**
 	 * Contains the Ids of pedestrians that are directly set into the topography (and not spawned by  sources).
@@ -37,7 +37,7 @@ public class AttributesTransmissionModel extends Attributes {
 
 	/**
 	 * Attribute related to the pedestrians' health state that is shared among all pedestrians. It is not defined
-	 * for each instance of TransmissionModelHealthStatus separately to keep the TransmissionModelHealthStatus lean.
+	 * for each instance of AirTransmissionModelHealthStatus separately to keep the AirTransmissionModelHealthStatus lean.
 	 * pedestrianRespiratoryCyclePeriod equals 1/(pedestrians' average breathing rate) in seconds.
 	 */
 	private double pedestrianRespiratoryCyclePeriod;
@@ -46,26 +46,26 @@ public class AttributesTransmissionModel extends Attributes {
 	 * Defines whether aerosol clouds are considered in the exposure model (true) or not (false).
 	 */
 	private boolean aerosolCloudsActive;
-	private AttributesTransmissionModelAerosolCloud aerosolCloudParameters;
+	private AttributesAirTransmissionModelAerosolCloud aerosolCloudParameters;
 
 	/**
 	 * Defines whether droplets are considered in the exposure model (true) or not (false).
 	 */
 	private boolean dropletsActive;
-	private AttributesTransmissionModelDroplets dropletParameters;
+	private AttributesAirTransmissionModelDroplets dropletParameters;
 
 
-	public AttributesTransmissionModel() {
-		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters()));
+	public AttributesAirTransmissionModel() {
+		this.exposureModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters()));
 		this.infectiousPedestrianIdsNoSource = new ArrayList<>();
 
 		this.pedestrianRespiratoryCyclePeriod = 4;
 
 		this.aerosolCloudsActive = false;
-		this.aerosolCloudParameters = new AttributesTransmissionModelAerosolCloud();
+		this.aerosolCloudParameters = new AttributesAirTransmissionModelAerosolCloud();
 
 		this.dropletsActive = false;
-		this.dropletParameters = new AttributesTransmissionModelDroplets();
+		this.dropletParameters = new AttributesAirTransmissionModelDroplets();
 	}
 
 	// Getter
@@ -74,8 +74,8 @@ public class AttributesTransmissionModel extends Attributes {
 		return pedestrianRespiratoryCyclePeriod;
 	}
 
-	public ArrayList<AttributesExposureModelSourceParameters> getTransmissionModelSourceParameters() {
-		return transmissionModelSourceParameters;
+	public ArrayList<AttributesExposureModelSourceParameters> getExposureModelSourceParameters() {
+		return exposureModelSourceParameters;
 	}
 
 	public ArrayList<Integer> getInfectiousPedestrianIdsNoSource() {

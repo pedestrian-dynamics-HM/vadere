@@ -1,15 +1,15 @@
 package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesTransmissionModel;
+import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
 
 /**
  * Attributes related to aerosol clouds that are shared among all aerosol clouds. These are not defined for each
  * instance of AerosolCloud separately to keep the AerosolCloud lean.
  * The frequency of occurrence is not defined here because aerosolClouds (if considered in the model) are directly
- * linked to the respiratory cycle defined in {@link AttributesTransmissionModel}.
+ * linked to the respiratory cycle defined in {@link AttributesAirTransmissionModel}.
  */
-public class AttributesTransmissionModelAerosolCloud extends Attributes {
+public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
 
     /**
      * Describes exponential decay of pathogen load within an aerosol cloud;
@@ -55,7 +55,7 @@ public class AttributesTransmissionModelAerosolCloud extends Attributes {
      */
     private double absorptionRate;
 
-    public AttributesTransmissionModelAerosolCloud() {
+    public AttributesAirTransmissionModelAerosolCloud() {
         this.halfLife = 600;
         this.initialRadius = 1.5;
         this.initialPathogenLoad = 10000;
@@ -64,7 +64,7 @@ public class AttributesTransmissionModelAerosolCloud extends Attributes {
         this.absorptionRate = 0.0005;
     }
 
-    public AttributesTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius, double initialPathogenLoad, double airDispersionFactor, double pedestrianDispersionWeight, double absorptionRate) {
+    public AttributesAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius, double initialPathogenLoad, double airDispersionFactor, double pedestrianDispersionWeight, double absorptionRate) {
         this.halfLife = aerosolCloudHalfLife;
         this.initialRadius = aerosolCloudInitialRadius;
         this.initialPathogenLoad = initialPathogenLoad;

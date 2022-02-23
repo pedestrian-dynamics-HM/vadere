@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.models.AttributesTransmissionModel;
+import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -16,7 +16,7 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
     // Constructors
     public AttributesAerosolCloud() {
         super();
-        this.radius = new AttributesTransmissionModel().getAerosolCloudInitialRadius();
+        this.radius = new AttributesAirTransmissionModel().getAerosolCloudInitialRadius();
         this.center = new VPoint();
     }
 

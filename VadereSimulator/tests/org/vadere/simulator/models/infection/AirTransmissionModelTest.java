@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesTransmissionModel;
+import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -20,15 +20,15 @@ import org.vadere.util.geometry.shapes.*;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.vadere.simulator.models.infection.TransmissionModel.*;
+import static org.vadere.simulator.models.infection.AirTransmissionModel.*;
 import static org.vadere.state.scenario.AerosolCloud.createAerosolCloudShape;
 
-public class TransmissionModelTest {
+public class AirTransmissionModelTest {
     public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
     static final double simTimeStepLength = 0.4;
 
     List<Attributes> attributeList;
-    TransmissionModel transmissionModel;
+    AirTransmissionModel airTransmissionModel;
     Topography topography;
     VadereContext ctx;
 
@@ -42,12 +42,12 @@ public class TransmissionModelTest {
     @Before
     public void setUp() {
         attributeList = getAttributeList();
-        transmissionModel = new TransmissionModel();
+        airTransmissionModel = new AirTransmissionModel();
         topography = new Topography();
         topography.setContextId("testId");
 
         ctx = new VadereContext();
-        ctx.put(TransmissionModel.simStepLength, simTimeStepLength);
+        ctx.put(AirTransmissionModel.simStepLength, simTimeStepLength);
         VadereContext.add(topography.getContextId(), ctx);
 
         circle = createAerosolCloudShape(center, radius);
@@ -62,16 +62,16 @@ public class TransmissionModelTest {
     @Test
     public void testInitializeOk() {
         // initialize must find the AttributesInfectionModel from the  attributeList
-        transmissionModel.initialize(attributeList, new Domain(topography),null,null);
+        airTransmissionModel.initialize(attributeList, new Domain(topography),null,null);
 
-        AttributesTransmissionModel attributesTransmissionModel = transmissionModel.getAttributesTransmissionModel();
+        AttributesAirTransmissionModel attributesAirTransmissionModel = airTransmissionModel.getAttributesAirTransmissionModel();
 
-        Assert.assertEquals(attributeList.get(0), attributesTransmissionModel);
+        Assert.assertEquals(attributeList.get(0), attributesAirTransmissionModel);
     }
 
     public List<Attributes> getAttributeList() {
         ArrayList<Attributes> attrList = new ArrayList<>();
-        var att = new AttributesTransmissionModel();
+        var att = new AttributesAirTransmissionModel();
 
         attrList.add(att);
 
@@ -102,7 +102,7 @@ public class TransmissionModelTest {
     @Test
     public void testUpdateNumberOfGeneratedAerosolClouds() {
 
-        transmissionModel.initialize(attributeList, new Domain(topography),null,null);
+        airTransmissionModel.initialize(attributeList, new Domain(topography),null,null);
 
         createPedestrian(topography, new VPoint(10, 10), 1, -1, true);
 
@@ -111,11 +111,11 @@ public class TransmissionModelTest {
         double simEndTime = 100;
 
         while(simTimeInSec <= simEndTime) {
-            transmissionModel.update(simTimeInSec);
+            airTransmissionModel.update(simTimeInSec);
             simTimeInSec += simTimeStepLength;
         }
 
-        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / transmissionModel.getAttributesTransmissionModel().getPedestrianRespiratoryCyclePeriod());
+        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / airTransmissionModel.getAttributesAirTransmissionModel().getPedestrianRespiratoryCyclePeriod());
         int actualNumberOfAerosolClouds = topography.getAerosolClouds().size();
 
         assertEquals(actualNumberOfAerosolClouds, expectedNumberOfAerosolClouds);

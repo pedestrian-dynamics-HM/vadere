@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.models.infection.AttributesTransmissionModelDroplets;
 import org.vadere.state.scenario.Droplets;
 import org.vadere.util.geometry.shapes.VShape;
 

@@ -2,7 +2,7 @@ package org.vadere.state.health;
 
 import org.vadere.util.geometry.shapes.VPoint;
 
-public class TransmissionModelHealthStatus extends ExposureModelHealthStatus {
+public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus {
 
     private boolean breathingIn;
 
@@ -23,18 +23,18 @@ public class TransmissionModelHealthStatus extends ExposureModelHealthStatus {
     private final static VPoint RESET_EXHALATION_POSITION = null;
 
     // Constructors
-    public TransmissionModelHealthStatus() {
+    public AirTransmissionModelHealthStatus() {
         this(false, 0, RESET_EXHALATION_POSITION);
     }
 
-    public TransmissionModelHealthStatus(boolean breathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
+    public AirTransmissionModelHealthStatus(boolean breathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
         super();
         this.breathingIn = breathingIn;
         this.respiratoryTimeOffset = respiratoryTimeOffset;
         this.exhalationStartPosition = exhalationStartPosition;
     }
 
-    public TransmissionModelHealthStatus(TransmissionModelHealthStatus other) {
+    public AirTransmissionModelHealthStatus(AirTransmissionModelHealthStatus other) {
         super(other.isInfectious(), other.getDegreeOfExposure());
         this.breathingIn = other.isBreathingIn();
         this.respiratoryTimeOffset = other.getRespiratoryTimeOffset();

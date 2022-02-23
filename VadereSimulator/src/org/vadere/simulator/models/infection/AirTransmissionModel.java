@@ -8,12 +8,12 @@ import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesTransmissionModel;
+import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
-import org.vadere.state.health.TransmissionModelHealthStatus;
+import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -29,21 +29,21 @@ import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
 
 /**
  * This class models the spread of infectious pathogen among pedestrians.
- * For this purpose, the TransmissionModel controls the airborne transmission of pathogen from infectious pedestrians to
+ * For this purpose, the AirTransmissionModel controls the airborne transmission of pathogen from infectious pedestrians to
  * other pedestrians, i.e. it
  * <ul>
- *     <li>initializes each pedestrian's {@link TransmissionModelHealthStatus} after a pedestrian is inserted into the topography,</li>
- *     <li>updates the pedestrian's {@link TransmissionModelHealthStatus}</li>
+ *     <li>initializes each pedestrian's {@link AirTransmissionModelHealthStatus} after a pedestrian is inserted into the topography,</li>
+ *     <li>updates the pedestrian's {@link AirTransmissionModelHealthStatus}</li>
  *     <li>creates, updates and deletes each {@link AerosolCloud}</li>
  *     <li>creates, updates and deletes {@link Droplets}</li>
  * </ul>
  */
 @ModelClass
-public class TransmissionModel extends AbstractExposureModel {
+public class AirTransmissionModel extends AbstractExposureModel {
 
-	protected static Logger logger = Logger.getLogger(TransmissionModel.class);
+	protected static Logger logger = Logger.getLogger(AirTransmissionModel.class);
 
-	private AttributesTransmissionModel attrTransmissionModel;
+	private AttributesAirTransmissionModel attrAirTransmissionModel;
 	double simTimeStepLength;
 	Topography topography;
 	int aerosolCloudIdCounter;
@@ -75,7 +75,7 @@ public class TransmissionModel extends AbstractExposureModel {
 			this.domain = domain;
 			this.random = random;
 			this.attributesAgent = attributesPedestrian;
-			this.attrTransmissionModel = Model.findAttributes(attributesList, AttributesTransmissionModel.class);
+			this.attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesAirTransmissionModel.class);
 			this.topography = domain.getTopography();
 			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
 			this.aerosolCloudIdCounter = 1;
@@ -101,26 +101,26 @@ public class TransmissionModel extends AbstractExposureModel {
 	@Override
 	public void update(double simTimeInSec) {
 
-		if (attrTransmissionModel.isAerosolCloudsActive()) {
+		if (attrAirTransmissionModel.isAerosolCloudsActive()) {
 			executeAerosolCloudEmissionEvents(simTimeInSec);
 			updateAerosolClouds(simTimeInSec);
 			updatePedestriansExposureToAerosolClouds();
 		}
 
-		if (attrTransmissionModel.isDropletsActive()) {
+		if (attrAirTransmissionModel.isDropletsActive()) {
 			executeDropletEmissionEvents(simTimeInSec);
 			updateDroplets(simTimeInSec);
 			updatePedestriansExposureToDroplets();
 		}
 
-		if (attrTransmissionModel.isAerosolCloudsActive() || attrTransmissionModel.isDropletsActive()) {
+		if (attrAirTransmissionModel.isAerosolCloudsActive() || attrAirTransmissionModel.isDropletsActive()) {
 			updatePedsHealthStatus(simTimeInSec);
 		}
 	}
 
 	@Override
 	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double deltaDegreeOfExposure) {
-		pedestrian.<TransmissionModelHealthStatus>getHealthStatus().incrementDegreeOfExposure(deltaDegreeOfExposure);
+		pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementDegreeOfExposure(deltaDegreeOfExposure);
 	}
 
 	public void executeAerosolCloudEmissionEvents(double simTimeInSec) {
@@ -150,18 +150,18 @@ public class TransmissionModel extends AbstractExposureModel {
 
 	public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
 
-		if (pedestrian.<TransmissionModelHealthStatus>getHealthStatus().isStartingExhalation()) {
-			pedestrian.<TransmissionModelHealthStatus>getHealthStatus().setExhalationStartPosition(pedestrian.getPosition());
+		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isStartingExhalation()) {
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().setExhalationStartPosition(pedestrian.getPosition());
 
-		} else if (pedestrian.<TransmissionModelHealthStatus>getHealthStatus().isStartingInhalation()) {
-			VPoint startBreatheOutPosition = pedestrian.<TransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
+		} else if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isStartingInhalation()) {
+			VPoint startBreatheOutPosition = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
 			VPoint stopBreatheOutPosition = pedestrian.getPosition();
 			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
 
 			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, distanceWalkedDuringExhalation);
 			topography.addAerosolCloud(aerosolCloud);
 
-			pedestrian.<TransmissionModelHealthStatus>getHealthStatus().resetStartExhalationPosition();
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetStartExhalationPosition();
 		}
 	}
 
@@ -169,11 +169,11 @@ public class TransmissionModel extends AbstractExposureModel {
 		VPoint center = distanceWalkedDuringExhalation.midPoint();
 
 		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(aerosolCloudIdCounter,
-				attrTransmissionModel.getAerosolCloudInitialRadius(),
+				attrAirTransmissionModel.getAerosolCloudInitialRadius(),
 				center,
 				simTimeInSec,
-				attrTransmissionModel.getAerosolCloudInitialPathogenLoad(),
-				attrTransmissionModel.getAerosolCloudInitialPathogenLoad()));
+				attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad(),
+				attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad()));
 
 		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
 
@@ -200,19 +200,19 @@ public class TransmissionModel extends AbstractExposureModel {
 		lastPedestrianPositions.put(pedestrianId, currentPosition);
 
 		// period between two droplet generating respiratory events
-		double dropletExhalationPeriod = 1 / attrTransmissionModel.getDropletsEmissionFrequency();
+		double dropletExhalationPeriod = 1 / attrAirTransmissionModel.getDropletsEmissionFrequency();
 
 		if (simTimeInSec % dropletExhalationPeriod < simTimeStepLength) {
 
 			VShape shape = createTransformedDropletsShape(pedestrian.getPosition(),
 					viewingDirection,
-					attrTransmissionModel.getDropletsDistanceOfSpread(),
-					Math.toRadians(attrTransmissionModel.getDropletsAngleOfSpreadInDeg()));
+					attrAirTransmissionModel.getDropletsDistanceOfSpread(),
+					Math.toRadians(attrAirTransmissionModel.getDropletsAngleOfSpreadInDeg()));
 
 			Droplets droplets = new Droplets(new AttributesDroplets(1,
 					shape,
 					simTimeInSec,
-					attrTransmissionModel.getDropletsPathogenLoad()));
+					attrAirTransmissionModel.getDropletsPathogenLoad()));
 
 			topography.addDroplets(droplets);
 		}
@@ -220,7 +220,7 @@ public class TransmissionModel extends AbstractExposureModel {
 
 	//TODO define recursive; then, if possible, remove property initialPathogenLoad from AerosolCloud
 	public void updateAerosolCloudsPathogenLoad(double simTimeInSec) {
-		double lambda = exponentialDecayFactor / attrTransmissionModel.getAerosolCloudHalfLife();
+		double lambda = exponentialDecayFactor / attrAirTransmissionModel.getAerosolCloudHalfLife();
 
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
@@ -238,18 +238,18 @@ public class TransmissionModel extends AbstractExposureModel {
 			 * Increasing extent due to dispersion, multiplication with simTimeStepLength keeps deltaRadius independent
 			 * of simulation step width
 			 */
-			if (attrTransmissionModel.getAerosolCloudAirDispersionFactor() > 0) {
-				deltaRadius = attrTransmissionModel.getAerosolCloudAirDispersionFactor() * simTimeStepLength;
+			if (attrAirTransmissionModel.getAerosolCloudAirDispersionFactor() > 0) {
+				deltaRadius = attrAirTransmissionModel.getAerosolCloudAirDispersionFactor() * simTimeStepLength;
 			}
 
 			/*
 			 * Increasing extent due to moving air caused by agents, multiplication with simTimeStepLength keeps
 			 * deltaRadius independent of simulation step width
 			 */
-			if (attrTransmissionModel.getAerosolCloudPedestrianDispersionWeight() > 0) {
+			if (attrAirTransmissionModel.getAerosolCloudPedestrianDispersionWeight() > 0) {
 				Collection<Pedestrian> pedestriansInsideCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 			for (Pedestrian pedestrian : pedestriansInsideCloud) {
-				deltaRadius += pedestrian.getVelocity().getLength() * attrTransmissionModel.getAerosolCloudPedestrianDispersionWeight() * simTimeStepLength;
+				deltaRadius += pedestrian.getVelocity().getLength() * attrAirTransmissionModel.getAerosolCloudPedestrianDispersionWeight() * simTimeStepLength;
 			}
 		}
 
@@ -263,8 +263,8 @@ public class TransmissionModel extends AbstractExposureModel {
 	 */
 	public void deleteExpiredAerosolClouds() {
 
-		double initialCloudVolume = AerosolCloud.radiusToVolume(attrTransmissionModel.getAerosolCloudInitialRadius());
-		double initialPathogenConcentration = attrTransmissionModel.getAerosolCloudInitialPathogenLoad() / initialCloudVolume;
+		double initialCloudVolume = AerosolCloud.radiusToVolume(attrAirTransmissionModel.getAerosolCloudInitialRadius());
+		double initialPathogenConcentration = attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad() / initialCloudVolume;
 		double minimumConcentration = minimumPercentage * initialPathogenConcentration;
 
 		Collection<AerosolCloud> aerosolCloudsToBeDeleted = topography.getAerosolClouds()
@@ -279,7 +279,7 @@ public class TransmissionModel extends AbstractExposureModel {
 	public void deleteExpiredDroplets(double simTimeInSec) {
 		Collection<Droplets> dropletsToBeDeleted = topography.getDroplets()
 				.stream()
-				.filter(d -> attrTransmissionModel.getDropletsLifeTime() + d.getCreationTime() < simTimeInSec)
+				.filter(d -> attrAirTransmissionModel.getDropletsLifeTime() + d.getCreationTime() < simTimeInSec)
 				.collect(Collectors.toSet());
 		for (Droplets droplets : dropletsToBeDeleted) {
 			topography.getDroplets().remove(droplets);
@@ -289,8 +289,8 @@ public class TransmissionModel extends AbstractExposureModel {
 	private void updatePedsHealthStatus(double simTimeInSec) {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
-			pedestrian.<TransmissionModelHealthStatus>getHealthStatus()
-					.updateRespiratoryCycle(simTimeInSec, attrTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus()
+					.updateRespiratoryCycle(simTimeInSec, attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		}
 	}
 
@@ -298,13 +298,13 @@ public class TransmissionModel extends AbstractExposureModel {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(p -> p.<TransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
+				.filter(p -> p.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
 				.collect(Collectors.toSet());
 
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption during inhalation
 		// must be divided into absorption for each sim step:
-		double inhalationPeriodLength = attrTransmissionModel.getPedestrianRespiratoryCyclePeriod() / 2.0;
-		double aerosolAbsorptionRatePerSimStep = attrTransmissionModel.getAerosolCloudAbsorptionRate() * (simTimeStepLength / inhalationPeriodLength);
+		double inhalationPeriodLength = attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod() / 2.0;
+		double aerosolAbsorptionRatePerSimStep = attrAirTransmissionModel.getAerosolCloudAbsorptionRate() * (simTimeStepLength / inhalationPeriodLength);
 
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
@@ -324,15 +324,15 @@ public class TransmissionModel extends AbstractExposureModel {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
-				.filter(p -> p.<TransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
+				.filter(p -> p.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
 				.collect(Collectors.toSet());
 
 		/*
 		 * Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption during inhalation
 		 * must be divided into absorption for each sim step:
 		 */
-		double inhalationPeriodLength = attrTransmissionModel.getPedestrianRespiratoryCyclePeriod() / 2.0;
-		double dropletsAbsorptionRatePerSimStep = attrTransmissionModel.getDropletsAbsorptionRate() * (simTimeStepLength / inhalationPeriodLength);
+		double inhalationPeriodLength = attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod() / 2.0;
+		double dropletsAbsorptionRatePerSimStep = attrAirTransmissionModel.getDropletsAbsorptionRate() * (simTimeStepLength / inhalationPeriodLength);
 
 		/*
 		 * Intake of droplets: Inhaling agents simply absorb a fraction of the pathogen from droplets they are exposed
@@ -347,7 +347,7 @@ public class TransmissionModel extends AbstractExposureModel {
 					.collect(Collectors.toSet());
 
 			for (Pedestrian ped : breathingInPedsInDroplets) {
-				double deltaDegreeOfExposure = attrTransmissionModel.getDropletsPathogenLoad() * dropletsAbsorptionRatePerSimStep;
+				double deltaDegreeOfExposure = attrAirTransmissionModel.getDropletsPathogenLoad() * dropletsAbsorptionRatePerSimStep;
 				updatePedestrianDegreeOfExposure(ped, deltaDegreeOfExposure);
 			}
 		}
@@ -367,10 +367,10 @@ public class TransmissionModel extends AbstractExposureModel {
 		AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
-		ped.setHealthStatus(new TransmissionModelHealthStatus());
+		ped.setHealthStatus(new AirTransmissionModelHealthStatus());
 		ped.setInfectious(sourceParameters.isInfectious());
-		ped.<TransmissionModelHealthStatus>getHealthStatus().setRespiratoryTimeOffset(random.nextDouble() * attrTransmissionModel.getPedestrianRespiratoryCyclePeriod());
-		ped.<TransmissionModelHealthStatus>getHealthStatus().setBreathingIn(false);
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setRespiratoryTimeOffset(random.nextDouble() * attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setBreathingIn(false);
 		//TODO check exhalation start position null?
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
@@ -383,13 +383,13 @@ public class TransmissionModel extends AbstractExposureModel {
 	 */
 	private Pedestrian topographyControllerEvent(TopographyController topographyController, double simtimeInSec, Agent agent) {
 		Pedestrian pedestrian = (Pedestrian) agent;
-		TransmissionModelHealthStatus defaultHealthStatus = new TransmissionModelHealthStatus();
+		AirTransmissionModelHealthStatus defaultHealthStatus = new AirTransmissionModelHealthStatus();
 
 		pedestrian.setHealthStatus(defaultHealthStatus);
-		pedestrian.<TransmissionModelHealthStatus>getHealthStatus()
-				.setRespiratoryTimeOffset(random.nextDouble() * attrTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+		pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus()
+				.setRespiratoryTimeOffset(random.nextDouble() * attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 
-		if (attrTransmissionModel.getInfectiousPedestrianIdsNoSource().contains(agent.getId())) {
+		if (attrAirTransmissionModel.getInfectiousPedestrianIdsNoSource().contains(agent.getId())) {
 			pedestrian.setInfectious(true);
 		}
 
@@ -399,25 +399,25 @@ public class TransmissionModel extends AbstractExposureModel {
 	private AttributesExposureModelSourceParameters defineSourceParameters(SourceController controller) {
 		int sourceId = controller.getSourceId();
 		int defaultSourceId = -1;
-		Optional<AttributesExposureModelSourceParameters> sourceParameters = attrTransmissionModel
-				.getTransmissionModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
+		Optional<AttributesExposureModelSourceParameters> sourceParameters = attrAirTransmissionModel
+				.getExposureModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
 
 		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
 		if (sourceParameters.isEmpty()) {
-			sourceParameters = attrTransmissionModel.getTransmissionModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
+			sourceParameters = attrAirTransmissionModel.getExposureModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
 
-			// if no user defined default values: use attributesTransmissionModel default values
+			// if no user defined default values: use attributesAirTransmissionModel default values
 			if (sourceParameters.isPresent()) {
-				logger.infof(">>>>>>>>>>>defineSourceParameters: sourceId %d not set explicitly transmissionModelSourceParameters. Source uses default transmissionModelSourceParameters defined for sourceId: %d", sourceId, defaultSourceId);
+				logger.infof(">>>>>>>>>>>defineSourceParameters: sourceId %d not set explicitly exposureModelSourceParameters. Source uses default exposureModelSourceParameters defined for sourceId: %d", sourceId, defaultSourceId);
 			} else {
-				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in transmissionModelSourceParameters", sourceId);
+				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in exposureModelSourceParameters", sourceId);
 			}
 		}
 			return sourceParameters.get();
 	}
 
-	public AttributesTransmissionModel getAttributesTransmissionModel() {
-		return attrTransmissionModel;
+	public AttributesAirTransmissionModel getAttributesAirTransmissionModel() {
+		return attrAirTransmissionModel;
 	}
 
 	public static Collection<Pedestrian> getDynamicElementsNearAerosolCloud(Topography topography, AerosolCloud aerosolCloud) {
