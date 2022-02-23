@@ -15,7 +15,6 @@ import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Pedestrian extends Agent {
@@ -176,8 +175,8 @@ public class Pedestrian extends Agent {
         return ScenarioElementType.PEDESTRIAN;
     }
 
-    public <T extends ExposureModelHealthStatus> T getHealthStatus(Class<T> modelType) {
-        return modelType.cast(healthStatus);
+    public <T extends ExposureModelHealthStatus> T getHealthStatus() {
+        return (T) healthStatus;
     }
 
     public boolean isInfectious() {
@@ -268,6 +267,14 @@ public class Pedestrian extends Agent {
         return modelPedestrianMap.put(modelPedestrian.getClass(), modelPedestrian);
     }
 
+    public void setHealthStatus(ExposureModelHealthStatus healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
+    public void setInfectionStatus(DoseResponseModelInfectionStatus infectionStatus) {
+        this.infectionStatus = infectionStatus;
+    }
+
     public void setInfectious(boolean infectious) {
         healthStatus.setInfectious(infectious);
     }
@@ -349,21 +356,5 @@ public class Pedestrian extends Agent {
 
     protected void setTargetsOther(LinkedList<Integer> targetIds) {
         super.setTargets(targetIds);
-    }
-
-    public <T> void addInfectionStatus(Class<T> infectionStatusType) {
-        try {
-            infectionStatus = (DoseResponseModelInfectionStatus) infectionStatusType.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public <T> void addHealthStatus(Class<T> healthStatusType) {
-        try {
-            healthStatus = (ExposureModelHealthStatus) healthStatusType.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
     }
 }
