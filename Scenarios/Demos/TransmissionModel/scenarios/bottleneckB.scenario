@@ -128,20 +128,26 @@
           "sourceId" : 5,
           "infectious" : true
         } ],
+        "infectiousPedestrianIdsNoSource" : [ ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
-        "pedestrianPathogenEmissionCapacity" : 4.0,
-        "pedestrianPathogenAbsorptionRate" : 5.0E-4,
-        "pedestrianMinInfectiousDose" : 1000.0,
-        "exposedPeriod" : 432000.0,
-        "infectiousPeriod" : 1209600.0,
-        "recoveredPeriod" : 1.296E7,
-        "aerosolCloudHalfLife" : 120.0,
-        "aerosolCloudInitialRadius" : 1,
-        "dropletsExhalationFrequency" : 0.0,
-        "dropletsDistanceOfSpread" : 1.5,
-        "dropletsAngleOfSpreadInDeg" : 30.0,
-        "dropletsLifeTime" : 1.001,
-        "dropletsPathogenLoadFactor" : 200.0
+        "aerosolCloudsActive" : true,
+        "aerosolCloudParameters" : {
+          "halfLife" : 600.0,
+          "initialRadius" : 1.5,
+          "initialPathogenLoad" : 10000.0,
+          "airDispersionFactor" : 0.0,
+          "pedestrianDispersionWeight" : 0.0125,
+          "absorptionRate" : 5.0E-4
+        },
+        "dropletsActive" : false,
+        "dropletParameters" : {
+          "emissionFrequency" : 0.016666666666666666,
+          "distanceOfSpread" : 1.5,
+          "angleOfSpreadInDeg" : 30.0,
+          "lifeTime" : 1.5,
+          "pathogenLoad" : 10000.0,
+          "absorptionRate" : 0.1
+        }
       }
     },
     "attributesSimulation" : {
