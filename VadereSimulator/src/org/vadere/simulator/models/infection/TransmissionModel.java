@@ -3,6 +3,7 @@ package org.vadere.simulator.models.infection;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.SourceController;
+import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
@@ -84,10 +85,11 @@ public class TransmissionModel extends AbstractExposureModel {
 
 	@Override
 	public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
-		// ToDo: controllerProvider should be handled by initialize method (this requires changes in all models)
+		// ToDo: controllerProvider could be handled by initialize method (this requires changes in all models)
 		for (var controller : controllerProvider.getSourceControllers()){
 			controller.register(this::sourceControllerEvent);
 		}
+		controllerProvider.getTopographyController().register(this::topographyControllerEvent);
 	}
 
 	@Override
@@ -179,7 +181,6 @@ public class TransmissionModel extends AbstractExposureModel {
 	}
 
 	private void createDroplets(double simTimeInSec, Pedestrian pedestrian) {
-		// ToDo: refactor: it could be better to have the walking directions stored in pedestrian
 		int pedestrianId = pedestrian.getId();
 		Vector2D viewingDirection;
 		VPoint currentPosition = pedestrian.getPosition();
@@ -374,6 +375,25 @@ public class TransmissionModel extends AbstractExposureModel {
 
 		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
+	}
+
+	/*
+	 * The TopographyController assures that each pedestrian that is directly set into the topography obtains a health
+	 * status.
+	 */
+	private Pedestrian topographyControllerEvent(TopographyController topographyController, double simtimeInSec, Agent agent) {
+		Pedestrian pedestrian = (Pedestrian) agent;
+		TransmissionModelHealthStatus defaultHealthStatus = new TransmissionModelHealthStatus();
+
+		pedestrian.setHealthStatus(defaultHealthStatus);
+		pedestrian.<TransmissionModelHealthStatus>getHealthStatus()
+				.setRespiratoryTimeOffset(random.nextDouble() * attrTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+
+		if (attrTransmissionModel.getInfectiousPedestrianIdsNoSource().contains(agent.getId())) {
+			pedestrian.setInfectious(true);
+		}
+
+		return pedestrian;
 	}
 
 	private AttributesExposureModelSourceParameters defineSourceParameters(SourceController controller) {

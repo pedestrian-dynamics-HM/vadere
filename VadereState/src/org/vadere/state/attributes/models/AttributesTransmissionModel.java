@@ -2,7 +2,6 @@ package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesEmbedShape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +30,12 @@ public class AttributesTransmissionModel extends Attributes {
 	private ArrayList<AttributesExposureModelSourceParameters> transmissionModelSourceParameters;
 
 	/**
+	 * Contains the Ids of pedestrians that are directly set into the topography (and not spawned by  sources).
+	 * Any agent contained in the list is infectious. All others (not spawned by sources) are not infectious.
+	 */
+	private ArrayList<Integer> infectiousPedestrianIdsNoSource;
+
+	/**
 	 * Attribute related to the pedestrians' health state that is shared among all pedestrians. It is not defined
 	 * for each instance of TransmissionModelHealthStatus separately to keep the TransmissionModelHealthStatus lean.
 	 * pedestrianRespiratoryCyclePeriod equals 1/(pedestrians' average breathing rate) in seconds.
@@ -51,7 +56,8 @@ public class AttributesTransmissionModel extends Attributes {
 
 
 	public AttributesTransmissionModel() {
-		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters(AttributesEmbedShape.ID_NOT_SET, false)));
+		this.transmissionModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters()));
+		this.infectiousPedestrianIdsNoSource = new ArrayList<>();
 
 		this.pedestrianRespiratoryCyclePeriod = 4;
 
@@ -70,6 +76,10 @@ public class AttributesTransmissionModel extends Attributes {
 
 	public ArrayList<AttributesExposureModelSourceParameters> getTransmissionModelSourceParameters() {
 		return transmissionModelSourceParameters;
+	}
+
+	public ArrayList<Integer> getInfectiousPedestrianIdsNoSource() {
+		return infectiousPedestrianIdsNoSource;
 	}
 
 	public boolean isAerosolCloudsActive() {
