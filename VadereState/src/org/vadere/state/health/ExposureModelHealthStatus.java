@@ -31,4 +31,9 @@ public abstract class ExposureModelHealthStatus {
     public void setDegreeOfExposure(double degreeOfExposure) {
         this.degreeOfExposure = degreeOfExposure;
     }
+
+    // Methods
+    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
+        this.degreeOfExposure += deltaDegreeOfExposure;
+    }
 }

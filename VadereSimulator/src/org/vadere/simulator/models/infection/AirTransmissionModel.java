@@ -120,7 +120,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	@Override
 	public void updatePedestrianDegreeOfExposure(Pedestrian pedestrian, double deltaDegreeOfExposure) {
-		pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementDegreeOfExposure(deltaDegreeOfExposure);
+		pedestrian.incrementDegreeOfExposure(deltaDegreeOfExposure);
 	}
 
 	public void executeAerosolCloudEmissionEvents(double simTimeInSec) {

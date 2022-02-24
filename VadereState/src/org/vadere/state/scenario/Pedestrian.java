@@ -283,6 +283,10 @@ public class Pedestrian extends Agent {
         healthStatus.setDegreeOfExposure(degreeOfExposure);
     }
 
+    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
+        healthStatus.incrementDegreeOfExposure(deltaDegreeOfExposure);
+    }
+
     public void setProbabilityOfInfection(double probabilityOfInfection) {
         infectionStatus.setProbabilityOfInfection(probabilityOfInfection);
     }

@@ -90,10 +90,6 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
 
     // Methods
 
-    public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
-        this.degreeOfExposure += deltaDegreeOfExposure;
-    }
-
     /*
      * Defines whether the pedestrian inhales or exhales depending on the current simulation time,
      * respiratoryTimeOffset, and periodLength. Assumes that periodLength for inhalation and exhalation are equally
