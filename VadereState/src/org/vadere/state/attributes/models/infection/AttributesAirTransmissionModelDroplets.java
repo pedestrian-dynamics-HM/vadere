@@ -1,34 +1,42 @@
 package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesDroplets;
+import org.vadere.state.scenario.Droplets;
 
 /**
  * Attributes related to droplets that are shared among all droplets. These are not defined for each
- * instance of Droplets separately to keep Droplets lean.
+ * instance of {@link Droplets} separately to keep the class lean.
  */
 public class AttributesAirTransmissionModelDroplets extends Attributes {
 
     /**
-     * Unit: 1/second
+     * Describes how often {@link Droplets} are emitted by an infectious pedestrian.
+     * Unit: 1 / second
      */
     private double emissionFrequency;
 
     /**
+     * Describes the shape of {@link AttributesDroplets}: Radius of the circular segment.
      * Unit: meter
      */
     private double distanceOfSpread;
 
     /**
+     * Describes the shape of {@link AttributesDroplets}: Angle of the circular segment.
      * Unit: degree
      */
     private double angleOfSpreadInDeg;
 
     /**
+     * Describes the persistence of {@link Droplets}.
      * Unit: second
      */
     private double lifeTime;
 
     /**
+     * Describes the pathogen load within {@link Droplets}. It remains constant over
+     * {@link #lifeTime}.
      * Unit: particles
      */
     private double pathogenLoad;
@@ -72,29 +80,4 @@ public class AttributesAirTransmissionModelDroplets extends Attributes {
     public double getAbsorptionRate() {
         return absorptionRate;
     }
-
-    public void setEmissionFrequency(double emissionFrequency) {
-        this.emissionFrequency = emissionFrequency;
-    }
-
-    public void setDistanceOfSpread(double distanceOfSpread) {
-        this.distanceOfSpread = distanceOfSpread;
-    }
-
-    public void setAngleOfSpreadInDeg(double angleOfSpreadInDeg) {
-        this.angleOfSpreadInDeg = angleOfSpreadInDeg;
-    }
-
-    public void setLifeTime(double lifeTime) {
-        this.lifeTime = lifeTime;
-    }
-
-    public void setPathogenLoad(double pathogenLoad) {
-        this.pathogenLoad = pathogenLoad;
-    }
-
-    public void setAbsorptionRate(double absorptionRate) {
-        this.absorptionRate = absorptionRate;
-    }
-
 }

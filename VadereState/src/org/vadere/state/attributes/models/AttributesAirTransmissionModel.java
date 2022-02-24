@@ -8,22 +8,15 @@ import org.vadere.state.attributes.models.infection.AttributesExposureModel;
 import org.vadere.state.scenario.*;
 
 /**
- * This class defines the attributes of the corresponding exposure model. All attributes are defined by the user and
- * relate to
- * <ul>
- *     <li>the AirTransmissionModel: {@link #exposureModelSourceParameters}, {@link #pedestrianRespiratoryCyclePeriod}</li>
- *     <li>the {@link AirTransmissionModelHealthStatus} of the {@link Pedestrian}s</li>
- *     <li>the {@link AerosolCloud}s' initial attributes when they are created by the AirTransmissionModel</li>
- *     <li>the {@link Droplets}s' initial attributes when they are created by the AirTransmissionModel</li>
- * </ul>
+ * Attributes related to the corresponding exposure model. They define properties of {@link Pedestrian}s,
+ * {@link AerosolCloud}s, and {@link Droplets} that are equal for all instances of each class.
  */
 @ModelAttributeClass
 public class AttributesAirTransmissionModel extends AttributesExposureModel {
 
 	/**
-	 * Attribute related to the pedestrians' health state that is shared among all pedestrians. It is not defined
-	 * for each instance of AirTransmissionModelHealthStatus separately to keep the AirTransmissionModelHealthStatus lean.
-	 * pedestrianRespiratoryCyclePeriod equals 1/(pedestrians' average breathing rate) in seconds.
+	 * Equals 1/(pedestrians' average breathing rate).
+	 * Unit: seconds
 	 */
 	private double pedestrianRespiratoryCyclePeriod;
 
@@ -114,39 +107,5 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 
 	public double getDropletsAbsorptionRate() {
 		return dropletParameters.getAbsorptionRate();
-	}
-
-	// Setter
-
-	public void setAerosolCloudsActive(boolean aerosolCloudsActive) {
-		this.aerosolCloudsActive = aerosolCloudsActive;
-	}
-
-	public void setAerosolCloudHalfLife(double aerosolCloudHalfLife) {
-		this.aerosolCloudParameters.setHalfLife(aerosolCloudHalfLife);
-	}
-
-	public void setAerosolCloudInitialRadius(double aerosolCloudInitialRadius) {
-		this.aerosolCloudParameters.setInitialRadius(aerosolCloudInitialRadius);
-	}
-
-	public void setAerosolCloudInitialPathogenLoad(double aerosolCloudInitialPathogenLoad) {
-		this.aerosolCloudParameters.setInitialPathogenLoad(aerosolCloudInitialPathogenLoad);
-	}
-
-	public void setAerosolCloudAirDispersionFactor(double aerosolCloudAirDispersionFactor) {
-		this.aerosolCloudParameters.setAirDispersionFactor(aerosolCloudAirDispersionFactor);
-	}
-
-	public void setAerosolCloudPedestrianDispersionWeight(double aerosolCloudPedestrianDispersionWeight) {
-		this.aerosolCloudParameters.setPedestrianDispersionWeight(aerosolCloudPedestrianDispersionWeight);
-	}
-
-	public void setAerosolCloudAbsorptionRate(double aerosolCloudAbsorptionRate) {
-		this.aerosolCloudParameters.setAbsorptionRate(aerosolCloudAbsorptionRate);
-	}
-
-	public void setDropletsActive(boolean dropletsActive) {
-		this.dropletsActive = dropletsActive;
 	}
 }

@@ -2,12 +2,13 @@ package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
+import org.vadere.state.scenario.AerosolCloud;
 
 /**
  * Attributes related to aerosol clouds that are shared among all aerosol clouds. These are not defined for each
- * instance of AerosolCloud separately to keep the AerosolCloud lean.
- * The frequency of occurrence is not defined here because aerosolClouds (if considered in the model) are directly
- * linked to the respiratory cycle defined in {@link AttributesAirTransmissionModel}.
+ * instance of {@link AerosolCloud} separately to keep the class lean.
+ * The frequency of occurrence is not defined here because {@link AerosolCloud}s (if considered in the exposure model)
+ * are directly linked to the respiratory cycle defined in {@link AttributesAirTransmissionModel}.
  */
 public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
 
@@ -97,31 +98,5 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
 
     public double getAbsorptionRate() {
         return absorptionRate;
-    }
-
-    // Setter
-
-    public void setHalfLife(double halfLife) {
-        this.halfLife = halfLife;
-    }
-
-    public void setInitialRadius(double initialRadius) {
-        this.initialRadius = initialRadius;
-    }
-
-    public void setInitialPathogenLoad(double initialPathogenLoad) {
-        this.initialPathogenLoad = initialPathogenLoad;
-    }
-
-    public void setAirDispersionFactor(double airDispersionFactor) {
-        this.airDispersionFactor = airDispersionFactor;
-    }
-
-    public void setPedestrianDispersionWeight(double pedestrianDispersionWeight) {
-        this.pedestrianDispersionWeight = pedestrianDispersionWeight;
-    }
-
-    public void setAbsorptionRate(double absorptionRate) {
-        this.absorptionRate = absorptionRate;
     }
 }
