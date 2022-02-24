@@ -125,7 +125,7 @@
           "height" : 1.0
         }
       },
-      "org.vadere.state.attributes.models.AttributesAirTransmissionModel" : {
+      "org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel" : {
         "exposureModelSourceParameters" : [ {
           "sourceId" : 15,
           "infectious" : false

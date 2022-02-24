@@ -1,4 +1,4 @@
-package org.vadere.state.attributes.models;
+package org.vadere.state.attributes.models.infection;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 

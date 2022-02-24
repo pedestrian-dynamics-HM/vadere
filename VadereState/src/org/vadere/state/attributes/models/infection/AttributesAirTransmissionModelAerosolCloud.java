@@ -1,7 +1,6 @@
 package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
 import org.vadere.state.scenario.AerosolCloud;
 
 /**

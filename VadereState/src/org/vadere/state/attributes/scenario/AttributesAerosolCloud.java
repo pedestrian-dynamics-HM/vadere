@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.models.AttributesAirTransmissionModel;
+import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
