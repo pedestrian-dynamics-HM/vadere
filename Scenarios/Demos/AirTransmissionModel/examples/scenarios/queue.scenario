@@ -1,8 +1,8 @@
 {
-  "name" : "queueScenario_publication",
+  "name" : "queue",
   "description" : "",
   "release" : "2.0",
-  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
+  "commithash" : "9d0fc8b34cc51cd7724fdc52b3673423e4b08886",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -143,7 +143,7 @@
           "height" : 1.0
         }
       },
-      "org.vadere.state.attributes.models.AttributesAirTransmissionModel" : {
+      "org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel" : {
         "exposureModelSourceParameters" : [ {
           "sourceId" : 1,
           "infectious" : false
