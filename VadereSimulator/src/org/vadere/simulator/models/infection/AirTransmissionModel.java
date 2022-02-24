@@ -364,7 +364,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
 		// SourceControllerListener. This will be called  *after* a pedestrian is inserted into the
 		// topography by the given SourceController. Change model state on Agent here
-		AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller);
+		AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller, attrAirTransmissionModel);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setHealthStatus(new AirTransmissionModelHealthStatus());
@@ -393,26 +393,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 
 		return pedestrian;
-	}
-
-	private AttributesExposureModelSourceParameters defineSourceParameters(SourceController controller) {
-		int sourceId = controller.getSourceId();
-		int defaultSourceId = -1;
-		Optional<AttributesExposureModelSourceParameters> sourceParameters = attrAirTransmissionModel
-				.getExposureModelSourceParameters().stream().filter(s -> s.getSourceId() == sourceId).findFirst();
-
-		// if sourceId not set by user, check if the user has defined default attributes by setting sourceId = -1
-		if (sourceParameters.isEmpty()) {
-			sourceParameters = attrAirTransmissionModel.getExposureModelSourceParameters().stream().filter(s -> s.getSourceId() == defaultSourceId).findFirst();
-
-			// if no user defined default values: use attributesAirTransmissionModel default values
-			if (sourceParameters.isPresent()) {
-				logger.infof(">>>>>>>>>>>defineSourceParameters: sourceId %d not set explicitly exposureModelSourceParameters. Source uses default exposureModelSourceParameters defined for sourceId: %d", sourceId, defaultSourceId);
-			} else {
-				logger.errorf(">>>>>>>>>>>defineSourceParameters: sourceId %d is not set in exposureModelSourceParameters", sourceId);
-			}
-		}
-			return sourceParameters.get();
 	}
 
 	public AttributesAirTransmissionModel getAttributesAirTransmissionModel() {
