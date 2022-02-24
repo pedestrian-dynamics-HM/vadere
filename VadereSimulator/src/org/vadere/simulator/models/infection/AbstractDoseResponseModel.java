@@ -15,8 +15,6 @@ import java.util.Random;
 
 public abstract class AbstractDoseResponseModel implements Model {
 
-    // add default implementations and shared fields here to keep ExposureModel interface clean
-
     protected static Logger logger = Logger.getLogger(AbstractDoseResponseModel.class);
 
     // this random provider everywhere to keep simulation reproducible
