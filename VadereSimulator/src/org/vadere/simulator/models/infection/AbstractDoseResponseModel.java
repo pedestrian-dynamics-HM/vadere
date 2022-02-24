@@ -22,15 +22,17 @@ public abstract class AbstractDoseResponseModel implements Model {
     protected Domain domain;
     protected AttributesAgent attributesAgent;
 
-    /*
-     * This will be called  *after* a pedestrian is inserted into the topography by the given SourceController.
-     * Change model state on Agent here
-     */
-    @Override
+        @Override
     public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
+        /*
+         * This will be called *after* a pedestrian is inserted into the topography by the given SourceController.
+         * Change model state on Agent here.
+         * ControllerProvider could also be handled by initialize method (this requires changes in all models)
+         */
         for (var controller : controllerProvider.getSourceControllers()){
             controller.register(this::sourceControllerEvent);
         }
+
         controllerProvider.getTopographyController().register(this::topographyControllerEvent);
     }
 

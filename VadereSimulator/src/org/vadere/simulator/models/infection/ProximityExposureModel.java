@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.scenarioelements.TopographyController;
-import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -48,14 +47,6 @@ public class ProximityExposureModel extends AbstractExposureModel {
         this.attributesAgent = attributesPedestrian;
         this.attributesProximityExposureModel = Model.findAttributes(attributesList, AttributesProximityExposureModel.class);
         this.topography = domain.getTopography();
-    }
-
-    @Override
-    public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
-        for (var controller : controllerProvider.getSourceControllers()){
-            controller.register(this::sourceControllerEvent);
-        }
-        controllerProvider.getTopographyController().register(this::topographyControllerEvent);
     }
 
     @Override
@@ -108,24 +99,18 @@ public class ProximityExposureModel extends AbstractExposureModel {
         pedestrian.setDegreeOfExposure(degreeOfExposure);
     }
 
+    @Override
     public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
-        // SourceControllerListener. This will be called  *after* a pedestrian is inserted into the
-        // topography by the given SourceController. Change model state on Agent here
         AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller, attributesProximityExposureModel);
 
         Pedestrian ped = (Pedestrian) scenarioElement;
         ped.setHealthStatus(new ProximityExposureModelHealthStatus());
         ped.setInfectious(sourceParameters.isInfectious());
-
-        logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
         return ped;
     }
 
-    /*
-     * The TopographyController assures that each pedestrian that is directly set into the topography obtains a health
-     * status.
-     */
-    private Pedestrian topographyControllerEvent(TopographyController topographyController, double simTimeInSec, Agent agent) {
+    @Override
+    public Pedestrian topographyControllerEvent(TopographyController topographyController, double simTimeInSec, Agent agent) {
         Pedestrian pedestrian = (Pedestrian) agent;
 
         pedestrian.setHealthStatus(new ProximityExposureModelHealthStatus());

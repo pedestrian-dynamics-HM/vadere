@@ -84,15 +84,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	}
 
 	@Override
-	public void registerToScenarioElementControllerEvents(ControllerProvider controllerProvider) {
-		// ToDo: controllerProvider could be handled by initialize method (this requires changes in all models)
-		for (var controller : controllerProvider.getSourceControllers()){
-			controller.register(this::sourceControllerEvent);
-		}
-		controllerProvider.getTopographyController().register(this::topographyControllerEvent);
-	}
-
-	@Override
 	public void preLoop(double simTimeInSec) {}
 
 	@Override
@@ -361,9 +352,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 				.collect(Collectors.toSet());
 	}
 
+	@Override
 	public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
-		// SourceControllerListener. This will be called  *after* a pedestrian is inserted into the
-		// topography by the given SourceController. Change model state on Agent here
 		AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller, attrAirTransmissionModel);
 
 		Pedestrian ped = (Pedestrian) scenarioElement;
@@ -371,16 +361,11 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		ped.setInfectious(sourceParameters.isInfectious());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setRespiratoryTimeOffset(random.nextDouble() * attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setBreathingIn(false);
-
-		logger.infof(">>>>>>>>>>>sourceControllerEvent at time: %f  agentId: %d", simTimeInSec, scenarioElement.getId());
 		return ped;
 	}
 
-	/*
-	 * The TopographyController assures that each pedestrian that is directly set into the topography obtains a health
-	 * status.
-	 */
-	private Pedestrian topographyControllerEvent(TopographyController topographyController, double simtimeInSec, Agent agent) {
+	@Override
+	public Pedestrian topographyControllerEvent(TopographyController topographyController, double simtimeInSec, Agent agent) {
 		Pedestrian pedestrian = (Pedestrian) agent;
 		AirTransmissionModelHealthStatus defaultHealthStatus = new AirTransmissionModelHealthStatus();
 

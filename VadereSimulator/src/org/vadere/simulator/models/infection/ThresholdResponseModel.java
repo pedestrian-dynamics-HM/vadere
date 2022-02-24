@@ -63,7 +63,7 @@ public class ThresholdResponseModel extends AbstractDoseResponseModel {
     public void update(double simTimeInSec) {
 
         /*
-         * Here we update the infection status at each simulation step. This could also be done once at the end of the
+         * Here, we update the infection status at each simulation step. This could also be done once at the end of the
          * simulation. However, this solution is useful if one wants to know when/where the threshold is exceeded.
          */
         Collection<Pedestrian> exposedPedestrians = topography.getPedestrianDynamicElements()
