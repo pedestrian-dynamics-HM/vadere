@@ -1,18 +1,11 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.state.attributes.Attributes;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelAerosolCloud;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelDroplets;
-import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
-import org.vadere.state.health.AirTransmissionModelHealthStatus;
-import org.vadere.state.scenario.AerosolCloud;
-import org.vadere.state.scenario.Droplets;
-import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.attributes.models.infection.AttributesExposureModel;
+import org.vadere.state.scenario.*;
 
 /**
  * This class defines the attributes of the corresponding exposure model. All attributes are defined by the user and
@@ -25,15 +18,7 @@ import org.vadere.state.scenario.Pedestrian;
  * </ul>
  */
 @ModelAttributeClass
-public class AttributesAirTransmissionModel extends Attributes {
-
-	private ArrayList<AttributesExposureModelSourceParameters> exposureModelSourceParameters;
-
-	/**
-	 * Contains the Ids of pedestrians that are directly set into the topography (and not spawned by  sources).
-	 * Any agent contained in the list is infectious. All others (not spawned by sources) are not infectious.
-	 */
-	private ArrayList<Integer> infectiousPedestrianIdsNoSource;
+public class AttributesAirTransmissionModel extends AttributesExposureModel {
 
 	/**
 	 * Attribute related to the pedestrians' health state that is shared among all pedestrians. It is not defined
@@ -46,6 +31,8 @@ public class AttributesAirTransmissionModel extends Attributes {
 	 * Defines whether aerosol clouds are considered in the exposure model (true) or not (false).
 	 */
 	private boolean aerosolCloudsActive;
+
+
 	private AttributesAirTransmissionModelAerosolCloud aerosolCloudParameters;
 
 	/**
@@ -56,8 +43,7 @@ public class AttributesAirTransmissionModel extends Attributes {
 
 
 	public AttributesAirTransmissionModel() {
-		this.exposureModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters()));
-		this.infectiousPedestrianIdsNoSource = new ArrayList<>();
+		super();
 
 		this.pedestrianRespiratoryCyclePeriod = 4;
 
@@ -72,14 +58,6 @@ public class AttributesAirTransmissionModel extends Attributes {
 
 	public double getPedestrianRespiratoryCyclePeriod() {
 		return pedestrianRespiratoryCyclePeriod;
-	}
-
-	public ArrayList<AttributesExposureModelSourceParameters> getExposureModelSourceParameters() {
-		return exposureModelSourceParameters;
-	}
-
-	public ArrayList<Integer> getInfectiousPedestrianIdsNoSource() {
-		return infectiousPedestrianIdsNoSource;
 	}
 
 	public boolean isAerosolCloudsActive() {
