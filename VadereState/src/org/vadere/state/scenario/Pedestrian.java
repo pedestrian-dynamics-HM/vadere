@@ -179,6 +179,10 @@ public class Pedestrian extends Agent {
         return (T) healthStatus;
     }
 
+    public <T extends DoseResponseModelInfectionStatus> T getInfectionStatus() {
+        return (T) infectionStatus;
+    }
+
     public boolean isInfectious() {
         return healthStatus.isInfectious();
     }
@@ -291,7 +295,9 @@ public class Pedestrian extends Agent {
         infectionStatus.setProbabilityOfInfection(probabilityOfInfection);
     }
 
-
+    public void setProbabilityOfInfectionToMax() {
+        infectionStatus.setProbabilityOfInfectionToMax();
+    }
 
     // Methods
     public boolean isTarget() {
