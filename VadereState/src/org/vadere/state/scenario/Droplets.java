@@ -12,7 +12,7 @@ import org.vadere.util.geometry.shapes.Vector2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 
-public class Droplets extends InfectiousParticleDispersion {
+public class Droplets extends ParticleDispersion {
 
     private AttributesDroplets attributes;
     final static int numberOfCircularSections = 5;

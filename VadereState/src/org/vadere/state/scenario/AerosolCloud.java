@@ -19,7 +19,7 @@ import org.vadere.util.geometry.shapes.*;
  *     concentration</li>
  * </ul>
  */
-public class AerosolCloud extends InfectiousParticleDispersion {
+public class AerosolCloud extends ParticleDispersion {
 
     private AttributesAerosolCloud attributes;
 
