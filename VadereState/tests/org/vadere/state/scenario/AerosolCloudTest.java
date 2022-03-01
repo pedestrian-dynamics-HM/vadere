@@ -30,7 +30,7 @@ public class AerosolCloudTest {
         double creationTime = 0;
         double initialPathogenLoad = 10e4;
 
-        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, radius, center, creationTime, initialPathogenLoad, initialPathogenLoad);
+        AttributesAerosolCloud attributesCirc = new AttributesAerosolCloud(id, radius, center, creationTime, initialPathogenLoad);
         aerosolCloudCirc = new AerosolCloud(attributesCirc);
     }
 
@@ -63,7 +63,7 @@ public class AerosolCloudTest {
         double pathogenLoad = 10e9;
         double lifeTime = 60*60*3;
 
-        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, radius, center, creationTime, pathogenLoad, pathogenLoad));
+        AerosolCloud aerosolCloudOriginal = new AerosolCloud(new AttributesAerosolCloud(id, radius, center, creationTime, pathogenLoad));
         AerosolCloud aerosolCloudClone = aerosolCloudOriginal.clone();
 
         Assert.assertEquals(aerosolCloudOriginal.getId(), aerosolCloudClone.getId());

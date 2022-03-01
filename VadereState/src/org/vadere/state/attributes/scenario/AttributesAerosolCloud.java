@@ -20,16 +20,14 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
         this.center = new VPoint();
     }
 
-    public AttributesAerosolCloud(VShape shape, double creationTime){
-        super(creationTime, shape);
+    public AttributesAerosolCloud(int id, double radius, VPoint center, double currentPathogenLoad) {
+        super(id, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
+        this.radius = radius;
+        this.center = center;
     }
 
-    public AttributesAerosolCloud(int id, double radius, VPoint center, double currentPathogenLoad){
-        super(id, AerosolCloud.createAerosolCloudShape(center, radius), currentPathogenLoad);
-    }
-
-    public AttributesAerosolCloud(int id, double radius, VPoint center, double creationTime, double initialPathogenLoad, double currentPathogenLoad) {
-        super(id, creationTime, initialPathogenLoad, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
+    public AttributesAerosolCloud(int id, double radius, VPoint center, double creationTime, double currentPathogenLoad) {
+        super(id, creationTime, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
         this.radius = radius;
         this.center = center;
     }

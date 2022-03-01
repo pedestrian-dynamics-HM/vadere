@@ -18,6 +18,6 @@ public class AttributesDroplets extends AttributesParticleDispersion {
 
 
     public AttributesDroplets(int id, VShape shape, double creationTime, double initialPathogenLoad) {
-        super(id, creationTime, initialPathogenLoad, initialPathogenLoad, shape);
+        super(id, creationTime, initialPathogenLoad, shape);
     }
 }

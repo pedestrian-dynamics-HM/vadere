@@ -4,7 +4,6 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.scenarioelements.TopographyController;
-import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -64,7 +63,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	private static final double exponentialDecayFactor = Math.log(2.0);
 
 	/**
-	 * minimumPercentage defines a percentage of the initial pathogen concentration
+	 * Defines a percentage of the initial pathogen concentration
 	 * (pathogenLoad / aerosolCloud.volume); As soon as an aerosolCloud has reached the minimum concentration, the
 	 * aerosolCloud is considered negligible and therefore deleted
 	 */
@@ -163,7 +162,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 				attrAirTransmissionModel.getAerosolCloudInitialRadius(),
 				center,
 				simTimeInSec,
-				attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad(),
 				attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad()));
 
 		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
@@ -216,7 +214,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			double t = simTimeInSec - aerosolCloud.getCreationTime();
-			aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getInitialPathogenLoad() * Math.exp(-lambda * t));
+			aerosolCloud.setCurrentPathogenLoad(attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad() * Math.exp(-lambda * t));
 		}
 	}
 

@@ -85,10 +85,6 @@ public class AerosolCloud extends InfectiousParticleDispersion {
         return attributes.getCreationTime();
     }
 
-    public double getInitialPathogenLoad() {
-        return attributes.getInitialPathogenLoad();
-    }
-
     public double getCurrentPathogenLoad() {
         return attributes.getCurrentPathogenLoad();
     }

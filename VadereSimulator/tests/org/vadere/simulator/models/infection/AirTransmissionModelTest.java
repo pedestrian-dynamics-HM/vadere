@@ -125,7 +125,7 @@ public class AirTransmissionModelTest {
     public void throwIfPedestrianInsideAerosolCloudNotDetected() {
         Topography topography = new Topography();
         createPedestrian(topography, new VPoint(10, 10), 1, -1, false);
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(new VCircle(new VPoint(10, 10), 1), 0.0));
+        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
         topography.addAerosolCloud(aerosolCloud);
         boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
 
@@ -136,7 +136,7 @@ public class AirTransmissionModelTest {
     public void throwIfPedestrianOutsideAerosolCloudConsideredInside() {
         Topography topography = new Topography();
         createPedestrian(topography, new VPoint(5, 5), 1, -1, false);
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(new VCircle(new VPoint(10, 10), 1), 0.0));
+        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
         topography.addAerosolCloud(aerosolCloud);
         boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
 
@@ -146,7 +146,7 @@ public class AirTransmissionModelTest {
     @Test
     public void testGetPedestriansInsideAerosolCloud() {
         Topography topography = new Topography();
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(new VCircle(new VPoint(10, 10), 1), 0.0));
+        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
         aerosolCloud.setId(1);
         topography.addAerosolCloud(aerosolCloud);
         // pedestrians outside cloud
