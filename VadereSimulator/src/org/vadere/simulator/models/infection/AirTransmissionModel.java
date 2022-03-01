@@ -27,14 +27,25 @@ import java.util.stream.Collectors;
 import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
 
 /**
- * This class models the spread of infectious pathogen among pedestrians.
- * For this purpose, the AirTransmissionModel controls the airborne transmission of pathogen from infectious pedestrians to
- * other pedestrians, i.e. it
+ * AirTransmissionModel describes the transmission of pathogen from one
+ * <code>Pedestrian</code> to another via <code>ParticleDispersion</code> that
+ * move through the air.
+ * <p>
+ *     This particle dispersion can either be described as {@link AerosolCloud
+ *     AerosolClouds}, which are carried by air for a longer period, or by {@link
+ *     Droplets}, which remain in the air only for short.
+ *     Whether aerosol clouds and/or droplets are considered, is defined in
+ *     {@link AttributesAirTransmissionModel}.
+ * </p>
+ * <p> <code>AirTransmissionModel</code> contains the logic, that is:
  * <ul>
- *     <li>initializes each pedestrian's {@link AirTransmissionModelHealthStatus} after a pedestrian is inserted into the topography,</li>
- *     <li>updates the pedestrian's {@link AirTransmissionModelHealthStatus}</li>
- *     <li>creates, updates and deletes each {@link AerosolCloud}</li>
- *     <li>creates, updates and deletes {@link Droplets}</li>
+ *     <li>Each pedestrian obtains a {@link AirTransmissionModelHealthStatus health
+ *     status} after being inserted into the topography.</li>
+ *     <li>Infectious pedestrians emit pathogen contained in aerosol
+ *     clouds or droplets.</li>
+ *     <li>Pedestrians health status, aerosol clouds, droplets</li>
+ *     <li>The <code>AirTransmissionModel</code> deletes aerosol clouds and
+ *     droplets once they have reached a minimum pathogen concentration.</li>
  * </ul>
  */
 @ModelClass

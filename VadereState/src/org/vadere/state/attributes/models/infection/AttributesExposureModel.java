@@ -5,6 +5,10 @@ import org.vadere.state.attributes.Attributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * AttributesExposureModel contains user-defined properties describing the
+ * <code>AbstractExposureModel</code>.
+ */
 public abstract class AttributesExposureModel extends Attributes {
 
     private ArrayList<AttributesExposureModelSourceParameters> exposureModelSourceParameters;

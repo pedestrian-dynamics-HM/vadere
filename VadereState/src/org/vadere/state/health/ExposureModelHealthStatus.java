@@ -1,5 +1,15 @@
 package org.vadere.state.health;
 
+/**
+ * ExposureModelHealthStatus is the abstract base class for all types of exposure
+ * a <code>Pedestrian</code> can adopt.
+ * <p>
+ *     It describes the degree to which a <code>Pedestrian</code> is exposed to
+ *     infectious pathogens, or in a more abstract sense, to other (infectious)
+ *     agents. The degree of exposure is defined by the underlying
+ *     <code>AbstractExposureModel</code>.
+ * </p>
+ */
 public abstract class ExposureModelHealthStatus {
 
     boolean infectious;

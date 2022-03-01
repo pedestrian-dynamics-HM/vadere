@@ -1,8 +1,12 @@
 package org.vadere.state.attributes.models.infection;
 
-
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 
+
+/**
+ * AttributesProximityExposureModel contains user-defined properties related to
+ * the <code>ProximityExposureModel</code>.
+ */
 @ModelAttributeClass
 public class AttributesProximityExposureModel extends AttributesExposureModel {
 

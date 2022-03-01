@@ -1,5 +1,16 @@
 package org.vadere.state.health;
 
+/**
+ * DoseResponseModelInfectionStatus is the abstract base class for all infection
+ * statuses a <code>Pedestrian</code> can adopt.
+ * <p>
+ *     It describes whether a <code>Pedestrian</code> is infected or not by a
+ *     probability of infection. The probability of infection ranges in [0, 1].
+ *     It is calculated based on the degree of exposure
+ *     ({@link ExposureModelHealthStatus}), by the underlying
+ *     <code>AbstractDoseResponseModel</code>.
+ * </p>
+ */
 public abstract class DoseResponseModelInfectionStatus {
 
     /*

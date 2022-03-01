@@ -6,10 +6,9 @@ import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
-import org.vadere.state.attributes.models.infection.AttributesExposureModel;
 import org.vadere.state.attributes.models.infection.AttributesThresholdResponseModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.health.ThresholdResponseModelInfectionStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -18,10 +17,25 @@ import org.vadere.state.scenario.Topography;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
+/**
+ * ThresholdResponseModel describes a <code>Pedestrian</code>'s probability of
+ * infection, more precisely its {@link ThresholdResponseModelInfectionStatus}.
+ * <p>
+ *     It can be included in the simulation by adding it to the list of
+ *     <code>submodels</code> in the scenario file. This requires that an
+ *     exposure model is defined.
+ * </p>
+ * <p>
+ *     The probability of infection is 0 by default but set to 1 if the
+ *     <code>Pedestrian</code>'s degree of exposure
+ *     {@link ExposureModelHealthStatus} reaches or exceeds a user-defined
+ *     threshold. The threshold is defined by
+ *     {@link AttributesThresholdResponseModel}.
+ * </p>
+ */
 @ModelClass
 public class ThresholdResponseModel extends AbstractDoseResponseModel {
 
@@ -39,16 +53,6 @@ public class ThresholdResponseModel extends AbstractDoseResponseModel {
         this.attributesThresholdResponseModel = Model.findAttributes(attributesList, AttributesThresholdResponseModel.class);
 
         checkIfExposureModelDefined(attributesList);
-    }
-
-    /*
-     * Check prerequisite for dose response model: Is exposure model defined? Throw error otherwise.
-     */
-    private void checkIfExposureModelDefined(List<Attributes> attributesList) throws AttributesNotFoundException {
-        Set<Attributes> result = attributesList.stream().filter(a -> AttributesExposureModel.class.isAssignableFrom(a.getClass())).collect(Collectors.toSet());
-        if (result.size() < 1) {
-            throw new RuntimeException(this.getClass() + " requires any exposure model defined by " + AttributesExposureModel.class);
-        }
     }
 
     @Override

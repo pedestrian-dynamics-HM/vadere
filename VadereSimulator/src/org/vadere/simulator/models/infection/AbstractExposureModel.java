@@ -8,6 +8,7 @@ import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.models.infection.AttributesExposureModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.logging.Logger;
@@ -15,6 +16,15 @@ import org.vadere.util.logging.Logger;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * AbstractExposureModel is the abstract base class for all exposure models which
+ * allow to describe a <code>Pedestrian</code>'s degree of exposure, more
+ * precisely, its {@link ExposureModelHealthStatus health status}.
+ * <p>
+ *     An exposure model can be included in the simulation by defining the
+ *     desired model in the scenario file in the list of <code>submodels</code>.
+ * </p>
+ */
 public abstract class AbstractExposureModel implements Model {
 
     protected static Logger logger = Logger.getLogger(AbstractExposureModel.class);

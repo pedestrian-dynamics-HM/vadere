@@ -24,9 +24,20 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
- * Models the spread of infectious pathogen among pedestrians based a simple rule:
- * Any pedestrian that approaches an infectious pedestrian so that the mutual distance falls below a defined
- * threshold becomes exposed.
+ * ProximityExposureModel describes the degree of exposure of
+ * <code>Pedestrian</code>s to another infectious one simply by their mutual
+ * distance.
+ * <p>
+ * </p>
+ * <p> <code>ProximityExposureModel</code> contains the logic, that is:
+ * <ul>
+ *     <li>Each pedestrian obtains a {@link ProximityExposureModelHealthStatus
+ *     health status}
+ *     after being inserted into the topography.</li>
+ *     <li>Any pedestrian that approaches an infectious pedestrian so that the
+ *     mutual distance falls below a defined threshold becomes exposed. The
+ *     threshold is defined in {@link AttributesProximityExposureModel}.</li>
+ * </ul>
  */
 @ModelClass
 public class ProximityExposureModel extends AbstractExposureModel {

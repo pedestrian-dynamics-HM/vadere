@@ -2,6 +2,10 @@ package org.vadere.state.health;
 
 import org.vadere.util.geometry.shapes.VPoint;
 
+/**
+ * AirTransmissionModelHealthStatus that is used in combination with the
+ * <code>AirTransmissionModel</code>.
+ */
 public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus {
 
     private boolean breathingIn;
@@ -90,7 +94,7 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
 
     // Methods
 
-    /*
+    /**
      * Defines whether the pedestrian inhales or exhales depending on the current simulation time,
      * respiratoryTimeOffset, and periodLength. Assumes that periodLength for inhalation and exhalation are equally
      * long. Pedestrian inhales when sin(time) > 0 or cos(time) == 1.

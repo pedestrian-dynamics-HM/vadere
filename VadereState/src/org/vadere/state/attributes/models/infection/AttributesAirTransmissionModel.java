@@ -2,14 +2,16 @@ package org.vadere.state.attributes.models.infection;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 
-import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelAerosolCloud;
-import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelDroplets;
-import org.vadere.state.attributes.models.infection.AttributesExposureModel;
-import org.vadere.state.scenario.*;
-
 /**
- * Attributes related to the corresponding exposure model. They define properties of {@link Pedestrian}s,
- * {@link AerosolCloud}s, and {@link Droplets} that are equal for all instances of each class.
+ * AttributesAirTransmissionModel contains user-defined properties related to the
+ * <code>AirTransmissionModel</code>.
+ * They define properties that are shared by all instances of
+ * <ul>
+ *     <li><code>Pedestrian</code></li>
+ *     <li><code>AerosolCloud</code></li>
+ *     <li><code>Droplets</code></li>
+ * </ul>
+ *
  */
 @ModelAttributeClass
 public class AttributesAirTransmissionModel extends AttributesExposureModel {
@@ -24,7 +26,6 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 	 * Defines whether aerosol clouds are considered in the exposure model (true) or not (false).
 	 */
 	private boolean aerosolCloudsActive;
-
 
 	private AttributesAirTransmissionModelAerosolCloud aerosolCloudParameters;
 
