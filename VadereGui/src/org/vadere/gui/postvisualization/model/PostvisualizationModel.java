@@ -7,6 +7,7 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.health.BasicExposureModelHealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
@@ -283,11 +284,17 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 
 		if(trajectories.isInfectiousCol != -1) {
-			String isInfectiousString = row.getString(trajectories.isInfectiousCol);
-			pedestrian.setInfectious(Boolean.parseBoolean(isInfectiousString));
+			boolean isInfectiousString = row.getBoolean(trajectories.isInfectiousCol);
+			if (pedestrian.getHealthStatus() == null) {
+				pedestrian.setHealthStatus(new BasicExposureModelHealthStatus());
+			}
+			pedestrian.setInfectious(isInfectiousString);
 		}
 
 		if(trajectories.degreeOfExposureCol != -1) {
+			if (pedestrian.getHealthStatus() == null) {
+				pedestrian.setHealthStatus(new BasicExposureModelHealthStatus());
+			}
 			pedestrian.setDegreeOfExposure(row.getDouble(trajectories.degreeOfExposureCol));
 		}
 
