@@ -156,8 +156,8 @@ public class TikzGenerator {
 			for (AerosolCloud aerosolCloud : topography.getAerosolClouds()) {
 				VPoint centroid = aerosolCloud.getShape().getCentroid();
 				generatedCode += String.format(Locale.US, "\\coordinate (AerosolCloud%d) at (%f,%f); %% Centroid: AerosolCloud %d\n", aerosolCloud.getId(), centroid.x, centroid.y, aerosolCloud.getId());
-				generatedCode += String.format(Locale.US, "\\fill[AerosolCloudColor,opacity=\\AerosolCloudOpacity] %s;\n", generatePathForScenarioElement(aerosolCloud));
-
+				double normalizedPathogenLoadPerArea = (aerosolCloud.getCurrentPathogenLoad() / aerosolCloud.getArea()) / (model.getConfig().getAerosolCloudAlphaPathLoad());
+				generatedCode += String.format(Locale.US, "\\fill[AerosolCloudColor,opacity=\\AerosolCloudOpacity*%f] %s;\n", normalizedPathogenLoadPerArea, generatePathForScenarioElement(aerosolCloud));
 			}
 		} else {
 			generatedCode += "% Aerosol clouds (not enabled in config)\n";
