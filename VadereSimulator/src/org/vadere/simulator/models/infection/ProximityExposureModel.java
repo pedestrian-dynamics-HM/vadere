@@ -10,7 +10,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.models.infection.AttributesProximityExposureModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.health.ProximityExposureModelHealthStatus;
+import org.vadere.state.health.BasicExposureModelHealthStatus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * </p>
  * <p> <code>ProximityExposureModel</code> contains the logic, that is:
  * <ul>
- *     <li>Each pedestrian obtains a {@link ProximityExposureModelHealthStatus
+ *     <li>Each pedestrian obtains a {@link BasicExposureModelHealthStatus
  *     health status}
  *     after being inserted into the topography.</li>
  *     <li>Any pedestrian that approaches an infectious pedestrian so that the
@@ -115,7 +115,7 @@ public class ProximityExposureModel extends AbstractExposureModel {
         AttributesExposureModelSourceParameters sourceParameters = defineSourceParameters(controller, attributesProximityExposureModel);
 
         Pedestrian ped = (Pedestrian) scenarioElement;
-        ped.setHealthStatus(new ProximityExposureModelHealthStatus());
+        ped.setHealthStatus(new BasicExposureModelHealthStatus());
         ped.setInfectious(sourceParameters.isInfectious());
         return ped;
     }
@@ -124,7 +124,7 @@ public class ProximityExposureModel extends AbstractExposureModel {
     public Pedestrian topographyControllerEvent(TopographyController topographyController, double simTimeInSec, Agent agent) {
         Pedestrian pedestrian = (Pedestrian) agent;
 
-        pedestrian.setHealthStatus(new ProximityExposureModelHealthStatus());
+        pedestrian.setHealthStatus(new BasicExposureModelHealthStatus());
 
         if (attributesProximityExposureModel.getInfectiousPedestrianIdsNoSource().contains(agent.getId())) {
             pedestrian.setInfectious(true);
