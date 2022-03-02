@@ -20,7 +20,7 @@ public class DefaultConfig {
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
 	private int aerosolCloudAlphaMax = 10;
-	private int aerosolCloudAlphaMin = 0;
+	private int aerosolCloudAlphaPathLoad = 1400; // pathogen load per area corresponding to aerosolCloudAlphaMax; 1400 results from init pathogen load 10000 / init area (1.5^2 * PI)
 	private Color dropletsColor = new Color(190, 210, 20);
 	private Color exposedColor = new Color(202, 76, 187);
 	private Color infectiousColor = new Color(202, 76, 76);
@@ -45,7 +45,7 @@ public class DefaultConfig {
 		this.measurementAreaAlpha = config.measurementAreaAlpha;
 		this.aerosolCloudColor = config.aerosolCloudColor;
 		this.aerosolCloudAlphaMax = config.aerosolCloudAlphaMax;
-		this.aerosolCloudAlphaMin = config.aerosolCloudAlphaMin;
+		this.aerosolCloudAlphaPathLoad = config.aerosolCloudAlphaPathLoad;
 		this.dropletsColor = config.dropletsColor;
 		this.exposedColor = config.exposedColor;
 		this.infectiousColor = config.infectiousColor;
@@ -105,7 +105,7 @@ public class DefaultConfig {
 	}
 	public Color getAerosolCloudColor() {return aerosolCloudColor;}
 	public int getAerosolCloudAlphaMax() { return aerosolCloudAlphaMax; }
-	public int getAerosolCloudAlphaMin() { return aerosolCloudAlphaMin; }
+	public int getAerosolCloudAlphaPathLoad() { return aerosolCloudAlphaPathLoad; }
 	public Color getDropletsColor() {return dropletsColor;}
 	public Color getExposedColor() {
 		return exposedColor;

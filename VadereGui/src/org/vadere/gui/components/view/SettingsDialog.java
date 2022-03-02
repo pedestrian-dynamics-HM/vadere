@@ -141,7 +141,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane
 				.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
 
-		FormLayout colorSettingsLayout = new FormLayout("5dlu, pref, 2dlu, pref:grow, 2dlu, pref, 2dlu, pref, 5dlu", // col
+		FormLayout colorSettingsLayout = new FormLayout("5dlu, pref:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
 				createCellsWithSeparators(9)); // rows
 		colorSettingsPane.setLayout(colorSettingsLayout);
 
@@ -167,6 +167,8 @@ public class SettingsDialog extends JDialog {
 		int row = 0;
 		int column2 = 4;
 		int column3 = 6;
+		int column4 = 8;
+		int column5 = 10;
 		CellConstraints cc = new CellConstraints();
 
 		final JButton bObstColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
@@ -174,72 +176,83 @@ public class SettingsDialog extends JDialog {
 		pObstacleColor.setBackground(model.config.getObstacleColor());
 		pObstacleColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bObstColor.addActionListener(new ActionSetObstacleColor("Set Obstacle Color", model, pObstacleColor));
-		colorSettingsPane.add(pObstacleColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bObstColor, cc.xy(column3, row));
+		colorSettingsPane.add(pObstacleColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bObstColor, cc.xy(column5, row));
 
 		final JButton bTarColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pTargetColor = new JPanel();
 		pTargetColor.setBackground(model.config.getTargetColor());
 		pTargetColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bTarColor.addActionListener(new ActionSetTargetColor("Set Target Color", model, pTargetColor));
-		colorSettingsPane.add(pTargetColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bTarColor, cc.xy(column3, row));
+		colorSettingsPane.add(pTargetColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bTarColor, cc.xy(column5, row));
 
 		final JButton bSrcColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pSourceColor = new JPanel();
 		pSourceColor.setBackground(model.config.getSourceColor());
 		pSourceColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bSrcColor.addActionListener(new ActionSetSourceColor("Set Source Color", model, pSourceColor));
-		colorSettingsPane.add(pSourceColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bSrcColor, cc.xy(column3, row));
+		colorSettingsPane.add(pSourceColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bSrcColor, cc.xy(column5, row));
 
 		final JButton bStairsColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pStairsColor = new JPanel();
 		pStairsColor.setBackground(model.config.getStairColor());
 		pStairsColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bStairsColor.addActionListener(new ActionSetStairsColor("Set Stairs Color", model, pStairsColor));
-		colorSettingsPane.add(pStairsColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bStairsColor, cc.xy(column3, row));
+		colorSettingsPane.add(pStairsColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bStairsColor, cc.xy(column5, row));
 
 		final JButton bDensityColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pDensityColor = new JPanel();
 		pDensityColor.setBackground(model.config.getDensityColor());
 		pDensityColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bDensityColor.addActionListener(new ActionSetDensityColor("Set Density Color", model, pDensityColor));
-		colorSettingsPane.add(pDensityColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bDensityColor, cc.xy(column3, row));
+		colorSettingsPane.add(pDensityColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bDensityColor, cc.xy(column5, row));
 
 		final JButton bAbsorbingAreaColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pAbsorbingAreaColor = new JPanel();
 		pAbsorbingAreaColor.setBackground(model.config.getAbsorbingAreaColor());
 		pAbsorbingAreaColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bAbsorbingAreaColor.addActionListener(new ActionSetAbsorbingAreaColor("Set Absorbing Area Color", model, pAbsorbingAreaColor));
-		colorSettingsPane.add(pAbsorbingAreaColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bAbsorbingAreaColor, cc.xy(column3, row));
+		colorSettingsPane.add(pAbsorbingAreaColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bAbsorbingAreaColor, cc.xy(column5, row));
 
 		final JButton bTargetChangerColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pTargetChangerColor = new JPanel();
 		pTargetChangerColor.setBackground(model.config.getTargetChangerColor());
 		pTargetChangerColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bTargetChangerColor.addActionListener(new ActionSetTargetChangerColor("Set Target Changer Color", model, pTargetChangerColor));
-		colorSettingsPane.add(pTargetChangerColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bTargetChangerColor, cc.xy(column3, row));
+		colorSettingsPane.add(pTargetChangerColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bTargetChangerColor, cc.xy(column5, row));
 
 		final JButton bAerosolCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pAerosolCloudColor = new JPanel();
 		pAerosolCloudColor.setBackground(model.config.getAerosolCloudColor());
 		pAerosolCloudColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bAerosolCloudColor.addActionListener(new ActionSetAerosolCloudColor("Set Aerosol Cloud Color", model, pAerosolCloudColor));
-		colorSettingsPane.add(pAerosolCloudColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bAerosolCloudColor, cc.xy(column3, row));
+		colorSettingsPane.add(pAerosolCloudColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bAerosolCloudColor, cc.xy(column5, row));
+		final JSpinner spinnerAerosolCloudAlpha = new JSpinner();
+		spinnerAerosolCloudAlpha.setPreferredSize(new Dimension(60, 20));
+		final SpinnerNumberModel sModelAerosolCloudAlpha = new SpinnerNumberModel(model.config.getAerosolCloudAlphaMax(),
+				0, 255, 1);
+		spinnerAerosolCloudAlpha.setModel(sModelAerosolCloudAlpha);
+		spinnerAerosolCloudAlpha.addChangeListener(e -> {
+			model.config.setAerosolCloudAlphaMax((int) sModelAerosolCloudAlpha.getValue());
+			model.notifyObservers();
+		});
+		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAerosolCloudAlpha.text") + ":"), cc.xy(column2, row));
+		colorSettingsPane.add(spinnerAerosolCloudAlpha, cc.xy(column3, row));
 
 		final JButton bDropletCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pDropletCloudColor = new JPanel();
 		pDropletCloudColor.setBackground(model.config.getDropletsColor());
 		pDropletCloudColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
 		bDropletCloudColor.addActionListener(new ActionSetDropletsColor("Set Droplet Cloud Color", model, pDropletCloudColor));
-		colorSettingsPane.add(pDropletCloudColor, cc.xy(column2, row += NEXT_CELL));
-		colorSettingsPane.add(bDropletCloudColor, cc.xy(column3, row));
+		colorSettingsPane.add(pDropletCloudColor, cc.xy(column4, row += NEXT_CELL));
+		colorSettingsPane.add(bDropletCloudColor, cc.xy(column5, row));
 	}
 
 	private void initAgentColorSettingsPane(JLayeredPane colorSettingsPane){
@@ -297,7 +310,7 @@ public class SettingsDialog extends JDialog {
 				bChangePedestrianColorInfectious, pPedestrianColorInfectious);
 
 		final JSpinner spinnerLowerExposure = new JSpinner();
-		spinnerLowerExposure.setPreferredSize(new Dimension(75, 20));
+		spinnerLowerExposure.setPreferredSize(new Dimension(60, 20));
 		final SpinnerNumberModel sModelLowerExposure = new SpinnerNumberModel(model.config.getLowerVisualizedExposure(), 0, model.config.getUpperVisualizedExposure(), 1);
 		spinnerLowerExposure.setModel(sModelLowerExposure);
 		spinnerLowerExposure.addChangeListener(e -> {
@@ -307,7 +320,7 @@ public class SettingsDialog extends JDialog {
 
 
 		final JSpinner spinnerUpperExposure = new JSpinner();
-		spinnerUpperExposure.setPreferredSize(new Dimension(75, 20));
+		spinnerUpperExposure.setPreferredSize(new Dimension(60, 20));
 		final SpinnerNumberModel sModelUpperExposure = new SpinnerNumberModel(model.config.getUpperVisualizedExposure(), model.config.getLowerVisualizedExposure(), null, 1);
 		spinnerUpperExposure.setModel(sModelUpperExposure);
 		spinnerUpperExposure.addChangeListener(e -> {
