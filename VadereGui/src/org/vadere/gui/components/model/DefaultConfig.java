@@ -1,6 +1,8 @@
 package org.vadere.gui.components.model;
 
+import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.psychology.cognition.GroupMembership;
+import org.vadere.state.scenario.AerosolCloud;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -20,7 +22,7 @@ public class DefaultConfig {
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
 	private int aerosolCloudAlphaMax = 10;
-	private int aerosolCloudAlphaPathLoad = 1400; // pathogen load per area corresponding to aerosolCloudAlphaMax; 1400 results from init pathogen load 10000 / init area (1.5^2 * PI)
+	private double aerosolCloudMaxPathogenConcentration; // pathogen concentration that corresponds to aerosolCloudAlphaMax
 	private Color dropletsColor = new Color(190, 210, 20);
 	private Color exposedColor = new Color(202, 76, 187);
 	private Color infectiousColor = new Color(202, 76, 76);
@@ -29,6 +31,7 @@ public class DefaultConfig {
 
 	// Constructors
 	public DefaultConfig() {
+		initPathogenConcentration();
 		initGroupMembershipColor();
 	}
 
@@ -45,7 +48,7 @@ public class DefaultConfig {
 		this.measurementAreaAlpha = config.measurementAreaAlpha;
 		this.aerosolCloudColor = config.aerosolCloudColor;
 		this.aerosolCloudAlphaMax = config.aerosolCloudAlphaMax;
-		this.aerosolCloudAlphaPathLoad = config.aerosolCloudAlphaPathLoad;
+		initPathogenConcentration();
 		this.dropletsColor = config.dropletsColor;
 		this.exposedColor = config.exposedColor;
 		this.infectiousColor = config.infectiousColor;
@@ -64,6 +67,13 @@ public class DefaultConfig {
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_FRIENDLY, new Color(0,135,98));
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_NEUTRAL, new Color(153,153,153));
 		groupMembershipColors.put(GroupMembership.OUT_GROUP_HOSTILE, new Color(229,229,0));
+	}
+
+	private void initPathogenConcentration() {
+		AttributesAirTransmissionModel attributes = new AttributesAirTransmissionModel();
+		double volume = AerosolCloud.radiusToVolume(attributes.getAerosolCloudInitialRadius());
+		double pathogenLoad = attributes.getAerosolCloudInitialPathogenLoad();
+		aerosolCloudMaxPathogenConcentration = (pathogenLoad / volume);
 	}
 
 	// Getter
@@ -105,7 +115,7 @@ public class DefaultConfig {
 	}
 	public Color getAerosolCloudColor() {return aerosolCloudColor;}
 	public int getAerosolCloudAlphaMax() { return aerosolCloudAlphaMax; }
-	public int getAerosolCloudAlphaPathLoad() { return aerosolCloudAlphaPathLoad; }
+	public double getAerosolCloudMaxPathogenConcentration() { return aerosolCloudMaxPathogenConcentration; }
 	public Color getDropletsColor() {return dropletsColor;}
 	public Color getExposedColor() {
 		return exposedColor;
