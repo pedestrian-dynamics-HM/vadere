@@ -22,9 +22,10 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 	@Override
 	public void initComponents() {
 		super.initComponents();
+		int row = 18; //TODO this is hard coded; must be adapted when further elements are inserted above
 		CellConstraints cc = new CellConstraints();
 		JRadioButton chShowEvacTimeColor = new JRadioButton(Messages.getString("PostVis.chShowEvacTimeColor.text"));
-		agentColorSettingsPane.add(chShowEvacTimeColor, cc.xyw(2, 14, 9));
+		agentColorSettingsPane.add(chShowEvacTimeColor, cc.xyw(2, row += NEXT_CELL, 9));
 		chShowEvacTimeColor.addItemListener(e -> {
 			model.setAgentColoring(AgentColoring.EVACUATION_TIMES);
 			model.notifyObservers();
@@ -33,8 +34,8 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 
 		JRadioButton chShowCriteriaColor = new JRadioButton(Messages.getString("PostVis.chShowCriteriaColor.text") + ":");
 		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model);
-		agentColorSettingsPane.add(chShowCriteriaColor, cc.xy(2, 16,  CellConstraints.LEFT, CellConstraints.TOP));
-		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, 16, 7));
+		agentColorSettingsPane.add(chShowCriteriaColor, cc.xy(2, row += NEXT_CELL,  CellConstraints.LEFT, CellConstraints.TOP));
+		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, row, 7));
 		chShowCriteriaColor.addItemListener(e -> {
 			model.setAgentColoring(AgentColoring.PREDICATE);
 			model.notifyObservers();
