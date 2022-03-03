@@ -26,6 +26,7 @@ public class TableAerosolCloudData {
 
     private Table currentSlice;
 
+    public static final String TABLE_NAME = "aerosolCloudShapes";
 
     // columns, TODO: this is hard coded!
     public final int timeStepCol;
@@ -53,8 +54,17 @@ public class TableAerosolCloudData {
 
         this.cloudDataFrame = dataFrame;
         this.currentSlice = cloudDataFrame;
-        this.sampleStepWidth = getTimeStepSampleStepWidth();
-        this.sampleSteps = getSampleSteps();
+        if (!isEmpty()) {
+            this.sampleStepWidth = getTimeStepSampleStepWidth();
+            this.sampleSteps = getSampleSteps();
+        } else {
+            this.sampleStepWidth = 0;
+            this.sampleSteps = List.of(0);
+        }
+    }
+
+    public boolean isEmpty() {
+        return cloudDataFrame.isEmpty();
     }
 
     protected AerosolCloud toAerosolCloud(@NotNull final Row row) {

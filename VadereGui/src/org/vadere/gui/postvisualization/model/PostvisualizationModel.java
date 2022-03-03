@@ -22,12 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -74,45 +69,48 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public PostvisualizationModel() {
 		super(new PostvisualizationConfig());
 		this.trajectories = new TableTrajectoryFootStep(Table.create());
-		this.contactData = null;
+		this.contactData = new ContactData(Table.create());
 		this.scenario = new Scenario("");
 		this.topographyId = 0;
 		this.potentialContainer = null;
-		this.tableAerosolCloudData = null;
+		this.tableAerosolCloudData = new TableAerosolCloudData(Table.create());
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
 		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
 		this.predicateColoringModel = new PredicateColoringModel();
 		this.outputChanged = false;
 	}
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath) {
-		init(trajectories, contactTrajectories, aerosolCloudData, scenario, projectPath, new AttributesAgent());
+	public synchronized void init(final Table trajectories, final HashMap<String, Table> additionalTables, final Scenario scenario, final String projectPath) {
+		init(trajectories, additionalTables, scenario, projectPath, new AttributesAgent());
 	}
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, contactTrajectories, null, scenario, projectPath, new AttributesAgent());
-	}
+
 	public synchronized void init(final Table trajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, null, null, scenario, projectPath, new AttributesAgent());
+		init(trajectories, new HashMap<>(), scenario, projectPath, new AttributesAgent());
 	}
 
 	/**
 	 * Initialize the {@link PostvisualizationModel}.
 	 * @param trajectories
+	 * @param additionalTables 	tables containing additional data that is not stored in trajectories but should be
+	 *                          postvisualized as well, for example contacts and aerosol clouds
 	 * @param scenario      the scenario which was used to produce the output the PostVis will display.
 	 *                      This scenario will not contain any agents.
 	 * @param projectPath   the path to the project.
 	 */
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
+	public synchronized void init(final Table trajectories, final HashMap<String, Table> additionalTables, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
 		this.scenario = scenario;
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
-		if (contactTrajectories != null) {
-			this.config.setContactsRecorded(true);
-			this.contactData = new ContactData(contactTrajectories);
-		}
-		if (aerosolCloudData != null) {
-			this.config.setAerosolCloudsRecorded(true);
-			this.tableAerosolCloudData = new TableAerosolCloudData(aerosolCloudData);
+		clearAdditionalTables();
+		for (HashMap.Entry<String, Table> entry : additionalTables.entrySet()) {
+			switch (entry.getKey()) {
+				case ContactData.TABLE_NAME:
+					this.config.setContactsRecorded(true);
+					this.contactData = new ContactData(entry.getValue());
+				case TableAerosolCloudData.TABLE_NAME:
+					this.config.setAerosolCloudsRecorded(true);
+					this.tableAerosolCloudData = new TableAerosolCloudData(entry.getValue());
+			}
 		}
 		this.visTime = 0;
 		this.attributesAgent = attributesAgent;
@@ -228,6 +226,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	public synchronized Table getAgentDataFrame() {
 		return trajectories.getAgentDataFrame();
+	}
+
+	private void clearAdditionalTables() {
+		config.setContactsRecorded(false);
+		contactData = new ContactData(Table.create());
+		config.setAerosolCloudsRecorded(false);
+		tableAerosolCloudData = new TableAerosolCloudData(Table.create());
 	}
 
 	private Pedestrian toAgent(final Row row) {
