@@ -23,11 +23,11 @@ import java.util.Collection;
  */
 
 @DataProcessorClass()
-public class AerosolCloudShapeProcessor extends DataProcessor<TimestepIdDataKey, String> {
+public class AerosolCloudDataProcessor extends DataProcessor<TimestepIdDataKey, String> {
 
     private int sampleEveryNthSimStep;
 
-    public AerosolCloudShapeProcessor() {
+    public AerosolCloudDataProcessor() {
         super("pathogenLoad", "radius", "centerX", "centerY");
         setAttributes(new AttributesAerosolCloudShapeProcessor());
     }

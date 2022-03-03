@@ -45,7 +45,7 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 6
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
       "id" : 7,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
       "attributes" : {
