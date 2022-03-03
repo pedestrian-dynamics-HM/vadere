@@ -31,13 +31,17 @@ import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
 import org.vadere.gui.postvisualization.control.ActionStop;
 import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
 import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
+import tech.tablesaw.api.Table;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -238,7 +242,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 					public void actionPerformed(ActionEvent e) {
 						if (!model.config.isAerosolCloudsRecorded()) {
 							JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
-									Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text"));
+									Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text") + "\n" + AerosolCloudDataProcessor.class.getName() + "\n" + TableAerosolCloudData.TABLE_NAME + ".txt");
 						} else {
 							model.config.setShowAerosolClouds(!model.config.isShowAerosolClouds());
 							model.notifyObservers();
