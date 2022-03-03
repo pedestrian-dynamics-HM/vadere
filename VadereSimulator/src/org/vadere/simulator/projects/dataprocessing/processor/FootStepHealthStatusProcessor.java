@@ -8,6 +8,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 
 import java.util.LinkedList;
+import java.util.Locale;
 
 /**
  * Log {@link Pedestrian}'s current {@link org.vadere.state.health.ExposureModelHealthStatus}
@@ -36,7 +37,7 @@ public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedest
     }
 
     private String healthStatusToString(Pedestrian pedestrian) {
-        String statusAsString = String.format("%s %f",
+        String statusAsString = String.format(Locale.US, "%s %f",
                 pedestrian.isInfectious(),
                 pedestrian.getDegreeOfExposure()
         );
