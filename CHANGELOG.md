@@ -6,16 +6,60 @@
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Fixed
+
+### Performance
+
+### Security
+
+### Deprecated
+
+### Other
+
+
+## v2.1 (2022-03-XX)
+
+### Added
+
 - Added new output processor "PedestrianTargetReachTimeProcessor" to log the time when an agent reaches its target.
+- Added settings in `SettingsDialog` that allow to define opacity of aerosol clouds and agent coloring depending on their degree of exposure (`GUI`)
+- Added `AbstractExposureModel` describing the exposure of healthy agents to infectious agents (`Simulator`)
+* `AirTransmissionModel` as a new version of the previous `TransmisisonModel` (see section `changed`)
+* `ProximityExposureModel`: Agents become exposed depending on the distance to infectious agents.
+- Added `AbstractDoseResponseModel` describing the probability of infection depending on a pedestrian's individual exposure. (`Simulator`)
+- `Pedestrian`: added new properties (`State`)
+* Added attribute healthStatus of type T extends `ExposureModelHealthStatus` (corresponding to the new exposure model)
+* Added attribute infectionStatus of type T extends `DoseResponseModelInfectionStatus` (corresponding to the new dose response model)
 
 ### Changed
 
 - In `postLoop()` of `Simulation.java`, clear the topography as very last step so that models and output processors can use it before.
-- `TransmissionModel`: Reduce complexity of the transmission model (: `Simulator`, `GUI`, `State`)
-* In AttributesTransmissionModel change parameter aerosolCloudInitialArea to aerosolCloudInitialRadius
-* In `AttributesAerosolCloud` reduce number of parameters that describe the shape of an `AerosolCloud`. Instead of `VPolygon`, we now use `VCircle`, which can defined by a radius and a center.
-* Adapt all methods and classes that were designed for both elliptical and circular clouds.
-- Fix bug in `TikzGenerator`: Now, the tex file (generated with tikz snapshot) also contains aerosol clouds (29e9c937: `GUI`)
+- Refactoring of the software architecture of `TransmissionModel` (`Simulator`, `GUI`, `State`):
+* Renamed `TransmissionModel` to `AirTransmissionModel` to avoid confusion with transmission in the sense of communication or others.
+* The previous concept of the TransmissionModel is now divided into exposure (`AbstractExposureModel`) and dose response (`AbstractDoseResponseModel`). The abstract classes allow for model enhancements or implementing alternative models.
+* Adapted the model attributes so that they fit to the new exposure models and dose response models.
+* Minor improvements / simplifications of the aerosol cloud model; Reduced complexity of the transmission model; Now, the model creates only circular but no elliptical clouds;
+* Moved some hidden parameters to scenario file to make the model more flexible
+* Move attributes that are equal for all instances of classes AerosolCloud, Droplets, and Pedestrian to the general model attributes (`AttributesAirTransmissionModel`). This is not strictly object-oriented but pragmatic and avoids redundancy.
+- `TikzGenerator`: Make the transparency of aerosol clouds in the tex file depend on the pathogen concentration. (`GUI`)
+- `SettingsDialog`: 
+* increase contrast between color of settings wheel and vadere GUI background color (2d2edad5: `GUI`)
+* reduce width of color panels (`GUI`)
+- Renamed
+
+### Fixed
+- `TikzGenerator`: Now, the tex file (generated with tikz snapshot during onlinevisualization) also contains aerosol clouds (29e9c937: `GUI`)
+- `SettingsDialog`: Fixed overlapping elements in postvis settings dialog. (`GUI`)
+- `TopographyController`: Previously, pedestrians that were directly put into the topography (not spawned by sources) could not be accessed / manipulated by the TransmissionModel, that is one could not define a health status. These pedestrians are now handled by the TopographyController. (`Simulator`)
+
+## Removed
+- Due to refactored architecture of the transmission model, removed...
+* classes `HealthStatus`, `NumberOfPedPerInfectionStatusProcessor`, `PedestrianHealthStatusProcessor` (`State`, `Simulator`)
+* enum `InfectionStatus` (`State`)
 
 
 ## v2.0
