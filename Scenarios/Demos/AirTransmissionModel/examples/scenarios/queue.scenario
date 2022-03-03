@@ -2,7 +2,7 @@
   "name" : "queue",
   "description" : "",
   "release" : "2.0",
-  "commithash" : "f7ec0b9e854e9fd67cf1e5ad8c87511b6a129a45",
+  "commithash" : "3f3ee220e1af8f15090e99a05468f55af50cc810",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -38,7 +38,7 @@
       "processors" : [ 9 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
-      "filename" : "aerosolCloudShapes.txt",
+      "filename" : "aerosolCloudData.txt",
       "processors" : [ 12 ]
     } ],
     "processors" : [ {

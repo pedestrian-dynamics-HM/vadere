@@ -26,7 +26,7 @@ public class TableAerosolCloudData {
 
     private Table currentSlice;
 
-    public static final String TABLE_NAME = "aerosolCloudShapes";
+    public static final String TABLE_NAME = "aerosolCloudData";
 
     // columns, TODO: this is hard coded!
     public final int timeStepCol;

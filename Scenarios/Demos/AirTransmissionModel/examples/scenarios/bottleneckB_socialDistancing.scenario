@@ -2,7 +2,7 @@
   "name" : "bottleneckB_socialDistancing",
   "description" : "",
   "release" : "2.0",
-  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
+  "commithash" : "3f3ee220e1af8f15090e99a05468f55af50cc810",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -20,6 +20,10 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "flow.txt",
       "processors" : [ 6 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
+      "filename" : "aerosolCloudData.txt",
+      "processors" : [ 9 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -61,8 +65,15 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 8
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
+      "id" : 9,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributes" : {
+        "sampleEveryNthSimStep" : 1
+      }
     } ],
-    "isTimestamped" : true,
+    "isTimestamped" : false,
     "isWriteMetaData" : false
   },
   "scenario" : {

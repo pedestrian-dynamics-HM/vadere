@@ -2,13 +2,9 @@
   "name" : "hamner-2020-life_postvis_template",
   "description" : "",
   "release" : "2.0",
-  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
+  "commithash" : "3f3ee220e1af8f15090e99a05468f55af50cc810",
   "processWriters" : {
     "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "infectionStatus.txt",
-      "processors" : [ 1 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
       "processors" : [ 2, 3, 6 ]
@@ -22,7 +18,7 @@
       "processors" : [ 5 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
-      "filename" : "aerosolCloudShapes.txt",
+      "filename" : "aerosolCloudData.txt",
       "processors" : [ 7 ]
     } ],
     "processors" : [ {

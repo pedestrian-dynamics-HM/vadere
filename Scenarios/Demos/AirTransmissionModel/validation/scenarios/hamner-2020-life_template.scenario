@@ -2,13 +2,9 @@
   "name" : "hamner-2020-life_template",
   "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice — skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606–610, 2020. doi:10.15585/mmwr.mm6919e6.",
   "release" : "2.0",
-  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
+  "commithash" : "3f3ee220e1af8f15090e99a05468f55af50cc810",
   "processWriters" : {
-    "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "infectionStatus.txt",
-      "processors" : [ 1 ]
-    } ],
+    "files" : [ ],
     "processors" : [ ],
     "isTimestamped" : false,
     "isWriteMetaData" : false
