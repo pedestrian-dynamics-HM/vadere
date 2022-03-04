@@ -109,4 +109,20 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 	public double getDropletsAbsorptionRate() {
 		return dropletParameters.getAbsorptionRate();
 	}
+
+	public void setAerosolCloudsActive(boolean aerosolCloudsActive) {
+		this.aerosolCloudsActive = aerosolCloudsActive;
+	}
+
+	public void setAirDispersionFactor(double airDispersionFactor) {
+		this.aerosolCloudParameters.setAirDispersionFactor(airDispersionFactor);
+	}
+
+	public void setPedestrianDispersionWeight(double pedestrianDispersionWeight) {
+		this.aerosolCloudParameters.setPedestrianDispersionWeight(pedestrianDispersionWeight);
+	}
+
+	public void setDropletsActive(boolean dropletsActive) {
+		this.dropletsActive = dropletsActive;
+	}
 }

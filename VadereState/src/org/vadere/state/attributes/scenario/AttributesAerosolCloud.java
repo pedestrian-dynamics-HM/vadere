@@ -2,6 +2,7 @@ package org.vadere.state.attributes.scenario;
 
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.scenario.AerosolCloud;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -62,10 +63,16 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
     // Setter
     public void setRadius(double radius) {
-        this.radius = radius;
+        this.setShape(new VCircle(this.center, radius));
     }
 
     public void setCenter(VPoint center) {
-        this.center = center;
+        this.setShape(new VCircle(center, this.radius));
+    }
+
+    public void setShape(VCircle circle) {
+        this.setShape((VShape) circle);
+        this.radius = circle.getRadius();
+        this.center = circle.getCenter();
     }
 }

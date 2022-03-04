@@ -35,7 +35,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
     /**
      * Describes constant dispersion (over time), i.e. the spatial spread over time due to local air movement.
      * This increases the radius of aerosol clouds equally in all directions (three-dimensional).
-     * Unit: meter / simulation step
+     * Unit: meter / second
      */
     private double airDispersionFactor;
 
@@ -44,7 +44,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * (which results temporally in local air movement). Each agent that passes a cloud with speed > 0 m / s contributes
      * to the dispersion of the cloud: deltaRadius = pedestrianSpeed * pedestrianDispersionWeight
      * This increases the radius of aerosol clouds equally in all directions (three-dimensional).
-     * Unit: 1 / simulation step
+     * Unit: 1
      */
     private double pedestrianDispersionWeight;
 
@@ -97,5 +97,13 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
 
     public double getAbsorptionRate() {
         return absorptionRate;
+    }
+
+    protected void setAirDispersionFactor(double airDispersionFactor) {
+        this.airDispersionFactor = airDispersionFactor;
+    }
+
+    protected void setPedestrianDispersionWeight(double pedestrianDispersionWeight) {
+        this.pedestrianDispersionWeight = pedestrianDispersionWeight;
     }
 }

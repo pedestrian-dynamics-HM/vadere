@@ -163,7 +163,7 @@ public class AerosolCloud extends ParticleDispersion {
             attributes.setRadius(newRadius);
 
             // define shape
-            VShape newShape = createAerosolCloudShape(center, newRadius);
+            VCircle newShape = createAerosolCloudShape(center, newRadius);
             attributes.setShape(newShape);
         }
     }

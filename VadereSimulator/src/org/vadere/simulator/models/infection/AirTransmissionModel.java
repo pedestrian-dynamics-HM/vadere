@@ -53,8 +53,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	protected static Logger logger = Logger.getLogger(AirTransmissionModel.class);
 
-	private AttributesAirTransmissionModel attrAirTransmissionModel;
-	double simTimeStepLength;
+	protected AttributesAirTransmissionModel attrAirTransmissionModel;
+	protected double simTimeStepLength;
 	Topography topography;
 	int aerosolCloudIdCounter;
 
@@ -78,7 +78,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	 * (pathogenLoad / aerosolCloud.volume); As soon as an aerosolCloud has reached the minimum concentration, the
 	 * aerosolCloud is considered negligible and therefore deleted
 	 */
-	private static final double minimumPercentage = 0.01;
+	protected static final double minimumPercentage = 0.01;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -286,7 +286,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 	}
 
-	private void updatePedsHealthStatus(double simTimeInSec) {
+	protected void updatePedsHealthStatus(double simTimeInSec) {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus()
@@ -387,10 +387,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 
 		return pedestrian;
-	}
-
-	public AttributesAirTransmissionModel getAttributesAirTransmissionModel() {
-		return attrAirTransmissionModel;
 	}
 
 	public static Collection<Pedestrian> getDynamicElementsNearAerosolCloud(Topography topography, AerosolCloud aerosolCloud) {
