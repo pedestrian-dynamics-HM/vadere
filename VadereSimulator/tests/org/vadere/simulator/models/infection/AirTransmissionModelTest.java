@@ -10,157 +10,259 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
 
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.vadere.simulator.models.infection.AirTransmissionModel.*;
-import static org.vadere.state.scenario.AerosolCloud.createAerosolCloudShape;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class AirTransmissionModelTest {
-    public static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
-    static final double simTimeStepLength = 0.4;
+    private static final double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
+    private static final double SIM_TIME_STEP_LENGTH = 0.4;
 
-    List<Attributes> attributeList;
+    List<Attributes> attributesList;
     AirTransmissionModel airTransmissionModel;
     Topography topography;
     VadereContext ctx;
+    Random rdm;
+    double simStartTime;
 
-    // member variables defining aerosol cloud shapes
-    double radius = 1;
-    VPoint center = new VPoint(0, 0);
-    VShape circle;
-
-
-    // will run before each test to setup test environment
     @Before
     public void setUp() {
-        attributeList = getAttributeList();
+        attributesList = new ArrayList<>();
+        attributesList.add(new AttributesAirTransmissionModel());
         airTransmissionModel = new AirTransmissionModel();
         topography = new Topography();
         topography.setContextId("testId");
-
+        rdm = new Random(0);
         ctx = new VadereContext();
-        ctx.put(AirTransmissionModel.simStepLength, simTimeStepLength);
+        ctx.put(AirTransmissionModel.simStepLength, SIM_TIME_STEP_LENGTH);
         VadereContext.add(topography.getContextId(), ctx);
+        simStartTime = 0.0;
 
-        circle = createAerosolCloudShape(center, radius);
+        initializeTransmissionModel();
     }
 
-    // cleanup test environment
     @After
     public void after() {
-        attributeList.clear();
+        attributesList.clear();
     }
 
     @Test
-    public void testInitializeOk() {
-        // initialize must find the AttributesInfectionModel from the  attributeList
-        airTransmissionModel.initialize(attributeList, new Domain(topography),null,null);
-
-        AttributesAirTransmissionModel attributesAirTransmissionModel = airTransmissionModel.getAttributesAirTransmissionModel();
-
-        Assert.assertEquals(attributeList.get(0), attributesAirTransmissionModel);
+    public void testInitializeFindsAttributesList() {
+        Assert.assertEquals(attributesList.get(0), airTransmissionModel.attrAirTransmissionModel);
     }
 
-    public List<Attributes> getAttributeList() {
-        ArrayList<Attributes> attrList = new ArrayList<>();
-        var att = new AttributesAirTransmissionModel();
-
-        attrList.add(att);
-
-        return attrList;
+    @Test
+    public void testInitializeGetsSimTimeStepLength() {
+        Assert.assertEquals(ctx.get(AirTransmissionModel.simStepLength), airTransmissionModel.simTimeStepLength);
     }
 
-    private void createPedestrian(Topography topography, VPoint pedPosition, int pedId, int targetId, boolean isInfectious) {
-        Pedestrian pedestrian = new Pedestrian(new AttributesAgent(), new Random(1));
-        pedestrian.setPosition(pedPosition);
-        pedestrian.setInfectious(isInfectious);
-        pedestrian.setId(pedId);
+    @Test
+    public void testRegisterToScenarioElementControllerEvents() {
+        // TODO ...
+    }
 
-        LinkedList<Integer> targetsPedestrian = new LinkedList<>();
-        targetsPedestrian.add(targetId);
-        pedestrian.setTargets(targetsPedestrian);
+    @Test
+    public void testUpdate() {
+        // TODO ...
+    }
 
+    @Test
+    public void testUpdateExecuteAerosolCloudEmissionEvents() {
+        setAerosolCloudsActive();
+        Pedestrian pedestrian = createPedestrian();
+        pedestrian.setInfectious(true);
         topography.addElement(pedestrian);
-    }
 
-    private void createTarget(Topography topography, VPoint targetCenter, int id) {
-        Target target = new Target(new AttributesTarget());
-        target.setShape(new VCircle(targetCenter, 0.5));
-        target.getAttributes().setId(id);
+        double simEndTime = airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod();
+        for (double simTimeInSec = simStartTime; simTimeInSec <= simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
+            airTransmissionModel.executeAerosolCloudEmissionEvents(simTimeInSec);
 
-        topography.addTarget(target);
-    }
-
-    @Test
-    public void testUpdateNumberOfGeneratedAerosolClouds() {
-
-        airTransmissionModel.initialize(attributeList, new Domain(topography),null,null);
-
-        createPedestrian(topography, new VPoint(10, 10), 1, -1, true);
-
-        double simTimeInSec = 0.0;
-        double simTimeStepLength = 0.4;
-        double simEndTime = 100;
-
-        while(simTimeInSec <= simEndTime) {
-            airTransmissionModel.update(simTimeInSec);
-            simTimeInSec += simTimeStepLength;
+            // the tested method requires that the pedestrian's health status is updated as well
+            airTransmissionModel.updatePedsHealthStatus(simTimeInSec);
         }
 
-        int expectedNumberOfAerosolClouds = (int) Math.floor(simEndTime / airTransmissionModel.getAttributesAirTransmissionModel().getPedestrianRespiratoryCyclePeriod());
-        int actualNumberOfAerosolClouds = topography.getAerosolClouds().size();
-
-        assertEquals(actualNumberOfAerosolClouds, expectedNumberOfAerosolClouds);
+        Assert.assertTrue(topography.getAerosolClouds().size()>0);
     }
 
     @Test
-    public void throwIfPedestrianInsideAerosolCloudNotDetected() {
-        Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(10, 10), 1, -1, false);
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
-        topography.addAerosolCloud(aerosolCloud);
-        boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
-
-        assertTrue(inAerosolCloud);
+    public void testUpdateAerosolClouds() {
+        // maybe not necessary
     }
 
     @Test
-    public void throwIfPedestrianOutsideAerosolCloudConsideredInside() {
-        Topography topography = new Topography();
-        createPedestrian(topography, new VPoint(5, 5), 1, -1, false);
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
-        topography.addAerosolCloud(aerosolCloud);
-        boolean inAerosolCloud = isPedestrianInAerosolCloud(aerosolCloud, topography.getPedestrianDynamicElements().getElement(1));
+    public void testUpdateAerosolCloudsPathogenLoad() {
+        setAerosolCloudsActive();
 
-        assertFalse(inAerosolCloud);
+        double expectedPathogenLoad = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad();
+        double simStepWidth = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudHalfLife();
+        double simTimeInSec = simStartTime;
+        int nSimSteps = 10;
+
+        createAerosolCloud(airTransmissionModel);
+
+        double[] modelPathogenLoads = new double[nSimSteps];
+        double[] expectedPathogenLoads = new double[nSimSteps];
+        for (int i = 0; i < nSimSteps; i++) {
+            airTransmissionModel.updateAerosolCloudsPathogenLoad(simTimeInSec);
+
+            modelPathogenLoads[i] = (topography.getAerosolClouds().stream().filter(a -> a.getId() == 1).findFirst().get().getCurrentPathogenLoad());
+            expectedPathogenLoads[i] = (expectedPathogenLoad);
+
+            simTimeInSec += simStepWidth;
+            expectedPathogenLoad /= 2;
+        }
+
+        Assert.assertArrayEquals(expectedPathogenLoads, modelPathogenLoads, ALLOWED_DOUBLE_TOLERANCE);
     }
 
     @Test
-    public void testGetPedestriansInsideAerosolCloud() {
-        Topography topography = new Topography();
-        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(Attributes.ID_NOT_SET, 1, new VPoint(10, 10), 0.0,  0));
-        aerosolCloud.setId(1);
-        topography.addAerosolCloud(aerosolCloud);
-        // pedestrians outside cloud
-        createPedestrian(topography, new VPoint(12, 12), 2, -1, false);
-        createPedestrian(topography, new VPoint(1, 1), 3, -1,false);
-        // pedestrians inside cloud
-        createPedestrian(topography, new VPoint(10, 10), 4, -1, false);
-        createPedestrian(topography, new VPoint(10.5, 10.5), 5, -1, false);
+    public void testUpdateAerosolCloudsExtentDueToDispersion() {
+        setAerosolCloudsActive();
+        double dispersionFactor = 0.001; // dispersion in meter / simStep
+        airTransmissionModel.attrAirTransmissionModel.setAirDispersionFactor(dispersionFactor); // defines time-dependent dispersion
+        airTransmissionModel.attrAirTransmissionModel.setPedestrianDispersionWeight(0.0); // ped movement has no effect
 
-        Collection<Pedestrian> expectedPedestriansInAerosolCloud = new LinkedList<>();
-        expectedPedestriansInAerosolCloud.add(topography.getPedestrianDynamicElements().getElement(4));
-        expectedPedestriansInAerosolCloud.add(topography.getPedestrianDynamicElements().getElement(5));
+        int nSimSteps = 100;
+        double simEndTime = nSimSteps * airTransmissionModel.simTimeStepLength;
 
-        Collection<Pedestrian> actualPedestriansInAerosolCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
-        assertEquals(actualPedestriansInAerosolCloud, expectedPedestriansInAerosolCloud);
+        createAerosolCloud(airTransmissionModel);
+
+        double radius = calculateAerosolCloudRadius(airTransmissionModel, nSimSteps);
+        double expectedRadius = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius() + simEndTime * dispersionFactor;
+
+        Assert.assertEquals(expectedRadius, radius, ALLOWED_DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsExtentDueToDispersionIndependentFromSimStepLength() {
+        setAerosolCloudsActive();
+        double dispersionFactor = 0.001;
+        airTransmissionModel.attrAirTransmissionModel.setAirDispersionFactor(dispersionFactor); // defines time-dependent dispersion
+        airTransmissionModel.attrAirTransmissionModel.setPedestrianDispersionWeight(0.0); // ped movement has no effect
+        createAerosolCloud(airTransmissionModel);
+        double simTimeStepLength = airTransmissionModel.simTimeStepLength;
+        int nSimSteps = 2500;
+
+        double simEndTime = nSimSteps * simTimeStepLength;
+
+        int nSimSteps2 = 2000;
+        double simTimeStepLength2 = simEndTime / nSimSteps2;
+
+        // second AirTransmissionModel with different simTimeStepLength
+        AirTransmissionModel airTransmissionModel2 = new AirTransmissionModel();
+        Topography topography2 = new Topography();
+        topography2.setContextId("testId2");
+        rdm = new Random(0);
+        VadereContext ctx2 = new VadereContext();
+        ctx2.put(AirTransmissionModel.simStepLength, simTimeStepLength2); // chosen arbitrarily, not too high
+        VadereContext.add(topography2.getContextId(), ctx2);
+        airTransmissionModel2.initialize(attributesList, new Domain(topography2), null, rdm);
+        airTransmissionModel2.attrAirTransmissionModel.setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel2);
+
+        double radius = calculateAerosolCloudRadius(airTransmissionModel, nSimSteps);
+        double radius2 = calculateAerosolCloudRadius(airTransmissionModel2, nSimSteps2);
+
+        Assert.assertEquals(radius, radius2, ALLOWED_DOUBLE_TOLERANCE);
+    }
+
+    private double calculateAerosolCloudRadius(AirTransmissionModel airTransmissionModel, int nSimSteps) {
+        for (int i = 1; i <= nSimSteps; i++) {
+            airTransmissionModel.updateAerosolCloudsExtent();
+        }
+        return airTransmissionModel.topography.getAerosolClouds().stream().findFirst().get().getRadius();
+    }
+
+
+    @Test
+    public void testUpdateAerosolCloudsExtentAgentMovement() {
+        createAerosolCloud(airTransmissionModel);
+
+        double simTimeStepLength = airTransmissionModel.simTimeStepLength;
+        int nSimSteps = 2; // arbitrarily chosen
+
+        Pedestrian pedestrian = createPedestrian();
+        VPoint positionWithinCloud = airTransmissionModel.topography.getAerosolClouds().stream().findFirst().get().getCenter();
+        pedestrian.setPosition(positionWithinCloud);
+        Vector2D velocity = new Vector2D (10, 10);
+        pedestrian.setVelocity(velocity);
+        topography.addElement(pedestrian);
+
+        double radius = calculateAerosolCloudRadius(airTransmissionModel, nSimSteps);
+        double expectedRadius = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius() + nSimSteps * velocity.getLength() * simTimeStepLength * airTransmissionModel.attrAirTransmissionModel.getAerosolCloudPedestrianDispersionWeight();
+
+        Assert.assertEquals(expectedRadius, radius, ALLOWED_DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    public void testDeleteExpiredAerosolClouds() {
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud aerosolCloud = topography.getAerosolClouds().stream().findFirst().get();
+        double negligiblePathogenConcentr = (AirTransmissionModel.minimumPercentage * 0.9) * aerosolCloud.getPathogenConcentration();
+        aerosolCloud.setCurrentPathogenLoad(negligiblePathogenConcentr);
+
+        airTransmissionModel.deleteExpiredAerosolClouds();
+
+        Assert.assertTrue(topography.getAerosolClouds().stream().collect(Collectors.toSet()).isEmpty());
+    }
+
+    @Test
+    public void testUpdatePedestriansExposureToAerosolClouds() {
+
+    }
+
+    @Test
+    public void testExecuteDropletEmissionEvents() {
+
+    }
+
+    @Test
+    public void testUpdateDroplets() {
+
+    }
+
+    @Test
+    public void testUpdatePedestriansExposureToDroplets() {
+
+    }
+
+    @Test
+    public void testUpdatePedsHealthStatus() {
+
+    }
+
+    private void initializeTransmissionModel() {
+        airTransmissionModel.initialize(attributesList, new Domain(topography), null, rdm);
+    }
+
+    private Pedestrian createPedestrian() {
+        Pedestrian pedestrian = new Pedestrian(new AttributesAgent(), rdm);
+        pedestrian.setHealthStatus(new AirTransmissionModelHealthStatus());
+        return pedestrian;
+    }
+
+    private void createAerosolCloud(AirTransmissionModel airTransmissionModel) {
+        AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(1,
+                airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius(),
+                new VPoint(5, 5), // position is not important for only a few tests
+                simStartTime,
+                airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad()));
+        airTransmissionModel.topography.addAerosolCloud(aerosolCloud);
+    }
+
+    private void setAerosolCloudsActive() {
+        airTransmissionModel.attrAirTransmissionModel.setAerosolCloudsActive(true);
+    }
+
+    private void setDropletsActive() {
+        airTransmissionModel.attrAirTransmissionModel.setDropletsActive(true);
     }
 }
