@@ -70,13 +70,135 @@ public class AirTransmissionModelTest {
     }
 
     @Test
-    public void testUpdate() {
-        // TODO ...
+    public void testUpdateCreatesAerosolCloudsAlthoughNotActive() {
+        setAerosolCloudsActive(false);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+        runUpdate(simTime);
+        Assert.assertEquals(0, topography.getAerosolClouds().size());
+    }
+
+    @Test
+    public void testUpdateCreatesDropletsAlthoughNotActive() {
+        setDropletsActive(false);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+        runUpdate(simTime);
+        Assert.assertEquals(0, topography.getDroplets().size());
+    }
+
+    @Test
+    public void testUpdateWhenAerosolCloudsActive() {
+        setAerosolCloudsActive(true);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+        runUpdate(simTime);
+
+        Assert.assertTrue(topography.getAerosolClouds().size() > 0);
+    }
+
+    @Test
+    public void testUpdateWhenDropletsActive() {
+        setDropletsActive(true);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+        runUpdate(simTime);
+
+        Assert.assertTrue(topography.getDroplets().size() > 0);
+    }
+
+    @Test
+    public void testUpdateHealthStatusWhenAerosolCloudsAndDropletsNotActive() {
+        setAerosolCloudsActive(false);
+        setDropletsActive(false);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+
+        Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus expectedStatus = actualStatus.clone();
+
+        runUpdate(simTime);
+
+        Assert.assertEquals(expectedStatus, actualStatus);
+    }
+
+    @Test
+    public void testUpdateHealthStatusWhenAerosolCloudsActive() {
+        setAerosolCloudsActive(true);
+        setDropletsActive(false);
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+
+        Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus unexpectedStatus = actualStatus.clone();
+
+        runUpdate(simTime);
+
+        Assert.assertNotEquals(unexpectedStatus, actualStatus);
+    }
+
+    @Test
+    public void testUpdateHealthStatusWhenDropletsActive() {
+        setAerosolCloudsActive(false);
+        setDropletsActive(true);
+        airTransmissionModel.attrAirTransmissionModel.setDropletsAngleOfSpreadInDeg(359.999); // make sure that non-infectious pedestrian is really caught by droplets
+        double simTime = getUpdateSimTime();
+        initUpdate(simTime);
+
+        Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus unexpectedStatus = actualStatus.clone();
+
+        runUpdate(simTime);
+
+        Assert.assertNotEquals(unexpectedStatus, actualStatus);
+    }
+
+    private double getUpdateSimTime() {
+        double bufferTime = 2 * airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod();
+        double simDuration = bufferTime + Math.max(1 / airTransmissionModel.attrAirTransmissionModel.getDropletsEmissionFrequency(), airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
+
+        return simDuration;
+    }
+
+    private void initUpdate(double simTime) {
+
+        // this is only necessary to assure that aerosol clouds or droplets remain until the simEndTime once they are inserted into the topography
+        airTransmissionModel.attrAirTransmissionModel.setAerosolCloudHalfLife(simTime + 1);
+        airTransmissionModel.attrAirTransmissionModel.setDropletsLifeTime(simTime + 1);
+
+        Pedestrian pedestrian1 = createPedestrian();
+        pedestrian1.setInfectious(true);
+        VPoint pos1 = new VPoint(2,2);
+        pedestrian1.setPosition(pos1);
+        pedestrian1.setId(1);
+        topography.addElement(pedestrian1);
+
+        double distance = 0.5 * Math.min(airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius(), airTransmissionModel.attrAirTransmissionModel.getDropletsDistanceOfSpread());
+        Vector2D spacingBetweenPeds = new Vector2D(1, 1);
+        spacingBetweenPeds.normalize(distance);
+
+        Pedestrian pedestrian2 = createPedestrian();
+        VPoint pos2 = pos1.add(spacingBetweenPeds);
+        pedestrian2.setPosition(pos2);
+        pedestrian2.setId(2);
+        topography.addElement(pedestrian2);
+    }
+
+    private void runUpdate(double simEndTime) {
+        double simTimeInSec;
+        double simTimeStepLength = airTransmissionModel.simTimeStepLength;
+
+        for (simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += simTimeStepLength) {
+            airTransmissionModel.update(simTimeInSec);
+        }
     }
 
     @Test
     public void testUpdateExecuteAerosolCloudEmissionEvents() {
-        setAerosolCloudsActive();
+        setAerosolCloudsActive(true);
         Pedestrian pedestrian = createPedestrian();
         pedestrian.setInfectious(true);
         topography.addElement(pedestrian);
@@ -99,7 +221,7 @@ public class AirTransmissionModelTest {
 
     @Test
     public void testUpdateAerosolCloudsPathogenLoad() {
-        setAerosolCloudsActive();
+        setAerosolCloudsActive(true);
 
         double expectedPathogenLoad = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad();
         double simStepWidth = airTransmissionModel.attrAirTransmissionModel.getAerosolCloudHalfLife();
@@ -125,7 +247,7 @@ public class AirTransmissionModelTest {
 
     @Test
     public void testUpdateAerosolCloudsExtentDueToDispersion() {
-        setAerosolCloudsActive();
+        setAerosolCloudsActive(true);
         double dispersionFactor = 0.001; // dispersion in meter / simStep
         airTransmissionModel.attrAirTransmissionModel.setAirDispersionFactor(dispersionFactor); // defines time-dependent dispersion
         airTransmissionModel.attrAirTransmissionModel.setPedestrianDispersionWeight(0.0); // ped movement has no effect
@@ -143,7 +265,7 @@ public class AirTransmissionModelTest {
 
     @Test
     public void testUpdateAerosolCloudsExtentDueToDispersionIndependentFromSimStepLength() {
-        setAerosolCloudsActive();
+        setAerosolCloudsActive(true);
         double dispersionFactor = 0.001;
         airTransmissionModel.attrAirTransmissionModel.setAirDispersionFactor(dispersionFactor); // defines time-dependent dispersion
         airTransmissionModel.attrAirTransmissionModel.setPedestrianDispersionWeight(0.0); // ped movement has no effect
@@ -214,9 +336,41 @@ public class AirTransmissionModelTest {
         Assert.assertTrue(topography.getAerosolClouds().stream().collect(Collectors.toSet()).isEmpty());
     }
 
-    @Test
-    public void testUpdatePedestriansExposureToAerosolClouds() {
+    private Pedestrian testUpdatePedestriansExposureToAerosolClouds(boolean pedestrianOutsideCloud) {
+        createAerosolCloud(airTransmissionModel);
 
+        double simTimeStepLength = airTransmissionModel.simTimeStepLength;
+        int nInhalations = 2;
+        double simEndTime = nInhalations * airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod();
+
+        Pedestrian pedestrian = createPedestrian();
+        VPoint position = airTransmissionModel.topography.getAerosolClouds().stream().findFirst().get().getCenter();
+        if (pedestrianOutsideCloud) {
+            position = position.add(new VPoint(airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius(), airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius()));
+        }
+            pedestrian.setPosition(position);
+        topography.addElement(pedestrian);
+
+        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += simTimeStepLength) {
+            airTransmissionModel.updatePedestriansExposureToAerosolClouds();
+            airTransmissionModel.updatePedsHealthStatus(simTimeInSec);
+        }
+
+        return pedestrian;
+    }
+
+    @Test
+    public void testUpdatePedestriansExposureWithinAerosolClouds() {
+        Pedestrian pedestrian = testUpdatePedestriansExposureToAerosolClouds(false);
+
+        Assert.assertTrue(pedestrian.getDegreeOfExposure() > 0);
+    }
+
+    @Test
+    public void testUpdatePedestriansExposureOutsideAerosolClouds() {
+        Pedestrian pedestrian = testUpdatePedestriansExposureToAerosolClouds(true);
+
+        Assert.assertEquals(0, pedestrian.getDegreeOfExposure(), ALLOWED_DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -258,11 +412,11 @@ public class AirTransmissionModelTest {
         airTransmissionModel.topography.addAerosolCloud(aerosolCloud);
     }
 
-    private void setAerosolCloudsActive() {
-        airTransmissionModel.attrAirTransmissionModel.setAerosolCloudsActive(true);
+    private void setAerosolCloudsActive(boolean active) {
+        airTransmissionModel.attrAirTransmissionModel.setAerosolCloudsActive(active);
     }
 
-    private void setDropletsActive() {
-        airTransmissionModel.attrAirTransmissionModel.setDropletsActive(true);
+    private void setDropletsActive(boolean active) {
+        airTransmissionModel.attrAirTransmissionModel.setDropletsActive(active);
     }
 }
