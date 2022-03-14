@@ -1,5 +1,7 @@
 package org.vadere.state.health;
 
+import java.util.Objects;
+
 /**
  * ExposureModelHealthStatus is the abstract base class for all types of exposure
  * a <code>Pedestrian</code> can adopt.
@@ -45,5 +47,21 @@ public abstract class ExposureModelHealthStatus {
     // Methods
     public void incrementDegreeOfExposure(double deltaDegreeOfExposure) {
         this.degreeOfExposure += deltaDegreeOfExposure;
+    }
+
+    @Override
+    public abstract ExposureModelHealthStatus clone();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ExposureModelHealthStatus)) return false;
+        ExposureModelHealthStatus other = (ExposureModelHealthStatus) obj;
+        return infectious == other.infectious && Double.compare(other.degreeOfExposure, degreeOfExposure) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(infectious, degreeOfExposure);
     }
 }

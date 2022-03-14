@@ -2,6 +2,8 @@ package org.vadere.state.health;
 
 import org.vadere.util.geometry.shapes.VPoint;
 
+import java.util.Objects;
+
 /**
  * AirTransmissionModelHealthStatus that is used in combination with the
  * <code>AirTransmissionModel</code>.
@@ -93,6 +95,24 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
     }
 
     // Methods
+    @Override
+    public AirTransmissionModelHealthStatus clone() {
+        return new AirTransmissionModelHealthStatus(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof AirTransmissionModelHealthStatus)) return false;
+        if (!super.equals(obj)) return false;
+        AirTransmissionModelHealthStatus other = (AirTransmissionModelHealthStatus) obj;
+        return breathingIn == other.breathingIn && Double.compare(other.respiratoryTimeOffset, respiratoryTimeOffset) == 0 && Objects.equals(exhalationStartPosition, other.exhalationStartPosition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(breathingIn, respiratoryTimeOffset, exhalationStartPosition);
+    }
 
     /**
      * Defines whether the pedestrian inhales or exhales depending on the current simulation time,
