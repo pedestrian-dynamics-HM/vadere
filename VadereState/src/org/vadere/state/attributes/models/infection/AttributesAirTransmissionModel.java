@@ -114,6 +114,10 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 		this.aerosolCloudsActive = aerosolCloudsActive;
 	}
 
+	public void setAerosolCloudHalfLife(double halfLife) {
+		this.aerosolCloudParameters.setHalfLife(halfLife);
+	}
+
 	public void setAirDispersionFactor(double airDispersionFactor) {
 		this.aerosolCloudParameters.setAirDispersionFactor(airDispersionFactor);
 	}
@@ -124,5 +128,13 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 
 	public void setDropletsActive(boolean dropletsActive) {
 		this.dropletsActive = dropletsActive;
+	}
+
+	public void setDropletsLifeTime(double lifeTime) {
+		this.dropletParameters.setLifeTime(lifeTime);
+	}
+
+	public void setDropletsAngleOfSpreadInDeg(double angleOfSpreadInDeg) {
+		this.dropletParameters.setAngleOfSpreadInDeg(angleOfSpreadInDeg);
 	}
 }

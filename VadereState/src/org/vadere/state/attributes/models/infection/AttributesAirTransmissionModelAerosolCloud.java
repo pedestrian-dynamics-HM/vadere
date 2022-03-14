@@ -99,6 +99,10 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
         return absorptionRate;
     }
 
+    protected void setHalfLife(double halfLife) {
+        this.halfLife = halfLife;
+    }
+
     protected void setAirDispersionFactor(double airDispersionFactor) {
         this.airDispersionFactor = airDispersionFactor;
     }

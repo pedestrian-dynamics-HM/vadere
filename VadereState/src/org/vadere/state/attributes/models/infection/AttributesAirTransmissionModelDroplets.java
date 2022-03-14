@@ -80,4 +80,12 @@ public class AttributesAirTransmissionModelDroplets extends Attributes {
     public double getAbsorptionRate() {
         return absorptionRate;
     }
+
+    protected void setLifeTime(double lifeTime) {
+        this.lifeTime = lifeTime;
+    }
+
+    protected void setAngleOfSpreadInDeg(double angleOfSpreadInDeg) {
+        this.angleOfSpreadInDeg = angleOfSpreadInDeg;
+    }
 }

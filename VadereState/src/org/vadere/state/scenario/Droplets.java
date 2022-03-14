@@ -15,7 +15,7 @@ import java.awt.geom.Path2D;
 public class Droplets extends ParticleDispersion {
 
     private AttributesDroplets attributes;
-    final static int numberOfCircularSections = 5;
+    final static int numberOfCircularSections = 10; // should not be lower; lower values cause edges when approximating a circular segment if angleOfSpreadInDeg in AttributesAirTransmissionModelDroplets is large
 
     // Constructors
     public Droplets() {

@@ -294,7 +294,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 	}
 
-	private void updatePedestriansExposureToAerosolClouds() {
+	protected void updatePedestriansExposureToAerosolClouds() {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
