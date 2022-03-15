@@ -5,16 +5,22 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.context.VadereContext;
+import org.vadere.simulator.control.scenarioelements.TopographyController;
+import org.vadere.simulator.models.MainModel;
+import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
+import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.attributes.scenario.AttributesDroplets;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.health.AirTransmissionModelHealthStatus;
-import org.vadere.state.scenario.AerosolCloud;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.health.ExposureModelHealthStatus;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.ArrayList;
@@ -23,7 +29,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AirTransmissionModelTest {
-    private static final double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
+    private static final double ALLOWED_DOUBLE_TOLERANCE = 10e-6;
     private static final double SIM_TIME_STEP_LENGTH = 0.4;
 
     List<Attributes> attributesList;
@@ -65,8 +71,49 @@ public class AirTransmissionModelTest {
     }
 
     @Test
+    public void testTopographyControllerEventDefinesInfectiousPedestrian() {
+        int pedestrianId = 1;
+        airTransmissionModel.attrAirTransmissionModel.addInfectiousPedestrianIdsNoSource(pedestrianId);
+        Agent agent = new Pedestrian(new AttributesAgent(pedestrianId), rdm);
+
+        Pedestrian pedestrian = airTransmissionModel.topographyControllerEvent(getTopographyController(new OptimalStepsModel()), simStartTime, agent);
+
+        Assert.assertTrue(pedestrian.isInfectious());
+    }
+
+    @Test
+    public void testTopographyControllerEventInstantiatesHealthStatus() {
+        int pedestrianId = 1;
+        airTransmissionModel.attrAirTransmissionModel.addInfectiousPedestrianIdsNoSource(pedestrianId);
+        Pedestrian pedestrian = new Pedestrian(new AttributesAgent(pedestrianId), rdm);
+        Pedestrian defaultPedestrian = pedestrian.clone();
+        ExposureModelHealthStatus defaultHealthState = defaultPedestrian.getHealthStatus();
+
+        pedestrian = airTransmissionModel.topographyControllerEvent(getTopographyController(new OptimalStepsModel()), simStartTime, pedestrian);
+        ExposureModelHealthStatus instantiatedHealthStatus = pedestrian.getHealthStatus();
+
+        Assert.assertNotEquals(defaultHealthState, instantiatedHealthStatus);
+        Assert.assertSame(instantiatedHealthStatus.getClass(), AirTransmissionModelHealthStatus.class);
+    }
+
+    private TopographyController getTopographyController(MainModel mainModel) {
+        return new TopographyController(new Domain(topography), mainModel, rdm);
+    }
+
+    @Test
     public void testRegisterToScenarioElementControllerEvents() {
-        // TODO ...
+
+        int sourceId = 1;
+        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1,1,1,1)));
+        topography.addSource(source);
+
+        airTransmissionModel.attrAirTransmissionModel.getExposureModelSourceParameters().add(new AttributesExposureModelSourceParameters(sourceId, true));
+
+        double simEndTime = 100;
+
+        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
+            airTransmissionModel.update(simTimeInSec);
+        }
     }
 
     @Test
@@ -208,15 +255,10 @@ public class AirTransmissionModelTest {
             airTransmissionModel.executeAerosolCloudEmissionEvents(simTimeInSec);
 
             // the tested method requires that the pedestrian's health status is updated as well
-            airTransmissionModel.updatePedsHealthStatus(simTimeInSec);
+            airTransmissionModel.updatePedestriansHealthStatus(simTimeInSec);
         }
 
         Assert.assertTrue(topography.getAerosolClouds().size()>0);
-    }
-
-    @Test
-    public void testUpdateAerosolClouds() {
-        // maybe not necessary
     }
 
     @Test
@@ -303,7 +345,6 @@ public class AirTransmissionModelTest {
         return airTransmissionModel.topography.getAerosolClouds().stream().findFirst().get().getRadius();
     }
 
-
     @Test
     public void testUpdateAerosolCloudsExtentAgentMovement() {
         createAerosolCloud(airTransmissionModel);
@@ -353,7 +394,7 @@ public class AirTransmissionModelTest {
 
         for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += simTimeStepLength) {
             airTransmissionModel.updatePedestriansExposureToAerosolClouds();
-            airTransmissionModel.updatePedsHealthStatus(simTimeInSec);
+            airTransmissionModel.updatePedestriansHealthStatus(simTimeInSec);
         }
 
         return pedestrian;
@@ -375,21 +416,102 @@ public class AirTransmissionModelTest {
 
     @Test
     public void testExecuteDropletEmissionEvents() {
+        double simEndTime = airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod() + 1 / airTransmissionModel.attrAirTransmissionModel.getDropletsEmissionFrequency();
 
+        airTransmissionModel.attrAirTransmissionModel.setDropletsLifeTime(simEndTime);
+
+        Pedestrian pedestrian = createPedestrian();
+        pedestrian.setId(1);
+        pedestrian.setInfectious(true);
+        VPoint position = new VPoint(1, 1);
+        pedestrian.setPosition(position);
+        topography.addElement(pedestrian);
+
+        Vector2D walkingDirection = new Vector2D(Math.random(), Math.random());
+        walkingDirection.normalize(AirTransmissionModel.MIN_PED_STEP_LENGTH);
+
+        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
+            position = position.add(walkingDirection);
+            pedestrian.setPosition(position);
+            airTransmissionModel.executeDropletEmissionEvents(simTimeInSec);
+        }
+
+        Vector2D normDropletsDirection = topography.getDroplets().stream().findFirst().get().getDirection().normalize(1);
+        Vector2D normExpectedDirection = walkingDirection.normalize(1);
+
+        Assert.assertEquals(normExpectedDirection.x, normDropletsDirection.x, ALLOWED_DOUBLE_TOLERANCE);
+        Assert.assertEquals(normExpectedDirection.y, normDropletsDirection.y, ALLOWED_DOUBLE_TOLERANCE);
     }
 
     @Test
-    public void testUpdateDroplets() {
+    public void testDeleteExpiredDropletsBeforeLifeTimeReached() {
+        double lifeTime = 3;
+        double simTimeInSec = simStartTime + lifeTime * 0.9; // any value < simStartTime + lifeTime
+        initTestDeleteExpiredDroplets(lifeTime);
 
+        airTransmissionModel.deleteExpiredDroplets(simTimeInSec);
+
+        Assert.assertTrue(topography.getDroplets().size() > 0);
     }
 
     @Test
-    public void testUpdatePedestriansExposureToDroplets() {
+    public void testDeleteExpiredDropletsAfterLifeTimeReached() {
+        double lifeTime = 3;
+        double simTimeInSec = simStartTime + lifeTime * 1.1; // any value > simStartTime + lifeTime
+        initTestDeleteExpiredDroplets(lifeTime);
 
+        airTransmissionModel.deleteExpiredDroplets(simTimeInSec);
+
+        Assert.assertTrue(topography.getDroplets().size() == 0);
+    }
+
+    public void initTestDeleteExpiredDroplets(double lifeTime) {
+        setDropletsActive(true);
+        airTransmissionModel.attrAirTransmissionModel.setDropletsLifeTime(lifeTime);
+        createDroplets(airTransmissionModel);
     }
 
     @Test
-    public void testUpdatePedsHealthStatus() {
+    public void testUpdatePedestriansExposureWithinDroplets() {
+        Pedestrian pedestrian = testUpdatePedestriansExposureToDroplets(false);
+
+        Assert.assertTrue(pedestrian.getDegreeOfExposure() > 0);
+    }
+
+    @Test
+    public void testUpdatePedestriansExposureOutsideDroplets() {
+        Pedestrian pedestrian = testUpdatePedestriansExposureToDroplets(true);
+
+        Assert.assertTrue(pedestrian.getDegreeOfExposure() == 0);
+    }
+
+    private Pedestrian testUpdatePedestriansExposureToDroplets(boolean pedestrianOutsideDroplets) {
+        createDroplets(airTransmissionModel);
+        Droplets droplets = airTransmissionModel.topography.getDroplets().stream().findFirst().get();
+        Vector2D dropletsDirection = droplets.getDirection();
+        VPoint dropletsOrigin = droplets.getOrigin();
+
+        double simTimeStepLength = airTransmissionModel.simTimeStepLength;
+        double simEndTime = 1 / airTransmissionModel.attrAirTransmissionModel.getDropletsEmissionFrequency() + 2 * airTransmissionModel.attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod();
+
+        Pedestrian pedestrian = createPedestrian();
+        VPoint position = dropletsOrigin.add(dropletsDirection.normalize(airTransmissionModel.attrAirTransmissionModel.getDropletsDistanceOfSpread() * 0.5));
+        if (pedestrianOutsideDroplets) {
+            position = dropletsOrigin.add(dropletsDirection.normalize(airTransmissionModel.attrAirTransmissionModel.getDropletsDistanceOfSpread() * 1.5));
+        }
+        pedestrian.setPosition(position);
+        topography.addElement(pedestrian);
+
+        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += simTimeStepLength) {
+            airTransmissionModel.updatePedestriansExposureToDroplets();
+            airTransmissionModel.updatePedestriansHealthStatus(simTimeInSec);
+        }
+
+        return pedestrian;
+    }
+
+    @Test
+    public void testUpdatePedestriansHealthStatus() {
 
     }
 
@@ -410,6 +532,17 @@ public class AirTransmissionModelTest {
                 simStartTime,
                 airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad()));
         airTransmissionModel.topography.addAerosolCloud(aerosolCloud);
+    }
+
+    private void createDroplets(AirTransmissionModel airTransmissionModel) {
+        Droplets droplets = new Droplets(new AttributesDroplets(1,
+                simStartTime,
+                airTransmissionModel.attrAirTransmissionModel.getDropletsPathogenLoad(),
+                new VPoint(5, 5),
+                new Vector2D(1, 1),
+                airTransmissionModel.attrAirTransmissionModel.getDropletsDistanceOfSpread(),
+                airTransmissionModel.attrAirTransmissionModel.getDropletsAngleOfSpreadInDeg()));
+        airTransmissionModel.topography.addDroplets(droplets);
     }
 
     private void setAerosolCloudsActive(boolean active) {
