@@ -41,7 +41,7 @@ public class ThresholdResponseModel extends AbstractDoseResponseModel {
 
     Topography topography;
 
-    private AttributesThresholdResponseModel attributesThresholdResponseModel;
+    protected AttributesThresholdResponseModel attributesThresholdResponseModel;
 
 
     @Override
