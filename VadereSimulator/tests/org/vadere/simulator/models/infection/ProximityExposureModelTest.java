@@ -130,12 +130,12 @@ public class ProximityExposureModelTest {
         proximityExposureModel.attributesProximityExposureModel.addInfectiousPedestrianIdsNoSource(pedestrianId);
         Pedestrian pedestrian = new Pedestrian(new AttributesAgent(pedestrianId), rdm);
         Pedestrian defaultPedestrian = pedestrian.clone();
-        ExposureModelHealthStatus defaultHealthState = defaultPedestrian.getHealthStatus();
+        ExposureModelHealthStatus defaultHealthStatus = defaultPedestrian.getHealthStatus();
 
         pedestrian = proximityExposureModel.topographyControllerEvent(getTopographyController(new OptimalStepsModel()), simStartTime, pedestrian);
         ExposureModelHealthStatus instantiatedHealthStatus = pedestrian.getHealthStatus();
 
-        Assert.assertNotEquals(defaultHealthState, instantiatedHealthStatus);
+        Assert.assertNotEquals(defaultHealthStatus, instantiatedHealthStatus);
         Assert.assertSame(instantiatedHealthStatus.getClass(), BasicExposureModelHealthStatus.class);
     }
 
