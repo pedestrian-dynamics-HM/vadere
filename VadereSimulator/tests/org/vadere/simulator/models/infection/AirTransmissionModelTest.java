@@ -11,16 +11,13 @@ import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
-import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
-import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.ArrayList;
@@ -70,6 +67,25 @@ public class AirTransmissionModelTest {
         Assert.assertEquals(ctx.get(AirTransmissionModel.simStepLength), airTransmissionModel.simTimeStepLength);
     }
 
+    // TODO test not completed yet
+//    @Test
+//    public void testSourceControllerEvent() {
+//        int pedestrianId = 1;
+//        int sourceId = 1;
+//        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1, 1, 1, 1)));
+//        topography.addSource(source);
+//
+//        MainModel mainModel = new OptimalStepsModel();
+//        SourceControllerFactory sourceControllerFactory = mainModel.getSourceControllerFactory();
+//        SourceController sourceController = sourceControllerFactory
+//                .create(topography, source, mainModel, new AttributesAgent(pedestrianId), rdm);
+//
+//        double simTimeInSec = simStartTime;
+//        Agent agent = new Pedestrian(new AttributesAgent(), rdm);
+//
+//        airTransmissionModel.sourceControllerEvent(sourceController, simTimeInSec, agent);
+//    }
+
     @Test
     public void testTopographyControllerEventDefinesInfectiousPedestrian() {
         int pedestrianId = 1;
@@ -100,21 +116,22 @@ public class AirTransmissionModelTest {
         return new TopographyController(new Domain(topography), mainModel, rdm);
     }
 
-    @Test
-    public void testRegisterToScenarioElementControllerEvents() {
-
-        int sourceId = 1;
-        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1,1,1,1)));
-        topography.addSource(source);
-
-        airTransmissionModel.attrAirTransmissionModel.getExposureModelSourceParameters().add(new AttributesExposureModelSourceParameters(sourceId, true));
-
-        double simEndTime = 100;
-
-        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
-            airTransmissionModel.update(simTimeInSec);
-        }
-    }
+//    TODO test not completed yet
+//    @Test
+//    public void testRegisterToScenarioElementControllerEvents() {
+//
+//        int sourceId = 1;
+//        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1,1,1,1)));
+//        topography.addSource(source);
+//
+//        airTransmissionModel.attrAirTransmissionModel.getExposureModelSourceParameters().add(new AttributesExposureModelSourceParameters(sourceId, true));
+//
+//        double simEndTime = 100;
+//
+//        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
+//            airTransmissionModel.update(simTimeInSec);
+//        }
+//    }
 
     @Test
     public void testUpdateCreatesAerosolCloudsAlthoughNotActive() {
@@ -225,7 +242,7 @@ public class AirTransmissionModelTest {
 
         double distance = 0.5 * Math.min(airTransmissionModel.attrAirTransmissionModel.getAerosolCloudInitialRadius(), airTransmissionModel.attrAirTransmissionModel.getDropletsDistanceOfSpread());
         Vector2D spacingBetweenPeds = new Vector2D(1, 1);
-        spacingBetweenPeds.normalize(distance);
+        spacingBetweenPeds = spacingBetweenPeds.normalize(distance);
 
         Pedestrian pedestrian2 = createPedestrian();
         VPoint pos2 = pos1.add(spacingBetweenPeds);
@@ -428,7 +445,7 @@ public class AirTransmissionModelTest {
         topography.addElement(pedestrian);
 
         Vector2D walkingDirection = new Vector2D(Math.random(), Math.random());
-        walkingDirection.normalize(AirTransmissionModel.MIN_PED_STEP_LENGTH);
+        walkingDirection = walkingDirection.normalize(AirTransmissionModel.MIN_PED_STEP_LENGTH);
 
         for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
             position = position.add(walkingDirection);
