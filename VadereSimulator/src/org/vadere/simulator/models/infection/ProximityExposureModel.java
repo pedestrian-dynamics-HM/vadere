@@ -45,7 +45,7 @@ public class ProximityExposureModel extends AbstractExposureModel {
     /*
      * defines the maximum possible degree of exposure a pedestrian can adopt
      */
-    private static final double MAX_DEG_OF_EXPOSURE = 1;
+    protected static final double MAX_DEG_OF_EXPOSURE = 1;
 
     Topography topography;
 
@@ -97,7 +97,7 @@ public class ProximityExposureModel extends AbstractExposureModel {
 
         Collection<Pedestrian> exposedPedestrians = pedestrians
                 .stream()
-                .filter(p -> (areaOfExposure.contains(p.getPosition())) && p.getDegreeOfExposure() < MAX_DEG_OF_EXPOSURE).collect(Collectors.toSet());
+                .filter(p -> (areaOfExposure.contains(p.getPosition())) && p.getId() != infectiousPedestrian.getId()).collect(Collectors.toSet());
         return exposedPedestrians;
     }
 
