@@ -24,8 +24,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.vadere.state.scenario.Droplets.createTransformedDropletsShape;
-
 /**
  * AirTransmissionModel describes the transmission of pathogen from one
  * <code>Pedestrian</code> to another via <code>ParticleDispersion</code> that
@@ -60,7 +58,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	private Map<Integer, VPoint> lastPedestrianPositions;
 	private Map<Integer, Vector2D> viewingDirections;
-	private static final double MIN_PED_STEP_LENGTH = 0.1;
+	private Map<Integer, Double> nextDropletsExhalationTime;
+	protected static final double MIN_PED_STEP_LENGTH = 0.1;
 
 	/**
 	 * Key that is used for initializeVadereContext in ScenarioRun
@@ -82,15 +81,16 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-			this.domain = domain;
-			this.random = random;
-			this.attributesAgent = attributesPedestrian;
-			this.attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesAirTransmissionModel.class);
-			this.topography = domain.getTopography();
-			this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
-			this.aerosolCloudIdCounter = 1;
-			this.viewingDirections = new HashMap<>();
-			this.lastPedestrianPositions = new HashMap<>();
+		this.domain = domain;
+		this.random = random;
+		this.attributesAgent = attributesPedestrian;
+		this.attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesAirTransmissionModel.class);
+		this.topography = domain.getTopography();
+		this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
+		this.aerosolCloudIdCounter = 1;
+		this.viewingDirections = new HashMap<>();
+		this.lastPedestrianPositions = new HashMap<>();
+		this.nextDropletsExhalationTime = new HashMap<>();
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 
 		if (attrAirTransmissionModel.isAerosolCloudsActive() || attrAirTransmissionModel.isDropletsActive()) {
-			updatePedsHealthStatus(simTimeInSec);
+			updatePedestriansHealthStatus(simTimeInSec);
 		}
 	}
 
@@ -202,19 +202,20 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		// period between two droplet generating respiratory events
 		double dropletExhalationPeriod = 1 / attrAirTransmissionModel.getDropletsEmissionFrequency();
 
-		if (simTimeInSec % dropletExhalationPeriod < simTimeStepLength) {
-
-			VShape shape = createTransformedDropletsShape(pedestrian.getPosition(),
+		if (nextDropletsExhalationTime.get(pedestrianId) == null) {
+			nextDropletsExhalationTime.put(pedestrianId, simTimeInSec + dropletExhalationPeriod);
+		} else if (simTimeInSec >= nextDropletsExhalationTime.get(pedestrianId) && !pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn()) {
+			Droplets droplets = new Droplets(new AttributesDroplets(1,
+					simTimeInSec,
+					attrAirTransmissionModel.getDropletsPathogenLoad(),
+					pedestrian.getPosition(),
 					viewingDirection,
 					attrAirTransmissionModel.getDropletsDistanceOfSpread(),
-					Math.toRadians(attrAirTransmissionModel.getDropletsAngleOfSpreadInDeg()));
-
-			Droplets droplets = new Droplets(new AttributesDroplets(1,
-					shape,
-					simTimeInSec,
-					attrAirTransmissionModel.getDropletsPathogenLoad()));
+					attrAirTransmissionModel.getDropletsAngleOfSpreadInDeg()));
 
 			topography.addDroplets(droplets);
+
+			nextDropletsExhalationTime.put(pedestrianId, simTimeInSec + dropletExhalationPeriod);
 		}
 	}
 
@@ -286,7 +287,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 	}
 
-	protected void updatePedsHealthStatus(double simTimeInSec) {
+	protected void updatePedestriansHealthStatus(double simTimeInSec) {
 		Collection<Pedestrian> allPedestrians = topography.getPedestrianDynamicElements().getElements();
 		for (Pedestrian pedestrian : allPedestrians) {
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus()
@@ -320,7 +321,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		}
 	}
 
-	private void updatePedestriansExposureToDroplets() {
+	protected void updatePedestriansExposureToDroplets() {
 		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
 				.getElements()
 				.stream()
@@ -374,7 +375,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	}
 
 	@Override
-	public Pedestrian topographyControllerEvent(TopographyController topographyController, double simtimeInSec, Agent agent) {
+	public Pedestrian topographyControllerEvent(TopographyController topographyController, double simTimeInSec, Agent agent) {
 		Pedestrian pedestrian = (Pedestrian) agent;
 		AirTransmissionModelHealthStatus defaultHealthStatus = new AirTransmissionModelHealthStatus();
 

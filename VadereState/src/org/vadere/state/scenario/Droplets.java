@@ -47,6 +47,14 @@ public class Droplets extends ParticleDispersion {
         return attributes;
     }
 
+    public VPoint getOrigin() {
+        return attributes.getOrigin();
+    }
+
+    public Vector2D getDirection() {
+        return attributes.getDirection();
+    }
+
     public double getCreationTime() { return attributes.getCreationTime(); }
 
        // Setter
@@ -95,8 +103,10 @@ public class Droplets extends ParticleDispersion {
         } else return attributes.equals(other.attributes);
     }
 
-    public static VShape createTransformedDropletsShape(VPoint origin, Vector2D direction, double radius, double centralAngleInRad) {
+    public static VShape createTransformedDropletsShape(VPoint origin, Vector2D direction, double radius, double centralAngleInDeg) {
         VPolygon shape;
+
+        double centralAngleInRad = Math.toRadians(centralAngleInDeg);
 
         Path2D path = new Path2D.Double();
         path.moveTo(0, 0); // define stating point

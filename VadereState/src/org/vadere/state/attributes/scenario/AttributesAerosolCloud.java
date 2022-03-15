@@ -63,11 +63,11 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
     // Setter
     public void setRadius(double radius) {
-        this.setShape(new VCircle(this.center, radius));
+        this.setShape(AerosolCloud.createAerosolCloudShape(this.center, radius));
     }
 
     public void setCenter(VPoint center) {
-        this.setShape(new VCircle(center, this.radius));
+        this.setShape(AerosolCloud.createAerosolCloudShape(center, this.radius));
     }
 
     public void setShape(VCircle circle) {

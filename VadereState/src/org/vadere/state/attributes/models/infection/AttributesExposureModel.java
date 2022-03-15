@@ -31,4 +31,8 @@ public abstract class AttributesExposureModel extends Attributes {
     public ArrayList<Integer> getInfectiousPedestrianIdsNoSource() {
         return infectiousPedestrianIdsNoSource;
     }
+
+    public void addInfectiousPedestrianIdsNoSource(int pedestrianId) {
+        infectiousPedestrianIdsNoSource.add(pedestrianId);
+    }
 }
