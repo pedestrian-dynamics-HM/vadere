@@ -57,6 +57,15 @@ public class AttributesAirTransmissionModelDroplets extends Attributes {
         this.absorptionRate = 0.1;
     }
 
+    public AttributesAirTransmissionModelDroplets(double emissionFrequency, double distanceOfSpread, double angleOfSpreadInDeg, double lifeTime, double pathogenLoad, double absorptionRate) {
+        this.emissionFrequency = emissionFrequency;
+        this.distanceOfSpread = distanceOfSpread;
+        this.angleOfSpreadInDeg = angleOfSpreadInDeg;
+        this.lifeTime = lifeTime;
+        this.pathogenLoad = pathogenLoad;
+        this.absorptionRate = absorptionRate;
+    }
+
     public double getEmissionFrequency() {
         return emissionFrequency;
     }

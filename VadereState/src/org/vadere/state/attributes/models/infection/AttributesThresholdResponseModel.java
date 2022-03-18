@@ -16,6 +16,10 @@ public class AttributesThresholdResponseModel extends AttributesDoseResponseMode
         this.exposureToInfectedThreshold = 1;
     }
 
+    public AttributesThresholdResponseModel(double exposureToInfectedThreshold) {
+        this.exposureToInfectedThreshold = exposureToInfectedThreshold;
+    }
+
     public double getExposureToInfectedThreshold() {
         return exposureToInfectedThreshold;
     }
