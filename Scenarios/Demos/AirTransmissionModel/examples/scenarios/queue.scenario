@@ -80,7 +80,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor",
       "id" : 12,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudDataProcessor",
       "attributes" : {
         "sampleEveryNthSimStep" : 1
       }

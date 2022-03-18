@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-public class AttributesAerosolCloudShapeProcessor extends AttributesProcessor {
+public class AttributesAerosolCloudDataProcessor extends AttributesProcessor {
 
     int sampleEveryNthSimStep = 1;
 

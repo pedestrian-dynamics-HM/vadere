@@ -4,7 +4,7 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepIdDataKey;
-import org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor;
+import org.vadere.state.attributes.processor.AttributesAerosolCloudDataProcessor;
 import org.vadere.state.scenario.AerosolCloud;
 
 import java.util.Collection;
@@ -29,7 +29,7 @@ public class AerosolCloudDataProcessor extends DataProcessor<TimestepIdDataKey, 
 
     public AerosolCloudDataProcessor() {
         super("pathogenLoad", "radius", "centerX", "centerY");
-        setAttributes(new AttributesAerosolCloudShapeProcessor());
+        setAttributes(new AttributesAerosolCloudDataProcessor());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AerosolCloudDataProcessor extends DataProcessor<TimestepIdDataKey, 
     @Override
     public void init(ProcessorManager manager) {
         super.init(manager);
-        AttributesAerosolCloudShapeProcessor attr = (AttributesAerosolCloudShapeProcessor) this.getAttributes();
+        AttributesAerosolCloudDataProcessor attr = (AttributesAerosolCloudDataProcessor) this.getAttributes();
         sampleEveryNthSimStep = attr.getSampleEveryNthSimStep();
     }
 
