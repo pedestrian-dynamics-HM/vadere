@@ -47,6 +47,12 @@ public class ScenarioChecker {
 		return runCheck(new TopographyOverlapCheck());
 	}
 
+	public PriorityQueue<ScenarioCheckerMessage> checkObstacleRepulsion() {
+		return runCheck(new ObstacleRepulsionCheck());
+	}
+
+
+
 
 	private PriorityQueue<ScenarioCheckerMessage> runCheck(ScenarioCheckerTest checkerTest) {
 		return checkerTest.runScenarioCheckerTest(scenario);
@@ -60,6 +66,7 @@ public class ScenarioChecker {
 		ret.addAll(checkStairTreadSanity());
 		ret.addAll(checkPedestrianSpeedSetup());
 		ret.addAll(checkOverlap());
+		ret.addAll(checkObstacleRepulsion());
 		ret.addAll(checkSimulationAttribues());
 		ret.addAll(checkSourceSpawnSetting());
 		ret.addAll(checkMinSourceRadius());
