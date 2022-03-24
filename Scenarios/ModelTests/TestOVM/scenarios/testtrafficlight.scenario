@@ -1,7 +1,8 @@
 {
   "name" : "testtrafficlight",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
+  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -134,6 +135,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -176,6 +179,7 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ]
+    "stimulusInfos" : [ ],
+    "reactionProbabilities" : [ ]
   }
 }
