@@ -26,6 +26,31 @@ public class AttributesFloorField extends Attributes {
 	 */
 	private double potentialFieldResolution = 0.1;
 	private double obstacleGridPenalty = 0.1;
+
+	/**
+	 * The targetAttractionStrength weights the target potential against the agent potential and the obstacle potential.
+	 * targetAttractionStrength > 1 means the target becomes more attractive (other parameters: default values).
+	 * Thus, agents keep less distance to other agents and to walls.
+	 * Choose targetAttractionStrength > 1, if agents get stuck (clogging) before narrow corridors (<1.28m).
+	 * Clogging can occur if the gradient of the obstacle potential is larger than the gradient of the target potential.
+	 * Then, the global minimum (within walking distance) is in front of the corridor.
+	 * If case of clogging, we recommend to choose the targetAttractionStrengh depending on the bottleneck width c.
+	 * 						 	  |	 25.0 		for c < 0.8m  (a) -> not tested
+	 * targetAttractionStrengh = -|	 25.0-18.8c 	for c < 1.28m (b) -> fulfils condition (d)
+	 * 							  |	 1.0 			for c >=1.28m (c) -> default value 1.
+	 * (d): | max. grad (target potential) | > | max. grad (obstacle potential) | (both measured at extended corridor center line)
+	 *
+	 * 			|
+	 * 			==========  .
+	 * 	   --X-----------             |target|
+	 * 			==========	.
+	 * 			|
+	 * Legend:
+	 * 		.  . 	: distance between points > corridor width c
+	 * 		X		: agent stuck on minimum in front of narrow corridor
+	 * 	    ---- 	: center line
+	 */
+
 	private double targetAttractionStrength = 1.0;
 
 	/**

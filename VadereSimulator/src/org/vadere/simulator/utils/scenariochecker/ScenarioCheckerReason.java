@@ -33,6 +33,8 @@ public enum ScenarioCheckerReason {
 	OVERLAP_OBSTACLE_OBSTACLE("ScenarioChecker.overlap.obstacle.obstacle"),
 	OVERLAP_OBSTACLE_OBSTACLE_ENCLOSE("ScenarioChecker.overlap.obstacle.obstacle.enclose"),
 
+	NARROW_BOTTLENECK("ScenarioChecker.obstacle.enclose"),
+
 	TARGET_UNUSED("ScenarioChecker.target.unused"),
 	TARGET_OVERLAP("ScenarioChecker.target.overlap"),
 	PEDESTRIAN_SPEED_SETUP("ScenarioChecker.pedestrian.speedsetup"),
