@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
@@ -224,14 +223,15 @@ public class TargetVersionV2_1 extends SimpleJsonTransformation {
         String newName1 = "org.vadere.simulator.models.infection.AirTransmissionModel";
         String newName2 = "org.vadere.simulator.models.infection.ThresholdResponseModel";
 
-        ArrayNode submodelsNode = (ArrayNode) path(scenarioFile, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/submodels");
+        JsonNode submodelsNode = path(scenarioFile, "scenario/attributesModel/org.vadere.state.attributes.models.AttributesOSM/submodels");
 
         if (!submodelsNode.isMissingNode()) {
-            for (int i = 0; i < submodelsNode.size(); i++) {
-                if (submodelsNode.get(i).asText().equals(oldName)) {
-                    submodelsNode.remove(i);
-                    submodelsNode.add(newName1);
-                    submodelsNode.add(newName2);
+            ArrayNode submodelsArray = (ArrayNode) submodelsNode;
+            for (int i = 0; i < submodelsArray.size(); i++) {
+                if (submodelsArray.get(i).asText().equals(oldName)) {
+                    submodelsArray.remove(i);
+                    submodelsArray.add(newName1);
+                    submodelsArray.add(newName2);
                 }
             }
         }
