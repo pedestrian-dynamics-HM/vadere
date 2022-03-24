@@ -310,6 +310,36 @@ public interface JsonNodeExplorer {
 		return ret;
 	}
 
+	default void renameFileFieldName(JsonNode rootNode, String fieldKey, String oldName, String newName) throws MigrationException {
+		String childName = "files";
+		renameProcessWritersChildField(rootNode, childName, fieldKey, oldName, newName);
+	}
+
+	default void renameProcessorFieldName(JsonNode rootNode, String fieldKey, String oldName, String newName) throws MigrationException {
+		String childName = "processors";
+		renameProcessWritersChildField(rootNode, childName, fieldKey, oldName, newName);
+	}
+
+	private void renameProcessWritersChildField(JsonNode rootNode, String childName, String fieldKey, String oldName, String newName) throws MigrationException {
+		String path = "processWriters/" + childName;
+		JsonNode childArrayNode = pathMustExist(rootNode, path);
+
+		if (childArrayNode.isArray()) {
+			for (JsonNode node : childArrayNode) {
+				if (node.has(fieldKey)) {
+					String fieldValue = node.get(fieldKey).asText("");
+
+					if (fieldValue.contains(oldName)) {
+						String newFieldValue = fieldValue.replace(oldName, newName);
+						changeStringValue(node, fieldKey, newFieldValue);
+					}
+				}
+			}
+		} else {
+			throw new MigrationException("Node '" + path + "' should be an Array Node.");
+		}
+	}
+
 	default void arrayRemoveString(ArrayNode arrayNode, String val){
 		Iterator<JsonNode> iter = arrayNode.iterator();
 		while (iter.hasNext()){

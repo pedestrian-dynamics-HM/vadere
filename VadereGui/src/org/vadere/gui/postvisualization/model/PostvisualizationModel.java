@@ -7,7 +7,7 @@ import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.health.InfectionStatus;
+import org.vadere.state.health.BasicExposureModelHealthStatus;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
@@ -22,12 +22,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -74,45 +69,48 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	public PostvisualizationModel() {
 		super(new PostvisualizationConfig());
 		this.trajectories = new TableTrajectoryFootStep(Table.create());
-		this.contactData = null;
+		this.contactData = new ContactData(Table.create());
 		this.scenario = new Scenario("");
 		this.topographyId = 0;
 		this.potentialContainer = null;
-		this.tableAerosolCloudData = null;
+		this.tableAerosolCloudData = new TableAerosolCloudData(Table.create());
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
 		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
 		this.predicateColoringModel = new PredicateColoringModel();
 		this.outputChanged = false;
 	}
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath) {
-		init(trajectories, contactTrajectories, aerosolCloudData, scenario, projectPath, new AttributesAgent());
+	public synchronized void init(final Table trajectories, final HashMap<String, Table> additionalTables, final Scenario scenario, final String projectPath) {
+		init(trajectories, additionalTables, scenario, projectPath, new AttributesAgent());
 	}
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, contactTrajectories, null, scenario, projectPath, new AttributesAgent());
-	}
+
 	public synchronized void init(final Table trajectories, final Scenario scenario, final String projectPath) {
-		init(trajectories, null, null, scenario, projectPath, new AttributesAgent());
+		init(trajectories, new HashMap<>(), scenario, projectPath, new AttributesAgent());
 	}
 
 	/**
 	 * Initialize the {@link PostvisualizationModel}.
 	 * @param trajectories
+	 * @param additionalTables 	tables containing additional data that is not stored in trajectories but should be
+	 *                          postvisualized as well, for example contacts and aerosol clouds
 	 * @param scenario      the scenario which was used to produce the output the PostVis will display.
 	 *                      This scenario will not contain any agents.
 	 * @param projectPath   the path to the project.
 	 */
-	public synchronized void init(final Table trajectories, final Table contactTrajectories, final Table aerosolCloudData, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
+	public synchronized void init(final Table trajectories, final HashMap<String, Table> additionalTables, final Scenario scenario, final String projectPath, final AttributesAgent attributesAgent) {
 		this.scenario = scenario;
 		this.simTimeStepLength = scenario.getAttributesSimulation().getSimTimeStepLength();
 		this.trajectories = new TableTrajectoryFootStep(trajectories);
-		if (contactTrajectories != null) {
-			this.config.setContactsRecorded(true);
-			this.contactData = new ContactData(contactTrajectories);
-		}
-		if (aerosolCloudData != null) {
-			this.config.setAerosolCloudsRecorded(true);
-			this.tableAerosolCloudData = new TableAerosolCloudData(aerosolCloudData);
+		clearAdditionalTables();
+		for (HashMap.Entry<String, Table> entry : additionalTables.entrySet()) {
+			switch (entry.getKey()) {
+				case ContactData.TABLE_NAME:
+					this.config.setContactsRecorded(true);
+					this.contactData = new ContactData(entry.getValue());
+				case TableAerosolCloudData.TABLE_NAME:
+					this.config.setAerosolCloudsRecorded(true);
+					this.tableAerosolCloudData = new TableAerosolCloudData(entry.getValue());
+			}
 		}
 		this.visTime = 0;
 		this.attributesAgent = attributesAgent;
@@ -230,6 +228,13 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return trajectories.getAgentDataFrame();
 	}
 
+	private void clearAdditionalTables() {
+		config.setContactsRecorded(false);
+		contactData = new ContactData(Table.create());
+		config.setAerosolCloudsRecorded(false);
+		tableAerosolCloudData = new TableAerosolCloudData(Table.create());
+	}
+
 	private Pedestrian toAgent(final Row row) {
 		int pedId = row.getInt(trajectories.pedIdCol);
 		double startTime = row.getDouble(trajectories.startTimeCol);
@@ -283,17 +288,19 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 			pedestrian.setGroupMembership(GroupMembership.valueOf(groupMembershipString));
 		}
 
-		if(trajectories.infectionStatusCol != -1) {
-			String infectionStatusString = row.getString(trajectories.infectionStatusCol);
-			pedestrian.setInfectionStatus(InfectionStatus.valueOf(infectionStatusString));
+		if(trajectories.isInfectiousCol != -1) {
+			boolean isInfectiousString = row.getBoolean(trajectories.isInfectiousCol);
+			if (pedestrian.getHealthStatus() == null) {
+				pedestrian.setHealthStatus(new BasicExposureModelHealthStatus());
+			}
+			pedestrian.setInfectious(isInfectiousString);
 		}
 
-		if(trajectories.absorbedPathogenLoadCol != -1) {
-			pedestrian.setPathogenAbsorbedLoad(row.getDouble(trajectories.absorbedPathogenLoadCol));
-		}
-
-		if(trajectories.minInfectiousDoseCol != -1) {
-			pedestrian.setMinInfectiousDose(row.getDouble(trajectories.minInfectiousDoseCol));
+		if(trajectories.degreeOfExposureCol != -1) {
+			if (pedestrian.getHealthStatus() == null) {
+				pedestrian.setHealthStatus(new BasicExposureModelHealthStatus());
+			}
+			pedestrian.setDegreeOfExposure(row.getDouble(trajectories.degreeOfExposureCol));
 		}
 
 		return pedestrian;

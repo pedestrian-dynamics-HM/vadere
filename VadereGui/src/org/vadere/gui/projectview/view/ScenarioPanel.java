@@ -22,7 +22,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -363,15 +365,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	public void loadOutputFileForPostVis(Scenario scenarioRM) throws IOException {
 		postVisualizationView.loadOutputFile(scenarioRM);
 	}
-
+	public void loadOutputFileForPostVis(File trajectoryFile, HashMap<String, File> additionalPostVisFiles, Scenario scenarioRM) throws IOException {
+		postVisualizationView.loadOutputFile(trajectoryFile, additionalPostVisFiles, scenarioRM);
+	}
 	public void loadOutputFileForPostVis(File trajectoryFile, Scenario scenarioRM) throws IOException {
-		postVisualizationView.loadOutputFile(trajectoryFile, null, null, scenarioRM);
-	}
-	public void loadOutputFileForPostVis(File trajectoryFile, File contactsTrajectoryFile, Scenario scenarioRM) throws IOException {
-		postVisualizationView.loadOutputFile(trajectoryFile, contactsTrajectoryFile, null, scenarioRM);
-	}
-	public void loadOutputFileForPostVis(File trajectoryFile, File contactsTrajectoryFile, File aerosolCloudDataFile, Scenario scenarioRM) throws IOException {
-		postVisualizationView.loadOutputFile(trajectoryFile, contactsTrajectoryFile, aerosolCloudDataFile, scenarioRM);
+		postVisualizationView.loadOutputFile(trajectoryFile, scenarioRM);
 	}
 
 	public static void setActiveTopographyErrorMsg(JEditorPane msg){

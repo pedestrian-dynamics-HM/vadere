@@ -295,12 +295,12 @@ public abstract class DefaultRenderer {
 		final Color tmpColor = graphics.getColor();
 		AerosolCloud cloud = (AerosolCloud) element;
 		float maxAlpha = defaultModel.getConfig().getAerosolCloudAlphaMax();
-		float minAlpha = defaultModel.getConfig().getAerosolCloudAlphaMin();
-		//ToDo this is hard coded!
-		double maxPathogensPerArea = 10000;
-		double pathogensPerArea = cloud.getCurrentPathogenLoad() / cloud.getArea();
-		pathogensPerArea = Math.min(pathogensPerArea, maxPathogensPerArea); // make sure that maxPathogensPerArea is not exceeded
-		int currentAlpha = (int) ((pathogensPerArea / maxPathogensPerArea) * (maxAlpha - minAlpha) + minAlpha);
+		float minAlpha = 0; // no lower threshold
+
+		double maxPathogenConcentration = defaultModel.getConfig().getAerosolCloudMaxPathogenConcentration();
+		double pathogenConcentration = cloud.getPathogenConcentration();
+		pathogenConcentration = Math.min(pathogenConcentration, maxPathogenConcentration); // make sure that pathogenConcentration is not exceeded
+		int currentAlpha = (int) ((pathogenConcentration / maxPathogenConcentration) * (maxAlpha - minAlpha) + minAlpha);
 
 		graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), currentAlpha));
 		if (cloud.getShape() instanceof VPolygon){

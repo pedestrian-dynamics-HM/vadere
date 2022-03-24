@@ -31,13 +31,17 @@ import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
 import org.vadere.gui.postvisualization.control.ActionStop;
 import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
 import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
+import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudDataProcessor;
 import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
+import tech.tablesaw.api.Table;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -50,10 +54,8 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Observer;
-import java.util.Optional;
 
 import javax.swing.*;
 
@@ -238,7 +240,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 					public void actionPerformed(ActionEvent e) {
 						if (!model.config.isAerosolCloudsRecorded()) {
 							JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
-									Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text"));
+									Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text") + "\n" + AerosolCloudDataProcessor.class.getName() + "\n" + TableAerosolCloudData.TABLE_NAME + ".txt");
 						} else {
 							model.config.setShowAerosolClouds(!model.config.isShowAerosolClouds());
 							model.notifyObservers();
@@ -397,19 +399,19 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		return menuBar;
 	}
 
-	public void loadOutputFile(final File trajectoryFile, final File contactsTrajectoryFile, final File aerosolCloudShapeFile, final Scenario scenario) throws IOException {
+	public void loadOutputFile(final File trajectoryFile, final HashMap<String, File> additionalFiles, final Scenario scenario) throws IOException {
 		Player.getInstance(model).stop();
-
 		try {
-			if (contactsTrajectoryFile != null && aerosolCloudShapeFile != null) {
-				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, contactsTrajectoryFile.getParent());
-			} else if(contactsTrajectoryFile != null && aerosolCloudShapeFile == null) {
-				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), IOOutput.readContactData(contactsTrajectoryFile.toPath()), scenario, contactsTrajectoryFile.getParent());
-			} else if(contactsTrajectoryFile == null && aerosolCloudShapeFile != null) {
-				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), null, IOOutput.readAerosolCloudData(aerosolCloudShapeFile.toPath()), scenario, aerosolCloudShapeFile.getParent());
-			} else {
-				model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			HashMap<String, Table> additionalTables = new HashMap<>();
+			for (HashMap.Entry<String, File> entry : additionalFiles.entrySet()) {
+				switch (entry.getKey()) {
+					case ContactData.TABLE_NAME:
+						additionalTables.put(entry.getKey(), IOOutput.readContactData(entry.getValue().toPath()));
+					case TableAerosolCloudData.TABLE_NAME:
+						additionalTables.put(entry.getKey(), IOOutput.readAerosolCloudData(entry.getValue().toPath()));
+				}
 			}
+			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), additionalTables, scenario, trajectoryFile.getParent());
 			model.notifyObservers();
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
@@ -417,7 +419,13 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 	}
 
 	public void loadOutputFile(final File trajectoryFile, final Scenario scenario) throws IOException {
-		loadOutputFile(trajectoryFile, null, null, scenario);
+		Player.getInstance(model).stop();
+		try {
+			model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
+			model.notifyObservers();
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public void loadOutputFile(final Scenario scenario) {

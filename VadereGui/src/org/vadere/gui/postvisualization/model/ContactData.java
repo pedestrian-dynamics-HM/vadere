@@ -16,6 +16,8 @@ public class ContactData {
 	private final List<Integer> rowsWithPedIds;
 	private static final double SIM_STEP_LENGTH = 0.4;
 
+	public static final String TABLE_NAME = "contacts";
+
 	// columns, TODO: this is hard coded!
 	public final int startTimeStepCol;
 	public final int firstPedIdCol;
@@ -41,13 +43,19 @@ public class ContactData {
 		yPathCol = columnNames.getStartYCol(dataFrame);
 
 		this.contactsDataFrame = dataFrame;
-		StringColumn startTimes = getStartTimeStep(contactsDataFrame);
 		rowsWithPedIds = new ArrayList<>();
-		for (int i = 0; i < startTimes.size(); i++) {
-			if (!startTimes.get(i).equals("-")) {
-				rowsWithPedIds.add(i);
+		if (!isEmpty()) {
+			StringColumn startTimes = getStartTimeStep(contactsDataFrame);
+			for (int i = 0; i < startTimes.size(); i++) {
+				if (!startTimes.get(i).equals("-")) {
+					rowsWithPedIds.add(i);
+				}
 			}
 		}
+	}
+
+	public boolean isEmpty() {
+		return contactsDataFrame.isEmpty();
 	}
 
 	public List<Integer> getRowsWithPedIds() {
