@@ -15,7 +15,6 @@ import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.projects.Domain;
@@ -256,7 +255,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			case GROUP:
 			case RANDOM:
 			case SELF_CATEGORY:
-			case INFECTION_STATUS:
+			case HEALTH_STATUS:
 				config.setAgentColoring(agentColoring);
 				break;
 			case INFORMATION_STATE:

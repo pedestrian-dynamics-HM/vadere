@@ -26,9 +26,8 @@ public final class ColumnNames {
 	private Set<String> selfCategoryKeys;
 	private Set<String> informationStateKeys;
 	private Set<String> groupMembershipKeys;
-	private Set<String> infectionStatusKeys;
-	private Set<String> absorbedPathogenLoadKeys;
-	private Set<String> minInfectiousDoseKeys;
+	private Set<String> isInfectiousKeys;
+	private Set<String> degreeOfExposureKeys;
 	private Set<String> aerosolCloudIdKeys;
 	private Set<String> aerosolCloudPathogenLoadKeys;
 	private Set<String> aerosolCloudRadiusKeys;
@@ -64,9 +63,8 @@ public final class ColumnNames {
 		selfCategoryKeys = new HashSet<>();
 		informationStateKeys = new HashSet<>();
 		groupMembershipKeys = new HashSet<>();
-		infectionStatusKeys = new HashSet<>();
-		absorbedPathogenLoadKeys = new HashSet<>();
-		minInfectiousDoseKeys = new HashSet<>();
+		isInfectiousKeys = new HashSet<>();
+		degreeOfExposureKeys = new HashSet<>();
 		aerosolCloudIdKeys = new HashSet<>();
 		aerosolCloudPathogenLoadKeys = new HashSet<>();
 		aerosolCloudRadiusKeys = new HashSet<>();
@@ -109,9 +107,8 @@ public final class ColumnNames {
 		informationStateKeys.add("informationState");
 		groupMembershipKeys.add("groupMembership");
 
-		infectionStatusKeys.add("infectionStatus");
-		absorbedPathogenLoadKeys.add("absorbedPathogenLoad");
-		minInfectiousDoseKeys.add("minInfectiousDose");
+		isInfectiousKeys.add("isInfectious");
+		degreeOfExposureKeys.add("degreeOfExposure");
 
 		aerosolCloudIdKeys.add("id");
 		aerosolCloudPathogenLoadKeys.add("pathogenLoad");
@@ -134,9 +131,8 @@ public final class ColumnNames {
 		keys.add(selfCategoryKeys);
 		keys.add(informationStateKeys);
 		keys.add(groupMembershipKeys);
-		keys.add(infectionStatusKeys);
-		keys.add(absorbedPathogenLoadKeys);
-		keys.add(minInfectiousDoseKeys);
+		keys.add(isInfectiousKeys);
+		keys.add(degreeOfExposureKeys);
 		keys.add(aerosolCloudIdKeys);
 		keys.add(aerosolCloudPathogenLoadKeys);
 		keys.add(aerosolCloudRadiusKeys);
@@ -164,16 +160,12 @@ public final class ColumnNames {
 		return getColId(dataFrame, groupMembershipKeys);
 	}
 
-	public int getInfectionStatusCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, infectionStatusKeys);
+	public int getIsInfectiousCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, isInfectiousKeys);
 	}
 
-	public int getAbsorbedPathogenLoadCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, absorbedPathogenLoadKeys);
-	}
-
-	public int getMinInfectiousDoseCol(@NotNull final Table dataFrame) {
-		return getColId(dataFrame, minInfectiousDoseKeys);
+	public int getDegreeOfExposureCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, degreeOfExposureKeys);
 	}
 
 	public int getAerosolCloudIdCol(@NotNull final Table dataFrame) {

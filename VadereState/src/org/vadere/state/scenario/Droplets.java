@@ -12,10 +12,10 @@ import org.vadere.util.geometry.shapes.Vector2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 
-public class Droplets extends InfectiousParticleDispersion {
+public class Droplets extends ParticleDispersion {
 
     private AttributesDroplets attributes;
-    final static int numberOfCircularSections = 5;
+    final static int numberOfCircularSections = 10; // should not be lower; lower values cause edges when approximating a circular segment if angleOfSpreadInDeg in AttributesAirTransmissionModelDroplets is large
 
     // Constructors
     public Droplets() {
@@ -47,13 +47,15 @@ public class Droplets extends InfectiousParticleDispersion {
         return attributes;
     }
 
-    public double getLifeTime() { return attributes.getLifeTime(); }
+    public VPoint getOrigin() {
+        return attributes.getOrigin();
+    }
+
+    public Vector2D getDirection() {
+        return attributes.getDirection();
+    }
 
     public double getCreationTime() { return attributes.getCreationTime(); }
-
-    public double getCurrentPathogenLoad() {
-        return attributes.getCurrentPathogenLoad();
-    }
 
        // Setter
     @Override
@@ -101,8 +103,10 @@ public class Droplets extends InfectiousParticleDispersion {
         } else return attributes.equals(other.attributes);
     }
 
-    public static VShape createTransformedDropletsShape(VPoint origin, Vector2D direction, double radius, double centralAngleInRad) {
+    public static VShape createTransformedDropletsShape(VPoint origin, Vector2D direction, double radius, double centralAngleInDeg) {
         VPolygon shape;
+
+        double centralAngleInRad = Math.toRadians(centralAngleInDeg);
 
         Path2D path = new Path2D.Double();
         path.moveTo(0, 0); // define stating point

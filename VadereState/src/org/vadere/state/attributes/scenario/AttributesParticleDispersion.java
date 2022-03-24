@@ -11,14 +11,12 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
 
     private int id;
     private double creationTime;
-    private double initialPathogenLoad;
     private double currentPathogenLoad;
     private VShape shape;
 
     public AttributesParticleDispersion() {
         this.id = AttributesEmbedShape.ID_NOT_SET;
         this.creationTime = -1;
-        this.initialPathogenLoad = -1;
         this.currentPathogenLoad = -1;
 
         Path2D path = new Path2D.Double();
@@ -26,24 +24,16 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
         this.shape = new VPolygon(path);
     }
 
-    public AttributesParticleDispersion(double creationTime, VShape shape){
-        this();
-        this.creationTime = creationTime;
-        this.shape = shape;
-    }
-
-    public AttributesParticleDispersion(int id, VShape shape, double currentPathogenLoad){
+    public AttributesParticleDispersion(int id, double currentPathogenLoad, VShape shape) {
         this();
         this.id = id;
-        this.shape = shape;
         this.currentPathogenLoad = currentPathogenLoad;
+        this.shape = shape;
     }
 
-    public AttributesParticleDispersion(int id, double creationTime, double initialPathogenLoad, double currentPathogenLoad, VShape shape) {
+    public AttributesParticleDispersion(int id, double creationTime, double currentPathogenLoad, VShape shape) {
         this.id = id;
-
         this.creationTime = creationTime;
-        this.initialPathogenLoad = initialPathogenLoad;
         this.currentPathogenLoad = currentPathogenLoad;
         this.shape = shape;
     }
@@ -52,11 +42,6 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
 
     public double getCreationTime() {
         return creationTime;
-    }
-
-
-    public double getInitialPathogenLoad() {
-        return initialPathogenLoad;
     }
 
     public double getCurrentPathogenLoad() {

@@ -164,7 +164,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderConnectingLinesByContact(Graphics2D g) {
-		boolean showContacts = model.config.isShowContacts() && model.getContactData() != null;
+		boolean showContacts = model.config.isShowContacts() && !model.getContactData().isEmpty();
 
 		if (showContacts) {
 			Color savedColor = g.getColor();
@@ -200,7 +200,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderAerosolCloudData(Graphics2D g) {
-		boolean showAerosolClouds = model.config.isShowAerosolClouds() && model.getTableAerosolCloudData() != null;
+		boolean showAerosolClouds = model.config.isShowAerosolClouds() && !model.getTableAerosolCloudData().isEmpty();
 
 		if (showAerosolClouds) {
 			Collection<AerosolCloud> aerosolClouds = model.getTableAerosolCloudData().toAerosolCloudCollection(getModel().getStep());

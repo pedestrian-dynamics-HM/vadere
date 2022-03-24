@@ -1,6 +1,8 @@
 package org.vadere.state.attributes.scenario;
 
+import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.scenario.AerosolCloud;
+import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -11,29 +13,24 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
     private double radius;
     private VPoint center;
-    private double halfLife;
 
     // Constructors
     public AttributesAerosolCloud() {
         super();
-        this.radius = 1.5;
-        this.center = new VPoint(0, 0);
-        this.halfLife = 600;
+        this.radius = new AttributesAirTransmissionModel().getAerosolCloudInitialRadius();
+        this.center = new VPoint();
     }
 
-    public AttributesAerosolCloud(VShape shape, double creationTime){
-        super(creationTime, shape);
-    }
-
-    public AttributesAerosolCloud(int id, double radius, VPoint center, double currentPathogenLoad){
-        super(id, AerosolCloud.createAerosolCloudShape(center, radius), currentPathogenLoad);
-    }
-
-    public AttributesAerosolCloud(int id, double radius, VPoint center, double creationTime, double halfLife, double initialPathogenLoad, double currentPathogenLoad) {
-        super(id, creationTime, initialPathogenLoad, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
+    public AttributesAerosolCloud(int id, double radius, VPoint center, double currentPathogenLoad) {
+        super(id, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
         this.radius = radius;
         this.center = center;
-        this.halfLife = halfLife;
+    }
+
+    public AttributesAerosolCloud(int id, double radius, VPoint center, double creationTime, double currentPathogenLoad) {
+        super(id, creationTime, currentPathogenLoad, AerosolCloud.createAerosolCloudShape(center, radius));
+        this.radius = radius;
+        this.center = center;
     }
 
     // Getter
@@ -44,8 +41,6 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
     public VPoint getCenter() {
         return center;
     }
-
-    public double getHalfLife() { return halfLife; }
 
     public double getArea() {
         return radius * radius * Math.PI;
@@ -68,10 +63,16 @@ public class AttributesAerosolCloud extends AttributesParticleDispersion {
 
     // Setter
     public void setRadius(double radius) {
-        this.radius = radius;
+        this.setShape(AerosolCloud.createAerosolCloudShape(this.center, radius));
     }
 
     public void setCenter(VPoint center) {
-        this.center = center;
+        this.setShape(AerosolCloud.createAerosolCloudShape(center, this.radius));
+    }
+
+    public void setShape(VCircle circle) {
+        this.setShape((VShape) circle);
+        this.radius = circle.getRadius();
+        this.center = circle.getCenter();
     }
 }
