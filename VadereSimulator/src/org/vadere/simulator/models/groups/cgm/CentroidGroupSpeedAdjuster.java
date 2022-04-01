@@ -28,7 +28,11 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 			// formular not completely the smae to seitz-2014 line 34 is  8/(delta +15) and not 8/(delta + 17)
 			if (!group.isLostMember(ped)) {
 				if (aheadDistance > 8) {
-					result = Double.MIN_VALUE;
+					if (!group.isCentroidWithinObstacle()){
+						result = Double.MIN_VALUE; // wait behavior
+					}
+					// else: do not wait, treat group member as "lost"
+					// holds if agents get seperated by obstacles broader 8[m]
 				} else if (aheadDistance >= 1) {
 					result /= 1.0 + aheadDistance / 8 - 1 / 8 + 1;
 				} else if (aheadDistance >= 0) {
