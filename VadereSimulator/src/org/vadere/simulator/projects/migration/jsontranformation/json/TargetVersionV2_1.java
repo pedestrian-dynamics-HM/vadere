@@ -109,7 +109,10 @@ import java.util.stream.Collectors;
  * </pre>
  *
  *
- * Further, this removes handles deprecated data writers:<p>
+ * Replace field healthStatus and add field infectionStatus under node dynamicElements. Assign value null in both cases.<p>
+ *
+ *
+ * Further, this handles deprecated data writers:<p>
  * Remove:
  * <ul>
  * <li>NumberOfPedPerInfectionStatusProcessor</li>
@@ -135,7 +138,26 @@ public class TargetVersionV2_1 extends SimpleJsonTransformation {
         addPostHookFirst(this::renameProcessWriters);
         addPostHookFirst(this::replaceSubmodelTransmissionModelUnderAttributesModel);
         addPostHookFirst(this::replaceAttributesTransmissionModelUnderAttributesModel);
+        addPostHookFirst(this::replaceDeserializedHealthStatusUnderDynamicElements);
         addPostHookLast(this::sort);
+    }
+
+    private JsonNode replaceDeserializedHealthStatusUnderDynamicElements(JsonNode node) throws MigrationException {
+
+        ArrayNode dynamicElementsNode = (ArrayNode) path(node, "scenario/topography/dynamicElements");
+
+        if (!dynamicElementsNode.isMissingNode()) {
+            for (int i = 0; i < dynamicElementsNode.size(); i++) {
+                JsonNode attributesNode = dynamicElementsNode.get(i);
+                if (!path(attributesNode, "healthStatus").isMissingNode()) {
+                    remove(attributesNode, "healthStatus");
+                    ((ObjectNode) attributesNode).set("healthStatus", null);
+                    ((ObjectNode) attributesNode).set("infectionStatus", null);
+                }
+            }
+        }
+
+        return node;
     }
 
     private JsonNode renameProcessWriters(JsonNode scenarioFile) throws MigrationException {
