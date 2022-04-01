@@ -223,6 +223,14 @@ public class CentroidGroup implements Group {
 		return ret;
 	}
 
+	public boolean isCentroidWithinObstacle(){
+		// alternative: compute the centroid, loop through obstacles and check if shape.contains(centroid)
+		return getPairIntersectObstacle()
+				.stream().map(pedestrianPairBooleanPair -> pedestrianPairBooleanPair.getValue())
+				.anyMatch(val -> val);
+	}
+
+
 	public ArrayList<Pair<PedestrianPair, Boolean>> getPairIntersectObstacle(){
 		ArrayList<Pair<PedestrianPair, Boolean>> ret = new ArrayList<>(getPairCount());
 
