@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -14,8 +15,10 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.PedestrianPair;
+import org.vadere.util.geometry.GrahamScan;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 
 public class CentroidGroup implements Group {
 
@@ -112,10 +115,9 @@ public class CentroidGroup implements Group {
 		return size - members.size();
 	}
 
-	@Deprecated
 	public VPoint getCentroid() {
 
-		double sumx = 0.0;
+		/*double sumx = 0.0;
 		double sumy = 0.0;
 
 		int size = members.size();
@@ -127,7 +129,18 @@ public class CentroidGroup implements Group {
 
 		double[] result = {sumx / size, sumy / size};
 
-		return new VPoint(result[0], result[1]);
+		return new VPoint(result[0], result[1]);*/
+
+		if (members.size() >= 3) {
+			List<VPoint> pointsOfGroup = members.stream()
+					.map(Agent::getPosition)
+					.collect(Collectors.toList());
+			VPolygon convexPolygon = new GrahamScan(pointsOfGroup).getPolytope();
+			VPoint centroid = convexPolygon.getCentroid();
+			return centroid;
+		} else {
+			throw new IllegalArgumentException("group too small");
+		}
 	}
 
 	@Deprecated
