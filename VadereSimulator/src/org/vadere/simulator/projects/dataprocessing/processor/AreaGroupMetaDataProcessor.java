@@ -30,7 +30,7 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
     private MeasurementArea measurementArea;
 
     public AreaGroupMetaDataProcessor() {
-        super("memb_in_area", "centroid_x", "centroid_y");
+        super("sim_time", "ped_total", "memb_in_area", "centroid_x", "centroid_y");
         setAttributes(new AttributesGroupMetaDataProcessor());
     }
 
@@ -43,6 +43,8 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
 
     @Override
     protected void doUpdate(final SimulationState state) {
+
+        double simTime = state.getSimTimeInSec();
 
         //collect all pedestrians from state
         Collection<Pedestrian> pedestrians = state.getTopography().getPedestrianDynamicElements().getElements();
@@ -74,18 +76,20 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
                 List<Pedestrian> membersInArea = currentGroup.getMembers().stream()
                         .filter(pedInArea::contains)
                         .collect(Collectors.toList());
-                AreaGroupMetaData data = new AreaGroupMetaData(currentGroup, membersInArea.size(), membersInArea);
+                AreaGroupMetaData data = new AreaGroupMetaData(currentGroup, membersInArea.size(), membersInArea, pedInArea.size());
+                data.setSimTime(simTime);
                 try {
                     //compute the convex hull for all groups and the centroid of the resulting polygons -> problem might be that
                     //convex hull is susceptible to statistical outliers
-                    VPoint centroid = data.getCentroid();
+                    VPoint centroid = currentGroup.getCentroid();
                     data.setCentroid(centroid);
                     data.setCentroidInArea(this.measurementArea.getShape().contains(centroid));
-                } catch (IllegalArgumentException ignored) {
+                } catch (IllegalArgumentException e) {
                 }
                 this.putValue(new TimestepGroupIdKey(state.getStep(), currentGroup.getID()), data);
             }
-        } catch (NoSuchElementException ignored) {
+        } catch (NoSuchElementException e) {
+            e.printStackTrace();
         }
     }
 
@@ -93,13 +97,16 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
     public String[] toStrings(TimestepGroupIdKey key) {
         AreaGroupMetaData groupInArea = this.getValue(key);
         if(groupInArea == null) {
-            return new String[]{"NA", "NA", "NA"};
+            return new String[]{"NA", "NA", "NA", "NA", "NA"};
         }
         else {
-            if (groupInArea.getCentroid() == null) {
-                return new String[]{Integer.toString(groupInArea.getSizeInArea()), "NA", "NA"};
+            if (groupInArea.getCentroid().isEmpty()) {
+                return new String[]{Double.toString(groupInArea.getSimTime()), Integer.toString(groupInArea.getTotalPedestriansInArea()),
+                        Integer.toString(groupInArea.getSizeInArea()), "NA", "NA"};
             } else {
-                return new String[]{Double.toString(groupInArea.getCentroid().x), Double.toString(groupInArea.getCentroid().y)};
+                return new String[]{Double.toString(groupInArea.getSimTime()), Integer.toString(groupInArea.getTotalPedestriansInArea()),
+                        Integer.toString(groupInArea.getSizeInArea()),
+                        Double.toString(groupInArea.getCentroid().get().x), Double.toString(groupInArea.getCentroid().get().y)};
             }
         }
     }

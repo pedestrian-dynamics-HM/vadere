@@ -1,24 +1,43 @@
 package org.vadere.simulator.models.groups;
 
-import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AreaGroupMetaData {
 
     final private Group group;
-    final private int sizeInArea;
+    private int sizeInArea;
     final protected List<Pedestrian> membersInArea;
     private VPoint centroid;
-    private boolean centroidInArea;
 
-    public AreaGroupMetaData(Group group, int sizeInArea, List<Pedestrian> membersInArea) {
+    private boolean centroidInArea;
+    private int totalPedestriansInArea;
+    private double simTime;
+
+    public AreaGroupMetaData(Group group, int sizeInArea, List<Pedestrian> membersInArea, int totalPedestriansInArea) {
         this.group = group;
         this.sizeInArea = sizeInArea;
         this.membersInArea = membersInArea;
+        this.totalPedestriansInArea = totalPedestriansInArea;
+        this.simTime = 0;
+    }
+
+    public double getSimTime() {
+        return simTime;
+    }
+
+    public void setSimTime(double simTime) {
+        this.simTime = simTime;
+    }
+
+    public int getTotalPedestriansInArea() {
+        return totalPedestriansInArea;
+    }
+
+    public void setTotalPedestriansInArea(int totalPedestriansInArea) {
+        this.totalPedestriansInArea = totalPedestriansInArea;
     }
 
     public Group getGroup() {
@@ -29,16 +48,20 @@ public class AreaGroupMetaData {
         return sizeInArea;
     }
 
+    public void setSizeInArea(int sizeInArea) {
+        this.sizeInArea = sizeInArea;
+    }
+
     public List<Pedestrian> getMembersInArea() {
         return membersInArea;
     }
 
-    public VPoint getCentroid() {
-        return centroid;
+    public Optional<VPoint> getCentroid() {
+        return Optional.ofNullable(centroid);
     }
 
-    public boolean isCentroidInArea() {
-        return centroidInArea;
+    public Optional<Boolean> isCentroidInArea() {
+        return Optional.of(centroidInArea);
     }
 
 
