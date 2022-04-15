@@ -1,13 +1,18 @@
 package org.vadere.simulator.projects.io;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.vadere.simulator.projects.ProjectOutput;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.migration.MigrationAssistant;
+import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.MigrationOptions;
 import org.vadere.simulator.projects.migration.MigrationResult;
+import org.vadere.simulator.projects.migration.jsontranformation.JsonMigrationAssistant;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.version.Version;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,14 +28,28 @@ public class IOVadere {
 
 	private static Logger logger = Logger.getLogger(IOVadere.class);
 
-	public static Scenario fromJson(final String json) throws IOException, IllegalArgumentException {
+	public static Scenario fromJson(final String json0) throws IOException, IllegalArgumentException {
 		try {
+
+			//TODO CM: replace the following lines of code
+			JsonMigrationAssistant migrationAssistant = (JsonMigrationAssistant) MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
+
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode node = mapper.readTree(json0);
+
+			String json = String.valueOf(migrationAssistant.transform(node, Version.V2_1));
+			
 			return JsonConverter.deserializeScenarioRunManager(json);
 		}
 		catch (Exception e) {
-			logger.warn("could not deserialize " + json);
-			throw e;
+			logger.warn("could not deserialize " + json0);
+			try {
+				throw e;
+			} catch (MigrationException ex) {
+				ex.printStackTrace();
+			}
 		}
+		return null;
 	}
 
 	public static VadereProject readProjectJson(final String filepath) throws IOException {
