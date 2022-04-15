@@ -163,7 +163,7 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 
 		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)) {
 			TraCISendFileCommandV20_0_1 cmd = (TraCISendFileCommandV20_0_1) rawCmd;
-
+			//TODO entry point
 			remoteManager.loadScenario(cmd.getFile(), cmd.getCacheData());
 			remoteManager.startSimulation();
 			return cmd;
