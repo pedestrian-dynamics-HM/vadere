@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 /**
  * The StimulusController encapsulates logic to inject stimuli
  * into the simulation loop.
- *
+ * <p>
  * The StimulusController uses the passed {@link ScenarioStore}
  * to extract the possible stimuli from the scenario description.
- *
+ * <p>
  * TODO: Clarify what shall happen if "simTimeSteps" is too coarse
  *   and defined stimuli cannot be triggered correctly here.
  */
@@ -26,7 +26,6 @@ public class StimulusController {
     private ScenarioStore scenarioStore;
     private List<StimulusInfo> oneTimeStimuli;
     private List<StimulusInfo> recurringStimuli;
-
 
 
     private HashMap<Integer, Double> reactionProbabilities;
@@ -49,26 +48,60 @@ public class StimulusController {
     }
 
 
+    public List<Stimulus> unpackWrappedStimuli(List<Stimulus> stimuli){
+
+        List<Stimulus> stimuli2 = new ArrayList<>();
+        stimuli2.addAll(stimuli);
+
+        for (Stimulus stimulus : stimuli2){
+            if (stimulus instanceof StimuliWrapper){
+                LinkedList<Stimulus> stimulusChangeTarget = ((StimuliWrapper) stimulus).unpackStimuli();
+                stimuli.remove(stimulus);
+                stimuli.addAll(stimulusChangeTarget);
+            }
+        }
+
+        return stimuli;
+    }
+
+
+
 
 
     // Getters
     public ScenarioStore getScenarioStore() {
         return scenarioStore;
     }
-    public List<StimulusInfo> getOneTimeStimuli() { return oneTimeStimuli; }
-    public List<StimulusInfo> getRecurringStimuli() { return recurringStimuli; }
-    public HashMap<Integer, Double> getReactionProbabilities() { return reactionProbabilities; }
+
+    public List<StimulusInfo> getOneTimeStimuli() {
+        return oneTimeStimuli;
+    }
+
+    public List<StimulusInfo> getRecurringStimuli() {
+        return recurringStimuli;
+    }
+
+    public HashMap<Integer, Double> getReactionProbabilities() {
+        return reactionProbabilities;
+    }
 
 
     // Setters
     public void setScenarioStore(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
-    public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
-    public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
+
+    public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) {
+        this.oneTimeStimuli = oneTimeStimuli;
+    }
+
+    public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) {
+        this.recurringStimuli = recurringStimuli;
+    }
+
     protected void setReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
         reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
-        this.reactionProbabilities = (HashMap<Integer, Double>) reactionProbabilities.stream().collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
+        this.reactionProbabilities = (HashMap<Integer, Double>) reactionProbabilities.stream().collect(Collectors.toMap(ReactionProbability::getStimulusId, ReactionProbability::getReactionProbability));
     }
 
     // Methods
@@ -94,13 +127,12 @@ public class StimulusController {
     }
 
     private void setReactionProbability(final List<Stimulus> stimuli) {
-        for (Stimulus stimulus : stimuli){
-            if (!(stimulus instanceof ElapsedTime)){
-                if (reactionProbabilities.containsKey(stimulus.getId())){
+        for (Stimulus stimulus : stimuli) {
+            if (!(stimulus instanceof ElapsedTime)) {
+                if (reactionProbabilities.containsKey(stimulus.getId())) {
                     stimulus.setPerceptionProbability(reactionProbabilities.get(stimulus.getId()));
-                }
-                else{
-                    throw new RuntimeException("Stimulus id = "+ stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities." );
+                } else {
+                    throw new RuntimeException("Stimulus id = " + stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities.");
                 }
             }
         }
@@ -111,7 +143,7 @@ public class StimulusController {
         this.pedSpecificStimuli = pedSpecificStimuli;
     }
 
-    public HashMap<Pedestrian,List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
+    public HashMap<Pedestrian, List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
 
         HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
 
@@ -131,23 +163,25 @@ public class StimulusController {
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
 
         Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(ped, waitInAreaStimuli);
-        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(ped,threatStimuli);
+        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(ped, threatStimuli);
 
         stimuli.removeAll(waitInAreaStimuli);
         stimuli.removeAll(threatStimuli);
-        if (mostImportantThrea!= null) stimuli.add(mostImportantThrea);
-        if (mostImportantWaitInArea != null)stimuli.add(mostImportantWaitInArea);
+        if (mostImportantThrea != null) stimuli.add(mostImportantThrea);
+        if (mostImportantWaitInArea != null) stimuli.add(mostImportantWaitInArea);
 
 
         stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime, stimuli));
+
+        stimuli = unpackWrappedStimuli(stimuli);
 
         return stimuli.stream().distinct().collect(Collectors.toList());
 
     }
 
-    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime, List<Stimulus> stimuli){
+    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime, List<Stimulus> stimuli) {
         List<Stimulus> activeStimuli = new ArrayList<>();
-        if (pedSpecificStimuli.containsKey(pedestrian)){
+        if (pedSpecificStimuli.containsKey(pedestrian)) {
             pedSpecificStimuli.get(pedestrian).stream()
                     .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
                     .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
@@ -157,11 +191,11 @@ public class StimulusController {
         List<Stimulus> threatStimuli = activeStimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
 
         Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(pedestrian, waitInAreaStimuli);
-        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(pedestrian,threatStimuli);
+        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(pedestrian, threatStimuli);
 
         activeStimuli.removeAll(waitInAreaStimuli);
         activeStimuli.removeAll(threatStimuli);
-        if (mostImportantThrea!= null) activeStimuli.add(mostImportantThrea);
+        if (mostImportantThrea != null) activeStimuli.add(mostImportantThrea);
         if (mostImportantWaitInArea != null) activeStimuli.add(mostImportantWaitInArea);
 
         List<Stimulus> finalstimuli = stimuli;
@@ -212,7 +246,8 @@ public class StimulusController {
     }
 
 
-    public void setDynamicStimulus(StimulusInfo stimulusInfo){
+
+    public void setDynamicStimulus(StimulusInfo stimulusInfo) {
 
         List<StimulusInfo> stimuliList = Collections.singletonList(stimulusInfo);
         List<StimulusInfo> oneTimeDynamicStimuli = filterOneTimeStimuli(stimuliList);
@@ -223,7 +258,7 @@ public class StimulusController {
     }
 
 
-    public void setPedSpecificDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
+    public void setPedSpecificDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo) {
 
         setReactionProbability(stimulusInfo.getStimuli());
         List<StimulusInfo> stimulusInfos = new ArrayList<>();
@@ -236,11 +271,11 @@ public class StimulusController {
 
     }
 
-    public void setPedSpecificDynamicStimulusEnduring(Pedestrian ped, Stimulus stimulus){
+    public void setPedSpecificDynamicStimulusEnduring(Pedestrian ped, Stimulus stimulus) {
         setPedSpecificDynamicStimulus(ped, stimulus, Double.MAX_VALUE);
     }
 
-    public void setPedSpecificDynamicStimulus(Pedestrian ped, Stimulus stimulus, double stimulusEndTime){
+    public void setPedSpecificDynamicStimulus(Pedestrian ped, Stimulus stimulus, double stimulusEndTime) {
 
         Timeframe timeframe = new Timeframe(0, stimulusEndTime, false, 0);
         StimulusInfo stimulusInfo = new StimulusInfo(timeframe, Collections.singletonList(stimulus));
@@ -268,13 +303,13 @@ public class StimulusController {
         return activeStimuli;
     }
 
-    public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi){
+    public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi) {
         return lsi.stream()
                 .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == false)
                 .collect(Collectors.toList());
     }
 
-    public static List<StimulusInfo> filterRecurringStimuli(List<StimulusInfo> lsi){
+    public static List<StimulusInfo> filterRecurringStimuli(List<StimulusInfo> lsi) {
         return lsi.stream()
                 .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == true)
                 .collect(Collectors.toList());
@@ -293,31 +328,32 @@ public class StimulusController {
         return stimuliIsActive;
     }
 
+
     /**
      * Given a (recurring) "timeframe" and a "simulationTime" return if the
      * timeframe is "active" at that specific "simulationTime" or not.
-     *
+     * <p>
      * An {@link Timeframe} contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
      * an {@link Stimulus}. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
      * the period length of an event:
-     *
-     *   period_length = (endTime - startTime) + waitTimeBetweenRepetition
-     *
+     * <p>
+     * period_length = (endTime - startTime) + waitTimeBetweenRepetition
+     * <p>
      * With this information, you can define intervals in which the timeframe is active. For instance:
-     *
-     *   startTime = 0.75
-     *   endTime = 1.25
-     *   waitTimeBetweenRepetition = 1.0
-     *   simulationTime = 0.8
-     *
+     * <p>
+     * startTime = 0.75
+     * endTime = 1.25
+     * waitTimeBetweenRepetition = 1.0
+     * simulationTime = 0.8
+     * <p>
      * That means, the timeframe is active in following intervals (end time is included!):
-     *
-     *   [0.75 -- 1.25]
-     *   [2.25 -- 2.75]
-     *   [3.75 -- 4.25]
-     *   [5.25 -- 5.75]
-     *   ...
-     *
+     * <p>
+     * [0.75 -- 1.25]
+     * [2.25 -- 2.75]
+     * [3.75 -- 4.25]
+     * [5.25 -- 5.75]
+     * ...
+     * <p>
      * Now, if this method gets "simulationTime = 0.8", the method should detect that the timeframe
      * is active in that given time.
      *
@@ -331,7 +367,7 @@ public class StimulusController {
 
         double normalizedSimulationTime = Math.max(0, (simulationTime - timeframe.getStartTime()));
         // Check with unit testing if cut-off is okay here or if we need rounding.
-        int currentPeriod = (int)(normalizedSimulationTime / stimulusPeriodLength);
+        int currentPeriod = (int) (normalizedSimulationTime / stimulusPeriodLength);
 
         double stimulusStartTimeCurrentPeriod = timeframe.getStartTime() + (currentPeriod * stimulusPeriodLength);
         double stimulusEndTimeCurrentPeriod = stimulusStartTimeCurrentPeriod + stimulusLength;
@@ -359,7 +395,7 @@ public class StimulusController {
      */
     private static void throwExceptionIfReactionProbabilityIsInvalid(ReactionProbability reactionProbability) {
         double probability = reactionProbability.getReactionProbability();
-        if ( probability > 1.0 || probability < 0.0) {
+        if (probability > 1.0 || probability < 0.0) {
             throw new IllegalArgumentException("ReactionProbability: probability must be in [0,1]. Got " + probability);
         }
     }

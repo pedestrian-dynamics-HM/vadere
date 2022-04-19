@@ -29,6 +29,8 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians) {
 
+        System.out.println( " new time step");
+
         for (Pedestrian pedestrian : pedestrians) {
 
             LinkedList<Stimulus> oldStimuli = pedestrian.getPerceivedStimuli();
@@ -36,6 +38,8 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
             if (!oldStimuli.equals(newStimuli)) {
                 Stimulus mostImportantStimulus = drawStimulusFromRandomDistribution(newStimuli);
+                System.out.println(pedestrian.getId() + " " + mostImportantStimulus.toString());
+
                 pedestrian.setMostImportantStimulus(mostImportantStimulus);
                 setInformationState(pedestrian, mostImportantStimulus,newStimuli);
                 applyAction(pedestrian);
@@ -43,6 +47,11 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
             pedestrian.setNextPerceivedStimuli(newStimuli);
             setInformationStateGroupMember(pedestrian.getPedGroupMembers());
         }
+
+        System.out.println( "time step end");
+
+
+
     }
 
     protected boolean pedestrianCannotMove(Pedestrian pedestrian) {
@@ -76,6 +85,9 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
                 ChangeTarget changeTarget = (ChangeTarget) pedestrian.getMostImportantStimulus();
                 pedestrian.setTargets(changeTarget.getNewTargetIds());
                 pedestrian.setNextTargetListIndex(0);
+
+
+
 
             } else if (stimulus instanceof Threat) {
                 nextSelfCategory = SelfCategory.THREATENED;

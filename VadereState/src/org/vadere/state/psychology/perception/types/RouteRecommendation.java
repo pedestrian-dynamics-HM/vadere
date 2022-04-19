@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Class that recommends agents targets.
  */
-public class RouteRecommendation extends Stimulus {
+public class RouteRecommendation extends StimuliWrapper {
 
     // Member Variables
     private String instruction;
@@ -80,7 +80,7 @@ public class RouteRecommendation extends Stimulus {
         return isProb && this.newTargetIds.equals(that1.getNewTargetIds());
     }
 
-    public LinkedList<Stimulus> unpackChangeTargetStimuli(){
+    public LinkedList<Stimulus> unpackStimuli(){
         LinkedList<Stimulus> changeTargets = new LinkedList<>();
 
         if (this.newTargetIds.size() != this.targetProbabilities.size()){
@@ -98,6 +98,9 @@ public class RouteRecommendation extends Stimulus {
 
         return changeTargets;
     }
+
+
+
 
 
 

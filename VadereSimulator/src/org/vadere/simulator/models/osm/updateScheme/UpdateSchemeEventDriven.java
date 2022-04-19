@@ -78,7 +78,9 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			// needed for postvis to correctly reproduce state.
+
 			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.SOCIAL_DISTANCING){
 			osmBehaviorController.changeRepulsion(pedestrian);
 			osmBehaviorController.makeStepToTarget(pedestrian, topography);
