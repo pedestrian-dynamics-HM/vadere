@@ -39,6 +39,7 @@ import java.util.List;
         @Type(value = ChangeTarget.class, name = "ChangeTarget"),
         @Type(value = ChangeTargetScripted.class, name = "ChangeTargetScripted"),
         @Type(value = DistanceRecommendation.class, name = "DistanceRecommendation"),
+        @Type(value = RouteRecommendation.class, name = "RouteRecommendation"),
 })
 // "time" is set when the stimulus is injected into the simulation run and must not be de-/serialized.
 // "perceptionProbability" is assigned by the StimulusController

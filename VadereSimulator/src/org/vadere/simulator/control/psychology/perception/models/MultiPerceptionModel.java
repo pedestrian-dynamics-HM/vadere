@@ -8,9 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Use a very simple strategy to rank stimulus priority:
- *
- * ChangeTargetScripted > ChangeTarget > Threat > Wait > WaitInArea > ElapsedTime
+ * Provide stimuli for cognition model
  */
 public class MultiPerceptionModel extends PerceptionModel {
 
@@ -28,10 +26,23 @@ public class MultiPerceptionModel extends PerceptionModel {
         for (Map.Entry<Pedestrian, List<Stimulus>> pedStimuli : pedSpecificStimuli.entrySet()) {
 
             LinkedList<Stimulus> stimuli = pedStimuli.getValue().stream().collect(Collectors.toCollection(LinkedList::new));
+            LinkedList<Stimulus> stimuli2 = new LinkedList<>();
+            stimuli2.addAll(stimuli);
+
             Pedestrian ped = pedStimuli.getKey();
+
+            for (Stimulus stimulus : stimuli2){
+                if (stimulus instanceof RouteRecommendation){
+                    LinkedList<Stimulus> stimulusChangeTarget = ((RouteRecommendation) stimulus).unpackChangeTargetStimuli();
+                    stimuli.remove(stimulus);
+                    stimuli.addAll(stimulusChangeTarget);
+                }
+            }
+
             ped.setNextPerceivedStimuli(stimuli);
         }
 
     }
+
 
 }

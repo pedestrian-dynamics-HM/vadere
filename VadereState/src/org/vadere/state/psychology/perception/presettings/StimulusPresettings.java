@@ -31,6 +31,7 @@ public class StimulusPresettings {
                 new ChangeTarget(),
                 new ChangeTargetScripted(),
                 new DistanceRecommendation(),
+                new RouteRecommendation(),
         };
 
         for (Stimulus stimulus : stimuliToUse) {
