@@ -30,12 +30,11 @@ public class IOVadere {
 
 	public static Scenario fromJson(String json) throws IOException, IllegalArgumentException {
 		try {
-
 			JsonMigrationAssistant migrationAssistant = (JsonMigrationAssistant) MigrationAssistant.getNewInstance(MigrationOptions.defaultOptions());
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode node = mapper.readTree(json);
-			json = String.valueOf(migrationAssistant.transform(node, Version.latest()));
-
+			String migrationResult = migrationAssistant.migrateScenarioFile(json, Version.latest());
+			if (migrationResult != null){
+				json = migrationResult;
+			}
 		}
 		catch (MigrationException migrationException){
 			migrationException.printStackTrace();
