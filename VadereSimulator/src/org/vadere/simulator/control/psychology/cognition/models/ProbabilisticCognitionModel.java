@@ -44,7 +44,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
                 setInformationState(pedestrian, mostImportantStimulus,newStimuli);
                 applyAction(pedestrian);
             }
-            pedestrian.setNextPerceivedStimuli(newStimuli);
+            pedestrian.setPerceivedStimuli(newStimuli);
             setInformationStateGroupMember(pedestrian.getPedGroupMembers());
         }
 

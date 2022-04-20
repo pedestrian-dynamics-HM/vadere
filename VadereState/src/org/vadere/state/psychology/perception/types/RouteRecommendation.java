@@ -77,7 +77,10 @@ public class RouteRecommendation extends StimuliWrapper {
         if(!(that instanceof RouteRecommendation)) return false;
         RouteRecommendation that1 = (RouteRecommendation) that;
         boolean isProb = Precision.equals(this.perceptionProbability, that1.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb && this.newTargetIds.equals(that1.getNewTargetIds());
+        boolean isInstructionEqual = this.instruction.equals(that1.getInstruction());
+        boolean areSubProbsEqual = this.targetProbabilities.equals(that1.getTargetProbabilities());
+        boolean isTargetIdsEqual = this.newTargetIds.equals(that1.getNewTargetIds());
+        return isProb && isInstructionEqual && areSubProbsEqual && isTargetIdsEqual;
     }
 
     public LinkedList<Stimulus> unpackStimuli(){
