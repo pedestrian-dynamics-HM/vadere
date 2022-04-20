@@ -102,7 +102,7 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 			migrationLogger.info("Nothing to do current version and target version match");
 			logger.info(migrationLogger.last());
 			restLog();
-			return null;
+			return json;
 		}
 
 		JsonNode transformedNode = node;
