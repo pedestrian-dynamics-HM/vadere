@@ -69,16 +69,14 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 		return stats;
 	}
 
-	// will return null if current and target version match
-	@Override
-	public String migrateScenarioFile(Path scenarioFilePath, Version targetVersion) throws MigrationException {
+	public String migrateScenarioFile(String json, Version targetVersion) throws MigrationException {
+
 		JsonNode node;
 		try {
-			String json = IOUtils.readTextFile(scenarioFilePath);
 			node = StateJsonConverter.deserializeToNode(json);
 		} catch (IOException e) {
 			logger.error("Error converting File: " + e.getMessage());
-			throw new MigrationException("Could not read JsonFile or create Json representation" + e.getMessage());
+			throw new MigrationException("Could not create Json representation" + e.getMessage());
 		}
 		restLog();
 		migrationLogger.info(">> analyzing JSON tree of scenario <" + node.get("name").asText() + ">");
@@ -125,6 +123,21 @@ public class JsonMigrationAssistant extends MigrationAssistant {
 			logger.error("could not serializeJsonNode after Transformation: " + e.getMessage());
 			throw new MigrationException("could not serializeJsonNode after Transformation: " + e.getMessage());
 		}
+
+	}
+
+	// will return null if current and target version match
+	@Override
+	public String migrateScenarioFile(Path scenarioFilePath, Version targetVersion) throws MigrationException {
+		String json = null;
+		try {
+			json = IOUtils.readTextFile(scenarioFilePath);
+		} catch (IOException e) {
+			logger.error("Error converting File: " + e.getMessage());
+			throw new MigrationException("Could not read JsonFile." + e.getMessage());
+		}
+
+		return migrateScenarioFile(json, targetVersion);
 	}
 
 
