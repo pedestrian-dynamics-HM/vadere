@@ -16,6 +16,7 @@ import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
+import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -133,7 +134,18 @@ public abstract class StateJsonConverter {
 
 	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
 			throws JsonProcessingException {
-		return mapper.treeToValue(node, AttributesPsychology.class);
+
+		JsonNode node2 = node.get("psychologyLayer");
+
+		String perceptionModel = String.valueOf(node2.get("perception"));
+		String cognitionModel = String.valueOf(node2.get("cognition"));
+
+		JsonNode attributesModelNode = node2.get("perceptionModelAttributes");
+		AttributesPerceptionModel attributesPerceptionModel = mapper.treeToValue(attributesModelNode, AttributesSimplePerceptionModel.class);
+
+		AttributesPsychologyLayer layer = new AttributesPsychologyLayer( perceptionModel, cognitionModel, attributesPerceptionModel, null);
+
+		return new AttributesPsychology();
 	}
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {

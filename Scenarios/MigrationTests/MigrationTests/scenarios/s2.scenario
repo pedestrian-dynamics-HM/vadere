@@ -59,10 +59,10 @@
         "cognition" : "SimpleCognitionModel",
         "perceptionModelAttributes" : {
         "argPerception" : 123,
-        "arg2Perception" : [1,2,3],
+        "arg2Perception" : [1,2,3]
         },
         "cognitionModelAttributes" : {
-        "argCognition" : 1.0,
+        "argCognition" : 1.0
         }
       }
     },
