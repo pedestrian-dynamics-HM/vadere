@@ -14,6 +14,8 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -388,7 +390,17 @@ public abstract class StateJsonConverter {
 
 	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
 			throws JsonProcessingException {
-		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
+
+		ObjectNode node = mapper.createObjectNode();
+		node.put("perception", attributesPsychology.getPsychologyLayer().getPerception());
+		AttributesPerceptionModel attributesPerceptionModel = attributesPsychology.getPsychologyLayer().getPerceptionModelAttributes();
+		node.set("perception", mapper.convertValue(attributesPerceptionModel, JsonNode.class));
+
+		node.put("cognition", attributesPsychology.getPsychologyLayer().getCognition());
+		AttributesCognitionModel attributesCognitionModel = attributesPsychology.getPsychologyLayer().getCognitionModelAttributes();
+		node.set("cognition", mapper.convertValue(attributesPsychology, JsonNode.class));
+
+		return prettyWriter.writeValueAsString(node);
 	}
 
 	public static String serializeAttributesStrategyModel(AttributesStrategyModel attributesStrategyModel)
