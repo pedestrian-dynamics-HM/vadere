@@ -1,5 +1,7 @@
 package org.vadere.state.attributes;
 
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
+
 import java.util.Objects;
 import java.util.Random;
 
@@ -45,4 +47,5 @@ public class AttributesPsychology extends Attributes {
 	public int hashCode() {
 		return Objects.hash(usePsychologyLayer, psychologyLayer);
 	}
+
 }

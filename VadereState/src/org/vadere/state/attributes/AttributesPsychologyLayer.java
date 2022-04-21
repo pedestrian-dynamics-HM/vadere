@@ -18,8 +18,14 @@ public class AttributesPsychologyLayer {
     // Watch out: Make sure these classes exist!
     public static final String DEFAULT_PERCEPTION_MODEL = "SimplePerceptionModel";
     public static final String DEFAULT_COGNITION_MODEL = "SimpleCognitionModel";
-    public List<AttributesPerceptionModel> perceptionModelAttributes;
-    public List<AttributesCognitionModel> cognitionModelAttributes;
+
+
+
+    public AttributesPerceptionModel perceptionModelAttributes;
+
+
+
+    public AttributesCognitionModel cognitionModelAttributes;
 
 
     // Variables
@@ -31,12 +37,14 @@ public class AttributesPsychologyLayer {
 
     // Constructors
     public AttributesPsychologyLayer() {
-        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL);
+        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL, null, null);
     }
 
-    public AttributesPsychologyLayer(String perception, String cognition) {
+    public AttributesPsychologyLayer(String perception, String cognition, AttributesPerceptionModel attributesPerceptionModel, AttributesCognitionModel attributesCognitionModel) {
         this.perception = perception;
         this.cognition = cognition;
+        this.perceptionModelAttributes = attributesPerceptionModel;
+        this.cognitionModelAttributes = attributesCognitionModel;
     }
 
     // Getter
@@ -70,6 +78,22 @@ public class AttributesPsychologyLayer {
     @Override
     public int hashCode() {
         return Objects.hash(perception, cognition);
+    }
+
+    public AttributesPerceptionModel getPerceptionModelAttributes() {
+        return perceptionModelAttributes;
+    }
+
+    public void setPerceptionModelAttributes(AttributesPerceptionModel perceptionModelAttributes) {
+        this.perceptionModelAttributes = perceptionModelAttributes;
+    }
+
+    public AttributesCognitionModel getCognitionModelAttributes() {
+        return cognitionModelAttributes;
+    }
+
+    public void setCognitionModelAttributes(AttributesCognitionModel cognitionModelAttributes) {
+        this.cognitionModelAttributes = cognitionModelAttributes;
     }
 
 }

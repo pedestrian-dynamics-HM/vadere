@@ -216,10 +216,10 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		// psychology layer
 
 		JMenuBar templatePsychologyModels = new JMenuBar();
-		JMenu mnAttributesPerception = new JMenu(Messages.getString("Tab.PerceptionModel.loadTemplateMenu.title"));
-		templatePsychologyModels.add(mnAttributesPerception);
-		JMenu mnAttributesCognition = new JMenu(Messages.getString("Tab.CognitionModel.loadTemplateMenu.title"));
-		templatePsychologyModels.add(mnAttributesCognition);
+		//JMenu mnAttributesPerception = new JMenu(Messages.getString("Tab.PerceptionModel.loadTemplateMenu.title"));
+		//templatePsychologyModels.add(mnAttributesPerception);
+		//JMenu mnAttributesCognition = new JMenu(Messages.getString("Tab.CognitionModel.loadTemplateMenu.title"));
+		//templatePsychologyModels.add(mnAttributesCognition);
 
 
 
@@ -233,7 +233,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		attributesPsychologyView.getPanelTop().add(templatePsychologyModels, 0);
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
 
-		attributeFactory.sortedAttributeStream().forEach(
+/*		attributeFactory.sortedAttributeStream().forEach(
 				attributesClassName -> mnAttributesPerception.add(new JMenuItem(new AbstractAction(attributesClassName) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -247,7 +247,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 						attributesPsychologyView.setText("1232423423423423");
 					}
-				})));
+				})));*/
 
 
 
