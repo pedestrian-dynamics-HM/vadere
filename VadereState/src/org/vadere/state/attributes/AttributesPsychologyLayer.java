@@ -1,6 +1,11 @@
 package org.vadere.state.attributes;
 
+import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,6 +18,9 @@ public class AttributesPsychologyLayer {
     // Watch out: Make sure these classes exist!
     public static final String DEFAULT_PERCEPTION_MODEL = "SimplePerceptionModel";
     public static final String DEFAULT_COGNITION_MODEL = "SimpleCognitionModel";
+    public List<AttributesPerceptionModel> perceptionModelAttributes;
+    public List<AttributesCognitionModel> cognitionModelAttributes;
+
 
     // Variables
     // Both should reference to concrete "IPerception" and "ICognition"

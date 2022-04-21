@@ -171,7 +171,9 @@ public class AttributesOSM extends Attributes {
 	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
 	private List<String> submodels = new LinkedList<>();
 
-	public AttributesOSM() {}
+	public AttributesOSM() {
+
+	}
 
 	// Getters...
 	public int getStepCircleResolution() {
