@@ -1,5 +1,6 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.DistanceRecommendation;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -11,6 +12,7 @@ import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Suppose a distance recommendation (a {@link DistanceRecommendation}) occurred (keyword: social distancing).
@@ -26,7 +28,7 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
     private HashMap<Pedestrian, Double> cloggingStartTimes = new HashMap<>();
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, List<Attributes> attributes) {
     }
 
     @Override

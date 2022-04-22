@@ -2,7 +2,10 @@ package org.vadere.simulator.control.psychology.cognition.helpers;
 
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.util.List;
 
 /**
  * This class encapsulates the creation of a concrete {@link ICognitionModel}
@@ -23,7 +26,8 @@ public class CognitionModelBuilder {
 		DynamicClassInstantiator<ICognitionModel> instantiator = new DynamicClassInstantiator<>();
 		ICognitionModel cognitionModel = instantiator.createObject(fullyQualifiedClassName);
 
-		cognitionModel.initialize(scenarioStore.getTopography());
+		List<Attributes> attributes = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
+		cognitionModel.initialize(scenarioStore.getTopography(), attributes);
 
 		return cognitionModel;
 	}

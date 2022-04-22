@@ -2,7 +2,11 @@ package org.vadere.simulator.control.psychology.perception.helpers;
 
 import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
 import org.vadere.simulator.projects.ScenarioStore;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.util.List;
 
 /**
  * This class encapsulates the creation of a concrete {@link IPerceptionModel}
@@ -23,8 +27,11 @@ public class PerceptionModelBuilder {
 		DynamicClassInstantiator<IPerceptionModel> instantiator = new DynamicClassInstantiator<>();
 		IPerceptionModel perceptionModel = instantiator.createObject(fullyQualifiedClassName);
 
-		perceptionModel.initialize(scenarioStore.getTopography(), scenarioStore.getAttributesSimulation().getSimTimeStepLength());
+		Topography topography = scenarioStore.getTopography();
+		double simTimeStepLength = scenarioStore.getAttributesSimulation().getSimTimeStepLength();
+		List<Attributes> attributesList = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
 
+		perceptionModel.initialize(topography, simTimeStepLength, attributesList);
 		return perceptionModel;
 	}
 

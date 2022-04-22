@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.CounterflowCognitionModel;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -18,6 +19,9 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 
 public class CounterflowCognitionModelTest {
+
+    private List<Attributes> attributes = new LinkedList<>();
+
 
     private List<Pedestrian> createPedestrians(int totalPedestrians, boolean usePedIdAsTargetId) {
         List<Pedestrian> pedestrians = new ArrayList<>();
@@ -87,7 +91,7 @@ public class CounterflowCognitionModelTest {
         Topography topography = createTopography(pedestrians);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
+        counterflowCognitionModel.initialize(topography, attributes);
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -108,7 +112,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
+        counterflowCognitionModel.initialize(topography, attributes);
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -117,6 +121,7 @@ public class CounterflowCognitionModelTest {
             assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
         }
     }
+
 
     @Test
     public void updateDoesNotChangeSelfCategoryIfNeighborIsFurtherAwayFromOwnTarget() {
@@ -128,7 +133,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(0.5,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
+        counterflowCognitionModel.initialize(topography, attributes);
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -148,7 +153,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
+        counterflowCognitionModel.initialize(topography, attributes);
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -169,7 +174,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography);
+        counterflowCognitionModel.initialize(topography, attributes);
 
         counterflowCognitionModel.update(pedestrians);
 

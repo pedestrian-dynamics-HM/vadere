@@ -19,7 +19,7 @@ public class MultiPerceptionModel extends PerceptionModel {
 
 
     @Override
-    public void initialize(Topography topography, final double simTimeStepLengh) {
+    public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
     }
 
@@ -35,8 +35,5 @@ public class MultiPerceptionModel extends PerceptionModel {
 
     }
 
-    @Override
-    public void setAttributes(List<Attributes> attributes) {
 
-    }
 }

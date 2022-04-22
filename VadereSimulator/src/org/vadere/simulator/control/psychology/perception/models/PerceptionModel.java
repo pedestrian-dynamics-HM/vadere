@@ -12,6 +12,4 @@ import java.util.List;
 
 public abstract class PerceptionModel implements IPerceptionModel {
 
-
-    public abstract void setAttributes(List<Attributes> attributes);
 }

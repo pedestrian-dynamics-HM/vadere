@@ -1,11 +1,13 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The {@link CooperativeCognitionModel} makes a pedestrian cooperative if its
@@ -21,7 +23,7 @@ public class CooperativeCognitionModel implements ICognitionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, List<Attributes> attributes) {
         this.topography = topography;
     }
 

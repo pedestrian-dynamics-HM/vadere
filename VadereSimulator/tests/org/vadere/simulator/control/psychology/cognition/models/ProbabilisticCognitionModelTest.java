@@ -3,6 +3,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.apache.commons.math3.util.Precision;
 import org.junit.Test;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -18,6 +19,7 @@ import static org.junit.Assert.*;
 
 public class ProbabilisticCognitionModelTest {
 
+    private List<Attributes> attributes = new LinkedList<>();
 
 
     private static double ALLOWED_DOUBLE_ERROR = 10e-3;
@@ -77,7 +79,7 @@ public class ProbabilisticCognitionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, attributes);
 
         for (Pedestrian pedestrian : pedestrians){
             pedestrian.setPerceivedStimuli(new LinkedList<>());
@@ -123,7 +125,7 @@ public class ProbabilisticCognitionModelTest {
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
 
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, attributes);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
         updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli);
@@ -137,7 +139,7 @@ public class ProbabilisticCognitionModelTest {
         List<Pedestrian> pedestrians = createPedestrians(1);
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography);
+        probabilisticPerceptionModel.initialize(topography, attributes);
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
 

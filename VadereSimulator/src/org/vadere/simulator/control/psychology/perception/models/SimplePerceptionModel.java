@@ -2,7 +2,6 @@ package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
@@ -23,14 +22,11 @@ public class SimplePerceptionModel extends PerceptionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, final double simTimeStepLengh) {
+    public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
+        this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
     }
 
-    @Override
-    public void setAttributes(List<Attributes> attributes) {
-        this.attributesSimplePerceptionModel = Model.findAttributes(attributes, AttributesSimplePerceptionModel.class);
-    }
 
     @Override
     public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {

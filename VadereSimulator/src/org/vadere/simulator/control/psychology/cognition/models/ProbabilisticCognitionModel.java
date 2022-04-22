@@ -3,6 +3,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.*;
@@ -22,7 +23,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     private RandomGenerator rng;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, List<Attributes> attributes) {
         rng = new JDKRandomGenerator(0); //TODO: use seed from json?
     }
 
