@@ -113,7 +113,9 @@ public class JsonConverter {
 		vadereNode.set("attributesModel", attributesModelNode);
 
 		vadereNode.set(AttributesSimulation.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class));
-		vadereNode.set(AttributesPsychology.JSON_KEY, StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class));
+
+		ObjectNode psychologyNode = StateJsonConverter.serializeAttributesPsychologyToNode(scenarioStore.getAttributesPsychology());
+		vadereNode.set(AttributesPsychology.JSON_KEY, psychologyNode);
 
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		vadereNode.set("topography", topographyNode);

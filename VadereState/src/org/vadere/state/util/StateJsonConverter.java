@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
@@ -23,13 +22,7 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class StateJsonConverter {
@@ -413,13 +406,16 @@ public abstract class StateJsonConverter {
 	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
 			throws JsonProcessingException {
 
+		ObjectNode node = serializeAttributesPsychologyToNode(attributesPsychology);
+		return prettyWriter.writeValueAsString(node);
+	}
+
+	public static ObjectNode serializeAttributesPsychologyToNode(AttributesPsychology attributesPsychology) {
 		ObjectNode node = mapper.valueToTree(attributesPsychology);
 		ObjectNode psychologyLayer = (ObjectNode) node.get(PSYCHOLOGY_LAYER_KEY);
-		// add class names to attributes
 		ObjectNode attributesModel = serializeAttributesModelToNode(attributesPsychology.getPsychologyLayer().getAttributesModel());
 		psychologyLayer.put(ATTRIBUTES_MODEL_KEY, attributesModel);
-
-		return prettyWriter.writeValueAsString(node);
+		return node;
 	}
 
 	public static String serializeAttributesStrategyModel(AttributesStrategyModel attributesStrategyModel)
