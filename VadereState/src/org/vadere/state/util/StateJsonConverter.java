@@ -142,7 +142,7 @@ public abstract class StateJsonConverter {
 		AttributesPsychology attributesPsychology = mapper.treeToValue(node, AttributesPsychology.class);
 		attributesPsychology.setPsychologyLayer(deseralizeAttributesPsychologyLayerFromNode(layer));
 
-		return new AttributesPsychology();
+		return attributesPsychology;
 	}
 
 	private static AttributesPsychologyLayer deseralizeAttributesPsychologyLayerFromNode(JsonNode jsonNode) throws JsonProcessingException {
@@ -413,15 +413,11 @@ public abstract class StateJsonConverter {
 	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
 			throws JsonProcessingException {
 
-		ObjectNode node = mapper.createObjectNode();
-
-		/*node.put("perception", attributesPsychology.getPsychologyLayer().getPerception());
-		AttributesPerceptionModel attributesPerceptionModel = attributesPsychology.getPsychologyLayer().getPerceptionModelAttributes();
-		node.set("perception", mapper.convertValue(attributesPerceptionModel, JsonNode.class));
-
-		node.put("cognition", attributesPsychology.getPsychologyLayer().getCognition());
-		AttributesCognitionModel attributesCognitionModel = attributesPsychology.getPsychologyLayer().getCognitionModelAttributes();
-		node.set("cognition", mapper.convertValue(attributesPsychology, JsonNode.class));*/
+		ObjectNode node = mapper.valueToTree(attributesPsychology);
+		ObjectNode psychologyLayer = (ObjectNode) node.get(PSYCHOLOGY_LAYER_KEY);
+		// add class names to attributes
+		ObjectNode attributesModel = serializeAttributesModelToNode(attributesPsychology.getPsychologyLayer().getAttributesModel());
+		psychologyLayer.put(ATTRIBUTES_MODEL_KEY, attributesModel);
 
 		return prettyWriter.writeValueAsString(node);
 	}
