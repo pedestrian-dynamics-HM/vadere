@@ -134,8 +134,8 @@ public class JsonConverter {
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
 		JsonNode attributesSimulationNode = StateJsonConverter.convertValue(scenarioStore.getAttributesSimulation(), JsonNode.class);
-		JsonNode attributesPsychologyNode = StateJsonConverter.convertValue(scenarioStore.getAttributesPsychology(), JsonNode.class);
 
+		ObjectNode attributesPsychologyNode = StateJsonConverter.serializeAttributesPsychologyToNode(scenarioStore.getAttributesPsychology());
 		ObjectNode attributesModelNode = StateJsonConverter.serializeAttributesModelToNode(scenarioStore.getAttributesList());
 		ObjectNode topographyNode = StateJsonConverter.serializeTopographyToNode(scenarioStore.getTopography());
 		ObjectNode stimulusNode = StateJsonConverter.serializeStimuliToNode(scenarioStore.getStimulusInfoStore());
