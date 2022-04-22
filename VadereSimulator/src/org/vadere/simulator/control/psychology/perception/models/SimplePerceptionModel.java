@@ -24,7 +24,7 @@ public class SimplePerceptionModel extends PerceptionModel {
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
-        this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
+        //this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
     }
 
 
