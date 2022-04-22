@@ -1,5 +1,6 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -34,4 +35,8 @@ public class MultiPerceptionModel extends PerceptionModel {
 
     }
 
+    @Override
+    public void setAttributes(List<Attributes> attributes) {
+
+    }
 }

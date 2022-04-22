@@ -1,6 +1,9 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychologyLayer;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
@@ -42,5 +45,8 @@ public interface IPerceptionModel {
 	 * stimuli. It is expected that the list contains an {@link ElapsedTime}.
 	 *  */
 	void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli);
+
+	void setAttributes(List<Attributes> attributes);
+
 
 }

@@ -1,7 +1,7 @@
 {
   "name" : "perceptionOnly",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
