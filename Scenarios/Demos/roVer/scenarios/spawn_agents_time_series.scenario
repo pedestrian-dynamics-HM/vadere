@@ -58,7 +58,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -90,6 +90,10 @@
           "width" : 0.2,
           "height" : 1.0
         }
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -152,6 +156,23 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
+      }, {
+        "id" : 22,
+        "absorbing" : false,
+        "shape" : {
+          "x" : 0.5,
+          "y" : 0.5,
+          "width" : 3.5,
+          "height" : 1.9,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : false,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -166,20 +187,19 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "timeSeries",
+        "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "intervalLength" : 5,
-          "spawnsPerInterval" : [ 5, 0, 5, 0 ]
+          "updateFrequency" : 20.0
         },
-        "spawnNumber" : 1,
+        "spawnNumber" : 6,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 11 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "targetIds" : [ 22, 11 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],

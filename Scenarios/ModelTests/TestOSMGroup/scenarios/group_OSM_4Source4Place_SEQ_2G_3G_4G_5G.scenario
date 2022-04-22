@@ -2,7 +2,6 @@
   "name" : "group_OSM_4Source4Place_SEQ_2G_3G_4G_5G",
   "description" : "",
   "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

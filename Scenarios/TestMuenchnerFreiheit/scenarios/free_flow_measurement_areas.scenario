@@ -1,77 +1,11 @@
 {
   "name" : "free_flow_measurement_areas",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.1",
   "processWriters" : {
-    "files" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "out.txt",
-      "processors" : [ 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepGroupIdOutputFile",
-      "filename" : "group_out.txt",
-      "processors" : [ 1, 2, 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "individual_out.txt",
-      "processors" : [ 7, 8 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
-      "filename" : "out2.txt",
-      "processors" : [ 4 ]
-    } ],
-    "processors" : [ {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaGroupMetaDataProcessor",
-      "id" : 1,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesGroupMetaDataProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.GroupMinDistProcessor",
-      "id" : 2,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesGroupMinDistProcessor",
-      "attributes" : {
-        "areaGroupMetaDataProcessorId" : 1
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.GroupHarmonicMeanDistProcessor",
-      "id" : 3,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesGroupHarmonicMeanDistProcessor",
-      "attributes" : {
-        "areaGroupMetaDataProcessorId" : 1
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
-      "attributes" : {
-        "cellSize" : 5.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPositionProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPositionProcessor",
-      "attributes" : {
-        "interpolate" : true
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
-      "id" : 8,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 7,
-        "radius" : 3.0
-      }
-    } ],
-    "isTimestamped" : false,
+    "files" : [ ],
+    "processors" : [ ],
+    "isTimestamped" : true,
     "isWriteMetaData" : true
   },
   "scenario" : {
@@ -89,7 +23,7 @@
         "movementThreshold" : 0.0,
         "minStepLength" : 0.1,
         "minimumStepLength" : true,
-        "maxStepDuration" : 1.7976931348623157E308,
+        "maxStepDuration" : 10.0,
         "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
         "seeSmallWalls" : false,
@@ -135,7 +69,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 250.0,
+      "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -232,6 +166,30 @@
           } ]
         },
         "id" : 11
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 220.5,
+            "y" : 200.6
+          }, {
+            "x" : 242.5,
+            "y" : 198.6
+          }, {
+            "x" : 265.3,
+            "y" : 199.2
+          }, {
+            "x" : 285.5,
+            "y" : 201.5
+          }, {
+            "x" : 285.5,
+            "y" : 277.4
+          }, {
+            "x" : 244.5,
+            "y" : 289.0
+          } ]
+        },
+        "id" : 12
       }, {
         "shape" : {
           "type" : "POLYGON",
@@ -802,30 +760,6 @@
           } ]
         },
         "id" : 28
-      }, {
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 220.5,
-            "y" : 200.6
-          }, {
-            "x" : 242.5,
-            "y" : 198.6
-          }, {
-            "x" : 265.3,
-            "y" : 199.2
-          }, {
-            "x" : 285.5,
-            "y" : 201.5
-          }, {
-            "x" : 285.5,
-            "y" : 277.4
-          }, {
-            "x" : 244.5,
-            "y" : 289.0
-          } ]
-        },
-        "id" : 12
       } ],
       "measurementAreas" : [ {
         "shape" : {
@@ -1402,7 +1336,29 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
-        "nextTarget" : [ 1111 ],
+        "nextTarget" : [ 302, 1111 ],
+        "probabilityToChangeTarget" : [ 1.0 ]
+      }, {
+        "id" : 8,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 231.5,
+            "y" : 278.4
+          }, {
+            "x" : 229.2,
+            "y" : 266.1
+          }, {
+            "x" : 236.9,
+            "y" : 263.9
+          }, {
+            "x" : 240.2,
+            "y" : 276.9
+          } ]
+        },
+        "reachDistance" : 0.0,
+        "changeAlgorithmType" : "SELECT_LIST",
+        "nextTarget" : [ 6, 1111 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       }, {
         "id" : 20,
@@ -1439,28 +1395,6 @@
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 1111 ],
         "probabilityToChangeTarget" : [ 1.0 ]
-      }, {
-        "id" : 8,
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 231.5,
-            "y" : 278.4
-          }, {
-            "x" : 229.2,
-            "y" : 266.1
-          }, {
-            "x" : 236.9,
-            "y" : 263.9
-          }, {
-            "x" : 240.2,
-            "y" : 276.9
-          } ]
-        },
-        "reachDistance" : 0.0,
-        "changeAlgorithmType" : "SELECT_LIST",
-        "nextTarget" : [ 6, 1111 ],
-        "probabilityToChangeTarget" : [ 1.0 ]
       } ],
       "absorbingAreas" : [ ],
       "aerosolClouds" : [ ],
@@ -1476,7 +1410,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 10.0
+          "updateFrequency" : 20.0
         },
         "spawnNumber" : 12,
         "maxSpawnNumberTotal" : -1,
