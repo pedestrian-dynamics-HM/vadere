@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -121,6 +122,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
+
 		menusInTabs.add(mnPresetMenu);
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
@@ -157,6 +159,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
+
 		JMenu mnHelpAttributesMenu = new JMenu(Messages.getString("Tab.Model.helpAttributesMenu.title"));
 		presetMenuBar.add(mnHelpAttributesMenu);
 		menusInTabs.add(mnHelpAttributesMenu);
@@ -203,10 +206,12 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
+
 		attributesPsychologyView =
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.PSYCHOLOGY);
 		attributesPsychologyView.setScenarioChecker(model); // use .isEditable(true); to save time (no check!)
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
+
 		topographyFileView = new TextView("ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
@@ -214,6 +219,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
 		perceptionFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
+
 		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		
