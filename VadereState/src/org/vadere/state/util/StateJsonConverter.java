@@ -38,8 +38,10 @@ public abstract class StateJsonConverter {
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
 
-	private static String ATTRIBUTES_MODEL_KEY = "attributesModel";
+	private static final String ATTRIBUTES_MODEL_KEY = "attributesModel";
 
+	private static final String PSYCHOLOGY_LAYER_KEY = "psychologyLayer";
+	
 
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
@@ -130,13 +132,15 @@ public abstract class StateJsonConverter {
 		return deserializeObjectFromJson(json, AttributesPsychology.class);
 	}
 
-	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
+	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode jsonNode)
 			throws JsonProcessingException {
 
-		JsonNode node2 = node.get("psychologyLayer");
+		ObjectNode node = jsonNode.deepCopy();
+		JsonNode layer = node.get(PSYCHOLOGY_LAYER_KEY);
+		node.remove(PSYCHOLOGY_LAYER_KEY);
 
-		deseralizeAttributesPsychologyLayerFromNode(node2);
-
+		AttributesPsychology attributesPsychology = mapper.treeToValue(node, AttributesPsychology.class);
+		attributesPsychology.setPsychologyLayer(deseralizeAttributesPsychologyLayerFromNode(layer));
 
 		return new AttributesPsychology();
 	}
@@ -410,6 +414,7 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException {
 
 		ObjectNode node = mapper.createObjectNode();
+
 		/*node.put("perception", attributesPsychology.getPsychologyLayer().getPerception());
 		AttributesPerceptionModel attributesPerceptionModel = attributesPsychology.getPsychologyLayer().getPerceptionModelAttributes();
 		node.set("perception", mapper.convertValue(attributesPerceptionModel, JsonNode.class));
