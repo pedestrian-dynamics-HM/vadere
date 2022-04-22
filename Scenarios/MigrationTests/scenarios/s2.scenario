@@ -2,7 +2,6 @@
   "name" : "s2",
   "description" : "",
   "release" : "2.1",
-  "commithash" : "e3380d4e5e342354de928fe9cb9b39dc54c15ec8",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -54,20 +53,19 @@
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
-      "psychologyLayer" : 
-      	{
+      "psychologyLayer" : {
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
+            "argPerception" : 12366666,
+            "arg2Perception" : [ 1, 2, 3 ]
+          },
+          "org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel" : {
+            "argCognition" : 1.0
+          }
+        },
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel",
-        "attributesModel" : 
-        	{
-        	"org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
-		"argPerception" : 123,
-		"arg2Perception" : [1,2,3] },
-		"org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel" : {
-		"argCognition" : 1.0
-        		}
-    		}
-    	}
+        "cognition" : "SimpleCognitionModel"
+      }
     },
     "topography" : {
       "attributes" : {
