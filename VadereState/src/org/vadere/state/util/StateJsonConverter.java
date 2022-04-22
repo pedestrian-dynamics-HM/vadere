@@ -13,8 +13,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
-import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
-import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -39,6 +37,9 @@ public abstract class StateJsonConverter {
 	public static final String SCENARIO_KEY = "scenario";
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
+
+	private static String ATTRIBUTES_MODEL_KEY = "attributesModel";
+
 
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
@@ -142,14 +143,12 @@ public abstract class StateJsonConverter {
 
 	private static AttributesPsychologyLayer deseralizeAttributesPsychologyLayerFromNode(JsonNode jsonNode) throws JsonProcessingException {
 
-		ObjectNode node0 = (ObjectNode) jsonNode;
-		ObjectNode node3 = (ObjectNode) jsonNode.get("attributesModel");
-		node0.remove("attributesModel");
+		ObjectNode node = jsonNode.deepCopy();
+		JsonNode attributesModel = node.get(ATTRIBUTES_MODEL_KEY);
+		node.remove(ATTRIBUTES_MODEL_KEY);
 
-
-		AttributesPsychologyLayer layer = mapper.treeToValue(node0, AttributesPsychologyLayer.class);
-		layer.setAttributesModel(deserializeAttributesListFromNode(node3));
-
+		AttributesPsychologyLayer layer = mapper.treeToValue(node, AttributesPsychologyLayer.class);
+		layer.setAttributesModel(deserializeAttributesListFromNode(attributesModel));
 
 		return layer;
 	}
@@ -295,7 +294,7 @@ public abstract class StateJsonConverter {
 
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
-		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
+		node.set(ATTRIBUTES_MODEL_KEY, serializeAttributesModelToNode(modelDefinition.getAttributesList()));
 		return prettyWriter.writeValueAsString(node);
 	}
 
@@ -435,7 +434,7 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
-		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
+		node.set(ATTRIBUTES_MODEL_KEY, serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);
 	}
 
@@ -501,7 +500,7 @@ public abstract class StateJsonConverter {
 
 	public static String addAttributesModel(String attributesClassName, String json) throws IOException {
 		JsonNode node = mapper.readTree(json);
-		JsonNode attributesModelNode = node.get("attributesModel");
+		JsonNode attributesModelNode = node.get(ATTRIBUTES_MODEL_KEY);
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
 		((ObjectNode) attributesModelNode).set(
 				attributesClassName,
