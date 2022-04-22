@@ -155,7 +155,7 @@ public class TargetController extends ScenarioElementController implements Model
 
 		if (agent.hasNextTarget()) {
 			if (agent.getNextTargetId() == target.getId()
-				&& agent.isCurrentTargetAnAgent() == false)
+				&& !agent.isCurrentTargetAnAgent())
 				isNextTargetForAgent = true;
 		}
 
@@ -188,42 +188,6 @@ public class TargetController extends ScenarioElementController implements Model
 			} else {
 				agent.checkNextTarget(target.getNextSpeed());
 			}
-		}
-	}
-
-	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
-	private void checkNextTarget(Agent agent) {
-		final int nextTargetListIndex = agent.getNextTargetListIndex();
-
-		// Deprecated target list usage
-		if (nextTargetListIndex <= -1 && !agent.getTargets().isEmpty()) {
-			agent.getTargets().removeFirst();
-		}
-
-		// The right way (later this first check should not be necessary anymore):
-		if (agent.hasNextTarget()) {
-				if (agent instanceof Pedestrian) {
-
-					Pedestrian p = (Pedestrian) agent;
-					if (p.isAgentsInGroup()) {
-						//instead centroidGroup.changeTarget(nextIndex)
-						p.incrementNextTargetListIndex();
-						for (Pedestrian ped : p.getPedGroupMembers()) {
-							p.incrementNextTargetListIndex();
-						}
-					} else {
-						p.incrementNextTargetListIndex();
-					}
-
-				} else {
-					agent.incrementNextTargetListIndex();
-				}
-		}
-
-		// set a new desired speed, if possible. you can model street networks with differing
-		// maximal speeds with this.
-		if (target.getNextSpeed() >= 0) {
-			agent.setFreeFlowSpeed(target.getNextSpeed());
 		}
 	}
 

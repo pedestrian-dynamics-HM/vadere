@@ -63,6 +63,7 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
 
         try {
             // find CentroidGroupModel
+            //TODO downcasting is breaking SOLID Principles
             CentroidGroupModel model = (CentroidGroupModel) getModel(state, CentroidGroupModel.class).get();
 
             //find groups represented in Area
