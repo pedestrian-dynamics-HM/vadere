@@ -53,18 +53,21 @@
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : false,
-      "psychologyLayer" : {
+      "usePsychologyLayer" : true,
+      "psychologyLayer" : 
+      	{
         "perception" : "SimplePerceptionModel",
         "cognition" : "SimpleCognitionModel",
-        "perceptionModelAttributes" : {
-        "argPerception" : 123,
-        "arg2Perception" : [1,2,3]
-        },
-        "cognitionModelAttributes" : {
-        "argCognition" : 1.0
-        }
-      }
+        "attributesModel" : 
+        	{
+        	"org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
+		"argPerception" : 123,
+		"arg2Perception" : [1,2,3] },
+		"org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel" : {
+		"argCognition" : 1.0
+        		}
+    		}
+    	}
     },
     "topography" : {
       "attributes" : {

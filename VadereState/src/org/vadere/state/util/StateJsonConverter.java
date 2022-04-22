@@ -137,16 +137,21 @@ public abstract class StateJsonConverter {
 
 		JsonNode node2 = node.get("psychologyLayer");
 
+
 		String perceptionModel = String.valueOf(node2.get("perception"));
 		String cognitionModel = String.valueOf(node2.get("cognition"));
 
-		JsonNode attributesModelNode = node2.get("perceptionModelAttributes");
-		AttributesPerceptionModel attributesPerceptionModel = mapper.treeToValue(attributesModelNode, AttributesSimplePerceptionModel.class);
 
-		AttributesPsychologyLayer layer = new AttributesPsychologyLayer( perceptionModel, cognitionModel, attributesPerceptionModel, null);
+		ObjectNode node3 = (ObjectNode) node2.get("attributesModel");
+		List<Attributes> res = deserializeAttributesListFromNode(node3);
+
+
+		AttributesPsychologyLayer layer = new AttributesPsychologyLayer( perceptionModel, cognitionModel, null, null);
 
 		return new AttributesPsychology();
 	}
+
+
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();

@@ -1,4 +1,6 @@
 package org.vadere.state.attributes.models.psychology;
 
-public abstract class AttributesPerceptionModel {
+import org.vadere.state.attributes.Attributes;
+
+public abstract class AttributesPerceptionModel extends Attributes {
 }
