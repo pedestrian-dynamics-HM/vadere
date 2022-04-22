@@ -1,5 +1,5 @@
 {
-  "name" : "s2",
+  "name" : "perceptionOnly",
   "description" : "",
   "release" : "2.1",
   "processWriters" : {
@@ -48,19 +48,16 @@
       "printFPS" : false,
       "digitsPerCoordinate" : 2,
       "useFixedSeed" : true,
-      "fixedSeed" : -2474893121473667580,
+      "fixedSeed" : -7838408672018301953,
       "simulationSeed" : 0
     },
     "attributesPsychology" : {
-      "usePsychologyLayer" : true,
+      "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "attributesModel" : {
           "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
             "argPerception" : 123,
             "arg2Perception" : [ 1, 2, 3 ]
-          },
-          "org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel" : {
-            "argCognition" : 1.0
           }
         },
         "perception" : "SimplePerceptionModel",
