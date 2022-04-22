@@ -129,7 +129,7 @@ public abstract class StateJsonConverter {
 	}
 
 	public static AttributesPsychology deserializeAttributesPsychology(String json) throws IOException  {
-		return deserializeObjectFromJson(json, AttributesPsychology.class);
+		return deserializeAttributesPsychologyFromNode(mapper.readTree(json));
 	}
 
 	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode jsonNode)

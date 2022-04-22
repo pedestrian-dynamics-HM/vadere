@@ -1,7 +1,6 @@
 package org.vadere.gui.projectview.view;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.gui.components.control.HelpTextView;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
@@ -13,7 +12,6 @@ import org.vadere.simulator.models.ModelHelper;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
-import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.ModelAttributeFactory;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
@@ -26,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -125,9 +122,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
 		menusInTabs.add(mnPresetMenu);
-
-
-		// load template
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
 					private static final long serialVersionUID = 1L;
@@ -163,9 +157,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 						}
 					}
 				})));
-
-
-		// help Attributes
 		JMenu mnHelpAttributesMenu = new JMenu(Messages.getString("Tab.Model.helpAttributesMenu.title"));
 		presetMenuBar.add(mnHelpAttributesMenu);
 		menusInTabs.add(mnHelpAttributesMenu);
@@ -212,47 +203,10 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 	
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
 		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
-
-		// psychology layer
-
-		JMenuBar templatePsychologyModels = new JMenuBar();
-		//JMenu mnAttributesPerception = new JMenu(Messages.getString("Tab.PerceptionModel.loadTemplateMenu.title"));
-		//templatePsychologyModels.add(mnAttributesPerception);
-		//JMenu mnAttributesCognition = new JMenu(Messages.getString("Tab.CognitionModel.loadTemplateMenu.title"));
-		//templatePsychologyModels.add(mnAttributesCognition);
-
-
-
-
-
-
 		attributesPsychologyView =
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.PSYCHOLOGY);
 		attributesPsychologyView.setScenarioChecker(model); // use .isEditable(true); to save time (no check!)
-
-		attributesPsychologyView.getPanelTop().add(templatePsychologyModels, 0);
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
-
-/*		attributeFactory.sortedAttributeStream().forEach(
-				attributesClassName -> mnAttributesPerception.add(new JMenuItem(new AbstractAction(attributesClassName) {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-
-						try {
-							AttributesPsychology json = StateJsonConverter.deserializeAttributesPsychology(attributesPsychologyView.getText());
-						} catch (IOException ex) {
-							ex.printStackTrace();
-						}
-
-
-						attributesPsychologyView.setText("1232423423423423");
-					}
-				})));*/
-
-
-
-		///////////
-
 		topographyFileView = new TextView("ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
@@ -260,11 +214,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
 		perceptionFileView.setScenarioChecker(model);
 		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
-
-
-
-
-
 		dataProcessingGUIview = new DataProcessingView(model);
 		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		
