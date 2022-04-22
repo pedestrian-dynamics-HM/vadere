@@ -10,13 +10,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
-import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -35,7 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public abstract class StateJsonConverter {
 
@@ -137,20 +134,25 @@ public abstract class StateJsonConverter {
 
 		JsonNode node2 = node.get("psychologyLayer");
 
+		deseralizeAttributesPsychologyLayerFromNode(node2);
 
-		String perceptionModel = String.valueOf(node2.get("perception"));
-		String cognitionModel = String.valueOf(node2.get("cognition"));
-
-
-		ObjectNode node3 = (ObjectNode) node2.get("attributesModel");
-		List<Attributes> res = deserializeAttributesListFromNode(node3);
-
-
-		AttributesPsychologyLayer layer = new AttributesPsychologyLayer( perceptionModel, cognitionModel, null, null);
 
 		return new AttributesPsychology();
 	}
 
+	private static AttributesPsychologyLayer deseralizeAttributesPsychologyLayerFromNode(JsonNode jsonNode) throws JsonProcessingException {
+
+		ObjectNode node0 = (ObjectNode) jsonNode;
+		ObjectNode node3 = (ObjectNode) jsonNode.get("attributesModel");
+		node0.remove("attributesModel");
+
+
+		AttributesPsychologyLayer layer = mapper.treeToValue(node0, AttributesPsychologyLayer.class);
+		layer.setAttributesModel(deserializeAttributesListFromNode(node3));
+
+
+		return layer;
+	}
 
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
@@ -409,13 +411,13 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException {
 
 		ObjectNode node = mapper.createObjectNode();
-		node.put("perception", attributesPsychology.getPsychologyLayer().getPerception());
+		/*node.put("perception", attributesPsychology.getPsychologyLayer().getPerception());
 		AttributesPerceptionModel attributesPerceptionModel = attributesPsychology.getPsychologyLayer().getPerceptionModelAttributes();
 		node.set("perception", mapper.convertValue(attributesPerceptionModel, JsonNode.class));
 
 		node.put("cognition", attributesPsychology.getPsychologyLayer().getCognition());
 		AttributesCognitionModel attributesCognitionModel = attributesPsychology.getPsychologyLayer().getCognitionModelAttributes();
-		node.set("cognition", mapper.convertValue(attributesPsychology, JsonNode.class));
+		node.set("cognition", mapper.convertValue(attributesPsychology, JsonNode.class));*/
 
 		return prettyWriter.writeValueAsString(node);
 	}

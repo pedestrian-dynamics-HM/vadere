@@ -3,10 +3,9 @@ package org.vadere.state.attributes;
 import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class beautifies the JSON content by mapping
@@ -21,11 +20,18 @@ public class AttributesPsychologyLayer {
 
 
 
-    public AttributesPerceptionModel perceptionModelAttributes;
+    //public AttributesPerceptionModel perceptionModelAttributes;
+    //public AttributesCognitionModel cognitionModelAttributes;
 
+    public List<Attributes> getAttributesModel() {
+        return attributesModel;
+    }
 
+    public void setAttributesModel(List<Attributes> attributesModel) {
+        this.attributesModel = attributesModel;
+    }
 
-    public AttributesCognitionModel cognitionModelAttributes;
+    public List<Attributes> attributesModel;
 
 
     // Variables
@@ -37,14 +43,13 @@ public class AttributesPsychologyLayer {
 
     // Constructors
     public AttributesPsychologyLayer() {
-        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL, null, null);
+        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL, new ArrayList<>());
     }
 
-    public AttributesPsychologyLayer(String perception, String cognition, AttributesPerceptionModel attributesPerceptionModel, AttributesCognitionModel attributesCognitionModel) {
+    public AttributesPsychologyLayer(String perception, String cognition, List<Attributes> attributesModel ) {
         this.perception = perception;
         this.cognition = cognition;
-        this.perceptionModelAttributes = attributesPerceptionModel;
-        this.cognitionModelAttributes = attributesCognitionModel;
+        this.attributesModel = attributesModel;
     }
 
     // Getter
@@ -80,20 +85,6 @@ public class AttributesPsychologyLayer {
         return Objects.hash(perception, cognition);
     }
 
-    public AttributesPerceptionModel getPerceptionModelAttributes() {
-        return perceptionModelAttributes;
-    }
 
-    public void setPerceptionModelAttributes(AttributesPerceptionModel perceptionModelAttributes) {
-        this.perceptionModelAttributes = perceptionModelAttributes;
-    }
-
-    public AttributesCognitionModel getCognitionModelAttributes() {
-        return cognitionModelAttributes;
-    }
-
-    public void setCognitionModelAttributes(AttributesCognitionModel cognitionModelAttributes) {
-        this.cognitionModelAttributes = cognitionModelAttributes;
-    }
 
 }
