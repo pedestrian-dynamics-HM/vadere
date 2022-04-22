@@ -393,4 +393,32 @@ public class CentroidGroup implements Group {
 	public IPotentialFieldTarget getPotentialFieldTarget() {
 		return potentialFieldTarget;
 	}
+
+	public void setNextTarget(int nextTargetListIndex) {
+		for (Pedestrian p: this.getMembers()) {
+			p.setNextTargetListIndex(nextTargetListIndex);
+		}
+	}
+
+	public void checkNextTarget(double nextSpeed) {
+		//is called by targetcontroller
+		//increments indx of targetlist in case of non absorbing target
+		for (Pedestrian p: this.getMembers()) {
+			if (p.getNextTargetListIndex() < (p.getTargets().size() - 1)) {
+				p.incrementNextTargetListIndex();
+			}
+			if (nextSpeed >= 0) {
+				p.setFreeFlowSpeed(nextSpeed);
+			}
+		}
+	}
+
+	public void setGroupTargetList(LinkedList<Integer> target) {
+		//is called by targetchanger controller
+		for (Pedestrian p: this.getMembers()) {
+			p.setTargets(target);
+			p.setIsCurrentTargetAnAgent(false);
+		}
+		setNextTarget(0);
+	}
 }

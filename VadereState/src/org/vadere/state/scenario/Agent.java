@@ -286,4 +286,25 @@ public abstract class Agent extends DynamicElement {
 		this.followers = followers;
 	}
 
+	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
+	public void checkNextTarget(double nextSpeed) {
+		final int nextTargetListIndex = this.getNextTargetListIndex();
+
+		// Deprecated target list usage
+		if (nextTargetListIndex <= -1 && !this.getTargets().isEmpty()) {
+			this.getTargets().removeFirst();
+		}
+
+		// The right way (later this first check should not be necessary anymore):
+		if (this.hasNextTarget()) {
+			this.incrementNextTargetListIndex();
+		}
+
+		// set a new desired speed, if possible. you can model street networks with differing
+		// maximal speeds with this.
+		if (nextSpeed >= 0) {
+			this.setFreeFlowSpeed(nextSpeed);
+		}
+	}
+
 }
