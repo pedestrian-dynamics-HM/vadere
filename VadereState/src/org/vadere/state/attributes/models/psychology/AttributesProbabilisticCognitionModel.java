@@ -1,9 +1,6 @@
 package org.vadere.state.attributes.models.psychology;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class AttributesProbabilisticCognitionModel extends AttributesCognitionModel {
     Map<String, Map> routeChoices;
@@ -38,16 +35,17 @@ public class AttributesProbabilisticCognitionModel extends AttributesCognitionMo
         return reactionBehavior;
     }
 
-    public LinkedList<Integer> getTargetIds(String information){
-        LinkedList<Integer> targets = new LinkedList<>();
-        targets.addAll((Collection<? extends Integer>) routeChoices.get(information).get("targetIds"));
-        return targets;
+
+    public int[] getTargetIds(String information){
+        ArrayList<Integer> al = (ArrayList<Integer>) routeChoices.get(information).get("targetIds");
+        int[] arr = al.stream().mapToInt(i -> i).toArray();
+        return arr;
     }
 
-    public LinkedList<Double> getTargetProbabilities(String information){
-        LinkedList<Double> probs = new LinkedList<>();
-        probs.addAll((Collection<? extends Double>) routeChoices.get(information).get("targetProbabilities"));
-        return probs;
+    public double[] getTargetProbabilities(String information){
+        ArrayList<Double> al = (ArrayList<Double>) routeChoices.get(information).get("targetProbabilities");
+        double[] arr = al.stream().mapToDouble(i -> i).toArray();
+        return arr;
     }
 
 

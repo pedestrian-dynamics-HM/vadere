@@ -6,7 +6,6 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel;
-import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.*;
@@ -44,12 +43,12 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
             InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
 
             if (!pedestrian.getKnowledgeBase().knowsAbout(information.getInformation())){
-
                 int targetId = getRouteChoice(information);
 
+                //TODO add to knowlegebase
+
             }
-
-
+            
 
             if (!oldStimuli.equals(newStimuli)) {
                 Stimulus mostImportantStimulus = drawStimulusFromRandomDistribution(newStimuli);
@@ -64,18 +63,12 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
     private int getRouteChoice(InformationStimulus information) {
 
-        LinkedList<Integer> targetIds = attributesProbabilisticCognitionModel.getTargetIds(information.getInformation());
-        LinkedList<Double> targetProbs = attributesProbabilisticCognitionModel.getTargetProbabilities(information.getInformation());
+        int[] targetIds = attributesProbabilisticCognitionModel.getTargetIds(information.getInformation());
+        double[] targetProbabilities = attributesProbabilisticCognitionModel.getTargetProbabilities(information.getInformation());
 
+        EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng, targetIds, targetProbabilities);
 
-
-        EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng,
-                IntStream.range(0, targetIds.size()).boxed().collect(Collectors.toList()).stream().mapToInt(i -> i).toArray(),
-                targetProbs.stream().mapToDouble(i -> i).toArray());
-
-        int indexDrawn = dist.sample();
-
-        return targetIds.get(indexDrawn);
+        return dist.sample();
     }
 
     protected boolean pedestrianCannotMove(Pedestrian pedestrian) {
