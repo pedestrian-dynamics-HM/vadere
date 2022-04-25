@@ -8,7 +8,9 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -24,7 +26,7 @@ public class SimplePerceptionModel extends PerceptionModel {
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
-        //this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
+        this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
     }
 
 
@@ -45,12 +47,24 @@ public class SimplePerceptionModel extends PerceptionModel {
                 .collect(Collectors.toList())
                 .get(0);
 
+        LinkedList<Stimulus> stimuliSorted = new LinkedList<>();
+        // first element in stimuliSorted is the most important stimulus
+        for (String typeName : attributesSimplePerceptionModel.getSortedPriorityQueue().values()){
+            Stimulus stimulus = StimulusFactory.stringToStimulus(typeName);
+            if (stimulus != null) {
+                stimuliSorted.addAll(stimuli.stream().filter(s -> s.getClass() == stimulus.getClass()).collect(Collectors.toList()));
+            }
+        }
+        // add ElapsedTime stimulus as last element, since any other stimulus is more important
+        stimuliSorted.add(mostImportantStimulus);
+
+
+         /* depracted
         List<Stimulus> waitStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList());
         List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
         List<Stimulus> changeTargetScriptedStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTargetScripted).collect(Collectors.toList());
-        // place List changepersonalspace here
         List<Stimulus> distanceRecommendationStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof DistanceRecommendation).collect(Collectors.toList());
 
 
@@ -67,9 +81,11 @@ public class SimplePerceptionModel extends PerceptionModel {
         }else if (distanceRecommendationStimuli.size() >= 1){
             mostImportantStimulus = distanceRecommendationStimuli.get(0);
         }
-        else if(true){} // place changepersonalspace here
+        else if(true){} */
 
-        return mostImportantStimulus;
+        return stimuliSorted.getFirst();
+
+
     }
 
 

@@ -42,7 +42,7 @@ import java.util.List;
 })
 // "time" is set when the stimulus is injected into the simulation run and must not be de-/serialized.
 // "perceptionProbability" is assigned by the StimulusController
-@JsonIgnoreProperties({ "time", "perceptionProbability" })
+@JsonIgnoreProperties({"time"})
 public abstract class Stimulus implements Cloneable {
 
     // Member Variables

@@ -24,7 +24,7 @@ public class SimpleCognitionModel implements ICognitionModel {
     @Override
     public void initialize(Topography topography, List<Attributes> attributes) {
         this.topography = topography;
-        //this.attributesSimpleCognitionModel = Model.findAttributes(attributes, AttributesSimpleCognitionModel.class);
+        this.attributesSimpleCognitionModel = Model.findAttributes(attributes, AttributesSimpleCognitionModel.class);
     }
 
     @Override
