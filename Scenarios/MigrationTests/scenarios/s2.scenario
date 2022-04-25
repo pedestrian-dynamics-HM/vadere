@@ -110,6 +110,7 @@
         "attributesModel" : {
           "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
             "priority" : {
+              "0" : "InformationStimulus",
               "1" : "ChangeTarget",
               "2" : "ChangeTargetScripted",
               "3" : "Thread",
