@@ -2,7 +2,7 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.models.Model;
+import org.vadere.simulator.models.groups.GroupIterator;
 import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
@@ -43,6 +43,7 @@ public class TargetChangerController extends ScenarioElementController implement
 
     // Member Variables
     public final TargetChanger targetChanger;
+    private final GroupIterator groupIterator;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
 
@@ -50,7 +51,9 @@ public class TargetChangerController extends ScenarioElementController implement
     private TargetChangerAlgorithm changerAlgorithm;
 
     // Constructors
-    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
+ 
+
+    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random, GroupIterator groupIterator) {
         this.changerAlgorithm = TargetChangerAlgorithm.create(targetChanger, topography);
         this.changerAlgorithm.throwExceptionOnInvalidInput(targetChanger);
         this.changerAlgorithm.init(random);
@@ -59,9 +62,15 @@ public class TargetChangerController extends ScenarioElementController implement
         this.topography = topography;
         this.processedAgents = new HashMap<>();
         this.random = random;
+        this.groupIterator = groupIterator;
     }
 
-    // Getters
+    //TODO: Manuel uncomment this
+    //public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
+      //  this(topography, targetChanger, random, null);
+    //}
+
+        // Getters
     public Map<Integer, Agent> getProcessedAgents() {
         return processedAgents;
     }
