@@ -118,7 +118,14 @@
               "6" : "DistanceRecommendation"
             }
           },
-          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {}
+          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : {
+              "use target [1]" : {
+                "targetIds" : [ 1, 2 ],
+                "targetProbabilities" : [ 0.4, 0.6 ]
+              }
+            }
+          }
         },
         "perception" : "SimplePerceptionModel",
         "cognition" : "ProbabilisticCognitionModel"
@@ -230,19 +237,10 @@
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "WaitInArea",
+        "type" : "InformationStimulus",
         "id" : -1,
-        "area" : {
-          "x" : 0.0,
-          "y" : 0.0,
-          "width" : 10.0,
-          "height" : 10.0,
-          "type" : "RECTANGLE"
-        }
-      }, {
-        "type" : "ChangeTarget",
-        "id" : -1,
-        "newTargetIds" : [ 12 ]
+        "information" : "use target [1]",
+        "obsolete_at" : 10.0
       } ]
     } ],
     "reactionProbabilities" : [ {
