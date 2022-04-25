@@ -12,6 +12,10 @@ public class InformationStimulus extends Stimulus {
 	private String information;
 	private double obsolete_at;
 
+	public InformationStimulus(){
+		super(0.0);
+	}
+
 	public InformationStimulus(String information) {
 		super(0.0);
 		this.information = information;

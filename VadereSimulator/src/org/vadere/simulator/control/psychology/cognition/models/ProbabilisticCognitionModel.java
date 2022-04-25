@@ -41,6 +41,16 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
             LinkedList<Stimulus> oldStimuli = pedestrian.getPerceivedStimuli();
             LinkedList<Stimulus> newStimuli = pedestrian.getNextPerceivedStimuli();
 
+            InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
+
+            if (!pedestrian.getKnowledgeBase().knowsAbout(information.getInformation())){
+
+                int targetId = getRouteChoice(information);
+
+            }
+
+
+
             if (!oldStimuli.equals(newStimuli)) {
                 Stimulus mostImportantStimulus = drawStimulusFromRandomDistribution(newStimuli);
                 pedestrian.setMostImportantStimulus(mostImportantStimulus);
@@ -50,6 +60,22 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
             pedestrian.setNextPerceivedStimuli(newStimuli);
             setInformationStateGroupMember(pedestrian.getPedGroupMembers());
         }
+    }
+
+    private int getRouteChoice(InformationStimulus information) {
+
+        LinkedList<Integer> targetIds = attributesProbabilisticCognitionModel.getTargetIds(information.getInformation());
+        LinkedList<Double> targetProbs = attributesProbabilisticCognitionModel.getTargetProbabilities(information.getInformation());
+
+
+
+        EnumeratedIntegerDistribution dist = new EnumeratedIntegerDistribution(rng,
+                IntStream.range(0, targetIds.size()).boxed().collect(Collectors.toList()).stream().mapToInt(i -> i).toArray(),
+                targetProbs.stream().mapToDouble(i -> i).toArray());
+
+        int indexDrawn = dist.sample();
+
+        return targetIds.get(indexDrawn);
     }
 
     protected boolean pedestrianCannotMove(Pedestrian pedestrian) {

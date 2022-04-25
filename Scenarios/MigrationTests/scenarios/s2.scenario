@@ -122,7 +122,7 @@
           "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
             "routeChoices" : {
               "use target [1]" : {
-                "targetIds" : [ 1, 2 ],
+                "targetIds" : [ 3, 4 ],
                 "targetProbabilities" : [ 0.4, 0.6 ]
               }
             }

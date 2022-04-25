@@ -14,8 +14,8 @@ public class AttributesSimplePerceptionModel extends AttributesPerceptionModel {
     public Map<Integer, String> getDefaultRanking() {
         Map<Integer, String> map = new HashMap();
 
-        map.put(2, "ChangeTargetScripted");
         map.put(1,"ChangeTarget");
+        map.put(2, "ChangeTargetScripted");
         map.put(3, "Thread");
         map.put(4, "Wait");
         map.put(5, "WaitInArea");
