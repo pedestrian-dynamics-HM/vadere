@@ -118,10 +118,10 @@
               "6" : "DistanceRecommendation"
             }
           },
-          "org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel" : {}
+          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {}
         },
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "cognition" : "ProbabilisticCognitionModel"
       }
     },
     "topography" : {
