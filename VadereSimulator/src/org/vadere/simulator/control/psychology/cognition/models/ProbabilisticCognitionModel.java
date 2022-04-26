@@ -45,18 +45,24 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
         for (Pedestrian pedestrian : pedestrians) {
 
-            InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
-            String instruction = information.getInformation();
+            Stimulus stimulus = pedestrian.getMostImportantStimulus();
 
-            if (!pedestrian.getKnowledgeBase().knowsAbout(instruction)) {
+            if (stimulus instanceof InformationStimulus) {
 
-                AttributesRouteChoiceDefinition attr = getFilteredAttributes(instruction);
-                LinkedList<Integer> newTarget = getNewTarget(attr.getTargetIds(), attr.getTargetProbabilities());
-                pedestrian.setTargets(newTarget);
-                pedestrian.setNextTargetListIndex(0);
+                InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
+                String instruction = information.getInformation();
 
-                pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
-                pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
+                if (!pedestrian.getKnowledgeBase().knowsAbout(instruction)) {
+
+                    AttributesRouteChoiceDefinition attr = getFilteredAttributes(instruction);
+                    LinkedList<Integer> newTarget = getNewTarget(attr.getTargetIds(), attr.getTargetProbabilities());
+                    pedestrian.setTargets(newTarget);
+                    pedestrian.setNextTargetListIndex(0);
+
+                    pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
+                    pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
+                }
+
             } else {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             }
@@ -116,7 +122,8 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     }
 
     private void checkIfTargetIdsValid(LinkedList<Integer> targetIds) {
-        List<Integer> targetIdsTopography = topography.getTargets().stream().map(target -> target.getId()).collect(Collectors.toList());
+
+        List<Integer> targetIdsTopography = topography.getTargetIds();
 
         if (!targetIdsTopography.containsAll(targetIds)) {
             throw new RuntimeException("Targets defined in topography and targets defined in " + AttributesProbabilisticCognitionModel.class.getSimpleName() + " mismatch.");
