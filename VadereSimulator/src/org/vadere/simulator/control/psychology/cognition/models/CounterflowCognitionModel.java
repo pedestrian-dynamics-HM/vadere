@@ -8,6 +8,7 @@ import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 /**
  * The {@link CounterflowCognitionModel} enables a pedestrian to evade if
@@ -22,7 +23,7 @@ public class CounterflowCognitionModel implements ICognitionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes) {
+    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
     }
 

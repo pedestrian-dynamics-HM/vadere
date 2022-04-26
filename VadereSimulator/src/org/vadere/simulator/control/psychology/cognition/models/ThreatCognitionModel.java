@@ -13,6 +13,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +32,7 @@ public class ThreatCognitionModel implements ICognitionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes) {
+    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
     }
 

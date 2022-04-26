@@ -13,6 +13,7 @@ import org.vadere.state.simulation.FootstepHistory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Suppose a distance recommendation (a {@link DistanceRecommendation}) occurred (keyword: social distancing).
@@ -28,7 +29,7 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
     private HashMap<Pedestrian, Double> cloggingStartTimes = new HashMap<>();
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes) {
+    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
     }
 
     @Override

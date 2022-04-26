@@ -9,6 +9,7 @@ import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Interface for a cognition model.
@@ -40,7 +41,7 @@ public interface ICognitionModel {
 	 * a model can acquire additional information about a pedestrian's surrounding
 	 * when evaluating pedestrian's cognition.
 	 */
-	void initialize(Topography topography, List<Attributes> attributes);
+	void initialize(Topography topography, List<Attributes> attributes, Random random);
 
 	/**
 	 * Usually, this method iterates over the pededestrians and calls

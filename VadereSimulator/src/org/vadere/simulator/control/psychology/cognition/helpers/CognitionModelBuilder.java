@@ -6,6 +6,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * This class encapsulates the creation of a concrete {@link ICognitionModel}
@@ -27,7 +28,9 @@ public class CognitionModelBuilder {
 		ICognitionModel cognitionModel = instantiator.createObject(fullyQualifiedClassName);
 
 		List<Attributes> attributes = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
-		cognitionModel.initialize(scenarioStore.getTopography(), attributes);
+
+		Random random = new Random(scenarioStore.getAttributesSimulation().getSimulationSeed());
+		cognitionModel.initialize(scenarioStore.getTopography(), attributes, random);
 
 		return cognitionModel;
 	}

@@ -79,7 +79,7 @@ public class ProbabilisticCognitionModelTest {
         stimuli.add(new Wait(time, prob3Is));
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography, attributes);
+        probabilisticPerceptionModel.initialize(topography, attributes, new Random(0));
 
         for (Pedestrian pedestrian : pedestrians){
             pedestrian.setPerceivedStimuli(new LinkedList<>());
@@ -125,7 +125,7 @@ public class ProbabilisticCognitionModelTest {
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
 
-        probabilisticPerceptionModel.initialize(topography, attributes);
+        probabilisticPerceptionModel.initialize(topography, attributes, new Random(0));
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
         updateStimuli(pedestrians, probabilisticPerceptionModel, stimuli);
@@ -139,7 +139,7 @@ public class ProbabilisticCognitionModelTest {
         List<Pedestrian> pedestrians = createPedestrians(1);
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography, attributes);
+        probabilisticPerceptionModel.initialize(topography, attributes, new Random(0));
         pedestrians.forEach(pedestrian -> assertNull(pedestrian.getMostImportantStimulus()));
 
 

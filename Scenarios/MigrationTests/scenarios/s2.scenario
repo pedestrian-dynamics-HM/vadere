@@ -120,12 +120,11 @@
             }
           },
           "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : {
-              "use target [1]" : {
-                "targetIds" : [ 3, 4 ],
-                "targetProbabilities" : [ 0.4, 0.6 ]
-              }
-            }
+            "routeChoices" : [ {
+              "instruction" : "use target [1]",
+              "targetIds" : [ 1, 2 ],
+              "targetProbabilities" : [ 0.0, 1.0 ]
+            } ]
           }
         },
         "perception" : "SimplePerceptionModel",
@@ -148,13 +147,47 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 11,
+        "id" : 1,
         "absorbing" : true,
         "shape" : {
           "x" : 7.9,
           "y" : 1.1,
           "width" : 1.0,
           "height" : 1.6,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 2,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 8.1,
+          "y" : 6.0,
+          "width" : 0.9,
+          "height" : 1.7,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 3,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 1.2,
+          "y" : 2.0,
+          "width" : 1.4,
+          "height" : 1.7,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -189,7 +222,7 @@
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 11 ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null

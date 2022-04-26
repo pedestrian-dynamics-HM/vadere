@@ -91,7 +91,7 @@ public class CounterflowCognitionModelTest {
         Topography topography = createTopography(pedestrians);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, attributes);
+        counterflowCognitionModel.initialize(topography, attributes, new Random(0));
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -112,7 +112,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, attributes);
+        counterflowCognitionModel.initialize(topography, attributes, new Random(0));
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -133,7 +133,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(0.5,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, attributes);
+        counterflowCognitionModel.initialize(topography, attributes, new Random(0));
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -153,7 +153,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, attributes);
+        counterflowCognitionModel.initialize(topography, attributes, new Random(0));
 
         counterflowCognitionModel.update(pedestrians);
 
@@ -174,7 +174,7 @@ public class CounterflowCognitionModelTest {
         movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
 
         CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, attributes);
+        counterflowCognitionModel.initialize(topography, attributes, new Random(0));
 
         counterflowCognitionModel.update(pedestrians);
 

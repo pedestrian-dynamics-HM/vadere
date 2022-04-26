@@ -9,6 +9,7 @@ import org.vadere.state.scenario.Topography;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +24,7 @@ public class ChangeTargetScriptedCognitionModel implements ICognitionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes) {
+    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
     }
 

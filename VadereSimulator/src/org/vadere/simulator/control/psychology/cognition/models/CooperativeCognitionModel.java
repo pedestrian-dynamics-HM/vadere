@@ -8,6 +8,7 @@ import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 /**
  * The {@link CooperativeCognitionModel} makes a pedestrian cooperative if its
@@ -23,7 +24,7 @@ public class CooperativeCognitionModel implements ICognitionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes) {
+    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
     }
 
