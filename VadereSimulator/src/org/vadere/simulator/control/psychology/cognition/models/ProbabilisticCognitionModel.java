@@ -61,6 +61,8 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
                     pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
                     pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
+                } else {
+                    pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
                 }
 
             } else {
