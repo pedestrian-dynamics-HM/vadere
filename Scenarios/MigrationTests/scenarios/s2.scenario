@@ -108,17 +108,7 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
-            "priority" : {
-              "0" : "InformationStimulus",
-              "1" : "ChangeTarget",
-              "2" : "ChangeTargetScripted",
-              "3" : "Thread",
-              "4" : "Wait",
-              "5" : "WaitInArea",
-              "6" : "DistanceRecommendation"
-            }
-          },
+          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {},
           "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
             "routeChoices" : [ {
               "instruction" : "use target [1]",
