@@ -12,7 +12,9 @@ public class StimulusFactory {
     public static Stimulus stringToStimulus(@NotNull String stimulusAsString) {
         Stimulus stimulusObject = null;
 
-        if (stimulusAsString.matches(ChangeTarget.class.getSimpleName())) {
+        if (stimulusAsString.matches(ChangeTargetScripted.class.getSimpleName())){
+            stimulusObject = new ChangeTargetScripted();
+        } else if (stimulusAsString.matches(ChangeTarget.class.getSimpleName())) {
             stimulusObject = new ChangeTarget();
         } else if (stimulusAsString.matches(Threat.class.getSimpleName())) {
             stimulusObject = new Threat();

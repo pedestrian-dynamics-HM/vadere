@@ -17,9 +17,9 @@ public class AttributesSimplePerceptionModel extends AttributesPerceptionModel {
         Map<Integer, String> map = new HashMap();
 
         map.put(1, InformationStimulus.class.getSimpleName());
-        map.put(2, ChangeTarget.class.getSimpleName());
-        map.put(3, ChangeTargetScripted.class.getSimpleName());
-        map.put(4, Thread.class.getSimpleName());
+        map.put(2, ChangeTargetScripted.class.getSimpleName());
+        map.put(3, ChangeTarget.class.getSimpleName());
+        map.put(4, Threat.class.getSimpleName());
         map.put(5, Wait.class.getSimpleName());
         map.put(6, WaitInArea.class.getSimpleName());
         map.put(7, DistanceRecommendation.class.getSimpleName());

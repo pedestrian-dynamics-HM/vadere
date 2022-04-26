@@ -3,6 +3,7 @@ package org.vadere.simulator.control.psychology.perception;
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.perception.types.*;
@@ -20,7 +21,7 @@ import static org.junit.Assert.*;
 public class SimplePerceptionModelTest {
 
     private static double ALLOWED_DOUBLE_ERROR = 10e-3;
-    private List<Attributes> attributesList = new LinkedList<>();
+    private List<Attributes> attributesList = Collections.singletonList(new AttributesSimplePerceptionModel());
 
 
     private List<Pedestrian> createPedestrians(int totalPedestrians) {

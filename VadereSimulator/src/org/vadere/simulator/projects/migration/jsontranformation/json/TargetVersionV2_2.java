@@ -15,7 +15,7 @@ import org.vadere.util.version.Version;
 public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
     JacksonObjectMapper mapper = new JacksonObjectMapper();
-    
+
     public TargetVersionV2_2() {
         super(Version.V2_2);
     }
