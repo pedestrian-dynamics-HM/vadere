@@ -94,7 +94,7 @@ public class StimulusController {
     }
 
     private void setReactionProbability(final List<Stimulus> stimuli) {
-        for (Stimulus stimulus : stimuli){
+        /*for (Stimulus stimulus : stimuli){
             if (!(stimulus instanceof ElapsedTime)){
                 if (reactionProbabilities.containsKey(stimulus.getId())){
                     stimulus.setPerceptionProbability(reactionProbabilities.get(stimulus.getId()));
@@ -103,7 +103,7 @@ public class StimulusController {
                     throw new RuntimeException("Stimulus id = "+ stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities." );
                 }
             }
-        }
+        }*/
     }
 
 

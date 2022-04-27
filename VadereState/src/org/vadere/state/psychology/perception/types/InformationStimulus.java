@@ -18,12 +18,12 @@ public class InformationStimulus extends Stimulus {
 		this.information = information;
 	}
 
-	public InformationStimulus(double time, double obsolete_at, String information) {
+	public InformationStimulus(double time, String information) {
 		super(time);
 		this.information = information;
 	}
 
-	public InformationStimulus(double time, double obsolete_at, String information, int id) {
+	public InformationStimulus(double time, String information, int id) {
 		super(time, id);
 		this.information = information;
 	}

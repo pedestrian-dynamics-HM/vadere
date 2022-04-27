@@ -7,10 +7,7 @@ import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,15 +45,20 @@ public class SimplePerceptionModel extends PerceptionModel {
                 .get(0);
 
         LinkedList<Stimulus> stimuliSorted = new LinkedList<>();
+        stimuliSorted.add(mostImportantStimulus);
+
         // first element in stimuliSorted is the most important stimulus
-        for (String typeName : attributesSimplePerceptionModel.getSortedPriorityQueue().values()){
+
+        List<String> attr = attributesSimplePerceptionModel.getSortedPriorityQueue().values().stream().collect(Collectors.toList());
+        Collections.reverse(attr);
+        for (String typeName : attr){
             Stimulus stimulus = StimulusFactory.stringToStimulus(typeName);
             if (stimulus != null) {
                 stimuliSorted.addAll(stimuli.stream().filter(s -> s.getClass() == stimulus.getClass()).collect(Collectors.toList()));
             }
         }
         // add ElapsedTime stimulus as last element, since any other stimulus is more important
-        stimuliSorted.add(mostImportantStimulus);
+
 
 
          /* depracted
@@ -83,7 +85,7 @@ public class SimplePerceptionModel extends PerceptionModel {
         }
         else if(true){} */
 
-        return stimuliSorted.getFirst();
+        return stimuliSorted.getLast();
 
 
     }
