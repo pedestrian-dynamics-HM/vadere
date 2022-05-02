@@ -1,12 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.models.groups.AreaGroupMetaData;
+import org.vadere.simulator.projects.dataprocessing.procesordata.AreaGroupMetaData;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepGroupIdKey;
 import org.vadere.state.attributes.processor.AttributesGroupDistProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
-import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.*;
 import java.util.stream.Collectors;

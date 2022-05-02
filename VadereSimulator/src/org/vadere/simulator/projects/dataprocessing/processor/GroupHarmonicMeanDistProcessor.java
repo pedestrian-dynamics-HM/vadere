@@ -1,17 +1,15 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.models.groups.AreaGroupMetaData;
+import org.vadere.simulator.projects.dataprocessing.procesordata.AreaGroupMetaData;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.processor.AttributesGroupHarmonicMeanDistProcessor;
-import org.vadere.state.attributes.processor.AttributesGroupMinDistProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 /**

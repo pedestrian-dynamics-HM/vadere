@@ -1,5 +1,6 @@
-package org.vadere.simulator.models.groups;
+package org.vadere.simulator.projects.dataprocessing.procesordata;
 
+import org.vadere.simulator.models.groups.Group;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
 import java.util.List;

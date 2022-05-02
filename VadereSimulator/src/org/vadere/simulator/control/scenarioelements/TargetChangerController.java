@@ -65,10 +65,9 @@ public class TargetChangerController extends ScenarioElementController implement
         this.groupIterator = groupIterator;
     }
 
-    //TODO: Manuel uncomment this
-    //public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
-      //  this(topography, targetChanger, random, null);
-    //}
+    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
+        this(topography, targetChanger, random, null);
+    }
 
         // Getters
     public Map<Integer, Agent> getProcessedAgents() {
