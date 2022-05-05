@@ -17,7 +17,8 @@ public abstract class Agent extends DynamicElement {
     // Member Variables
     private AttributesAgent attributes;
 
-	private final List<AgentListener> listeners;
+	private transient final List<AgentListener> listeners;
+	private transient final Set<Integer> encounteredScenarioElements;
 
 	/**
 	 * Source where the agent was spawned. The SourceController should
@@ -33,7 +34,6 @@ public abstract class Agent extends DynamicElement {
 	private VPoint position;
 	private Vector2D velocity;
 	private double freeFlowSpeed;
-	private final Set<Integer> encounteredScenarioElements;
 
 	private LinkedList<Agent> followers;
 
