@@ -1,11 +1,7 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
-import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.groups.GroupIterator;
-import org.vadere.simulator.models.groups.cgm.CentroidGroup;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
-import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -34,7 +30,7 @@ import java.util.*;
  *     </li>
  * </ul>
  */
-public class TargetChangerController extends ScenarioElementController implements ModelFilter {
+public class TargetChangerController extends ScenarioElementController {
 
     // Static Variables
     private static final Logger log = Logger.getLogger(TargetChangerController.class);
@@ -46,12 +42,11 @@ public class TargetChangerController extends ScenarioElementController implement
     private final GroupIterator groupIterator;
     private Topography topography;
     private Map<Integer, Agent> processedAgents;
-
     private Random random;
     private TargetChangerAlgorithm changerAlgorithm;
 
     // Constructors
- 
+
 
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random, GroupIterator groupIterator) {
         this.changerAlgorithm = TargetChangerAlgorithm.create(targetChanger, topography);
@@ -69,13 +64,11 @@ public class TargetChangerController extends ScenarioElementController implement
         this(topography, targetChanger, random, null);
     }
 
-        // Getters
+    // Getters
     public Map<Integer, Agent> getProcessedAgents() {
         return processedAgents;
     }
 
-
-    // Public Methods
     public void update(double simTimeInSec) {
         for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
 
@@ -87,69 +80,16 @@ public class TargetChangerController extends ScenarioElementController implement
                 continue;
             }
 
-            if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
+            if (agent.getElementsEncountered().contains(targetChanger.getId()) && !processedAgents.containsKey(agent.getId())) {
+                processedAgents.put(agent.getId(), agent);
+            }
+
+            if (hasAgentReachedTargetChangerArea(agent) && !processedAgents.containsKey(agent.getId())) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
                 notifyListenersTargetChangerAreaReached(agent);
-
-                if (agent instanceof Pedestrian) {
-                    Pedestrian p = (Pedestrian) agent;
-                    if (p.isAgentsInGroup()) {
-                        changerAlgorithm.setAgentTargetList(p);
-                        for (Pedestrian ped : p.getPedGroupMembers()) {
-                            processedAgents.put(ped.getId(), ped);
-                        }
-                    } else {
-                        changerAlgorithm.setAgentTargetList(p);
-                    }
-                } else {
-                    changerAlgorithm.setAgentTargetList(agent);
-                }
+                changerAlgorithm.setAgentTargetList(agent);
                 processedAgents.put(agent.getId(), agent);
-            }
-        }
-    }
-
-    //new update method to include groups
-    public void update(SimulationState state) {
-        for (DynamicElement element : getDynamicElementsNearTargetChangerArea()) {
-
-            final Agent agent;
-            if (element instanceof Agent) {
-                agent = (Agent) element;
-            } else {
-                log.error("The given object is not a subtype of Agent.");
-                continue;
-            }
-
-            if (hasAgentReachedTargetChangerArea(agent) && processedAgents.containsKey(agent.getId()) == false) {
-                logEnteringTimeOfAgent(agent, state.getSimTimeInSec());
-                notifyListenersTargetChangerAreaReached(agent);
-
-                if (agent instanceof Pedestrian) {
-                    Pedestrian p = (Pedestrian) agent;
-                    //TODO tmp better GroupTargetChangerController like GroupSourceController or CentroidGroup to DynamicElement
-                    if (p.isAgentsInGroup()) {
-                        getModel(state, CentroidGroupModel.class).ifPresentOrElse(
-                                (model)
-                                        -> {
-                                    CentroidGroupModel cgm = (CentroidGroupModel) model;
-                                    CentroidGroup group = cgm.getGroup(p);
-                                    group.setGroupTargetList(this.targetChanger.getAttributes().getNextTarget());
-                                },
-                                ()
-                                        -> {
-                                    log.error("no group Model found but Agent in Group");
-                                });
-                        for (Pedestrian ped : p.getPedGroupMembers()) {
-                            processedAgents.put(ped.getId(), ped);
-                        }
-                    } else {
-                        changerAlgorithm.setAgentTargetList(p);
-                    }
-                } else {
-                    changerAlgorithm.setAgentTargetList(agent);
-                }
-                processedAgents.put(agent.getId(), agent);
+                agent.elementEncountered(targetChanger);
             }
         }
     }
@@ -161,12 +101,9 @@ public class TargetChangerController extends ScenarioElementController implement
         final double reachDistance = targetChanger.getAttributes().getReachDistance();
         final double reachRadius = Math.max(areaBounds.getHeight(), areaBounds.getWidth()) + reachDistance;
 
-        final Collection<DynamicElement> elementsNearArea = new LinkedList<>();
-
         List<Pedestrian> pedestriansNearArea = topography.getSpatialMap(Pedestrian.class).getObjects(areaCenter, reachRadius);
-        elementsNearArea.addAll(pedestriansNearArea);
 
-        return elementsNearArea;
+        return new LinkedList<>(pedestriansNearArea);
     }
 
     private boolean hasAgentReachedTargetChangerArea(Agent agent) {
