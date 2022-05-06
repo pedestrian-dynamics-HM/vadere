@@ -32,4 +32,6 @@ public interface Group {
 	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
 
 	IPotentialFieldTarget getPotentialFieldTarget();
+
+	void checkNextTarget(double nextSpeed);
 }

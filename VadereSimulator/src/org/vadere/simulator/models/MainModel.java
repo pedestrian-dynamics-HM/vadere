@@ -1,7 +1,9 @@
 package org.vadere.simulator.models;
 
 import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
+import org.vadere.simulator.control.factory.SingleTargetControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.factory.TargetControllerFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Topography;
 
@@ -17,6 +19,10 @@ public interface MainModel extends Model, DynamicElementFactory {
 
 	default SourceControllerFactory getSourceControllerFactory() {
 		return new SingleSourceControllerFactory();
+	}
+
+	default TargetControllerFactory getTargetControllerFactory() {
+		return new SingleTargetControllerFactory();
 	}
 
 	@Override

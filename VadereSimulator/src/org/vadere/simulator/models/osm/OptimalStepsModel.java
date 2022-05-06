@@ -2,9 +2,7 @@ package org.vadere.simulator.models.osm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
-import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
-import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.factory.*;
 import org.vadere.simulator.models.*;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupPotential;
@@ -299,6 +297,18 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		}
 
 		return new SingleSourceControllerFactory();
+	}
+
+	@Override
+	public TargetControllerFactory getTargetControllerFactory() {
+		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
+				.filter(ac -> ac instanceof CentroidGroupModel)
+				.map(ac -> (CentroidGroupModel) ac).findAny();
+		if (opCentroidGroupModel.isPresent()) {
+			return new GroupTargetControllerFactory(opCentroidGroupModel.get());
+		}
+
+		return new SingleTargetControllerFactory();
 	}
 
 	/**

@@ -1,9 +1,6 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.models.groups.cgm.CentroidGroup;
-import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
-import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
@@ -22,14 +19,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TargetController extends ScenarioElementController implements ModelFilter {
+public class TargetController extends ScenarioElementController {
 
 	private static final Logger log = Logger.getLogger(TargetController.class);
 
 	public final Target target;
-	private Topography topography;
+	protected final Topography topography;
 
-	public TrafficLightPhase phase = TrafficLightPhase.GREEN;
+	public TrafficLightPhase phase;
 
 	public TargetController(Topography topography, Target target) {
 		this.target = target;
@@ -42,7 +39,7 @@ public class TargetController extends ScenarioElementController implements Model
 		}
 	}
 
-	public void update(SimulationState state) {
+	public void update(double simTimeInSec) {
 		if (target.isTargetPedestrian()) {
 			return;
 		}
@@ -63,9 +60,9 @@ public class TargetController extends ScenarioElementController implements Model
 				notifyListenersTargetReached(agent);
 
 				if (target.getWaitingTime() <= 0) {
-					checkRemove(agent, state);
+					checkRemove(agent);
 				} else {
-					waitingBehavior(state, agent);
+					waitingBehavior(simTimeInSec, agent);
 				}
 			}
 		}
@@ -85,30 +82,30 @@ public class TargetController extends ScenarioElementController implements Model
 		return elementsInRange;
 	}
 
-	private void waitingBehavior(SimulationState state, final Agent agent) {
+	private void waitingBehavior(double simTimeInSec, final Agent agent) {
 		final int agentId = agent.getId();
 		// individual waiting behaviour, as opposed to waiting at a traffic light
 		if (target.getAttributes().isIndividualWaiting()) {
 			final Map<Integer, Double> enteringTimes = target.getEnteringTimes();
 			if (enteringTimes.containsKey(agentId)) {
-				if (state.getSimTimeInSec() - enteringTimes.get(agentId) > target
+				if (simTimeInSec - enteringTimes.get(agentId) > target
 						.getWaitingTime()) {
 					enteringTimes.remove(agentId);
-					checkRemove(agent, state);
+					checkRemove(agent);
 				}
 			} else {
 				final int parallelWaiters = target.getParallelWaiters();
 				if (parallelWaiters <= 0 || (parallelWaiters > 0 &&
 						enteringTimes.size() < parallelWaiters)) {
-					enteringTimes.put(agentId, state.getSimTimeInSec());
+					enteringTimes.put(agentId, simTimeInSec);
 				}
 			}
 		} else {
 			// traffic light switching based on waiting time. Light starts green.
-			phase = getCurrentTrafficLightPhase(state.getSimTimeInSec());
+			phase = getCurrentTrafficLightPhase(simTimeInSec);
 
 			if (phase == TrafficLightPhase.GREEN) {
-				checkRemove(agent, state);
+				checkRemove(agent);
 			}
 		}
 	}
@@ -162,33 +159,13 @@ public class TargetController extends ScenarioElementController implements Model
 		return isNextTargetForAgent;
 	}
 
-	private void checkRemove(Agent agent, SimulationState state) {
+	protected boolean checkRemove(Agent agent) {
 		if (target.isAbsorbing()) {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
-		} else {
-			if (agent instanceof Pedestrian) {
-				Pedestrian p = (Pedestrian) agent;
-				//TODO better GroupTargetController like GroupSourceController or make CentroidGroup a DynamicElement
-				if (p.isAgentsInGroup()) {
-					getModel(state, CentroidGroupModel.class).ifPresentOrElse(
-							(model)
-									-> {
-								CentroidGroupModel cgm = (CentroidGroupModel) model;
-								CentroidGroup group = cgm.getGroup(p);
-								group.checkNextTarget(target.getNextSpeed());
-							},
-							()
-									-> {
-								log.error("no group Model found but Agent in Group");
-							});
-				} else {
-					agent.checkNextTarget(target.getNextSpeed());
-				}
-			} else {
-				agent.checkNextTarget(target.getNextSpeed());
-			}
+			return true;
 		}
+		return false;
 	}
 
 	private void changeTargetOfFollowers(Agent agent) {

@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.factory.TargetControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
@@ -84,6 +85,7 @@ public class Simulation implements ControllerProvider{
 	private final Topography topography;
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
+	private final TargetControllerFactory targetControllerFactory;
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
@@ -120,6 +122,7 @@ public class Simulation implements ControllerProvider{
 
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
+		this.targetControllerFactory = mainModel.getTargetControllerFactory();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
@@ -159,7 +162,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (Target target : topography.getTargets()) {
-			targetControllers.add(new TargetController(topography, target));
+			targetControllers.add(this.targetControllerFactory.create(topography, target));
 		}
 
 		for (TargetChanger targetChanger : topography.getTargetChangers()) {
@@ -438,7 +441,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (TargetController targetController : this.targetControllers) {
-			targetController.update(this.getSimulationState());
+			targetController.update(simTimeInSec);
 		}
 
 		for (TargetChangerController targetChangerController : this.targetChangerControllers) {
