@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.simulation;
 
 import org.vadere.simulator.control.factory.SourceControllerFactory;
+import org.vadere.simulator.control.factory.TargetChangerControllerFactory;
 import org.vadere.simulator.control.factory.TargetControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
@@ -86,6 +87,7 @@ public class Simulation implements ControllerProvider{
 	private final ProcessorManager processorManager;
 	private final SourceControllerFactory sourceControllerFactory;
 	private final TargetControllerFactory targetControllerFactory;
+	private final TargetChangerControllerFactory targetChangerControllerFactory;
 	private SimulationResult simulationResult;
 	private final StimulusController stimulusController;
 	private final ScenarioCache scenarioCache;
@@ -123,6 +125,7 @@ public class Simulation implements ControllerProvider{
 		this.models = mainModel.getSubmodels();
 		this.sourceControllerFactory = mainModel.getSourceControllerFactory();
 		this.targetControllerFactory = mainModel.getTargetControllerFactory();
+		this.targetChangerControllerFactory = mainModel.getTargetChangerControllerFactory();
 
 		// TODO [priority=normal] [task=bugfix] - the attributesCar are missing in initialize' parameters
 		this.dynamicElementFactory = mainModel;
@@ -166,7 +169,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (TargetChanger targetChanger : topography.getTargetChangers()) {
-			targetChangerControllers.add(new TargetChangerController(topography, targetChanger, random));
+			targetChangerControllers.add(this.targetChangerControllerFactory.create(topography, targetChanger, random));
 		}
 
 		for (AbsorbingArea absorbingArea : topography.getAbsorbingAreas()) {
@@ -433,7 +436,7 @@ public class Simulation implements ControllerProvider{
 		// new targets.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
-			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
+			targetControllers.add(this.targetControllerFactory.create(this.topographyController.getTopography(), target));
 		}
 
 		for (SourceController sourceController : this.sourceControllers) {
@@ -445,7 +448,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (TargetChangerController targetChangerController : this.targetChangerControllers) {
-			targetChangerController.update(this.getSimulationState());
+			targetChangerController.update(simTimeInSec);
 		}
 
 		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {

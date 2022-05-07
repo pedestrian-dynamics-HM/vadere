@@ -3,6 +3,7 @@ package org.vadere.simulator.control;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.simulator.control.scenarioelements.SingleTargetChangerController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -165,7 +166,7 @@ public class TargetChangerControllerTest {
         int seed = 0;
         Random random = new Random(seed);
 
-        return new TargetChangerController(topography, targetChanger, random);
+        return new SingleTargetChangerController(topography, targetChanger, random);
     }
 
     @After
@@ -699,7 +700,7 @@ public class TargetChangerControllerTest {
         attributesTargetChanger.setProbabilitiesToChangeTarget(probability);
 
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
-        TargetChangerController controllerUnderTest = new TargetChangerController(topography, targetChanger, new Random(0));
+        TargetChangerController controllerUnderTest = new SingleTargetChangerController(topography, targetChanger, new Random(0));
 
         assertEquals(peds.get(0).getNextTargetId(), 1);
         assertEquals(peds.get(1).getNextTargetId(), 1);

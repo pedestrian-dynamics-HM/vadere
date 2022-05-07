@@ -98,7 +98,7 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 				//todo[random]: use Random object from context for now. This should be replaced by the meta seed.
 				VadereContext ctx = VadereContext.get(state.getTopography());
 				Random rnd = (Random) ctx.get("random");
-				TargetChangerController tcc = new TargetChangerController(state.getTopography(), tc, rnd);
+				TargetChangerController tcc = state.getMainModel().get().getTargetChangerControllerFactory().create(state.getTopography(), tc, rnd);
 				manager.getRemoteSimulationRun().addTargetChangerController(tcc);
 				state.getTopography().addTargetChanger(tc);
 				cmd.setOK();

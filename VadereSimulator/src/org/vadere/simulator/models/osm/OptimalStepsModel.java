@@ -289,11 +289,9 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public SourceControllerFactory getSourceControllerFactory() {
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
-				.filter(ac -> ac instanceof CentroidGroupModel)
-				.map(ac -> (CentroidGroupModel) ac).findAny();
-		if (opCentroidGroupModel.isPresent()) {
-			return new GroupSourceControllerFactory(opCentroidGroupModel.get());
+		Optional<CentroidGroupModel> cgm = getCentroidGroupModel();
+		if (cgm.isPresent()) {
+			return new GroupSourceControllerFactory(cgm.get());
 		}
 
 		return new SingleSourceControllerFactory();
@@ -301,14 +299,28 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public TargetControllerFactory getTargetControllerFactory() {
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
-				.filter(ac -> ac instanceof CentroidGroupModel)
-				.map(ac -> (CentroidGroupModel) ac).findAny();
-		if (opCentroidGroupModel.isPresent()) {
-			return new GroupTargetControllerFactory(opCentroidGroupModel.get());
+		Optional<CentroidGroupModel> cgm = getCentroidGroupModel();
+		if (cgm.isPresent()) {
+			return new GroupTargetControllerFactory(cgm.get());
 		}
 
 		return new SingleTargetControllerFactory();
+	}
+
+	@Override
+	public TargetChangerControllerFactory getTargetChangerControllerFactory() {
+		Optional<CentroidGroupModel> cgm = getCentroidGroupModel();
+		if (cgm.isPresent()) {
+			return new GroupTargetChangerControllerFactory(cgm.get());
+		}
+
+		return new SingleTargetChangerControllerFactory();
+	}
+
+	private Optional<CentroidGroupModel> getCentroidGroupModel() {
+		return models.stream()
+				.filter(ac -> ac instanceof CentroidGroupModel)
+				.map(ac -> (CentroidGroupModel) ac).findAny();
 	}
 
 	/**
