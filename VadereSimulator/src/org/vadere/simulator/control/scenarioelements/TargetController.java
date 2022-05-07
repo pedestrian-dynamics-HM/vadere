@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Car;
 import org.vadere.state.scenario.DynamicElement;
@@ -19,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TargetController extends ScenarioElementController {
+public abstract class TargetController extends ScenarioElementController {
 
 	private static final Logger log = Logger.getLogger(TargetController.class);
 
