@@ -1,8 +1,8 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
-import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;

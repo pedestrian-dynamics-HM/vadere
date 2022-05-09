@@ -1,6 +1,4 @@
-package org.vadere.state.attributes.models.psychology;
-
-import org.vadere.state.attributes.models.psychology.HelperAttributes.AttributesRouteChoiceDefinition;
+package org.vadere.state.attributes.models.psychology.cognition;
 
 import java.util.LinkedList;
 import java.util.List;

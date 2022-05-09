@@ -1,11 +1,6 @@
 package org.vadere.state.attributes;
 
-import org.vadere.state.attributes.models.psychology.AttributesCognitionModel;
-import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
-
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class beautifies the JSON content by mapping
@@ -19,27 +14,14 @@ public class AttributesPsychologyLayer {
     public static final String DEFAULT_COGNITION_MODEL = "SimpleCognitionModel";
 
 
-
-    //public AttributesPerceptionModel perceptionModelAttributes;
-    //public AttributesCognitionModel cognitionModelAttributes;
-
-    public List<Attributes> getAttributesModel() {
-        return attributesModel;
-    }
-
-    public void setAttributesModel(List<Attributes> attributesModel) {
-        this.attributesModel = attributesModel;
-    }
-
-    public List<Attributes> attributesModel;
-
-
     // Variables
     // Both should reference to concrete "IPerception" and "ICognition"
     // implementations! We do not reference them here to avoid cyclic
     // dependencies between state and controller packages
     private String perception;
     private String cognition;
+
+    public List<Attributes> attributesModel;
 
     // Constructors
     public AttributesPsychologyLayer() {
@@ -83,6 +65,15 @@ public class AttributesPsychologyLayer {
     @Override
     public int hashCode() {
         return Objects.hash(perception, cognition);
+    }
+
+
+    public List<Attributes> getAttributesModel() {
+        return attributesModel;
+    }
+
+    public void setAttributesModel(List<Attributes> attributesModel) {
+        this.attributesModel = attributesModel;
     }
 
 

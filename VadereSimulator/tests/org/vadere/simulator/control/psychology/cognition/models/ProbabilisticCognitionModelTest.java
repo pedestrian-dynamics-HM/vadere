@@ -6,10 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel;
-import org.vadere.state.attributes.models.psychology.HelperAttributes.AttributesRouteChoiceDefinition;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
@@ -18,7 +17,6 @@ import org.vadere.state.scenario.Topography;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

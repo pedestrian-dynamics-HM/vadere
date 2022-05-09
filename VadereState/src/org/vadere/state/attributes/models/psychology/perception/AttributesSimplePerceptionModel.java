@@ -1,4 +1,4 @@
-package org.vadere.state.attributes.models.psychology;
+package org.vadere.state.attributes.models.psychology.perception;
 
 import org.vadere.state.psychology.perception.types.*;
 

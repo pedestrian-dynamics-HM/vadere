@@ -1,9 +1,6 @@
 package org.vadere.state.attributes;
 
-import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
-
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * This class encapsulates psychology-related simulation attributes.

@@ -5,8 +5,7 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
-import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
-import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 

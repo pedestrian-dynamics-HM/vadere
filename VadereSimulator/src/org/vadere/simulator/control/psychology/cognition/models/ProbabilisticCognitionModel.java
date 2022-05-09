@@ -4,20 +4,17 @@ import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Precision;
-import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel;
-import org.vadere.state.attributes.models.psychology.HelperAttributes.AttributesRouteChoiceDefinition;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.logging.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProbabilisticCognitionModel extends AProbabilisticModel {
 

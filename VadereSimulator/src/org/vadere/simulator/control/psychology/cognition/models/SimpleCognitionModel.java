@@ -1,7 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.psychology.AttributesSimpleCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;

@@ -1,4 +1,4 @@
-package org.vadere.state.attributes.models.psychology;
+package org.vadere.state.attributes.models.psychology.perception;
 
 public class AttributesMultiPerceptionModel extends AttributesPerceptionModel {
 

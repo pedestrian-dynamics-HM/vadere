@@ -1,4 +1,4 @@
-package org.vadere.state.attributes.models.psychology.HelperAttributes;
+package org.vadere.state.attributes.models.psychology.cognition;
 
 import java.util.LinkedList;
 
