@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
@@ -41,6 +42,17 @@ public class CooperativeCognitionModel implements ICognitionModel {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             }
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesCooperativeCognitionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesCooperativeCognitionModel getAttributes() {
+        return this.attributes;
     }
 
     protected boolean pedestrianCannotMove(Pedestrian pedestrian) {

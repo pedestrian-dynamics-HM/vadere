@@ -2,6 +2,8 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
@@ -53,5 +55,9 @@ public interface ICognitionModel {
 	 * @param pedestrians The pedestrians to update
 	 */
 	void update(Collection<Pedestrian> pedestrians);
+
+	void setAttributes(AttributesCognitionModel attributes);
+
+	AttributesCognitionModel getAttributes();
 
 }

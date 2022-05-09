@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
@@ -49,6 +50,16 @@ public class SimpleCognitionModel implements ICognitionModel {
 
             pedestrian.setSelfCategory(nextSelfCategory);
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesSimpleCognitionModel) attributes;
+    }
+
+    @Override
+    public AttributesSimpleCognitionModel getAttributes() {
+        return this.attributes;
     }
 
 }

@@ -5,6 +5,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Precision;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -21,6 +22,15 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     private static Logger logger = Logger.getLogger(ProbabilisticCognitionModel.class);
 
     private RandomGenerator rng;
+
+    public AttributesProbabilisticCognitionModel getAttributes() {
+        return attributesProbabilisticCognitionModel;
+    }
+
+    public void setAttributes(AttributesCognitionModel attributesProbabilisticCognitionModel) {
+        this.attributesProbabilisticCognitionModel = (AttributesProbabilisticCognitionModel) attributesProbabilisticCognitionModel;
+    }
+
     private AttributesProbabilisticCognitionModel attributesProbabilisticCognitionModel;
     private Topography topography;
 

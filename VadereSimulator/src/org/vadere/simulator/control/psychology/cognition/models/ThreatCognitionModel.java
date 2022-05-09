@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesThreatCognitionModel;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -51,6 +52,16 @@ public class ThreatCognitionModel implements ICognitionModel {
             }
 
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesThreatCognitionModel) attributes;
+    }
+
+    @Override
+    public AttributesThreatCognitionModel getAttributes() {
+        return this.attributes;
     }
 
     private void handleThreat(Pedestrian pedestrian, Stimulus stimulus) {

@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCounterflowCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
@@ -47,6 +48,18 @@ public class CounterflowCognitionModel implements ICognitionModel {
                 }
             }
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+
+        this.attributes = (AttributesCounterflowCognitionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesCounterflowCognitionModel getAttributes() {
+        return this.attributes;
     }
 
 }

@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesChangeTargetScriptedCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTargetScripted;
 import org.vadere.state.scenario.Pedestrian;
@@ -44,6 +45,17 @@ public class ChangeTargetScriptedCognitionModel implements ICognitionModel {
         }
 
         pedestrians.stream().forEach(pedestrian -> pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED));
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesChangeTargetScriptedCognitionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesChangeTargetScriptedCognitionModel getAttributes() {
+        return attributes;
     }
 
     private void changeTargetsAccordingToStimulus(ChangeTargetScripted changeTargetScripted, Collection<Pedestrian> pedestrians) {

@@ -4,6 +4,7 @@ import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.combinedPotentials.PedestrianRepulsionStrategy;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPedestrianRepulsionPotentialStrategy;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesSocialDistancingCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.DistanceRecommendation;
@@ -58,6 +59,17 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
                 ped.setCombinedPotentialStrategyAttributes(attr);
             }
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesSocialDistancingCognitionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesSocialDistancingCognitionModel getAttributes() {
+        return this.attributes;
     }
 
 

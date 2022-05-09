@@ -1,8 +1,11 @@
 package org.vadere.simulator.control.psychology.cognition.helpers;
 
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.util.List;
@@ -31,6 +34,11 @@ public class CognitionModelBuilder {
 
 		Random random = new Random(scenarioStore.getAttributesSimulation().getSimulationSeed());
 		cognitionModel.initialize(scenarioStore.getTopography(), attributes, random);
+
+		List<Attributes> attributesList = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
+
+		AttributesCognitionModel attributesCognitionModel = Model.findAttributes(attributesList, cognitionModel.getAttributes().getClass());
+		cognitionModel.setAttributes(attributesCognitionModel);
 
 		return cognitionModel;
 	}
